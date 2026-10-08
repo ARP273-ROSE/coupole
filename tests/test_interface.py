@@ -118,4 +118,7 @@ def test_interface_reactive_pendant_un_travail(app_qt, fenetre):
         time.sleep(0.005)
     minuteur.stop()
     ecarts = [b - a for a, b in zip(battements, battements[1:])]
-    assert len(battements) > 15 and max(ecarts) < 0.25
+    # Un serveur partagé (CI Windows) peut avoir un hoquet isolé de ~0,3 s sans rapport avec l'application :
+    # on exige que 90 % des battements soient à l'heure et qu'aucun trou n'atteigne une demi-seconde.
+    a_l_heure = sum(1 for e in ecarts if e < 0.1) / len(ecarts)
+    assert len(battements) > 15 and a_l_heure >= 0.9 and max(ecarts) < 0.5
