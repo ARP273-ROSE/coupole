@@ -168,30 +168,29 @@ def hauteurs_soleil_cachees(utcs, site) -> list[float]:
     """Hauteurs du Soleil (degrés) aux instants `utcs` (datetime aware) au site, via le cache par (site, minute UTC).
 
     Les instants absents du cache sont calculés **en un seul appel** astropy (le coût est par appel, pas par instant),
-    puis mémorisés.  Sûr entre fils (verrou) ; borné (_CACHE_SOLEIL_MAX entrées, les plus anciennes sortent).
+    puis mémorisés.  Le calcul se fait sous le verrou : deux fils qui demandent la même minute en même temps ne
+    calculent qu'une fois et reçoivent la même valeur (sans quoi chacun calculerait à son propre instant).  Borné
+    (_CACHE_SOLEIL_MAX entrées, les plus anciennes sortent).
     """
     cles = [_cle_soleil(u, site) for u in utcs]
     with _cache_soleil_verrou:
         valeurs = [_cache_soleil.get(c) for c in cles]
-        for c, v in zip(cles, valeurs):
+        manquants = {}
+        for u, c, v in zip(utcs, cles, valeurs):
             if v is not None:
                 _cache_soleil.move_to_end(c)
-    manquants = {}
-    for u, c, v in zip(utcs, cles, valeurs):
-        if v is None and c not in manquants:
-            manquants[c] = u
-    nouveaux: dict = {}
-    if manquants:
-        calc = hauteur_soleil(list(manquants.values()), site)
-        nouveaux = {c: float(h) for c, h in zip(manquants, calc)}
-        with _cache_soleil_verrou:
+            elif c not in manquants:
+                manquants[c] = u
+        nouveaux: dict = {}
+        if manquants:
+            calc = hauteur_soleil(list(manquants.values()), site)
+            nouveaux = {c: float(h) for c, h in zip(manquants, calc)}
             _cache_soleil_stats['calculs'] += 1
             _cache_soleil.update(nouveaux)
             while len(_cache_soleil) > _CACHE_SOLEIL_MAX:
                 _cache_soleil.popitem(last=False)
-    with _cache_soleil_verrou:
         _cache_soleil_stats['reutilisations'] += sum(1 for v in valeurs if v is not None)
-    return [nouveaux[c] if v is None else v for c, v in zip(cles, valeurs)]
+        return [nouveaux[c] if v is None else v for c, v in zip(cles, valeurs)]
 
 
 def vider_cache_soleil() -> None:

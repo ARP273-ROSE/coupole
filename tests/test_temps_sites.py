@@ -116,7 +116,7 @@ def test_cache_hauteur_du_soleil_entre_fils():
     [f.join(30) for f in fils]
     assert not erreurs and len(resultats) == 8
     assert len({tuple(v) for v in resultats.values()}) == 1          # tous la même paire (même minute)
-    assert temps.statistiques_cache_soleil()['entrees'] == 2
+    assert temps.statistiques_cache_soleil()['entrees'] == 2 and temps.statistiques_cache_soleil()['calculs'] == 1
 
 
 def test_affichage_utc_et_local():
