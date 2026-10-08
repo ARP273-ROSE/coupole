@@ -142,3 +142,19 @@ class Flux(QLayout):
             x += t.width() + esp
             hauteur_ligne = max(hauteur_ligne, t.height())
         return y + hauteur_ligne - rect.y() + m.bottom()
+
+
+ESPACE_INSECABLE_NUL = '​'   # espace de largeur nulle : point de coupure invisible
+
+
+def coupable(texte: str) -> str:
+    """Permet à un chemin ou une adresse (sans espaces) de passer à la ligne après chaque séparateur.
+    À n'employer que pour l'affichage ; `texte_reel` rend la valeur d'origine."""
+    s = str(texte)
+    for sep in ('\\', '/'):
+        s = s.replace(sep, sep + ESPACE_INSECABLE_NUL)
+    return s
+
+
+def texte_reel(texte: str) -> str:
+    return str(texte).replace(ESPACE_INSECABLE_NUL, '')

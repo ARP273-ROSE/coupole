@@ -9,6 +9,7 @@ from PyQt6.QtCore import Qt
 
 from ...core import donnees
 from ...core.i18n import tr
+from ...gui.adaptatif import coupable
 from ...gui.outils import aide, bouton, liste
 from ...gui.trace import Trace
 from . import cli
@@ -67,7 +68,7 @@ class Panneau(QWidget):
         except Exception as e:
             QMessageBox.warning(self, tr('don_ouvrir'), tr('don_erreur', erreur=str(e)))
             return
-        self.l_fichier.setText(chemin)
+        self.l_fichier.setText(coupable(chemin))
         self.liste.clear()
         for d in self.ds:
             self.liste.addItem('%s — %s' % (tr('don_genre_' + d.genre), d.titre))
