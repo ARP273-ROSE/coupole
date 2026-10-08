@@ -24,6 +24,7 @@ import re
 import shutil
 import subprocess
 import sys
+import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -31,6 +32,38 @@ from pathlib import Path
 from .fitsentete import Entete
 
 _SANS_CONSOLE = getattr(subprocess, 'CREATE_NO_WINDOW', 0)
+
+# Processus ASTAP en cours dans CE processus (un seul à la fois par processus de conversion) : un arrêt
+# demandé (annulation, fermeture, SIGTERM du pilote) le tue au lieu d'attendre jusqu'à 4 minutes.
+_courant: dict = {'p': None}
+_verrou = threading.Lock()
+
+
+def tuer_en_cours() -> bool:
+    with _verrou:
+        p = _courant['p']
+    if p is None or p.poll() is not None:
+        return False
+    try:
+        p.kill()
+    except OSError:
+        return False
+    return True
+
+
+def installer_arret_propre():
+    """Dans un processus de conversion : SIGTERM (annulation du pilote) tue ASTAP puis quitte."""
+    import signal
+
+    def h(signum, frame):
+        tuer_en_cours()
+        os._exit(1)
+    try:
+        signal.signal(signal.SIGTERM, h)
+        if hasattr(signal, 'SIGINT'):
+            signal.signal(signal.SIGINT, h)
+    except (ValueError, OSError):            # pas dans le fil principal : rien à faire
+        pass
 
 SITE = 'https://www.hnsky.org/astap.htm'
 SF = 'https://sourceforge.net/projects/astap-program/files/'
@@ -301,22 +334,63 @@ def catalogue_conseille(champ_deg: float) -> str:
 
 
 # ======================================================================== résolution
+class _Resultat:
+    def __init__(self, stdout, stderr):
+        self.stdout, self.stderr = stdout or '', stderr or ''
+
+
+def _lancer(cmd, delai, arret=None):
+    """subprocess.run annulable : `arret` (threading.Event) tue le processus ; délai respecté."""
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                         creationflags=_SANS_CONSOLE, stdin=subprocess.DEVNULL)
+    with _verrou:
+        _courant['p'] = p
+    try:
+        fin = time.monotonic() + delai
+        while True:
+            try:
+                out, err = p.communicate(timeout=0.25)
+                return _Resultat(out, err)
+            except subprocess.TimeoutExpired:
+                if arret is not None and arret.is_set():
+                    p.kill()
+                    p.communicate()
+                    raise Annulee()
+                if time.monotonic() > fin:
+                    p.kill()
+                    p.communicate()
+                    raise subprocess.TimeoutExpired(cmd, delai)
+    finally:
+        with _verrou:
+            if _courant['p'] is p:
+                _courant['p'] = None
+
+
+class Annulee(Exception):
+    """Résolution interrompue à la demande de l'utilisateur."""
+
+
 def resoudre(etat: EtatASTAP, chemin_fits: str, ra=None, dec=None, fov_h=0.0, rayon=3.0, extra=(),
-             delai=240):
-    """Résout `chemin_fits` autour de (ra, dec) en degrés.  Renvoie (Entete WCS, message) ou (None, message)."""
+             delai=240, arret=None):
+    """Résout `chemin_fits` autour de (ra, dec) en degrés.  Renvoie (Entete WCS, message) ou (None, message).
+
+    Arguments passés en liste (jamais de shell) ; `arret` : threading.Event qui interrompt ASTAP (lève Annulee).
+    """
     if not etat.utilisable:
         return None, etat.message_cle()
+    if not os.path.isfile(etat.executable) or not os.path.isfile(str(chemin_fits)):
+        return None, 'ASTAP: executable or image missing'
     base = str(chemin_fits)[:-5] if str(chemin_fits).lower().endswith('.fits') else str(chemin_fits)
     for ext in ('.wcs', '.ini', '.log'):
         if os.path.exists(base + ext):
             os.remove(base + ext)
     cmd = [etat.executable, '-f', str(chemin_fits), '-D', etat.catalogue, '-d', etat.catalogue_dossier,
-           '-wcs', '-sip', '-fov', '%.3f' % fov_h, '-z', '0'] + list(extra)
+           '-wcs', '-sip', '-fov', '%.3f' % fov_h, '-z', '0'] + [str(x) for x in extra]
     if ra is not None:
         cmd += ['-ra', '%.6f' % (ra / 15), '-spd', '%.6f' % (dec + 90), '-r', '%.1f' % rayon]
     t0 = time.time()
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=delai, creationflags=_SANS_CONSOLE)
+        r = _lancer(cmd, delai, arret)
     except subprocess.TimeoutExpired:
         return None, 'ASTAP: timeout'
     except OSError as ex:

@@ -112,6 +112,11 @@ class DialogueReglages(QDialog):
         f.addRow('', self.eco)
         self.maj = case('reg_maj', bool(r['maj_auto']))
         f.addRow('', self.maj)
+        self.nouveautes = case('reg_nouveautes', bool(r['ohp_verifier_nouveautes']))
+        f.addRow('', self.nouveautes)
+        self.nouv_heures = nombre('reg_nouveautes_heures_aide', 1, 720, int(r['ohp_nouveautes_heures'] or 24))
+        self.nouv_heures.setSuffix(' ' + tr('unite_heures'))
+        f.addRow(tr('reg_nouveautes_heures'), self.nouv_heures)
         racine.addWidget(_boutons(self))
         adaptatif.ajuster(self, 820, 520)
         adaptatif.assouplir(self)
@@ -163,9 +168,12 @@ class DialogueReglages(QDialog):
 
     def _distant(self):
         from ..core import sources
-        ok = sources.rafraichir_distant()
-        QMessageBox.information(self, tr('reg_onglet_sources'), tr('sources_distant_ok' if ok else 'sources_distant_non'))
-        self._actualiser_sources()
+        t = Tache(sources.rafraichir_distant, parent=self)     # requête réseau : jamais dans le fil graphique
+        t.quand_fini(lambda ok: (QMessageBox.information(self, tr('reg_onglet_sources'),
+                                                         tr('sources_distant_ok' if ok else 'sources_distant_non')),
+                                 self._actualiser_sources()))
+        self._t_distant = t
+        t.start()
 
     def _enregistrer_sources(self):
         from ..core import sources
@@ -177,7 +185,7 @@ class DialogueReglages(QDialog):
         from ..core import sources
         self._enregistrer_sources()
         t = Tache(sources.tester, cle, parent=self)
-        t.fini.connect(lambda r: QMessageBox.information(
+        t.quand_fini(lambda r: QMessageBox.information(
             self, cle, tr('sources_test_ok' if r[0] else 'sources_test_echec', cle=cle, detail=r[1][:200])))
         self._t_test = t
         t.start()
@@ -199,6 +207,8 @@ class DialogueReglages(QDialog):
         r['debit_max_mo_s'] = self.debit.value()
         r['mode_econome'] = self.eco.isChecked()
         r['maj_auto'] = self.maj.isChecked()
+        r['ohp_verifier_nouveautes'] = self.nouveautes.isChecked()
+        r['ohp_nouveautes_heures'] = self.nouv_heures.value()
         if r['apparence'] != self.apparence.currentData():
             r['apparence'] = self.apparence.currentData()
             from . import theme
@@ -235,9 +245,15 @@ class DialogueASTAP(QDialog):
         self.actualiser()
 
     def actualiser(self):
+        """Détection (sous-processus « astap_cli -h », parcours de dossiers) hors du fil graphique."""
         from ..core import astap
         r = config.reglages()
-        e = astap.detecter(r['astap_executable'], r['astap_catalogue'])
+        self.etat.setText(tr('astapdlg_recherche'))
+        self._t = Tache(astap.detecter, r['astap_executable'], r['astap_catalogue'], parent=self)
+        self._t.quand_fini(self._afficher)
+        self._t.start()
+
+    def _afficher(self, e):
         couleur = '#2C7A55' if e.utilisable else '#B5382B'
         lignes = ['<b style="color:%s">%s</b>' % (couleur, html.escape(tr(e.message_cle())))]
         lignes.append('%s : %s' % (tr('astap_executable'), html.escape(e.executable or '—')))
@@ -292,6 +308,8 @@ def guide_astap_html() -> str:
 
 # ======================================================================== à propos
 def texte_configuration() -> str:
+    """Texte « configuration détectée ».  Sondes système et ASTAP : à appeler hors du fil graphique
+    (les dialogues le font par une Tache) ; `machine.detecter()` est mis en cache après le premier appel."""
     from ..core import astap, machine
     m = machine.detecter()
     r = config.reglages()
@@ -309,14 +327,18 @@ class DialogueAPropos(QDialog):
         self.setWindowTitle(tr('apropos_titre'))
         v = QVBoxLayout(self)
         from PyQt6.QtCore import QT_VERSION_STR, PYQT_VERSION_STR
-        t = navigateur('<h2>Coupole %s</h2><p>%s</p><p>%s</p><pre>%s</pre><p>%s</p>' % (
+        self._gabarit = '<h2>Coupole %s</h2><p>%s</p><p>%s</p><pre>%%s</pre><p>%s</p>' % (
             __version__, html.escape(tr('apropos_texte')), html.escape(tr('apropos_credits')),
-            html.escape(texte_configuration() + '\nQt %s / PyQt %s' % (QT_VERSION_STR, PYQT_VERSION_STR)),
-            html.escape(tr('apropos_licence'))), 'apropos_aide')
-        v.addWidget(t)
+            html.escape(tr('apropos_licence')))
+        self._qt = '\nQt %s / PyQt %s' % (QT_VERSION_STR, PYQT_VERSION_STR)
+        self.navig = navigateur(self._gabarit % html.escape(tr('astapdlg_recherche')), 'apropos_aide')
+        v.addWidget(self.navig)
         v.addWidget(_boutons(self, ok=True, annuler=False))
         adaptatif.ajuster(self, 640, 560)
         adaptatif.assouplir(self)
+        self._t = Tache(texte_configuration, parent=self)      # sondes : hors du fil graphique
+        self._t.quand_fini(lambda txt: self.navig.setHtml(self._gabarit % html.escape(txt + self._qt)))
+        self._t.start()
 
 
 # ======================================================================== signalement
@@ -342,12 +364,22 @@ class DialogueSignaler(QDialog):
         adaptatif.ajuster(self, 560, 420)
         adaptatif.assouplir(self)
 
-    def _rapport(self):
-        from ..core import rapports
+    def _rapport(self, diagnostic: str = ''):
         champs = {'description': self.texte.toPlainText()[:4000]}
         if self.diag.isChecked():
-            champs['diagnostic'] = texte_configuration()
+            champs['diagnostic'] = diagnostic
         return champs
+
+    def _avec_diagnostic(self, suite):
+        """Le diagnostic (sondes système, ASTAP) se calcule hors du fil graphique, puis `suite(texte)`."""
+        if not self.diag.isChecked():
+            suite('')
+            return
+        self.b_env.setEnabled(False)
+        self._t = Tache(texte_configuration, parent=self)
+        self._t.quand_fini(lambda txt: (self.b_env.setEnabled(True), suite(txt)))
+        self._t.quand_erreur(lambda e: (self.b_env.setEnabled(True), suite(e)))
+        self._t.start()
 
     def envoyer(self):
         from ..core import rapports
@@ -356,20 +388,30 @@ class DialogueSignaler(QDialog):
                     QMessageBox.StandardButton.Yes:
                 return
             rapports.definir_consentement(True)
-        rapports.envoyer('manuel', **self._rapport())
-        QMessageBox.information(self, tr('signaler_titre'), tr('signaler_envoye'))
-        self.accept()
+
+        def suite(diag):
+            rapports.envoyer('manuel', **self._rapport(diag))
+            QMessageBox.information(self, tr('signaler_titre'), tr('signaler_envoye'))
+            self.accept()
+        self._avec_diagnostic(suite)
 
     def fichier(self):
         from ..core import rapports
         f, _ = QFileDialog.getSaveFileName(self, tr('signaler_fichier'), 'coupole-rapport.json', 'JSON (*.json)')
-        if f:
+        if not f:
+            return
+
+        def suite(diag):
             r = rapports.machine()
-            r.update(self._rapport())
+            r.update(self._rapport(diag))
             r['genre'] = 'manuel'
-            with open(f, 'w', encoding='utf-8') as fh:
-                json.dump(r, fh, ensure_ascii=False, indent=1)
+            try:
+                config.ecrire_json_atomique(f, r)
+            except OSError as e:
+                QMessageBox.warning(self, tr('signaler_titre'), tr('erreur_ecriture', chemin=f, erreur=str(e)))
+                return
             QMessageBox.information(self, tr('signaler_titre'), tr('ecrit', chemin=f))
+        self._avec_diagnostic(suite)
 
 
 # ======================================================================== raccourcis, aide d'écran
@@ -411,6 +453,8 @@ def verifier_maj(parent, silencieux=False):
     """Vérifie en arrière-plan ; ne dérange que s'il y a une nouvelle version (ou sur demande)."""
     from ..core import maj
     t = Tache(maj.verifier, __version__, parent=parent)
+    if hasattr(parent, 'statusBar') and not silencieux:
+        parent.statusBar().showMessage(tr('maj_verification', depot=maj.depot()), 4000)
 
     def fini(m):
         if not m:
@@ -426,16 +470,16 @@ def verifier_maj(parent, silencieux=False):
                 != QMessageBox.StandardButton.Yes:
             return
         t2 = Tache(maj.appliquer, m, parent=parent)
-        t2.fini.connect(lambda _: (QMessageBox.information(parent, tr('maj_titre'), tr('maj_redemarrer')),
-                                   maj.relancer(), parent.close()))
-        t2.erreur.connect(lambda e: QMessageBox.warning(parent, tr('maj_titre'), tr('maj_echec', erreur=e)))
+        t2.quand_fini(lambda _: (QMessageBox.information(parent, tr('maj_titre'), tr('maj_redemarrer')),
+                                 maj.relancer(), parent.close()))
+        t2.quand_erreur(lambda e: QMessageBox.warning(parent, tr('maj_titre'), tr('maj_echec', erreur=e)))
         parent._tache_maj2 = t2
         t2.start()
 
     def erreur(e):
         if not silencieux:
             QMessageBox.warning(parent, tr('maj_titre'), tr('maj_echec', erreur=e))
-    t.fini.connect(fini)
-    t.erreur.connect(erreur)
+    t.quand_fini(fini)
+    t.quand_erreur(erreur)
     parent._tache_maj = t
     t.start()
