@@ -145,3 +145,226 @@ class Trace(QWidget):
     def leaveEvent(self, ev):
         self._curseur = None
         self.update()
+
+
+# Couleurs des séries (palette catégorielle validée, ordre fixe ; un pas par thème).
+SERIES = {'clair': ['#2a78d6', '#eb6834', '#1baf7a', '#eda100'],
+          'sombre': ['#3987e5', '#d95926', '#199e70', '#c98500']}
+
+
+def _theme_courant() -> str:
+    try:
+        from ..core import config
+        return 'sombre' if config.reglages()['apparence'] == 'sombre' else 'clair'
+    except Exception:
+        return 'clair'
+
+
+def _graduations_log(a: float, b: float):
+    """Puissances de 10 entre a et b (a, b > 0), complétées de 2 et 5 si la plage est courte."""
+    lo, hi = math.floor(math.log10(a)), math.ceil(math.log10(b))
+    out = [10.0 ** k for k in range(lo, hi + 1) if a <= 10.0 ** k <= b]
+    if len(out) < 3:
+        out = sorted({m * 10.0 ** k for k in range(lo, hi + 1) for m in (1, 2, 5) if a <= m * 10.0 ** k <= b})
+    return out
+
+
+def _texte_nombre(v: float) -> str:
+    if v == 0:
+        return '0'
+    if 1 <= abs(v) < 1e7 and v == int(v):
+        return '{:,d}'.format(int(v)).replace(',', '\u202f')
+    if 1e-3 <= abs(v) < 1e7:
+        return '%.4g' % v
+    return '%.0e' % v
+
+
+class TraceCourbes(QWidget):
+    """Plusieurs courbes sur un même axe (une seule échelle verticale), axes logarithmiques au choix,
+    légende au-dessus, étiquette directe en bout de courbe, marqueur vertical, lecture au curseur
+    (réticule + valeurs de toutes les séries).  Sans matplotlib."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.series = []                # [(nom, x, y)]
+        self.log_x = self.log_y = True
+        self.titre_x = self.titre_y = ''
+        self.marqueur = None            # abscisse d'un trait vertical (valeur courante)
+        self.format_x = '{:.4g}'
+        self.format_y = '{:.4g}'
+        self._curseur = None
+        self.setMouseTracking(True)
+        self.setMinimumSize(220, 200)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
+    def definir(self, series, titre_x='', titre_y='', log_x=True, log_y=True):
+        propres = []
+        for nom, x, y in series:
+            x, y = np.asarray(x, dtype=float), np.asarray(y, dtype=float)
+            ok = np.isfinite(x) & np.isfinite(y)
+            if log_x:
+                ok &= x > 0
+            if log_y:
+                ok &= y > 0
+            o = np.argsort(x[ok])
+            propres.append((nom, x[ok][o], y[ok][o]))
+        self.series, self.titre_x, self.titre_y, self.log_x, self.log_y = propres, titre_x, titre_y, log_x, log_y
+        self.update()
+
+    def placer_marqueur(self, x):
+        self.marqueur = x
+        self.update()
+
+    # ------------------------------------------------------------ géométrie
+    def _limites(self):
+        xs = [s[1] for s in self.series if len(s[1])]
+        ys = [s[2] for s in self.series if len(s[2])]
+        if not xs:
+            return None
+        x0, x1 = min(float(v.min()) for v in xs), max(float(v.max()) for v in xs)
+        y0, y1 = min(float(v.min()) for v in ys), max(float(v.max()) for v in ys)
+        if self.log_y:
+            y0, y1 = y0 / 1.3, y1 * 1.3
+        else:
+            m = (y1 - y0) * 0.05 or 1.0
+            y0, y1 = y0 - m, y1 + m
+        if x1 <= x0:
+            x1 = x0 * 10 if self.log_x else x0 + 1
+        return x0, x1, y0, y1
+
+    def _t(self, v, log):
+        return math.log10(v) if log else v
+
+    def _cadre(self, hauteur_legende):
+        return QRectF(64, 10 + hauteur_legende, max(10, self.width() - 64 - 70), max(10, self.height() - 52 - hauteur_legende))
+
+    def paintEvent(self, ev):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        pal = self.palette()
+        encre = pal.text().color()
+        douce = pal.placeholderText().color()
+        p.fillRect(self.rect(), pal.base())
+        f = QFont(self.font())
+        f.setPointSizeF(max(7.0, f.pointSizeF() * 0.9))
+        p.setFont(f)
+        fm = p.fontMetrics()
+        couleurs = SERIES[_theme_courant()]
+        # légende (une rangée, qui passe à la ligne si besoin)
+        x, y, h = 64.0, 4.0, fm.height()
+        for i, (nom, _, _) in enumerate(self.series):
+            w = 22 + fm.horizontalAdvance(nom) + 14
+            if x + w > self.width() - 8 and x > 64:
+                x, y = 64.0, y + h + 2
+            p.setPen(QPen(QColor(couleurs[i % len(couleurs)]), 2))
+            p.drawLine(QPointF(x, y + h / 2), QPointF(x + 16, y + h / 2))
+            p.setPen(encre)
+            p.drawText(QRectF(x + 20, y, w, h), Qt.AlignmentFlag.AlignVCenter, nom)
+            x += w
+        r = self._cadre(y + h + 4 - 10 if self.series else 0)
+        lim = self._limites()
+        p.setPen(QPen(douce, 1))
+        p.drawLine(r.bottomLeft(), r.bottomRight())
+        p.drawLine(r.bottomLeft(), r.topLeft())
+        if lim is None:
+            p.end()
+            return
+        x0, x1, y0, y1 = lim
+        tx0, tx1 = self._t(x0, self.log_x), self._t(x1, self.log_x)
+        ty0, ty1 = self._t(y0, self.log_y), self._t(y1, self.log_y)
+
+        def px(v):
+            return r.left() + (self._t(v, self.log_x) - tx0) / (tx1 - tx0) * r.width()
+
+        def py(v):
+            return r.bottom() - (self._t(v, self.log_y) - ty0) / (ty1 - ty0) * r.height()
+        self._px, self._r, self._lim = px, r, lim
+        grille = QPen(QColor(douce.red(), douce.green(), douce.blue(), 45), 1)
+        gx = _graduations_log(x0, x1) if self.log_x else graduations(x0, x1)
+        gy = _graduations_log(y0, y1) if self.log_y else graduations(y0, y1)
+        for v in gx:
+            X = px(v)
+            p.setPen(grille)
+            p.drawLine(QPointF(X, r.top()), QPointF(X, r.bottom()))
+            p.setPen(douce)
+            p.drawText(QRectF(X - 40, r.bottom() + 3, 80, h), Qt.AlignmentFlag.AlignHCenter, _texte_nombre(v))
+        for v in gy:
+            Y = py(v)
+            p.setPen(grille)
+            p.drawLine(QPointF(r.left(), Y), QPointF(r.right(), Y))
+            p.setPen(douce)
+            p.drawText(QRectF(0, Y - h / 2, r.left() - 5, h), Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter,
+                       _texte_nombre(v))
+        p.setPen(encre)
+        p.drawText(QRectF(r.left(), r.bottom() + h + 6, r.width(), h + 2), Qt.AlignmentFlag.AlignHCenter, self.titre_x)
+        p.save()
+        p.translate(12, r.center().y())
+        p.rotate(-90)
+        p.drawText(QRectF(-r.height() / 2, -h / 2, r.height(), h + 2), Qt.AlignmentFlag.AlignHCenter, self.titre_y)
+        p.restore()
+        p.setClipRect(r.adjusted(-2, -2, 2, 2))
+        fins = []
+        for i, (nom, xs, ys) in enumerate(self.series):
+            if len(xs) < 2:
+                continue
+            chemin = QPainterPath()
+            chemin.moveTo(px(xs[0]), py(ys[0]))
+            for a, b in zip(xs[1:], ys[1:]):
+                chemin.lineTo(px(a), py(b))
+            p.setPen(QPen(QColor(couleurs[i % len(couleurs)]), 2))
+            p.drawPath(chemin)
+            fins.append((py(ys[-1]), nom))
+        if self.marqueur is not None and x0 <= self.marqueur <= x1:
+            p.setPen(QPen(encre, 1, Qt.PenStyle.DashLine))
+            X = px(self.marqueur)
+            p.drawLine(QPointF(X, r.top()), QPointF(X, r.bottom()))
+            for i, (nom, xs, ys) in enumerate(self.series):
+                if len(xs) < 2:
+                    continue
+                yv = float(np.interp(self._t(self.marqueur, self.log_x), [self._t(v, self.log_x) for v in xs],
+                                     [self._t(v, self.log_y) for v in ys]))
+                Y = r.bottom() - (yv - ty0) / (ty1 - ty0) * r.height()
+                p.setPen(QPen(pal.base().color(), 2))
+                p.setBrush(QColor(couleurs[i % len(couleurs)]))
+                p.drawEllipse(QPointF(X, Y), 4.5, 4.5)
+        p.setClipping(False)
+        # étiquettes directes en bout de courbe (texte à l'encre du thème, décalées pour ne pas se chevaucher)
+        p.setPen(encre)
+        dernier = -1e9
+        for Y, nom in sorted(fins):
+            Y = max(Y, dernier + h)
+            dernier = Y
+            court = nom.split(' ')[0] if ' ' in nom else nom
+            p.drawText(QRectF(r.right() + 4, Y - h / 2, 66, h), Qt.AlignmentFlag.AlignVCenter, court)
+        # réticule et valeurs au curseur
+        if self._curseur is not None:
+            cx = min(max(self._curseur, r.left()), r.right())
+            tv = tx0 + (cx - r.left()) / r.width() * (tx1 - tx0)
+            xv = 10 ** tv if self.log_x else tv
+            p.setPen(QPen(douce, 1, Qt.PenStyle.DotLine))
+            p.drawLine(QPointF(cx, r.top()), QPointF(cx, r.bottom()))
+            lignes = [self.format_x.format(xv)]
+            for nom, xs, ys in self.series:
+                if len(xs) >= 2 and xs[0] <= xv <= xs[-1]:
+                    yv = float(np.interp(self._t(xv, self.log_x), [self._t(v, self.log_x) for v in xs],
+                                         [self._t(v, self.log_y) for v in ys]))
+                    lignes.append('%s : %s' % (nom, self.format_y.format(10 ** yv if self.log_y else yv)))
+            largeur = max(fm.horizontalAdvance(s) for s in lignes) + 16
+            hauteur = len(lignes) * h + 10
+            bx = cx + 10 if cx + 10 + largeur < self.width() else cx - 10 - largeur
+            boite = QRectF(bx, r.top() + 6, largeur, hauteur)
+            p.setPen(QPen(douce, 1))
+            p.setBrush(pal.toolTipBase())
+            p.drawRoundedRect(boite, 6, 6)
+            p.setPen(pal.toolTipText().color())
+            for k, s in enumerate(lignes):
+                p.drawText(QRectF(bx + 8, r.top() + 11 + k * h, largeur, h), Qt.AlignmentFlag.AlignVCenter, s)
+        p.end()
+
+    def mouseMoveEvent(self, ev):
+        self._curseur = ev.position().x() if self.series else None
+        self.update()
+
+    def leaveEvent(self, ev):
+        self._curseur = None
+        self.update()

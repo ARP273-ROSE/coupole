@@ -67,6 +67,26 @@ def requete(url, data=None, en_tetes=None, delai=60):
     return urllib.request.urlopen(req, timeout=delai)
 
 
+class ServiceInjoignable(IOError):
+    """Service en ligne injoignable, trop lent ou en erreur (hors ligne, DNS, délai dépassé, HTTP 5xx...)."""
+
+
+def lire_texte(url: str, delai: float = 8, max_octets: int = 2_000_000, accepter=()) -> str:
+    """Petite requête GET (services en ligne) : texte de la réponse, ou ServiceInjoignable.
+
+    `accepter` : codes HTTP « d'erreur » dont le corps est quand même utile (ex. 300 de JPL SBDB).
+    """
+    try:
+        with requete(url, delai=delai) as r:
+            return r.read(max_octets).decode('utf-8', 'replace')
+    except urllib.error.HTTPError as e:
+        if e.code in accepter:
+            return e.read(max_octets).decode('utf-8', 'replace')
+        raise ServiceInjoignable('HTTP %d' % e.code) from e
+    except Exception as e:                      # réseau absent, DNS, délai dépassé, TLS...
+        raise ServiceInjoignable('%s: %s' % (type(e).__name__, e)) from e
+
+
 def tap_sync(url_service: str, adql: str, delai=300) -> bytes:
     """Requête TAP synchrone (ADQL), résultat CSV."""
     corps = urllib.parse.urlencode({'REQUEST': 'doQuery', 'LANG': 'ADQL', 'FORMAT': 'csv',

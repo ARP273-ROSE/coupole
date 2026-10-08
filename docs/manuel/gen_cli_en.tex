@@ -214,6 +214,24 @@ FILE & file to read\\
 \par\medskip
 \begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
 \toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole cosmo\newline\normalfont\small From redshift to distances: comoving, luminosity, angular, lookback time, age, volume, distance modulus, scale (Planck 2018 and other parameter sets)}\\
+\midrule
+Z & redshift(s) to compute\\
+--objet,\allowbreak{} --object NAME & object name: redshift requested from SIMBAD\\
+--modele,\allowbreak{} --model \{planck18,\allowbreak{}planck15,\allowbreak{}wmap9,\allowbreak{}simple,\allowbreak{}perso\} & parameter set (default: planck18)\\
+--h0 H0 & H₀ in km/s/Mpc (custom model)\\
+--om OM & total Ωm (custom model)\\
+--ok OK & Ωk, curvature (planck18 or perso)\\
+--shoes & add the SH0ES comparison (planck18)\\
+--sans-incertitudes,\allowbreak{} --no-uncertainties & without uncertainties (faster)\\
+--csv FILE & write the results to this CSV file\\
+--courbes,\allowbreak{} --curves ZMIN ZMAX N & write the curves (z from ZMIN to ZMAX, N points) to the CSV file given by --csv\\
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole sites\newline\normalfont\small Observing sites (OpenStreetMap map), time zones, UTC and local time}\\
 \midrule
 --ajouter,\allowbreak{} --add X & add a site: ID NAME LAT LON ALT TIMEZONE [MPC]\\

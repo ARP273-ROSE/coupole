@@ -81,6 +81,11 @@ def main():
     capture('ciel')
     ohp.onglets.setCurrentIndex(2)
     capture('lots')
+    # fiche en ligne de NGC 6888 (vraie requête SIMBAD si Internet est disponible, sinon message hors ligne)
+    ohp.onglets.setCurrentIndex(ohp.onglet_fiche)
+    attendre(app, lambda: ohp.fiche.resultat() is not None, 30)
+    capture('fiche')
+    ohp.onglets.setCurrentIndex(0)
     for i, p in enumerate(f.panneaux):
         mid = getattr(getattr(p, 'module', None), 'id', '')
         if mid == 'donnees':
@@ -88,6 +93,12 @@ def main():
             p.axe.setCurrentIndex(2)
         if mid == 'sites':
             p.en_ligne.setChecked(False)           # pas de tuiles téléchargées pour les captures
+        if mid == 'cosmo':                         # 3C 273, Planck 2018, comparaison SH0ES
+            attendre(app, lambda: p.resultat is not None, 60)
+            p.shoes.setChecked(True)
+            p.recevoir_redshift(0.158, '3C 273')
+            attendre(app, lambda: p.resultat is not None and abs(p.resultat['z'] - 0.158) < 1e-9
+                     and 'shoes' in p.resultat, 60)
         if mid == 'qualite' and len(sys.argv) > 3:
             p.l_dossier.setText(sys.argv[3])
             p.lancer()

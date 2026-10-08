@@ -11,9 +11,10 @@ anglais, sur Windows, macOS et Linux. Architecture **modulaire** : d'autres modu
 
 | Module | Ce qu'il fait |
 |---|---|
-| **Banque OHP** | Récupère la banque d'images « OHP student observations » (T120 et IRIS, 7 989 images, 78 Go) par le service TAP public de l'Observatoire ; catalogue des 166 objets ; téléchargement avec reprise ; doublons écartés (et expliqués) ; solution astrométrique contrôlée (ASTAP facultatif) ; en-têtes corrigés avec traçabilité ; conversion **XISF** (PixInsight), **FITS compressé sans perte** (`.fits.fz` : Siril, astropy) ou FITS float32 ; tri en **lots empilables** avec fiche `LOT.txt` ; carte du ciel ; rapport d'anomalies. |
+| **Banque OHP** | Récupère la banque d'images « OHP student observations » (T120 et IRIS, 7 989 images, 78 Go) par le service TAP public de l'Observatoire ; catalogue des 166 objets ; téléchargement avec reprise ; doublons écartés (et expliqués) ; solution astrométrique contrôlée (ASTAP facultatif) ; en-têtes corrigés avec traçabilité ; conversion **XISF** (PixInsight), **FITS compressé sans perte** (`.fits.fz` : Siril, astropy) ou FITS float32 ; tri en **lots empilables** avec fiche `LOT.txt` ; carte du ciel ; rapport d'anomalies ; **fiche en ligne** facultative (SIMBAD, JPL, liens Aladin et NED). |
 | **Qualité des images** | Facultatif : FWHM, ellipticité (carte 3 × 3), fond, bruit, gradient, saturation, traînées, échantillonnage — mesures validées sur images synthétiques. |
 | **Spectres et séries** | Lecture et tracé de données 1D (spectres H I à 21 cm avec axe fréquence ↔ vitesse radio, courbes de lumière, tables FITS ou CSV). |
+| **Cosmologie** | Du redshift aux distances (comobile, luminosité, angulaire, trajet de la lumière), âges, volume comobile, module de distance, échelle en kpc/″ ; Planck 2018 avec incertitudes, SH0ES, Planck 2015, WMAP 9, jeu personnalisé ; redshift d'un objet demandé à SIMBAD ; courbes, export CSV. Noyau repris du calculateur [cosmologie-redshift](https://github.com/ARP273-ROSE/cosmologie-redshift), vérifié sous SageMath. |
 | **Sites et heures** | Sites d'observation (MPC), carte OpenStreetMap, heure UTC et heure locale du site. |
 | **Ma machine** | Diagnostic matériel et parallélisme retenu (exemple minimal de module). |
 
@@ -116,6 +117,9 @@ Données : banque « OHP student observations », Observatoire de Paris / PADC (
 service TAP public, licence Etalab 2.0. Méthode de traitement : guide officiel de la base (PADC-BDD-DU-ECU) et
 inventaire de la banque de l'auteur. Format XISF : spécification de Pleiades Astrophoto. ASTAP : Han Kleijn
 (www.hnsky.org), non inclus. SEP : Source Extractor en Python (LGPL). Cartes : © OpenStreetMap contributors.
+Fiche en ligne : SIMBAD et Sesame (CDS, Strasbourg), Aladin Lite (CDS), NED (NASA/IPAC), JPL Small-Body Database.
+Cosmologie : noyau de calcul repris du calculateur « cosmologie-redshift » du même auteur (publié sans licence
+formelle, intégré ici par son auteur sous GPL-3), astropy.cosmology, paramètres Planck 2018 / 2015, WMAP 9, SH0ES.
 Auteur : ARP273-ROSE. Licence : GNU GPL version 3 ou ultérieure.
 
 ---
@@ -129,9 +133,10 @@ English, on Windows, macOS and Linux. **Modular** architecture: more modules wil
 
 | Module | What it does |
 |---|---|
-| **OHP image bank** | Fetches the « OHP student observations » bank (T120 and IRIS, 7,989 images, 78 GB) through the Observatory's public TAP service; catalogue of 166 objects; resumable downloads; duplicates left out (and explained); astrometric solution checked (ASTAP optional); headers fixed with traceability; **XISF** (PixInsight), **lossless compressed FITS** (`.fits.fz`: Siril, astropy) or float32 FITS output; sorting into **stackable sets** with a `LOT.txt` sheet; sky map; anomaly report. |
+| **OHP image bank** | Fetches the « OHP student observations » bank (T120 and IRIS, 7,989 images, 78 GB) through the Observatory's public TAP service; catalogue of 166 objects; resumable downloads; duplicates left out (and explained); astrometric solution checked (ASTAP optional); headers fixed with traceability; **XISF** (PixInsight), **lossless compressed FITS** (`.fits.fz`: Siril, astropy) or float32 FITS output; sorting into **stackable sets** with a `LOT.txt` sheet; sky map; anomaly report; optional **online record** (SIMBAD, JPL, Aladin and NED links). |
 | **Image quality** | Optional: FWHM, ellipticity (3 × 3 map), background, noise, gradient, saturation, trails, sampling — measurements validated on synthetic images. |
 | **Spectra and series** | Reading and plotting 1D data (21 cm H I spectra with frequency ↔ radio velocity axis, light curves, FITS or CSV tables). |
+| **Cosmology** | From redshift to distances (comoving, luminosity, angular, light travel), ages, comoving volume, distance modulus, scale in kpc/″; Planck 2018 with uncertainties, SH0ES, Planck 2015, WMAP 9, custom set; an object's redshift requested from SIMBAD; curves, CSV export. Core taken from the [cosmologie-redshift](https://github.com/ARP273-ROSE/cosmologie-redshift) calculator, checked with SageMath. |
 | **Sites and times** | Observing sites (MPC), OpenStreetMap map, UTC and site local time. |
 | **My computer** | Hardware diagnosis and chosen parallelism (minimal example module). |
 
@@ -198,4 +203,7 @@ Reference manual: `coupole/docs/manuel_en.pdf` (*Help* > *Manual*, or `coupole m
 format: [CONTRIBUTING.md](CONTRIBUTING.md). History: [CHANGELOG.en.md](CHANGELOG.en.md).
 Data: « OHP student observations », Observatoire de Paris / PADC, public TAP service, Etalab 2.0 licence. XISF:
 Pleiades Astrophoto specification. ASTAP: Han Kleijn (www.hnsky.org), not included. SEP (LGPL). Maps: ©
-OpenStreetMap contributors. Author: ARP273-ROSE. Licence: GNU GPL version 3 or later.
+OpenStreetMap contributors. Online record: SIMBAD and Sesame (CDS, Strasbourg), Aladin Lite (CDS), NED (NASA/IPAC),
+JPL Small-Body Database. Cosmology: computation core taken from the same author's « cosmologie-redshift » calculator
+(published without a formal licence, included here by its author under GPL-3), astropy.cosmology, Planck 2018 / 2015,
+WMAP 9, SH0ES parameters. Author: ARP273-ROSE. Licence: GNU GPL version 3 or later.

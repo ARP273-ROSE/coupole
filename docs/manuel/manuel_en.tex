@@ -43,6 +43,7 @@ system language is detected and can be forced (\emph{Language} menu, Preferences
 OHP image bank & Inventory, catalogue, download, astrometric check, fixed headers, conversion, stackable sets, anomalies, sky map.\\
 Image quality & Optional. FWHM, ellipticity, background, noise, gradient, saturation, trails, sampling.\\
 Spectra and series & Reading and plotting 1D data (radio spectra, light curves, tables).\\
+Cosmology & From redshift to distances, ages, volume, distance modulus, scale (Planck 2018 and others).\\
 Sites and times & Site database, OpenStreetMap map, UTC and local time.\\
 My computer & Hardware diagnosis; minimal example module.\\
 \bottomrule
@@ -255,6 +256,33 @@ fields. CSV export with bilingual columns; nothing is deleted.
 Aitoff projection, right ascension increasing to the left, 12~h at the centre; one point per fixed object (size:
 number of images) and per night for moving objects; ecliptic dashed, galactic plane dotted.
 
+\subsection{Online record (optional)}\label{sec:fiche}
+\capture{img/fiche_en.png}{0.95}
+When the Internet is available, the \emph{Online record} tab (or the button of the same name under the catalogue)
+shows public information on the selected object:
+\begin{itemize}
+\item deep sky and stars: \textbf{SIMBAD} (CDS, Strasbourg) --- type, ICRS coordinates, magnitudes, parallax (and
+the distance it gives when precise enough), preferred measured distance with its method and reference, radial
+velocity and redshift, angular size, spectral and morphological types, other names; links to the SIMBAD page,
+\textbf{Aladin Lite} (sky image centred on the object) and, for galaxies, \textbf{NED}; when SIMBAD does not know
+the name, \textbf{Sesame} (CDS) also queries NED and VizieR;
+\item asteroids, comets, trans-Neptunian objects: \textbf{JPL} Small-Body Database --- orbit class, near-Earth or
+not, elements (a, e, i, q, Q, $\Omega$, $\omega$, period, epoch), diameter, albedo, rotation period, absolute
+magnitude;
+\item planets and NEOCP designations: no record (explanatory message).
+\end{itemize}
+\textbf{The identifier chosen by the service is always shown}: SIMBAD, for instance, attaches « NGC 6888 » to its
+Wolf-Rayet star HD 192163; the record says so. A positive redshift can be sent to the Cosmology module
+(\emph{Send this redshift to the Cosmology module} button).
+
+\paragraph{Politeness and offline use.} Nothing is sent while the tab is hidden; one request per selected object
+(after 0.6~s without another selection change), at most one per second and per service, 8~s timeout, Coupole's
+User-Agent. Answers are kept for 30~days in Coupole's cache (\texttt{enligne.json}, with their date; « not found »
+for one day). Offline, the last known record is shown with its date, otherwise a clear message; the rest of the
+application never depends on it. The \emph{Query online services} box stops all requests. The addresses
+(\texttt{simbad.base}, \texttt{simbad.page}, \texttt{aladin.page}, \texttt{ned.page}, \texttt{sbdb.page},
+\texttt{resolution.sbdb}, \texttt{resolution.sesame}) are set like the other sources.
+
 % =====================================================================
 \section{ASTAP (optional)}
 Without ASTAP, Coupole does everything else. ASTAP (Han Kleijn, MPL~2.0 licence,
@@ -364,6 +392,61 @@ once their coordinates are known from a reliable source. Map: OpenStreetMap tile
 downloads at a time, User-Agent naming the application, attribution shown; offline, plain background and points.
 
 % =====================================================================
+\section{Cosmology}\label{sec:cosmo}
+\capture{img/module_cosmo_en.png}{1.0}
+The redshift $z$ of a distant object does not give « one » distance but several, all correct, answering different
+questions. The module computes them in the $\Lambda$CDM model with
+\[ E(z)^2 = \Omega_r(z)(1+z)^4 + \Omega_m(1+z)^3 + \Omega_k(1+z)^2 + \Omega_\Lambda, \qquad
+   D_C = \frac{c}{H_0}\int_0^z\frac{dz'}{E(z')}, \]
+radiation included (CMB photons and neutrinos, one of them massive, 0.06~eV).
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Quantity & Use \\
+\midrule
+$D_C$ line-of-sight comoving & present distance of the object; saturates at $\approx 46$~Gly (particle horizon)\\
+$D_M$ transverse comoving & equals $D_C$ in a flat universe; enters $D_L$ and $D_A$\\
+$D_L = (1+z)D_M$ & photometry: $F = L/(4\pi D_L^2)$; distance modulus $\mu = 5\log_{10}(D_L/10~\mathrm{pc})$\\
+$D_A = D_M/(1+z)$ & sizes: $\theta = \ell/D_A$; scale in kpc per arcsecond; maximum near $z\approx1.6$\\
+$c\,t_L$ & path travelled by the light (the most intuitive, the least physical)\\
+$t_L$, age at $z$, $t_0$ & lookback time; check $t_L + t(z) = t_0$\\
+$V_C$ & comoving volume out to $z$ (Hogg 1999, exact in curved universes too)\\
+velocities & $cz$ (naive), relativistic Doppler (inappropriate), $H_0 D_C$ (the only correct one)\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\paragraph{Parameters.} Planck 2018 by default ($H_0 = 67.66$, $\Omega_m = 0.3111$ incl. $\Omega_\nu = 0.00144$,
+$T_0 = 2.7255$~K) with the $1\sigma$ uncertainty propagated from \emph{correlated} $H_0$ and $\Omega_m$
+($\rho = -0.976$: ignoring it would overestimate the uncertainty) and, optionally, the comparison with SH0ES
+($H_0 = 73.04$, Hubble tension). For comparison: Planck 2015, WMAP 9-year, a « textbook » $\Lambda$CDM
+(70~/ 0.3~/ 0.7 without radiation) and a custom set ($H_0$, $\Omega_m$, $\Omega_k$, Planck 2018 radiation).
+Ranges: $H_0$ from 40 to 100, $\Omega_m$ from 0.1 to 1, $\Omega_k$ from $-0.3$ to $0.3$ ($\pm 0.05$ for Planck
+2018); an out-of-range value is \emph{refused with an explanation}, never silently corrected.
+
+\paragraph{Input.} A $z$ (comma or point), one of the examples (M\,87, 3C\,273, $z = 1$, $z = 2.34$, ULAS J1120,
+GN-z11, reionisation, CMB), or an object name: its redshift is requested from SIMBAD (tolerant naming: « m87 »,
+« ngc4486 »; several candidates: you choose). $z \le 0$ (approaching object, like M\,31) gives no distance; below
+$z = 0.03$ the object's peculiar velocity dominates (warning); beyond $z \approx 1090$ the universe is opaque. Table
+and curves export to CSV (« ; », UTF-8; raw values in Mpc, Gyr, Gpc$^3$).
+
+\paragraph{Origin and checks.} The computation core is taken from the same author's « cosmologie-redshift »
+calculator (public repository \url{https://github.com/ARP273-ROSE/cosmologie-redshift}), with astropy.cosmology.
+Before integration it was compared on 8 October 2026 with astropy and with an independent SageMath integration
+(mpmath, 18 digits, exact Fermi-Dirac function for the neutrinos), from $z = 10^{-8}$ to 1100, for
+$\Omega_k = 0, \pm0.01, \pm0.05$: relative deviation $\le 3\times10^{-6}$ on distances and $\le 2\times10^{-5}$ on
+ages and $E(z)$ (Komatsu fit of the neutrinos in astropy); no bug. astropy's comoving volume, however, loses all
+its digits at very small $z$ in curved universes (down to a negative volume): Coupole uses a series expansion there,
+matched to the closed form. Scripts: \texttt{outils/verif\_cosmo/}.
+
+\begin{ccode}
+coupole cosmo 0.158 --shoes\\
+coupole cosmo --object "3C 273"\\
+coupole cosmo 1 2 3 --model wmap9 --csv results.csv\\
+coupole cosmo --curves 0.001 1500 300 --csv curves.csv
+\end{ccode}
+
+% =====================================================================
 \section{Computer and performance}
 \capture{img/module_machine_en.png}{0.9}
 Detection without mandatory dependency: system, architecture, processor, physical and logical cores (bounded by
@@ -455,5 +538,8 @@ Quality unavailable & \texttt{pip install sep} (included in the packages).\\
 service, Etalab 2.0 licence; official guide of the database (PADC-BDD-DU-ECU). XISF 1.0 specification (Pleiades
 Astrophoto). ASTAP: \url{https://www.hnsky.org/astap.htm}. Observatory codes: Minor Planet Center. SEP: Barbary
 (2016), Bertin \& Arnouts (1996). Adaptive moments: Bernstein \& Jarvis (2002). Map background: © OpenStreetMap
-contributors.
+contributors. SIMBAD and Sesame: CDS, Strasbourg (Wenger et al. 2000); Aladin Lite (CDS); NED (NASA/IPAC); JPL
+Small-Body Database (NASA/JPL). Cosmology: Planck Collaboration (2020, A\&A 641, A6); Hinshaw et al. (2013, WMAP 9);
+Riess et al. (2022, SH0ES); Hogg (1999, astro-ph/9905116); Komatsu et al. (2011) for the massive-neutrino density;
+astropy.cosmology; « cosmologie-redshift » calculator (same author).
 \end{document}

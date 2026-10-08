@@ -46,6 +46,10 @@ class Panneau(QWidget):
         self.onglets.addTab(self._onglet_lots(), tr('ohp_onglet_lots'))
         self.onglets.addTab(self._onglet_anomalies(), tr('ohp_onglet_anomalies'))
         self.onglets.addTab(self._onglet_ciel(), tr('ohp_onglet_ciel'))
+        from ...gui.fiche import FicheEnLigne
+        self.fiche = FicheEnLigne()
+        self.onglet_fiche = self.onglets.addTab(self.fiche, tr('fiche_titre'))
+        self.onglets.currentChanged.connect(self._maj_fiche)
         self._remplir_lots()
         sc = QShortcut(QKeySequence('Ctrl+R'), self)
         sc.activated.connect(lambda: self.charger(True))
@@ -113,6 +117,7 @@ class Panneau(QWidget):
         self.l_estimation.setWordWrap(True)
         h.addWidget(self.l_estimation, 1)
         h.addWidget(bouton('ohp_corriger', self.corriger))
+        h.addWidget(bouton('ohp_voir_fiche', lambda: self.onglets.setCurrentIndex(self.onglet_fiche)))
         self.b_vers_traitement = bouton('ohp_vers_traitement', self.vers_traitement)
         h.addWidget(self.b_vers_traitement)
         v.addLayout(h)
@@ -198,6 +203,20 @@ class Panneau(QWidget):
                 combo.addItem(val, val)
             combo.blockSignals(False)
         self._remplir_images()
+        self._maj_fiche()
+
+    def _maj_fiche(self, *_):
+        """Fiche en ligne : seulement quand l'onglet est affiché, et pour un seul objet choisi."""
+        if not hasattr(self, 'fiche') or self.onglets.currentIndex() != self.onglet_fiche:
+            return
+        objs = lignes_choisies(self.v_obj, self.p_obj, self.m_obj)
+        if len(objs) != 1:
+            self.fiche.demander(None)
+            return
+        o = objs[0]
+        if self.fiche._demande and self.fiche._demande[0] == o['objet'] and self.fiche.resultat() is not None:
+            return                                  # déjà affichée : pas de nouvelle requête
+        self.fiche.demander(o['objet'], o['cat'], o.get('sbdb'), sorted(o.get('noms') or ()))
 
     def _images_filtrees(self):
         objs = getattr(self, '_objets', set())

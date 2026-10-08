@@ -76,6 +76,9 @@ class Panneau(QWidget):
         return False
 ```
 
+Un panneau peut en ouvrir un autre : `self.window().ouvrir_module('cosmo')` rend le panneau du module (ou `None`),
+par exemple pour lui passer une valeur (`recevoir_redshift(z, nom)` du module Cosmologie).
+
 ### La ligne de commande
 
 ```python
@@ -97,6 +100,8 @@ def enregistrer(p):                          # p : sous-parseur argparse « coup
 | `coupole.core.calcul` | `tableaux(preferer_gpu=True)` : CuPy si possible, sinon numpy |
 | `coupole.core.reseau` | téléchargement poli (User-Agent, débit plafonné, reprise, annulation), requête TAP |
 | `coupole.core.sources` | adresses des services (jamais en dur) |
+| `coupole.core.enligne`, `simbad` | fiche d'un objet (SIMBAD, Sesame, JPL SBDB) avec cache daté et repli hors ligne ; redshift par nom |
+| `coupole.gui.fiche` | widget « Fiche en ligne » prêt à l'emploi (`FicheEnLigne.demander(nom, cat)`) |
 | `coupole.core.temps`, `sites` | temps en UTC, heure locale du site, date du soir, hauteur du Soleil, base des sites |
 | `coupole.core.xisf` | écrire et relire un XISF |
 | `coupole.core.donnees` | lecture générique (images, spectres, séries, tables) |
@@ -150,7 +155,8 @@ enforce both. Long work never runs on the GUI thread (`coupole.gui.outils.Tache`
 
 The core provides i18n, settings and folders, hardware detection and parallelism planning, an optional GPU array API
 (CuPy or numpy), polite networking (User-Agent, rate cap, resume, cancellation, TAP), configurable service addresses,
-UTC/local time and sites, XISF reading/writing, generic data reading, ASTAP detection and consented incident reports.
+online object records (SIMBAD, Sesame, JPL SBDB: `coupole.core.enligne`, widget `coupole.gui.fiche`, dated
+cache, offline fallback), UTC/local time and sites, XISF reading/writing, generic data reading, ASTAP detection and consented incident reports.
 
 ### Adding a data format
 

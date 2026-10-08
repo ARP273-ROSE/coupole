@@ -321,7 +321,7 @@ class Inventaire:
         par = C.OrderedDict()
         for x in sorted(self.images, key=lambda x: (ordre.index(x['cat']) if x['cat'] in ordre else 99, x['objet'])):
             o = par.setdefault(x['objet'], {'objet': x['objet'], 'cat': x['cat'], 'rem': x['rem'], 'noms': set(),
-                                            'images': 0, 'doublons': 0, 'octets': 0, 'nuits': set(), 'tel': set(),
+                                            'sbdb': x.get('sbdb'), 'images': 0, 'doublons': 0, 'octets': 0, 'nuits': set(), 'tel': set(),
                                             'filtres': set(), 'a_verifier': False, 'nouveau': False,
                                             'vu_le': ''})
             o['noms'].add(x['target_name'])
