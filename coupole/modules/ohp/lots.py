@@ -94,37 +94,63 @@ def plan_des_lots(tout, L):
     return lots
 
 
-def ranger(racine, tout, L, maj_info, ext='.xisf'):
+def chemin_os(p: str) -> str:
+    """Chemin tel que le système le veut : sous Windows, au-delà de ~250 caractères, préfixe « \\\\?\\ » (chemins longs)."""
+    if os.name == 'nt' and len(p) > 250 and not p.startswith('\\\\?\\'):
+        return '\\\\?\\' + os.path.abspath(p)
+    return p
+
+
+def _libre(cible: str, pris: set, actuels: set) -> str:
+    """Nom de fichier libre : ni déjà prévu dans ce rangement (casse indifférente : Windows), ni déjà présent sur
+    le disque pour un fichier étranger au rangement (jamais d'écrasement)."""
+    base, ext = cible, ''
+    for e in ('.fits.fz', '.xisf', '.fits'):
+        if cible.lower().endswith(e):
+            base, ext = cible[:-len(e)], cible[-len(e):]
+            break
+    nom, n = cible, 1
+    while nom.lower() in pris or (os.path.exists(nom) and os.path.abspath(nom).lower() not in actuels):
+        n += 1
+        nom = '%s_%d%s' % (base, n, ext)
+    return nom
+
+
+def ranger(racine, tout, L, maj_info, ext='.xisf', conflits=None):
     """Déplace les fichiers convertis à leur place (jamais d'écrasement), écrit LOT.txt et INDEX_LOTS.csv.
 
-    tout : [(id, info)] ; maj_info(id, info) enregistre le nouvel emplacement.  Renvoie la liste de l'index.
+    tout : [(id, info)] ; maj_info(id, info) enregistre le nouvel emplacement.  `conflits` (liste) reçoit
+    (nom voulu, nom retenu) quand un fichier étranger occupait déjà le nom.  Renvoie la liste de l'index.
     """
     lots = plan_des_lots(tout, L)
     pris = set()
+    actuels = {os.path.abspath(info.get('final') or info['staging']).lower() for _, info in tout}
     plan = []
     for cle in sorted(lots):
         dossier = os.path.join(racine, *cle)
         for i, info in sorted(lots[cle], key=lambda it: (it[1]['mjd'], it[0])):
             ext_i = info.get('extension', ext)
-            base = nom_fichier(info, L)
-            nom, n = base + ext_i, 1
-            while os.path.join(dossier, nom).lower() in pris:          # Windows : casse indifférente
-                n += 1
-                nom = '%s_%d%s' % (base, n, ext_i)
-            cible = os.path.join(dossier, nom)
+            voulu = os.path.join(dossier, nom_fichier(info, L) + ext_i)
+            cible = _libre(voulu, pris, actuels)
+            if cible != voulu and conflits is not None and not voulu.lower() in pris:
+                conflits.append((voulu, cible))
             pris.add(cible.lower())
             plan.append((cle, i, info, cible))
     # deux temps : ce qui doit bouger repasse par la zone de conversion, puis rejoint sa place
+    staging_dir = os.path.join(racine, '_traitement', 'converties')
     for cle, i, info, cible in plan:
         actuel = info.get('final') or info['staging']
         if actuel != cible and actuel != info['staging'] and os.path.exists(actuel):
-            os.replace(actuel, info['staging'])
+            if not os.path.isdir(os.path.dirname(info['staging'])):
+                os.makedirs(staging_dir, exist_ok=True)
+                info['staging'] = os.path.join(staging_dir, i + os.path.splitext(actuel)[1])
+            os.replace(chemin_os(actuel), chemin_os(info['staging']))
             info['final'] = None
     for cle, i, info, cible in plan:
         actuel = info.get('final') or info['staging']
         if actuel != cible:
-            os.makedirs(os.path.dirname(cible), exist_ok=True)
-            os.replace(info['staging'], cible)
+            os.makedirs(chemin_os(os.path.dirname(cible)), exist_ok=True)
+            os.replace(chemin_os(info['staging']), chemin_os(cible))
             info['final'] = cible
             maj_info(i, info)
     index = []
@@ -141,14 +167,17 @@ def ranger(racine, tout, L, maj_info, ext='.xisf'):
                 os.remove(os.path.join(r, f))
         if not os.listdir(r):
             os.rmdir(r)
-    with open(os.path.join(racine, 'INDEX_LOTS.csv'), 'w', newline='', encoding='utf-8-sig') as f:
-        w = csv.writer(f, delimiter=';')
-        w.writerow([tr('csv_' + c, 'fr') + ' (' + tr('csv_' + c, 'en') + ')' if tr('csv_' + c, 'fr') != tr('csv_' + c, 'en')
-                    else tr('csv_' + c, 'fr') for c in ('dossier', 'type', 'objet', 'lot', 'filtre', 'poses',
-                                                         'pose_totale_s', 'nuits', 'centre_ra', 'centre_dec',
-                                                         'angle_deg', 'alignement')])
-        for r in index:
-            w.writerow(r)
+    import io
+    from ...core.config import ecrire_atomique
+    buf = io.StringIO()
+    w = csv.writer(buf, delimiter=';')
+    w.writerow([tr('csv_' + c, 'fr') + ' (' + tr('csv_' + c, 'en') + ')' if tr('csv_' + c, 'fr') != tr('csv_' + c, 'en')
+                else tr('csv_' + c, 'fr') for c in ('dossier', 'type', 'objet', 'lot', 'filtre', 'poses',
+                                                     'pose_totale_s', 'nuits', 'centre_ra', 'centre_dec',
+                                                     'angle_deg', 'alignement')])
+    for r in index:
+        w.writerow(r)
+    ecrire_atomique(os.path.join(racine, 'INDEX_LOTS.csv'), buf.getvalue(), 'utf-8-sig')
     return index
 
 
@@ -210,8 +239,9 @@ def ecrire_lot(cle, dossier, items, L):
     infos = [it[1] for it in items]
     fr, geo, n, tot, nuits, sans, mobile = _textes_lot(cle, infos, items, 'fr')
     en = _textes_lot(cle, infos, items, 'en')[0]
-    with open(os.path.join(dossier, 'LOT.txt'), 'w', encoding='utf-8') as f:
-        f.write('\n'.join(['=== Français ==='] + fr + ['', '=== English ==='] + en) + '\n')
+    from ...core.config import ecrire_atomique
+    ecrire_atomique(os.path.join(dossier, 'LOT.txt'),
+                    '\n'.join(['=== Français ==='] + fr + ['', '=== English ==='] + en) + '\n')
     alignement = (tr('lot_align_aucun', 'fr') + ' / ' + tr('lot_align_aucun', 'en')) if sans \
         else 'CometAlignment' if mobile else 'StarAlignment'
     return ['/'.join(cle), cle[0], nom_affiche(infos[0]['objet'], L), cle[2], infos[0]['filtre'], n, round(tot, 1),
@@ -226,14 +256,21 @@ COLONNES_JOURNAL = ['fichier_source', 'destination', 'octets_fits', 'octets_xisf
 
 def ecrire_journal(chemin, racine, lignes):
     """lignes : [(id, url, statut, info)] → journal.csv (mêmes colonnes que le traitement de référence)."""
-    with open(chemin, 'w', newline='', encoding='utf-8-sig') as f:
-        w = csv.writer(f, delimiter=';')
-        w.writerow(COLONNES_JOURNAL)
-        for i, url, st, info in lignes:
-            x = json.loads(info) if isinstance(info, str) else (info or {})
-            w.writerow([x.get('source', ''), os.path.relpath(x['final'], racine) if x.get('final') else '',
-                        x.get('octets_fits', ''), x.get('octets_sortie', x.get('octets_xisf', '')), x.get('ratio', ''),
-                        x.get('ecart_max', ''), st, x.get('wcs', ''), ' | '.join(x.get('doutes', [])),
-                        x.get('ecart_astap_arcsec', ''), x.get('deplacement_centre_arcsec', ''),
-                        ' '.join(x.get('modifs', [])), x.get('date', ''), x.get('pose_ctrl', ''),
-                        x.get('doublon_de', ''), x.get('erreur', ''), url])
+    import io
+    from ...core.config import ecrire_atomique
+    buf = io.StringIO()
+    w = csv.writer(buf, delimiter=';')
+    w.writerow(COLONNES_JOURNAL)
+    for i, url, st, info in lignes:
+        x = json.loads(info) if isinstance(info, str) else (info or {})
+        try:
+            dest = os.path.relpath(x['final'], racine) if x.get('final') else ''
+        except ValueError:                          # autre lecteur Windows : chemin absolu
+            dest = x.get('final', '')
+        w.writerow([x.get('source', ''), dest,
+                    x.get('octets_fits', ''), x.get('octets_sortie', x.get('octets_xisf', '')), x.get('ratio', ''),
+                    x.get('ecart_max', ''), st, x.get('wcs', ''), ' | '.join(x.get('doutes', [])),
+                    x.get('ecart_astap_arcsec', ''), x.get('deplacement_centre_arcsec', ''),
+                    ' '.join(x.get('modifs', [])), x.get('date', ''), x.get('pose_ctrl', ''),
+                    x.get('doublon_de', ''), x.get('erreur', ''), url])
+    ecrire_atomique(chemin, buf.getvalue(), 'utf-8-sig')
