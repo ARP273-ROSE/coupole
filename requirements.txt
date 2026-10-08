@@ -6,3 +6,4 @@ lz4>=4.0
 PyQt6>=6.5
 tzdata
 lxml>=4.9
+sep>=1.4

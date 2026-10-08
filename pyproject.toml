@@ -32,9 +32,9 @@ dependencies = [
 
 [project.optional-dependencies]
 validation = ["lxml>=4.9", "xisf>=0.9"]
-qualite = ["photutils>=1.9", "scipy>=1.10"]
+qualite = ["sep>=1.4"]
 gpu = ["cupy-cuda12x"]
-test = ["pytest>=7", "lxml>=4.9", "xisf>=0.9", "psutil>=5.9", "pillow>=10"]
+test = ["pytest>=7", "lxml>=4.9", "xisf>=0.9", "psutil>=5.9", "pillow>=10", "sep>=1.4"]
 
 [project.urls]
 Homepage = "https://github.com/ARP273-ROSE/coupole"
