@@ -10,9 +10,9 @@ from pathlib import Path
 
 def _version() -> str:
     # 1) dépôt ou paquet autonome : le fichier VERSION à côté du dossier coupole/
-    #    (seulement si kit.json est là aussi : ce n'est pas le VERSION d'un autre paquet)
+    #    (seulement si lancer.py ou pyproject.toml est là aussi : ce n'est pas le VERSION d'un autre paquet)
     racine = Path(__file__).resolve().parent.parent
-    if (racine / 'kit.json').exists():
+    if (racine / 'lancer.py').exists() or (racine / 'pyproject.toml').exists():
         try:
             v = (racine / 'VERSION').read_text(encoding='utf-8').strip()
             if v:

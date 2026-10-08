@@ -232,6 +232,20 @@ def racine_paquet() -> Path:
     return bundle if bundle.exists() else PKG
 
 
+# Modules Qt que Coupole n'utilise pas (Widgets, Gui, Core, Svg, DBus, OpenGL et les greffons de plateforme restent).
+QT_INUTILES = ('Qt6Quick', 'Qt6Qml', 'Qt6Labs', 'Qt6Pdf', 'Qt6Multimedia', 'Qt6WebEngine', 'Qt6WebView',
+               'Qt6WebSockets', 'Qt6WebChannel', 'Qt6Designer', 'Qt6Help', 'Qt6Bluetooth', 'Qt6Nfc',
+               'Qt6Positioning', 'Qt6RemoteObjects', 'Qt6Sensors', 'Qt6SerialPort', 'Qt6SerialBus', 'Qt6Test',
+               'Qt6Charts', 'Qt6DataVisualization', 'Qt6Graphs', 'Qt63D', 'Qt6SpatialAudio', 'Qt6TextToSpeech',
+               'Qt6ShaderTools', 'Qt6Sql', 'Qt6StateMachine', 'Qt6Scxml', 'Qt6VirtualKeyboard', 'Qt6FFmpeg',
+               'Qt6Location', 'Qt6NetworkAuth', 'Qt6Protobuf', 'Qt6Grpc', 'Qt6HttpServer')
+PYQT_INUTILES = ('QtQml', 'QtQuick', 'QtQuick3D', 'QtQuickWidgets', 'QtPdf', 'QtPdfWidgets', 'QtMultimedia',
+                 'QtMultimediaWidgets', 'QtDesigner', 'QtHelp', 'QtBluetooth', 'QtNfc', 'QtPositioning',
+                 'QtRemoteObjects', 'QtSensors', 'QtSerialPort', 'QtTest', 'QtSql', 'QtStateMachine',
+                 'QtSpatialAudio', 'QtTextToSpeech', 'QtWebSockets', 'QtWebChannel', 'QtNetworkAuth')
+GARDER_TESTS = ('astropy',)          # astropy importe astropy.tests a l'initialisation
+
+
 def step_elaguer():
     """Retire ce qui ne sert pas a l'execution."""
     base = racine_paquet()
@@ -239,8 +253,32 @@ def step_elaguer():
     for motif in ('__pycache__', 'test', 'tests', 'idlelib', 'tkinter',
                   'turtledemo', 'lib2to3', 'ensurepip'):
         for chemin in list(base.rglob(motif)):
-            if chemin.is_dir():
+            if chemin.is_dir() and not any(g in chemin.parts for g in GARDER_TESTS):
                 shutil.rmtree(chemin, ignore_errors=True)
+    for qt in base.rglob('PyQt6'):
+        if not qt.is_dir() or qt.parent.name != 'site-packages':
+            continue
+        for sous in ('Qt6/lib', 'Qt6/qml', 'Qt6/translations'):
+            d = qt / sous
+            if sous.endswith('qml') and d.exists():
+                shutil.rmtree(d, ignore_errors=True)
+                continue
+            if d.is_dir():
+                for f in d.iterdir():
+                    if sous.endswith('lib') and f.name.startswith(tuple('lib' + p for p in QT_INUTILES)) or \
+                            sous.endswith('lib') and f.name.startswith(QT_INUTILES):
+                        if f.is_dir():
+                            shutil.rmtree(f, ignore_errors=True)
+                        else:
+                            f.unlink()
+                    elif sous.endswith('translations') and f.is_file() and not any(t in f.name for t in ('_fr', '_en')):
+                        f.unlink()
+        for m in PYQT_INUTILES:
+            for f in qt.glob(m + '.*'):
+                f.unlink()
+        for d in ('Qt6/plugins/sqldrivers', 'Qt6/plugins/multimedia', 'Qt6/plugins/qmltooling', 'Qt6/plugins/position',
+                  'Qt6/plugins/sensors', 'Qt6/plugins/designer', 'Qt6/plugins/texttospeech', 'bindings', 'Qt6/include'):
+            shutil.rmtree(qt / d, ignore_errors=True)
     for chemin in list(base.rglob('*.pyc')):
         chemin.unlink(missing_ok=True)
     apres = sum(f.stat().st_size for f in base.rglob('*') if f.is_file())

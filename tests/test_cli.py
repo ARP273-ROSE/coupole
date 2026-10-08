@@ -61,3 +61,9 @@ def test_anomalies_csv(capsys, tmp_path):
 def test_sites_heure(capsys):
     code, out = lancer(capsys, '--lang', 'fr', 'sites', '--heure', '2025-07-16T22:20:23', '--site', 'ohp')
     assert '2025-07-17 00:20:23 (UTC+2)' in out and 'date du soir au site : 2025-07-16' in out
+
+
+def test_version_unique():
+    from pathlib import Path
+    import coupole
+    assert coupole.__version__ == (Path(__file__).resolve().parents[1] / 'VERSION').read_text().strip()
