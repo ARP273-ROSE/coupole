@@ -277,7 +277,7 @@ def test_crash_natif_releve_par_faulthandler(tmp_path, monkeypatch):
     envoyes = []
     monkeypatch.setattr(rapports, 'envoyer', lambda genre, **c: envoyes.append((genre, c)) or {})
     assert rapports.relever_crash_natif(journal) is True
-    assert envoyes[0][0] == 'crash_natif' and 'Fatal Python error' in envoyes[0][1]['trace']
+    assert envoyes[0][0] == 'crash_natif' and 'fatal' in envoyes[0][1]['trace'].lower()   # « Windows fatal exception » aussi
     assert not journal.exists() and rapports.relever_crash_natif(journal) is False
 
 
