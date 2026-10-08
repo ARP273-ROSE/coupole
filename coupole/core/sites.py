@@ -68,13 +68,20 @@ def chemin_utilisateur() -> Path:
     return config.dossier_config() / 'sites_utilisateur.json'
 
 
+_livres: list | None = None
+
+
 def sites() -> list[Site]:
-    out = {s['id']: _depuis_dict(s, 'livre') for s in json.loads(FICHIER.read_text(encoding='utf-8'))['sites']}
-    try:
-        for s in json.loads(chemin_utilisateur().read_text(encoding='utf-8')).get('sites', []):
+    global _livres
+    if _livres is None:
+        _livres = json.loads(FICHIER.read_text(encoding='utf-8'))['sites']
+    out = {s['id']: _depuis_dict(s, 'livre') for s in _livres}
+    doc = config.lire_json_protege(chemin_utilisateur(), {})
+    for s in doc.get('sites', []) if isinstance(doc.get('sites'), list) else []:
+        try:
             out[str(s['id'])] = _depuis_dict(s, 'utilisateur')
-    except Exception:
-        pass
+        except (KeyError, TypeError, ValueError):     # un site mal formé n'empêche pas les autres
+            continue
     return list(out.values())
 
 
@@ -93,21 +100,17 @@ def par_nom(nom: str) -> Site | None:
 def enregistrer_site(d: dict):
     """Ajoute ou remplace un site de l'utilisateur (id, nom, lat, lon, alt, fuseau, mpc)."""
     _depuis_dict(d, 'utilisateur')               # validation
-    try:
-        doc = json.loads(chemin_utilisateur().read_text(encoding='utf-8'))
-    except Exception:
-        doc = {'format': 1, 'sites': []}
+    doc = config.lire_json_protege(chemin_utilisateur(), None) or {'format': 1, 'sites': []}
     doc['sites'] = [s for s in doc.get('sites', []) if s.get('id') != d['id']] + [d]
-    chemin_utilisateur().write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding='utf-8')
+    config.ecrire_json_atomique(chemin_utilisateur(), doc)
 
 
 def supprimer_site(ident: str):
-    try:
-        doc = json.loads(chemin_utilisateur().read_text(encoding='utf-8'))
-    except Exception:
+    doc = config.lire_json_protege(chemin_utilisateur(), None)
+    if not doc:
         return
     doc['sites'] = [s for s in doc.get('sites', []) if s.get('id') != ident]
-    chemin_utilisateur().write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding='utf-8')
+    config.ecrire_json_atomique(chemin_utilisateur(), doc)
 
 
 # ======================================================================== contrôle des en-têtes de position

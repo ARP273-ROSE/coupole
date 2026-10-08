@@ -32,7 +32,7 @@ class Panneau(QWidget):
 
     def actualiser(self):
         self._t = Tache(cli.rapport, parent=self)          # sondes système : hors du fil graphique
-        self._t.fini.connect(self._afficher)
+        self._t.quand_fini(self._afficher)
         self._t.start()
 
     def _afficher(self, d):

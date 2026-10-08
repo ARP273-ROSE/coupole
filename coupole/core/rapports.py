@@ -40,6 +40,8 @@ APPLICATION = 'coupole'
 DELAI = 8
 FILE_MAX = 50
 AGE_MAX = 30 * 86400
+CHAMP_MAX = 8000           # caractères par champ texte
+RAPPORT_MAX = 64_000       # octets : un rapport ne dépasse jamais cette taille (charge réseau, vie privée)
 GENRES = ('installation', 'demarrage', 'plantage', 'crash_natif', 'gel', 'manuel')
 
 _dossier: Path | None = None
@@ -74,6 +76,12 @@ def anonymiser(texte) -> str:
     if not texte:
         return ''
     texte = str(texte)
+    try:                                           # nom de la machine : jamais transmis
+        hote = platform.node()
+        if hote and len(hote) > 2:
+            texte = re.sub(r'(?<![A-Za-z0-9])%s(?![A-Za-z0-9])' % re.escape(hote), '<host>', texte)
+    except Exception:
+        pass
     home = str(Path.home())
     for v in {home, home.replace('\\', '/'), home.lower()}:
         if v and len(v) > 1:
@@ -85,6 +93,21 @@ def anonymiser(texte) -> str:
     texte = re.sub(r'([A-Za-z]:\\[^\\\n"\']{1,30})(\\[^\\\n"\']{1,60}){2,}\\', r'\1\\…\\', texte)
     texte = re.sub(r'(/(?:home|Users|mnt|media|Volumes)/[^/\n"\']{1,30})(/[^/\n"\']{1,60}){2,}/', r'\1/…/', texte)
     return texte
+
+
+def _anonymiser_valeur(v, profondeur=0):
+    """Applique `anonymiser` à toute chaîne d'une structure (dict, liste), en bornant chaque texte."""
+    if isinstance(v, str):
+        return anonymiser(v[-CHAMP_MAX:] if len(v) > CHAMP_MAX else v)
+    if profondeur > 4:
+        return str(v)[:200]
+    if isinstance(v, dict):
+        return {str(k)[:80]: _anonymiser_valeur(x, profondeur + 1) for k, x in list(v.items())[:100]}
+    if isinstance(v, (list, tuple)):
+        return [_anonymiser_valeur(x, profondeur + 1) for x in list(v)[:200]]
+    if isinstance(v, (int, float, bool)) or v is None:
+        return v
+    return anonymiser(str(v)[:CHAMP_MAX])
 
 
 def machine() -> dict:
@@ -133,9 +156,10 @@ def _mettre_en_file(rapport: dict) -> Path | None:
     if _dossier is None:
         return None
     try:
-        nom = '%s-%s-%d.json' % (time.strftime('%Y%m%dT%H%M%S'), rapport.get('genre', 'autre'), os.getpid())
+        nom = '%s-%s-%d-%d.json' % (time.strftime('%Y%m%dT%H%M%S'), rapport.get('genre', 'autre'), os.getpid(),
+                                    threading.get_ident() % 10000)
         p = _dossier / nom
-        p.write_text(json.dumps(rapport, ensure_ascii=False, indent=1), encoding='utf-8')
+        config.ecrire_json_atomique(p, rapport)
         return p
     except OSError:
         return None
@@ -147,11 +171,16 @@ def envoyer(genre: str, **champs) -> dict:
     rapport['genre'] = genre if genre in GENRES else 'autre'
     rapport['horodatage'] = time.strftime('%Y-%m-%d %H:%M:%S')
     for cle, valeur in champs.items():
-        rapport[cle] = anonymiser(valeur) if isinstance(valeur, str) else valeur
+        rapport[cle] = _anonymiser_valeur(valeur)
+    charge = json.dumps(rapport, ensure_ascii=False).encode('utf-8')
+    if len(charge) > RAPPORT_MAX:                   # on tronque les plus longs champs jusqu'à tenir
+        for cle in sorted(rapport, key=lambda k: -len(str(rapport[k]))):
+            if isinstance(rapport[cle], str) and len(charge) > RAPPORT_MAX:
+                rapport[cle] = rapport[cle][-(len(rapport[cle]) // 2):] + ' […]'
+                charge = json.dumps(rapport, ensure_ascii=False).encode('utf-8')
     if consentement() is not True:
         _mettre_en_file(rapport)
         return rapport
-    charge = json.dumps(rapport, ensure_ascii=False).encode('utf-8')
 
     def tache():
         if not _poster(charge):

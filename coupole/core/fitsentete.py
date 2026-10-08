@@ -23,14 +23,24 @@ def fnum(v, fmt='%.10g') -> str:
     return fmt % v
 
 
+BLOCS_MAX = 2000                   # 2000 x 2880 octets = 5,8 Mo d'en-tête : au-delà ce n'est pas un FITS
+
+
 def lire_cartes(chemin) -> list[str]:
     """Cartes de l'en-tête primaire (80 caractères), sans END."""
     cartes = []
     with open(chemin, 'rb') as f:
+        if f.read(9) != b'SIMPLE  =':
+            raise IOError('not a FITS file (SIMPLE missing)')
+        f.seek(0)
+        blocs = 0
         while True:
             b = f.read(2880)
+            blocs += 1
             if len(b) < 2880:
                 raise IOError('truncated FITS header')
+            if blocs > BLOCS_MAX:
+                raise IOError('END card not found in the first %d blocks: not a FITS header' % BLOCS_MAX)
             for i in range(0, 2880, 80):
                 c = b[i:i + 80].decode('ascii', 'replace')
                 if c[:8] == 'END     ':

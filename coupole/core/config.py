@@ -13,12 +13,16 @@ portables).
 from __future__ import annotations
 
 import json
+import logging
 import os
 import sys
 import tempfile
 import threading
+import time
 import uuid
 from pathlib import Path
+
+log = logging.getLogger(__name__)
 
 NOM = 'Coupole'
 NOM_TECHNIQUE = 'coupole'
@@ -71,23 +75,82 @@ DEFAUTS = {
     'format_sortie': 'xisf',
     'langue_noms': 'auto',             # langue des noms de dossiers et d'objets
     'maj_auto': True,
-    'apparence': 'clair',
-    'services_en_ligne': True,         # fiches SIMBAD / JPL et redshift par nom (une requête par objet, cache)              # thème de Coupole (clair/sombre), indépendant de celui du système
+    'apparence': 'clair',              # thème de Coupole (clair/sombre), indépendant de celui du système
+    'services_en_ligne': True,         # fiches SIMBAD / JPL et redshift par nom (une requête par objet, cache)
+    'ohp_verifier_nouveautes': True,   # Banque OHP : comparer l'inventaire TAP à la copie locale au démarrage
+    'ohp_nouveautes_heures': 24,       # au plus une vérification par ce nombre d'heures
+    'ohp_derniere_verification': '',   # ISO UTC de la dernière vérification des nouveautés
 }
 
 _verrou = threading.Lock()
 
 
+def ecrire_atomique(chemin, texte: str, encodage: str = 'utf-8') -> None:
+    """Écrit `texte` dans un fichier temporaire du même dossier puis le substitue d'un coup (os.replace) :
+    une coupure de courant, un disque plein ou un plantage ne laissent jamais de fichier à moitié écrit."""
+    chemin = Path(chemin)
+    chemin.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=str(chemin.parent), prefix='.' + chemin.name + '.', suffix='.tmp')
+    try:
+        with os.fdopen(fd, 'w', encoding=encodage, newline='') as f:
+            f.write(texte)
+        os.replace(tmp, chemin)
+    except BaseException:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+        raise
+
+
+def ecrire_json_atomique(chemin, objet, indent: int | None = 1) -> None:
+    ecrire_atomique(chemin, json.dumps(objet, ensure_ascii=False, indent=indent))
+
+
+def lire_json_protege(chemin, defaut=None, attendu=dict):
+    """Lit un JSON ; s'il est illisible ou n'a pas le type attendu, le met de côté (`.corrompu-<date>`) et
+    rend `defaut`.  Un fichier absent rend `defaut` sans rien faire."""
+    chemin = Path(chemin)
+    try:
+        texte = chemin.read_text(encoding='utf-8')
+    except FileNotFoundError:
+        return defaut
+    except OSError as e:
+        log.warning('%s unreadable: %s', chemin.name, e)
+        return defaut
+    try:
+        doc = json.loads(texte)
+        if attendu is not None and not isinstance(doc, attendu):
+            raise ValueError('not a %s' % attendu.__name__)
+        return doc
+    except ValueError as e:
+        copie = chemin.with_name('%s.corrompu-%s' % (chemin.name, time.strftime('%Y%m%d-%H%M%S')))
+        k = 1
+        while copie.exists():                                   # deux fichiers abîmés dans la même seconde
+            k += 1
+            copie = chemin.with_name('%s.corrompu-%s-%d' % (chemin.name, time.strftime('%Y%m%d-%H%M%S'), k))
+        try:
+            os.replace(chemin, copie)
+            log.warning('%s corrupt (%s): kept as %s, defaults restored', chemin.name, e, copie.name)
+        except OSError:
+            pass
+        return defaut
+
+
 class Reglages:
-    """Réglages lus et écrits de façon atomique (fichier temporaire + remplacement)."""
+    """Réglages lus et écrits de façon atomique (fichier temporaire + remplacement).
+
+    Un fichier corrompu (JSON invalide, ou qui n'est pas un objet) est mis de côté sous
+    ``reglages.json.corrompu-<date>`` et les valeurs par défaut reprennent : l'application démarre toujours.
+    """
 
     def __init__(self, chemin: Path | None = None):
         self.chemin = chemin or dossier_config() / 'reglages.json'
         self.valeurs = dict(DEFAUTS)
-        try:
-            self.valeurs.update(json.loads(self.chemin.read_text(encoding='utf-8')))
-        except Exception:
-            pass
+        existait = self.chemin.exists()
+        lu = lire_json_protege(self.chemin, None)
+        self.valeurs.update(lu or {})
+        self.restaure = existait and lu is None            # fichier présent mais illisible : mis de côté
         if not self.valeurs.get('id_installation'):
             self.valeurs['id_installation'] = uuid.uuid4().hex[:12]
             self.enregistrer()
@@ -105,13 +168,9 @@ class Reglages:
     def enregistrer(self):
         with _verrou:
             try:
-                self.chemin.parent.mkdir(parents=True, exist_ok=True)
-                fd, tmp = tempfile.mkstemp(dir=str(self.chemin.parent), suffix='.tmp')
-                with os.fdopen(fd, 'w', encoding='utf-8') as f:
-                    json.dump(self.valeurs, f, indent=2, ensure_ascii=False)
-                os.replace(tmp, self.chemin)
-            except OSError:
-                pass
+                ecrire_json_atomique(self.chemin, self.valeurs, indent=2)
+            except OSError as e:                       # disque plein, dossier en lecture seule : on continue
+                log.warning('settings not saved: %s', e)
 
 
 _reglages: Reglages | None = None

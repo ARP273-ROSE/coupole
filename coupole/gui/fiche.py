@@ -244,9 +244,9 @@ class FicheEnLigne(QWidget):
         service = 'JPL SBDB' if (cat in enligne.PETITS_CORPS or sbdb) else 'SIMBAD'
         self.etat.setText(tr('fiche_attente', service=service, nom=nom))
         self._t = Tache(enligne.fiche_objet, nom, cat, sbdb, autres, rafraichir,
-                        en_ligne=self.activer.isChecked())
-        self._t.fini.connect(lambda r, k=numero: self._recu(r, k))
-        self._t.erreur.connect(lambda e, k=numero: self._recu({'etat': 'hors_ligne', 'erreur': e, 'demande': nom}, k))
+                        en_ligne=self.activer.isChecked(), parent=self)
+        self._t.quand_fini(lambda r, k=numero: self._recu(r, k))
+        self._t.quand_erreur(lambda e, k=numero: self._recu({'etat': 'hors_ligne', 'erreur': e, 'demande': nom}, k))
         self._t.start()
 
     def _recu(self, r, numero):

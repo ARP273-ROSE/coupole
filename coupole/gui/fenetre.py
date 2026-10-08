@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtGui import QIcon, QKeySequence
+from PyQt6.QtGui import QAction, QIcon, QKeySequence
 from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QMainWindow, QMessageBox,
                              QStackedWidget, QWidget)
 
@@ -98,9 +98,13 @@ class FenetrePrincipale(QMainWindow):
     def _menus(self):
         mb = self.menuBar()
         m = mb.addMenu(tr('menu_fichier'))
-        m.addAction(action(self, 'act_reglages', self.reglages, QKeySequence('Ctrl+,')))
+        a = action(self, 'act_reglages', self.reglages, QKeySequence('Ctrl+,'))
+        a.setMenuRole(QAction.MenuRole.PreferencesRole)      # macOS : menu de l'application, Cmd+,
+        m.addAction(a)
         m.addSeparator()
-        m.addAction(action(self, 'act_quitter', self.close, QKeySequence('Ctrl+Q')))
+        a = action(self, 'act_quitter', self.close, QKeySequence('Ctrl+Q'))
+        a.setMenuRole(QAction.MenuRole.QuitRole)
+        m.addAction(a)
         m = mb.addMenu(tr('menu_affichage'))
         for i, mod in enumerate(modules.decouvrir()[:9]):
             a = action(self, 'act_module', lambda _=False, k=i: self.barre.setCurrentRow(k),
@@ -129,7 +133,9 @@ class FenetrePrincipale(QMainWindow):
         m.addAction(self.act_rapports)
         m.addAction(action(self, 'act_maj', lambda: dialogues.verifier_maj(self)))
         m.addSeparator()
-        m.addAction(action(self, 'act_apropos', lambda: dialogues.DialogueAPropos(self).exec()))
+        a = action(self, 'act_apropos', lambda: dialogues.DialogueAPropos(self).exec())
+        a.setMenuRole(QAction.MenuRole.AboutRole)
+        m.addAction(a)
 
     # ---------------------------------------------------------------- actions
     def panneau_courant(self):
@@ -203,7 +209,13 @@ class FenetrePrincipale(QMainWindow):
                     QMessageBox.StandardButton.Yes:
                 ev.ignore()
                 return
+        self.statusBar().showMessage(tr('fen_arret_en_cours'))
         for p in self.panneaux:
             if hasattr(p, 'arreter'):
-                p.arreter()
+                try:
+                    p.arreter()                       # lève l'événement d'arrêt du panneau et attend son fil
+                except Exception:
+                    pass
+        from .outils import arreter_tout
+        arreter_tout()                                # tous les fils, pools et QThread : arrêtés et attendus
         ev.accept()

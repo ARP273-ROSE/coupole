@@ -55,4 +55,16 @@ def planifier(m: Machine, telechargements: int = 0, conversions: int = 0,
     if conversions > 0:
         c = min(conversions, CONVERSIONS_MAX)
         raison = 'parallele_raison_manuel'
+        # Même imposé à la main, le nombre de processus reste dans le budget mémoire : sinon le système
+        # échange ou tue un processus (OOM), ce que l'utilisateur n'a certainement pas voulu.
+        dispo = m.memoire_disponible_mo or m.memoire_totale_mo // 2
+        if dispo:
+            plafond = max(1, int(dispo * PART_MEMOIRE // MEMOIRE_PAR_CONVERSION_MO))
+            if c > plafond:
+                c, raison = plafond, 'parallele_raison_memoire'
     return Plan(telechargements=t, conversions=c, econome=eco, raison=raison)
+
+
+def budget_memoire_mo(plan: Plan) -> int:
+    """Mémoire que le plan peut engager au pire (processus de conversion x pic mesuré)."""
+    return plan.conversions * MEMOIRE_PAR_CONVERSION_MO

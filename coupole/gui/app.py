@@ -16,8 +16,14 @@ def main() -> int:
     from ..core import config, rapports
     initialiser()
     journal = config.dossier_config() / 'coupole.log'
-    logging.basicConfig(filename=str(journal), level=logging.INFO,
-                        format='%(asctime)s %(levelname)s %(name)s %(message)s')
+    try:
+        import logging.handlers
+        h = logging.handlers.RotatingFileHandler(str(journal), maxBytes=2_000_000, backupCount=2, encoding='utf-8')
+        h.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(name)s %(message)s'))
+        logging.getLogger().addHandler(h)
+        logging.getLogger().setLevel(logging.INFO)
+    except OSError:                              # dossier en lecture seule : l'application démarre quand même
+        logging.basicConfig(level=logging.WARNING)
     rapports.init()
     rapports.installer_crochets(config.dossier_config() / '_crash_natif.log')
     from PyQt6.QtCore import Qt
@@ -48,15 +54,19 @@ def main() -> int:
 
     def apres_affichage():
         demander_consentement_si_besoin(f)
-        rapports.signaler_demarrage()
+        from .outils import lancer_fil
+        # sondes matérielles (PowerShell sous Windows : plusieurs secondes) et rapport de démarrage : hors du
+        # fil graphique, jamais au prix d'un gel au lancement
+        lancer_fil(lambda: (machine.detecter(), rapports.signaler_demarrage()))
         rapports.reprendre_file_en_fond()
         from ..core import sources
         sources.rafraichir_en_fond()            # fichier de sources publié : repli silencieux
         if config.reglages()['maj_auto']:
             verifier_maj(f, silencieux=True)
+    from ..core import machine
     QTimer.singleShot(300, apres_affichage)
-    from .outils import attendre_taches
-    app.aboutToQuit.connect(lambda: (vigie.arreter(), attendre_taches()))
+    from .outils import arreter_tout
+    app.aboutToQuit.connect(lambda: (vigie.arreter(), arreter_tout()))
     return app.exec()
 
 
