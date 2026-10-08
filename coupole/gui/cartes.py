@@ -304,13 +304,30 @@ class CarteMonde(QWidget):
             for lat in range(-60, 61, 30):
                 _, y = lonlat_vers_monde(0, lat, self.z)
                 p.drawText(QPointF(3, y - oy - 3), '%d°' % lat)
+        centres = []
         for lon, lat, etiquette, _ in self.points:
             x, y = lonlat_vers_monde(lon, lat, self.z)
+            centres.append((x - ox, y - oy, etiquette.split('\n')[0]))
             p.setPen(QPen(QColor('white'), 2))
             p.setBrush(QColor('#B5382B'))
             p.drawEllipse(QPointF(x - ox, y - oy), 6, 6)
-            p.setPen(QColor('#1F2430'))
-            p.drawText(QPointF(x - ox + 9, y - oy + 4), etiquette.split('\n')[0])
+        # Étiquettes sur fond clair (lisibles sur les tuiles), placées à droite, à gauche, dessous ou dessus du
+        # point selon la place ; une étiquette qui chevaucherait encore une autre n'est pas dessinée (le survol
+        # du point la montre).
+        fm = p.fontMetrics()
+        poses = []
+        for cx, cy, texte in centres:
+            l, h = fm.horizontalAdvance(texte) + 8, fm.height() + 2
+            for r in (QRectF(cx + 9, cy - h / 2, l, h), QRectF(cx - 9 - l, cy - h / 2, l, h),
+                      QRectF(cx - l / 2, cy + 9, l, h), QRectF(cx - l / 2, cy - 9 - h, l, h)):
+                if not any(r.intersects(q) for q in poses):
+                    poses.append(r)
+                    p.setPen(Qt.PenStyle.NoPen)
+                    p.setBrush(QColor(255, 255, 255, 215))
+                    p.drawRoundedRect(r, 3, 3)
+                    p.setPen(QColor('#1F2430'))
+                    p.drawText(r, Qt.AlignmentFlag.AlignCenter, texte)
+                    break
         texte = tr('carte_attribution') if self.en_ligne else tr('carte_hors_ligne')
         if self.en_ligne and self.cache.hors_ligne:
             texte = tr('carte_hors_ligne')
