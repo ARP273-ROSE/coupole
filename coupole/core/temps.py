@@ -19,8 +19,20 @@ from __future__ import annotations
 
 import datetime as D
 import re
+import threading
+from collections import OrderedDict
 
 UTC = D.timezone.utc
+
+# Cache de la hauteur du Soleil par (site, minute UTC).  Dans un processus de conversion, le contrôle « heure locale
+# écrite par erreur » demande deux hauteurs par image (≈ 25 ms d'astropy) ; les poses d'une même minute (séries
+# courtes d'un objet mobile) partagent le calcul.  Un cache par processus suffit (les conversions sont des processus
+# séparés) ; le verrou protège les fils d'un même processus.  Le Soleil bouge de 0,25°/min au plus : deux instants
+# de la même minute reçoivent la valeur du premier calculé, sans conséquence sur un test de seuil à 0° ou −12°.
+_CACHE_SOLEIL_MAX = 4096
+_cache_soleil: OrderedDict = OrderedDict()
+_cache_soleil_verrou = threading.Lock()
+_cache_soleil_stats = {'calculs': 0, 'reutilisations': 0}
 
 
 def _astropy_hors_ligne():
@@ -146,6 +158,53 @@ def hauteur_soleil(utcs, site):
     return float(alt[0]) if seul else alt
 
 
+def _cle_soleil(utc: D.datetime, site) -> tuple:
+    """Clé du cache : site (coordonnées arrondies au mètre près) et minute UTC."""
+    u = utc.astimezone(UTC)
+    return (round(site.lat, 5), round(site.lon, 5), round(site.alt, 0), u.year, u.month, u.day, u.hour, u.minute)
+
+
+def hauteurs_soleil_cachees(utcs, site) -> list[float]:
+    """Hauteurs du Soleil (degrés) aux instants `utcs` (datetime aware) au site, via le cache par (site, minute UTC).
+
+    Les instants absents du cache sont calculés **en un seul appel** astropy (le coût est par appel, pas par instant),
+    puis mémorisés.  Sûr entre fils (verrou) ; borné (_CACHE_SOLEIL_MAX entrées, les plus anciennes sortent).
+    """
+    cles = [_cle_soleil(u, site) for u in utcs]
+    with _cache_soleil_verrou:
+        valeurs = [_cache_soleil.get(c) for c in cles]
+        for c, v in zip(cles, valeurs):
+            if v is not None:
+                _cache_soleil.move_to_end(c)
+    manquants = {}
+    for u, c, v in zip(utcs, cles, valeurs):
+        if v is None and c not in manquants:
+            manquants[c] = u
+    nouveaux: dict = {}
+    if manquants:
+        calc = hauteur_soleil(list(manquants.values()), site)
+        nouveaux = {c: float(h) for c, h in zip(manquants, calc)}
+        with _cache_soleil_verrou:
+            _cache_soleil_stats['calculs'] += 1
+            _cache_soleil.update(nouveaux)
+            while len(_cache_soleil) > _CACHE_SOLEIL_MAX:
+                _cache_soleil.popitem(last=False)
+    with _cache_soleil_verrou:
+        _cache_soleil_stats['reutilisations'] += sum(1 for v in valeurs if v is not None)
+    return [nouveaux[c] if v is None else v for c, v in zip(cles, valeurs)]
+
+
+def vider_cache_soleil() -> None:
+    with _cache_soleil_verrou:
+        _cache_soleil.clear()
+        _cache_soleil_stats.update(calculs=0, reutilisations=0)
+
+
+def statistiques_cache_soleil() -> dict:
+    with _cache_soleil_verrou:
+        return dict(_cache_soleil_stats, entrees=len(_cache_soleil))
+
+
 def soupcon_heure_locale(r: dict, site, nocturne: bool = True) -> str | None:
     """Indice qu'une date a été écrite en heure locale : renvoie une raison (texte technique) ou None."""
     if r.get('utc') is None:
@@ -158,8 +217,8 @@ def soupcon_heure_locale(r: dict, site, nocturne: bool = True) -> str | None:
         if m and abs(abs(float(m.group(1))) / 3600 - abs(dec)) < 0.02:
             return 'ecart_fuseau:%+.1fh' % dec
     if nocturne:
-        h_lue = hauteur_soleil(r['utc'], site)
-        h_corr = hauteur_soleil(r['utc'] - D.timedelta(hours=dec), site)
+        # les deux hauteurs (heure lue, heure corrigée du décalage) en un seul calcul, mis en cache par minute
+        h_lue, h_corr = hauteurs_soleil_cachees([r['utc'], r['utc'] - D.timedelta(hours=dec)], site)
         if h_lue > 0 and h_corr < -12:
             return 'soleil:%.0f->%.0f' % (h_lue, h_corr)
     return None

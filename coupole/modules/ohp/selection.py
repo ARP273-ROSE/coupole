@@ -92,6 +92,26 @@ def estimer(selection, fmt='xisf') -> dict:
             'nuits': len({str(x['nuit']) for x in utiles}), 'objets': len({x['objet'] for x in utiles})}
 
 
-def place_necessaire(est: dict, conversions: int, telechargements: int) -> float:
-    """Octets à prévoir à destination : la sortie + les FITS en attente (fenêtre du pilote)."""
-    return est['octets_sortie'] + (2 * conversions + telechargements) * est['plus_gros'] * 2
+def fenetre_nominale(conversions: int, telechargements: int) -> int:
+    """FITS en attente sur le disque (téléchargés ou en cours) que le pilote s'autorise : 2 × conversions + téléchargements."""
+    return 2 * conversions + telechargements
+
+
+def fenetre_adaptee(est: dict, conversions: int, telechargements: int, libre: float | None) -> int:
+    """Fenêtre réduite à ce que la place libre permet, plutôt que de refuser le traitement.
+
+    Chaque FITS en attente réserve 2 × le plus gros fichier (le FITS et sa sortie en cours).  Quand la place libre, une
+    fois la sortie finale retirée, ne couvre pas la fenêtre nominale, elle est réduite — jamais sous
+    ``conversions + 1`` (les conversions tournent, un téléchargement se recouvre encore).  `libre` None : nominale.
+    """
+    nominale = fenetre_nominale(conversions, telechargements)
+    if libre is None or est.get('plus_gros', 0) <= 0:
+        return nominale
+    minimum = min(nominale, conversions + 1)
+    possible = int((libre - est['octets_sortie']) // (2 * est['plus_gros']))
+    return max(minimum, min(nominale, possible))
+
+
+def place_necessaire(est: dict, conversions: int, telechargements: int, libre: float | None = None) -> float:
+    """Octets à prévoir à destination : la sortie + les FITS en attente (fenêtre du pilote, adaptée à `libre`)."""
+    return est['octets_sortie'] + fenetre_adaptee(est, conversions, telechargements, libre) * est['plus_gros'] * 2

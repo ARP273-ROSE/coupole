@@ -6,6 +6,15 @@ French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
 First release.
 
+- **Audit follow-up** (§ 10 of the report, proposals applied): the Sun altitude used by the « local time written by
+  mistake » check is computed in a single astropy call and cached per (site, UTC minute) in each conversion process
+  (13.2 → 2.5 ms of CPU per exposure on a series of 20 s exposures, 33 → 13 ms on an isolated image; overall rate
+  unchanged, network-bound); on Windows, each conversion process puts itself in a « kill on close » *job object*: on
+  cancellation the ASTAP it launched dies immediately with it instead of finishing alone (up to 4 min) — silent
+  fallback if the API refuses, Linux and macOS unchanged (signal); when free space at the destination is tight, the
+  queue of waiting FITS (2 × conversions + downloads) is **reduced automatically** (never below conversions + 1), with a
+  message and a log line, instead of refusing the job. Deliberately not applied: persistent HTTP connections (gain
+  < 1 %) and memory budget 500 → 400 MB per conversion (caution: ASTAP adds its own process).
 - **Full audit** (`docs/AUDIT_2026-10.md`, French): performance (window shown in 0.42 s instead of 1.51 s: astropy,
   scipy and SEP no longer load before display; peak memory of an IRIS 4096² conversion down from 573 to 365 MB; one
   HTTP request per image instead of two; progress aggregated at 10 Hz), parallelism (manual limit bounded by

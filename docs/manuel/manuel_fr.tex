@@ -175,11 +175,14 @@ commande) reprend sans rien refaire. Un dossier garde la langue de noms et le fo
 \texttt{\_traitement/fits\_origine}.
 
 La chaîne est un \emph{pipeline} : les téléchargements (fils) et les conversions (processus séparés, un par cœur
-disponible) se recouvrent, la file des FITS en attente est bornée ($2\times$ conversions + téléchargements), et le
+disponible) se recouvrent, la file des FITS en attente est bornée ($2\times$ conversions + téléchargements ; si la
+place libre à destination est juste, elle est réduite automatiquement — jamais sous conversions + 1 — et le journal le
+dit, plutôt que de refuser le traitement), et le
 débit global est celui du réseau ou du plafond choisi (mesuré : 24 images de 8 Mo à 8 Mo/s en 24,5 s, soit la durée
 du seul téléchargement ; sans plafond, 86 Mo/s de FITS convertis sur 6 cœurs). \emph{Pause} suspend
 l'alimentation du pipeline (les images en cours se terminent) et \emph{Reprendre} la rétablit ; \emph{Arrêter}
-interrompt téléchargements et conversions sans attendre (les processus sont terminés, ASTAP compris). À la fin, un
+interrompt téléchargements et conversions sans attendre (les processus sont terminés, ASTAP compris : par signal
+sous Linux et macOS, par un \emph{job object} sous Windows). À la fin, un
 rapport résume images, durée, converties, doublons, échecs (avec leur raison), volume écrit et lots.
 
 \subsection{Tout télécharger, journal, réorganiser}\label{sec:tout}

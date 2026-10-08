@@ -259,13 +259,18 @@ def _plan(a):
 
 def _afficher_estimation(est, fmt, dest, plan):
     from ...core.machine import disque_libre_go
-    from .selection import place_necessaire
+    from .selection import fenetre_adaptee, fenetre_nominale, place_necessaire
     print(tr('ohp_estimation', images=est['images'], objets=est['objets'], nuits=est['nuits'],
              doublons=est['doublons'], fits=_taille(est['octets_fits']), sortie=_taille(est['octets_sortie']),
              format=fmt.upper()))
-    besoin = place_necessaire(est, plan.conversions, plan.telechargements)
     libre = disque_libre_go(dest) * 1e9
+    # la fenêtre de FITS en attente se réduit à la place libre plutôt que de refuser le traitement
+    besoin = place_necessaire(est, plan.conversions, plan.telechargements, libre)
     print(tr('ohp_place', besoin=_taille(besoin), libre=_taille(libre), dest=dest))
+    fenetre = fenetre_adaptee(est, plan.conversions, plan.telechargements, libre)
+    nominale = fenetre_nominale(plan.conversions, plan.telechargements)
+    if fenetre < nominale and libre >= besoin:
+        print(tr('ohp_fenetre_reduite', libre=_taille(libre), fenetre=fenetre, nominale=nominale))
     return libre >= besoin
 
 

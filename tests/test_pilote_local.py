@@ -298,6 +298,50 @@ def test_reorganiser_des_fichiers_deplaces(tmp_path, banque):
     assert 'réorganisation' in j and 'conflit de nom' in j and 'name conflict' in j
 
 
+# ---------------------------------------------------------------- place juste : fenêtre réduite, pas de refus
+def test_fenetre_reduite_a_la_place_libre():
+    from coupole.modules.ohp.selection import fenetre_adaptee, fenetre_nominale, place_necessaire
+    est = {'plus_gros': 10e6, 'octets_sortie': 30e6}
+    assert fenetre_nominale(2, 2) == 6
+    assert fenetre_adaptee(est, 2, 2, None) == 6                      # place inconnue : nominale
+    assert fenetre_adaptee(est, 2, 2, 1e12) == 6                      # large : nominale
+    assert fenetre_adaptee(est, 2, 2, 30e6 + 6 * 20e6) == 6           # exactement la réserve nominale
+    assert fenetre_adaptee(est, 2, 2, 30e6 + 4 * 20e6) == 4           # juste : réduite à ce qui tient
+    assert fenetre_adaptee(est, 2, 2, 30e6 + 1 * 20e6) == 3           # jamais sous conversions + 1
+    assert fenetre_adaptee(est, 2, 2, 0.0) == 3
+    assert fenetre_adaptee({'plus_gros': 0, 'octets_sortie': 0}, 2, 2, 0.0) == 6   # rien à télécharger : nominale
+    # la place « nécessaire » suit la fenêtre réduite : ce qui était refusé (12 FITS de réserve) passe avec 4
+    assert place_necessaire(est, 2, 2) == 30e6 + 6 * 20e6
+    libre = 30e6 + 4 * 20e6 + 1
+    assert place_necessaire(est, 2, 2, libre) == 30e6 + 4 * 20e6 and libre >= place_necessaire(est, 2, 2, libre)
+
+
+def test_pilote_reduit_la_fenetre_quand_la_place_est_juste(tmp_path, banque, monkeypatch):
+    """Place libre simulée juste au-dessus de la sortie : fenêtre 3 au lieu de 6, événement + ligne de journal,
+    et les six images sont quand même toutes traitées."""
+    s, inv = banque
+    from coupole.core import machine
+    from coupole.modules.ohp.selection import estimer
+    est = estimer(inv.images, 'xisf')
+    libre_simulee = est['octets_sortie'] + 2 * est['plus_gros'] * 1.5          # de quoi tenir 1 FITS, pas plus
+    monkeypatch.setattr(machine, 'disque_libre_go', lambda chemin: libre_simulee / 1e9)
+    evts = []
+    dest = tmp_path / 'juste'
+    bilan = lancer(dest, inv, inv.images, evts=evts)
+    fen = [e for e in evts if e['type'] == 'fenetre']
+    assert len(fen) == 1 and fen[0]['fenetre'] == 3 and fen[0]['nominale'] == 6
+    assert bilan['compte']['ok'] + bilan['compte']['doublon'] == 6 and bilan['compte']['echec'] == 0
+    journal = (dest / '_traitement' / 'JOURNAL.txt').read_text(encoding='utf-8')
+    assert 'réduite à 3' in journal and 'reduced to 3' in journal
+
+
+def test_pilote_garde_la_fenetre_nominale_quand_la_place_est_large(tmp_path, banque):
+    s, inv = banque
+    evts = []
+    lancer(tmp_path / 'large', inv, inv.images, evts=evts)
+    assert not [e for e in evts if e['type'] == 'fenetre']
+
+
 # ---------------------------------------------------------------- estimation « tout »
 def test_estimation_du_temps(banque):
     s, inv = banque

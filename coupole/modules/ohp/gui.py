@@ -613,8 +613,9 @@ class Panneau(QWidget):
         fmt = self.format.currentData()
         m, plan = self._plan()
         est = estimer(sel, fmt)
-        besoin = place_necessaire(est, plan.conversions, plan.telechargements)
         libre = disque_libre_go(dest) * 1e9
+        # fenêtre de FITS en attente réduite à la place libre plutôt qu'un refus (le pilote le signale au journal)
+        besoin = place_necessaire(est, plan.conversions, plan.telechargements, libre)
         if libre < besoin:
             QMessageBox.warning(self, tr('ohp_onglet_traitement'),
                                 tr('ohp_place_manque', besoin=_taille(besoin), libre=_taille(libre), dest=dest))
@@ -744,6 +745,9 @@ class Panneau(QWidget):
                 self._log(tr(ev['cle'], valeur=ev['valeur']))
             elif t == 'pause':
                 self._log(tr('ohp_pause_journal' if ev['actif'] else 'ohp_reprise_journal'))
+            elif t == 'fenetre':
+                self._log(tr('ohp_fenetre_reduite', libre=_taille(ev['libre']), fenetre=ev['fenetre'],
+                             nominale=ev['nominale']))
             elif t == 'erreur':
                 self._log(tr('ohp_erreur_traitement', erreur=ev['erreur']))
             elif t == 'fin':

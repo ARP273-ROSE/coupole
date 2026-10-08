@@ -171,11 +171,13 @@ again) resumes without redoing anything. A folder keeps the name language and fo
 \texttt{\_traitement/fits\_origine}.
 
 The chain is a \emph{pipeline}: downloads (threads) and conversions (separate processes, one per available core)
-overlap, the queue of waiting FITS is bounded ($2\times$ conversions + downloads), and the overall rate is that of
+overlap, the queue of waiting FITS is bounded ($2\times$ conversions + downloads; when free space at the destination
+is tight it is reduced automatically — never below conversions + 1 — and the log says so, rather than refusing the
+job), and the overall rate is that of
 the network or of the chosen cap (measured: 24 images of 8 MB at 8 MB/s in 24.5 s, i.e. the duration of the download
 alone; without a cap, 86 MB/s of FITS converted on 6 cores). \emph{Pause} suspends feeding the pipeline (images in
 progress finish) and \emph{Resume} restores it; \emph{Stop} interrupts downloads and conversions without waiting
-(processes are terminated, ASTAP included). At the end, a report sums up images, duration, converted, duplicates,
+(processes are terminated, ASTAP included: by signal on Linux and macOS, by a \emph{job object} on Windows). At the end, a report sums up images, duration, converted, duplicates,
 failures (with their reason), volume written and stacks.
 
 \subsection{Download everything, log, reorganise}\label{sec:tout}

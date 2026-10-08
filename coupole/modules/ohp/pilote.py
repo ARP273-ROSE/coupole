@@ -154,10 +154,13 @@ class Journal:
 
 
 def _initialiser_processus():
-    """Dans chaque processus de conversion : SIGTERM tue ASTAP en cours puis quitte (annulation propre)."""
+    """Dans chaque processus de conversion : SIGTERM tue ASTAP en cours puis quitte (annulation propre) ; sous
+    Windows (pas de signal), le processus se place dans un job object « kill on close » : l'ASTAP qu'il lancera
+    meurt avec lui dès que le pilote le termine (core/processus.py ; repli silencieux si l'API refuse)."""
     try:
-        from ...core import astap
+        from ...core import astap, processus
         astap.installer_arret_propre()
+        processus.confiner_descendance()
     except Exception:
         pass
 
@@ -303,7 +306,7 @@ class Traitement:
                         'plan': {'telechargements': self.plan.telechargements, 'conversions': self.plan.conversions}})
         compte = {'ok': 0, 'doublon': 0, 'echec': 0}
         echecs: list[dict] = []
-        fenetre = 2 * self.plan.conversions + self.plan.telechargements
+        fenetre = self._fenetre(a_faire)
         ctx = mp.get_context('spawn')
         options_proc = dict(self.options)
         astap = options_proc.get('astap')
@@ -417,13 +420,31 @@ class Traitement:
         self.rapporter({'type': 'fin', 'bilan': bilan})
         return bilan
 
+    def _fenetre(self, a_faire) -> int:
+        """FITS en attente autorisés : la fenêtre nominale (2 × conversions + téléchargements), réduite si la place
+        libre à destination est juste — le traitement continue, un peu moins recouvert, au lieu d'être refusé."""
+        from ...core.machine import disque_libre_go
+        from .selection import estimer, fenetre_adaptee, fenetre_nominale
+        nominale = fenetre_nominale(self.plan.conversions, self.plan.telechargements)
+        try:
+            est = estimer(a_faire, self.options.get('format', 'xisf'))
+            libre = disque_libre_go(self.racine) * 1e9
+            fenetre = fenetre_adaptee(est, self.plan.conversions, self.plan.telechargements, libre)
+        except Exception:                                   # l'estimation ne fait jamais échouer un traitement
+            return nominale
+        if fenetre < nominale:
+            self.journal.ecrire('jrn_fenetre_reduite', fenetre=fenetre, nominale=nominale, libre='%.2f' % (libre / 1e9))
+            self.rapporter({'type': 'fenetre', 'fenetre': fenetre, 'nominale': nominale, 'libre': libre})
+        return fenetre
+
     def _nouveau_pool(self, ctx):
         return F.ProcessPoolExecutor(max(1, self.plan.conversions), mp_context=ctx, initializer=_initialiser_processus)
 
     @staticmethod
     def _terminer_processus(pool):
-        """Annulation : les processus de conversion sont terminés tout de suite (ASTAP compris, par leur
-        gestionnaire SIGTERM) au lieu d'attendre la fin de l'image en cours."""
+        """Annulation : les processus de conversion sont terminés tout de suite (ASTAP compris : par leur
+        gestionnaire SIGTERM sous Linux/macOS, par le job object sous Windows) au lieu d'attendre la fin de
+        l'image en cours."""
         procs = getattr(pool, '_processes', None) or {}
         for p in list(procs.values()):
             try:
