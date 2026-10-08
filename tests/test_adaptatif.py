@@ -31,6 +31,10 @@ def fenetre_adaptative(app_qt):
     from coupole.core import config
     config.reglages()['maj_auto'] = False
     config.reglages()['rapports_autorises'] = False
+    # chemin long sans espace, comme sous Windows (C:\\Users\\…) : il doit pouvoir passer à la ligne
+    ancien = config.reglages()['dossier_sortie']
+    config.reglages()['dossier_sortie'] = ('C:\\Users\\runneradmin\\AppData\\Local\\Temp\\pytest-of-runneradmin\\'
+                                           'pytest-0\\un_dossier_de_sortie_au_nom_tres_long\\OHP_DU_ECU')
     from coupole.gui.fenetre import FenetrePrincipale
     from coupole.gui.outils import attendre_taches
     f = FenetrePrincipale()
@@ -42,6 +46,7 @@ def fenetre_adaptative(app_qt):
     yield f
     f.close()
     attendre_taches()
+    config.reglages()['dossier_sortie'] = ancien
 
 
 @pytest.mark.parametrize('largeur,hauteur', ECRANS)
@@ -88,3 +93,10 @@ def test_dialogues_tiennent_sur_un_petit_ecran(app_qt):
         d.close()
     from coupole.gui.outils import attendre_taches
     attendre_taches()                            # l'assistant ASTAP cherche en fond : on attend avant de quitter
+
+
+def test_chemins_coupables_et_reversibles():
+    from coupole.gui.adaptatif import coupable, texte_reel
+    for s in ('C:\\Users\\x\\OHP_DU_ECU', '/home/x/OHP_DU_ECU', 'http://tap-ufe.obspm.fr/tap', 'sans separateur'):
+        assert texte_reel(coupable(s)) == s
+    assert '\u200b' in coupable('/a/b')

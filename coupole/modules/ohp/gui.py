@@ -18,7 +18,7 @@ from PyQt6.QtWidgets import (QDialog, QFileDialog, QFormLayout, QGridLayout, QGr
 
 from ...core import config, i18n
 from ...core.i18n import tr
-from ...gui.adaptatif import Flux
+from ...gui.adaptatif import Flux, coupable
 from ...gui.dialogues import DialogueASTAP, ouvrir_fichier
 from ...gui.modele import ModeleTableau, lignes_choisies, vue_tableau
 from ...gui.outils import FileEvenements, Tache, aide, bouton, case, champ, decimal, liste, nombre
@@ -373,7 +373,7 @@ class Panneau(QWidget):
         self._etat_astap = astap.detecter(r['astap_executable'], r['astap_catalogue'])
         e = self._etat_astap
         if e.utilisable:
-            self.l_astap.setText(tr('ohp_avec_astap', exe=e.executable, cat=e.catalogue.upper()))
+            self.l_astap.setText(tr('ohp_avec_astap', exe=coupable(e.executable), cat=e.catalogue.upper()))
         else:
             self.l_astap.setText(tr(e.message_cle()) + ' ' + tr('astap_sans_effet'))
         self.mode_astap.setEnabled(e.utilisable)
@@ -539,6 +539,7 @@ class Panneau(QWidget):
         h.addWidget(bouton('ohp_lots_dossier', lambda: ouvrir_fichier(self.dest.text())))
         v.addLayout(h)
         self.l_lots = QLabel('')
+        self.l_lots.setWordWrap(True)
         v.addWidget(self.l_lots)
         self.m_lots = ModeleTableau([tr('csv_dossier'), tr('csv_objet'), tr('csv_filtre'), tr('csv_poses'),
                                      tr('csv_pose_totale_s'), tr('csv_nuits'), tr('csv_alignement')])
@@ -559,8 +560,8 @@ class Panneau(QWidget):
                     donnees.append(os.path.join(self.dest.text(), *r[0].split('/')))
         self.m_lots.remplir(lignes, donnees)
         self.v_lots.resizeColumnsToContents()
-        self.l_lots.setText(tr('ohp_lots_resume', n=len(lignes), dest=self.dest.text()) if lignes
-                            else tr('ohp_lots_aucun', dest=self.dest.text()))
+        self.l_lots.setText(tr('ohp_lots_resume', n=len(lignes), dest=coupable(self.dest.text())) if lignes
+                            else tr('ohp_lots_aucun', dest=coupable(self.dest.text())))
 
     def _ouvrir_lot(self):
         ch = lignes_choisies(self.v_lots, self.p_lots, self.m_lots)

@@ -10,6 +10,7 @@ from PyQt6.QtCore import Qt
 
 from ...core import config
 from ...core.i18n import langue, tr
+from ...gui.adaptatif import coupable, texte_reel
 from ...gui.modele import ModeleTableau, vue_tableau
 from ...gui.outils import FileEvenements, aide, bouton
 from . import mesures, rapport
@@ -26,7 +27,8 @@ class Panneau(QWidget):
         self.b_arreter.setEnabled(False)
         h.addWidget(self.b_lancer)
         h.addWidget(self.b_arreter)
-        self.l_dossier = QLabel(config.reglages()['dossier_sortie'] or str(config.dossier_sortie_defaut() / 'OHP_DU_ECU'))
+        self.l_dossier = QLabel(coupable(config.reglages()['dossier_sortie'] or
+                                        str(config.dossier_sortie_defaut() / 'OHP_DU_ECU')))
         h.addWidget(self.l_dossier, 1)
         v.addLayout(h)
         if not mesures.disponible():
@@ -49,9 +51,9 @@ class Panneau(QWidget):
         self._lignes = []
 
     def choisir(self):
-        d = QFileDialog.getExistingDirectory(self, tr('qual_choisir'), self.l_dossier.text())
+        d = QFileDialog.getExistingDirectory(self, tr('qual_choisir'), texte_reel(self.l_dossier.text()))
         if d:
-            self.l_dossier.setText(d)
+            self.l_dossier.setText(coupable(d))
 
     def occupe(self):
         return self._fil is not None and self._fil.is_alive()
@@ -59,7 +61,7 @@ class Panneau(QWidget):
     def lancer(self, dossier=None):
         if self.occupe():
             return
-        racine = dossier or self.l_dossier.text()
+        racine = dossier or texte_reel(self.l_dossier.text())
         lots = rapport.fichiers(racine)
         total = sum(len(v) for v in lots.values())
         self.barre.setMaximum(max(1, total))

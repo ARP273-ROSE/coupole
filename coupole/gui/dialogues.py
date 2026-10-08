@@ -248,7 +248,7 @@ class DialogueASTAP(QDialog):
             if e.catalogue else '—')))
         if not e.utilisable:
             lignes.append('<i>%s</i>' % html.escape(tr('astap_sans_effet')))
-        self.etat.setText('<br>'.join(lignes))
+        self.etat.setText(adaptatif.coupable('<br>'.join(lignes)).replace('<br\u200b>', '<br>').replace('</\u200b', '</'))
         self.guide.setHtml(guide_astap_html())
 
     def choisir_exe(self):
