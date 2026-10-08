@@ -68,6 +68,7 @@ class Trace(QWidget):
         p.setPen(QPen(pal.text().color(), 1))
         p.drawRect(r)
         if self.x is None or len(self.x) < 2:
+            p.end()
             return
         x0, x1, y0, y1 = self._limites()
 
@@ -133,6 +134,7 @@ class Trace(QWidget):
             p.setPen(pal.text().color())
             p.drawText(QRectF(r.left() + 6, r.top() + 4, r.width() - 12, 18), Qt.AlignmentFlag.AlignRight,
                        self.format_lecture.format(x=self.x[i], y=self.y[i]))
+        p.end()
 
     def mouseMoveEvent(self, ev):
         r = self._cadre()

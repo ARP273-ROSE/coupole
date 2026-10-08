@@ -1,0 +1,27 @@
+# Changelog
+
+French version (reference): [CHANGELOG.md](CHANGELOG.md).
+
+## 0.1.0 — 8 October 2026
+
+First release.
+
+- **Core**: PyQt6 interface and complete command line, French and English everywhere (system language detection,
+  forced choice), tooltips on every widget; automatically discovered modules (shipped, installed, or dropped into the
+  settings folder); hardware detection (system, processor, cores, memory, disk, graphics card) and adapted
+  parallelism; configurable service addresses (sources file, forced values, published file with shape check and
+  domain allow-list); anonymous incident reports with consent; automatic package updates from GitHub Releases; PDF
+  manual and per-screen help.
+- **OHP image bank**: TAP inventory (cache, shipped snapshot, new items flagged); catalogue of 166 objects (JSON
+  classification table, rules, optional online resolution, grouping by position, recorded corrections); polite,
+  resumable downloads; pixel-fingerprint duplicates; astrometric solution check (consistency, optional ASTAP); headers
+  fixed with HISTORY, conditional and idempotent position fix; XISF, lossless compressed FITS and float32 FITS output;
+  stackable sets, bilingual `LOT.txt`, `INDEX_LOTS.csv`, `journal.csv`; anomaly report; sky map. Matches the 7-8
+  October 2026 reference processing (identical pixels and headers on the real test).
+- **Image quality** (optional, SEP): FWHM and ellipticity (Moffat fit, 3 × 3 map), background, noise, gradient,
+  residual, saturation, trails, sampling; validated on synthetic images.
+- **Spectra and series**: FITS (WCS axis, radio cubes, tables) and CSV reading, radio velocity.
+- **Sites and times**: OHP, Meudon, Paris (MPC constants), added sites, OpenStreetMap map, UTC and local time.
+- **My computer**: diagnosis (example module).
+- **Distribution**: Windows (embedded Python + Inno Setup), macOS (.app, .dmg) and Linux (archive + installer)
+  packages, `install.sh` / `install.ps1` / `install.bat` scripts, `pipx`/`pip`.
