@@ -1,0 +1,54 @@
+{
+ "format": 1,
+ "_note": "Sites d'observation. Coordonnées géodésiques WGS 84 calculées depuis les constantes de parallaxe de la liste des codes d'observatoire du Minor Planet Center (https://www.minorplanetcenter.net/iau/lists/ObsCodes.html, relevé du 8/10/2026) : longitude Est, rho cos phi', rho sin phi'. Précision des constantes : environ 60 m en hauteur. Fuseau : base IANA. Les sites partenaires annoncés à la rentrée 2026 (Madagascar, Australie côte ouest, Yunnan) ne sont pas encore identifiés avec certitude : à ajouter (Préférences ou sites_utilisateur.json) quand leurs coordonnées seront connues de source sûre.",
+ "sites": [
+  {
+   "id": "ohp",
+   "nom": "Observatoire de Haute-Provence",
+   "mpc": "511",
+   "mpc_constantes": [
+    5.7157,
+    0.7214,
+    0.69034
+   ],
+   "fuseau": "Europe/Paris",
+   "alias": [
+    "Observatoire de Haute Provence",
+    "Haute Provence",
+    "OHP",
+    "IRiS",
+    "IRIS OHP",
+    "OHP T120",
+    "ACP->NTM"
+   ]
+  },
+  {
+   "id": "meudon",
+   "nom": "Observatoire de Paris, site de Meudon",
+   "mpc": "005",
+   "mpc_constantes": [
+    2.231,
+    0.659891,
+    0.748875
+   ],
+   "fuseau": "Europe/Paris",
+   "alias": [
+    "Meudon"
+   ]
+  },
+  {
+   "id": "paris",
+   "nom": "Observatoire de Paris",
+   "mpc": "007",
+   "mpc_constantes": [
+    2.33675,
+    0.65947,
+    0.749223
+   ],
+   "fuseau": "Europe/Paris",
+   "alias": [
+    "Paris"
+   ]
+  }
+ ]
+}

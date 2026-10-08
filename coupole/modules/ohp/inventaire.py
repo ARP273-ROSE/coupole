@@ -24,7 +24,8 @@ from ...core import astro, config, reseau
 from . import cibles
 
 COLONNES = ['access_url', 'access_estsize', 'target_name', 'filter_name', 't_min', 't_exptime',
-            'instrument_name', 's_ra', 's_dec', 's_fov', 's_region', 's_xel1', 's_xel2', 's_pixel_scale']
+            'instrument_name', 's_ra', 's_dec', 's_fov', 's_region', 's_xel1', 's_xel2', 's_pixel_scale',
+            'facility_name', 'dataproduct_type']
 NUMERIQUES = {'access_estsize', 't_min', 't_exptime', 's_ra', 's_dec', 's_fov', 's_xel1', 's_xel2', 's_pixel_scale'}
 INSTRUMENTS = {'OHP T120': 'T120', 'ACP->NTM': 'IRIS', 'IRIS OHP': 'IRIS'}
 INSTANTANE = Path(__file__).resolve().parent / 'data' / 'inventaire.json.gz'
@@ -167,20 +168,73 @@ def instrument(nom: str) -> str:
     return n[:16] or 'inconnu'
 
 
+SOLAIRES_CIBLE = {'soleil', 'sun', 'sol'}
+SOLAIRES_FILTRE = ('cak', 'ca k', 'ca-k', 'caii', 'white light', 'lumiere blanche', 'herschel', 'pleine ouverture',
+                   'full aperture', 'solar')
+
+
+def est_solaire(x) -> bool:
+    """Observation du Soleil : jamais signalée « de jour »."""
+    from .selection import norm
+    if norm(x['target_name']) in {norm(c) for c in SOLAIRES_CIBLE}:
+        return True
+    f = (x['filter_name'] or '').lower()
+    return any(m in f for m in SOLAIRES_FILTRE) or 'solaire' in (x['instrument_name'] or '').lower() \
+        or 'solar' in (x['instrument_name'] or '').lower()
+
+
+def est_image(x) -> bool:
+    return (x.get('dataproduct_type') or 'image') in ('image', 'cube', '')
+
+
+def site_de(x):
+    """Site de l'observation d'après facility_name / instrument (base des sites), ou None."""
+    from ...core import sites
+    return sites.par_nom(x.get('facility_name', '')) or sites.par_nom(x.get('instrument_name', ''))
+
+
+def marquer_temps(d: list[dict]):
+    """nuit (date du soir AU SITE, midi local), diurne (Soleil au-dessus de l'horizon au site), fuseau."""
+    from ...core import temps
+    par_site = C.defaultdict(list)
+    memo = {}
+    for x in d:
+        k = (x.get('facility_name', ''), x.get('instrument_name', ''))
+        if k not in memo:
+            memo[k] = site_de(x)
+        par_site[memo[k]].append(x)
+    for site_, xs in par_site.items():
+        if site_ is None:
+            for x in xs:
+                x['nuit'] = astro.nuit(x['t_min'])
+                x['site'] = ''
+                x['diurne'] = False
+            continue
+        utcs = [temps.mjd_vers_utc(x['t_min']) for x in xs]
+        try:
+            hauteurs = temps.hauteur_soleil([x['t_min'] for x in xs], site_)
+        except Exception:
+            hauteurs = [-90.0] * len(xs)
+        for x, u, h in zip(xs, utcs, hauteurs):
+            x['site'] = site_.id
+            x['nuit'] = temps.date_du_soir(u, site_)
+            x['soleil_deg'] = round(float(h), 1)
+            x['diurne'] = bool(h > 0) and est_image(x) and not est_solaire(x)
+
+
 def enrichir(lignes: list[dict]) -> list[dict]:
     from ...core.astro import sep_deg
     d = [dict(x) for x in lignes]
+    marquer_temps(d)
     classeur = cibles.Classeur()
     h = historique()
     vus = h.get('urls', {})
     ref = h.get('reference', '')
     for x in d:
-        x['nuit'] = astro.nuit(x['t_min'])
         x['tel'] = instrument(x['instrument_name'])
         x['go'] = x['access_estsize'] * 1024 / 1e9           # access_estsize en Kio
         x['objet'], x['cat'], x['sbdb'], x['rem'], x['classement'] = classeur.classer(x['target_name'])
         x['a_verifier'] = x['classement'] not in cibles.ORIGINES_SURES
-        x['diurne'] = 5 <= astro.utc(x['t_min']).hour <= 17
         x['vu_le'] = vus.get(x['access_url'], '')
         x['nouveau'] = bool(ref and x['vu_le'] and x['vu_le'] > ref)
     # regroupement par position : un nom inconnu pointé sur un objet fixe connu en devient l'alias

@@ -21,7 +21,9 @@ import warnings
 import numpy as np
 
 from ...core import astap as astap_mod
-from ...core.astro import SITE_H, SITE_LAT, SITE_LON, ecart_angle, parse_sexa, sep_deg, sexa, utc
+from ...core import sites as sites_mod
+from ...core import temps as temps_mod
+from ...core.astro import ecart_angle, parse_sexa, sep_deg, sexa, utc
 from ...core.fitsentete import Entete, fnum, fstr, lire_cartes
 from ...core.i18n import tr
 from . import formats
@@ -82,6 +84,33 @@ def pixels(fic):
 
 def empreinte(ref) -> str:
     return hashlib.sha1(np.ascontiguousarray(ref).tobytes()).hexdigest()
+
+
+def corriger_site(ent, site_, info, H):
+    """LATITUDE/LONGITUD corrigées seulement si l'inversion est démontrée ; SITELAT/SITELONG/SITEELEV ajoutés
+    seulement s'ils manquent (cohérents : gardés ; incohérents : signalés, pas touchés).  Idempotent."""
+    la, lo = ent.gets('LATITUDE'), ent.gets('LONGITUD')
+    diag = sites_mod.diagnostic_position(la, lo, site_, ent.getf('LAT-OBS'), ent.getf('LONG-OBS'))
+    info['position'] = diag
+    if diag == 'inversee' and site_ is not None:
+        ent.poser('LATITUDE', fstr(sexa(site_.lat, signe=False, dec=0)), 'Latitude of observation site (N)',
+                  H('raison_site'))
+        ent.poser('LONGITUD', fstr(sexa(site_.lon, signe=False, dec=0)), 'Longitude of observation site (E)',
+                  H('raison_site'))
+    if site_ is None:
+        info['site_mots_cles'] = 'site_inconnu'
+        return
+    etat = []
+    for cle, val, com, ref in (('SITELAT', fstr(sexa(site_.lat, dec=1)), H('sitelat'), site_.lat),
+                               ('SITELONG', fstr(sexa(site_.lon, dec=1)), H('sitelong'), site_.lon)):
+        v = ent.gets(cle)
+        if v is None:
+            ent.poser(cle, val, com)
+        elif parse_sexa(v) is None or abs(parse_sexa(v) - ref) > sites_mod.TOLERANCE_DEG:
+            etat.append(cle + '_incoherent')
+    if ent.get('SITEELEV') is None:
+        ent.poser('SITEELEV', fnum(site_.alt, '%.0f'), H('siteelev'))
+    info['site_mots_cles'] = ' '.join(etat) or 'ok'
 
 
 def convertir(x: dict, fic: str, sortie: str, med: dict, medo: dict, options: dict) -> dict:
@@ -238,16 +267,9 @@ def convertir(x: dict, fic: str, sortie: str, med: dict, medo: dict, options: di
     if f_orig is not None and f_orig != f_norm:
         ent.poser('FILTORIG', fstr(f_orig), H('filtorig'))
     info['filtre'], info['filtre_dossier'], info['filtre_sys'] = f_norm, f_dos, f_sys
-    la, lo = ent.gets('LATITUDE'), ent.gets('LONGITUD')
-    if la is not None and (parse_sexa(la) is None or abs(parse_sexa(la) - SITE_LAT) > 0.05):
-        ent.poser('LATITUDE', fstr(sexa(SITE_LAT, signe=False, dec=0)), 'Latitude of observation site (N)',
-                  H('raison_site'))
-    if lo is not None and (parse_sexa(lo) is None or abs(parse_sexa(lo) - SITE_LON) > 0.05):
-        ent.poser('LONGITUD', fstr(sexa(SITE_LON, signe=False, dec=0)), 'Longitude of observation site (E)',
-                  H('raison_site'))
-    ent.poser('SITELAT', fstr(sexa(SITE_LAT, dec=1)), H('sitelat'))
-    ent.poser('SITELONG', fstr(sexa(SITE_LON, dec=1)), H('sitelong'))
-    ent.poser('SITEELEV', fnum(SITE_H, '%.0f'), H('siteelev'))
+    # ------------------------------------------------------------ site : correction conditionnelle et idempotente
+    site_ = sites_mod.site(x.get('site') or '') if x.get('site') else None
+    corriger_site(ent, site_, info, H)
     # t_min de la base = DATE-OBS - pose/2 : DATE-OBS (début de pose) fait foi
     d_inv = utc(x['t_min']) + D.timedelta(seconds=x['t_exptime'] / 2)
     d_hdr = ent.gets('DATE-OBS')
@@ -264,6 +286,15 @@ def convertir(x: dict, fic: str, sortie: str, med: dict, medo: dict, options: di
             info['date'] = 'illisible'
             d_deb = d_inv
     info['debut'] = d_deb.isoformat(timespec='milliseconds')
+    if site_ is not None:
+        try:
+            r_t = temps_mod.lire_temps({k[0]: ent.gets(k[0]) for k in ent.k if k[0] in
+                                        ('DATE-OBS', 'MJD-OBS', 'JD', 'TIMESYS', 'TIME-OBS', 'UT')})
+            soup = None if x.get('diurne') else temps_mod.soupcon_heure_locale(r_t, site_)
+            if soup:
+                info['heure_locale_soupconnee'] = soup
+        except Exception as e:  # le contrôle du temps ne fait jamais échouer une conversion
+            info['temps_erreur'] = str(e)[:100]
     if x['date_partagee']:
         ent.poser('DATEDOUT', 'T', H('datedout'))
     e_hdr = ent.getf('EXPTIME')
@@ -295,10 +326,7 @@ def convertir(x: dict, fic: str, sortie: str, med: dict, medo: dict, options: di
     props = [('Observation:Object:Name', 'String', objet_h),
              ('Observation:Title', 'String', 'OHP %s DU ECU %s %s %gs' % (x['tel'], objet_h, f_norm, x['t_exptime'])),
              ('Observation:Time:Start', 'TimePoint', debut_txt),
-             ('Observation:Location:Name', 'String', 'Observatoire de Haute-Provence (MPC 511)'),
-             ('Observation:Location:Latitude', 'Float64', SITE_LAT),
-             ('Observation:Location:Longitude', 'Float64', SITE_LON),
-             ('Observation:Location:Elevation', 'Float64', round(SITE_H, 1)),
+
              ('Instrument:Telescope:Name', 'String', 'OHP T120' if x['tel'] == 'T120' else 'OHP IRIS'),
              ('Instrument:ExposureTime', 'Float32', x['t_exptime']),
              ('Instrument:Filter:Name', 'String', f_norm),
@@ -307,6 +335,12 @@ def convertir(x: dict, fic: str, sortie: str, med: dict, medo: dict, options: di
              ('OHP:Conversion:Description', 'String', conv),
              ('OHP:Conversion:MaxAbsDifference', 'Float64', ecart),
              ('OHP:Astrometry:Status', 'String', wstat)]
+    if site_ is not None:
+        props[3:3] = [('Observation:Location:Name', 'String',
+                       site_.nom + (' (MPC %s)' % site_.mpc if site_.mpc else '')),
+                      ('Observation:Location:Latitude', 'Float64', site_.lat),
+                      ('Observation:Location:Longitude', 'Float64', site_.lon),
+                      ('Observation:Location:Elevation', 'Float64', round(site_.alt, 1))]
     if sol_final:
         props += [('Observation:Center:RA', 'Float64', sol_final['ra']),
                   ('Observation:Center:Dec', 'Float64', sol_final['dec'])]

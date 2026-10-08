@@ -182,7 +182,8 @@ def _textes_lot(cle, infos, items, L):
                 ded='%+.5f' % de, dmax='%.1f' % dmax),
               T('angle', a='%.1f' % ang, e='%.3f' % ech)]
     st = C.Counter(x.get('wcs') for x in infos)
-    l.append(T('solutions', v=', '.join('%s %d' % kv for kv in sorted(st.items()))))
+    l.append(T('solutions', v=', '.join('%s %d' % ((k if L == 'fr' else tr('ohp_wcs_' + (k or 'aucune'), 'en')), n)
+                                         for k, n in sorted(st.items(), key=lambda kv: str(kv[0])))))
     dp = sum(1 for x in infos if x.get('date_partagee'))
     if dp:
         l.append(T('dates', n=dp))
