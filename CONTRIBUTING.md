@@ -65,8 +65,10 @@ class Panneau(QWidget):
         v.addWidget(bouton('par_calculer', self.calculer))
 
     def calculer(self):
-        t = Tache(fonction_longue, 42)        # jamais de travail long dans le fil graphique
-        t.fini.connect(self.afficher)
+        t = Tache(fonction_longue, 42, parent=self)   # jamais de travail long dans le fil graphique
+        t.quand_fini(self.afficher)                   # rien n'est appelé si le panneau a été détruit entre-temps
+        t.quand_erreur(self.montrer_erreur)           # une exception dans la tâche devient un message, jamais un plantage
+        self._t = t                                   # garder la référence
         t.start()
 
     def aide_html(self):                      # F1 : aide de l'écran
@@ -74,7 +76,19 @@ class Panneau(QWidget):
 
     def occupe(self):                         # facultatif : empêche de quitter en plein travail
         return False
+
+    def arreter(self):                        # facultatif : appelé à la fermeture ; lever l'arrêt ET attendre
+        pass
 ```
+
+Un travail long qui n'est pas une simple fonction (boucle avec événements, processus) passe par
+`lancer_fil(fonction)` et un `threading.Event` enregistré avec `enregistrer_arret(event)` : à la fermeture de
+l'application, `arreter_tout()` lève tous ces événements puis attend les fils et les `Tache`. Jamais d'appel Qt
+hors du fil graphique : les fils rendent leurs événements à une `FileEvenements` lue à cadence fixe (agrégée :
+pas un événement par bloc de 64 Kio). Jamais de requête réseau, de sous-processus ni de lecture de gros fichier
+dans le fil graphique (`tests/test_gui_robustesse.py::test_aucune_sonde_bloquante_au_demarrage` le vérifie).
+Écrire un fichier : `config.ecrire_atomique()` / `ecrire_json_atomique()` (temporaire + remplacement) ; lire un
+JSON de l'utilisateur : `config.lire_json_protege()` (fichier corrompu mis de côté).
 
 Un panneau peut en ouvrir un autre : `self.window().ouvrir_module('cosmo')` rend le panneau du module (ou `None`),
 par exemple pour lui passer une valeur (`recevoir_redshift(z, nom)` du module Cosmologie).
@@ -150,8 +164,12 @@ optional `textes`, `gui` (a `QWidget` class), `cli` (a function receiving the ar
 
 Every visible string goes through `tr()` with keys declared in the module's `TEXTES` dictionary (French and English);
 every interactive widget has a tooltip (`<key>_aide`). `tests/test_traductions.py` and `tests/test_interface.py`
-enforce both. Long work never runs on the GUI thread (`coupole.gui.outils.Tache`). A panel may provide
-`aide_html()` (F1 help) and `occupe()`.
+enforce both. Long work never runs on the GUI thread: `coupole.gui.outils.Tache(fonction, parent=widget)` with
+`quand_fini()` / `quand_erreur()` (nothing is called once the widget is destroyed; an exception becomes a message),
+or `lancer_fil()` + `enregistrer_arret(event)` for loops and processes (`arreter_tout()` raises every event and
+waits at close). No network request, subprocess or large file read on the GUI thread (a test enforces it). Files
+are written with `config.ecrire_atomique()`; user JSON is read with `config.lire_json_protege()`. A panel may
+provide `aide_html()` (F1 help), `occupe()` and `arreter()`.
 
 The core provides i18n, settings and folders, hardware detection and parallelism planning, an optional GPU array API
 (CuPy or numpy), polite networking (User-Agent, rate cap, resume, cancellation, TAP), configurable service addresses,

@@ -127,6 +127,52 @@ OBJET & objet(s) : « NGC 6888 », « Pluton », « 1998 AG6 », ou un nom de la
 \par\medskip
 \begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
 \toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp tout (all)\newline\normalfont\small Toute la banque (≈ 8 000 images, ≈ 78 Go de FITS → ≈ 30 Go en XISF), avec estimation du volume et du temps avant confirmation ; relancer la même commande reprend là où elle s'était arrêtée.}\\
+\midrule
+--dest DOSSIER & dossier de destination (défaut : \textasciitilde{}/Coupole/OHP\_DU\_ECU ou celui des réglages)\\
+--format \{xisf,\allowbreak{}fz,\allowbreak{}fits\} & format de sortie : xisf (PixInsight, défaut), fz (FITS compressé sans perte), fits (float32)\\
+--noms,\allowbreak{} --names \{fr,\allowbreak{}en\} & langue des noms de dossiers, d'objets et des en-têtes (défaut : langue de l'interface)\\
+--astap \{auto,\allowbreak{}tous,\allowbreak{}suspectes,\allowbreak{}jamais,\allowbreak{}all,\allowbreak{}suspicious,\allowbreak{}never\} & vérification ASTAP : auto/tous (chaque image si ASTAP est là), suspectes, jamais\\
+--telechargements,\allowbreak{} --downloads N & téléchargements simultanés (défaut automatique ; 4 au plus)\\
+--conversions N & conversions simultanées (défaut : selon cœurs et mémoire)\\
+--econome,\allowbreak{} --eco & mode économe : 1 conversion, 2 téléchargements\\
+--debit,\allowbreak{} --rate Mo/s & débit maximal vers le serveur (défaut 8 Mo/s)\\
+--garder-fits,\allowbreak{} --keep-fits & garde aussi les FITS d'origine (dans \_traitement/fits\_origine)\\
+--garder-doublons,\allowbreak{} --keep-duplicates & traite aussi les doublons (inventaire et pixels identiques) au lieu de les écarter\\
+--oui,\allowbreak{} --yes & accepte une sélection de plus de 5 Go sans confirmation\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp nouveautes (new)\newline\normalfont\small Réinterroge le service TAP, compare à la copie locale (dossier de sortie) et liste les nouveautés ; --telecharger les traite dans la même arborescence (jamais sans cette option).}\\
+\midrule
+--telecharger,\allowbreak{} --download & télécharge et convertit les nouveautés listées\\
+--dest DOSSIER & dossier de destination (défaut : \textasciitilde{}/Coupole/OHP\_DU\_ECU ou celui des réglages)\\
+--format \{xisf,\allowbreak{}fz,\allowbreak{}fits\} & format de sortie : xisf (PixInsight, défaut), fz (FITS compressé sans perte), fits (float32)\\
+--noms,\allowbreak{} --names \{fr,\allowbreak{}en\} & langue des noms de dossiers, d'objets et des en-têtes (défaut : langue de l'interface)\\
+--astap \{auto,\allowbreak{}tous,\allowbreak{}suspectes,\allowbreak{}jamais,\allowbreak{}all,\allowbreak{}suspicious,\allowbreak{}never\} & vérification ASTAP : auto/tous (chaque image si ASTAP est là), suspectes, jamais\\
+--telechargements,\allowbreak{} --downloads N & téléchargements simultanés (défaut automatique ; 4 au plus)\\
+--conversions N & conversions simultanées (défaut : selon cœurs et mémoire)\\
+--econome,\allowbreak{} --eco & mode économe : 1 conversion, 2 téléchargements\\
+--debit,\allowbreak{} --rate Mo/s & débit maximal vers le serveur (défaut 8 Mo/s)\\
+--garder-fits,\allowbreak{} --keep-fits & garde aussi les FITS d'origine (dans \_traitement/fits\_origine)\\
+--garder-doublons,\allowbreak{} --keep-duplicates & traite aussi les doublons (inventaire et pixels identiques) au lieu de les écarter\\
+--oui,\allowbreak{} --yes & accepte une sélection de plus de 5 Go sans confirmation\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp reorganiser (reorganise, reorganize)\newline\normalfont\small Parcourt un dossier, reconnaît les fichiers produits par Coupole (en-tête) et les déplace dans l'arborescence des lots de --dest ; conflit de nom → suffixe et ligne de journal ; rien n'est écrasé.}\\
+\midrule
+DOSSIER & dossier où se trouvent les fichiers à ranger\\
+--dest DOSSIER & dossier de destination (défaut : \textasciitilde{}/Coupole/OHP\_DU\_ECU ou celui des réglages)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp telecharger (download)\newline\normalfont\small Rangement : <dossier>/<objet>/<nuit>\_<télescope>/<fichier d'origine>.}\\
 \midrule
 OBJET & objet(s) : « NGC 6888 », « Pluton », « 1998 AG6 », ou un nom de la base\\

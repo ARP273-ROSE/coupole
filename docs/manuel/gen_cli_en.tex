@@ -127,6 +127,52 @@ OBJECT & object(s): « NGC 6888 », « Pluto », « 1998 AG6 », or a database n
 \par\medskip
 \begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
 \toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp tout (all)\newline\normalfont\small The whole bank (≈ 8,000 images, ≈ 78 GB of FITS → ≈ 30 GB as XISF), with a volume and time estimate before confirmation; running the same command again resumes where it stopped.}\\
+\midrule
+--dest FOLDER & destination folder (default: \textasciitilde{}/Coupole/OHP\_DU\_ECU or the one in the settings)\\
+--format \{xisf,\allowbreak{}fz,\allowbreak{}fits\} & output format: xisf (PixInsight, default), fz (lossless compressed FITS), fits (float32)\\
+--noms,\allowbreak{} --names \{fr,\allowbreak{}en\} & language of folder names, object names and headers (default: interface language)\\
+--astap \{auto,\allowbreak{}tous,\allowbreak{}suspectes,\allowbreak{}jamais,\allowbreak{}all,\allowbreak{}suspicious,\allowbreak{}never\} & ASTAP check: auto/all (every image when ASTAP is present), suspicious, never\\
+--telechargements,\allowbreak{} --downloads N & simultaneous downloads (automatic by default; at most 4)\\
+--conversions N & simultaneous conversions (default: from cores and memory)\\
+--econome,\allowbreak{} --eco & economy mode: 1 conversion, 2 downloads\\
+--debit,\allowbreak{} --rate MB/s & maximum download rate (default 8 MB/s)\\
+--garder-fits,\allowbreak{} --keep-fits & also keep the original FITS (in \_traitement/fits\_origine)\\
+--garder-doublons,\allowbreak{} --keep-duplicates & also process duplicates (inventory and identical pixels) instead of leaving them out\\
+--oui,\allowbreak{} --yes & accept a selection over 5 GB without confirmation\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp nouveautes (new)\newline\normalfont\small Query the TAP service again, compare with the local copy (output folder) and list what is new; --download processes them into the same tree (never without this option).}\\
+\midrule
+--telecharger,\allowbreak{} --download & download and convert the listed new images\\
+--dest FOLDER & destination folder (default: \textasciitilde{}/Coupole/OHP\_DU\_ECU or the one in the settings)\\
+--format \{xisf,\allowbreak{}fz,\allowbreak{}fits\} & output format: xisf (PixInsight, default), fz (lossless compressed FITS), fits (float32)\\
+--noms,\allowbreak{} --names \{fr,\allowbreak{}en\} & language of folder names, object names and headers (default: interface language)\\
+--astap \{auto,\allowbreak{}tous,\allowbreak{}suspectes,\allowbreak{}jamais,\allowbreak{}all,\allowbreak{}suspicious,\allowbreak{}never\} & ASTAP check: auto/all (every image when ASTAP is present), suspicious, never\\
+--telechargements,\allowbreak{} --downloads N & simultaneous downloads (automatic by default; at most 4)\\
+--conversions N & simultaneous conversions (default: from cores and memory)\\
+--econome,\allowbreak{} --eco & economy mode: 1 conversion, 2 downloads\\
+--debit,\allowbreak{} --rate MB/s & maximum download rate (default 8 MB/s)\\
+--garder-fits,\allowbreak{} --keep-fits & also keep the original FITS (in \_traitement/fits\_origine)\\
+--garder-doublons,\allowbreak{} --keep-duplicates & also process duplicates (inventory and identical pixels) instead of leaving them out\\
+--oui,\allowbreak{} --yes & accept a selection over 5 GB without confirmation\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp reorganiser (reorganise, reorganize)\newline\normalfont\small Walk a folder, recognise files produced by Coupole (header) and move them into the stack tree of --dest; name conflict → suffix and a log line; nothing is overwritten.}\\
+\midrule
+FOLDER & folder holding the files to sort\\
+--dest FOLDER & destination folder (default: \textasciitilde{}/Coupole/OHP\_DU\_ECU or the one in the settings)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp telecharger (download)\newline\normalfont\small Layout: <folder>/<object>/<night>\_<telescope>/<original file>.}\\
 \midrule
 OBJECT & object(s): « NGC 6888 », « Pluto », « 1998 AG6 », or a database name\\

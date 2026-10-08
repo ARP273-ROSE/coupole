@@ -5,7 +5,7 @@ set -e
 ICI=$(cd "$(dirname "$0")" && pwd)
 cd "$ICI"
 V=$(cat ../../VERSION)
-python3 ../../outils/tables_cli.py >/dev/null 2>&1 || true
+[ -n "$COUPOLE_SANS_TABLES" ] || python3 ../../outils/tables_cli.py >/dev/null 2>&1 || true
 for L in fr en; do
   if [ "$L" = fr ]; then D="8 octobre 2026"; else D="8 October 2026"; fi
   printf '\\newcommand{\\versioncoupole}{%s}\n\\newcommand{\\datecoupole}{%s}\n' "$V" "$D" > version.tex

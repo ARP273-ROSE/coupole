@@ -116,3 +116,34 @@ décrite dans les en-têtes). T120 (914) Palisana : FWHM 2,0 à 2,6″, cohéren
   (réponses simulées ; essai réel M27, NGC 6888, (3) Juno, Pluton avec `COUPOLE_TEST_RESEAU=1` : réussi),
   tests d'interface (module Cosmologie, fiche → Cosmologie).
 - Captures FR/EN (`fiche_*.png`, `module_cosmo_*.png`, autres régénérées), manuels FR/EN complétés et recompilés.
+
+## 2026-10-08 — audit complet et nouvelles fonctions (rapport : `docs/AUDIT_2026-10.md`)
+Huit axes audités, constats avec fichier:ligne, gravité, correction et test ; puis chaîne complète mesurée et quatre
+fonctions ajoutées (tout télécharger, rangement/réorganisation, journal, nouveautés).
+- **Performance** : fenêtre affichée **1,51 → 0,42 s** (astropy/scipy/sep plus jamais chargés avant l'affichage :
+  Cosmologie calculait dans le fil graphique à la construction, Qualité importait sep, la carte du ciel calculait
+  l'écliptique au premier paint) ; mémoire de pointe IRIS 4096² **573 → 365 Mo** (vues sur la référence float64 qui
+  empêchaient sa libération, hachage sans copie, memmap, XISF sans copies intermédiaires) ; une requête HTTP par
+  image au lieu de deux ; progression agrégée à 10 Hz (3 073 → 251 événements).
+- **Chaîne complète** (`outils/pipeline.py`, serveur local) : 24 images de 8 Mo à 8 Mo/s en **24,5 s = durée du
+  téléchargement seul** (recouvrement complet) ; sans plafond 86 Mo/s de FITS convertis sur 5 processus
+  (0,13 s/image) → le débit est borné par le réseau, pas par le CPU ni une sérialisation.
+- **Parallélisme** : bridage manuel borné par la mémoire ; annulation qui termine les processus et ASTAP (Popen
+  scruté) ; `BrokenProcessPool` : KeyError corrigé (le pilote plantait après un plantage de processus) ; pause ;
+  fermeture : `arreter_tout()` lève et attend tous les fils, pools, QThread.
+- **Robustesse** : `lire_json_protege` (réglages corrompus mis de côté), `ecrire_atomique` partout, bornes FITS/XISF,
+  `Tache(parent=…).quand_fini()` (rien vers un widget détruit, exception de slot jamais fatale), vigie de gel et
+  faulthandler **testés** (gel simulé détecté, SIGSEGV relevé).
+- 🔴 **Bug trouvé** : logique des doublons de pixels inversée (`pilote._enregistrer`).
+- **Sécurité** : HTTPS obligatoire (sources distant, collecte), `verifier_archive` (zip slip robuste, symlinks,
+  bombe), rapports ≤ 64 ko + nom de machine masqué, noms réservés Windows, aucun écrasement au rangement,
+  `release.yml` corrigé (importait `reporting`/`updater`), pip-audit propre.
+- **Multiplateforme** : console cp1252 (`reconfigure(errors='replace')`), locales Windows, rôles de menu macOS,
+  chemins > 250 car. ; tests à 150 % et 200 % ; Python 3.10 et 3.12.
+- **Bilinguisme** : test de fuite de langue (aucune fuite réelle) ; 165 clés ajoutées.
+- **Cosmologie** : combos dimensionnés au contenu (`ajuster_combo`), courbes sous le tableau sous 1500 px.
+- **Nouvelles fonctions** : `ohp tout` (estimation volume/temps/place avant confirmation, dossier proposé par OS,
+  reprise, pause, rapport), `JOURNAL.txt` bilingue horodaté, `ohp reorganiser` (déplacement sans écrasement),
+  `ohp nouveautes` + bandeau au démarrage (fréquence réglable, jamais de téléchargement sans accord).
+- Tests : **185 → 232** (3.12, exit 0), 226 sous 3.10 ; manuels FR/EN recompilés, captures régénérées.
+

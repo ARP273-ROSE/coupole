@@ -20,7 +20,7 @@
 \vspace{1.4cm}
 \begin{minipage}{0.78\linewidth}\centering\sffamily\color{ink}
 Free toolbox for students of the « Explorer et Comprendre l'Univers » diploma (Observatoire de Paris).\\[4pt]
-OHP image bank · image quality · spectra and series · sites and times.
+OHP image bank · image quality · spectra and series · sites and times · cosmology.
 \end{minipage}
 \vfill
 {\sffamily\small\color{summit}Author: ARP273-ROSE · GNU GPL licence version 3 or later\\
@@ -129,8 +129,9 @@ Ctrl+Shift+A & ASTAP assistant\\ Ctrl+R & OHP bank: refresh the inventory\\ Ctrl
 
 \capture{img/reglages_en.png}{0.62}
 Preferences (Ctrl+,): interface language; language of folder names, object names and FITS comments;
-appearance (light or dark theme, Coupole's own and independent of the system theme: fixed style, colours and font size, WCAG contrast $\geq$ 4.5); output folder; format; parallelism; maximum rate; economy mode; update check. The \emph{Sources} tab lists the service
-addresses (chapter~\ref{chap:evolutif}).
+appearance (light or dark theme, Coupole's own and independent of the system theme: fixed style, colours and font size, WCAG contrast $\geq$ 4.5); output folder; format; parallelism; maximum rate; economy mode; update check; check of the bank for new images at startup and its maximum frequency (section~\ref{sec:nouveautes}). The \emph{Sources} tab lists the service
+addresses (chapter~\ref{chap:evolutif}). An unreadable settings file is set aside (suffix \texttt{.corrompu-…}) and
+the defaults take over: the application always starts.
 
 % =====================================================================
 \section{OHP image bank module}
@@ -168,6 +169,42 @@ The state is kept in \texttt{\_traitement/etat.sqlite}: \emph{Stop} then \emph{S
 again) resumes without redoing anything. A folder keeps the name language and format of its first run.
 \emph{Keep duplicates} also processes what would be left out; \emph{Keep the original FITS} stores them in
 \texttt{\_traitement/fits\_origine}.
+
+The chain is a \emph{pipeline}: downloads (threads) and conversions (separate processes, one per available core)
+overlap, the queue of waiting FITS is bounded ($2\times$ conversions + downloads), and the overall rate is that of
+the network or of the chosen cap (measured: 24 images of 8 MB at 8 MB/s in 24.5 s, i.e. the duration of the download
+alone; without a cap, 86 MB/s of FITS converted on 6 cores). \emph{Pause} suspends feeding the pipeline (images in
+progress finish) and \emph{Resume} restores it; \emph{Stop} interrupts downloads and conversions without waiting
+(processes are terminated, ASTAP included). At the end, a report sums up images, duration, converted, duplicates,
+failures (with their reason), volume written and stacks.
+
+\subsection{Download everything, log, reorganise}\label{sec:tout}
+\emph{Download everything…} takes the whole bank (about 8,000 images, 78 GB of FITS, 30 GB as XISF). On first use
+(or when no output folder is set), Coupole asks for the destination folder through a native dialog and proposes
+\texttt{Documents/Coupole/OHP\_DU\_ECU}; then it shows, \textbf{before any confirmation}, the volume to download,
+the expected output volume, the estimated duration at the rate cap (78 GB at 8 MB/s: 2~h~42) and the free space; it
+clearly refuses when space is short. Processing is the same as for any selection: resume after a cut or a close
+(per-image state in \texttt{\_traitement/etat.sqlite}, already downloaded FITS found again), pause, end report.
+Command line: \cmd{coupole ohp all --yes}.
+
+\emph{Open the log} shows \texttt{\_traitement/JOURNAL.txt}: one timestamped (UTC), bilingual line per event ---
+session start and end (resume, pause), each image downloaded, converted or left out with its reason, each error, each
+name conflict; rotation at 5 MB (\texttt{JOURNAL-1.txt}, \texttt{JOURNAL-2.txt}). The tabular details stay in
+\texttt{journal.csv}.
+
+\emph{Reorganise files…} sorts into the stack tree images already converted by Coupole that live elsewhere or in an
+older layout: each file is recognised by its header (source address \texttt{OHP:Source:URL}, or \texttt{HISTORY}
+card « converted from … »), attached to the inventory and \textbf{moved} (never copied); a name already taken by a
+foreign file gets a suffix and a log line; nothing is ever overwritten. Command line:
+\cmd{coupole ohp reorganise FOLDER --dest DEST}.
+
+\subsection{New images in the bank}\label{sec:nouveautes}
+At startup (at most once a day, adjustable, can be disabled in Preferences), when the Internet is available and a
+local copy exists in the output folder, Coupole compares a fresh TAP inventory with the copy. If there are new images,
+a banner appears in the OHP bank (and a message in the status bar): « N new images (M objects, X GB) since DD/MM ---
+Download now? / Later / Show ». \emph{Download} processes only the new images into the same tree; \emph{Show}
+filters the catalogue; nothing is ever downloaded without explicit consent. The \emph{Check for new images} button
+runs the comparison on demand. Command line: \cmd{coupole ohp new} (list) and \cmd{coupole ohp new --download}.
 
 \subsection{Astrometric solution}\label{sec:astrometrie}
 Consistency checks, always made: solution present and readable; scale within 2~\% of the nominal one
@@ -452,19 +489,28 @@ coupole cosmo --curves 0.001 1500 300 --csv curves.csv
 Detection without mandatory dependency: system, architecture, processor, physical and logical cores (bounded by
 affinity and container quota), total and available memory, free space, graphics cards (nvidia-smi,
 \texttt{/sys/class/drm}, system\_profiler, CIM). Parallelism: 3 downloads (at most 4), conversions = physical
-cores − 1 bounded by available memory at 500 MB per conversion; economy mode (1 conversion, 2 downloads) automatic
-below 4 GB or 2 cores; manual limits. The graphics card is not used by the OHP bank (work bound by network, disk and
-Zstandard); \texttt{coupole.core.calcul} offers CuPy to future modules.
+cores − 1 bounded by available memory at 500 MB per conversion (peak measured on an IRIS 4096² image, at most half
+of the free memory); economy mode (1 conversion, 2 downloads) automatic below 4 GB or 2 cores; manual limits, also
+bounded by memory. Examples: 2 cores and 2 GB → 2 downloads, 1 conversion; 6 cores and 20 GB free → 3 and 5;
+32 cores and 60 GB free → 3 and 16 (cap). The graphics card is not used by the OHP bank (work bound by network, disk
+and Zstandard); \texttt{coupole.core.calcul} offers CuPy to future modules.
+
+Nothing heavy runs on the GUI thread: astropy, scipy and SEP are loaded only when first needed, the machine probes and
+the ASTAP detection run in the background, and closing the window stops then waits for every thread, task and process
+(see \texttt{docs/AUDIT\_2026-10.md}).
 
 \begin{center}\small
 \begin{tabular}{@{}lr@{}}
 \toprule
-\textbf{Measurement (Ryzen 5 8500G, NVMe)} & \textbf{Value}\\
+\textbf{Measurement (Ryzen 5 8500G, 6 cores, NVMe; Debian container)} & \textbf{Value}\\
 \midrule
 \texttt{coupole --version} & 0.1–0.2 s\\
-window shown & 0.4–0.5 s\\
-inventory loaded (background thread) & 3.1 s at first launch, 0.7 s afterwards\\
-memory peak of a T120 / IRIS 4096² conversion & 144 MB / 600 MB\\
+window shown (astropy, scipy, SEP not loaded) & 0.42 s (1.5 s before the audit)\\
+inventory loaded (background thread) & 3.3 s at first launch, 0.8 s afterwards\\
+full chain, 24 T120 images of 8 MB, 8 MB/s cap & 24.5 s = duration of the download alone (24.2 s)\\
+same chain without a cap (local server) & 2.3 s, 86 MB/s of FITS, 10 images/s\\
+conversion of one T120 image (one process) & 0.13 s (zstd 14 ms, reading 18 ms, writing and reading back 29 ms)\\
+memory peak of a T120 / IRIS 4096² conversion & see \texttt{docs/AUDIT\_2026-10.md}\\
 interface during 3 downloads (28 MB/s) & max gap of a 20 ms timer: 20.8 ms\\
 \bottomrule
 \end{tabular}
@@ -495,13 +541,20 @@ resolution (JPL SBDB, CDS Sesame), cached; grouping by position on a known fixed
 Every automatic classification is marked « to check ».
 \paragraph{Database.} Extra ObsCore columns ignored, missing ones replaced by a default, unknown instruments and
 filters stored apart, non-image data never flagged « daytime »; tested on simulated inventories.
+\paragraph{Security.} No secret in the repository; remote sources file and collection point over HTTPS only, bounded
+size, domain allow-list; update archive downloaded from GitHub only and checked before extraction (absolute paths or
+« .. » refused, symbolic links refused, unpacked size and member count bounded), replacement with rollback on
+failure; XISF and FITS read with size bounds; folder names built from the database made safe (ASCII, forbidden
+characters, Windows reserved names, length); ASTAP launched without a shell; no \texttt{eval} nor \texttt{pickle}
+on external data.
 
 % =====================================================================
 \section{Incident reports and privacy}
 At first launch Coupole asks whether it may send anonymous reports: installation, sign of life (once a day), crash,
 native crash, frozen interface, written report. Content: version, system, processor, memory, graphics card, a random
-installation identifier, error trace with the home folder replaced by « \textasciitilde », the user name masked and
-deep paths shortened. Never a computer name, a user name or an image. Without consent nothing is sent: reports stay
+installation identifier, error trace with the home folder replaced by « \textasciitilde », the user name and the
+computer name masked and deep paths shortened; a report never exceeds 64 kB. Never a computer name, a user name or an
+image. Without consent nothing is sent: reports stay
 in \texttt{\_rapports} in the settings folder. The choice can be changed (Help menu, \cmd{coupole reports
 --enable|--disable}).
 
@@ -528,6 +581,9 @@ Not enough space & choose another output folder; the space needed includes pendi
 Slow computer & economy mode, or fewer simultaneous conversions.\\
 Unknown target name & Catalogue tab, « To check » box, \emph{Correct the classification}.\\
 Quality unavailable & \texttt{pip install sep} (included in the packages).\\
+Settings back to defaults & the \texttt{reglages.json} file was unreadable: it is kept alongside with the suffix \texttt{.corrompu-…}.\\
+Output folder not writable & clear message at start; choose another folder (Preferences or the Folder field).\\
+\texttt{.part} or \texttt{.tmp} file in \texttt{\_traitement} & left by a cut: resuming reuses it (\texttt{.part}) or replaces it; nothing to do.\\
 \bottomrule
 \end{tabularx}
 \end{center}
