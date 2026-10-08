@@ -17,10 +17,18 @@ EXEMPLES = [('cosmo_ex_m87', 0.00428), ('cosmo_ex_3c273', 0.158), ('cosmo_ex_z1'
 
 
 def _calcul_complet(z, modele, H0, Om, Ok, shoes, avec_courbes):
-    """Hors du fil graphique : grandeurs (et courbes si les paramètres ont changé)."""
-    d = calcul.calculer(z, modele, H0, Om, Ok, incertitudes=(modele == 'planck18'), shoes=shoes)
-    c = calcul.courbes(calcul.grille_z(), modele, H0, Om, Ok) if avec_courbes else None
+    """Hors du fil graphique : contrôle des paramètres (astropy, importé ici et pas avant), grandeurs,
+    et courbes si les paramètres ont changé.  Une saisie hors bornes lève ErreurCosmo, rendue à l'interface."""
+    try:
+        calcul.construire(modele, H0, Om, Ok)
+        d = calcul.calculer(z, modele, H0, Om, Ok, incertitudes=(modele == 'planck18'), shoes=shoes)
+        c = calcul.courbes(calcul.grille_z(), modele, H0, Om, Ok) if avec_courbes else None
+    except calcul.ErreurCosmo as e:
+        return 'erreur', e
     return d, c
+
+
+LARGEUR_COTE_A_COTE = 1500      # pixels logiques : en dessous, les courbes passent sous le tableau
 
 
 def _paire(cle_libelle, widget):
@@ -40,6 +48,7 @@ class Panneau(QWidget):
         self._cle_courbes = None
         self._tache = None
         self._en_attente = False
+        self._premier_affichage = True
         v = QVBoxLayout(self)
 
         # ---------------------------------------------------------------- paramètres
@@ -100,12 +109,14 @@ class Panneau(QWidget):
                                     tr('cosmo_col_shoes')])
         self.v_res, self.p_res = vue_tableau(self.m_res, 'cosmo_table_aide', selection_multiple=False)
         self.v_res.setSortingEnabled(False)
+        self.v_res.setWordWrap(False)
         sp.addWidget(self.v_res)
         self.trace = aide(TraceCourbes(), 'cosmo_courbes_aide')
         sp.addWidget(self.trace)
         sp.setSizes([760, 400])
         sp.setStretchFactor(0, 3)
         sp.setStretchFactor(1, 2)
+        self.splitter = sp
         v.addWidget(sp, 1)
         f = Flux()
         f.addWidget(bouton('cosmo_csv_table', self.exporter_tableau))
@@ -119,7 +130,54 @@ class Panneau(QWidget):
         for w in (self.h0, self.om, self.ok):
             w.valueChanged.connect(self.calculer)
         self.shoes.toggled.connect(self.calculer)
-        self._modele_change()
+        self._modele_change(calculer=False)          # premier calcul au premier affichage (showEvent)
+
+    # ------------------------------------------------------------ disposition
+    def showEvent(self, ev):
+        super().showEvent(ev)
+        if self._premier_affichage:
+            self._premier_affichage = False
+            self.calculer()
+        self._disposer()
+
+    def resizeEvent(self, ev):
+        super().resizeEvent(ev)
+        self._disposer()
+
+    def _disposer(self):
+        """Tableau et courbes côte à côte sur un grand écran, l'un sous l'autre sinon : le tableau garde toutes
+        ses colonnes visibles (jamais de défilement horizontal pour la colonne SH0ES)."""
+        voulu = Qt.Orientation.Horizontal if self.width() >= LARGEUR_COTE_A_COTE else Qt.Orientation.Vertical
+        if self.splitter.orientation() != voulu:
+            self.splitter.setOrientation(voulu)
+            self.splitter.setSizes([3, 2] if voulu == Qt.Orientation.Horizontal else [11, 7])   # tableau d'abord
+        # l'un sous l'autre : le tableau montre toutes ses lignes (la page défile si l'écran est bas)
+        if voulu == Qt.Orientation.Vertical and self.m_res.rowCount():
+            h = self.v_res.horizontalHeader().height() + self.v_res.rowHeight(0) * self.m_res.rowCount() + 6
+            self.v_res.setMinimumHeight(min(h, 460))
+        else:
+            self.v_res.setMinimumHeight(0)
+        self._ajuster_colonnes()
+
+    def _ajuster_colonnes(self):
+        """Colonnes au contenu, puis la dernière visible s'étire ; si le total dépasse la vue, la colonne
+        « valeur » (la plus longue) est réduite d'abord : tout reste visible sans ascenseur horizontal."""
+        v = self.v_res
+        if self.m_res.rowCount() == 0:
+            return
+        v.resizeColumnsToContents()
+        en_tete = v.horizontalHeader()
+        visibles = [c for c in range(self.m_res.columnCount()) if not v.isColumnHidden(c)]
+        dispo = v.viewport().width() - 4
+        total = sum(v.columnWidth(c) for c in visibles)
+        if total > dispo and dispo > 200:
+            trop = total - dispo
+            for c in (1, 3, 2):                            # valeur, SH0ES, sigma : on réduit dans cet ordre
+                if c in visibles and trop > 0:
+                    mini = max(90, v.columnWidth(c) - trop)
+                    trop -= v.columnWidth(c) - mini
+                    v.setColumnWidth(c, mini)
+        en_tete.setStretchLastSection(True)
 
     # ------------------------------------------------------------ outils
     @staticmethod
@@ -144,7 +202,7 @@ class Panneau(QWidget):
         m = self.modele.currentData()
         return m, self.h0.value(), self.om.value(), (self.ok.value() if m in calcul.AVEC_COURBURE else 0.0)
 
-    def _modele_change(self, *_):
+    def _modele_change(self, *_, calculer=True):
         m = self.modele.currentData()
         perso = m == 'perso'
         for w in (self.h0, self.om):
@@ -158,7 +216,8 @@ class Panneau(QWidget):
             self.om.setValue(calcul.OM_PLANCK)
             for w in (self.h0, self.om):
                 w.blockSignals(False)
-        self.calculer()
+        if calculer:
+            self.calculer()
 
     # ------------------------------------------------------------ calcul
     def definir_z(self, z):
@@ -181,20 +240,22 @@ class Panneau(QWidget):
             return
         modele, H0, Om, Ok = self._parametres()
         try:
-            z = calcul.verifier_z(self.z.text())
-            calcul.construire(modele, H0, Om, Ok)
+            z = calcul.verifier_z(self.z.text())             # sans astropy : contrôle immédiat de la saisie
         except calcul.ErreurCosmo as e:
-            self.l_etat.setText(tr(e.cle, **{k: self._n(v) if isinstance(v, float) else v
-                                             for k, v in e.valeurs.items()}))
+            self._erreur_cosmo(e)
             return
         cle = (modele, round(H0, 4), round(Om, 5), round(Ok, 5))
         avec = cle != self._cle_courbes
         if avec:
             self.l_etat.setText(tr('cosmo_calcul_courbes'))
-        self._tache = Tache(_calcul_complet, z, modele, H0, Om, Ok, self.shoes.isChecked(), avec)
-        self._tache.fini.connect(lambda r, k=cle: self._afficher(r, k))
-        self._tache.erreur.connect(self._erreur)
+        self._tache = Tache(_calcul_complet, z, modele, H0, Om, Ok, self.shoes.isChecked(), avec, parent=self)
+        self._tache.quand_fini(lambda r, k=cle: self._afficher(r, k))
+        self._tache.quand_erreur(self._erreur)
         self._tache.start()
+
+    def _erreur_cosmo(self, e):
+        self.l_etat.setText(tr(e.cle, **{k: self._n(v) if isinstance(v, float) else v
+                                         for k, v in e.valeurs.items()}))
 
     def _erreur(self, e):
         self.l_etat.setText(e)
@@ -207,6 +268,10 @@ class Panneau(QWidget):
 
     def _afficher(self, r, cle):
         d, c = r
+        if d == 'erreur':
+            self._erreur_cosmo(c)
+            self._suite()
+            return
         if c is not None:
             self.courbes, self._cle_courbes = c, cle
             k = 1e-3 * calcul.al_par_mpc() / 1e6       # Mpc → G al
@@ -241,7 +306,7 @@ class Panneau(QWidget):
         self.m_res.remplir(lignes, [k for k, _ in calcul.GRANDEURS], bulles)
         self.v_res.setColumnHidden(2, 'sigma' not in d)
         self.v_res.setColumnHidden(3, 'shoes' not in d)
-        self.v_res.resizeColumnsToContents()
+        self._disposer()
         self.l_etat.setText(' '.join(tr(a) for a in d['avertissements']))
         self._suite()
 
@@ -254,9 +319,9 @@ class Panneau(QWidget):
         self.b_chercher.setEnabled(False)
         self.candidats.setVisible(False)
         self.l_etat.setText(tr('cosmo_recherche', nom=nom))
-        self._t_nom = Tache(enligne.redshift, nom)
-        self._t_nom.fini.connect(self._nom_trouve)
-        self._t_nom.erreur.connect(lambda e: self._nom_trouve({'etat': 'hors_ligne', 'erreur': e, 'demande': nom}))
+        self._t_nom = Tache(enligne.redshift, nom, parent=self)
+        self._t_nom.quand_fini(self._nom_trouve)
+        self._t_nom.quand_erreur(lambda e: self._nom_trouve({'etat': 'hors_ligne', 'erreur': e, 'demande': nom}))
         self._t_nom.start()
 
     def _nom_trouve(self, r):

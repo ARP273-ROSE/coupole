@@ -18,7 +18,8 @@ from PyQt6.QtWidgets import (QAbstractItemView, QComboBox, QFrame, QHeaderView, 
                              QTableView, QWidget)
 
 LONGUEUR_LIGNE = 60          # au-delà, un QLabel passe à la ligne
-CONTENU_COMBO = 14           # largeur minimale d'une liste déroulante, en caractères
+CONTENU_COMBO = 14           # largeur minimale d'une liste déroulante, en caractères (plancher)
+CONTENU_COMBO_MAX = 32       # plafond : au-delà, le texte est abrégé plutôt que d'élargir la rangée
 TAILLE_MIN = QSize(640, 420)  # plus petite fenêtre principale utilisable (en pixels logiques)
 
 
@@ -68,8 +69,7 @@ def assouplir(racine: QWidget) -> None:
         if not lab.wordWrap() and lab.pixmap() is None and (len(lab.text()) > LONGUEUR_LIGNE or not lab.text()):
             lab.setWordWrap(True)
     for cb in racine.findChildren(QComboBox):
-        cb.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
-        cb.setMinimumContentsLength(CONTENU_COMBO)
+        ajuster_combo(cb)
     for t in racine.findChildren(QAbstractItemView):
         t.setTextElideMode(Qt.TextElideMode.ElideRight)
         t.setHorizontalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
@@ -79,6 +79,15 @@ def assouplir(racine: QWidget) -> None:
             en_tete.setStretchLastSection(True)
             en_tete.setMinimumSectionSize(40)
             en_tete.setTextElideMode(Qt.TextElideMode.ElideRight)
+
+
+def ajuster_combo(cb: QComboBox) -> None:
+    """Largeur minimale d'une liste déroulante : assez pour son élément le plus long (jusqu'à CONTENU_COMBO_MAX
+    caractères, au moins CONTENU_COMBO), sans jamais s'élargir à l'infini.  Un libellé comme « Planck 2018
+    (référence) » n'est ainsi plus coupé."""
+    cb.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+    plus_long = max((len(cb.itemText(i)) for i in range(cb.count())), default=0)
+    cb.setMinimumContentsLength(max(CONTENU_COMBO, min(CONTENU_COMBO_MAX, plus_long + 1)))
 
 
 class Flux(QLayout):

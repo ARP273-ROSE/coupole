@@ -34,12 +34,19 @@ SEUIL_SAT_DEFAUT = 60000.0
 SIGMA_FWHM = 2.0 * math.sqrt(2.0 * math.log(2.0))           # 2,3548 : FWHM = 2,3548 σ
 
 
+_disponible: bool | None = None
+
+
 def disponible() -> bool:
-    try:
-        import sep  # noqa: F401
-        return True
-    except Exception:
-        return False
+    """SEP est-il installé ?  Vérifié sans l'importer (find_spec) : rien de lourd au démarrage de l'interface."""
+    global _disponible
+    if _disponible is None:
+        try:
+            import importlib.util
+            _disponible = importlib.util.find_spec('sep') is not None
+        except Exception:
+            _disponible = False
+    return _disponible
 
 
 def moments_adaptatifs(cut, x0, y0, s0=2.0, iterations=40):

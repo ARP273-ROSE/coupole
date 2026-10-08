@@ -40,13 +40,22 @@ RE_WCS_NEUTRALISE = re.compile(r'^(A|B|AP|BP)_(ORDER|\d+_\d+)$|^(CD|PC)\d_\d$|^C
                                r'^CRVAL\d$|^CRPIX\d$|^CTYPE\d$|^CUNIT\d$|^LONPOLE$|^LATPOLE$|^IMAGEW$|^IMAGEH$')
 
 
+RESERVES_WINDOWS = {'CON', 'PRN', 'AUX', 'NUL', 'CLOCK$'} | {'COM%d' % i for i in range(1, 10)} | \
+    {'LPT%d' % i for i in range(1, 10)}
+LONGUEUR_NOM_MAX = 80
+
+
 def sur(s: str) -> str:
-    """Nom de fichier/dossier sûr sous Windows : ASCII, ni / \\ : * ? \" < > | ni espace."""
+    """Nom de fichier/dossier sûr sous Windows : ASCII, ni / \\ : * ? \" < > | ni espace, jamais « .. », jamais un
+    nom réservé (CON, PRN, AUX, NUL, COM1…, LPT1…), longueur bornée."""
     from ...core.fitsentete import ascii_
-    s = ascii_(s).replace('/', '_').replace('(', '').replace(')', '')
+    s = ascii_(s).replace('/', '_').replace('\\', '_').replace('(', '').replace(')', '')
     s = re.sub(r'^([CPDXI])_(\d{4})', r'\1\2', s)
-    s = re.sub(r'[^A-Za-z0-9.\-]+', '_', s).strip('._')
-    return s or 'objet'
+    s = re.sub(r'[^A-Za-z0-9.\-]+', '_', s)
+    s = re.sub(r'\.{2,}', '.', s).strip('._')[:LONGUEUR_NOM_MAX].rstrip('._') or 'objet'
+    if s.split('.')[0].upper() in RESERVES_WINDOWS:          # CON, NUL, COM1… : refusés par Windows
+        s = s + '_'
+    return s
 
 
 def ident(x) -> str:
@@ -65,25 +74,33 @@ def pixels(fic):
     from astropy.io import fits
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
-        with fits.open(fic, memmap=False, do_not_scale_image_data=True) as hd:
+        # mappé en mémoire : le fichier n'est pas recopié en entier avant les conversions de type (une copie
+        # de moins : 64 Mo sur une image IRIS 4096²) ; les tableaux rendus sont indépendants du fichier
+        with fits.open(fic, memmap=True, do_not_scale_image_data=True) as hd:
             brut = hd[0].data
             bitpix = hd[0].header['BITPIX']
             bzero = hd[0].header.get('BZERO', 0)
             bscale = hd[0].header.get('BSCALE', 1)
-    if brut is None or brut.ndim != 2:
-        raise ValueError('not a 2-D image')
-    if bitpix == 16 and bzero == 32768 and bscale == 1:
-        phys = (brut.astype(np.int32) + 32768).astype('<u2')
-        return phys, phys.astype(np.float64), bitpix, True
-    if bitpix in (-64, -32):
-        phys = brut.astype(np.float64) * bscale + bzero if (bscale != 1 or bzero != 0) else brut
-        return phys.astype('<f4'), phys.astype(np.float64), bitpix, False
-    phys = brut.astype(np.float64) * bscale + bzero
-    return phys.astype('<f4'), phys, bitpix, False
+            if brut is None or brut.ndim != 2:
+                raise ValueError('not a 2-D image')
+            if bitpix == 16 and bzero == 32768 and bscale == 1:
+                phys = (brut.astype(np.int32) + 32768).astype('<u2')
+                return phys, phys.astype(np.float64), bitpix, True
+            if bitpix in (-64, -32):
+                if bscale != 1 or bzero != 0:
+                    ref = brut.astype(np.float64) * bscale + bzero
+                else:
+                    ref = brut.astype(np.float64)        # copie en mémoire centrale (le memmap se referme)
+                return ref.astype('<f4'), ref, bitpix, False
+            phys = brut.astype(np.float64) * bscale + bzero
+            return phys.astype('<f4'), phys, bitpix, False
 
 
 def empreinte(ref) -> str:
-    return hashlib.sha1(np.ascontiguousarray(ref).tobytes()).hexdigest()
+    """SHA-1 des pixels de référence (float64), calculé directement sur la mémoire du tableau : aucune copie
+    (`tobytes()` doublait la mémoire de pointe de 128 Mo sur une image IRIS 4096²)."""
+    a = np.ascontiguousarray(ref)
+    return hashlib.sha1(memoryview(a).cast('B')).hexdigest()
 
 
 def corriger_site(ent, site_, info, H):
@@ -127,6 +144,11 @@ def convertir(x: dict, fic: str, sortie: str, med: dict, medo: dict, options: di
         return tr('hdr_' + cle, L, **kw)
 
     t0 = time.time()
+    simuler = options.get('_simuler')              # crochet des tests : 'exception' ou 'plantage' du processus
+    if simuler == 'exception':
+        raise ValueError('simulated conversion failure')
+    if simuler == 'plantage':
+        os._exit(3)
     info = info_de_base(x)
     info['octets_fits'] = os.path.getsize(fic)
     cartes = lire_cartes(fic)
@@ -136,8 +158,10 @@ def convertir(x: dict, fic: str, sortie: str, med: dict, medo: dict, options: di
     info['sha_pixels'] = empreinte(ref)
     fini = np.isfinite(ref)
     info['non_finis'] = int((~fini).sum())
-    info['min'] = float(np.nanmin(ref)) if fini.any() else None
-    info['max'] = float(np.nanmax(ref)) if fini.any() else None
+    un_fini = bool(fini.any())
+    del fini                                       # 16 Mo sur une image 4096² : libérés tout de suite
+    info['min'] = float(np.nanmin(ref)) if un_fini else None
+    info['max'] = float(np.nanmax(ref)) if un_fini else None
     info['negatifs'] = int((ref < 0).sum())
     info['hors_bornes'] = int(((ref < formats.BORNES[0]) | (ref > formats.BORNES[1])).sum())
     conv = formats.description_conversion(fmt, bitpix, entier16)
@@ -307,6 +331,7 @@ def convertir(x: dict, fic: str, sortie: str, med: dict, medo: dict, options: di
 
     # ------------------------------------------------------------ précision float32
     ecart = 0.0
+    r_ = s_ = s64 = f_ = diff = None
     if sortie_px.dtype.kind == 'f':
         # contrôle pixel à pixel par blocs de lignes : la mémoire de pointe ne dépend pas de la taille de l'image
         pas = max(1, (1 << 20) // max(1, nx))
@@ -324,6 +349,9 @@ def convertir(x: dict, fic: str, sortie: str, med: dict, medo: dict, options: di
                 raise ValueError('NaN moved')
         if hors:
             raise ValueError('difference > half float32 ULP on %d pixels' % hors)
+        # les tranches sont des vues sur `ref` : les oublier, sinon `del ref` ne libère rien et les 128 Mo de la
+        # référence float64 restent en mémoire pendant l'écriture (mesuré : pic 491 → 270 Mo sur une IRIS 4096²)
+        del r_, s_, s64, f_, diff
     info['ecart_max'] = ecart
     ent.poser('XISFCONV', fstr(conv[:68]), H('xisfconv'))
     ent.histoire.append(H('ecart', conv=conv, ecart='%.3g' % ecart))

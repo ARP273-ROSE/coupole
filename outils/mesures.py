@@ -56,28 +56,34 @@ attendre_taches()
 
 
 def memoire_conversion(nx, dtype):
-    code = r'''
-import resource, sys, numpy as np, json
+    """Pic RSS d'un processus qui ne fait QUE la conversion (l'image d'essai est fabriquée par un autre processus :
+    ru_maxrss est un maximum historique, la fabrication ne doit pas le gonfler)."""
+    fabriquer = r'''
+import sys, numpy as np
 from astropy.io import fits
-from coupole.cli import initialiser
-initialiser("fr")
-from coupole.modules.ohp import conversion
 nx, dt, d = int(sys.argv[1]), sys.argv[2], sys.argv[3]
 h = fits.Header(); h["CTYPE1"] = "RA---TAN"; h["CTYPE2"] = "DEC--TAN"; h["CRVAL1"] = 303.0; h["CRVAL2"] = 38.3
 h["CRPIX1"] = nx / 2; h["CRPIX2"] = nx / 2; h["CD1_1"] = -0.46 / 3600; h["CD2_2"] = 0.46 / 3600
 h["CD1_2"] = 0.0; h["CD2_1"] = 0.0; h["DATE-OBS"] = "2025-07-16T22:00:00"
 a = np.random.default_rng(0).normal(1000, 30, (nx, nx)).astype(dt)
 fits.PrimaryHDU(a, header=h).writeto(d + "/m.fits", overwrite=True)
-del a
+'''
+    code = r'''
+import resource, sys, json
+from coupole.cli import initialiser
+initialiser("fr")
+from coupole.modules.ohp import conversion
+nx, d = int(sys.argv[1]), sys.argv[3]
 base = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 x = {"access_url": "http://x/m.fits", "objet": "NGC 6888", "cat": "neb", "tel": "IRIS", "nuit": "2025-07-16",
      "filter_name": "Ha", "t_exptime": 60.0, "t_min": 60872.9, "date_partagee": False, "target_name": "NGC 6888",
      "s_ra": 303.0, "s_dec": 38.3, "s_xel1": nx, "s_pixel_scale": 0.46, "site": "ohp", "diurne": False}
 conversion.convertir(x, d + "/m.fits", d + "/m.xisf", {}, {}, {"format": "xisf"})
 pic = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-print(json.dumps({"base_mo": base / 1024, "pic_mo": pic / 1024}))
+print(json.dumps({"base_mo": round(base / 1024), "pic_mo": round(pic / 1024)}))
 '''
     with tempfile.TemporaryDirectory() as d:
+        subprocess.run([PY, '-c', fabriquer, str(nx), dtype, d], check=True, cwd=RACINE)
         r = subprocess.run([PY, '-c', code, str(nx), dtype, d], capture_output=True, text=True, cwd=RACINE)
         return json.loads(r.stdout.strip().splitlines()[-1])
 

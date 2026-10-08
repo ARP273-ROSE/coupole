@@ -94,6 +94,7 @@ def main():
         if mid == 'sites':
             p.en_ligne.setChecked(False)           # pas de tuiles téléchargées pour les captures
         if mid == 'cosmo':                         # 3C 273, Planck 2018, comparaison SH0ES
+            f.barre.setCurrentRow(i)               # le premier calcul part au premier affichage
             attendre(app, lambda: p.resultat is not None, 60)
             p.shoes.setChecked(True)
             p.recevoir_redshift(0.158, '3C 273')

@@ -72,6 +72,19 @@ def _header_fits(mots):
     return h
 
 
+def identiques(a, b) -> bool:
+    """Égalité pixel à pixel, NaN compris, sans les copies de 64 Mo que fait `np.array_equal(equal_nan=True)`
+    (indexation booléenne) : seulement des tableaux de booléens (1 octet par pixel)."""
+    if a.shape != b.shape:
+        return False
+    if a.dtype.kind != 'f' or b.dtype.kind != 'f':
+        return bool(np.array_equal(a, b))
+    egaux = a == b
+    if egaux.all():
+        return True
+    return bool((egaux | (np.isnan(a) & np.isnan(b))).all())
+
+
 def ecrire(fmt, chemin, donnees, mots, proprietes, createur):
     """Écrit `donnees` (float32 ou uint16) au format voulu et vérifie la relecture.  Renvoie la taille."""
     if fmt == 'xisf':
@@ -81,7 +94,7 @@ def ecrire(fmt, chemin, donnees, mots, proprietes, createur):
         relu, inf = xisf.lire(chemin)
         if relu.dtype.str != donnees.dtype.str:
             raise ValueError('read back format %s instead of %s' % (relu.dtype.str, donnees.dtype.str))
-        if not np.array_equal(relu, donnees, equal_nan=(donnees.dtype.kind == 'f')):
+        if not identiques(relu, donnees):
             raise ValueError('pixels read back differ from pixels written')
         t_ = xisf.xml_texte
         if [tuple(m) for m in inf['mots_cles']] != [(t_(a), t_(b), t_(c)) for a, b, c in mots]:
@@ -105,9 +118,7 @@ def ecrire(fmt, chemin, donnees, mots, proprietes, createur):
             ext = 0
         with fits.open(tmp, memmap=False) as hd:
             relu = hd[ext].data
-            if relu is None or relu.shape != donnees.shape or \
-                    not np.array_equal(relu.astype(donnees.dtype), donnees,
-                                       equal_nan=(donnees.dtype.kind == 'f')):
+            if relu is None or relu.shape != donnees.shape or not identiques(relu.astype(donnees.dtype), donnees):
                 raise ValueError('pixels read back differ from pixels written')
     os.replace(tmp, chemin)
     return os.path.getsize(chemin)

@@ -31,6 +31,8 @@ from xml.sax.saxutils import escape, quoteattr
 import numpy as np
 
 ALIGNEMENT = 4096
+PIXELS_MAX = 2**31                 # 2 Gpixel : au-delà, fichier refusé (une image de la banque fait 16 Mpixel)
+ENTETE_MAX = 64 * 2**20            # octets : l'en-tête XML d'une image fait quelques ko
 _FORMATS = {np.dtype('<f4'): 'Float32', np.dtype('<f8'): 'Float64', np.dtype('<u2'): 'UInt16',
             np.dtype('uint8'): 'UInt8', np.dtype('<u4'): 'UInt32'}
 NS = '{http://www.pixinsight.com/xisf}'
@@ -44,18 +46,26 @@ class ErreurXISF(Exception):
 
 
 # ======================================================================== écriture
-def melanger(octets: bytes, taille_item: int) -> bytes:
-    """Byte shuffling (§ 10.6.2) ; la queue incomplète reste telle quelle."""
+def melanger(octets, taille_item: int):
+    """Byte shuffling (§ 10.6.2) ; la queue incomplète reste telle quelle.
+
+    `octets` : bytes ou tableau d'octets ; rend un tableau numpy contigu (une seule copie, pas de `tobytes()`
+    intermédiaire : 64 Mo de moins au pic sur une image IRIS 4096²)."""
+    a = np.frombuffer(octets, np.uint8) if isinstance(octets, (bytes, bytearray, memoryview)) else octets.view(np.uint8).reshape(-1)
     if taille_item <= 1:
-        return octets
-    a = np.frombuffer(octets, np.uint8)
+        return a
     n = len(a) // taille_item
-    return a[:n * taille_item].reshape(n, taille_item).T.tobytes() + a[n * taille_item:].tobytes()
+    if n * taille_item == len(a):
+        return np.ascontiguousarray(a.reshape(n, taille_item).T)
+    return np.concatenate([np.ascontiguousarray(a[:n * taille_item].reshape(n, taille_item).T).reshape(-1), a[n * taille_item:]])
 
 
-def compresser(octets: bytes, codec: str, niveau: int, taille_item: int) -> bytes:
+def compresser(octets, codec: str, niveau: int, taille_item: int) -> bytes:
+    """`octets` : bytes ou tableau numpy (passé aux compresseurs par le protocole tampon, sans copie)."""
     if codec.endswith('+sh'):
         octets = melanger(octets, taille_item)
+    if isinstance(octets, np.ndarray):
+        octets = memoryview(np.ascontiguousarray(octets)).cast('B')
     base = codec.split('+')[0]
     if base == 'zstd':
         import zstandard
@@ -101,11 +111,11 @@ def ecrire(chemin, donnees, mots_cles, proprietes=(), bounds=None, codec='zstd+s
     fmt = _FORMATS[np.dtype(a.dtype.str.replace('=', '<').replace('|', ''))]
     if fmt.startswith('Float') and bounds is None:
         raise ValueError('bounds required for a floating point image (XISF 11.5.1)')
-    brut = a.tobytes()
     taille_item = a.dtype.itemsize
-    bloc = compresser(brut, codec, niveau, taille_item)
-    compression = ('%s:%d:%d' % (codec, len(brut), taille_item)) if codec.endswith('+sh') \
-        else '%s:%d' % (codec, len(brut))
+    n_brut = a.nbytes
+    bloc = compresser(a, codec, niveau, taille_item)              # le tableau lui-même : aucune copie en bytes
+    compression = ('%s:%d:%d' % (codec, n_brut, taille_item)) if codec.endswith('+sh') \
+        else '%s:%d' % (codec, n_brut)
     somme = hashlib.sha1(bloc).hexdigest()
     ny, nx = a.shape
     uid = str(_uuid.uuid4())
@@ -150,15 +160,22 @@ def ecrire(chemin, donnees, mots_cles, proprietes=(), bounds=None, codec='zstd+s
     else:
         raise RuntimeError('unstable block position')
     tmp = str(chemin) + '.tmp'
-    with open(tmp, 'wb') as f:
-        f.write(b'XISF0100')
-        f.write(len(x).to_bytes(4, 'little'))
-        f.write(b'\0\0\0\0')
-        f.write(x)
-        f.write(b'\0' * (position - 16 - len(x)))
-        f.write(bloc)
-        f.flush()
-    os.replace(tmp, chemin)
+    try:
+        with open(tmp, 'wb') as f:
+            f.write(b'XISF0100')
+            f.write(len(x).to_bytes(4, 'little'))
+            f.write(b'\0\0\0\0')
+            f.write(x)
+            f.write(b'\0' * (position - 16 - len(x)))
+            f.write(bloc)
+            f.flush()
+        os.replace(tmp, chemin)
+    except BaseException:                  # disque plein, dossier retiré, annulation : jamais de .tmp orphelin
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+        raise
     return position + len(bloc), len(bloc)
 
 
@@ -169,17 +186,22 @@ def _verifier(cond, msg):
 
 
 def _desordonner(octets, n):
+    """Inverse du byte shuffling ; rend un tableau d'octets contigu (une seule copie)."""
     if n <= 1:
         return octets
     a = np.frombuffer(octets, np.uint8)
     m = len(a) // n
-    return a[:m * n].reshape(n, m).T.tobytes() + a[m * n:].tobytes()
+    if m * n == len(a):
+        return np.ascontiguousarray(a.reshape(n, m).T).reshape(-1)
+    return np.concatenate([np.ascontiguousarray(a[:m * n].reshape(n, m).T).reshape(-1), a[m * n:]])
 
 
 def _decompresser(bloc, spec):
     parts = spec.split(':')
+    _verifier(len(parts) >= 2 and parts[1].isdigit(), 'compression %s' % spec)
     codec = parts[0]
     taille = int(parts[1])
+    _verifier(taille <= PIXELS_MAX * 8, 'uncompressed size too large: %d' % taille)
     item = 1
     if codec.endswith('+sh'):
         _verifier(len(parts) == 3, 'compression %s: missing item size' % spec)
@@ -197,7 +219,7 @@ def _decompresser(bloc, spec):
     else:
         raise ErreurXISF('non standard codec: %s' % codec)
     _verifier(len(d) == taille, 'decompressed size %d != %d' % (len(d), taille))
-    return _desordonner(d, item) if codec.endswith('+sh') else d
+    return _desordonner(d, item) if codec.endswith('+sh') else np.frombuffer(d, np.uint8)
 
 
 def valider_xsd(xml: bytes, xsd) -> None:
@@ -210,14 +232,22 @@ def valider_xsd(xml: bytes, xsd) -> None:
 def lire(chemin, xsd=None):
     """Lit et contrôle un XISF monolithique à une image.  Renvoie (tableau, infos)."""
     with open(chemin, 'rb') as f:
-        tout = f.read()
-    _verifier(tout[:8] == b'XISF0100', 'signature missing')
-    lg = int.from_bytes(tout[8:12], 'little')
-    _verifier(tout[12:16] == b'\0\0\0\0', 'reserved field not zero')
+        debut = f.read(16)
+        _verifier(debut[:8] == b'XISF0100', 'signature missing')
+        lg = int.from_bytes(debut[8:12], 'little')
+        _verifier(debut[12:16] == b'\0\0\0\0', 'reserved field not zero')
+        _verifier(lg <= ENTETE_MAX, 'header too large: %d bytes' % lg)
+        taille_fichier = os.fstat(f.fileno()).st_size
+        _verifier(taille_fichier <= 16 + lg + PIXELS_MAX * 8 + ALIGNEMENT, 'file too large')
+        f.seek(0)
+        tout = f.read(16 + lg + ALIGNEMENT)                # en-tête et bourrage ; le bloc de pixels est lu à part
     xml = tout[16:16 + lg]
     _verifier(xml.startswith(b'<?xml version="1.0" encoding="UTF-8"?>'), 'XML declaration missing')
-    xml.decode('utf-8')
-    racine = ET.fromstring(xml)
+    try:
+        xml.decode('utf-8')
+        racine = ET.fromstring(xml)
+    except (UnicodeDecodeError, ET.ParseError) as e:        # en-tête abîmé (fichier partiel, octets altérés)
+        raise ErreurXISF('invalid XML header: %s' % e)
     _verifier(racine.tag == NS + 'xisf', 'root %s' % racine.tag)
     _verifier(racine.get('version') == '1.0', 'root version')
     if xsd is not None:
@@ -229,8 +259,12 @@ def lire(chemin, xsd=None):
     images = racine.findall(NS + 'Image')
     _verifier(len(images) == 1, '%d images' % len(images))
     im = images[0]
-    geo = [int(v) for v in im.get('geometry').split(':')]
+    try:
+        geo = [int(v) for v in (im.get('geometry') or '').split(':')]
+    except ValueError:
+        raise ErreurXISF('geometry %s' % im.get('geometry'))
     _verifier(len(geo) == 3 and geo[2] == 1 and min(geo) > 0, 'geometry %s' % im.get('geometry'))
+    _verifier(geo[0] * geo[1] <= PIXELS_MAX, 'image too large: %dx%d' % (geo[0], geo[1]))
     fmt = im.get('sampleFormat')
     _verifier(fmt in TYPES, 'sampleFormat %s' % fmt)
     bounds = im.get('bounds')
@@ -244,9 +278,12 @@ def lire(chemin, xsd=None):
     m = re.match(r'^attachment:(\d+):(\d+)$', im.get('location', ''))
     _verifier(m is not None, 'location %s' % im.get('location'))
     pos, taille = int(m.group(1)), int(m.group(2))
-    _verifier(pos >= 16 + lg and pos + taille <= len(tout), 'block outside the file')
+    _verifier(pos >= 16 + lg and pos + taille <= taille_fichier, 'block outside the file')
     _verifier(not tout[16 + lg:pos].strip(b'\0'), 'unused space not zero')
-    bloc = tout[pos:pos + taille]
+    with open(chemin, 'rb') as f:
+        f.seek(pos)
+        bloc = f.read(taille)
+    _verifier(len(bloc) == taille, 'block outside the file')
     cs = im.get('checksum')
     if cs:
         algo, dig = cs.split(':')
@@ -259,7 +296,7 @@ def lire(chemin, xsd=None):
         dt = dt.newbyteorder('>')
     nx, ny = geo[0], geo[1]
     _verifier(len(brut) == nx * ny * dt.itemsize, 'pixel data size')
-    data = np.frombuffer(brut, dt).reshape(ny, nx)
+    data = (brut.view(dt) if isinstance(brut, np.ndarray) else np.frombuffer(brut, dt)).reshape(ny, nx)
     mots = []
     for k in im.findall(NS + 'FITSKeyword'):
         nom = k.get('name')
