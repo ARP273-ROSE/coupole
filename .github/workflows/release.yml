@@ -160,7 +160,7 @@ jobs:
           sys.path.insert(0, r'$PKG/app')
           from PyQt6.QtWidgets import QApplication
           app = QApplication(sys.argv)
-          import reporting, updater
+          import coupole.cli, coupole.core.maj, coupole.core.rapports
           kit = json.loads(pathlib.Path(r'$PKG/app/kit.json').read_text(encoding='utf-8'))
           # Modules que l'application doit pouvoir importer : c'est le seul
           # moyen de repérer ici une dependance oubliee dans le paquet, qui

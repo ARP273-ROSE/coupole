@@ -39,6 +39,9 @@ PREFIXE = 'coupole-app-'
 POINT_ENTREE = 'lancer.py'
 PROTEGES = {'reglages.json'}
 DELAI = 20
+ARCHIVE_MAX = 200 * 2**20          # octets téléchargés : l'archive applicative fait ~5 Mo
+CONTENU_MAX = 1024 * 2**20         # octets une fois dépliés (protection contre une « zip bomb »)
+MEMBRES_MAX = 20000
 HOTES = ('github.com', 'api.github.com', 'objects.githubusercontent.com', 'release-assets.githubusercontent.com')
 SECTIONS = {'fr': ('Français', 'Francais'), 'en': ('English',)}
 
@@ -145,20 +148,22 @@ def appliquer(maj: dict, progression=None) -> bool:
     try:
         with _ouvrir(maj['url']) as r, open(archive, 'wb') as f:
             total = int(r.headers.get('Content-Length') or maj.get('taille') or 0)
+            if total > ARCHIVE_MAX:
+                raise RuntimeError('archive too large: %d bytes' % total)
             fait = 0
             while True:
                 b = r.read(65536)
                 if not b:
                     break
-                f.write(b)
                 fait += len(b)
+                if fait > ARCHIVE_MAX:
+                    raise RuntimeError('archive too large')
+                f.write(b)
                 if progression:
                     progression(fait, total)
         extrait = tmp / 'contenu'
         with zipfile.ZipFile(archive) as z:
-            for membre in z.namelist():
-                if not str((extrait / membre).resolve()).startswith(str(extrait.resolve())):
-                    raise RuntimeError('suspicious archive: %s' % membre)
+            verifier_archive(z, extrait)
             z.extractall(extrait)
             if os.name != 'nt':                    # zipfile ne restitue pas le bit d'exécution
                 for info in z.infolist():
@@ -199,6 +204,28 @@ def appliquer(maj: dict, progression=None) -> bool:
         raise
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+
+
+def verifier_archive(z: 'zipfile.ZipFile', extrait: Path) -> None:
+    """Refuse toute archive qui écrirait hors de `extrait` (zip slip : « ../ », chemin absolu, lecteur Windows),
+    un lien symbolique, un nombre de membres ou un volume déplié déraisonnables."""
+    infos = z.infolist()
+    if len(infos) > MEMBRES_MAX:
+        raise RuntimeError('suspicious archive: %d members' % len(infos))
+    total = 0
+    base = os.path.realpath(str(extrait))
+    for info in infos:
+        nom = info.filename
+        if not nom or nom.startswith(('/', '\\')) or ':' in nom.split('/')[0] or '..' in nom.replace('\\', '/').split('/'):
+            raise RuntimeError('suspicious archive: %s' % nom)
+        cible = os.path.realpath(os.path.join(base, *nom.replace('\\', '/').split('/')))
+        if os.path.commonpath([base, cible]) != base:
+            raise RuntimeError('suspicious archive: %s' % nom)
+        if (info.external_attr >> 16) & 0o170000 == 0o120000:
+            raise RuntimeError('suspicious archive: symbolic link %s' % nom)
+        total += info.file_size
+        if total > CONTENU_MAX:
+            raise RuntimeError('suspicious archive: unpacked size over %d bytes' % CONTENU_MAX)
 
 
 def relancer() -> bool:

@@ -56,13 +56,18 @@ def chemin_cache_distant() -> Path:
     return config.dossier_config() / 'sources_distant.json'
 
 
-def _domaine_ok(url: str) -> bool:
+TAILLE_MAX_DISTANT = 200_000      # octets : le fichier livré fait ~2 ko
+HTTPS_OBLIGATOIRE = {'sources.distant', 'rapports.collecte'}   # jamais de téléchargement de « code » en clair
+
+
+def _domaine_ok(url: str, https: bool = False) -> bool:
     try:
         u = urlparse(url)
     except ValueError:
         return False
     h = (u.hostname or '').lower()
-    return u.scheme in ('http', 'https') and any(h == d or h.endswith('.' + d) for d in DOMAINES_AUTORISES)
+    schemas = ('https',) if https else ('http', 'https')
+    return u.scheme in schemas and any(h == d or h.endswith('.' + d) for d in DOMAINES_AUTORISES)
 
 
 def valider(doc) -> list[str]:
@@ -86,6 +91,8 @@ def valider(doc) -> list[str]:
             pb.append('bad value for %s' % k)
         elif k == 'ohp.telechargement.vers' and v and not _domaine_ok(v):
             pb.append('domain not allowed for %s' % k)
+        elif k in HTTPS_OBLIGATOIRE and v and not _domaine_ok(v, https=True):
+            pb.append('https required for %s' % k)
         elif k not in CLES_TEXTE and v and not _domaine_ok(v):
             pb.append('domain not allowed for %s' % k)
     al = doc.get('alias_ohp', {})
@@ -165,13 +172,17 @@ def alias_distants() -> dict:
 def rafraichir_distant(delai=8) -> bool:
     """Récupère le fichier distant ; True s'il a été accepté.  Ne lève jamais."""
     url = valeur('sources.distant')
-    if not url or not _domaine_ok(url):
+    if not url or not _domaine_ok(url, https=True):
         return False
     try:
         from .. import __version__
         req = urllib.request.Request(url, headers={'User-Agent': 'Coupole/%s' % __version__})
         with urllib.request.urlopen(req, timeout=delai) as r:
-            doc = json.loads(r.read(200_000).decode('utf-8'))
+            brut = r.read(TAILLE_MAX_DISTANT + 1)
+        if len(brut) > TAILLE_MAX_DISTANT:
+            log.warning('remote sources rejected: too large')
+            return False
+        doc = json.loads(brut.decode('utf-8'))
     except Exception as e:
         log.info('remote sources unavailable: %s', e)
         return False
@@ -182,7 +193,11 @@ def rafraichir_distant(delai=8) -> bool:
     if doc['version'] <= defauts()['version']:
         return False
     with _verrou:
-        chemin_cache_distant().write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding='utf-8')
+        try:
+            config.ecrire_json_atomique(chemin_cache_distant(), doc)
+        except OSError as e:
+            log.warning('remote sources not cached: %s', e)
+            return False
     return True
 
 
