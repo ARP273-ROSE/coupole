@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "version": 1,
+  "version": 2,
   "date": "2026-10-08",
   "_note": "Adresses des services utilisés par Coupole. Valeurs par défaut livrées avec l'application ; une version plus récente peut être publiée dans le dépôt (coupole/donnees/sources.json) et récupérée au démarrage ; l'utilisateur peut forcer chaque valeur dans les Préférences.",
   "valeurs": {
@@ -11,6 +11,11 @@
     "ohp.telechargement.vers": "",
     "resolution.sbdb": "https://ssd-api.jpl.nasa.gov/sbdb.api",
     "resolution.sesame": "https://cds.unistra.fr/cgi-bin/nph-sesame/-oxp/SNV",
+    "simbad.base": "https://simbad.u-strasbg.fr/simbad",
+    "simbad.page": "https://simbad.u-strasbg.fr/simbad/sim-id?Ident={id}",
+    "aladin.page": "https://aladin.cds.unistra.fr/AladinLite/?target={ra}%20{dec}&fov={fov}",
+    "ned.page": "https://ned.ipac.caltech.edu/byname?objname={id}",
+    "sbdb.page": "https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr={id}",
     "rapports.collecte": "https://fenice.giff.re/rapports/collecte.php",
     "maj.depot": "ARP273-ROSE/coupole",
     "sources.distant": "https://raw.githubusercontent.com/ARP273-ROSE/coupole/main/coupole/donnees/sources.json",

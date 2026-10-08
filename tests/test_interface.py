@@ -155,3 +155,58 @@ def test_theme_independant_du_systeme_et_lisible(app_qt):
             assert abs(app_qt.font().pointSizeF() - theme.TAILLE_POINTS) < 0.01
     finally:
         theme.appliquer(app_qt, 'clair')
+
+
+def test_module_cosmologie(app_qt, fenetre):
+    """Le module calcule au démarrage, accepte un redshift reçu d'un autre module, refuse z ≤ 0 en l'expliquant."""
+    p = fenetre.ouvrir_module('cosmo')
+    assert p is not None
+    attendre(app_qt, lambda: p.resultat is not None and p.courbes is not None, 60)
+    assert p.m_res.rowCount() > 10 and len(p.trace.series) == 4
+    p.recevoir_redshift(0.158, '3C 273')
+    attendre(app_qt, lambda: abs(p.resultat['z'] - 0.158) < 1e-9, 30)
+    assert '3C 273' in p.objet.text() and p.v_res.isColumnHidden(2) is False
+    p.z.setText('-1')
+    p.calculer()
+    assert 'M 31' in p.l_etat.text()
+    p.modele.setCurrentIndex(p.modele.findData('wmap9'))
+    p.definir_z(1.0)
+    attendre(app_qt, lambda: p.resultat['modele'] == 'wmap9' and abs(p.resultat['z'] - 1) < 1e-9, 60)
+    assert p.v_res.isColumnHidden(2) and not p.ok.isEnabled() and not p.shoes.isEnabled()
+    p.modele.setCurrentIndex(p.modele.findData('planck18'))
+    attendre(app_qt, lambda: p.resultat['modele'] == 'planck18', 60)
+    from coupole.gui.outils import attendre_taches
+    attendre_taches()
+
+
+def test_fiche_en_ligne_vers_cosmologie(app_qt, fenetre, monkeypatch):
+    """Onglet Fiche en ligne de la Banque OHP (réponse simulée) → « envoyer ce redshift » au module Cosmologie."""
+    from coupole.core import enligne
+    demandes = []
+
+    def fiche(nom, cat=None, sbdb=None, autres=(), rafraichir=False, delai=8, en_ligne=None):
+        demandes.append(nom)
+        return {'etat': 'ok', 'demande': nom, 'cache': False, 'perime': False, 'erreur': '', 'raison': '',
+                'date': '2026-10-08T12:00:00+00:00',
+                'fiche': {'service': 'simbad', 'nom': 'M 31', 'otype': 'AGN', 'type': 'Galaxy', 'ra': 10.68,
+                          'dec': 41.27, 'ra_s': '', 'dec_s': '', 'z': 0.5, 'vr': None, 'plx': None, 'flux': {},
+                          'ids': [], 'liens': {'simbad': 'https://simbad.u-strasbg.fr/simbad/sim-id?Ident=M%2031'}}}
+    monkeypatch.setattr(enligne, 'fiche_objet', fiche)
+    ohp = fenetre.ouvrir_module('ohp')
+    attendre(app_qt, lambda: ohp.inv is not None and ohp.m_obj.rowCount() > 0)
+    for r, o in enumerate(ohp.m_obj.donnees):
+        if o['objet'] == 'M31':
+            ohp.v_obj.selectRow(ohp.p_obj.mapFromSource(ohp.m_obj.index(r, 0)).row())
+    assert demandes == []                                   # onglet caché : aucune requête
+    ohp.onglets.setCurrentIndex(ohp.onglet_fiche)
+    attendre(app_qt, lambda: ohp.fiche.resultat() is not None, 10)
+    assert demandes == ['M31'] and 'M 31' in ohp.fiche.vue.toPlainText()
+    assert ohp.fiche.b_cosmo.isEnabled()
+    ohp.fiche.b_cosmo.click()
+    p = fenetre.panneau_module('cosmo')
+    assert fenetre.panneau_courant() is p
+    attendre(app_qt, lambda: p.resultat is not None and abs(p.resultat['z'] - 0.5) < 1e-9, 30)
+    ohp.onglets.setCurrentIndex(0)
+    fenetre.ouvrir_module('ohp')
+    from coupole.gui.outils import attendre_taches
+    attendre_taches()

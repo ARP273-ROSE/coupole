@@ -264,6 +264,11 @@ TEXTES = {
     'ohp_corriger': {'fr': 'Corriger le classement…', 'en': 'Correct the classification…'},
     'ohp_corriger_aide': {'fr': "Renommer l'objet, changer son type, ou le fusionner avec un autre (correction mémorisée).",
                           'en': 'Rename the object, change its type, or merge it into another (correction recorded).'},
+    'ohp_voir_fiche': {'fr': 'Fiche en ligne', 'en': 'Online record'},
+    'ohp_voir_fiche_aide': {'fr': "Ouvre l'onglet « Fiche en ligne » pour l'objet choisi : SIMBAD (ciel profond) ou JPL "
+                                  '(petits corps), si Internet est disponible.',
+                            'en': 'Opens the « Online record » tab for the selected object: SIMBAD (deep sky) or JPL '
+                                  '(small bodies), when the Internet is available.'},
     'ohp_corriger_un': {'fr': 'Sélectionner un seul objet.', 'en': 'Select a single object.'},
     'ohp_corriger_texte': {'fr': 'Objet : {objet}\nNoms dans la base : {noms}', 'en': 'Object: {objet}\nNames in the database: {noms}'},
     'ohp_corr_nom': {'fr': 'Nom canonique', 'en': 'Canonical name'},
@@ -339,7 +344,12 @@ TEXTES = {
               "rangement en lots. Arrêter puis relancer reprend là où c'était.</p><h4>Lots</h4><p>Objets fixes : un lot par "
               "champ (toutes nuits) et par filtre → StarAlignment. Objets mobiles : un lot par nuit → CometAlignment. "
               "LOT.txt donne le conseil d'empilement.</p><h4>Anomalies</h4><p>Doublons, dates partagées ou diurnes, champs "
-              "incohérents, noms à vérifier : tout est expliqué, rien n'est supprimé.</p>",
+              "incohérents, noms à vérifier : tout est expliqué, rien n'est supprimé.</p>"
+              "<h4>Fiche en ligne</h4><p>Facultative, si Internet est disponible : pour l'objet choisi, SIMBAD (type, "
+              "coordonnées, magnitudes, parallaxe, distance mesurée, vitesse radiale et redshift, taille, identifiants, "
+              "liens SIMBAD, Aladin Lite et NED pour les galaxies) ou la base des petits corps du JPL (classe orbitale, "
+              "éléments, diamètre, albédo, rotation). Une requête par objet, gardée 30 jours en cache ; hors ligne, la "
+              "dernière fiche connue s'affiche avec sa date. Un redshift positif s'envoie au module Cosmologie.</p>",
         'en': "<h3>OHP image bank</h3><p>Images from the diploma's training nights at the Observatoire de Haute-Provence "
               "(T120 since 2015, IRIS since 2021), already calibrated (dark, flat) and astrometrically solved by the database.</p>"
               "<h4>Catalogue</h4><p>Database names are grouped into objects. Select objects, filter night and filter on the "
@@ -350,7 +360,12 @@ TEXTES = {
               "starting again resumes where it was.</p><h4>Stacks</h4><p>Fixed objects: one stack per field (all nights) and "
               "filter → StarAlignment. Moving objects: one stack per night → CometAlignment. LOT.txt gives stacking advice.</p>"
               "<h4>Anomalies</h4><p>Duplicates, shared or daytime dates, inconsistent fields, names to check: everything is "
-              "explained, nothing is deleted.</p>"},
+              "explained, nothing is deleted.</p>"
+              "<h4>Online record</h4><p>Optional, when the Internet is available: for the selected object, SIMBAD (type, "
+              "coordinates, magnitudes, parallax, measured distance, radial velocity and redshift, size, identifiers, "
+              "SIMBAD, Aladin Lite and, for galaxies, NED links) or JPL's small-body database (orbit class, elements, "
+              "diameter, albedo, rotation). One request per object, cached for 30 days; offline, the last known record is "
+              "shown with its date. A positive redshift can be sent to the Cosmology module.</p>"},
 'ohp_onglet_ciel': {'fr': 'Carte du ciel', 'en': 'Sky map'},
     'ohp_ciel_intro': {'fr': 'Un point par objet fixe (taille : nombre d\'images), un point par nuit pour les objets mobiles. Clic : sélectionne l\'objet.',
                        'en': 'One point per fixed object (size: number of images), one point per night for moving objects. Click: select the object.'},

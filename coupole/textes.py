@@ -360,11 +360,15 @@ TEXTES = {
     'apropos_credits': {'fr': "Données : banque « OHP student observations », Observatoire de Paris / PADC (Paris Astronomical "
                               "Data Centre), service TAP public, licence Etalab 2.0. Méthode : guide officiel de la base "
                               "(PADC-BDD-DU-ECU). Format XISF : spécification de Pleiades Astrophoto. ASTAP : Han Kleijn "
-                              "(www.hnsky.org), facultatif, non inclus.",
+                              "(www.hnsky.org), facultatif, non inclus. Fiche en ligne : SIMBAD et Sesame "
+                              "(CDS, Strasbourg), Aladin Lite, NED (NASA/IPAC), JPL Small-Body Database. Cosmologie : "
+                              "noyau repris du calculateur « cosmologie-redshift » du même auteur, astropy.cosmology.",
                         'en': "Data: « OHP student observations » bank, Observatoire de Paris / PADC (Paris Astronomical Data "
                               "Centre), public TAP service, Etalab 2.0 licence. Method: official guide of the database "
                               "(PADC-BDD-DU-ECU). XISF format: Pleiades Astrophoto specification. ASTAP: Han Kleijn "
-                              "(www.hnsky.org), optional, not included."},
+                              "(www.hnsky.org), optional, not included. Online record: SIMBAD and Sesame (CDS, "
+                              "Strasbourg), Aladin Lite, NED (NASA/IPAC), JPL Small-Body Database. Cosmology: core "
+                              "taken from the same author's « cosmologie-redshift » calculator, astropy.cosmology."},
     'apropos_licence': {'fr': 'Licence : GNU GPL version 3 ou ultérieure. Logiciel fourni sans garantie.',
                         'en': 'Licence: GNU GPL version 3 or later. Software provided without warranty.'},
     'apropos_config': {'fr': 'Système : {os}\nProcesseur : {cpu} ({p} cœurs, {l} logiques)\nMémoire : {ram} Go\n'

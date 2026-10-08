@@ -1,0 +1,15 @@
+{
+  "id": "cosmo",
+  "version": "1.0.0",
+  "nom": {"fr": "Cosmologie", "en": "Cosmology"},
+  "description": {
+    "fr": "Du redshift aux distances : comobile, luminosité, angulaire, temps de regard en arrière, âge, volume, module de distance, échelle (Planck 2018 et autres jeux de paramètres)",
+    "en": "From redshift to distances: comoving, luminosity, angular, lookback time, age, volume, distance modulus, scale (Planck 2018 and other parameter sets)"
+  },
+  "icone": "icone.svg",
+  "ordre": 35,
+  "textes": "textes:TEXTES",
+  "gui": "gui:Panneau",
+  "cli": "cli:enregistrer",
+  "coupole_min": "0.1.0"
+}

@@ -71,7 +71,8 @@ DEFAUTS = {
     'format_sortie': 'xisf',
     'langue_noms': 'auto',             # langue des noms de dossiers et d'objets
     'maj_auto': True,
-    'apparence': 'clair',              # thème de Coupole (clair/sombre), indépendant de celui du système
+    'apparence': 'clair',
+    'services_en_ligne': True,         # fiches SIMBAD / JPL et redshift par nom (une requête par objet, cache)              # thème de Coupole (clair/sombre), indépendant de celui du système
 }
 
 _verrou = threading.Lock()

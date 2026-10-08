@@ -14,7 +14,7 @@ Contrôle du fichier distant : pas de signature cryptographique (une clé
 embarquée dans une application libre n'est pas un secret) ; à la place, un
 contrôle de forme strict (format, types, clés connues) et une **liste blanche
 de domaines** : une adresse distante ne peut viser que les domaines déjà
-utilisés (Observatoire de Paris, CDS, JPL, GitHub, point de collecte).  Un
+utilisés (Observatoire de Paris, CDS, JPL, NED, GitHub, point de collecte).  Un
 fichier distant compromis ne peut donc pas rediriger les téléchargements
 ailleurs.  Une valeur forcée par l'utilisateur, elle, est libre.
 """
@@ -33,8 +33,8 @@ log = logging.getLogger(__name__)
 
 FICHIER_DEFAUT = Path(__file__).resolve().parent.parent / 'donnees' / 'sources.json'
 FORMAT = 1
-DOMAINES_AUTORISES = ('obspm.fr', 'unistra.fr', 'u-strasbg.fr', 'nasa.gov', 'github.com', 'githubusercontent.com',
-                      'giff.re', 'openstreetmap.org')
+DOMAINES_AUTORISES = ('obspm.fr', 'unistra.fr', 'u-strasbg.fr', 'nasa.gov', 'caltech.edu', 'github.com',
+                      'githubusercontent.com', 'giff.re', 'openstreetmap.org')
 CLES_TEXTE = {'ohp.collection', 'maj.depot', 'ohp.telechargement.de', 'ohp.telechargement.vers'}
 
 _verrou = threading.Lock()

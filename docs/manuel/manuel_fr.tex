@@ -45,6 +45,7 @@ anglais ; la langue du système est détectée, et peut être imposée (menu \em
 Banque OHP & Inventaire, catalogue, téléchargement, contrôle astrométrique, en-têtes corrigés, conversion, lots empilables, anomalies, carte du ciel.\\
 Qualité des images & Facultatif. FWHM, ellipticité, fond, bruit, gradient, saturation, traînées, échantillonnage.\\
 Spectres et séries & Lecture et tracé de données 1D (spectres radio, courbes de lumière, tables).\\
+Cosmologie & Du redshift aux distances, âges, volume, module de distance, échelle (Planck 2018 et autres).\\
 Sites et heures & Base des sites, carte OpenStreetMap, heure UTC et heure locale.\\
 Ma machine & Diagnostic matériel ; exemple minimal de module.\\
 \bottomrule
@@ -259,6 +260,33 @@ incohérents. Export CSV aux colonnes bilingues ; rien n'est supprimé.
 Projection d'Aitoff, ascension droite croissante vers la gauche, 12~h au centre ; un point par objet fixe (taille :
 nombre d'images) et par nuit pour les objets mobiles ; écliptique en tirets, plan galactique en pointillés.
 
+\subsection{Fiche en ligne (facultative)}\label{sec:fiche}
+\capture{img/fiche_fr.png}{0.95}
+Si Internet est disponible, l'onglet \emph{Fiche en ligne} (ou le bouton du même nom sous le catalogue) affiche des
+informations publiques sur l'objet choisi :
+\begin{itemize}
+\item ciel profond et étoiles : \textbf{SIMBAD} (CDS, Strasbourg) --- type, coordonnées ICRS, magnitudes, parallaxe
+(et la distance qu'elle donne quand elle est assez précise), distance mesurée préférée avec sa méthode et sa
+référence, vitesse radiale et redshift, taille angulaire, types spectral et morphologique, autres noms ; liens
+vers la page SIMBAD, \textbf{Aladin Lite} (image du ciel centrée sur l'objet) et, pour les galaxies, \textbf{NED} ;
+si SIMBAD ne connaît pas le nom, \textbf{Sesame} (CDS) interroge aussi NED et VizieR ;
+\item astéroïdes, comètes, transneptuniens : base des petits corps du \textbf{JPL} (SBDB) --- classe orbitale,
+géocroiseur ou non, éléments (a, e, i, q, Q, $\Omega$, $\omega$, période, époque), diamètre, albédo, période de
+rotation, magnitude absolue ;
+\item planètes et désignations NEOCP : pas de fiche (message explicatif).
+\end{itemize}
+\textbf{L'identifiant retenu est toujours affiché} : SIMBAD rattache par exemple « NGC 6888 » à son étoile
+Wolf-Rayet HD 192163 ; la fiche le signale. Un redshift positif s'envoie au module Cosmologie (bouton \emph{Envoyer
+ce redshift au module Cosmologie}).
+
+\paragraph{Politesse et hors ligne.} Rien ne part tant que l'onglet n'est pas affiché ; une seule requête par
+objet choisi (après 0,6~s sans autre changement de sélection), au plus une par seconde et par service, délai de
+8~s, User-Agent de Coupole. Les réponses sont gardées 30~jours dans le cache de Coupole (\texttt{enligne.json},
+avec leur date ; un « introuvable » un jour). Hors ligne, la dernière fiche connue s'affiche avec sa date, sinon un
+message clair ; le reste de l'application n'en dépend jamais. La case \emph{Interroger les services en ligne} coupe
+tout envoi. Les adresses (\texttt{simbad.base}, \texttt{simbad.page}, \texttt{aladin.page}, \texttt{ned.page},
+\texttt{sbdb.page}, \texttt{resolution.sbdb}, \texttt{resolution.sesame}) se règlent comme les autres sources.
+
 % =====================================================================
 \section{ASTAP (facultatif)}
 Sans ASTAP, Coupole fait tout le reste. ASTAP (Han Kleijn, licence MPL~2.0, \url{https://www.hnsky.org/astap.htm})
@@ -369,6 +397,62 @@ source sûre. Carte : tuiles OpenStreetMap en cache disque, deux téléchargemen
 l'application, attribution affichée ; hors ligne, fond simple et points.
 
 % =====================================================================
+\section{Cosmologie}\label{sec:cosmo}
+\capture{img/module_cosmo_fr.png}{1.0}
+Le redshift $z$ d'un objet lointain ne donne pas « une » distance mais plusieurs, toutes justes, qui répondent à des
+questions différentes. Le module les calcule dans le modèle $\Lambda$CDM avec
+\[ E(z)^2 = \Omega_r(z)(1+z)^4 + \Omega_m(1+z)^3 + \Omega_k(1+z)^2 + \Omega_\Lambda, \qquad
+   D_C = \frac{c}{H_0}\int_0^z\frac{dz'}{E(z')}, \]
+rayonnement compris (photons du fond diffus et neutrinos, dont un massif de 0,06~eV).
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Grandeur & Usage \\
+\midrule
+$D_C$ comobile radiale & distance actuelle de l'objet ; sature à $\approx 46$~G\,al (horizon des particules)\\
+$D_M$ comobile transverse & égale à $D_C$ si l'univers est plat ; entre dans $D_L$ et $D_A$\\
+$D_L = (1+z)D_M$ & photométrie : $F = L/(4\pi D_L^2)$ ; module de distance $\mu = 5\log_{10}(D_L/10~\mathrm{pc})$\\
+$D_A = D_M/(1+z)$ & tailles : $\theta = \ell/D_A$ ; échelle en kpc par seconde d'arc ; maximum vers $z\approx1{,}6$\\
+$c\,t_L$ & chemin parcouru par la lumière (le plus intuitif, le moins physique)\\
+$t_L$, âge à $z$, $t_0$ & temps de regard en arrière ; contrôle $t_L + t(z) = t_0$\\
+$V_C$ & volume comobile jusqu'à $z$ (Hogg 1999, exact aussi en univers courbe)\\
+vitesses & $cz$ (naïf), Doppler relativiste (inadapté), $H_0 D_C$ (la seule correcte)\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\paragraph{Paramètres.} Planck 2018 par défaut ($H_0 = 67{,}66$, $\Omega_m = 0{,}3111$ dont $\Omega_\nu = 0{,}00144$,
+$T_0 = 2{,}7255$~K) avec l'incertitude $1\sigma$ propagée depuis $H_0$ et $\Omega_m$ \emph{corrélés}
+($\rho = -0{,}976$ : l'oublier surestimerait l'incertitude) et, au choix, la comparaison avec SH0ES
+($H_0 = 73{,}04$, tension de Hubble). Pour comparer : Planck 2015, WMAP 9 ans, un $\Lambda$CDM « de manuel »
+(70~/ 0,3~/ 0,7 sans rayonnement) et un jeu personnalisé ($H_0$, $\Omega_m$, $\Omega_k$, rayonnement de Planck 2018).
+Plages : $H_0$ de 40 à 100, $\Omega_m$ de 0,1 à 1, $\Omega_k$ de $-0{,}3$ à $0{,}3$ ($\pm 0{,}05$ pour Planck 2018) ;
+une valeur hors plage est \emph{refusée avec une explication}, jamais corrigée en silence.
+
+\paragraph{Saisie.} Un $z$ (virgule ou point), un des exemples (M\,87, 3C\,273, $z = 1$, $z = 2{,}34$, ULAS J1120,
+GN-z11, réionisation, fond diffus), ou un nom d'objet : son redshift est demandé à SIMBAD (nom tolérant :
+« m87 », « ngc4486 » ; plusieurs candidats : vous choisissez). $z \le 0$ (objet qui s'approche, comme M\,31) ne donne
+pas de distance ; sous $z = 0{,}03$ la vitesse propre de l'objet domine (avertissement) ; au-delà de $z \approx 1090$
+l'univers est opaque. Tableau et courbes s'exportent en CSV (« ; », UTF-8 ; valeurs brutes en Mpc, Gyr, Gpc$^3$).
+
+\paragraph{Origine et vérification.} Le noyau de calcul est repris du calculateur « cosmologie-redshift » du même
+auteur (dépôt public \url{https://github.com/ARP273-ROSE/cosmologie-redshift}), avec astropy.cosmology. Avant
+l'intégration, il a été comparé le 8 octobre 2026 à astropy et à une intégration indépendante sous SageMath
+(mpmath, 18 chiffres, fonction de Fermi-Dirac exacte pour les neutrinos), de $z = 10^{-8}$ à 1100, pour
+$\Omega_k = 0, \pm0{,}01, \pm0{,}05$ : écart relatif $\le 3\times10^{-6}$ sur les distances et
+$\le 2\times10^{-5}$ sur les âges et $E(z)$ (ajustement de Komatsu des neutrinos dans astropy) ; aucun bug. Le
+volume comobile d'astropy perd en revanche tous ses chiffres à très petit $z$ en univers courbe (jusqu'à un volume
+négatif) : Coupole emploie là un développement limité, raccordé à la forme fermée. Scripts :
+\texttt{outils/verif\_cosmo/}.
+
+\begin{ccode}
+coupole cosmo 0,158 --shoes\\
+coupole cosmo --objet "3C 273"\\
+coupole cosmo 1 2 3 --modele wmap9 --csv resultats.csv\\
+coupole cosmo --courbes 0,001 1500 300 --csv courbes.csv
+\end{ccode}
+
+% =====================================================================
 \section{Machine et performance}
 \capture{img/module_machine_fr.png}{0.9}
 Détection sans dépendance obligatoire : système, architecture, processeur, cœurs physiques et logiques (bornés par
@@ -462,5 +546,8 @@ Banque « OHP student observations », Observatoire de Paris / PADC (Paris Astro
 public, licence Etalab 2.0 ; guide officiel de la base (PADC-BDD-DU-ECU). Spécification XISF 1.0 (Pleiades
 Astrophoto). ASTAP : \url{https://www.hnsky.org/astap.htm}. Codes d'observatoire : Minor Planet Center. SEP :
 Barbary (2016), Bertin \& Arnouts (1996). Moments adaptatifs : Bernstein \& Jarvis (2002). Fond de carte :
-© OpenStreetMap contributors.
+© OpenStreetMap contributors. SIMBAD et Sesame : CDS, Strasbourg (Wenger et al. 2000) ; Aladin Lite (CDS) ;
+NED (NASA/IPAC) ; JPL Small-Body Database (NASA/JPL). Cosmologie : Planck Collaboration (2020, A\&A 641, A6) ;
+Hinshaw et al. (2013, WMAP 9) ; Riess et al. (2022, SH0ES) ; Hogg (1999, astro-ph/9905116) ; Komatsu et al. (2011)
+pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur).
 \end{document}

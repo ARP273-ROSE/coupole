@@ -136,6 +136,21 @@ class FenetrePrincipale(QMainWindow):
         i = self.pile.currentIndex()
         return self.panneaux[i] if 0 <= i < len(self.panneaux) else None
 
+    def panneau_module(self, ident: str):
+        """Panneau du module `ident` (None s'il est absent ou défectueux)."""
+        for p in self.panneaux:
+            if getattr(getattr(p, 'module', None), 'id', '') == ident:
+                return p
+        return None
+
+    def ouvrir_module(self, ident: str):
+        """Affiche le module `ident` et rend son panneau (liens entre modules : fiche → Cosmologie...)."""
+        for i, p in enumerate(self.panneaux):
+            if getattr(getattr(p, 'module', None), 'id', '') == ident:
+                self.barre.setCurrentRow(i)
+                return p
+        return None
+
     def aide_ecran(self):
         p = self.panneau_courant()
         if p is None:

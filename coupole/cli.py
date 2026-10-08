@@ -29,8 +29,9 @@ def _langue_argv(argv) -> str | None:
 
 def initialiser(langue: str | None = None):
     """Langue, textes du cœur, modules.  Commun à la CLI et à l'interface."""
-    from . import textes
+    from . import textes, textes_enligne
     i18n.enregistrer(textes.TEXTES)
+    i18n.enregistrer(textes_enligne.TEXTES)
     choix = langue or config.reglages()['langue'] or 'auto'
     i18n.choisir_langue(choix)
     from .core import modules

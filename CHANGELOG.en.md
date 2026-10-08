@@ -6,6 +6,22 @@ French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
 First release.
 
+- **Cosmology** (new module): from redshift to line-of-sight and transverse comoving, luminosity, angular diameter
+  and light-travel distances, lookback time, age at z and present age, E(z) and H(z), distance modulus, scale in kpc
+  per arcsecond, comoving volume, three recession velocities; Planck 2018 by default (1σ uncertainty with the
+  H₀–Ωm correlation, SH0ES comparison), Planck 2015, WMAP 9, « textbook » ΛCDM, custom set (H₀, Ωm, Ωk);
+  out-of-range values refused with an explanation; an object's redshift requested from SIMBAD; distance curves;
+  CSV export; `coupole cosmo` command line. Computation core taken from the same author's « cosmologie-redshift »
+  calculator, **checked before integration** against astropy and an independent SageMath integration (z from 10⁻⁸
+  to 1100, flat and curved universes): no bug, deviation ≤ 3·10⁻⁶ on distances, ≤ 2·10⁻⁵ on ages. Comoving volume:
+  series expansion at very small z in curved universes, where astropy's formula loses all its digits (wrong, even
+  negative, volume).
+- **Online record** (OHP bank, reusable by other modules): SIMBAD (type, coordinates, magnitudes, parallax,
+  measured distance, radial velocity and redshift, angular size, spectral and morphological types, identifiers,
+  SIMBAD, Aladin Lite and NED links), Sesame fallback, JPL Small-Body Database for small bodies (orbit class,
+  elements, diameter, albedo, rotation); optional and never blocking (background thread, 8 s timeout, one request per
+  object, 30-day dated cache, offline fallback to the last known record); chosen identifier always shown; « send
+  this redshift to the Cosmology module ». Addresses in `sources.json`.
 - **Every screen**: interface adapted from 1024×600 (or 1366×768 at 150 %) to 4K, with no truncation or overflow:
   sizes capped to the screen, scrolling content, wrapping text, flexible rows of filters and settings, module bar
   reduced to icons below 1,100 px, exact fractional scaling; checked by tests at 6 screen sizes and at 150/200 %.

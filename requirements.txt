@@ -1,6 +1,7 @@
 # Dépendances des paquets autonomes (build_package.py / build_unix.py) : tout ce qui tourne est embarqué.
 numpy>=1.24
 astropy>=5.3
+scipy>=1.10
 zstandard>=0.21
 lz4>=4.0
 PyQt6>=6.5
