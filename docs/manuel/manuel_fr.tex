@@ -518,7 +518,7 @@ inventaire chargé (fil de fond) & 3,3 s au premier lancement, 0,8 s ensuite\\
 chaîne complète, 24 images T120 de 8 Mo, plafond 8 Mo/s & 24,5 s = durée du téléchargement seul (24,2 s)\\
 même chaîne sans plafond (serveur local) & 2,3 s, 86 Mo/s de FITS, 10 images/s\\
 conversion d'une image T120 (un processus) & 0,13 s (zstd 14 ms, lecture 18 ms, écriture et relecture 29 ms)\\
-pic mémoire d'une conversion T120 / IRIS 4096² & voir \texttt{docs/AUDIT\_2026-10.md}\\
+pic mémoire d'une conversion T120 / IRIS 4096² (processus dédié) & 163 Mo / 365 Mo (170 / 573 avant)\\
 interface pendant 3 téléchargements (28 Mo/s) & écart max. du minuteur 20 ms : 20,8 ms\\
 \bottomrule
 \end{tabular}
