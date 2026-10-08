@@ -88,6 +88,10 @@ class DialogueReglages(QDialog):
         self.noms = liste('reg_noms_aide', [(tr('reg_langue_auto'), 'auto'), ('Français', 'fr'), ('English', 'en')])
         self.noms.setCurrentIndex(max(0, self.noms.findData(r['langue_noms'])))
         f.addRow(tr('reg_noms'), self.noms)
+        self.apparence = liste('reg_apparence_aide', [(tr('reg_apparence_clair'), 'clair'),
+                                                      (tr('reg_apparence_sombre'), 'sombre')])
+        self.apparence.setCurrentIndex(max(0, self.apparence.findData(r['apparence'])))
+        f.addRow(tr('reg_apparence'), self.apparence)
         h = QHBoxLayout()
         self.dest = champ('reg_dest_aide', r['dossier_sortie'] or str(config.dossier_sortie_defaut() / 'OHP_DU_ECU'))
         h.addWidget(self.dest, 1)
@@ -192,6 +196,10 @@ class DialogueReglages(QDialog):
         r['debit_max_mo_s'] = self.debit.value()
         r['mode_econome'] = self.eco.isChecked()
         r['maj_auto'] = self.maj.isChecked()
+        if r['apparence'] != self.apparence.currentData():
+            r['apparence'] = self.apparence.currentData()
+            from . import theme
+            theme.appliquer(nom=r['apparence'])
         self._enregistrer_sources()
         self.langue_changee = ancienne != r['langue']
         super().accept()

@@ -298,6 +298,11 @@ TEXTES = {
 
     # ------------------------------------------------------------ préférences
     'reg_titre': {'fr': 'Préférences', 'en': 'Preferences'},
+    'reg_apparence': {'fr': 'Apparence', 'en': 'Appearance'},
+    'reg_apparence_aide': {'fr': "Thème de Coupole. Il ne dépend pas du thème de l'ordinateur, pour que tout reste lisible.",
+                           'en': "Coupole's theme. It does not follow the computer's theme, so that everything stays readable."},
+    'reg_apparence_clair': {'fr': 'Clair', 'en': 'Light'},
+    'reg_apparence_sombre': {'fr': 'Sombre', 'en': 'Dark'},
     'reg_langue': {'fr': "Langue de l'interface", 'en': 'Interface language'},
     'reg_langue_aide': {'fr': 'auto : la langue du système (français ou anglais).', 'en': 'auto: the system language (French or English).'},
     'reg_langue_auto': {'fr': 'Automatique', 'en': 'Automatic'},

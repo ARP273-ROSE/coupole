@@ -71,6 +71,7 @@ DEFAUTS = {
     'format_sortie': 'xisf',
     'langue_noms': 'auto',             # langue des noms de dossiers et d'objets
     'maj_auto': True,
+    'apparence': 'clair',              # thème de Coupole (clair/sombre), indépendant de celui du système
 }
 
 _verrou = threading.Lock()

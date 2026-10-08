@@ -122,3 +122,36 @@ def test_interface_reactive_pendant_un_travail(app_qt, fenetre):
     # on exige que 90 % des battements soient à l'heure et qu'aucun trou n'atteigne une demi-seconde.
     a_l_heure = sum(1 for e in ecarts if e < 0.1) / len(ecarts)
     assert len(battements) > 15 and a_l_heure >= 0.9 and max(ecarts) < 0.5
+
+
+def _contraste(a, b):
+    """Rapport de contraste WCAG 2 entre deux QColor."""
+    def lum(c):
+        def canal(v):
+            v = v / 255
+            return v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4
+        return 0.2126 * canal(c.red()) + 0.7152 * canal(c.green()) + 0.0722 * canal(c.blue())
+    l1, l2 = sorted((lum(a), lum(b)), reverse=True)
+    return (l1 + 0.05) / (l2 + 0.05)
+
+
+def test_theme_independant_du_systeme_et_lisible(app_qt):
+    """Le thème de Coupole remplace celui du système (même un système en mode sombre) et reste lisible :
+    contraste WCAG ≥ 4,5 pour le texte, les champs, les boutons, les info-bulles et la sélection."""
+    from PyQt6.QtGui import QColor, QPalette
+    from coupole.gui import theme
+    R = QPalette.ColorRole
+    sombre_systeme = QPalette(QColor('#202020'))          # simule un système en mode sombre
+    app_qt.setPalette(sombre_systeme)
+    try:
+        for nom in ('clair', 'sombre'):
+            assert theme.appliquer(app_qt, nom) == nom
+            assert str(app_qt.property('coupole_style')).lower() == 'fusion'
+            p = app_qt.palette()
+            for fond, texte in ((R.Window, R.WindowText), (R.Base, R.Text), (R.Button, R.ButtonText),
+                                (R.ToolTipBase, R.ToolTipText), (R.Highlight, R.HighlightedText),
+                                (R.AlternateBase, R.Text)):
+                assert _contraste(p.color(fond), p.color(texte)) >= 4.5, (nom, fond, texte)
+            assert abs(app_qt.font().pointSizeF() - theme.TAILLE_POINTS) < 0.01
+    finally:
+        theme.appliquer(app_qt, 'clair')
