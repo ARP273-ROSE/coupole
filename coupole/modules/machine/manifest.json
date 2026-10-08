@@ -1,0 +1,15 @@
+{
+  "id": "machine",
+  "version": "1.0.0",
+  "nom": {"fr": "Ma machine", "en": "My computer"},
+  "description": {
+    "fr": "Diagnostic matériel, parallélisme retenu, carte graphique, ASTAP",
+    "en": "Hardware diagnosis, chosen parallelism, graphics card, ASTAP"
+  },
+  "icone": "icone.svg",
+  "ordre": 90,
+  "textes": "textes:TEXTES",
+  "gui": "gui:Panneau",
+  "cli": "cli:enregistrer",
+  "coupole_min": "0.1.0"
+}

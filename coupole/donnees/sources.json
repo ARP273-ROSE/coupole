@@ -1,0 +1,19 @@
+{
+  "format": 1,
+  "version": 1,
+  "date": "2026-10-08",
+  "_note": "Adresses des services utilisés par Coupole. Valeurs par défaut livrées avec l'application ; une version plus récente peut être publiée dans le dépôt (coupole/donnees/sources.json) et récupérée au démarrage ; l'utilisateur peut forcer chaque valeur dans les Préférences.",
+  "valeurs": {
+    "ohp.tap": "http://tap-ufe.obspm.fr/tap",
+    "ohp.collection": "OHP student observations",
+    "ohp.portail": "https://voparis-portal.obspm.fr/?service_url=http://ufe-tap/tap",
+    "ohp.telechargement.de": "",
+    "ohp.telechargement.vers": "",
+    "resolution.sbdb": "https://ssd-api.jpl.nasa.gov/sbdb.api",
+    "resolution.sesame": "https://cds.unistra.fr/cgi-bin/nph-sesame/-oxp/SNV",
+    "rapports.collecte": "https://fenice.giff.re/rapports/collecte.php",
+    "maj.depot": "ARP273-ROSE/coupole",
+    "sources.distant": "https://raw.githubusercontent.com/ARP273-ROSE/coupole/main/coupole/donnees/sources.json"
+  },
+  "alias_ohp": {}
+}

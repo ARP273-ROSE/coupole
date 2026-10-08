@@ -1,0 +1,351 @@
+"""Dialogues du cœur : consentement, réglages, assistant ASTAP, à propos, signalement, mise à jour, aide."""
+from __future__ import annotations
+
+import html
+import json
+import os
+import platform
+
+from PyQt6.QtCore import Qt, QUrl
+from PyQt6.QtGui import QDesktopServices
+from PyQt6.QtWidgets import (QDialog, QDialogButtonBox, QFileDialog, QFormLayout, QHBoxLayout, QLabel, QMessageBox,
+                             QPlainTextEdit, QTextBrowser, QVBoxLayout)
+
+from .. import __version__
+from ..core import config, i18n
+from ..core.i18n import tr
+from .outils import Tache, aide, bouton, case, champ, decimal, liste, nombre
+
+
+def _boutons(dlg, ok=True, annuler=True):
+    std = QDialogButtonBox.StandardButton
+    bb = QDialogButtonBox((std.Ok if ok else std.NoButton) | (std.Cancel if annuler else std.NoButton))
+    if ok:
+        b = bb.button(std.Ok)
+        b.setText(tr('dlg_ok'))
+        aide(b, 'dlg_ok_aide')
+    if annuler:
+        b = bb.button(std.Cancel)
+        b.setText(tr('dlg_annuler'))
+        aide(b, 'dlg_annuler_aide')
+    bb.accepted.connect(dlg.accept)
+    bb.rejected.connect(dlg.reject)
+    return bb
+
+
+def navigateur(html_texte: str, cle_aide: str) -> QTextBrowser:
+    t = QTextBrowser()
+    t.setOpenExternalLinks(True)
+    t.setHtml(html_texte)
+    return aide(t, cle_aide)
+
+
+# ======================================================================== consentement
+class DialogueConsentement(QDialog):
+    """Premier lancement : rien n'est envoyé sans accord explicite."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(tr('consent_titre'))
+        v = QVBoxLayout(self)
+        t = QLabel(tr('consent_texte'))
+        t.setWordWrap(True)
+        t.setTextFormat(Qt.TextFormat.RichText)
+        v.addWidget(t)
+        h = QHBoxLayout()
+        self.b_non = bouton('consent_non', self.reject)
+        self.b_oui = bouton('consent_oui', self.accept)
+        h.addStretch(1)
+        h.addWidget(self.b_non)
+        h.addWidget(self.b_oui)
+        v.addLayout(h)
+        self.resize(560, 360)
+
+
+def demander_consentement_si_besoin(parent=None):
+    from ..core import rapports
+    if rapports.consentement() is None:
+        d = DialogueConsentement(parent)
+        rapports.definir_consentement(d.exec() == QDialog.DialogCode.Accepted)
+
+
+# ======================================================================== réglages
+class DialogueReglages(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(tr('reg_titre'))
+        r = config.reglages()
+        f = QFormLayout(self)
+        self.langue = liste('reg_langue_aide', [(tr('reg_langue_auto'), 'auto'), ('Français', 'fr'), ('English', 'en')])
+        self.langue.setCurrentIndex(max(0, self.langue.findData(r['langue'])))
+        f.addRow(tr('reg_langue'), self.langue)
+        self.noms = liste('reg_noms_aide', [(tr('reg_langue_auto'), 'auto'), ('Français', 'fr'), ('English', 'en')])
+        self.noms.setCurrentIndex(max(0, self.noms.findData(r['langue_noms'])))
+        f.addRow(tr('reg_noms'), self.noms)
+        h = QHBoxLayout()
+        self.dest = champ('reg_dest_aide', r['dossier_sortie'] or str(config.dossier_sortie_defaut() / 'OHP_DU_ECU'))
+        h.addWidget(self.dest, 1)
+        h.addWidget(bouton('reg_parcourir', self._parcourir))
+        f.addRow(tr('reg_dest'), h)
+        self.format = liste('reg_format_aide', [(tr('fmt_xisf'), 'xisf'), (tr('fmt_fz'), 'fz'), (tr('fmt_fits'), 'fits')])
+        self.format.setCurrentIndex(max(0, self.format.findData(r['format_sortie'])))
+        f.addRow(tr('reg_format'), self.format)
+        self.dl = nombre('reg_dl_aide', 0, 4, int(r['telechargements_max'] or 0), 'reg_auto')
+        f.addRow(tr('reg_dl'), self.dl)
+        self.conv = nombre('reg_conv_aide', 0, 16, int(r['conversions_max'] or 0), 'reg_auto')
+        f.addRow(tr('reg_conv'), self.conv)
+        self.debit = decimal('reg_debit_aide', 0.5, 20.0, float(r['debit_max_mo_s'] or 8.0), 'unite_mos')
+        f.addRow(tr('reg_debit'), self.debit)
+        self.eco = case('reg_econome', bool(r['mode_econome']))
+        f.addRow('', self.eco)
+        self.maj = case('reg_maj', bool(r['maj_auto']))
+        f.addRow('', self.maj)
+        f.addRow(_boutons(self))
+
+    def _parcourir(self):
+        d = QFileDialog.getExistingDirectory(self, tr('reg_dest'), self.dest.text())
+        if d:
+            self.dest.setText(d)
+
+    def accept(self):
+        r = config.reglages()
+        ancienne = r['langue']
+        r['langue'] = self.langue.currentData()
+        r['langue_noms'] = self.noms.currentData()
+        r['dossier_sortie'] = self.dest.text().strip()
+        r['format_sortie'] = self.format.currentData()
+        r['telechargements_max'] = self.dl.value()
+        r['conversions_max'] = self.conv.value()
+        r['debit_max_mo_s'] = self.debit.value()
+        r['mode_econome'] = self.eco.isChecked()
+        r['maj_auto'] = self.maj.isChecked()
+        self.langue_changee = ancienne != r['langue']
+        super().accept()
+
+
+# ======================================================================== ASTAP
+class DialogueASTAP(QDialog):
+    """Assistant : état, guide d'installation pour ce système, recherche, choix manuel."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(tr('astapdlg_titre'))
+        v = QVBoxLayout(self)
+        self.etat = QLabel()
+        self.etat.setWordWrap(True)
+        self.etat.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        v.addWidget(self.etat)
+        h = QHBoxLayout()
+        h.addWidget(bouton('astapdlg_chercher', self.actualiser))
+        h.addWidget(bouton('astapdlg_choisir_exe', self.choisir_exe))
+        h.addWidget(bouton('astapdlg_choisir_cat', self.choisir_cat))
+        h.addWidget(bouton('astapdlg_oublier', self.oublier))
+        h.addStretch(1)
+        v.addLayout(h)
+        self.guide = navigateur('', 'astapdlg_guide_aide')
+        v.addWidget(self.guide, 1)
+        v.addWidget(_boutons(self, ok=True, annuler=False))
+        self.resize(780, 640)
+        self.actualiser()
+
+    def actualiser(self):
+        from ..core import astap
+        r = config.reglages()
+        e = astap.detecter(r['astap_executable'], r['astap_catalogue'])
+        couleur = '#2C7A55' if e.utilisable else '#B5382B'
+        lignes = ['<b style="color:%s">%s</b>' % (couleur, html.escape(tr(e.message_cle())))]
+        lignes.append('%s : %s' % (tr('astap_executable'), html.escape(e.executable or '—')))
+        if e.version:
+            lignes.append('%s : %s' % (tr('astap_version'), html.escape(e.version)))
+        lignes.append('%s : %s' % (tr('astap_catalogue'), html.escape(
+            '%s (%d %s) — %s' % (e.catalogue.upper(), e.catalogue_fichiers, tr('astap_tuiles'), e.catalogue_dossier)
+            if e.catalogue else '—')))
+        if not e.utilisable:
+            lignes.append('<i>%s</i>' % html.escape(tr('astap_sans_effet')))
+        self.etat.setText('<br>'.join(lignes))
+        self.guide.setHtml(guide_astap_html())
+
+    def choisir_exe(self):
+        f, _ = QFileDialog.getOpenFileName(self, tr('astapdlg_choisir_exe'))
+        if f:
+            config.reglages()['astap_executable'] = f
+            self.actualiser()
+
+    def choisir_cat(self):
+        d = QFileDialog.getExistingDirectory(self, tr('astapdlg_choisir_cat'))
+        if d:
+            config.reglages()['astap_catalogue'] = d
+            self.actualiser()
+
+    def oublier(self):
+        config.reglages()['astap_executable'] = ''
+        config.reglages()['astap_catalogue'] = ''
+        self.actualiser()
+
+
+def guide_astap_html() -> str:
+    from ..core import astap
+    c = astap.conseils_installation()
+    e = html.escape
+    p = ['<h3>%s</h3>' % e(tr('astap_guide_titre', systeme=tr('os_' + c['systeme']), arch=c['arch'],
+                                famille=(' (' + c['famille'] + ')') if c['famille'] else '')),
+         '<p>%s</p>' % e(tr('astap_guide_pourquoi')), '<p>%s</p>' % e(tr('astap_guide_catalogue')), '<ol>']
+    liens = ''.join('<li><a href="%s">%s</a></li>' % (e(u), e(tr(k))) for k, u in c['programme'])
+    if c['cli'] and all(u != c['cli'] for _, u in c['programme']):
+        liens += '<li><a href="%s">%s</a></li>' % (e(c['cli']), e(tr('astap_lien_cli_zip')))
+    p.append('<li>%s<ul>%s</ul></li>' % (e(tr('astap_guide_programme')), liens))
+    p.append('<li>%s<ul>%s</ul></li>' % (e(tr('astap_guide_cat')),
+                                         ''.join('<li><a href="%s">%s</a></li>' % (e(u), e(tr(k)))
+                                                 for k, u in c['catalogue'])))
+    for et in c['etapes']:
+        p.append('<li>%s</li>' % e(tr(et, dossier=c['dossier'])))
+    p.append('</ol><p>%s</p>' % e(tr('astap_guide_detection')))
+    p.append('<p><a href="%s">%s</a></p>' % (e(c['page']), e(tr('astap_guide_page', page=c['page']))))
+    return ''.join(p)
+
+
+# ======================================================================== à propos
+def texte_configuration() -> str:
+    from ..core import astap, machine
+    m = machine.detecter()
+    r = config.reglages()
+    a = astap.detecter(r['astap_executable'], r['astap_catalogue'])
+    gpu = ', '.join('%s [%s]' % (c.nom, c.fabricant) for c in m.cartes) or tr('gpu_aucune')
+    return tr('apropos_config', os='%s %s (%s)' % (m.nom_systeme, m.version_systeme, m.architecture),
+              cpu=m.processeur, p=m.coeurs_physiques, l=m.coeurs_logiques,
+              ram='%.1f' % (m.memoire_totale_mo / 1024), gpu=gpu, python=platform.python_version(),
+              astap=tr(a.message_cle()) + ((' — ' + a.executable) if a.executable else ''))
+
+
+class DialogueAPropos(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(tr('apropos_titre'))
+        v = QVBoxLayout(self)
+        from PyQt6.QtCore import QT_VERSION_STR, PYQT_VERSION_STR
+        t = navigateur('<h2>Coupole %s</h2><p>%s</p><p>%s</p><pre>%s</pre><p>%s</p>' % (
+            __version__, html.escape(tr('apropos_texte')), html.escape(tr('apropos_credits')),
+            html.escape(texte_configuration() + '\nQt %s / PyQt %s' % (QT_VERSION_STR, PYQT_VERSION_STR)),
+            html.escape(tr('apropos_licence'))), 'apropos_aide')
+        v.addWidget(t)
+        v.addWidget(_boutons(self, ok=True, annuler=False))
+        self.resize(640, 560)
+
+
+# ======================================================================== signalement
+class DialogueSignaler(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(tr('signaler_titre'))
+        v = QVBoxLayout(self)
+        l = QLabel(tr('signaler_texte'))
+        l.setWordWrap(True)
+        v.addWidget(l)
+        self.texte = aide(QPlainTextEdit(), 'signaler_zone_aide')
+        v.addWidget(self.texte, 1)
+        self.diag = case('signaler_diag', True)
+        v.addWidget(self.diag)
+        h = QHBoxLayout()
+        h.addWidget(bouton('signaler_fichier', self.fichier))
+        h.addStretch(1)
+        h.addWidget(bouton('dlg_annuler', self.reject))
+        self.b_env = bouton('signaler_envoyer', self.envoyer)
+        h.addWidget(self.b_env)
+        v.addLayout(h)
+        self.resize(560, 420)
+
+    def _rapport(self):
+        from ..core import rapports
+        champs = {'description': self.texte.toPlainText()[:4000]}
+        if self.diag.isChecked():
+            champs['diagnostic'] = texte_configuration()
+        return champs
+
+    def envoyer(self):
+        from ..core import rapports
+        if rapports.consentement() is not True:
+            if QMessageBox.question(self, tr('signaler_titre'), tr('signaler_consentement')) != \
+                    QMessageBox.StandardButton.Yes:
+                return
+            rapports.definir_consentement(True)
+        rapports.envoyer('manuel', **self._rapport())
+        QMessageBox.information(self, tr('signaler_titre'), tr('signaler_envoye'))
+        self.accept()
+
+    def fichier(self):
+        from ..core import rapports
+        f, _ = QFileDialog.getSaveFileName(self, tr('signaler_fichier'), 'coupole-rapport.json', 'JSON (*.json)')
+        if f:
+            r = rapports.machine()
+            r.update(self._rapport())
+            r['genre'] = 'manuel'
+            with open(f, 'w', encoding='utf-8') as fh:
+                json.dump(r, fh, ensure_ascii=False, indent=1)
+            QMessageBox.information(self, tr('signaler_titre'), tr('ecrit', chemin=f))
+
+
+# ======================================================================== raccourcis, aide d'écran
+RACCOURCIS = [('F1', 'racc_f1'), ('Shift+F1', 'racc_manuel'), ('Ctrl+1 … Ctrl+9', 'racc_modules'),
+              ('Ctrl+,', 'racc_reglages'), ('Ctrl+Shift+A', 'racc_astap'), ('Ctrl+R', 'racc_actualiser'),
+              ('Ctrl+Q', 'racc_quitter')]
+
+
+def afficher_raccourcis(parent):
+    lignes = ''.join('<tr><td><b>%s</b></td><td>&nbsp;&nbsp;%s</td></tr>' % (html.escape(k), html.escape(tr(c)))
+                     for k, c in RACCOURCIS)
+    d = QDialog(parent)
+    d.setWindowTitle(tr('racc_titre'))
+    v = QVBoxLayout(d)
+    v.addWidget(navigateur('<table>%s</table>' % lignes, 'racc_aide'))
+    v.addWidget(_boutons(d, ok=True, annuler=False))
+    d.resize(460, 300)
+    d.exec()
+
+
+def afficher_aide(parent, titre: str, texte: str):
+    d = QDialog(parent)
+    d.setWindowTitle(tr('aide_ecran_titre', ecran=titre))
+    v = QVBoxLayout(d)
+    v.addWidget(navigateur(texte, 'aide_ecran_aide'))
+    v.addWidget(_boutons(d, ok=True, annuler=False))
+    d.resize(640, 520)
+    d.exec()
+
+
+def ouvrir_fichier(chemin: str):
+    QDesktopServices.openUrl(QUrl.fromLocalFile(chemin))
+
+
+# ======================================================================== mise à jour
+def verifier_maj(parent, silencieux=False):
+    """Vérifie en arrière-plan ; ne dérange que s'il y a une nouvelle version (ou sur demande)."""
+    from ..core import maj
+    t = Tache(maj.verifier, __version__, parent=parent)
+
+    def fini(m):
+        if not m:
+            if not silencieux:
+                QMessageBox.information(parent, tr('maj_titre'), tr('maj_aucune', version=__version__))
+            return
+        notes = maj.notes_dans_la_langue(m['notes'], i18n.langue())[:3000]
+        if not maj.est_paquet():
+            QMessageBox.information(parent, tr('maj_titre'), tr('maj_disponible', version=m['version']) + '\n\n' +
+                                    tr('maj_pip', commande=maj.commande_pip()) + '\n\n' + notes)
+            return
+        if QMessageBox.question(parent, tr('maj_titre'), tr('maj_question', version=m['version']) + '\n\n' + notes) \
+                != QMessageBox.StandardButton.Yes:
+            return
+        t2 = Tache(maj.appliquer, m, parent=parent)
+        t2.fini.connect(lambda _: (QMessageBox.information(parent, tr('maj_titre'), tr('maj_redemarrer')),
+                                   maj.relancer(), parent.close()))
+        t2.erreur.connect(lambda e: QMessageBox.warning(parent, tr('maj_titre'), tr('maj_echec', erreur=e)))
+        parent._tache_maj2 = t2
+        t2.start()
+
+    def erreur(e):
+        if not silencieux:
+            QMessageBox.warning(parent, tr('maj_titre'), tr('maj_echec', erreur=e))
+    t.fini.connect(fini)
+    t.erreur.connect(erreur)
+    parent._tache_maj = t
+    t.start()

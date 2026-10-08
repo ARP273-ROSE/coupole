@@ -1,0 +1,811 @@
+{
+ "_note": "Table d'alias de la banque OHP (nom dans la base -> objet canonique, catégorie, clé JPL SBDB, remarque). Vérifiée le 7 octobre 2026 (Inventaire.pdf, chap. 3). Complétée par le fichier de sources distant et par les corrections de l'utilisateur ; jamais modifiée à l'exécution.",
+ "version": 1,
+ "alias": {
+  "0081P": {
+   "objet": "81P/Wild 2",
+   "cat": "com",
+   "sbdb": "81P",
+   "rem": ""
+  },
+  "81P Wild 2": {
+   "objet": "81P/Wild 2",
+   "cat": "com",
+   "sbdb": "81P",
+   "rem": ""
+  },
+  "14P Wolf": {
+   "objet": "14P/Wolf",
+   "cat": "com",
+   "sbdb": "14P",
+   "rem": ""
+  },
+  "21P Giacobini-Zinner": {
+   "objet": "21P/Giacobini-Zinner",
+   "cat": "com",
+   "sbdb": "21P",
+   "rem": ""
+  },
+  "237P": {
+   "objet": "237P/LINEAR",
+   "cat": "com",
+   "sbdb": "237P",
+   "rem": ""
+  },
+  "237P LINEAR": {
+   "objet": "237P/LINEAR",
+   "cat": "com",
+   "sbdb": "237P",
+   "rem": ""
+  },
+  "260P McNaught": {
+   "objet": "260P/McNaught",
+   "cat": "com",
+   "sbdb": "260P",
+   "rem": ""
+  },
+  "284P/McNaught": {
+   "objet": "284P/McNaught",
+   "cat": "com",
+   "sbdb": "284P",
+   "rem": ""
+  },
+  "29P Schwassmann-Wachmann 1": {
+   "objet": "29P/Schwassmann-Wachmann",
+   "cat": "com",
+   "sbdb": "29P",
+   "rem": ""
+  },
+  "41P Tuttle-Giacobini-Kresak": {
+   "objet": "41P/Tuttle-Giacobini-Kresák",
+   "cat": "com",
+   "sbdb": "41P",
+   "rem": ""
+  },
+  "53P Van Biesbroeck": {
+   "objet": "53P/Van Biesbroeck",
+   "cat": "com",
+   "sbdb": "53P",
+   "rem": ""
+  },
+  "73P Schwassmann-Wachmann 3-A": {
+   "objet": "73P-A/Schwassmann-Wachmann",
+   "cat": "com",
+   "sbdb": null,
+   "rem": "fragment A"
+  },
+  "78P Gehrels 2": {
+   "objet": "78P/Gehrels",
+   "cat": "com",
+   "sbdb": "78P",
+   "rem": ""
+  },
+  "P 2023 M4 ATLAS": {
+   "objet": "P/2023 M4 (ATLAS)",
+   "cat": "com",
+   "sbdb": "P/2023 M4",
+   "rem": ""
+  },
+  "C 2023 E1 ATLAS": {
+   "objet": "C/2023 E1 (ATLAS)",
+   "cat": "com",
+   "sbdb": "C/2023 E1",
+   "rem": ""
+  },
+  "C/2023 E1 (ATLAS)": {
+   "objet": "C/2023 E1 (ATLAS)",
+   "cat": "com",
+   "sbdb": "C/2023 E1",
+   "rem": ""
+  },
+  "122024 2000 GC50": {
+   "objet": "C/2024 M1 (ATLAS)",
+   "cat": "com",
+   "sbdb": "C/2024 M1",
+   "rem": "identifiée par JPL Horizons (écart 0,006°)"
+  },
+  "Neptune": {
+   "objet": "Neptune",
+   "cat": "pla",
+   "sbdb": null,
+   "rem": ""
+  },
+  "neptune": {
+   "objet": "Neptune",
+   "cat": "pla",
+   "sbdb": null,
+   "rem": ""
+  },
+  "Saturn": {
+   "objet": "Saturne",
+   "cat": "pla",
+   "sbdb": null,
+   "rem": ""
+  },
+  "Uranus": {
+   "objet": "Uranus",
+   "cat": "pla",
+   "sbdb": null,
+   "rem": ""
+  },
+  "134340 Pluto 1930 BM": {
+   "objet": "(134340) Pluton",
+   "cat": "tno",
+   "sbdb": "134340",
+   "rem": ""
+  },
+  "136108 Haumea 2003 EL61": {
+   "objet": "(136108) Haumea",
+   "cat": "tno",
+   "sbdb": "136108",
+   "rem": ""
+  },
+  "136199 Eris 2003 UB313": {
+   "objet": "(136199) Éris",
+   "cat": "tno",
+   "sbdb": "136199",
+   "rem": ""
+  },
+  "50000 Quaoar 2002 LM60": {
+   "objet": "(50000) Quaoar",
+   "cat": "tno",
+   "sbdb": "50000",
+   "rem": ""
+  },
+  "55636 2002 TX300": {
+   "objet": "(55636) 2002 TX300",
+   "cat": "tno",
+   "sbdb": "55636",
+   "rem": ""
+  },
+  "145452 2005 RN43": {
+   "objet": "(145452) Ritona",
+   "cat": "tno",
+   "sbdb": "145452",
+   "rem": ""
+  },
+  "1988eg": {
+   "objet": "(6037) 1988 EG",
+   "cat": "ast",
+   "sbdb": "6037",
+   "rem": ""
+  },
+  "6037 1988 EG": {
+   "objet": "(6037) 1988 EG",
+   "cat": "ast",
+   "sbdb": "6037",
+   "rem": ""
+  },
+  "Sylvia87": {
+   "objet": "(87) Sylvia",
+   "cat": "ast",
+   "sbdb": "87",
+   "rem": ""
+  },
+  "palisana": {
+   "objet": "(914) Palisana",
+   "cat": "ast",
+   "sbdb": "914",
+   "rem": ""
+  },
+  "914 Palisana A919 NC": {
+   "objet": "(914) Palisana",
+   "cat": "ast",
+   "sbdb": "914",
+   "rem": ""
+  },
+  "667 Denise A908 OF": {
+   "objet": "(667) Denise",
+   "cat": "ast",
+   "sbdb": "667",
+   "rem": ""
+  },
+  "667 Denise A908OF": {
+   "objet": "(667) Denise",
+   "cat": "ast",
+   "sbdb": "667",
+   "rem": ""
+  },
+  "137 Melibolea": {
+   "objet": "(137) Meliboea",
+   "cat": "ast",
+   "sbdb": "137",
+   "rem": ""
+  },
+  "2013 DD1 = 2018 PO23": {
+   "objet": "2013 DD1",
+   "cat": "ast",
+   "sbdb": "2013 DD1",
+   "rem": ""
+  },
+  "7N28001": {
+   "objet": "7N28001",
+   "cat": "neocp",
+   "sbdb": null,
+   "rem": ""
+  },
+  "A117QUQ": {
+   "objet": "A117QUQ",
+   "cat": "neocp",
+   "sbdb": null,
+   "rem": ""
+  },
+  "RAN0116": {
+   "objet": "RAN0116",
+   "cat": "neocp",
+   "sbdb": null,
+   "rem": ""
+  },
+  "g8Z001": {
+   "objet": "g8Z001",
+   "cat": "neocp",
+   "sbdb": null,
+   "rem": ""
+  },
+  "p10cgcy": {
+   "objet": "p10cgcy",
+   "cat": "neocp",
+   "sbdb": null,
+   "rem": ""
+  },
+  "RS Ophiuchi": {
+   "objet": "RS Ophiuchi",
+   "cat": "eto",
+   "sbdb": null,
+   "rem": "nova récurrente"
+  },
+  "T CrB T Coronae Borealis": {
+   "objet": "T Coronae Borealis",
+   "cat": "eto",
+   "sbdb": null,
+   "rem": "nova récurrente"
+  },
+  "TCrB": {
+   "objet": "T Coronae Borealis",
+   "cat": "eto",
+   "sbdb": null,
+   "rem": "nova récurrente"
+  },
+  "M27": {
+   "objet": "M27",
+   "cat": "pn",
+   "sbdb": null,
+   "rem": "Dumbbell"
+  },
+  "M57": {
+   "objet": "M57",
+   "cat": "pn",
+   "sbdb": null,
+   "rem": "Lyre"
+  },
+  "M76": {
+   "objet": "M76",
+   "cat": "pn",
+   "sbdb": null,
+   "rem": "Petit Dumbbell"
+  },
+  "NGC 6210": {
+   "objet": "NGC 6210",
+   "cat": "pn",
+   "sbdb": null,
+   "rem": ""
+  },
+  "NGC 6543": {
+   "objet": "NGC 6543",
+   "cat": "pn",
+   "sbdb": null,
+   "rem": "Œil de chat"
+  },
+  "NGC 6826": {
+   "objet": "NGC 6826",
+   "cat": "pn",
+   "sbdb": null,
+   "rem": "Œil clignotant"
+  },
+  "NGC-6826": {
+   "objet": "NGC 6826",
+   "cat": "pn",
+   "sbdb": null,
+   "rem": "Œil clignotant"
+  },
+  "NGC 7026": {
+   "objet": "NGC 7026",
+   "cat": "pn",
+   "sbdb": null,
+   "rem": ""
+  },
+  "NGC 7662": {
+   "objet": "NGC 7662",
+   "cat": "pn",
+   "sbdb": null,
+   "rem": "Boule de neige bleue"
+  },
+  "BARNARD 68 dark nebula": {
+   "objet": "Barnard 68",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "nébuleuse sombre"
+  },
+  "C11 Bubble Nebula": {
+   "objet": "NGC 7635",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Bulle, C11"
+  },
+  "NGC 7635": {
+   "objet": "NGC 7635",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Bulle, C11"
+  },
+  "Caldwell 34 Veil Nebula": {
+   "objet": "NGC 6960",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Dentelles ouest, C34 ; rémanent"
+  },
+  "NGC  6992": {
+   "objet": "NGC 6992",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Dentelles est ; rémanent"
+  },
+  "NGC 6992": {
+   "objet": "NGC 6992",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Dentelles est ; rémanent"
+  },
+  "Cocoon Nebula IC 5146": {
+   "objet": "IC 5146",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Cocon"
+  },
+  "IC 5146 Cocoon nebula": {
+   "objet": "IC 5146",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Cocon"
+  },
+  "IC 1396 Elephant Trunk Nebula": {
+   "objet": "IC 1396",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Trompe d'éléphant"
+  },
+  "IC 434 Horsehead Nebula": {
+   "objet": "IC 434",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Tête de cheval"
+  },
+  "IC434": {
+   "objet": "IC 434",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Tête de cheval"
+  },
+  "IC 5070 Pelican nebula": {
+   "objet": "IC 5070",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Pélican"
+  },
+  "IC5070": {
+   "objet": "IC 5070",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Pélican"
+  },
+  "M16": {
+   "objet": "M16",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Aigle"
+  },
+  "M17": {
+   "objet": "M17",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Oméga"
+  },
+  "M20": {
+   "objet": "M20",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Trifide"
+  },
+  "M42": {
+   "objet": "M42",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Orion"
+  },
+  "NGC 6888": {
+   "objet": "NGC 6888",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Croissant ; bulle d'étoile Wolf-Rayet"
+  },
+  "NGC  6888 Crescent nebula": {
+   "objet": "NGC 6888",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Croissant ; bulle d'étoile Wolf-Rayet"
+  },
+  "NGC 6888 Crescent nebula": {
+   "objet": "NGC 6888",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Croissant ; bulle d'étoile Wolf-Rayet"
+  },
+  "NGC  7000 C20 North America Nebula": {
+   "objet": "NGC 7000",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Amérique du Nord"
+  },
+  "NGC 7023": {
+   "objet": "NGC 7023",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Iris ; nébuleuse par réflexion"
+  },
+  "NGC 7023 Iris Nebula": {
+   "objet": "NGC 7023",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Iris ; nébuleuse par réflexion"
+  },
+  "NGC  7380 Wizard nebula": {
+   "objet": "NGC 7380",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Sorcier"
+  },
+  "NGC 7538": {
+   "objet": "NGC 7538",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": ""
+  },
+  "NGC 2237": {
+   "objet": "NGC 2237",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Rosette"
+  },
+  "Sharpless 101 Sh2-101 H II Tulip nebula": {
+   "objet": "Sh2-101",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Tulipe"
+  },
+  "Sharpless 101 Sh2-101 H II nebula": {
+   "objet": "Sh2-101",
+   "cat": "neb",
+   "sbdb": null,
+   "rem": "Tulipe"
+  },
+  "M13": {
+   "objet": "M13",
+   "cat": "amas",
+   "sbdb": null,
+   "rem": "globulaire"
+  },
+  "M15": {
+   "objet": "M15",
+   "cat": "amas",
+   "sbdb": null,
+   "rem": "globulaire"
+  },
+  "M56": {
+   "objet": "M56",
+   "cat": "amas",
+   "sbdb": null,
+   "rem": "globulaire"
+  },
+  "M62": {
+   "objet": "M62",
+   "cat": "amas",
+   "sbdb": null,
+   "rem": "globulaire"
+  },
+  "M71": {
+   "objet": "M71",
+   "cat": "amas",
+   "sbdb": null,
+   "rem": "globulaire"
+  },
+  "M92": {
+   "objet": "M92",
+   "cat": "amas",
+   "sbdb": null,
+   "rem": "globulaire"
+  },
+  "NGC 6366": {
+   "objet": "NGC 6366",
+   "cat": "amas",
+   "sbdb": null,
+   "rem": "globulaire"
+  },
+  "NGC 6934": {
+   "objet": "NGC 6934",
+   "cat": "amas",
+   "sbdb": null,
+   "rem": "globulaire"
+  },
+  "M29": {
+   "objet": "M29",
+   "cat": "amas",
+   "sbdb": null,
+   "rem": "ouvert"
+  },
+  "M45": {
+   "objet": "M45",
+   "cat": "amas",
+   "sbdb": null,
+   "rem": "ouvert, Pléiades"
+  },
+  "NGC 1039": {
+   "objet": "NGC 1039",
+   "cat": "amas",
+   "sbdb": null,
+   "rem": "ouvert, M34"
+  },
+  "NGC 654": {
+   "objet": "NGC 654",
+   "cat": "amas",
+   "sbdb": null,
+   "rem": "ouvert"
+  },
+  "NGC 6871": {
+   "objet": "NGC 6871",
+   "cat": "amas",
+   "sbdb": null,
+   "rem": "ouvert"
+  },
+  "IC1805": {
+   "objet": "IC 1805",
+   "cat": "amas",
+   "sbdb": null,
+   "rem": "ouvert, dans la nébuleuse du Cœur"
+  },
+  "M 101": {
+   "objet": "M101",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  },
+  "M101": {
+   "objet": "M101",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  },
+  "M102": {
+   "objet": "NGC 5866",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  },
+  "NGC 5866": {
+   "objet": "NGC 5866",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  },
+  "M110": {
+   "objet": "M110",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  },
+  "M31": {
+   "objet": "M31",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": "Andromède"
+  },
+  "M31 Andromeda": {
+   "objet": "M31",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": "Andromède"
+  },
+  "M32": {
+   "objet": "M32",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  },
+  "m32": {
+   "objet": "M32",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  },
+  "M33": {
+   "objet": "M33",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": "Triangle"
+  },
+  "M51": {
+   "objet": "M51",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": "Tourbillon"
+  },
+  "M74": {
+   "objet": "M74",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  },
+  "M81": {
+   "objet": "M81",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  },
+  "M82": {
+   "objet": "M82",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  },
+  "NGC  6822": {
+   "objet": "NGC 6822",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": "galaxie de Barnard"
+  },
+  "NGC 6822": {
+   "objet": "NGC 6822",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": "galaxie de Barnard"
+  },
+  "NGC  6946": {
+   "objet": "NGC 6946",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": "Feu d'artifice"
+  },
+  "NGC  6946 Firework galaxy": {
+   "objet": "NGC 6946",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": "Feu d'artifice"
+  },
+  "NGC 6946": {
+   "objet": "NGC 6946",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": "Feu d'artifice"
+  },
+  "NGC  7331": {
+   "objet": "NGC 7331",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  },
+  "NGC 7331": {
+   "objet": "NGC 7331",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  },
+  "NGC  7416": {
+   "objet": "NGC 7416",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  },
+  "NGC 7416": {
+   "objet": "NGC 7416",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  },
+  "NGC  891": {
+   "objet": "NGC 891",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": "vue par la tranche"
+  },
+  "NGC 891": {
+   "objet": "NGC 891",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": "vue par la tranche"
+  },
+  "NGC 5673": {
+   "objet": "NGC 5673",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  },
+  "NGC 5981": {
+   "objet": "NGC 5981",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  },
+  "NGC 5982": {
+   "objet": "NGC 5982",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": "elliptique"
+  },
+  "NGC 6814": {
+   "objet": "NGC 6814",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": "Seyfert"
+  },
+  "ARP295": {
+   "objet": "Arp 295",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": "paire en interaction"
+  },
+  "Stephan Quintet": {
+   "objet": "Quintette de Stephan",
+   "cat": "gal",
+   "sbdb": null,
+   "rem": ""
+  }
+ },
+ "noms_en": {
+  "(134340) Pluton": "(134340) Pluto",
+  "Saturne": "Saturn",
+  "(136199) Éris": "(136199) Eris",
+  "Quintette de Stephan": "Stephan's Quintet"
+ },
+ "remarques_en": {
+  "Aigle": "Eagle",
+  "Amérique du Nord": "North America",
+  "Andromède": "Andromeda",
+  "Boule de neige bleue": "Blue Snowball",
+  "Bulle, C11": "Bubble, C11",
+  "Cocon": "Cocoon",
+  "Croissant ; bulle d'étoile Wolf-Rayet": "Crescent; Wolf-Rayet star bubble",
+  "Dentelles est ; rémanent": "Eastern Veil; remnant",
+  "Dentelles ouest, C34 ; rémanent": "Western Veil, C34; remnant",
+  "Dumbbell": "Dumbbell",
+  "Feu d'artifice": "Fireworks",
+  "Iris ; nébuleuse par réflexion": "Iris; reflection nebula",
+  "Lyre": "Ring",
+  "Oméga": "Omega",
+  "Orion": "Orion",
+  "Petit Dumbbell": "Little Dumbbell",
+  "Pélican": "Pelican",
+  "Rosette": "Rosette",
+  "Seyfert": "Seyfert",
+  "Sorcier": "Wizard",
+  "Tourbillon": "Whirlpool",
+  "Triangle": "Triangulum",
+  "Trifide": "Trifid",
+  "Trompe d'éléphant": "Elephant's Trunk",
+  "Tulipe": "Tulip",
+  "Tête de cheval": "Horsehead",
+  "elliptique": "elliptical",
+  "fragment A": "fragment A",
+  "galaxie de Barnard": "Barnard's Galaxy",
+  "globulaire": "globular",
+  "identifiée par JPL Horizons (écart 0,006°)": "identified with JPL Horizons (0.006° offset)",
+  "nova récurrente": "recurrent nova",
+  "nébuleuse sombre": "dark nebula",
+  "ouvert": "open",
+  "ouvert, M34": "open, M34",
+  "ouvert, Pléiades": "open, Pleiades",
+  "ouvert, dans la nébuleuse du Cœur": "open, in the Heart Nebula",
+  "paire en interaction": "interacting pair",
+  "vue par la tranche": "edge-on",
+  "Œil clignotant": "Blinking Eye",
+  "Œil de chat": "Cat's Eye"
+ }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "ohp",
+  "version": "1.0.0",
+  "nom": {"fr": "Banque OHP", "en": "OHP image bank"},
+  "description": {
+    "fr": "Images des stages à l'OHP (T120, IRIS) : inventaire, téléchargement, en-têtes corrigés, lots à empiler",
+    "en": "Images from the OHP training nights (T120, IRIS): inventory, download, fixed headers, stacks"
+  },
+  "icone": "icone.svg",
+  "ordre": 10,
+  "textes": "textes_ui:TEXTES",
+  "gui": "gui:Panneau",
+  "cli": "cli:enregistrer",
+  "coupole_min": "0.1.0"
+}
