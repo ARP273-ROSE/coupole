@@ -19,7 +19,7 @@ def _taille(o: float) -> str:
 def _selection_args(p, objet=True):
     if objet:
         p.add_argument('objets', nargs='*', metavar=tr('ohp_meta_objet'), help=tr('ohp_aide_objet'))
-    p.add_argument('--type', dest='categories', action='append', metavar='CAT', help=tr('ohp_aide_type'))
+    p.add_argument('--type', dest='categories', action='append', metavar=tr('ohp_meta_cat'), help=tr('ohp_aide_type'))
     p.add_argument('--telescope', action='append', choices=['T120', 'IRIS'], help=tr('ohp_aide_telescope'))
     p.add_argument('--filtre', '--filter', dest='filtres', action='append', metavar='F', help=tr('ohp_aide_filtre'))
     p.add_argument('--nuit', '--night', dest='nuits', action='append', metavar=tr('ohp_meta_date'),
@@ -40,7 +40,7 @@ def enregistrer(p):
 
     s = sous.add_parser('catalogue', aliases=['catalog'], help=tr('ohp_cli_catalogue'),
                         description=tr('ohp_cli_catalogue_desc'), formatter_class=fmt)
-    s.add_argument('--type', dest='categories', action='append', metavar='CAT', help=tr('ohp_aide_type'))
+    s.add_argument('--type', dest='categories', action='append', metavar=tr('ohp_meta_cat'), help=tr('ohp_aide_type'))
     s.add_argument('--telescope', action='append', choices=['T120', 'IRIS'], help=tr('ohp_aide_telescope'))
     s.add_argument('--chercher', '--search', metavar=tr('ohp_meta_texte'), help=tr('ohp_aide_chercher'))
     s.add_argument('--json', action='store_true', help=tr('cli_aide_json'))

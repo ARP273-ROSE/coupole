@@ -357,4 +357,5 @@ TEXTES = {
     'ohp_ciel_aide': {'fr': 'Survol : nom et nombre d\'images ; clic : ouvre l\'objet dans le catalogue.', 'en': 'Hover: name and number of images; click: open the object in the catalogue.'},
     'ohp_ciel_bulle': {'fr': '{nom}\n{cat} — {n} image(s)', 'en': '{nom}\n{cat} — {n} image(s)'},
     'ohp_col_heure_site': {'fr': 'heure du site', 'en': 'site time'},
+'ohp_meta_cat': {'fr': 'TYPE', 'en': 'TYPE'},
 }

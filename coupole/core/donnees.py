@@ -235,6 +235,10 @@ def lire_csv(chemin) -> list[Donnee]:
         entete = rangs[0]
         rangs = rangs[1:]
     n = max(len(r) for r in rangs)
+    if entete and len(entete) != n and (not delim or delim == ' '):
+        # en-tête séparé par des espaces mais noms avec espaces : « freq (MHz)  Ta (K) »
+        brut = next(l for l in lignes if l.strip())
+        entete = [c.strip() for c in re.split(r'\s{2,}|\t', brut.strip()) if c.strip()]
     noms = entete if entete and len(entete) == n else ['col%d' % (i + 1) for i in range(n)]
     cols = {}
     for i, nom in enumerate(noms):
