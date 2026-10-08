@@ -13,7 +13,7 @@ import time
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QKeySequence, QShortcut
-from PyQt6.QtWidgets import (QDialog, QFileDialog, QFormLayout, QGridLayout, QGroupBox, QHBoxLayout, QLabel,
+from PyQt6.QtWidgets import (QDialog, QFileDialog, QFormLayout, QFrame, QGridLayout, QGroupBox, QHBoxLayout, QLabel,
                              QMessageBox, QPlainTextEdit, QProgressBar, QSplitter, QTabWidget, QVBoxLayout, QWidget)
 
 from ...core import config, i18n
@@ -21,12 +21,16 @@ from ...core.i18n import tr
 from ...gui.adaptatif import Flux, coupable
 from ...gui.dialogues import DialogueASTAP, ouvrir_fichier
 from ...gui.modele import ModeleTableau, lignes_choisies, vue_tableau
-from ...gui.outils import FileEvenements, Tache, aide, bouton, case, champ, decimal, liste, nombre
+from ...gui.outils import (FileEvenements, Tache, aide, bouton, case, champ, decimal, enregistrer_arret, lancer_fil,
+                           liste, nombre)
 from . import cibles
 
 
 def _taille(o: float) -> str:
     return tr('taille_go', v='%.2f' % (o / 1e9)) if o >= 1e8 else tr('taille_mo', v='%.1f' % (o / 1e6))
+
+
+from .gui_sans_qt import duree_lisible  # noqa: E402
 
 
 class Panneau(QWidget):
@@ -36,9 +40,15 @@ class Panneau(QWidget):
         self.selection = []
         self.traitement = None
         self.arret = None
+        self.pause = None
         self._fil = None
+        self._nouveautes = None
+        self._mode_tout = False
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
+        self.bandeau = self._bandeau_nouveautes()
+        self.bandeau.setVisible(False)
+        v.addWidget(self.bandeau)
         self.onglets = aide(QTabWidget(), 'ohp_onglets_aide')
         v.addWidget(self.onglets)
         self.onglets.addTab(self._onglet_catalogue(), tr('ohp_onglet_catalogue'))
@@ -54,6 +64,76 @@ class Panneau(QWidget):
         sc = QShortcut(QKeySequence('Ctrl+R'), self)
         sc.activated.connect(lambda: self.charger(True))
         self.charger(False)
+        self._etat_astap = None
+
+    # ================================================================ bandeau des nouveautés
+    def _bandeau_nouveautes(self):
+        w = QFrame()
+        w.setObjectName('bandeauNouveautes')
+        w.setFrameShape(QFrame.Shape.StyledPanel)
+        aide(w, 'ohp_bandeau_aide')
+        h = Flux(w, marge=6)
+        self.l_bandeau = QLabel('')
+        self.l_bandeau.setWordWrap(True)
+        aide(self.l_bandeau, 'ohp_bandeau_aide')
+        h.addWidget(self.l_bandeau)
+        h.addWidget(bouton('ohp_nouv_telecharger', self.telecharger_nouveautes))
+        h.addWidget(bouton('ohp_nouv_voir', self.voir_nouveautes))
+        h.addWidget(bouton('ohp_nouv_plus_tard', lambda: self.bandeau.setVisible(False)))
+        return w
+
+    def verifier_nouveautes(self, forcer=False):
+        """Compare l'inventaire TAP frais à la copie locale (fil de fond) ; bandeau si quelque chose est nouveau."""
+        if self.occupe() or getattr(self, '_t_nouv', None) is not None and self._t_nouv.isRunning():
+            return
+        from .inventaire import verifier_nouveautes
+        dest = os.path.abspath(os.path.expanduser(self.dest.text().strip())) if hasattr(self, 'dest') else ''
+        if forcer:
+            self.window().statusBar().showMessage(tr('ohp_nouv_verification'), 5000)
+        self._t_nouv = Tache(verifier_nouveautes, dest, forcer, parent=self)
+        self._t_nouv.quand_fini(lambda n, f=forcer: self._nouveautes_pretes(n, f))
+        self._t_nouv.quand_erreur(lambda e, f=forcer: f and self.window().statusBar().showMessage(tr('ohp_nouv_hors_ligne'), 8000))
+        self._t_nouv.start()
+
+    def _nouveautes_pretes(self, n, forcer):
+        if n is None:
+            if forcer:
+                self.window().statusBar().showMessage(tr('ohp_nouv_hors_ligne'), 8000)
+            return
+        inv = n.pop('inv', None)
+        if inv is not None:
+            self._inventaire_pret(inv)
+        self._nouveautes = n
+        dest = self.dest.text().strip() if hasattr(self, 'dest') else ''
+        if not n['copie']:
+            if forcer:
+                self.window().statusBar().showMessage(tr('ohp_nouv_sans_copie', dest=dest), 8000)
+            self.bandeau.setVisible(False)
+            return
+        if not n['images']:
+            if forcer:
+                self.window().statusBar().showMessage(tr('ohp_nouv_aucune', depuis=n['depuis'] or '?'), 8000)
+            self.bandeau.setVisible(False)
+            return
+        self.l_bandeau.setText(tr('ohp_bandeau_nouveautes', n=len(n['images']), objets=len(n['objets']),
+                                  taille=_taille(n['octets']), depuis=n['depuis'] or '?'))
+        self.bandeau.setVisible(True)
+        self.window().statusBar().showMessage(tr('ohp_nouv_statut', n=len(n['images']), taille=_taille(n['octets'])), 15000)
+
+    def voir_nouveautes(self):
+        self.onglets.setCurrentIndex(0)
+        self.f_nouveaux.setChecked(True)
+
+    def telecharger_nouveautes(self):
+        n = self._nouveautes
+        if not n or not n['images']:
+            return
+        self.bandeau.setVisible(False)
+        self.selection = list(n['images'])
+        self.l_sel.setText(tr('ohp_selection_courante', n=len(self.selection),
+                              objets=', '.join(cibles.nom_affiche(o) for o in n['objets'])[:300]))
+        self.onglets.setCurrentIndex(1)
+        self.lancer(confirmer=True, apres_succes='nouveautes')
 
     # ================================================================ catalogue
     def _onglet_catalogue(self):
@@ -130,8 +210,8 @@ class Panneau(QWidget):
         self.b_rafraichir.setEnabled(False)
         self.l_inventaire.setText(tr('ohp_interrogation_tap') if rafraichir else tr('ohp_chargement'))
         self._t_inv = Tache(Inventaire.charger, rafraichir, parent=self)
-        self._t_inv.fini.connect(self._inventaire_pret)
-        self._t_inv.erreur.connect(self._inventaire_erreur)
+        self._t_inv.quand_fini(self._inventaire_pret)
+        self._t_inv.quand_erreur(self._inventaire_erreur)
         self._t_inv.start()
 
     def _inventaire_erreur(self, e):
@@ -155,6 +235,10 @@ class Panneau(QWidget):
         self._remplir_objets()
         self._remplir_anomalies()
         self._remplir_ciel()
+        if not getattr(self, '_nouveautes_verifiees', False) and hasattr(self, 'dest'):
+            self._nouveautes_verifiees = True        # une fois par lancement, si le réglage le demande (délai respecté)
+            if config.reglages()['ohp_verifier_nouveautes'] and not os.environ.get('COUPOLE_SANS_RESEAU'):
+                self.verifier_nouveautes(False)
 
     def _remplir_objets(self):
         if not self.inv:
@@ -357,15 +441,23 @@ class Panneau(QWidget):
         for wid in (self.n_dl, self.n_conv, self.eco):
             (wid.valueChanged if hasattr(wid, 'valueChanged') else wid.toggled).connect(self._maj_plan)
         v.addWidget(g)
-        h = QHBoxLayout()
+        h = Flux()
         self.b_lancer = bouton('ohp_lancer', self.lancer)
+        self.b_tout = bouton('ohp_tout', self.tout_telecharger)
+        self.b_pause = bouton('ohp_pause', self.basculer_pause)
+        self.b_pause.setEnabled(False)
         self.b_arreter = bouton('ohp_arreter', self.arreter_traitement)
         self.b_arreter.setEnabled(False)
         h.addWidget(self.b_lancer)
+        h.addWidget(self.b_tout)
+        h.addWidget(self.b_pause)
         h.addWidget(self.b_arreter)
-        self.barre = aide(QProgressBar(), 'ohp_barre_aide')
-        h.addWidget(self.barre, 1)
+        h.addWidget(bouton('ohp_ouvrir_journal', self.ouvrir_journal))
+        h.addWidget(bouton('ohp_reorganiser', self.reorganiser))
+        h.addWidget(bouton('ohp_nouv_verifier', lambda: self.verifier_nouveautes(True)))
         v.addLayout(h)
+        self.barre = aide(QProgressBar(), 'ohp_barre_aide')
+        v.addWidget(self.barre)
         self.l_stats = QLabel('')
         v.addWidget(self.l_stats)
         self.journal = aide(QPlainTextEdit(), 'ohp_journal_aide')
@@ -387,9 +479,19 @@ class Panneau(QWidget):
         self.reglages_changes()
 
     def reglages_changes(self):
-        from ...core import astap
+        """Détection d'ASTAP (sous-processus) et sondes de la machine : hors du fil graphique."""
+        from ...core import astap, machine
         r = config.reglages()
-        self._etat_astap = astap.detecter(r['astap_executable'], r['astap_catalogue'])
+        self.l_astap.setText(tr('astapdlg_recherche'))
+
+        def sonder():
+            return machine.detecter(), astap.detecter(r['astap_executable'], r['astap_catalogue'])
+        self._t_astap = Tache(sonder, parent=self)
+        self._t_astap.quand_fini(self._sondes_pretes)
+        self._t_astap.start()
+
+    def _sondes_pretes(self, resultat):
+        self._machine, self._etat_astap = resultat
         e = self._etat_astap
         if e.utilisable:
             self.l_astap.setText(tr('ohp_avec_astap', exe=coupable(e.executable), cat=e.catalogue.upper()))
@@ -400,10 +502,12 @@ class Panneau(QWidget):
 
     def _plan(self):
         from ...core import machine, parallele
-        m = machine.detecter()
+        m = getattr(self, '_machine', None) or machine.detecter()   # détection déjà faite en fond (cache)
         return m, parallele.planifier(m, self.n_dl.value(), self.n_conv.value(), True if self.eco.isChecked() else None)
 
     def _maj_plan(self, *_):
+        if getattr(self, '_machine', None) is None:
+            return                                   # les sondes ne sont pas encore revenues
         m, p = self._plan()
         self.l_plan.setText(tr('ohp_machine', cpu=m.coeurs_physiques, log=m.coeurs_logiques,
                                ram='%.1f' % (m.memoire_disponible_mo / 1024), dl=p.telechargements,
@@ -412,7 +516,90 @@ class Panneau(QWidget):
     def occupe(self):
         return self._fil is not None and self._fil.is_alive()
 
-    def lancer(self):
+    # ---------------------------------------------------------------- tout télécharger, journal, réorganiser
+    def _choisir_dest_si_besoin(self) -> str | None:
+        """Premier « Tout télécharger » (ou dossier non défini) : dialogue natif, défaut sensé selon le système."""
+        from .pilote import dossier_sortie_propose
+        r = config.reglages()
+        actuel = self.dest.text().strip()
+        if r['dossier_sortie'] and actuel:
+            return os.path.abspath(os.path.expanduser(actuel))
+        propose = actuel or dossier_sortie_propose()
+        QMessageBox.information(self, tr('ohp_choisir_dest_titre'), tr('ohp_choisir_dest_texte', dest=propose))
+        d = QFileDialog.getExistingDirectory(self, tr('ohp_choisir_dest_titre'), os.path.dirname(propose) or propose)
+        if not d:
+            return None
+        if os.path.basename(d) != 'OHP_DU_ECU' and not os.path.exists(os.path.join(d, '_traitement')):
+            d = os.path.join(d, 'OHP_DU_ECU')
+        self.dest.setText(d)
+        return os.path.abspath(d)
+
+    def tout_telecharger(self):
+        """Toute la banque : estimation (volume, temps au débit plafond, place libre), confirmation, puis traitement."""
+        if self.occupe() or not self.inv:
+            return
+        dest = self._choisir_dest_si_besoin()
+        if not dest:
+            return
+        self.selection = list(self.inv.images)
+        self._mode_tout = True
+        self.l_sel.setText(tr('ohp_selection_courante', n=len([x for x in self.selection if not x['doublon']]),
+                              objets=tr('ohp_tous_types')))
+        self.lancer(confirmer=True)
+
+    def _estimation_tout(self, est, fmt, plan):
+        from .pilote import estimation_temps
+        debit = self.debit.value()
+        return tr('ohp_estimation_tout', images=est['images'], objets=est['objets'], fits=_taille(est['octets_fits']),
+                  sortie=_taille(est['octets_sortie']), format=fmt.upper(), debit='%.1f' % debit,
+                  temps=duree_lisible(estimation_temps(est['octets_fits'], debit * 1e6)))
+
+    def ouvrir_journal(self):
+        p = os.path.join(self.dest.text().strip(), '_traitement', 'JOURNAL.txt')
+        if os.path.exists(p):
+            ouvrir_fichier(p)
+        else:
+            QMessageBox.information(self, tr('ohp_ouvrir_journal'), tr('ohp_journal_absent', dest=self.dest.text()))
+
+    def reorganiser(self):
+        """Range des fichiers déjà convertis (ailleurs, ancien rangement) dans l'arborescence des lots."""
+        if self.occupe() or not self.inv:
+            return
+        src = QFileDialog.getExistingDirectory(self, tr('ohp_reorganiser_titre'), self.dest.text())
+        if not src:
+            return
+        dest = os.path.abspath(os.path.expanduser(self.dest.text().strip()))
+        from .pilote import Traitement
+        from ...core.parallele import Plan
+        inv = self.inv
+        fmt, L = self.format.currentData(), self.noms.currentData()
+
+        def travail():
+            t = Traitement(dest, inv, Plan(1, 1, True, ''), {'format': fmt, 'langue': L})
+            try:
+                return t.reorganiser(src)
+            finally:
+                t.fermer()
+        self.b_lancer.setEnabled(False)
+        self._t_reorg = Tache(travail, parent=self)
+        self._t_reorg.quand_fini(lambda r: (self.b_lancer.setEnabled(True), self._remplir_lots(),
+                                            self._log(tr('ohp_reorganise_fait', n=r['ranges'], lots=r['lots'],
+                                                         ignores=len(r['ignores'])))))
+        self._t_reorg.quand_erreur(lambda e: (self.b_lancer.setEnabled(True),
+                                              QMessageBox.warning(self, tr('ohp_reorganiser'), e)))
+        self._t_reorg.start()
+
+    def basculer_pause(self):
+        if self.pause is None:
+            return
+        if self.pause.is_set():
+            self.pause.clear()
+            self.b_pause.setText(tr('ohp_pause'))
+        else:
+            self.pause.set()
+            self.b_pause.setText(tr('ohp_reprendre'))
+
+    def lancer(self, confirmer=False, apres_succes=None):
         from .pilote import Traitement
         from .selection import estimer, place_necessaire
         from ...core.machine import disque_libre_go
@@ -427,18 +614,31 @@ class Panneau(QWidget):
         m, plan = self._plan()
         est = estimer(sel, fmt)
         besoin = place_necessaire(est, plan.conversions, plan.telechargements)
-        if disque_libre_go(dest) * 1e9 < besoin:
-            QMessageBox.warning(self, tr('ohp_onglet_traitement'), tr('ohp_place_insuffisante'))
+        libre = disque_libre_go(dest) * 1e9
+        if libre < besoin:
+            QMessageBox.warning(self, tr('ohp_onglet_traitement'),
+                                tr('ohp_place_manque', besoin=_taille(besoin), libre=_taille(libre), dest=dest))
             return
-        if est['octets_fits'] > 5e9 and QMessageBox.question(
+        if confirmer or self._mode_tout:
+            texte = tr('ohp_tout_question', estimation=self._estimation_tout(est, fmt, plan), dest=dest,
+                       place=tr('ohp_place', besoin=_taille(besoin), libre=_taille(libre), dest=dest))
+            if QMessageBox.question(self, tr('ohp_tout_titre'), texte) != QMessageBox.StandardButton.Yes:
+                self._mode_tout = False
+                return
+        elif est['octets_fits'] > 5e9 and QMessageBox.question(
                 self, tr('ohp_onglet_traitement'), tr('ohp_confirmer_gros_gui', taille=_taille(est['octets_fits']))) \
                 != QMessageBox.StandardButton.Yes:
             return
+        self._mode_tout = False
+        self._apres_succes = apres_succes
         r = config.reglages()
         r['dossier_sortie'] = dest
         r['format_sortie'] = fmt
-        etat = self._etat_astap if self._etat_astap.utilisable and self.mode_astap.currentData() != 'jamais' else None
-        self.arret = threading.Event()
+        e_astap = self._etat_astap
+        etat = e_astap if (e_astap is not None and e_astap.utilisable and self.mode_astap.currentData() != 'jamais') else None
+        self.arret = enregistrer_arret(threading.Event())
+        self.pause = threading.Event()
+        self.b_pause.setText(tr('ohp_pause'))
         self.journal.clear()
         self.barre.setValue(0)
         self._octets, self._t0, self._total = 0, time.time(), 0
@@ -448,26 +648,30 @@ class Panneau(QWidget):
                 'garder_fits': self.garder_fits.isChecked(), 'garder_doublons': self.garder_doublons.isChecked()}
         self._log(tr('ohp_journal_debut', n=est['images'], dest=dest, format=fmt.upper()))
         if etat is None:
-            self._log(tr('ohp_sans_astap') if not self._etat_astap.utilisable else tr('ohp_astap_desactive'))
+            self._log(tr('ohp_sans_astap') if not (e_astap and e_astap.utilisable) else tr('ohp_astap_desactive'))
+        evts, arret, pause, inv = self._evts, self.arret, self.pause, self.inv
 
         def travail():
             t = None
             try:
-                t = Traitement(dest, self.inv, plan, opts, rapporter=self._evts, arret=self.arret)
+                t = Traitement(dest, inv, plan, opts, rapporter=evts, arret=arret, pause=pause)
                 t.lancer(sel)
+            except OSError as e:                     # dossier non inscriptible, disque plein, dossier retiré
+                evts({'type': 'erreur', 'erreur': str(e)})
             except Exception as e:
                 import traceback
                 from ...core import rapports
                 rapports.signaler_plantage(traceback.format_exc(), contexte='traitement')
-                self._evts({'type': 'erreur', 'erreur': '%s: %s' % (type(e).__name__, e)})
+                evts({'type': 'erreur', 'erreur': '%s: %s' % (type(e).__name__, e)})
             finally:
                 if t is not None:
                     t.fermer()
-                self._evts({'type': 'termine'})
+                evts({'type': 'termine'})
         self.b_lancer.setEnabled(False)
+        self.b_tout.setEnabled(False)
+        self.b_pause.setEnabled(True)
         self.b_arreter.setEnabled(True)
-        self._fil = threading.Thread(target=travail, name='traitement', daemon=True)
-        self._fil.start()
+        self._fil = lancer_fil(travail)
 
     def _verifier_qualite(self):
         """Contrôle de qualité demandé explicitement (case cochée) : lots du dossier de sortie, en fond."""
@@ -492,17 +696,27 @@ class Panneau(QWidget):
                 q(tr('qual_lot', lot=os.path.relpath(d, dest), n=len(lignes)) + ' — ' +
                   rapport.resume(lignes, i18n.langue())[1 if len(lignes) else 0])
             q(tr('qual_fini', n=n, lots=len(lots)))
-        threading.Thread(target=travail, daemon=True).start()
+        lancer_fil(travail)
 
     def arreter_traitement(self):
         if self.arret is not None:
             self.arret.set()
+            if self.pause is not None:
+                self.pause.clear()
             self._log(tr('ohp_arret_demande'))
             self.b_arreter.setEnabled(False)
+            self.b_pause.setEnabled(False)
 
     def arreter(self):
+        """Fermeture : lève l'arrêt, débloque une pause, attend le fil du traitement (processus terminés par lui)."""
         if self.arret is not None:
             self.arret.set()
+        if self.pause is not None:
+            self.pause.clear()
+        if self._fil is not None and self._fil.is_alive():
+            self._fil.join(15)
+        if getattr(self, '_evts', None) is not None:
+            self._evts.arreter()
 
     def _log(self, texte):
         self.journal.appendPlainText(texte)
@@ -528,6 +742,8 @@ class Panneau(QWidget):
                 self._log(tr('ohp_ligne_echec', source=ev['source'], erreur=ev['erreur']))
             elif t == 'avis':
                 self._log(tr(ev['cle'], valeur=ev['valeur']))
+            elif t == 'pause':
+                self._log(tr('ohp_pause_journal' if ev['actif'] else 'ohp_reprise_journal'))
             elif t == 'erreur':
                 self._log(tr('ohp_erreur_traitement', erreur=ev['erreur']))
             elif t == 'fin':
@@ -537,12 +753,26 @@ class Panneau(QWidget):
                              echecs=b['statuts'].get('echec', 0), fits=_taille(of), sortie=_taille(ox),
                              ratio='%.1f' % (100 * ox / of if of else 0), lots=b.get('lots', '?'),
                              dest=self.dest.text()))
+                c = b.get('compte', {})
+                self._log(tr('ohp_rapport_fin', images=b.get('images', 0), duree=duree_lisible(b.get('duree', 0)),
+                             ok=c.get('ok', 0), doublons=c.get('doublon', 0), echecs=c.get('echec', 0),
+                             sortie=_taille(ox), lots=b.get('lots', 0),
+                             journal=os.path.join(self.dest.text(), '_traitement', 'JOURNAL.txt')))
+                if b.get('echecs'):
+                    self._log(tr('ohp_rapport_echecs', liste='; '.join(
+                        '%s (%s)' % (e['source'].rsplit('/', 1)[-1], e['erreur'][:60]) for e in b['echecs'][:10])))
                 if b.get('annule'):
                     self._log(tr('interrompu_reprise'))
+                elif not c.get('echec') and getattr(self, '_apres_succes', None) == 'nouveautes':
+                    from .inventaire import marquer_reference
+                    marquer_reference()
+                    self._nouveautes = None
             elif t == 'termine':
                 self.b_lancer.setEnabled(True)
+                self.b_tout.setEnabled(True)
+                self.b_pause.setEnabled(False)
                 self.b_arreter.setEnabled(False)
-                self._evts.timer.stop()
+                self._evts.arreter()
                 self._remplir_lots()
                 self._remplir_anomalies()
                 if self.qualite.isChecked() and not (self.arret and self.arret.is_set()):
@@ -624,7 +854,7 @@ class Panneau(QWidget):
             a = anomalies.detecter(inv.images, medo)
             return a + anomalies.depuis_traitement(os.path.join(dest, '_traitement', 'etat.sqlite'))
         self._t_anom = Tache(calcul, parent=self)
-        self._t_anom.fini.connect(self._anomalies_pretes)
+        self._t_anom.quand_fini(self._anomalies_pretes)
         self._t_anom.start()
 
     def _anomalies_pretes(self, anoms):

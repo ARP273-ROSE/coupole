@@ -65,6 +65,23 @@ def enregistrer(p):
     _options_traitement(s)
     s.set_defaults(fonction=cmd_traiter)
 
+    s = sous.add_parser('tout', aliases=['all'], help=tr('ohp_cli_tout'), description=tr('ohp_cli_tout_desc'),
+                        formatter_class=fmt)
+    _options_traitement(s)
+    s.set_defaults(fonction=cmd_tout)
+
+    s = sous.add_parser('nouveautes', aliases=['new'], help=tr('ohp_cli_nouveautes'),
+                        description=tr('ohp_cli_nouveautes_desc'), formatter_class=fmt)
+    s.add_argument('--telecharger', '--download', action='store_true', help=tr('ohp_aide_telecharger_nouveautes'))
+    _options_traitement(s)
+    s.set_defaults(fonction=cmd_nouveautes)
+
+    s = sous.add_parser('reorganiser', aliases=['reorganise', 'reorganize'], help=tr('ohp_cli_reorganiser'),
+                        description=tr('ohp_cli_reorganiser_desc'), formatter_class=fmt)
+    s.add_argument('source', metavar=tr('cli_meta_dossier'), help=tr('ohp_aide_source_reorg'))
+    s.add_argument('--dest', metavar=tr('cli_meta_dossier'), help=tr('ohp_aide_dest'))
+    s.set_defaults(fonction=cmd_reorganiser)
+
     s = sous.add_parser('telecharger', aliases=['download'], help=tr('ohp_cli_telecharger'),
                         description=tr('ohp_cli_telecharger_desc'), formatter_class=fmt)
     _selection_args(s)
@@ -287,14 +304,92 @@ def _astap_pour(mode):
     return e, mode
 
 
-def cmd_traiter(a):
-    from .pilote import Traitement
+def _duree(s):
+    from .gui_sans_qt import duree_lisible
+    return duree_lisible(s)
+
+
+def cmd_tout(a):
+    """Toute la banque : estimation (volume, temps au débit plafond), confirmation (--oui), traitement reprenable."""
+    from .pilote import estimation_temps
     from .selection import estimer
     r = config.reglages()
+    inv = _inventaire()
+    fmt = a.format or r['format_sortie']
+    debit = (a.debit if a.debit is not None else r['debit_max_mo_s'])
+    est = estimer(inv.images, fmt)
+    print(tr('ohp_estimation_tout', images=est['images'], objets=est['objets'], fits=_taille(est['octets_fits']),
+             sortie=_taille(est['octets_sortie']), format=fmt.upper(), debit='%.1f' % debit,
+             temps=_duree(estimation_temps(est['octets_fits'], debit * 1e6))))
+    if not a.oui:
+        print(tr('ohp_confirmer_tout'), file=sys.stderr)
+        return 4
+    a.objets, a.tout = [], True
+    return _traiter(a, inv, list(inv.images), confirmer_gros=False)
+
+
+def cmd_nouveautes(a):
+    """Nouveautés de la banque absentes de la copie locale ; --telecharger les traite dans la même arborescence."""
+    from .inventaire import marquer_reference, nouveautes_locales
+    dest = _dest(a)
+    print(tr('ohp_nouv_verification'))
+    try:
+        inv = _inventaire(True)
+    except Exception as e:
+        print(tr('ohp_nouv_hors_ligne') + ' (%s)' % e, file=sys.stderr)
+        return 3
+    n = nouveautes_locales(inv, dest)
+    if not n['copie']:
+        print(tr('ohp_nouv_sans_copie', dest=dest))
+        return 1
+    if not n['images']:
+        print(tr('ohp_nouv_aucune', depuis=n['depuis'] or '?'))
+        return 0
+    print(tr('ohp_nouv_liste', n=len(n['images']), objets=len(n['objets']), taille=_taille(n['octets']),
+             depuis=n['depuis'] or '?'))
+    from .cibles import nom_affiche
+    from ...core.astro import utc
+    for x in sorted(n['images'], key=lambda x: (x['t_min'], x['access_url']))[:200]:
+        print('   %-19s %-5s %-11s %-28s %s' % (utc(x['t_min']).isoformat(timespec='seconds'), x['tel'],
+                                               x['filter_name'], nom_affiche(x['objet'])[:28], x.get('vu_le', '')))
+    if len(n['images']) > 200:
+        print('   …')
+    if not a.telecharger:
+        return 0
+    code = _traiter(a, inv, list(n['images']), confirmer_gros=not a.oui)
+    if code == 0:
+        marquer_reference()
+    return code
+
+
+def cmd_reorganiser(a):
+    from .pilote import Traitement
+    from ...core.parallele import Plan
+    inv = _inventaire()
+    r = config.reglages()
+    t = Traitement(_dest(a), inv, Plan(1, 1, True, ''), {'format': r['format_sortie'], 'langue': i18n.langue()})
+    try:
+        res = t.reorganiser(a.source)
+    finally:
+        t.fermer()
+    print(tr('ohp_reorganise_fait', n=res['ranges'], lots=res['lots'], ignores=len(res['ignores'])))
+    for chemin, raison in res['ignores'][:50]:
+        print('   %s : %s' % (chemin, tr('reorg_' + raison)))
+    return 0
+
+
+def cmd_traiter(a):
     inv = _inventaire()
     sel = _choisir(a, inv)
     if sel is None:
         return 2
+    return _traiter(a, inv, sel)
+
+
+def _traiter(a, inv, sel, confirmer_gros=True):
+    from .pilote import Traitement
+    from .selection import estimer
+    r = config.reglages()
     fmt = a.format or r['format_sortie']
     dest = _dest(a)
     m, plan = _plan(a)
@@ -308,7 +403,7 @@ def cmd_traiter(a):
     if not assez:
         print(tr('ohp_place_insuffisante'), file=sys.stderr)
         return 3
-    if est['octets_fits'] > 5e9 and not a.oui:
+    if confirmer_gros and est['octets_fits'] > 5e9 and not a.oui:
         print(tr('ohp_confirmer_gros', taille=_taille(est['octets_fits'])), file=sys.stderr)
         return 4
     etat, mode = _astap_pour(a.astap)
@@ -337,10 +432,14 @@ def cmd_traiter(a):
             print(tr('ohp_ligne_echec', source=ev['source'], erreur=ev['erreur']), flush=True)
         elif t == 'avis':
             print(tr(ev['cle'], valeur=ev['valeur']))
-    tr_ = Traitement(dest, inv, plan, {'format': fmt, 'langue': langue, 'astap': etat, 'mode_astap': mode,
-                                       'debit_octets_s': debit, 'garder_fits': a.garder_fits,
-                                       'garder_doublons': a.garder_doublons},
-                     rapporter=rapporter, arret=arret)
+    try:
+        tr_ = Traitement(dest, inv, plan, {'format': fmt, 'langue': langue, 'astap': etat, 'mode_astap': mode,
+                                           'debit_octets_s': debit, 'garder_fits': a.garder_fits,
+                                           'garder_doublons': a.garder_doublons},
+                         rapporter=rapporter, arret=arret)
+    except OSError as e:                              # dossier non inscriptible, disque retiré
+        print(str(e), file=sys.stderr)
+        return 3
     try:
         bilan = tr_.lancer(sel)
     except KeyboardInterrupt:
@@ -350,6 +449,13 @@ def cmd_traiter(a):
     finally:
         tr_.fermer()
     _imprimer_bilan(bilan, dest)
+    c = bilan.get('compte', {})
+    print(tr('ohp_rapport_fin', images=bilan.get('images', 0), duree=_duree(bilan.get('duree', 0)), ok=c.get('ok', 0),
+             doublons=c.get('doublon', 0), echecs=c.get('echec', 0), sortie=_taille(bilan['octets_sortie']),
+             lots=bilan.get('lots', 0), journal=os.path.join(dest, '_traitement', 'JOURNAL.txt')))
+    if bilan.get('echecs'):
+        print(tr('ohp_rapport_echecs', liste='; '.join('%s (%s)' % (e['source'].rsplit('/', 1)[-1], e['erreur'][:60])
+                                                     for e in bilan['echecs'][:10])))
     return 0 if not bilan['compte']['echec'] else 1
 
 

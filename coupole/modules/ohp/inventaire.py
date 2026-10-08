@@ -17,6 +17,7 @@ import datetime as D
 import gzip
 import io
 import json
+import os
 import re
 from pathlib import Path
 
@@ -92,10 +93,19 @@ def chemin_historique() -> Path:
 
 
 def historique() -> dict:
-    try:
-        return json.loads(chemin_historique().read_text(encoding='utf-8'))
-    except Exception:
-        return {}
+    return config.lire_json_protege(chemin_historique(), {}) or {}
+
+
+def _ecrire_historique(h: dict):
+    config.ecrire_json_atomique(chemin_historique(), h, indent=None)
+
+
+def marquer_reference(date: str | None = None):
+    """Déplace la date de référence des nouveautés (après un téléchargement des nouveautés, ou « ignorer ») :
+    ce qui est apparu avant n'est plus « nouveau »."""
+    h = historique()
+    h['reference'] = date or D.datetime.now(D.timezone.utc).strftime('%Y-%m-%d')
+    _ecrire_historique(h)
 
 
 def noter_vus(lignes: list[dict], date: str) -> dict:
@@ -117,10 +127,58 @@ def noter_vus(lignes: list[dict], date: str) -> dict:
                 nouv_n.append(x['target_name'])
     h['dernier_rafraichissement'] = date
     h.setdefault('reference', date)
-    tmp = chemin_historique().with_suffix('.tmp')
-    tmp.write_text(json.dumps(h, ensure_ascii=False), encoding='utf-8')
-    tmp.replace(chemin_historique())
+    _ecrire_historique(h)
     return {'images': nouv_i, 'noms': sorted(set(nouv_n)), 'depuis': depuis, 'premiere': premiere}
+
+
+# ======================================================================== nouveautés par rapport à la copie locale
+def nouveautes_locales(inv, dest) -> dict:
+    """Images apparues dans la banque depuis la date de référence et absentes de la copie locale `dest`.
+
+    Rend {'images': [lignes], 'objets': [noms canoniques], 'octets': n, 'depuis': 'AAAA-MM-JJ', 'copie': bool}
+    (`copie` : une copie locale existe, c.-à-d. un `_traitement/etat.sqlite` dans `dest`).
+    """
+    from .conversion import ident
+    etat_p = os.path.join(str(dest), '_traitement', 'etat.sqlite') if dest else ''
+    copie = bool(etat_p) and os.path.exists(etat_p)
+    locaux = {}
+    if copie:
+        from .pilote import Etat
+        e = Etat(etat_p)
+        try:
+            locaux = e.statuts()
+        finally:
+            e.fermer()
+    ref = historique().get('reference', '')
+    nouv = [x for x in inv.images if x.get('nouveau') and not x['doublon']
+            and locaux.get(ident(x)) not in ('ok', 'doublon')]
+    return {'images': nouv, 'objets': sorted({x['objet'] for x in nouv}),
+            'octets': sum(x['access_estsize'] * 1024 for x in nouv), 'depuis': ref, 'copie': copie}
+
+
+def verifier_nouveautes(dest, forcer: bool = False) -> dict | None:
+    """Vérification automatique : réinterroge le TAP si la dernière vérification date de plus de
+    `ohp_nouveautes_heures` heures (ou `forcer`), et rend `nouveautes_locales` (+ 'inv'), ou None si rien à faire.
+    Ne lève jamais : hors ligne → None.  Jamais de téléchargement ici : seulement l'information."""
+    r = config.reglages()
+    if not forcer:
+        if not r['ohp_verifier_nouveautes']:
+            return None
+        derniere = r.get('ohp_derniere_verification') or ''
+        try:
+            if derniere and (D.datetime.now(D.timezone.utc) - D.datetime.fromisoformat(derniere)) < \
+                    D.timedelta(hours=float(r['ohp_nouveautes_heures'] or 24)):
+                return None
+        except ValueError:
+            pass
+    try:
+        inv = Inventaire.charger(True)
+    except Exception:
+        return None
+    r['ohp_derniere_verification'] = D.datetime.now(D.timezone.utc).isoformat(timespec='seconds')
+    n = nouveautes_locales(inv, dest)
+    n['inv'] = inv
+    return n
 
 
 def rafraichir(service: str | None = None):
@@ -207,9 +265,7 @@ def _cache_soleil() -> dict:
 
 def _ecrire_cache_soleil(c: dict):
     try:
-        tmp = _chemin_soleil().with_suffix('.tmp')
-        tmp.write_text(json.dumps(c), encoding='utf-8')
-        tmp.replace(_chemin_soleil())
+        config.ecrire_json_atomique(_chemin_soleil(), c, indent=None)
     except OSError:
         pass
 
