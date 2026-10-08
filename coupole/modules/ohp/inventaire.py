@@ -193,6 +193,27 @@ def site_de(x):
     return sites.par_nom(x.get('facility_name', '')) or sites.par_nom(x.get('instrument_name', ''))
 
 
+def _chemin_soleil():
+    return config.dossier_cache() / 'ohp_soleil.json'
+
+
+def _cache_soleil() -> dict:
+    """Hauteurs du Soleil déjà calculées (site|MJD → degrés) : le calcul astropy n'est fait qu'une fois par pose."""
+    try:
+        return json.loads(_chemin_soleil().read_text(encoding='utf-8'))
+    except Exception:
+        return {}
+
+
+def _ecrire_cache_soleil(c: dict):
+    try:
+        tmp = _chemin_soleil().with_suffix('.tmp')
+        tmp.write_text(json.dumps(c), encoding='utf-8')
+        tmp.replace(_chemin_soleil())
+    except OSError:
+        pass
+
+
 def marquer_temps(d: list[dict]):
     """nuit (date du soir AU SITE, midi local), diurne (Soleil au-dessus de l'horizon au site), fuseau."""
     from ...core import temps
@@ -211,10 +232,17 @@ def marquer_temps(d: list[dict]):
                 x['diurne'] = False
             continue
         utcs = [temps.mjd_vers_utc(x['t_min']) for x in xs]
-        try:
-            hauteurs = temps.hauteur_soleil([x['t_min'] for x in xs], site_)
-        except Exception:
-            hauteurs = [-90.0] * len(xs)
+        cache = _cache_soleil()
+        cles = ['%s|%.8f' % (site_.id, x['t_min']) for x in xs]
+        manque = sorted({c for c in cles if c not in cache})
+        if manque:
+            try:
+                h = temps.hauteur_soleil([float(c.split('|')[1]) for c in manque], site_)
+                cache.update({c: round(float(v), 2) for c, v in zip(manque, h)})
+                _ecrire_cache_soleil(cache)
+            except Exception:
+                pass
+        hauteurs = [cache.get(c, -90.0) for c in cles]
         for x, u, h in zip(xs, utcs, hauteurs):
             x['site'] = site_.id
             x['nuit'] = temps.date_du_soir(u, site_)

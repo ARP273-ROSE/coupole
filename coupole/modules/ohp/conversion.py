@@ -308,15 +308,22 @@ def convertir(x: dict, fic: str, sortie: str, med: dict, medo: dict, options: di
     # ------------------------------------------------------------ précision float32
     ecart = 0.0
     if sortie_px.dtype.kind == 'f':
-        s64 = sortie_px.astype(np.float64)
-        diff = np.abs(ref[fini] - s64[fini])
-        ecart = float(diff.max()) if diff.size else 0.0
-        ulp = np.spacing(np.abs(sortie_px[fini])).astype(np.float64)
-        if np.any(diff > ulp / 2 * (1 + 1e-9)):
-            raise ValueError('difference > half float32 ULP on %d pixels' % int((diff > ulp / 2).sum()))
-        if not np.array_equal(np.isnan(ref), np.isnan(s64)):
-            raise ValueError('NaN moved')
-        del s64, diff, ulp
+        # contrôle pixel à pixel par blocs de lignes : la mémoire de pointe ne dépend pas de la taille de l'image
+        pas = max(1, (1 << 20) // max(1, nx))
+        hors = 0
+        for i in range(0, ny, pas):
+            r_ = ref[i:i + pas]
+            s_ = sortie_px[i:i + pas]
+            s64 = s_.astype(np.float64)
+            f_ = np.isfinite(r_)
+            diff = np.abs(r_[f_] - s64[f_])
+            if diff.size:
+                ecart = max(ecart, float(diff.max()))
+                hors += int((diff > np.spacing(np.abs(s_[f_])).astype(np.float64) / 2 * (1 + 1e-9)).sum())
+            if not np.array_equal(np.isnan(r_), np.isnan(s64)):
+                raise ValueError('NaN moved')
+        if hors:
+            raise ValueError('difference > half float32 ULP on %d pixels' % hors)
     info['ecart_max'] = ecart
     ent.poser('XISFCONV', fstr(conv[:68]), H('xisfconv'))
     ent.histoire.append(H('ecart', conv=conv, ecart='%.3g' % ecart))

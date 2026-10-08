@@ -23,7 +23,7 @@ from .machine import Machine
 TELECHARGEMENTS_DEFAUT = 3
 TELECHARGEMENTS_MAX = 4           # politesse envers un serveur public
 CONVERSIONS_MAX = 16
-MEMOIRE_PAR_CONVERSION_MO = 700   # pic mesuré (IRIS 4096 px) + marge ; cf. PROGRESSION.md
+MEMOIRE_PAR_CONVERSION_MO = 500   # pic mesuré : IRIS 4096² float32 ≈ 440 Mo par processus ; cf. PROGRESSION.md
 PART_MEMOIRE = 0.5                # on ne prévoit d'utiliser que la moitié de la mémoire libre
 
 
