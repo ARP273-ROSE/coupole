@@ -19,7 +19,8 @@
     "CHANGELOG.md",
     "CHANGELOG.en.md",
     "LICENSE",
-    "coupole.ico"
+    "coupole.ico",
+    "kit.json"
   ],
   "requirements": "requirements.txt",
   "pip": [],
