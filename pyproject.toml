@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "coupole"
+dynamic = ["version"]
+description = "Boîte à outils libre du DU « Explorer et Comprendre l'Univers » (Observatoire de Paris) / Free toolbox for the ECU diploma"
+readme = "README.md"
+license = {text = "GPL-3.0-or-later"}
+authors = [{name = "ARP273-ROSE"}]
+requires-python = ">=3.10"
+keywords = ["astronomy", "FITS", "XISF", "PixInsight", "Siril", "OHP", "education", "TAP", "ObsCore"]
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Natural Language :: French",
+    "Natural Language :: English",
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: Education",
+]
+dependencies = [
+    "numpy>=1.24",
+    "astropy>=5.3",
+    "zstandard>=0.21",
+    "lz4>=4.0",
+    "PyQt6>=6.5",
+    "tzdata; platform_system == 'Windows'",
+]
+
+[project.optional-dependencies]
+validation = ["lxml>=4.9", "xisf>=0.9"]
+qualite = ["photutils>=1.9", "scipy>=1.10"]
+gpu = ["cupy-cuda12x"]
+test = ["pytest>=7", "lxml>=4.9", "xisf>=0.9", "psutil>=5.9", "pillow>=10"]
+
+[project.urls]
+Homepage = "https://github.com/ARP273-ROSE/coupole"
+Issues = "https://github.com/ARP273-ROSE/coupole/issues"
+
+[project.scripts]
+coupole = "coupole.cli:main"
+
+[project.gui-scripts]
+coupole-gui = "coupole.gui.app:main"
+
+[project.entry-points."coupole.modules"]
+# Modules tiers : ajouter ici « nom = paquet » dans le pyproject du module (voir CONTRIBUTING.md).
+
+[tool.setuptools.dynamic]
+version = {file = "VERSION"}
+
+[tool.setuptools.packages.find]
+include = ["coupole*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.json.gz", "*.svg", "*.png", "*.pdf"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

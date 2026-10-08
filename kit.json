@@ -1,1 +1,40 @@
-{}
+{
+  "nom_technique": "coupole",
+  "nom_fichier": "Coupole",
+  "nom_affiche": "Coupole",
+  "depot_distribution": "ARP273-ROSE/coupole",
+  "point_entree": "lancer.py",
+  "fichier_version": "VERSION",
+  "icone": "coupole.ico",
+  "appid": "{{EBF5650E-E264-4F65-A851-3DCFCB799042}",
+  "modules": [
+    "lancer.py"
+  ],
+  "paquets": [
+    "coupole"
+  ],
+  "assets": [
+    "VERSION",
+    "README.md",
+    "CHANGELOG.md",
+    "CHANGELOG.en.md",
+    "LICENSE",
+    "coupole.ico"
+  ],
+  "requirements": "requirements.txt",
+  "pip": [],
+  "binaires": [],
+  "fichiers_proteges": [],
+  "verification_import": [
+    "coupole.cli",
+    "coupole.core.xisf",
+    "coupole.core.machine",
+    "coupole.modules.ohp.conversion",
+    "coupole.modules.ohp.pilote",
+    "coupole.gui.fenetre",
+    "astropy.io.fits",
+    "zstandard",
+    "lz4.block"
+  ],
+  "_note": "Dépôt de distribution à créer (public) : ARP273-ROSE/coupole. appid tiré au hasard pour Coupole (GUID de l'installeur Windows)."
+}
