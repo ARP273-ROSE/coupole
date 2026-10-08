@@ -24,6 +24,7 @@ class Panneau(QWidget):
         h.addWidget(bouton('don_ouvrir', self.ouvrir))
         h.addWidget(bouton('don_exporter', self.exporter))
         self.l_fichier = QLabel(tr('don_aucun'))
+        self.l_fichier.setWordWrap(True)
         h.addWidget(self.l_fichier, 1)
         v.addLayout(h)
         sp = QSplitter(Qt.Orientation.Horizontal)
