@@ -6,6 +6,10 @@ Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
 Première version.
 
+- **Apparence** : style, couleurs et police propres à Coupole, indépendants des réglages de l'ordinateur (mode sombre
+  du système, thèmes GTK/KDE, taille de police) ; thème clair ou sombre au choix dans les Préférences ; couleurs
+  douces (blanc cassé, anthracite, bleu ardoise) et coins arrondis ; contraste texte/fond WCAG ≥ 4,5 vérifié par test.
+
 - **Cœur** : interface PyQt6 et ligne de commande complète, français et anglais partout (détection de la langue du
   système, choix forcé), info-bulles sur tous les widgets ; modules découverts automatiquement (livrés, installés,
   ou déposés dans le dossier des réglages) ; détection du matériel (système, processeur, cœurs, mémoire, disque,

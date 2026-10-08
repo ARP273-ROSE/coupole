@@ -51,4 +51,6 @@ def app_qt():
     pytest.importorskip('PyQt6')
     from PyQt6.QtWidgets import QApplication
     app = QApplication.instance() or QApplication([])
+    from coupole.gui import theme
+    theme.appliquer(app, 'clair')
     yield app

@@ -29,6 +29,8 @@ def main() -> int:
             app._mutex_installeur = ctypes.windll.kernel32.CreateMutexW(None, False, 'CoupoleEnCours')
         except Exception:
             pass
+    from . import theme
+    theme.appliquer(app)
     from .dialogues import demander_consentement_si_besoin, verifier_maj
     from .fenetre import FenetrePrincipale
     f = FenetrePrincipale()

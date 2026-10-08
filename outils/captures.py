@@ -48,6 +48,9 @@ def main():
     initialiser(langue)
     rapports.init()
     app = QApplication(sys.argv)
+    from coupole.gui import theme
+    config.reglages()['apparence'] = os.environ.get('COUPOLE_THEME', 'clair')
+    theme.appliquer(app)
     from coupole.gui.fenetre import FenetrePrincipale
     f = FenetrePrincipale()
     f.resize(1400, 860)

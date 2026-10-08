@@ -6,6 +6,10 @@ French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
 First release.
 
+- **Appearance**: Coupole's own style, colours and font, independent of the computer's settings (system dark mode,
+  GTK/KDE themes, font size); light or dark theme chosen in Preferences; soft colours (off-white, charcoal, slate
+  blue) and rounded corners; text/background WCAG contrast ≥ 4.5 checked by a test.
+
 - **Core**: PyQt6 interface and complete command line, French and English everywhere (system language detection,
   forced choice), tooltips on every widget; automatically discovered modules (shipped, installed, or dropped into the
   settings folder); hardware detection (system, processor, cores, memory, disk, graphics card) and adapted
