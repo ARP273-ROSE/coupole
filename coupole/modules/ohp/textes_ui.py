@@ -358,4 +358,7 @@ TEXTES = {
     'ohp_ciel_bulle': {'fr': '{nom}\n{cat} — {n} image(s)', 'en': '{nom}\n{cat} — {n} image(s)'},
     'ohp_col_heure_site': {'fr': 'heure du site', 'en': 'site time'},
 'ohp_meta_cat': {'fr': 'TYPE', 'en': 'TYPE'},
+'ohp_qualite': {'fr': 'Vérifier la qualité des images', 'en': 'Check image quality'},
+    'ohp_qualite_aide': {'fr': 'Facultatif : après le traitement, mesure chaque lot (QUALITE.csv, QUALITE.txt). Demande SEP.',
+                         'en': 'Optional: after processing, measure each stack (QUALITE.csv, QUALITE.txt). Needs SEP.'},
 }

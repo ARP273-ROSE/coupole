@@ -136,8 +136,9 @@ def ranger(racine, tout, L, maj_info, ext='.xisf'):
         if os.path.basename(r) == '_traitement' or '_traitement' in os.path.relpath(r, racine).split(os.sep) \
                 or r == racine or not os.path.isdir(r):
             continue
-        if os.listdir(r) == ['LOT.txt']:
-            os.remove(os.path.join(r, 'LOT.txt'))
+        if os.listdir(r) and set(os.listdir(r)) <= {'LOT.txt', 'QUALITE.csv', 'QUALITE.txt'}:
+            for f in os.listdir(r):
+                os.remove(os.path.join(r, f))
         if not os.listdir(r):
             os.rmdir(r)
     with open(os.path.join(racine, 'INDEX_LOTS.csv'), 'w', newline='', encoding='utf-8-sig') as f:

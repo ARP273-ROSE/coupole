@@ -296,6 +296,8 @@ class Panneau(QWidget):
         self.garder_fits = case('ohp_garder_fits')
         f.addRow('', self.garder_doublons)
         f.addRow('', self.garder_fits)
+        self.qualite = case('ohp_qualite')
+        f.addRow('', self.qualite)
         v.addWidget(g)
         g = QGroupBox(tr('ohp_groupe_astrometrie'))
         hg = QHBoxLayout(g)
@@ -436,6 +438,31 @@ class Panneau(QWidget):
         self._fil = threading.Thread(target=travail, name='traitement', daemon=True)
         self._fil.start()
 
+    def _verifier_qualite(self):
+        """Contrôle de qualité demandé explicitement (case cochée) : lots du dossier de sortie, en fond."""
+        try:
+            from ..qualite import mesures, rapport
+        except ImportError:                      # module Qualité retiré : rien à faire
+            return
+        if not mesures.disponible():
+            self._log(tr('qual_absent'))
+            return
+        dest = self.dest.text()
+        q = FileEvenements(self, lambda evs: [self._log(e) for e in evs])
+        self._evts_qualite = q
+
+        def travail():
+            n = 0
+            lots = rapport.fichiers(dest)
+            for d, imgs in lots.items():
+                lignes = rapport.analyser_lot(imgs)
+                rapport.ecrire(d, lignes)
+                n += len(lignes)
+                q(tr('qual_lot', lot=os.path.relpath(d, dest), n=len(lignes)) + ' — ' +
+                  rapport.resume(lignes, i18n.langue())[1 if len(lignes) else 0])
+            q(tr('qual_fini', n=n, lots=len(lots)))
+        threading.Thread(target=travail, daemon=True).start()
+
     def arreter_traitement(self):
         if self.arret is not None:
             self.arret.set()
@@ -487,6 +514,8 @@ class Panneau(QWidget):
                 self._evts.timer.stop()
                 self._remplir_lots()
                 self._remplir_anomalies()
+                if self.qualite.isChecked() and not (self.arret and self.arret.is_set()):
+                    self._verifier_qualite()
 
     # ================================================================ lots
     def _onglet_lots(self):

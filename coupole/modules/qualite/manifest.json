@@ -1,0 +1,15 @@
+{
+  "id": "qualite",
+  "version": "1.0.0",
+  "nom": {"fr": "Qualité des images", "en": "Image quality"},
+  "description": {
+    "fr": "Facultatif : fond, bruit, FWHM et ellipticité (carte 3×3), gradient du fond, saturation, traînées, échantillonnage",
+    "en": "Optional: background, noise, FWHM and ellipticity (3×3 map), background gradient, saturation, trails, sampling"
+  },
+  "icone": "icone.svg",
+  "ordre": 20,
+  "textes": "textes:TEXTES",
+  "gui": "gui:Panneau",
+  "cli": "cli:enregistrer",
+  "coupole_min": "0.1.0"
+}
