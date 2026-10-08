@@ -13,7 +13,8 @@
     "resolution.sesame": "https://cds.unistra.fr/cgi-bin/nph-sesame/-oxp/SNV",
     "rapports.collecte": "https://fenice.giff.re/rapports/collecte.php",
     "maj.depot": "ARP273-ROSE/coupole",
-    "sources.distant": "https://raw.githubusercontent.com/ARP273-ROSE/coupole/main/coupole/donnees/sources.json"
+    "sources.distant": "https://raw.githubusercontent.com/ARP273-ROSE/coupole/main/coupole/donnees/sources.json",
+    "cartes.tuiles": "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
   },
   "alias_ohp": {}
 }

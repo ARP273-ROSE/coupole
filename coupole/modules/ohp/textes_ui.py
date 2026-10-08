@@ -351,4 +351,10 @@ TEXTES = {
               "filter → StarAlignment. Moving objects: one stack per night → CometAlignment. LOT.txt gives stacking advice.</p>"
               "<h4>Anomalies</h4><p>Duplicates, shared or daytime dates, inconsistent fields, names to check: everything is "
               "explained, nothing is deleted.</p>"},
+'ohp_onglet_ciel': {'fr': 'Carte du ciel', 'en': 'Sky map'},
+    'ohp_ciel_intro': {'fr': 'Un point par objet fixe (taille : nombre d\'images), un point par nuit pour les objets mobiles. Clic : sélectionne l\'objet.',
+                       'en': 'One point per fixed object (size: number of images), one point per night for moving objects. Click: select the object.'},
+    'ohp_ciel_aide': {'fr': 'Survol : nom et nombre d\'images ; clic : ouvre l\'objet dans le catalogue.', 'en': 'Hover: name and number of images; click: open the object in the catalogue.'},
+    'ohp_ciel_bulle': {'fr': '{nom}\n{cat} — {n} image(s)', 'en': '{nom}\n{cat} — {n} image(s)'},
+    'ohp_col_heure_site': {'fr': 'heure du site', 'en': 'site time'},
 }

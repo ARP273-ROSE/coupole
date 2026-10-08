@@ -1,0 +1,15 @@
+{
+  "id": "donnees",
+  "version": "1.0.0",
+  "nom": {"fr": "Spectres et séries", "en": "Spectra and series"},
+  "description": {
+    "fr": "Lecture et tracé de données 1D : spectres (fréquence ↔ vitesse radio), séries temporelles, tables FITS et CSV",
+    "en": "Reading and plotting 1D data: spectra (frequency ↔ radio velocity), time series, FITS and CSV tables"
+  },
+  "icone": "icone.svg",
+  "ordre": 30,
+  "textes": "textes:TEXTES",
+  "gui": "gui:Panneau",
+  "cli": "cli:enregistrer",
+  "coupole_min": "0.1.0"
+}

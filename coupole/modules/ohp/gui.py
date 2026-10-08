@@ -44,6 +44,7 @@ class Panneau(QWidget):
         self.onglets.addTab(self._onglet_traitement(), tr('ohp_onglet_traitement'))
         self.onglets.addTab(self._onglet_lots(), tr('ohp_onglet_lots'))
         self.onglets.addTab(self._onglet_anomalies(), tr('ohp_onglet_anomalies'))
+        self.onglets.addTab(self._onglet_ciel(), tr('ohp_onglet_ciel'))
         sc = QShortcut(QKeySequence('Ctrl+R'), self)
         sc.activated.connect(lambda: self.charger(True))
         self.charger(False)
@@ -95,7 +96,8 @@ class Panneau(QWidget):
         hf.addWidget(self.f_filtre)
         hf.addWidget(self.f_dates)
         vd.addLayout(hf)
-        self.m_img = ModeleTableau([tr('ohp_col_date'), tr('ohp_col_nuit'), tr('ohp_col_tel'), tr('ohp_col_filtre'),
+        self.m_img = ModeleTableau([tr('ohp_col_date'), tr('ohp_col_heure_site'), tr('ohp_col_nuit'), tr('ohp_col_tel'),
+                                    tr('ohp_col_filtre'),
                                     tr('ohp_col_pose'), tr('ohp_col_drapeaux'), tr('ohp_col_noms')])
         self.v_img, self.p_img = vue_tableau(self.m_img, 'ohp_table_images_aide')
         vd.addWidget(self.v_img)
@@ -143,6 +145,7 @@ class Panneau(QWidget):
         self.l_inventaire.setText(texte)
         self._remplir_objets()
         self._remplir_anomalies()
+        self._remplir_ciel()
 
     def _remplir_objets(self):
         if not self.inv:
@@ -210,8 +213,10 @@ class Panneau(QWidget):
 
     def _remplir_images(self, *_):
         from ...core.astro import utc
+        from ...core import sites as sites_mod, temps
         imgs = sorted(self._images_filtrees(), key=lambda x: (x['t_min'], x['access_url']))
-        lignes = []
+        sites_par_id = {s.id: s for s in sites_mod.sites()}
+        lignes, bulles = [], []
         for x in imgs:
             dr = []
             if x['doublon']:
@@ -222,9 +227,13 @@ class Panneau(QWidget):
                 dr.append(tr('ohp_drapeau_diurne'))
             if x['nouveau']:
                 dr.append(tr('ohp_etat_nouveau', date=x['vu_le']))
-            lignes.append((utc(x['t_min']).strftime('%Y-%m-%d %H:%M:%S'), str(x['nuit']), x['tel'], x['filter_name'],
+            u = temps.mjd_vers_utc(x['t_min'])
+            s_ = sites_par_id.get(x.get('site'))
+            loc = temps.heure_locale(u, s_).strftime('%H:%M:%S (UTC%z)') if s_ else ''
+            lignes.append((u.strftime('%Y-%m-%d %H:%M:%S'), loc, str(x['nuit']), x['tel'], x['filter_name'],
                            x['t_exptime'], ', '.join(dr), x['target_name']))
-        self.m_img.remplir(lignes, imgs, [x['access_url'] for x in imgs])
+            bulles.append(temps.formater(u, s_) + '\n' + x['access_url'])
+        self.m_img.remplir(lignes, imgs, bulles)
         self.v_img.resizeColumnsToContents()
         self.selection = imgs
         self._estimer()
@@ -586,6 +595,62 @@ class Panneau(QWidget):
         if f:
             anomalies.ecrire_csv(f, self._anoms)
             QMessageBox.information(self, tr('ohp_anom_csv'), tr('ecrit', chemin=f))
+
+    # ================================================================ carte du ciel
+    COULEURS = {'ast': '#E07B39', 'neocp': '#C9A227', 'com': '#3FB0AC', 'pla': '#D94F70', 'tno': '#8E6CC8',
+                'pn': '#5DADE2', 'neb': '#E74C3C', 'amas': '#F4D03F', 'gal': '#A9CCE3', 'eto': '#FFFFFF',
+                'autre': '#95A5A6'}
+
+    def _onglet_ciel(self):
+        from ...gui.cartes import CarteCiel
+        w = QWidget()
+        v = QVBoxLayout(w)
+        h = QHBoxLayout()
+        self.ciel_cat = liste('ohp_f_cat_aide', [(tr('ohp_tous_types'), '')] +
+                              [(tr('ohp_cat_' + c), c) for c in cibles.CATEGORIES])
+        self.ciel_cat.currentIndexChanged.connect(self._remplir_ciel)
+        h.addWidget(self.ciel_cat)
+        self.l_ciel = QLabel(tr('ohp_ciel_intro'))
+        self.l_ciel.setWordWrap(True)
+        h.addWidget(self.l_ciel, 1)
+        v.addLayout(h)
+        self.ciel = aide(CarteCiel(), 'ohp_ciel_aide')
+        self.ciel.point_clique.connect(self._ciel_clic)
+        v.addWidget(self.ciel, 1)
+        return w
+
+    def _remplir_ciel(self, *_):
+        if not self.inv:
+            return
+        import math
+        import numpy as np
+        from PyQt6.QtGui import QColor
+        cat = self.ciel_cat.currentData()
+        groupes = {}
+        for x in self.inv.images:
+            if x['doublon'] or (cat and x['cat'] != cat):
+                continue
+            cle = x['objet'] if x['cat'] in cibles.FIXES else (x['objet'], str(x['nuit']))
+            groupes.setdefault(cle, []).append(x)
+        pts = []
+        for cle, xs in groupes.items():
+            ra = float(np.median([x['s_ra'] for x in xs]))
+            de = float(np.median([x['s_dec'] for x in xs]))
+            x0 = xs[0]
+            r = 2.5 + 1.2 * math.sqrt(len(xs)) if x0['cat'] in cibles.FIXES else 2.5
+            nom = cibles.nom_affiche(x0['objet']) + ('' if x0['cat'] in cibles.FIXES else ' — ' + str(x0['nuit']))
+            pts.append((ra, de, min(r, 14), QColor(self.COULEURS.get(x0['cat'], '#95A5A6')),
+                        tr('ohp_ciel_bulle', nom=nom, n=len(xs), cat=tr('ohp_cat_' + x0['cat'])), x0['objet']))
+        self.ciel.definir(pts)
+
+    def _ciel_clic(self, objet):
+        for r, o in enumerate(self.m_obj.donnees):
+            if o['objet'] == objet:
+                idx = self.p_obj.mapFromSource(self.m_obj.index(r, 0))
+                self.v_obj.selectRow(idx.row())
+                self.v_obj.scrollTo(idx)
+                self.onglets.setCurrentIndex(0)
+                return
 
     # ================================================================ aide
     def aide_html(self):

@@ -392,4 +392,10 @@ TEXTES = {
     'maj_question': {'fr': 'La version {version} est disponible. L\'installer maintenant ?', 'en': 'Version {version} is available. Install it now?'},
     'maj_redemarrer': {'fr': 'Mise à jour installée : Coupole va redémarrer.', 'en': 'Update installed: Coupole will restart.'},
     'maj_echec': {'fr': 'Mise à jour impossible : {erreur}', 'en': 'Update failed: {erreur}'},
+# ------------------------------------------------------------ cartes
+    'carte_attribution': {'fr': '© OpenStreetMap contributors', 'en': '© OpenStreetMap contributors'},
+    'carte_hors_ligne': {'fr': 'Hors ligne : fond simple (carte © OpenStreetMap contributors quand le réseau revient)',
+                         'en': 'Offline: plain background (map © OpenStreetMap contributors when the network is back)'},
+    'carte_legende_ciel': {'fr': 'Aitoff, AD croissante vers la gauche, 12 h au centre — tirets dorés : écliptique ; pointillés : plan galactique',
+                           'en': 'Aitoff, RA increasing to the left, 12 h at centre — gold dashes: ecliptic; dots: galactic plane'},
 }

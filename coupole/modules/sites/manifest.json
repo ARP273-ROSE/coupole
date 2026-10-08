@@ -1,0 +1,15 @@
+{
+  "id": "sites",
+  "version": "1.0.0",
+  "nom": {"fr": "Sites et heures", "en": "Sites and times"},
+  "description": {
+    "fr": "Sites d'observation (carte OpenStreetMap), fuseaux horaires, heure UTC et heure locale",
+    "en": "Observing sites (OpenStreetMap map), time zones, UTC and local time"
+  },
+  "icone": "icone.svg",
+  "ordre": 40,
+  "textes": "textes:TEXTES",
+  "gui": "gui:Panneau",
+  "cli": "cli:enregistrer",
+  "coupole_min": "0.1.0"
+}

@@ -17,6 +17,25 @@ def attendre(app, condition, delai=30.0):
         time.sleep(0.02)
 
 
+def spectre_exemple(dossier):
+    """Spectre H I synthétique (raie à -40 km/s et +25 km/s) pour illustrer le module Spectres et séries."""
+    import numpy as np
+    from astropy.io import fits
+    from coupole.core import donnees as D
+    n, f0 = 1024, D.HI_HZ
+    df = 2.4e6 / n
+    f = f0 - 1.2e6 + np.arange(n) * df
+    y = 12 + 6 * np.exp(-0.5 * ((f - D.frequence_depuis_vitesse(-40, f0)) / 40e3) ** 2) \
+        + 3 * np.exp(-0.5 * ((f - D.frequence_depuis_vitesse(25, f0)) / 25e3) ** 2) \
+        + np.random.default_rng(1).normal(0, 0.25, n)
+    h = fits.Header()
+    h.update(CTYPE1='FREQ', CUNIT1='Hz', CRVAL1=f[0], CDELT1=df, CRPIX1=1.0, RESTFRQ=f0, SPECSYS='TOPOCENT', BUNIT='K',
+             BTYPE='Ta')
+    p = Path(dossier) / '_spectre_HI_synthetique.fits'
+    fits.PrimaryHDU(y, header=h).writeto(p, overwrite=True)
+    return str(p)
+
+
 def main():
     langue = sys.argv[1] if len(sys.argv) > 1 else 'fr'
     dossier = Path(sys.argv[2] if len(sys.argv) > 2 else 'captures')
@@ -55,10 +74,17 @@ def main():
     ohp.onglets.setCurrentIndex(3)
     attendre(app, lambda: ohp.m_anom.rowCount() > 0, 20)
     capture('anomalies')
+    ohp.onglets.setCurrentIndex(4)
+    capture('ciel')
     ohp.onglets.setCurrentIndex(2)
     capture('lots')
     for i, p in enumerate(f.panneaux):
         mid = getattr(getattr(p, 'module', None), 'id', '')
+        if mid == 'donnees':
+            p.ouvrir(spectre_exemple(dossier))
+            p.axe.setCurrentIndex(2)
+        if mid == 'sites':
+            p.en_ligne.setChecked(False)           # pas de tuiles téléchargées pour les captures
         if mid and mid != 'ohp':
             f.barre.setCurrentRow(i)
             attendre(app, lambda: False, 1.5)

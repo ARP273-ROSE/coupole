@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 FICHIER_DEFAUT = Path(__file__).resolve().parent.parent / 'donnees' / 'sources.json'
 FORMAT = 1
 DOMAINES_AUTORISES = ('obspm.fr', 'unistra.fr', 'u-strasbg.fr', 'nasa.gov', 'github.com', 'githubusercontent.com',
-                      'giff.re')
+                      'giff.re', 'openstreetmap.org')
 CLES_TEXTE = {'ohp.collection', 'maj.depot', 'ohp.telechargement.de', 'ohp.telechargement.vers'}
 
 _verrou = threading.Lock()
