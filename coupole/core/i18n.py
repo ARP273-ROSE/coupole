@@ -67,13 +67,17 @@ def detecter_langue() -> str:
         codes.append(locale.setlocale(locale.LC_CTYPE) or '')
     except Exception:
         pass
-    for code in codes:
-        code = (code or '').strip().lower().replace('-', '_')
-        if not code or code in ('c', 'posix', 'c.utf_8', 'c.utf-8'):
-            continue
-        racine = code.split('_')[0].split('.')[0]
-        if racine in LANGUES:
-            return racine
+    noms_windows = {'french': 'fr', 'français': 'fr', 'francais': 'fr', 'english': 'en'}
+    for brut in codes:
+        for code in (brut or '').replace(':', ',').split(','):
+            code = code.strip().lower().replace('-', '_')
+            if not code or code in ('c', 'posix', 'c.utf_8', 'c.utf-8'):
+                continue
+            racine = code.split('_')[0].split('.')[0].split('@')[0]
+            if racine in LANGUES:
+                return racine
+            if racine in noms_windows:                 # « French_France.1252 » (locale.setlocale sous Windows)
+                return noms_windows[racine]
     return LANGUE_DEFAUT
 
 
