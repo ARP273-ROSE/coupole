@@ -191,4 +191,6 @@ Consigne : « fais au mieux » → appliquer ce qui apporte un gain réel sans r
   le cache en même temps calculaient chacun à son propre instant et obtenaient des valeurs différentes pour la même
   minute → calcul **sous le verrou** (un seul calcul, même valeur pour tous) ; (ii) `test_interface_reactive` : hoquet
   de 0,69 s du serveur Windows partagé contre un seuil de 0,5 s → seuil porté à 1 s (un vrai gel durerait les 1,5 s du
-  travail). Deuxième CI : voir le dépôt (6 jobs attendus verts).
+  travail). Deuxième CI : 5 verts, Windows 3.10 rouge sur `test_pause_suspend_puis_reprend` (délai fixe de 1,5 s
+  avant de chercher l'événement « pause » : trop court pour le démarrage du pilote sur ce serveur) → attente scrutée
+  de l'événement (≤ 20 s) puis contrôle qu'en pause rien n'avance. Troisième CI : 6 jobs verts.

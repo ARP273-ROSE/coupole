@@ -176,9 +176,14 @@ def test_pause_suspend_puis_reprend(tmp_path, banque):
         res['b'] = lancer(tmp_path / 'pz', inv, inv.images[:3], evts=evts, arret=arret, pause=pause)
     fil = threading.Thread(target=corps, daemon=True)
     fil.start()
-    time.sleep(1.5)
-    assert not any(e['type'] in ('image', 'telecharge') for e in evts)        # en pause : rien n'avance
+    # le pilote signale la pause dès son premier tour de boucle ; sur un serveur de CI lent, son démarrage (base
+    # d'état, journal) peut dépasser la seconde : on attend l'événement au lieu d'un délai fixe
+    t0 = time.monotonic()
+    while not any(e['type'] == 'pause' and e['actif'] for e in evts) and time.monotonic() - t0 < 20:
+        time.sleep(0.05)
     assert any(e['type'] == 'pause' and e['actif'] for e in evts)
+    time.sleep(1.0)
+    assert not any(e['type'] in ('image', 'telecharge') for e in evts)        # en pause : rien n'avance
     pause.clear()
     fil.join(60)
     assert not fil.is_alive() and res['b']['compte']['ok'] == 3
