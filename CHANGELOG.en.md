@@ -6,6 +6,10 @@ French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
 First release.
 
+- **Every screen**: interface adapted from 1024×600 (or 1366×768 at 150 %) to 4K, with no truncation or overflow:
+  sizes capped to the screen, scrolling content, wrapping text, flexible rows of filters and settings, module bar
+  reduced to icons below 1,100 px, exact fractional scaling; checked by tests at 6 screen sizes and at 150/200 %.
+- **Fix**: closing the world map while a tile was downloading could crash Python.
 - **Appearance**: Coupole's own style, colours and font, independent of the computer's settings (system dark mode,
   GTK/KDE themes, font size); light or dark theme chosen in Preferences; soft colours (off-white, charcoal, slate
   blue) and rounded corners; text/background WCAG contrast ≥ 4.5 checked by a test.

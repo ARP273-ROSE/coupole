@@ -18,6 +18,7 @@ from PyQt6.QtWidgets import (QDialog, QFileDialog, QFormLayout, QGridLayout, QGr
 
 from ...core import config, i18n
 from ...core.i18n import tr
+from ...gui.adaptatif import Flux
 from ...gui.dialogues import DialogueASTAP, ouvrir_fichier
 from ...gui.modele import ModeleTableau, lignes_choisies, vue_tableau
 from ...gui.outils import FileEvenements, Tache, aide, bouton, case, champ, decimal, liste, nombre
@@ -54,14 +55,15 @@ class Panneau(QWidget):
     def _onglet_catalogue(self):
         w = QWidget()
         v = QVBoxLayout(w)
-        h = QHBoxLayout()
+        h = Flux()                                 # filtres : passent à la ligne sur un écran étroit
         self.recherche = champ('ohp_recherche_aide', '', 'ohp_recherche_indice')
         self.recherche.textChanged.connect(self._filtrer_objets)
-        h.addWidget(self.recherche, 2)
+        self.recherche.setMinimumWidth(self.recherche.fontMetrics().horizontalAdvance('M' * 18))
+        h.addWidget(self.recherche)
         self.f_cat = liste('ohp_f_cat_aide', [(tr('ohp_tous_types'), '')] +
                            [(tr('ohp_cat_' + c), c) for c in cibles.CATEGORIES])
         self.f_cat.currentIndexChanged.connect(self._filtrer_objets)
-        h.addWidget(self.f_cat, 1)
+        h.addWidget(self.f_cat)
         self.f_tel = liste('ohp_f_tel_aide', [(tr('ohp_tous_tel'), ''), ('T120', 'T120'), ('IRIS', 'IRIS')])
         self.f_tel.currentIndexChanged.connect(self._filtrer_objets)
         h.addWidget(self.f_tel)
@@ -75,6 +77,7 @@ class Panneau(QWidget):
         h.addWidget(self.b_rafraichir)
         v.addLayout(h)
         self.l_inventaire = QLabel(tr('ohp_chargement'))
+        self.l_inventaire.setWordWrap(True)
         v.addWidget(self.l_inventaire)
         sp = QSplitter(Qt.Orientation.Horizontal)
         self.m_obj = ModeleTableau([tr('ohp_col_type'), tr('ohp_col_objet'), tr('ohp_col_remarque'), tr('ohp_col_images'),
@@ -86,7 +89,7 @@ class Panneau(QWidget):
         droite = QWidget()
         vd = QVBoxLayout(droite)
         vd.setContentsMargins(0, 0, 0, 0)
-        hf = QHBoxLayout()
+        hf = Flux()
         self.f_nuit = liste('ohp_f_nuit_aide', [(tr('ohp_toutes_nuits'), '')])
         self.f_nuit.currentIndexChanged.connect(self._remplir_images)
         self.f_filtre = liste('ohp_f_filtre_aide', [(tr('ohp_tous_filtres'), '')])
@@ -301,10 +304,12 @@ class Panneau(QWidget):
         f.addRow('', self.qualite)
         v.addWidget(g)
         g = QGroupBox(tr('ohp_groupe_astrometrie'))
-        hg = QHBoxLayout(g)
+        vg = QVBoxLayout(g)                        # texte au-dessus, réglages dessous : tient sur un écran étroit
         self.l_astap = QLabel()
         self.l_astap.setWordWrap(True)
-        hg.addWidget(self.l_astap, 1)
+        vg.addWidget(self.l_astap)
+        hg = Flux()
+        vg.addLayout(hg)
         self.mode_astap = liste('ohp_mode_astap_aide', [(tr('ohp_astap_tous'), 'tous'),
                                                         (tr('ohp_astap_suspectes'), 'suspectes'),
                                                         (tr('ohp_astap_jamais'), 'jamais')])
@@ -320,9 +325,15 @@ class Panneau(QWidget):
         self.n_conv = nombre('reg_conv_aide', 0, 16, int(r['conversions_max'] or 0), 'reg_auto')
         self.debit = decimal('reg_debit_aide', 0.5, 20.0, float(r['debit_max_mo_s'] or 8.0), 'unite_mos')
         self.eco = case('reg_econome', bool(r['mode_econome']))
-        for i, (cle, wid) in enumerate((('reg_dl', self.n_dl), ('reg_conv', self.n_conv), ('reg_debit', self.debit))):
-            gl.addWidget(QLabel(tr(cle)), 1, 2 * i)
-            gl.addWidget(wid, 1, 2 * i + 1)
+        flux = Flux()                              # paires « libellé + réglage » qui passent à la ligne
+        for cle, wid in (('reg_dl', self.n_dl), ('reg_conv', self.n_conv), ('reg_debit', self.debit)):
+            paire = QWidget()
+            hp = QHBoxLayout(paire)
+            hp.setContentsMargins(0, 0, 12, 0)
+            hp.addWidget(QLabel(tr(cle)))
+            hp.addWidget(wid)
+            flux.addWidget(paire)
+        gl.addLayout(flux, 1, 0, 1, 6)
         gl.addWidget(self.eco, 2, 0, 1, 3)
         for wid in (self.n_dl, self.n_conv, self.eco):
             (wid.valueChanged if hasattr(wid, 'valueChanged') else wid.toggled).connect(self._maj_plan)

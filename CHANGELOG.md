@@ -6,6 +6,11 @@ Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
 Première version.
 
+- **Tous les écrans** : interface adaptée de 1024×600 (ou 1366×768 à 150 %) à la 4K, sans troncature ni
+  débordement : tailles plafonnées à l'écran, contenus défilants, textes qui passent à la ligne, filtres et réglages
+  en rangées souples, barre des modules réduite aux icônes sous 1 100 px, mise à l'échelle fractionnaire exacte ;
+  vérifié par des tests à 6 tailles d'écran et à 150/200 %.
+- **Correctif** : fermer la carte du monde pendant le téléchargement d'une tuile pouvait faire planter Python.
 - **Apparence** : style, couleurs et police propres à Coupole, indépendants des réglages de l'ordinateur (mode sombre
   du système, thèmes GTK/KDE, taille de police) ; thème clair ou sombre au choix dans les Préférences ; couleurs
   douces (blanc cassé, anthracite, bleu ardoise) et coins arrondis ; contraste texte/fond WCAG ≥ 4,5 vérifié par test.

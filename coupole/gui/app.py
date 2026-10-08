@@ -20,6 +20,10 @@ def main() -> int:
                         format='%(asctime)s %(levelname)s %(name)s %(message)s')
     rapports.init()
     rapports.installer_crochets(config.dossier_config() / '_crash_natif.log')
+    from PyQt6.QtCore import Qt
+    from PyQt6.QtGui import QGuiApplication
+    if QApplication.instance() is None:     # mise à l'échelle fractionnaire exacte (125 %, 150 %…) sans arrondi
+        QGuiApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
     app = QApplication.instance() or QApplication(sys.argv)
     app.setApplicationName('Coupole')
     app.setOrganizationName('Coupole')
