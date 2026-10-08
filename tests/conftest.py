@@ -10,6 +10,7 @@ RACINE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RACINE))
 os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
 os.environ['COUPOLE_HOME'] = tempfile.mkdtemp(prefix='coupole-tests-')
+os.environ['COUPOLE_SANS_RESEAU'] = '1'      # jamais de requête publique depuis les tests (serveur local seulement)
 
 # Traitement de référence (dépôt de l'auteur) : utilisé quand il est présent, sinon les tests concernés sont sautés.
 REFERENCE = Path(os.environ.get('COUPOLE_REFERENCE',
