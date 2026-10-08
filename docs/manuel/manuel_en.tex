@@ -510,7 +510,7 @@ inventory loaded (background thread) & 3.3 s at first launch, 0.8 s afterwards\\
 full chain, 24 T120 images of 8 MB, 8 MB/s cap & 24.5 s = duration of the download alone (24.2 s)\\
 same chain without a cap (local server) & 2.3 s, 86 MB/s of FITS, 10 images/s\\
 conversion of one T120 image (one process) & 0.13 s (zstd 14 ms, reading 18 ms, writing and reading back 29 ms)\\
-memory peak of a T120 / IRIS 4096² conversion & see \texttt{docs/AUDIT\_2026-10.md}\\
+memory peak of a T120 / IRIS 4096² conversion (dedicated process) & 163 MB / 365 MB (170 / 573 before)\\
 interface during 3 downloads (28 MB/s) & max gap of a 20 ms timer: 20.8 ms\\
 \bottomrule
 \end{tabular}
