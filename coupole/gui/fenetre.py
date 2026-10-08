@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QListWidget, QListWidgetItem, 
 from .. import __version__
 from ..core import config, i18n, modules
 from ..core.i18n import tr
-from . import dialogues
+from . import adaptatif, dialogues
 from .outils import action, aide
 from .ressources import icone_application
 
@@ -18,7 +18,8 @@ class FenetrePrincipale(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowIcon(icone_application())
-        self.resize(1280, 820)
+        adaptatif.ajuster(self, 1400, 900)
+        self.setMinimumSize(adaptatif.TAILLE_MIN.boundedTo(adaptatif.zone_utile(self)))
         self.panneaux = []
         self.construire()
 
@@ -32,7 +33,6 @@ class FenetrePrincipale(QMainWindow):
         self.barre = aide(QListWidget(), 'fen_modules_aide')
         self.barre.setObjectName('barreModules')
         self.barre.setIconSize(QSize(40, 40))
-        self.barre.setFixedWidth(215)
         self.barre.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.barre.setWordWrap(True)
         self.barre.setSpacing(2)
@@ -58,14 +58,42 @@ class FenetrePrincipale(QMainWindow):
             ic = mod.chemin_icone()
             if ic is not None and ic.exists():
                 it.setIcon(QIcon(str(ic)))
-            it.setToolTip(mod.description_locale())
+            it.setToolTip('%s\n%s' % (mod.nom_local(), mod.description_locale()))  # nom visible aussi en barre compacte
             self.barre.addItem(it)
-            self.pile.addWidget(panneau)
+            adaptatif.assouplir(panneau)
+            self.pile.addWidget(adaptatif.defilable(panneau))
             self.panneaux.append(panneau)
         self.barre.currentRowChanged.connect(self.pile.setCurrentIndex)
         self.barre.setCurrentRow(0)
         self._menus()
+        self._largeur_barre()
         self.statusBar().showMessage(tr('fen_pret'))
+
+    # ---------------------------------------------------------------- barre des modules adaptative
+    SEUIL_COMPACT = 1100                 # en dessous (pixels logiques), la barre ne garde que les icônes
+
+    def _largeur_barre(self):
+        fm = self.barre.fontMetrics()
+        icone = self.barre.iconSize().width()
+        compacte = self.width() < self.SEUIL_COMPACT
+        if compacte:
+            largeur = icone + 30
+        else:
+            textes = [self.barre.item(i).data(Qt.ItemDataRole.UserRole) or self.barre.item(i).text()
+                      for i in range(self.barre.count())]
+            largeur = icone + 46 + max((fm.horizontalAdvance(s) for s in textes), default=80)
+            largeur = min(largeur, max(icone + 30, self.width() // 4))
+        for i in range(self.barre.count()):
+            it = self.barre.item(i)
+            if it.data(Qt.ItemDataRole.UserRole) is None:
+                it.setData(Qt.ItemDataRole.UserRole, it.text())
+            it.setText('' if compacte else it.data(Qt.ItemDataRole.UserRole))
+        self.barre.setFixedWidth(largeur)
+
+    def resizeEvent(self, ev):
+        super().resizeEvent(ev)
+        if hasattr(self, 'barre'):
+            self._largeur_barre()
 
     def _menus(self):
         mb = self.menuBar()

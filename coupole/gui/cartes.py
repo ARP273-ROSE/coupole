@@ -19,7 +19,8 @@ from pathlib import Path
 import numpy as np
 from PyQt6.QtCore import QPointF, QRectF, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QBrush, QColor, QFont, QImage, QPainter, QPainterPath, QPen
-from PyQt6.QtWidgets import QToolTip, QWidget
+from PyQt6 import sip
+from PyQt6.QtWidgets import QApplication, QToolTip, QWidget
 
 from ..core import config
 from ..core.i18n import tr
@@ -189,6 +190,12 @@ class CacheTuiles:
         self.rappel = rappel
         self.verrou = threading.Lock()
         self.hors_ligne = False
+        self.ferme = False
+
+    def fermer(self):
+        """Arrête les téléchargements (fermeture de la carte ou de l'application) ; plus aucun rappel ensuite."""
+        self.ferme = True
+        self.pool.shutdown(wait=False, cancel_futures=True)
 
     def chemin(self, z, x, y) -> Path:
         return self.dossier / str(z) / str(x) / ('%d.png' % y)
@@ -212,7 +219,7 @@ class CacheTuiles:
 
     def _demander(self, cle):
         with self.verrou:
-            if cle in self.en_cours or self.hors_ligne or time.time() - self.echecs.get(cle, 0) < 300:
+            if self.ferme or cle in self.en_cours or self.hors_ligne or time.time() - self.echecs.get(cle, 0) < 300:
                 return
             self.en_cours.add(cle)
         self.pool.submit(self._telecharger, cle)
@@ -237,7 +244,8 @@ class CacheTuiles:
         finally:
             with self.verrou:
                 self.en_cours.discard(cle)
-            self.rappel()
+            if not self.ferme:
+                self.rappel()
 
 
 class CarteMonde(QWidget):
@@ -250,11 +258,21 @@ class CarteMonde(QWidget):
         self.centre = (10.0, 30.0)
         self.points = []           # (lon, lat, étiquette, donnée)
         self.en_ligne = en_ligne
-        self.cache = CacheTuiles(self._rafraichir.emit)
+        self.cache = CacheTuiles(self._tuile_arrivee)
         self._rafraichir.connect(self.update)
+        app = QApplication.instance()
+        if app is not None:
+            app.aboutToQuit.connect(self.cache.fermer)
+        self.destroyed.connect(self.cache.fermer)
         self._glisse = None
         self.setMouseTracking(True)
         self.setMinimumSize(400, 260)
+
+    def _tuile_arrivee(self):
+        # Appelé depuis un fil de téléchargement : si le widget a déjà été détruit (fenêtre fermée pendant un
+        # téléchargement), émettre son signal ferait planter Python ; on vérifie d'abord.
+        if not self.cache.ferme and not sip.isdeleted(self):
+            self._rafraichir.emit()
 
     def definir(self, points):
         self.points = points

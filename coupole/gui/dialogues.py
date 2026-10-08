@@ -14,6 +14,7 @@ from PyQt6.QtWidgets import (QDialog, QDialogButtonBox, QFileDialog, QFormLayout
 from .. import __version__
 from ..core import config, i18n
 from ..core.i18n import tr
+from . import adaptatif
 from .outils import Tache, aide, bouton, case, champ, decimal, liste, nombre
 
 
@@ -59,7 +60,8 @@ class DialogueConsentement(QDialog):
         h.addWidget(self.b_non)
         h.addWidget(self.b_oui)
         v.addLayout(h)
-        self.resize(560, 360)
+        adaptatif.ajuster(self, 560, 360)
+        adaptatif.assouplir(self)
 
 
 def demander_consentement_si_besoin(parent=None):
@@ -79,8 +81,8 @@ class DialogueReglages(QDialog):
         self.onglets = aide(QTabWidget(), 'reg_onglets_aide')
         racine.addWidget(self.onglets)
         general = QWidget()
-        self.onglets.addTab(general, tr('reg_onglet_general'))
-        self.onglets.addTab(self._onglet_sources(), tr('reg_onglet_sources'))
+        self.onglets.addTab(adaptatif.defilable(general), tr('reg_onglet_general'))
+        self.onglets.addTab(adaptatif.defilable(self._onglet_sources()), tr('reg_onglet_sources'))
         f = QFormLayout(general)
         self.langue = liste('reg_langue_aide', [(tr('reg_langue_auto'), 'auto'), ('Français', 'fr'), ('English', 'en')])
         self.langue.setCurrentIndex(max(0, self.langue.findData(r['langue'])))
@@ -111,7 +113,8 @@ class DialogueReglages(QDialog):
         self.maj = case('reg_maj', bool(r['maj_auto']))
         f.addRow('', self.maj)
         racine.addWidget(_boutons(self))
-        self.resize(820, 520)
+        adaptatif.ajuster(self, 820, 520)
+        adaptatif.assouplir(self)
 
     def _onglet_sources(self):
         from ..core import sources
@@ -217,17 +220,18 @@ class DialogueASTAP(QDialog):
         self.etat.setWordWrap(True)
         self.etat.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         v.addWidget(self.etat)
-        h = QHBoxLayout()
-        h.addWidget(bouton('astapdlg_chercher', self.actualiser))
-        h.addWidget(bouton('astapdlg_choisir_exe', self.choisir_exe))
-        h.addWidget(bouton('astapdlg_choisir_cat', self.choisir_cat))
-        h.addWidget(bouton('astapdlg_oublier', self.oublier))
-        h.addStretch(1)
+        h = QGridLayout()                          # 2 × 2 : tient sur un écran étroit
+        h.addWidget(bouton('astapdlg_chercher', self.actualiser), 0, 0)
+        h.addWidget(bouton('astapdlg_choisir_exe', self.choisir_exe), 0, 1)
+        h.addWidget(bouton('astapdlg_choisir_cat', self.choisir_cat), 1, 0)
+        h.addWidget(bouton('astapdlg_oublier', self.oublier), 1, 1)
+        h.setColumnStretch(2, 1)
         v.addLayout(h)
         self.guide = navigateur('', 'astapdlg_guide_aide')
         v.addWidget(self.guide, 1)
         v.addWidget(_boutons(self, ok=True, annuler=False))
-        self.resize(780, 640)
+        adaptatif.ajuster(self, 780, 640)
+        adaptatif.assouplir(self)
         self.actualiser()
 
     def actualiser(self):
@@ -311,7 +315,8 @@ class DialogueAPropos(QDialog):
             html.escape(tr('apropos_licence'))), 'apropos_aide')
         v.addWidget(t)
         v.addWidget(_boutons(self, ok=True, annuler=False))
-        self.resize(640, 560)
+        adaptatif.ajuster(self, 640, 560)
+        adaptatif.assouplir(self)
 
 
 # ======================================================================== signalement
@@ -334,7 +339,8 @@ class DialogueSignaler(QDialog):
         self.b_env = bouton('signaler_envoyer', self.envoyer)
         h.addWidget(self.b_env)
         v.addLayout(h)
-        self.resize(560, 420)
+        adaptatif.ajuster(self, 560, 420)
+        adaptatif.assouplir(self)
 
     def _rapport(self):
         from ..core import rapports
@@ -380,7 +386,8 @@ def afficher_raccourcis(parent):
     v = QVBoxLayout(d)
     v.addWidget(navigateur('<table>%s</table>' % lignes, 'racc_aide'))
     v.addWidget(_boutons(d, ok=True, annuler=False))
-    d.resize(460, 300)
+    adaptatif.ajuster(d, 460, 300)
+    adaptatif.assouplir(d)
     d.exec()
 
 
@@ -390,7 +397,8 @@ def afficher_aide(parent, titre: str, texte: str):
     v = QVBoxLayout(d)
     v.addWidget(navigateur(texte, 'aide_ecran_aide'))
     v.addWidget(_boutons(d, ok=True, annuler=False))
-    d.resize(640, 520)
+    adaptatif.ajuster(d, 640, 520)
+    adaptatif.assouplir(d)
     d.exec()
 
 
