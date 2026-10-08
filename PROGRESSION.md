@@ -65,3 +65,24 @@ décrite dans les en-têtes). T120 (914) Palisana : FWHM 2,0 à 2,6″, cohéren
   générés depuis les vrais analyseurs (`outils/tables_cli.py`), compilés par `docs/manuel/compiler.sh` (deux passes,
   temporaires supprimés), copiés dans `coupole/docs/` (menu Aide > Manuel, `coupole manuel`).
 - README bilingue, CONTRIBUTING (écrire un module, ajouter un format), CHANGELOG.md (FR) et CHANGELOG.en.md.
+
+## 2026-10-08 — état à la fin de la session
+- Paquet Linux final reconstruit (avec SEP) : `Coupole-0.1.0-linux.tar.gz` (202 Mo) et `coupole-app-0.1.0.zip`
+  (4,4 Mo, manuels compris) à la racine du dépôt (ignorés par git). **Mise à jour automatique essayée en vrai** sur
+  une copie du paquet annoncée en 0.0.9 : archive appliquée, l'application repart en 0.1.0.
+- Suite de tests : 129 réussis, 1 sauté (essai réseau, activé par `COUPOLE_TEST_RESEAU=1`) ; sous Python 3.10 aussi.
+- `collecte.php` : **non modifié** — il accepte déjà toute application dont l'en-tête X-App suit
+  `nom/version` (« coupole/0.1.0 ») et range ses rapports dans `rapports/coupole/` ; les genres envoyés par Coupole
+  (installation, demarrage, plantage, crash_natif, gel, manuel) sont ceux qu'il connaît.
+
+### Reste à faire pour publier
+1. Créer le dépôt **public** `ARP273-ROSE/coupole` (nom en place dans `kit.json`, `coupole/donnees/sources.json`,
+   `pyproject.toml`) et pousser ; la mise à jour automatique et le fichier de sources distant en dépendent.
+2. Poser le tag `v0.1.0` : le workflow `release.yml` construit Windows (Python embarqué + Inno Setup), macOS (arm64,
+   x86_64) et Linux (x86_64, arm64) et publie la Release.
+3. Essayer réellement sous Windows (installeur, `install.bat`/`install.ps1`, raccourcis) et sous macOS (bundle, dmg) :
+   non testés ici. Carte graphique NVIDIA/CuPy : non testée (pas de carte NVIDIA sur le NAS).
+4. Sites partenaires (Madagascar, Australie côte ouest « ZATCO » d'après la transcription, Yunnan) : à ajouter quand
+   leurs coordonnées seront connues de source sûre.
+5. Formats réels des radio-antennes de Meudon et de Pologne : ajouter un lecteur quand un fichier exemple sera
+   disponible (architecture et documentation en place).
