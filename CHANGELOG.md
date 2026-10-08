@@ -6,6 +6,16 @@ Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
 Première version.
 
+- **Suite de l'audit** (§ 10 du rapport, propositions appliquées) : hauteur du Soleil du contrôle « heure locale écrite
+  par erreur » calculée en un seul appel astropy et mise en cache par (site, minute UTC) dans chaque processus de
+  conversion (13,2 → 2,5 ms de CPU par pose sur une série de poses de 20 s, 33 → 13 ms sur une image isolée ; débit
+  global inchangé, borné par le réseau) ; sous Windows, chaque processus de conversion se place dans un *job object*
+  « kill on close » : à l'annulation, l'ASTAP qu'il a lancé meurt immédiatement avec lui au lieu de finir seul (jusqu'à
+  4 min) — repli silencieux si l'API refuse, Linux et macOS inchangés (signal) ; quand la place libre à destination est
+  juste, la file des FITS en attente (2 × conversions + téléchargements) est **réduite automatiquement** (jamais sous
+  conversions + 1), avec un message et une ligne de journal, au lieu de refuser le traitement. Non appliqué, à dessein :
+  connexions HTTP persistantes (gain < 1 %) et budget mémoire 500 → 400 Mo par conversion (prudence : ASTAP ajoute son
+  propre processus).
 - **Audit complet** (`docs/AUDIT_2026-10.md`) : performance (fenêtre affichée en 0,42 s au lieu de 1,51 s : astropy,
   scipy et SEP ne se chargent plus avant l'affichage ; mémoire de pointe d'une conversion IRIS 4096² ramenée de
   573 à 365 Mo ; une requête HTTP par image au lieu de deux ; progression agrégée à 10 Hz), parallélisme (bridage

@@ -147,3 +147,42 @@ fonctions ajoutées (tout télécharger, rangement/réorganisation, journal, nou
   `ohp nouveautes` + bandeau au démarrage (fréquence réglable, jamais de téléchargement sans accord).
 - Tests : **185 → 232** (3.12, exit 0), 226 sous 3.10 ; manuels FR/EN recompilés, captures régénérées.
 
+
+## 2026-10-08 — suite de l'audit : § 10 « Proposé, non appliqué » tranché
+Consigne : « fais au mieux » → appliquer ce qui apporte un gain réel sans risque, laisser le reste en l'expliquant.
+- **Appliqué — proposition 2** (cache de la hauteur du Soleil) : `core/temps.py::hauteurs_soleil_cachees` — cache par
+  (site arrondi, minute UTC), dict ordonné borné à 4 096 entrées + verrou (un cache par processus de conversion suffit,
+  le `spawn` les isole) ; les deux hauteurs du contrôle « heure locale écrite par erreur » (heure lue, heure corrigée)
+  partent en **un seul** appel astropy (le coût est par appel, pas par instant). Mesure dans `python:3.12-slim`
+  (`mesure_soleil.py`, 60 poses de 20 s = 3 par minute) : **13,2 → 2,5 ms de CPU par pose** (−81 %) ; image isolée
+  (profil `outils/pipeline.py`, conversion seule) : `soupcon_heure_locale` **33 → 13 ms**. Chaîne complète 24 images
+  sans plafond : 2,28 → 2,31 s (inchangée, bornée par le réseau/les processus, comme annoncé). Deux instants d'une même
+  minute reçoivent la valeur du premier calculé (≤ 0,25° d'écart) : sans effet sur des seuils à 0° et −12°.
+  Tests : `test_cache_hauteur_du_soleil_par_minute` (même minute → un seul calcul, identique au calcul direct à 1e-9 ;
+  minute suivante et autre site → nouveaux calculs), `test_cache_hauteur_du_soleil_entre_fils` (8 fils simultanés).
+- **Appliqué — proposition 5** (ASTAP orphelin sous Windows) : `core/processus.py::confiner_descendance()` — chaque
+  processus de conversion se place lui-même (initializer du pool) dans un job object `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE`
+  dont il détient le seul descripteur (`ctypes`, kernel32 : `CreateJobObjectW`, `SetInformationJobObject`,
+  `AssignProcessToJobObject(GetCurrentProcess())`). Ses enfants (ASTAP) héritent du job ; quand le pilote le termine
+  (`TerminateProcess`), ou s'il plante, le système ferme le descripteur → le job se ferme → ASTAP est tué à l'instant.
+  Aucun PID à suivre côté pilote. Linux/macOS : inchangés (SIGTERM → `astap.tuer_en_cours`). Échec de l'API : journal
+  technique, comportement d'avant. Tests Windows seulement (`tests/test_processus.py`, `skipif`) : parent confiné tué →
+  l'enfant `ping -n 60` meurt ; **témoin** sans confinement → l'enfant survit (le test mesure bien le défaut corrigé).
+- **Appliqué — proposition 4** (place juste) : `selection.fenetre_adaptee(est, conv, dl, libre)` — fenêtre nominale
+  2 × conversions + téléchargements, réduite à `(libre − sortie) // (2 × plus gros)` quand la place manque, jamais sous
+  conversions + 1 ; `place_necessaire(…, libre)` suit la fenêtre réduite, donc CLI (`ohp estimer`, `ohp telecharger`,
+  `ohp tout`) et GUI acceptent ce qu'ils refusaient quand seule la réserve de fenêtre manquait. Le pilote recalcule la
+  fenêtre au lancement sur la place réelle (`Traitement._fenetre`), signale la réduction (événement `fenetre` → journal
+  de l'interface, ligne `jrn_fenetre_reduite` dans JOURNAL.txt, message `ohp_fenetre_reduite` en CLI). Tests :
+  `test_fenetre_reduite_a_la_place_libre` (bornes), `test_pilote_reduit_la_fenetre_quand_la_place_est_juste` (place
+  simulée : fenêtre 3 au lieu de 6, six images traitées, journal bilingue), témoin place large.
+- **Non appliqué — proposition 1** (connexions HTTP persistantes) : gain < 1 % au plafond de 8 Mo/s (une image de 8 Mo
+  dure 1 s, l'établissement TCP quelques ms) contre une gestion des connexions mortes à écrire ; à revoir seulement si
+  le plafond est relevé bien au-delà.
+- **Non appliqué — proposition 3** (`MEMOIRE_PAR_CONVERSION_MO` 500 → 400) : 365 Mo mesurés, mais ASTAP ajoute son
+  propre processus à côté de chaque conversion ; une conversion de plus sur une machine à 4 Go ne vaut pas un risque
+  d'échange ou d'OOM. Gardé à 500.
+- Manuels FR/EN : phrase du pipeline (fenêtre réduite si la place est juste ; arrêt d'ASTAP par signal / job object)
+  et recompilés ; CHANGELOG FR/EN ; `docs/AUDIT_2026-10.md` § 10 annoté.
+- Tests dans `python:3.12-slim` (copie du dépôt sans `build/`, `pip install ".[test]"`, `QT_QPA_PLATFORM=offscreen`) :
+  **232 réussis, 10 sautés, code de sortie 0** (les 2 tests du job object ne tournent que sous Windows : CI).

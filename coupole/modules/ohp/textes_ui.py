@@ -119,6 +119,10 @@ TEXTES = {
                             'en': '{images} image(s) ({doublons} duplicate(s) left out): {fits} to download.'},
     'ohp_place': {'fr': 'Place à prévoir : {besoin} ; libre : {libre} ({dest}).', 'en': 'Space needed: {besoin}; free: {libre} ({dest}).'},
     'ohp_place_insuffisante': {'fr': 'Place insuffisante à destination.', 'en': 'Not enough space at the destination.'},
+    'ohp_fenetre_reduite': {'fr': 'Place juste à destination ({libre} libres) : au plus {fenetre} FITS en attente au lieu de {nominale} ; '
+                                  'le traitement continue, un peu moins recouvert.',
+                            'en': 'Tight space at the destination ({libre} free): at most {fenetre} FITS waiting instead of {nominale}; '
+                                  'processing goes on, with a little less overlap.'},
     'ohp_confirmer_gros': {'fr': 'Sélection de {taille} : ajouter --oui pour confirmer.', 'en': 'Selection of {taille}: add --yes to confirm.'},
     'ohp_rien': {'fr': 'Rien à traiter.', 'en': 'Nothing to process.'},
     'ohp_machine': {'fr': 'Machine : {cpu} cœurs ({log} logiques), {ram} Go libres → {dl} téléchargement(s), {conv} conversion(s) ({raison}).',
@@ -480,6 +484,8 @@ TEXTES = {
     'jrn_reprise': {'fr': 'reprise : {deja} image(s) déjà faite(s) ne seront pas refaites, {fits} téléchargement(s) retrouvé(s)',
                     'en': 'resume: {deja} image(s) already done will not be redone, {fits} download(s) found again'},
     'jrn_pause': {'fr': 'pause demandée', 'en': 'pause requested'},
+    'jrn_fenetre_reduite': {'fr': 'place juste ({libre} Go libres) : fenêtre de FITS en attente réduite à {fenetre} (nominale {nominale})',
+                            'en': 'tight space ({libre} GB free): window of waiting FITS reduced to {fenetre} (nominal {nominale})'},
     'jrn_reprise_pause': {'fr': 'reprise après pause', 'en': 'resumed after pause'},
     'jrn_telechargee': {'fr': 'téléchargée {source} ({octets} octets, {duree} s)', 'en': 'downloaded {source} ({octets} bytes, {duree} s)'},
     'jrn_convertie': {'fr': 'convertie {source} : solution {wcs}, taille {ratio} % du FITS, {duree} s',

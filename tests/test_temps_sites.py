@@ -70,6 +70,55 @@ def test_heure_locale_ecrite_par_erreur():
     assert temps.soupcon_heure_locale(r4, PERTH) in (None,) or temps.soupcon_heure_locale(r4, PERTH).startswith('soleil')
 
 
+def test_cache_hauteur_du_soleil_par_minute():
+    """Deux poses de la même minute : un seul calcul astropy ; résultat identique au calcul direct."""
+    temps.vider_cache_soleil()
+    t1 = D.datetime(2023, 8, 15, 22, 8, 42, tzinfo=UTC)
+    t2 = t1 + D.timedelta(seconds=15)                      # même minute UTC
+    t3 = t1 + D.timedelta(seconds=30)                      # minute suivante
+    direct = temps.hauteur_soleil(t1, OHP)
+    assert abs(temps.hauteurs_soleil_cachees([t1], OHP)[0] - direct) < 1e-9
+    s = temps.statistiques_cache_soleil()
+    assert s['calculs'] == 1 and s['reutilisations'] == 0 and s['entrees'] == 1
+    assert temps.hauteurs_soleil_cachees([t2], OHP)[0] == temps.hauteurs_soleil_cachees([t1], OHP)[0]
+    s = temps.statistiques_cache_soleil()
+    assert s['calculs'] == 1 and s['reutilisations'] == 2          # aucun nouveau calcul
+    assert abs(temps.hauteurs_soleil_cachees([t2], OHP)[0] - temps.hauteur_soleil(t2, OHP)) < 0.3   # ≤ 0,25°/min
+    # minute suivante et autre site : nouveaux calculs ; deux instants manquants → UN appel astropy
+    h3, h4 = temps.hauteurs_soleil_cachees([t3, t3 + D.timedelta(minutes=1)], OHP)
+    assert temps.statistiques_cache_soleil()['calculs'] == 2
+    assert abs(h3 - temps.hauteur_soleil(t3, OHP)) < 1e-9
+    temps.hauteurs_soleil_cachees([t1], PERTH)
+    assert temps.statistiques_cache_soleil()['calculs'] == 3 and temps.statistiques_cache_soleil()['entrees'] == 4
+    # soupcon_heure_locale passe par le cache : la 2e pose de la même minute ne calcule rien
+    temps.vider_cache_soleil()
+    r1 = temps.lire_temps({'DATE-OBS': '2025-06-21T23:00:00'})
+    r2 = temps.lire_temps({'DATE-OBS': '2025-06-21T23:00:20'})
+    a, b = temps.soupcon_heure_locale(r1, PERTH), temps.soupcon_heure_locale(r2, PERTH)
+    assert a == b and temps.statistiques_cache_soleil()['calculs'] == 1
+
+
+def test_cache_hauteur_du_soleil_entre_fils():
+    """Appels simultanés depuis plusieurs fils : mêmes valeurs, aucune exception, cache cohérent."""
+    import threading
+    temps.vider_cache_soleil()
+    t = D.datetime(2024, 3, 1, 18, 30, 5, tzinfo=UTC)
+    instants = [t + D.timedelta(seconds=k) for k in range(8)]
+    resultats, erreurs = {}, []
+
+    def corps(k):
+        try:
+            resultats[k] = temps.hauteurs_soleil_cachees([instants[k], instants[k] - D.timedelta(hours=1)], OHP)
+        except Exception as e:                                    # pragma: no cover
+            erreurs.append(e)
+    fils = [threading.Thread(target=corps, args=(k,)) for k in range(8)]
+    [f.start() for f in fils]
+    [f.join(30) for f in fils]
+    assert not erreurs and len(resultats) == 8
+    assert len({tuple(v) for v in resultats.values()}) == 1          # tous la même paire (même minute)
+    assert temps.statistiques_cache_soleil()['entrees'] == 2
+
+
 def test_affichage_utc_et_local():
     u = D.datetime(2025, 7, 16, 22, 20, 23, tzinfo=UTC)
     t = temps.formater(u, OHP, local_utilisateur=False)
