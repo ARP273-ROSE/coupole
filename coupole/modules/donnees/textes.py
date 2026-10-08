@@ -23,6 +23,7 @@ TEXTES = {
     'don_exporter_aide': {'fr': 'Enregistre les deux colonnes affichées (avec la vitesse si elle est affichée).',
                           'en': 'Save the two displayed columns (with the velocity when it is displayed).'},
     'don_aucun': {'fr': 'Aucun fichier ouvert.', 'en': 'No file open.'},
+    'don_lecture': {'fr': 'Lecture de {fichier}…', 'en': 'Reading {fichier}…'},
     'don_info': {'fr': '{genre} — {n} points — {x}', 'en': '{genre} — {n} points — {x}'},
     'don_genre_image': {'fr': 'image', 'en': 'image'},
     'don_genre_spectre': {'fr': 'spectre', 'en': 'spectrum'},

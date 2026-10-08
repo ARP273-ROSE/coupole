@@ -110,3 +110,36 @@ def test_choix_force_et_repli(langue):
     assert i18n.tr('menu_aide') == '&Aide'
     assert i18n.choisir_langue('kl') == 'en'          # langue non traduite : anglais, jamais d'étiquette vide
     assert i18n.tr('cle_inexistante') == 'cle_inexistante'
+
+
+# ---------------------------------------------------------------- aucune fuite d'une langue dans l'autre
+_FR_DANS_EN = re.compile(r"(?<![\w'’-])(le|la|les|des|du|et|ou|est|sont|avec|pour|dans|une|un|sur|pas|par|aucune?|chaque|"
+                         r"cette?|ces|déjà|puis|très|être|vers|depuis|sans|sous|entre|donc|mais|aussi|même)(?![\w'’-])")
+_EN_DANS_FR = re.compile(r"(?<![\w'’-])(the|and|with|this|these|without|from|into|only|when|which|already|also|then|"
+                         r"again|never|always|each|every|about)(?![\w'’-])")
+# noms propres et citations qui gardent légitimement leur langue
+_TOLERES_EN = ("Explorer et Comprendre l'Univers", 'et al.', 'Observatoire de Paris', 'Haute-Provence', 'Pôle', 'Centre de')
+
+
+def _nettoyer(texte):
+    texte = re.sub(r'<[^>]+>', ' ', texte)
+    texte = re.sub(r'\{[^}]*\}', ' ', texte)                 # {depuis}, {dest} : des noms de champs, pas des mots
+    for t in _TOLERES_EN:
+        texte = texte.replace(t, ' ')
+    return texte.lower()
+
+
+def test_aucune_fuite_de_langue():
+    fuites = []
+    for k, v in i18n.toutes_les_cles().items():
+        if k.startswith(('hdr_',)):                        # en-têtes FITS : ASCII technique, déjà testés à part
+            continue
+        en, fr = _nettoyer(v.get('en', '')), _nettoyer(v.get('fr', ''))
+        m = _FR_DANS_EN.findall(en)
+        if m:
+            fuites.append(('en', k, m[:3]))
+        m = _EN_DANS_FR.findall(fr)
+        if m:
+            fuites.append(('fr', k, m[:3]))
+    assert not fuites, fuites
+

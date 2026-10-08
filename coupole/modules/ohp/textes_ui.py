@@ -376,4 +376,125 @@ TEXTES = {
 'ohp_qualite': {'fr': 'Vérifier la qualité des images', 'en': 'Check image quality'},
     'ohp_qualite_aide': {'fr': 'Facultatif : après le traitement, mesure chaque lot (QUALITE.csv, QUALITE.txt). Demande SEP.',
                          'en': 'Optional: after processing, measure each stack (QUALITE.csv, QUALITE.txt). Needs SEP.'},
+
+    # ------------------------------------------------------------ tout télécharger, pause, nouveautés, journal (v0.1.0, audit)
+    'ohp_cli_tout': {'fr': 'télécharge et convertit toute la banque (reprenable)', 'en': 'download and convert the whole bank (resumable)'},
+    'ohp_cli_tout_desc': {'fr': "Toute la banque (≈ 8 000 images, ≈ 78 Go de FITS → ≈ 30 Go en XISF), avec estimation du volume et du "
+                                "temps avant confirmation ; relancer la même commande reprend là où elle s'était arrêtée.",
+                          'en': 'The whole bank (≈ 8,000 images, ≈ 78 GB of FITS → ≈ 30 GB as XISF), with a volume and time estimate '
+                                'before confirmation; running the same command again resumes where it stopped.'},
+    'ohp_cli_nouveautes': {'fr': 'images apparues dans la banque et absentes de la copie locale', 'en': 'images that appeared in the bank and are missing locally'},
+    'ohp_cli_nouveautes_desc': {'fr': "Réinterroge le service TAP, compare à la copie locale (dossier de sortie) et liste les nouveautés ; "
+                                      "--telecharger les traite dans la même arborescence (jamais sans cette option).",
+                                'en': 'Query the TAP service again, compare with the local copy (output folder) and list what is new; '
+                                      '--download processes them into the same tree (never without this option).'},
+    'ohp_aide_telecharger_nouveautes': {'fr': 'télécharge et convertit les nouveautés listées', 'en': 'download and convert the listed new images'},
+    'ohp_cli_reorganiser': {'fr': 'range dans les lots des fichiers convertis ailleurs (déplacement, jamais de copie)',
+                            'en': 'sort files converted elsewhere into the stacks (move, never copy)'},
+    'ohp_cli_reorganiser_desc': {'fr': "Parcourt un dossier, reconnaît les fichiers produits par Coupole (en-tête) et les déplace dans "
+                                       "l'arborescence des lots de --dest ; conflit de nom → suffixe et ligne de journal ; rien n'est écrasé.",
+                                 'en': 'Walk a folder, recognise files produced by Coupole (header) and move them into the stack tree of '
+                                       '--dest; name conflict → suffix and a log line; nothing is overwritten.'},
+    'ohp_aide_source_reorg': {'fr': 'dossier où se trouvent les fichiers à ranger', 'en': 'folder holding the files to sort'},
+    'ohp_estimation_tout': {'fr': 'Toute la banque : {images} image(s) de {objets} objet(s), {fits} à télécharger → environ {sortie} en '
+                                  '{format} ; au débit plafond de {debit} Mo/s : environ {temps}.',
+                            'en': 'The whole bank: {images} image(s) of {objets} object(s), {fits} to download → about {sortie} as '
+                                  '{format}; at the {debit} MB/s cap: about {temps}.'},
+    'ohp_duree_h': {'fr': '{h} h {m:02d} min', 'en': '{h} h {m:02d} min'},
+    'ohp_duree_min': {'fr': '{m} min', 'en': '{m} min'},
+    'ohp_duree_j': {'fr': '{j} j {h} h', 'en': '{j} d {h} h'},
+    'ohp_confirmer_tout': {'fr': 'Toute la banque va être téléchargée et convertie ; ajouter --oui pour confirmer.',
+                           'en': 'The whole bank is about to be downloaded and converted; add --yes to confirm.'},
+    'ohp_tout': {'fr': 'Tout télécharger…', 'en': 'Download everything…'},
+    'ohp_tout_aide': {'fr': "Toute la banque (≈ 8 000 images, ≈ 78 Go → ≈ 30 Go en XISF) : estimation du volume et du temps, confirmation, "
+                            "puis traitement complet reprenable (ce qui est déjà fait n'est pas refait).",
+                      'en': 'The whole bank (≈ 8,000 images, ≈ 78 GB → ≈ 30 GB as XISF): volume and time estimate, confirmation, '
+                            'then a complete, resumable processing (what is already done is not redone).'},
+    'ohp_tout_titre': {'fr': 'Tout télécharger', 'en': 'Download everything'},
+    'ohp_tout_question': {'fr': '{estimation}\n\nDossier : {dest}\n{place}\n\nLe traitement peut être arrêté et repris à tout moment ; '
+                                "ce qui est fait n'est jamais refait. Lancer ?",
+                          'en': '{estimation}\n\nFolder: {dest}\n{place}\n\nProcessing can be stopped and resumed at any time; '
+                                'what is done is never redone. Start?'},
+    'ohp_place_manque': {'fr': 'Place insuffisante : {besoin} nécessaires, {libre} libres dans {dest}. Choisir un autre dossier ou libérer de la place.',
+                         'en': 'Not enough space: {besoin} needed, {libre} free in {dest}. Choose another folder or free some space.'},
+    'ohp_choisir_dest_titre': {'fr': 'Où ranger les images ?', 'en': 'Where to put the images?'},
+    'ohp_choisir_dest_texte': {'fr': 'Choisissez le dossier qui recevra les images (proposé : {dest}). Il sera organisé en lots : '
+                                     'type / objet / champ ou nuit / filtre.',
+                               'en': 'Choose the folder that will receive the images (proposed: {dest}). It will be organised in stacks: '
+                                     'type / object / field or night / filter.'},
+    'ohp_dest_non_inscriptible': {'fr': 'Dossier de sortie non inscriptible : {dest}', 'en': 'Output folder is not writable: {dest}'},
+    'ohp_pause': {'fr': 'Pause', 'en': 'Pause'},
+    'ohp_pause_aide': {'fr': "Suspend l'alimentation du traitement (les images en cours se terminent) ; cliquer de nouveau pour reprendre.",
+                       'en': 'Suspend feeding the pipeline (images in progress finish); click again to resume.'},
+    'ohp_reprendre': {'fr': 'Reprendre', 'en': 'Resume'},
+    'ohp_pause_journal': {'fr': 'Pause.', 'en': 'Paused.'},
+    'ohp_reprise_journal': {'fr': 'Reprise.', 'en': 'Resumed.'},
+    'ohp_ouvrir_journal': {'fr': 'Ouvrir le journal', 'en': 'Open the log'},
+    'ohp_ouvrir_journal_aide': {'fr': 'Ouvre _traitement/JOURNAL.txt du dossier de sortie : sessions, chaque image, écarts et erreurs, horodatés (UTC), FR / EN.',
+                                'en': 'Open _traitement/JOURNAL.txt of the output folder: sessions, each image, discards and errors, timestamped (UTC), FR / EN.'},
+    'ohp_journal_absent': {'fr': 'Aucun journal dans {dest} pour le moment.', 'en': 'No log in {dest} yet.'},
+    'ohp_reorganiser': {'fr': 'Réorganiser des fichiers…', 'en': 'Reorganise files…'},
+    'ohp_reorganiser_aide': {'fr': "Range dans l'arborescence des lots des images déjà converties par Coupole qui se trouvent ailleurs ou "
+                                   "selon un ancien rangement : déplacement (jamais de copie), jamais d'écrasement, journal.",
+                             'en': 'Sort images already converted by Coupole that live elsewhere or in an older layout into the stack '
+                                   'tree: move (never copy), never overwrite, logged.'},
+    'ohp_reorganiser_titre': {'fr': 'Dossier contenant les fichiers à ranger', 'en': 'Folder holding the files to sort'},
+    'ohp_reorganise_fait': {'fr': '{n} fichier(s) rangé(s) dans {lots} lot(s), {ignores} ignoré(s) (détail dans JOURNAL.txt).',
+                            'en': '{n} file(s) sorted into {lots} stack(s), {ignores} ignored (details in JOURNAL.txt).'},
+    'ohp_rapport_fin': {'fr': 'Rapport : {images} image(s) traitée(s) en {duree} — {ok} converties, {doublons} doublons, {echecs} échec(s) ; '
+                              '{sortie} écrits dans {lots} lot(s). Journal : {journal}',
+                        'en': 'Report: {images} image(s) processed in {duree} — {ok} converted, {doublons} duplicates, {echecs} failure(s); '
+                              '{sortie} written into {lots} stack(s). Log: {journal}'},
+    'ohp_rapport_echecs': {'fr': 'Échecs : {liste}', 'en': 'Failures: {liste}'},
+    'ohp_bandeau_nouveautes': {'fr': '{n} nouvelle(s) image(s) ({objets} objet(s), {taille}) depuis le {depuis} — télécharger maintenant ?',
+                               'en': '{n} new image(s) ({objets} object(s), {taille}) since {depuis} — download now?'},
+    'ohp_bandeau_aide': {'fr': "Nouveautés de la banque absentes de votre copie locale ; rien n'est téléchargé sans votre accord.",
+                         'en': 'New images in the bank missing from your local copy; nothing is downloaded without your consent.'},
+    'ohp_nouv_telecharger': {'fr': 'Télécharger maintenant', 'en': 'Download now'},
+    'ohp_nouv_telecharger_aide': {'fr': 'Traite les seules nouveautés, dans le même dossier de sortie.', 'en': 'Process only the new images, into the same output folder.'},
+    'ohp_nouv_plus_tard': {'fr': 'Plus tard', 'en': 'Later'},
+    'ohp_nouv_plus_tard_aide': {'fr': 'Cache ce message ; il reviendra à la prochaine vérification.', 'en': 'Hide this message; it will come back at the next check.'},
+    'ohp_nouv_voir': {'fr': 'Voir', 'en': 'Show'},
+    'ohp_nouv_voir_aide': {'fr': 'Filtre le catalogue sur les nouveautés.', 'en': 'Filter the catalogue on what is new.'},
+    'ohp_nouv_verifier': {'fr': 'Vérifier les nouveautés', 'en': 'Check for new images'},
+    'ohp_nouv_verifier_aide': {'fr': "Réinterroge le service TAP et compare à la copie locale (dossier de sortie).",
+                               'en': 'Query the TAP service again and compare with the local copy (output folder).'},
+    'ohp_nouv_aucune': {'fr': 'Aucune nouveauté depuis le {depuis} (copie locale à jour).', 'en': 'Nothing new since {depuis} (local copy up to date).'},
+    'ohp_nouv_sans_copie': {'fr': 'Aucune copie locale dans {dest} : lancer d\'abord « Tout télécharger » ou traiter une sélection.',
+                            'en': 'No local copy in {dest}: run « Download everything » or process a selection first.'},
+    'ohp_nouv_liste': {'fr': '{n} nouvelle(s) image(s), {objets} objet(s), {taille}, depuis le {depuis} :',
+                       'en': '{n} new image(s), {objets} object(s), {taille}, since {depuis}:'},
+    'ohp_nouv_statut': {'fr': 'Nouveautés : {n} image(s), {taille}', 'en': 'New images: {n}, {taille}'},
+    'ohp_nouv_verification': {'fr': 'Vérification des nouveautés de la banque…', 'en': 'Checking the bank for new images…'},
+    'ohp_nouv_hors_ligne': {'fr': 'Vérification des nouveautés impossible (hors ligne ou service indisponible).',
+                            'en': 'Could not check for new images (offline or service unavailable).'},
+    # ------------------------------------------------------------ JOURNAL.txt (lignes bilingues, horodatées)
+    'jrn_session_debut': {'fr': 'DÉBUT de session Coupole {version} : {n} image(s) à traiter, {deja} déjà faite(s) ; {dest} ({format}) ; '
+                                '{dl} téléchargement(s), {conv} conversion(s)',
+                          'en': 'Session START Coupole {version}: {n} image(s) to process, {deja} already done; {dest} ({format}); '
+                                '{dl} download(s), {conv} conversion(s)'},
+    'jrn_session_fin': {'fr': 'FIN de session ({etat}) : {ok} converties, {doublons} doublons, {echecs} échec(s), {duree} s, {sortie} Go, {lots} lot(s)',
+                        'en': 'Session END ({etat}): {ok} converted, {doublons} duplicates, {echecs} failure(s), {duree} s, {sortie} GB, {lots} stack(s)'},
+    'jrn_reprise': {'fr': 'reprise : {deja} image(s) déjà faite(s) ne seront pas refaites, {fits} téléchargement(s) retrouvé(s)',
+                    'en': 'resume: {deja} image(s) already done will not be redone, {fits} download(s) found again'},
+    'jrn_pause': {'fr': 'pause demandée', 'en': 'pause requested'},
+    'jrn_reprise_pause': {'fr': 'reprise après pause', 'en': 'resumed after pause'},
+    'jrn_telechargee': {'fr': 'téléchargée {source} ({octets} octets, {duree} s)', 'en': 'downloaded {source} ({octets} bytes, {duree} s)'},
+    'jrn_convertie': {'fr': 'convertie {source} : solution {wcs}, taille {ratio} % du FITS, {duree} s',
+                      'en': 'converted {source}: solution {wcs}, size {ratio} % of the FITS, {duree} s'},
+    'jrn_doublon_inventaire': {'fr': 'écartée {source} : doublon d\'inventaire ({raison})', 'en': 'left out {source}: inventory duplicate ({raison})'},
+    'jrn_pixels_identiques': {'fr': 'écartée {source} : pixels identiques à {autre}', 'en': 'left out {source}: pixels identical to {autre}'},
+    'jrn_pixels_identiques_gardee': {'fr': 'gardée {source} malgré des pixels identiques à {autre} (option « garder les doublons »)',
+                                     'en': 'kept {source} despite pixels identical to {autre} (« keep duplicates » option)'},
+    'jrn_echec': {'fr': 'ÉCHEC {source} : {erreur}', 'en': 'FAILED {source}: {erreur}'},
+    'jrn_processus_perdu': {'fr': 'processus de conversion perdu pendant {source} ; bassin reconstruit',
+                            'en': 'conversion process lost while handling {source}; pool rebuilt'},
+    'jrn_conflit_nom': {'fr': 'conflit de nom : {voulu} existait déjà → {retenu}', 'en': 'name conflict: {voulu} already existed → {retenu}'},
+    'jrn_reorg_fichier': {'fr': 'réorganisation : {fichier} rattaché à {objet}', 'en': 'reorganisation: {fichier} attached to {objet}'},
+    'jrn_reorg_ignore': {'fr': 'réorganisation : {fichier} ignoré ({raison})', 'en': 'reorganisation: {fichier} ignored ({raison})'},
+    'reorg_deja_rangee': {'fr': 'déjà rangée ailleurs', 'en': 'already sorted elsewhere'},
+    'reorg_format': {'fr': 'format inconnu', 'en': 'unknown format'},
+    'reorg_illisible': {'fr': 'en-tête illisible', 'en': 'unreadable header'},
+    'reorg_pas_coupole': {'fr': 'pas un fichier produit par Coupole', 'en': 'not a file produced by Coupole'},
+    'reorg_inconnu_inventaire': {'fr': 'fichier d\'origine absent de l\'inventaire', 'en': 'source file missing from the inventory'},
 }

@@ -261,7 +261,18 @@ def _gui():
     return gui_main()
 
 
+def console_tolerante():
+    """Console qui ne sait pas tout afficher (Windows cp1252, LANG=C) : remplacer au lieu de planter."""
+    for flux in (sys.stdout, sys.stderr):
+        try:
+            if flux is not None and hasattr(flux, 'reconfigure') and (flux.encoding or '').lower() not in ('utf-8', 'utf8'):
+                flux.reconfigure(errors='replace')
+        except (AttributeError, ValueError, OSError):
+            pass
+
+
 def main(argv=None) -> int:
+    console_tolerante()
     argv = list(sys.argv[1:] if argv is None else argv)
     mods = initialiser(_langue_argv(argv))
     if not argv:

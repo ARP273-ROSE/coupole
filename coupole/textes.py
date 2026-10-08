@@ -7,6 +7,7 @@ TEXTES = {
     'taille_go': {'fr': '{v} Go', 'en': '{v} GB'},
     'taille_mo': {'fr': '{v} Mo', 'en': '{v} MB'},
     'ecrit': {'fr': 'Écrit : {chemin}', 'en': 'Written: {chemin}'},
+    'erreur_ecriture': {'fr': "Impossible d'écrire {chemin} : {erreur}", 'en': 'Cannot write {chemin}: {erreur}'},
     'interrompu': {'fr': 'Interrompu.', 'en': 'Interrupted.'},
     'interrompu_reprise': {'fr': 'Interrompu. Relancer la même commande reprend là où le traitement s\'est arrêté.',
                            'en': 'Interrupted. Running the same command again resumes where processing stopped.'},
@@ -261,6 +262,9 @@ TEXTES = {
     'fen_modules_aide': {'fr': 'Modules de Coupole (Ctrl+1, Ctrl+2…).', 'en': 'Coupole modules (Ctrl+1, Ctrl+2…).'},
     'fen_module_erreur': {'fr': 'Le module « {module} » n\'a pas pu s\'ouvrir : {erreur}', 'en': 'The « {module} » module could not open: {erreur}'},
     'fen_pret': {'fr': 'Prêt.', 'en': 'Ready.'},
+    'fen_arret_en_cours': {'fr': 'Arrêt des travaux en cours…', 'en': 'Stopping running work…'},
+    'fen_reglages_restaures': {'fr': "Le fichier des réglages était illisible : valeurs par défaut rétablies (l'ancien fichier est gardé à côté, suffixe « .corrompu-… »).",
+                               'en': 'The settings file was unreadable: defaults restored (the old file is kept alongside, suffix « .corrompu-… »).'},
     'fen_langue_occupe': {'fr': 'Un traitement est en cours : changer de langue après la fin.', 'en': 'A processing is running: change the language when it ends.'},
     'fen_quitter_titre': {'fr': 'Quitter', 'en': 'Quit'},
     'fen_quitter_occupe': {'fr': "Un traitement est en cours. Quitter l'interrompt (il reprendra au prochain lancement). Quitter ?",
@@ -332,11 +336,20 @@ TEXTES = {
     'reg_econome_aide': {'fr': 'Une conversion et deux téléchargements à la fois : peu de mémoire, machine réactive.',
                          'en': 'One conversion and two downloads at a time: little memory, responsive computer.'},
     'reg_maj': {'fr': 'Rechercher les mises à jour au démarrage', 'en': 'Check for updates at startup'},
+    'reg_nouveautes': {'fr': 'Vérifier les nouveautés de la banque OHP au démarrage', 'en': 'Check the OHP bank for new images at startup'},
+    'reg_nouveautes_aide': {'fr': "Si Internet est disponible et qu'une copie locale existe : compare l'inventaire à la copie et propose "
+                                  "(sans jamais télécharger seul) les nouveautés.",
+                            'en': 'When the Internet is available and a local copy exists: compare the inventory with the copy and offer '
+                                  '(never downloading on its own) what is new.'},
+    'reg_nouveautes_heures': {'fr': 'Au plus une vérification toutes les', 'en': 'At most one check every'},
+    'reg_nouveautes_heures_aide': {'fr': 'Fréquence maximale de la vérification automatique (heures).', 'en': 'Maximum frequency of the automatic check (hours).'},
+    'unite_heures': {'fr': 'h', 'en': 'h'},
     'reg_maj_aide': {'fr': 'Une requête discrète à GitHub au démarrage ; rien ne s\'installe sans votre accord.',
                      'en': 'One discreet request to GitHub at startup; nothing installs without your consent.'},
 
     # ------------------------------------------------------------ assistant ASTAP
     'astapdlg_titre': {'fr': 'Assistant ASTAP', 'en': 'ASTAP assistant'},
+    'astapdlg_recherche': {'fr': 'Recherche en cours…', 'en': 'Searching…'},
     'astapdlg_chercher': {'fr': 'Chercher', 'en': 'Search'},
     'astapdlg_chercher_aide': {'fr': "Cherche ASTAP et son catalogue aux emplacements habituels, dans le PATH et les variables d'environnement.",
                                'en': 'Look for ASTAP and its catalogue in the usual places, in the PATH and environment variables.'},
