@@ -186,3 +186,9 @@ Consigne : « fais au mieux » → appliquer ce qui apporte un gain réel sans r
   et recompilés ; CHANGELOG FR/EN ; `docs/AUDIT_2026-10.md` § 10 annoté.
 - Tests dans `python:3.12-slim` (copie du dépôt sans `build/`, `pip install ".[test]"`, `QT_QPA_PLATFORM=offscreen`) :
   **232 réussis, 10 sautés, code de sortie 0** (les 2 tests du job object ne tournent que sous Windows : CI).
+- Première CI (6 jobs) : Windows 3.10 vert (job object validé en vrai : enfant tué avec le parent confiné, témoin qui
+  survit sans confinement) ; **deux défauts attrapés** — (i) le cache calculait hors du verrou : deux fils qui ratent
+  le cache en même temps calculaient chacun à son propre instant et obtenaient des valeurs différentes pour la même
+  minute → calcul **sous le verrou** (un seul calcul, même valeur pour tous) ; (ii) `test_interface_reactive` : hoquet
+  de 0,69 s du serveur Windows partagé contre un seuil de 0,5 s → seuil porté à 1 s (un vrai gel durerait les 1,5 s du
+  travail). Deuxième CI : voir le dépôt (6 jobs attendus verts).
