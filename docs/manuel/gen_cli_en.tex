@@ -1,0 +1,233 @@
+% Généré par outils/tables_cli.py — ne pas modifier à la main.
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole}\\
+\midrule
+--version & show the version and exit\\
+--lang,\allowbreak{} --langue \{auto,\allowbreak{}fr,\allowbreak{}en\} & message language (auto: system language)\\
+-v,\allowbreak{} --verbeux,\allowbreak{} --verbose & detailed log\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole astap\newline\normalfont\small Look for ASTAP and its star catalogue, show what to install for this system, or record their location. Coupole works without ASTAP.}\\
+\midrule
+--guide & show the installation guide for this system\\
+--definir,\allowbreak{} --set PATH & path of the ASTAP executable (or its folder)\\
+--catalogue,\allowbreak{} --catalog FOLDER & star catalogue folder (D80, D50...)\\
+--oublier,\allowbreak{} --forget & forget recorded paths (back to detection)\\
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole rapports (reports)\newline\normalfont\small Nothing is sent without consent. Without consent, reports stay in a local folder.}\\
+\midrule
+--activer,\allowbreak{} --enable & allow sending (anonymous) reports\\
+--desactiver,\allowbreak{} --disable & forbid sending reports\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole maj (update)\newline\normalfont\small Query the releases published on GitHub. The standalone package updates itself; a pip/pipx installation shows the command to run.}\\
+\midrule
+--appliquer,\allowbreak{} --apply & download and install the update (standalone package)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole sources\newline\normalfont\small Without option: list the addresses and their origin (shipped default, remote file, forced value).}\\
+\midrule
+--forcer,\allowbreak{} --set KEY VALUE & force a value (never overwritten by an update)\\
+--defaut,\allowbreak{} --default KEY & go back to the default value for this key\\
+--tout-reinitialiser,\allowbreak{} --reset-all & go back to the default values for every key\\
+--tester,\allowbreak{} --test KEY & test the connection to this address\\
+--distant,\allowbreak{} --remote & fetch the sources file published in the repository now\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp inventaire (inventory)\newline\normalfont\small Bank inventory from the public TAP service (http://tap-ufe.obspm.fr/tap, table ivoa.obscore), kept in a local cache.}\\
+\midrule
+--rafraichir,\allowbreak{} --refresh & query the Observatory's TAP service again (one request)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp catalogue (catalog)\newline\normalfont\small The 194 database names grouped into objects, sorted by type.}\\
+\midrule
+--type TYPE & category: ast, neocp, com, pla, tno, pn, neb, amas, gal, eto (repeatable)\\
+--telescope \{T120,\allowbreak{}IRIS\} & telescope (repeatable)\\
+--chercher,\allowbreak{} --search TEXT & keep objects whose name contains this text\\
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp images (list)\newline\normalfont\small One line per image: date, telescope, filter, exposure, flags (duplicate, shared date, daytime).}\\
+\midrule
+OBJECT & object(s): « NGC 6888 », « Pluto », « 1998 AG6 », or a database name\\
+--type TYPE & category: ast, neocp, com, pla, tno, pn, neb, amas, gal, eto (repeatable)\\
+--telescope \{T120,\allowbreak{}IRIS\} & telescope (repeatable)\\
+--filtre,\allowbreak{} --filter F & filter: B, V, R (Johnson and Cousins), Bc, Vc, Rc, Ha, OIII, g, r, i, z, or the exact name (« Johnson R »); repeatable or comma-separated\\
+--nuit,\allowbreak{} --night YYYY-MM-DD & night (evening date); repeatable\\
+--sans-dates-douteuses,\allowbreak{} --no-doubtful-dates & leave out exposures with a shared DATE-OBS or dated in daytime\\
+--tout,\allowbreak{} --all & the whole bank (≈ 78 GB)\\
+--csv FILE & also write the list to this CSV file\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp estimer (estimate)\newline\normalfont\small Estimate before downloading, with the free space at the destination.}\\
+\midrule
+OBJECT & object(s): « NGC 6888 », « Pluto », « 1998 AG6 », or a database name\\
+--type TYPE & category: ast, neocp, com, pla, tno, pn, neb, amas, gal, eto (repeatable)\\
+--telescope \{T120,\allowbreak{}IRIS\} & telescope (repeatable)\\
+--filtre,\allowbreak{} --filter F & filter: B, V, R (Johnson and Cousins), Bc, Vc, Rc, Ha, OIII, g, r, i, z, or the exact name (« Johnson R »); repeatable or comma-separated\\
+--nuit,\allowbreak{} --night YYYY-MM-DD & night (evening date); repeatable\\
+--sans-dates-douteuses,\allowbreak{} --no-doubtful-dates & leave out exposures with a shared DATE-OBS or dated in daytime\\
+--tout,\allowbreak{} --all & the whole bank (≈ 78 GB)\\
+--format \{xisf,\allowbreak{}fz,\allowbreak{}fits\} & output format: xisf (PixInsight, default), fz (lossless compressed FITS), fits (float32)\\
+--dest FOLDER & destination folder (default: \textasciitilde{}/Coupole/OHP\_DU\_ECU or the one in the settings)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp traiter (process)\newline\normalfont\small Full processing of a selection, resumable: running the same command again resumes where it stopped.}\\
+\midrule
+OBJECT & object(s): « NGC 6888 », « Pluto », « 1998 AG6 », or a database name\\
+--type TYPE & category: ast, neocp, com, pla, tno, pn, neb, amas, gal, eto (repeatable)\\
+--telescope \{T120,\allowbreak{}IRIS\} & telescope (repeatable)\\
+--filtre,\allowbreak{} --filter F & filter: B, V, R (Johnson and Cousins), Bc, Vc, Rc, Ha, OIII, g, r, i, z, or the exact name (« Johnson R »); repeatable or comma-separated\\
+--nuit,\allowbreak{} --night YYYY-MM-DD & night (evening date); repeatable\\
+--sans-dates-douteuses,\allowbreak{} --no-doubtful-dates & leave out exposures with a shared DATE-OBS or dated in daytime\\
+--tout,\allowbreak{} --all & the whole bank (≈ 78 GB)\\
+--dest FOLDER & destination folder (default: \textasciitilde{}/Coupole/OHP\_DU\_ECU or the one in the settings)\\
+--format \{xisf,\allowbreak{}fz,\allowbreak{}fits\} & output format: xisf (PixInsight, default), fz (lossless compressed FITS), fits (float32)\\
+--noms,\allowbreak{} --names \{fr,\allowbreak{}en\} & language of folder names, object names and headers (default: interface language)\\
+--astap \{auto,\allowbreak{}tous,\allowbreak{}suspectes,\allowbreak{}jamais,\allowbreak{}all,\allowbreak{}suspicious,\allowbreak{}never\} & ASTAP check: auto/all (every image when ASTAP is present), suspicious, never\\
+--telechargements,\allowbreak{} --downloads N & simultaneous downloads (automatic by default; at most 4)\\
+--conversions N & simultaneous conversions (default: from cores and memory)\\
+--econome,\allowbreak{} --eco & economy mode: 1 conversion, 2 downloads\\
+--debit,\allowbreak{} --rate MB/s & maximum download rate (default 8 MB/s)\\
+--garder-fits,\allowbreak{} --keep-fits & also keep the original FITS (in \_traitement/fits\_origine)\\
+--garder-doublons,\allowbreak{} --keep-duplicates & also process duplicates (inventory and identical pixels) instead of leaving them out\\
+--oui,\allowbreak{} --yes & accept a selection over 5 GB without confirmation\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp telecharger (download)\newline\normalfont\small Layout: <folder>/<object>/<night>\_<telescope>/<original file>.}\\
+\midrule
+OBJECT & object(s): « NGC 6888 », « Pluto », « 1998 AG6 », or a database name\\
+--type TYPE & category: ast, neocp, com, pla, tno, pn, neb, amas, gal, eto (repeatable)\\
+--telescope \{T120,\allowbreak{}IRIS\} & telescope (repeatable)\\
+--filtre,\allowbreak{} --filter F & filter: B, V, R (Johnson and Cousins), Bc, Vc, Rc, Ha, OIII, g, r, i, z, or the exact name (« Johnson R »); repeatable or comma-separated\\
+--nuit,\allowbreak{} --night YYYY-MM-DD & night (evening date); repeatable\\
+--sans-dates-douteuses,\allowbreak{} --no-doubtful-dates & leave out exposures with a shared DATE-OBS or dated in daytime\\
+--tout,\allowbreak{} --all & the whole bank (≈ 78 GB)\\
+--dest FOLDER & destination folder (default: \textasciitilde{}/Coupole/OHP\_DU\_ECU or the one in the settings)\\
+--telechargements,\allowbreak{} --downloads N & simultaneous downloads (automatic by default; at most 4)\\
+--debit,\allowbreak{} --rate MB/s & maximum download rate (default 8 MB/s)\\
+--oui,\allowbreak{} --yes & accept a selection over 5 GB without confirmation\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp anomalies (anomalies-report)\newline\normalfont\small Duplicates (same file, daytime copy, identical pixels), shared or daytime dates, inconsistent field, classification to check, unknown instrument. Nothing is deleted.}\\
+\midrule
+--dest FOLDER & add the pixel duplicates found in this processing folder\\
+--csv FILE & also write the list to this CSV file\\
+--nouveaux,\allowbreak{} --new & only images new since the last refresh\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp classer (classify)\newline\normalfont\small Without argument: list the names to check. With a database name and --object: record the correction (merge into an existing object if --type is omitted). --online: query JPL SBDB and CDS Sesame.}\\
+\midrule
+DB\_NAME & target name as it appears in the database\\
+--objet,\allowbreak{} --object OBJECT & canonical object to associate (existing one: merge)\\
+--type \{ast,\allowbreak{}neocp,\allowbreak{}com,\allowbreak{}pla,\allowbreak{}tno,\allowbreak{}pn,\allowbreak{}neb,\allowbreak{}amas,\allowbreak{}gal,\allowbreak{}eto,\allowbreak{}autre\} & category: ast, neocp, com, pla, tno, pn, neb, amas, gal, eto (repeatable)\\
+--oublier,\allowbreak{} --forget & forget the correction of this name\\
+--en-ligne,\allowbreak{} --online & resolve unknown names online (JPL SBDB, CDS Sesame), with cache\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp ranger (sort)\newline\normalfont\small Useful after an interruption, or to merge several runs in the same folder.}\\
+\midrule
+--dest FOLDER & destination folder (default: \textasciitilde{}/Coupole/OHP\_DU\_ECU or the one in the settings)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp bilan (status)\newline\normalfont\small progress of a processing folder}\\
+\midrule
+--dest FOLDER & destination folder (default: \textasciitilde{}/Coupole/OHP\_DU\_ECU or the one in the settings)\\
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole qualite\newline\normalfont\small Optional: background, noise, FWHM and ellipticity (3×3 map), background gradient, saturation, trails, sampling}\\
+\midrule
+FOLDER & folder of stacks (or one image file)\\
+--ecrire,\allowbreak{} --write & write QUALITE.csv and QUALITE.txt in each stack\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole donnees lire (read)\newline\normalfont\small describe the contents of a file (FITS, CSV)}\\
+\midrule
+FILE & file to read\\
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole donnees exporter (export)\newline\normalfont\small export a spectrum or a series as CSV}\\
+\midrule
+FILE & file to read\\
+--csv FILE & export a spectrum or a series as CSV\\
+--hdu HDU & index of the dataset in the file (default: the first 1D one)\\
+--vitesse,\allowbreak{} --velocity & add the radio velocity (frequency spectrum)\\
+--f0 MHz & rest frequency in MHz (default: RESTFRQ, else H I)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole sites\newline\normalfont\small Observing sites (OpenStreetMap map), time zones, UTC and local time}\\
+\midrule
+--ajouter,\allowbreak{} --add X & add a site: ID NAME LAT LON ALT TIMEZONE [MPC]\\
+--supprimer,\allowbreak{} --delete ID & delete an added site\\
+--heure,\allowbreak{} --time ISO\_DATE & show a UTC date (ISO) in site time and evening date\\
+--site ID & site identifier (default: ohp)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole machine\newline\normalfont\small Hardware diagnosis, chosen parallelism, graphics card, ASTAP}\\
+\midrule
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip

@@ -73,6 +73,8 @@ def vue_tableau(modele: ModeleTableau, cle_aide: str, selection_multiple=True) -
     v = QTableView()
     v.setModel(proxy)
     v.setSortingEnabled(True)
+    v.horizontalHeader().setSortIndicator(-1, Qt.SortOrder.AscendingOrder)   # ordre d'origine tant qu'on ne trie pas
+    proxy.sort(-1)
     v.setAlternatingRowColors(True)
     v.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
     v.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection if selection_multiple

@@ -1,0 +1,459 @@
+\newcommand{\langue}{english}
+\newcommand{\nomchapitre}{Chapter}
+\newcommand{\titrecourt}{REFERENCE MANUAL}
+\input{version.tex}
+\input{preambule_coupole.tex}
+\renewcommand{\partiecourante}{Coupole \versioncoupole}
+\newcommand{\capture}[2]{\par\needspace{10\baselineskip}\begin{center}\includegraphics[width=#2\linewidth]{#1}\end{center}}
+\newcommand{\cmd}[1]{\texttt{#1}}
+
+\begin{document}
+\begin{titlepage}
+\centering
+\vspace*{2.5cm}
+\includegraphics[width=4.2cm]{../../logo/coupole_512.png}\par\vspace{1.2cm}
+{\sffamily\bfseries\color{night}\fontsize{38}{44}\selectfont Coupole\par}
+\vspace{0.4cm}
+{\sffamily\Large\color{sky}Reference manual\par}
+\vspace{0.3cm}
+{\sffamily\large\color{summit}Version \versioncoupole{} --- \datecoupole\par}
+\vspace{1.4cm}
+\begin{minipage}{0.78\linewidth}\centering\sffamily\color{ink}
+Free toolbox for students of the « Explorer et Comprendre l'Univers » diploma (Observatoire de Paris).\\[4pt]
+OHP image bank · image quality · spectra and series · sites and times.
+\end{minipage}
+\vfill
+{\sffamily\small\color{summit}Author: ARP273-ROSE · GNU GPL licence version 3 or later\\
+Data: « OHP student observations » bank, Observatoire de Paris / PADC (Etalab 2.0 licence)\par}
+\end{titlepage}
+
+\tableofcontents
+
+% =====================================================================
+\section{Overview}
+Coupole is a free application (GPL-3.0) written in Python 3.10+, running on Windows, macOS and Linux, with a
+graphical interface (PyQt6) and a complete command line. Every displayed text exists in French and English; the
+system language is detected and can be forced (\emph{Language} menu, Preferences, or \cmd{--lang fr|en}).
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Module} & \textbf{Purpose}\\
+\midrule
+OHP image bank & Inventory, catalogue, download, astrometric check, fixed headers, conversion, stackable sets, anomalies, sky map.\\
+Image quality & Optional. FWHM, ellipticity, background, noise, gradient, saturation, trails, sampling.\\
+Spectra and series & Reading and plotting 1D data (radio spectra, light curves, tables).\\
+Sites and times & Site database, OpenStreetMap map, UTC and local time.\\
+My computer & Hardware diagnosis; minimal example module.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Principles: all long work runs off the GUI thread (the interface stays responsive, with progress and
+cancellation); an interrupted run resumes where it stopped; nothing is deleted without a trace; no data is sent
+without consent; optional components (ASTAP, SEP, CuPy) may be missing.
+
+% =====================================================================
+\section{Installation}
+\subsection{All-inclusive packages}
+The packages bundle Python and every library (PyQt6, numpy, astropy, zstandard, lz4, SEP): nothing else to
+install. They update themselves. ASTAP stays optional and is not included.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l>{\ttfamily\small}lX@{}}
+\toprule
+\textbf{System} & \textbf{\normalfont File} & \textbf{Installation}\\
+\midrule
+Windows 10/11 64-bit & Coupole-Setup-x.y.z.exe & Double-click. SmartScreen warning at first launch (unsigned installer): « More info », « Run anyway ». Installed in the user profile, no administrator rights.\\
+macOS Apple Silicon & Coupole-x.y.z-macos-arm64.dmg & Drag Coupole into Applications. First launch: right click, « Open ».\\
+macOS Intel & Coupole-x.y.z-macos-x86\_64.dmg & Same.\\
+Linux x86\_64 / ARM64 & Coupole-x.y.z-linux-*.tar.gz & Unpack, run \texttt{installer.sh} (copied into \texttt{\textasciitilde/.local/share/coupole}, menu entry).\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{With the computer's Python}
+The scripts in the source folder look for Python 3.10 or newer, create a virtual environment, install the
+dependencies and create launchers. One question only: Enter to confirm (\cmd{--oui} / \cmd{-Oui} to skip it).
+\begin{ccode}
+sh install.sh                \# Linux, macOS\\
+install.bat                  \# Windows (double-click; runs install.ps1)
+\end{ccode}
+Without Python, or without the \texttt{venv} module (Debian: \texttt{python3-venv} package), the script says so and
+explains how to get it. Locations: Linux \texttt{\textasciitilde/.local/share/coupole/venv}, launchers in
+\texttt{\textasciitilde/.local/bin}; macOS \texttt{\textasciitilde/Library/Application Support/Coupole/venv} and
+\texttt{\textasciitilde/Applications/Coupole.app}; Windows \texttt{\%LOCALAPPDATA\%\textbackslash
+Programs\textbackslash CoupolePython}, Desktop and Start menu shortcuts.
+
+\subsection{pip and pipx}
+\begin{ccode}
+pipx install git+https://github.com/ARP273-ROSE/coupole\\
+pip install .                 \# from the sources; pip install ".[qualite]" adds SEP\\
+python -m coupole             \# interface; coupole --help: command line
+\end{ccode}
+Extras: \texttt{qualite} (SEP), \texttt{validation} (lxml, xisf: XSD validation and second reader), \texttt{gpu}
+(CuPy), \texttt{test} (pytest).
+
+\subsection{Updates, uninstallation, data}
+At startup (can be disabled) the packages check the latest release on GitHub and offer to install it: only the
+code archive (\texttt{coupole-app-x.y.z.zip}, about 1 MB) is downloaded and unpacked by the application, the
+previous version being restored on failure. A pip/pipx installation shows the command to run. Settings, cache and
+reports live outside the installation folder and survive updates:
+
+\begin{center}\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Windows & \texttt{\%LOCALAPPDATA\%\textbackslash Coupole}\\
+macOS & \texttt{\textasciitilde/Library/Application Support/Coupole} (cache: \texttt{\textasciitilde/Library/Caches/Coupole})\\
+Linux & \texttt{\textasciitilde/.config/coupole} (cache: \texttt{\textasciitilde/.cache/coupole})\\
+All & \texttt{COUPOLE\_HOME} variable: replaces both (portable installations, tests)\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% =====================================================================
+\section{Getting started}
+The window has a module bar on the left (Ctrl+1 to Ctrl+9) and the current module on the right. Every interactive
+element has a tooltip. \emph{Help} menu: help on the screen shown (F1), this manual (Shift+F1), keyboard shortcuts,
+report a problem, incident reports, check for updates, About (version, licence, detected configuration).
+
+\begin{center}\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+F1 & help on the screen\\ Shift+F1 & PDF manual\\ Ctrl+1 … Ctrl+9 & module 1 to 9\\ Ctrl+, & Preferences\\
+Ctrl+Shift+A & ASTAP assistant\\ Ctrl+R & OHP bank: refresh the inventory\\ Ctrl+Q & quit\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\capture{img/reglages_en.png}{0.62}
+Preferences (Ctrl+,): interface language; language of folder names, object names and FITS comments; output
+folder; format; parallelism; maximum rate; economy mode; update check. The \emph{Sources} tab lists the service
+addresses (chapter~\ref{chap:evolutif}).
+
+% =====================================================================
+\section{OHP image bank module}
+\subsection{The bank}
+« OHP student observations » gathers the images taken by the diploma's students at the Observatoire de
+Haute-Provence: 7,989 FITS images on 8 October 2026, 166 objects under 194 names, 60 nights from 2015 to 2026,
+78.0 GB; 1.20 m telescope (T120, 7,419 images, 1024 pixels of 0.77″, 13.1′ field) and the 50 cm IRIS robotic
+telescope (570 images, 2048 pixels of 0.68″ or 4096 pixels of 0.46″, 23′ and 31′ fields). The images are already
+calibrated (dark, flat) and astrometrically solved: \textbf{they must not be recalibrated}.
+
+\subsection{Catalogue}
+\capture{img/catalogue_en.png}{1.0}
+The inventory comes from the Observatory's public TAP service (\texttt{http://tap-ufe.obspm.fr/tap}, table
+\texttt{ivoa.obscore}, one synchronous ADQL query), kept in a cache; a snapshot is shipped for offline work.
+\emph{Refresh the inventory} (Ctrl+R) queries the service again and flags new images and names (« new since … »).
+Database names are grouped into canonical objects; selecting one or several objects lists their images on the
+right, filtered by night, filter and doubtful dates; this list is the selection to process. The estimate gives the
+volume to download, the expected output volume and the free space. Times are shown in UTC and in site time (hover:
+also the user's time).
+
+\subsection{Processing}
+\capture{img/traitement_en.png}{1.0}
+For each image, duplicates excluded:
+\begin{enumerate}[leftmargin=*,itemsep=1pt]
+\item download: at most 4 at once (3 by default), total rate capped (8 MB/s by default), User-Agent naming Coupole,
+  resume by HTTP Range requests, checks of size (server and inventory), multiple of 2,880 bytes and \texttt{SIMPLE}
+  card;
+\item reading of the FITS cards as written and of the pixels; SHA-1 fingerprint of the pixels (exact duplicates);
+\item astrometric solution check (section~\ref{sec:astrometrie});
+\item fixed header (section~\ref{sec:entetes});
+\item writing in the chosen format, reading back and pixel-by-pixel comparison;
+\item at the end: sorting into stacks, \texttt{LOT.txt}, \texttt{INDEX\_LOTS.csv}, \texttt{\_traitement/journal.csv}.
+\end{enumerate}
+The state is kept in \texttt{\_traitement/etat.sqlite}: \emph{Stop} then \emph{Start} (or running the same command
+again) resumes without redoing anything. A folder keeps the name language and format of its first run.
+\emph{Keep duplicates} also processes what would be left out; \emph{Keep the original FITS} stores them in
+\texttt{\_traitement/fits\_origine}.
+
+\subsection{Astrometric solution}\label{sec:astrometrie}
+Consistency checks, always made: solution present and readable; scale within 2~\% of the nominal one
+(\texttt{XPIXSZ}/\texttt{FOCALLEN}) or of the night median; angle within 5° of the night median (modulo 180°);
+centre within 1.5° of the object medoid (fixed) or 2° of the object-and-night medoid (moving). Medians and medoids
+come from the whole inventory.
+
+With ASTAP (optional), each image is also solved independently:
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Status} & \textbf{Meaning}\\
+\midrule
+confirmed & ASTAP finds the same centre within 10″ and the same scale within 1~\%.\\
+validated & solution kept: checks pass, ASTAP silent (poor or crowded field, short exposure) or absent.\\
+redone & missing or inconsistent solution replaced by ASTAP's (with SIP); the old one goes to HISTORY.\\
+doubtful & checks fail and no ASTAP to decide: image stored apart.\\
+failed & nothing usable: image stored in \texttt{\_sans\_solution\_astrometrique} (\texttt{\_no\_astrometric\_solution} with English names).\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Fixed headers}\label{sec:entetes}
+All original cards are kept in order; every replaced value is copied into a \texttt{HISTORY original value: …}
+card (French wording when names are in French).
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily}lX@{}}
+\toprule
+\normalfont\textbf{Keyword} & \textbf{Fix}\\
+\midrule
+OBJECT & canonical name (database aliases merged).\\
+FILTER, FILTSYS, FILTORIG & normalised filter (B, V, R, Ha, OIII, g, r, i, z), system (Johnson, Cousins, SDSS, Gunn, Narrowband), original value.\\
+LATITUDE, LONGITUD & fixed \textbf{only when the swap is proven} (swapped values matching the site); correct: untouched; ambiguous: flagged, untouched. Idempotent.\\
+SITELAT, SITELONG, SITEELEV & added when missing (MPC 511 site converted to WGS 84); present and consistent: kept; inconsistent: flagged.\\
+RA, DEC, OBJCTRA, OBJCTDEC & true centre of the solution.\\
+PIXSCALE, ORIENTAT & measured scale, position angle of the Y axis.\\
+FOCALLEN, XPIXSZ & recomputed only when missing or inconsistent by more than 2~\%.\\
+CTYPE1/2 & « -SIP » without coefficients (IRIS, PinPoint) brought back to TAN.\\
+DATE-OBS, DATEDOUT & added when missing; \texttt{DATEDOUT = T} when the date is shared with another exposure.\\
+XISFCONV & description of the conversion.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+The \texttt{t\_min} column of the database equals \texttt{DATE-OBS} − exposure/2; \texttt{DATE-OBS} (exposure
+start) prevails. A header date written in local time (whole-hour offset equal to the site time-zone offset against
+\texttt{MJD-OBS}/\texttt{JD}, or a « night » exposure dated in daylight) is flagged in the log, never silently
+fixed.
+
+\subsection{Stacks}
+\capture{img/lots_en.png}{0.9}
+A stack gathers what is stacked together: same object, same instrument (T120, T120-bin1, T120-sCMOS, IRIS-2048,
+IRIS-4096), same filter, and same field for a fixed object (all nights) or same night for a moving object.
+\begin{ccode}
+07\_Nebulae/NGC\_6888/field\_1\_T120/V/20250716-214427\_NGC\_6888\_V\_1s.xisf\\
+01\_Asteroids/914\_Palisana/night\_2023-08-15\_T120/R/LOT.txt
+\end{ccode}
+\texttt{LOT.txt} (French then English) gives object, database names, instrument, filter, exposures and total
+exposure, nights, mean centre, angle, solution status, doubtful dates and stacking advice (StarAlignment or
+CometAlignment, rejection suited to the number of exposures). File names: UTC date and time of the exposure start,
+object, filter, exposure; sorting by name = sorting in time. Names are safe under Windows.
+
+\subsection{Anomalies}
+\capture{img/anomalies_en.png}{1.0}
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily}llX@{}}
+\toprule
+\normalfont\textbf{Kind} & \textbf{Action} & \textbf{Meaning}\\
+\midrule
+meme\_fichier & left out & same exposure under another path or spelling\\
+copie\_diurne & left out & daytime-dated copy of a correctly dated image\\
+pixels\_identiques & left out & same pixels (SHA-1) as another image, at processing\\
+memes\_meta & flagged & same date, filter, exposure, size, different name\\
+date\_partagee & flagged & DATE-OBS identical to another exposure\\
+date\_diurne & flagged & Sun above the horizon at the site (never for the Sun or radio data)\\
+champ\_incoherent & flagged & centre far from the other exposures of the object\\
+classement & flagged & name classified automatically or not at all\\
+instrument & flagged & instrument missing from the table\\
+\bottomrule
+\end{tabularx}
+\end{center}
+On 8 October 2026: 133 + 11 = 144 duplicates left out, 1,654 shared dates, 3 daytime exposures, 92 inconsistent
+fields. CSV export with bilingual columns; nothing is deleted.
+
+\subsection{Sky map}
+\capture{img/ciel_en.png}{0.95}
+Aitoff projection, right ascension increasing to the left, 12~h at the centre; one point per fixed object (size:
+number of images) and per night for moving objects; ecliptic dashed, galactic plane dotted.
+
+% =====================================================================
+\section{ASTAP (optional)}
+Without ASTAP, Coupole does everything else. ASTAP (Han Kleijn, MPL~2.0 licence,
+\url{https://www.hnsky.org/astap.htm}) adds an independent check of each solution. It needs the program and one
+star catalogue.
+
+\capture{img/astap_en.png}{0.72}
+
+\paragraph{Catalogue.} The official site states that for a field of 0.6° or more, D05, D20, D50 and D80 all suit,
+and that dense catalogues serve small fields. The bank's fields range from 10.7′ (0.18°) to 31.4′ (0.52°):
+\textbf{D80} is recommended (about 1.2 GB; catalogue of the reference processing, 6,888 solutions confirmed out of
+7,625); D50 (about 0.9 GB) also suits IRIS.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{System} & \textbf{Program (links of the official page)}\\
+\midrule
+Windows x64 & \texttt{astap\_setup.exe} then \texttt{d80\_star\_database.exe} (same folder, \texttt{C:\textbackslash Program Files\textbackslash astap}); optional: \texttt{astap\_command-line\_version\_win64.zip}\\
+Windows ARM64 & \texttt{astap\_command-line\_version\_win11\_aarch64.zip} and \texttt{d80\_star\_database.zip}, in one folder\\
+macOS Apple Silicon & \texttt{astap\_M1.pkg}, \texttt{d80\_star\_database.pkg}; once: \texttt{codesign --force -s - /Applications/ASTAP.app/Contents/MacOS/astap}\\
+macOS Intel & \texttt{astap.pkg}, \texttt{d80\_star\_database.pkg}\\
+Linux Debian/Ubuntu & \texttt{astap\_amd64.deb} (or \texttt{astap\_aarch64.deb}), \texttt{d80\_star\_database.deb} (into \texttt{/opt/astap})\\
+Linux Fedora/openSUSE & \texttt{astap\_amd64.rpm}, catalogue \texttt{d80\_star\_database.zip} unzipped into \texttt{/opt/astap}\\
+Linux Arch & \texttt{astap\_amd64.pkg.tar.zst}, catalogue as zip\\
+Other Linux & \texttt{astap\_amd64.tar.gz} or \texttt{astap\_command-line\_version\_Linux\_amd64.zip}; no official AppImage\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{sloppypar}\noindent\textbf{Detection.} Order: chosen path (Preferences, \cmd{coupole astap --set}),
+\texttt{COUPOLE\_ASTAP} variable, PATH (\texttt{astap\_cli}, then \texttt{astap}), default locations (Windows
+\texttt{Program Files\textbackslash astap}, \texttt{\%LOCALAPPDATA\%\textbackslash astap}; macOS
+\texttt{/Applications/ASTAP.app}, \texttt{/usr/local/opt/astap}; Linux \texttt{/opt/astap}, \texttt{/usr/bin},
+\texttt{/usr/local/bin}, \texttt{\textasciitilde/astap}). Catalogue: chosen folder, \texttt{COUPOLE\_ASTAP\_CATALOGUE},
+program folder, \texttt{/opt/astap}, \texttt{/usr/share/astap/data}, \texttt{/usr/local/opt/astap}. A catalogue is
+declared complete with its 1,476 tiles; the version is read from \texttt{astap\_cli -h}.\end{sloppypar}
+
+% =====================================================================
+\section{Output formats}
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+\textbf{Format} & \textbf{Content} & \textbf{Readers}\\
+\midrule
+XISF (default) & Float32 in ADU, \texttt{bounds="-1000:65535"}; UInt16 for integer IRIS FITS; zstd+sh level 9 compression; \texttt{Observation:*}, \texttt{Instrument:*} properties & PixInsight\\
+FITS \texttt{.fits.fz} & lossless tile compression: GZIP\_2 without quantization (floats), RICE\_1 (integers) & Siril, astropy, DS9\\
+FITS & uncompressed float32 (or UInt16) & all\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{XISF}: \texttt{bounds} sets the range PixInsight maps to [0,1] when opening: nothing to set, same scale for
+every exposure; the −1,000 lower bound keeps the negative values of short calibrated exposures. Size: 36~\% of the
+original FITS for the T120 (float64), 62~\% for IRIS. \textbf{Compressed FITS}: measured with astropy 8.0, RICE\_1
+and HCOMPRESS\_1 quantize floats (one-ADU error, even with \texttt{quantize\_level=0}); only GZIP\_1 and GZIP\_2
+without quantization restore floats bit for bit. \textbf{float32 FITS}: in PixInsight, set the FITS input range to
+0–65,535 with \emph{Truncate}. For every format the difference to the original FITS stays below half a float32 ULP
+(checked pixel by pixel).
+
+% =====================================================================
+\section{Image quality (optional)}
+\capture{img/module_qualite_en.png}{1.0}
+The module needs the SEP library (Source Extractor in Python, LGPL, about 1 MB); it never runs automatically
+(\emph{Measure} button, \emph{Check image quality} box of the processing, or \cmd{coupole qualite FOLDER --write}).
+Report per stack: \texttt{QUALITE.csv} and \texttt{QUALITE.txt}.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+\textbf{Measure} & \textbf{Method} & \textbf{Synthetic validation}\\
+\midrule
+FWHM & elliptical Moffat with free $\beta$ fitted to each isolated, unsaturated star (model integrated over the pixel); median & ≤ 0.4~\% (Gauss and Moffat, 2.5–8 px)\\
+ellipticity & $1-b/a$ of the same fit & ± 0.02\\
+3 × 3 map & medians per ninth of the field & order recovered\\
+background, noise & SEP, 64 px mesh & 0.5~\%; 5~\%\\
+gradient, residual & plane fitted to the background map; residual amplitude & gradient and vignetting recovered\\
+saturated & peak above SATURATE/DATAMAX (else 60,000 ADU) & 5 out of 5\\
+trails & objects with major axis ≥ 12 px and $a/b \ge 6$ & 1 out of 1, 0 false\\
+SNR & only with the gain (EGAIN/GAIN) & given or absent\\
+sampling & FWHM < 2 px, 2–5 px, > 5 px & —\\
+\bottomrule
+\end{tabularx}
+\end{center}
+On 14 IRIS images (12 nights, FWHM from 2.4 to 11.3 px), the measured FWHM and the one written by PinPoint in the
+header correlate (r = 0.974), median ratio 1.046 (0.85 to 1.16): the two estimators differ (PinPoint's method is
+not described). Not offered for lack of validation: mag/arcsec² (no zero point), dust-donut detection. A FWHM
+growing towards an edge may come from the sensor, field curvature, collimation, but also from seeing, tracking or
+focus: the map alone cannot tell.
+
+% =====================================================================
+\section{Spectra and series}
+\capture{img/module_donnees_en.png}{1.0}
+Formats read: FITS (1D image with a linear \texttt{CRVAL/CDELT/CRPIX} WCS axis, 1 × 1 × N radio cubes, binary
+tables) and CSV or text in columns (optional header, unit in parentheses or brackets). Radio velocity:
+$v = c\,(1 - f/f_0)$ (FITS radio convention), $f_0$ read from \texttt{RESTFRQ}, otherwise the H\,I line at
+1,420.405751768 MHz. The frame is that of the frequency axis (\texttt{SPECSYS}); no LSR or barycentric correction is
+made implicitly. Formats of teaching radio antennas are added with a reader (CONTRIBUTING.md, « Adding a format »).
+
+% =====================================================================
+\section{Sites and times}
+\capture{img/module_sites_en.png}{0.95}
+Time is always kept in UTC (aware dates); the site's local time and the user's are shown as well. The « evening
+date » of a night is the site's local date at the previous noon; daylight is computed from the Sun's altitude at the
+site (astropy, no IERS download). Shipped sites: OHP (MPC 511), Meudon (005), Paris (007), geodetic coordinates
+computed from the Minor Planet Center parallax constants. Partner sites are added (IANA time zone, MPC code if any)
+once their coordinates are known from a reliable source. Map: OpenStreetMap tiles cached on disk, at most two
+downloads at a time, User-Agent naming the application, attribution shown; offline, plain background and points.
+
+% =====================================================================
+\section{Computer and performance}
+\capture{img/module_machine_en.png}{0.9}
+Detection without mandatory dependency: system, architecture, processor, physical and logical cores (bounded by
+affinity and container quota), total and available memory, free space, graphics cards (nvidia-smi,
+\texttt{/sys/class/drm}, system\_profiler, CIM). Parallelism: 3 downloads (at most 4), conversions = physical
+cores − 1 bounded by available memory at 500 MB per conversion; economy mode (1 conversion, 2 downloads) automatic
+below 4 GB or 2 cores; manual limits. The graphics card is not used by the OHP bank (work bound by network, disk and
+Zstandard); \texttt{coupole.core.calcul} offers CuPy to future modules.
+
+\begin{center}\small
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Measurement (Ryzen 5 8500G, NVMe)} & \textbf{Value}\\
+\midrule
+\texttt{coupole --version} & 0.1–0.2 s\\
+window shown & 0.4–0.5 s\\
+inventory loaded (background thread) & 3.1 s at first launch, 0.7 s afterwards\\
+memory peak of a T120 / IRIS 4096² conversion & 144 MB / 600 MB\\
+interface during 3 downloads (28 MB/s) & max gap of a 20 ms timer: 20.8 ms\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% =====================================================================
+\section{Command line}
+Everything the interface does is available on the command line; \cmd{--json} for scripts. Without argument,
+\cmd{coupole} opens the interface. Commands have a French name and an English alias.
+\begin{ccode}
+coupole --lang en ohp estimate "NGC 6888" --night 2025-07-16\\
+coupole --lang en ohp process "NGC 6888" --night 2025-07-16 --filter B --filter V --filter R --dest \textasciitilde/OHP --yes\\
+coupole --lang en ohp download Pluto --no-doubtful-dates --dest \textasciitilde/FITS\\
+coupole --lang en qualite \textasciitilde/OHP --write
+\end{ccode}
+{\small\input{gen_cli_en.tex}}
+
+% =====================================================================
+\section{Evolution}\label{chap:evolutif}
+\paragraph{Sources.} Addresses (TAP, collection, portal, download URL rewriting, resolvers, collection point,
+repository, map tiles) are in \texttt{coupole/donnees/sources.json}. Three layers: shipped values; file published in
+the repository, fetched at startup when newer and passing the shape check (known keys, types, domains from an
+allow-list; no cryptographic signature); values forced by the user, never overwritten. Preferences > Sources: edit,
+back to default, test. If the image server moves, \texttt{ohp.telechargement.de}/\texttt{vers} rewrites the URLs.
+\paragraph{Classification.} Shipped table \texttt{data/classement.json} (194 checked names); published aliases; user
+corrections (\emph{Correct the classification}, \cmd{coupole ohp classify}); name-shape rules; optional online
+resolution (JPL SBDB, CDS Sesame), cached; grouping by position on a known fixed object; otherwise « unclassified ».
+Every automatic classification is marked « to check ».
+\paragraph{Database.} Extra ObsCore columns ignored, missing ones replaced by a default, unknown instruments and
+filters stored apart, non-image data never flagged « daytime »; tested on simulated inventories.
+
+% =====================================================================
+\section{Incident reports and privacy}
+At first launch Coupole asks whether it may send anonymous reports: installation, sign of life (once a day), crash,
+native crash, frozen interface, written report. Content: version, system, processor, memory, graphics card, a random
+installation identifier, error trace with the home folder replaced by « \textasciitilde », the user name masked and
+deep paths shortened. Never a computer name, a user name or an image. Without consent nothing is sent: reports stay
+in \texttt{\_rapports} in the settings folder. The choice can be changed (Help menu, \cmd{coupole reports
+--enable|--disable}).
+
+% =====================================================================
+\section{Writing a module}
+A module is a Python package with a \texttt{manifest.json} (identifier, version, French and English names, icon,
+texts, graphical and command-line entry points), discovered in \texttt{coupole/modules/}, through the
+\texttt{coupole.modules} entry point, or in the \texttt{modules/} folder of the settings. Texts through \texttt{tr()},
+mandatory tooltips, long work off the GUI thread: see CONTRIBUTING.md.
+
+% =====================================================================
+\section{Troubleshooting}
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.34\linewidth}X@{}}
+\toprule
+\textbf{Symptom} & \textbf{What to do}\\
+\midrule
+Nothing starts (Windows) & Start menu > Coupole > Diagnostic: the error stays on screen.\\
+« Graphical interface unavailable » & missing Qt libraries (Linux: \texttt{libxcb-cursor0}, \texttt{libegl1}); the command line still works.\\
+Download fails & run again (resume); check the connection; Preferences > Sources > Test; server moved: URL rewriting.\\
+« ASTAP not found » & ASTAP assistant; or \texttt{coupole astap --set PATH --catalog FOLDER}.\\
+Incomplete catalogue & reinstall the catalogue (1,476 tiles expected).\\
+Not enough space & choose another output folder; the space needed includes pending FITS.\\
+Slow computer & economy mode, or fewer simultaneous conversions.\\
+Unknown target name & Catalogue tab, « To check » box, \emph{Correct the classification}.\\
+Quality unavailable & \texttt{pip install sep} (included in the packages).\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section*{Sources}
+\addcontentsline{toc}{section}{Sources}
+« OHP student observations » bank, Observatoire de Paris / PADC (Paris Astronomical Data Centre), public TAP
+service, Etalab 2.0 licence; official guide of the database (PADC-BDD-DU-ECU). XISF 1.0 specification (Pleiades
+Astrophoto). ASTAP: \url{https://www.hnsky.org/astap.htm}. Observatory codes: Minor Planet Center. SEP: Barbary
+(2016), Bertin \& Arnouts (1996). Adaptive moments: Bernstein \& Jarvis (2002). Map background: © OpenStreetMap
+contributors.
+\end{document}

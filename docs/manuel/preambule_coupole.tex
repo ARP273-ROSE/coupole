@@ -1,0 +1,177 @@
+% ================================================================
+%  Préambule du manuel de Coupole (FR et EN), d'après le format
+%  maison : Latin Modern, titres sans-serif colorés, encadrés
+%  tcolorbox, fontawesome5.  \langue{french} ou \langue{english}
+%  est défini par le fichier principal avant \input.
+% ================================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[\langue]{babel}
+\usepackage{lmodern}
+\usepackage{textcomp}
+\usepackage{amsmath,amssymb}
+\usepackage{mathtools}
+\usepackage{siunitx}
+\sisetup{group-minimum-digits=4,separate-uncertainty=true,per-mode=symbol}
+\usepackage{cancel}
+\usepackage{microtype}
+\DeclareUnicodeCharacter{2248}{\ensuremath{\approx}}
+\DeclareUnicodeCharacter{2212}{\ensuremath{-}}
+\DeclareUnicodeCharacter{00D7}{\ensuremath{\times}}
+\DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow}}
+\DeclareUnicodeCharacter{00A0}{~}
+\DeclareUnicodeCharacter{202F}{\,}
+\DeclareUnicodeCharacter{2033}{\ensuremath{''}}
+\DeclareUnicodeCharacter{2032}{\ensuremath{'}}
+\DeclareUnicodeCharacter{2264}{\ensuremath{\le}}
+\DeclareUnicodeCharacter{2265}{\ensuremath{\ge}}
+\DeclareUnicodeCharacter{2194}{\ensuremath{\leftrightarrow}}
+\DeclareUnicodeCharacter{00B2}{\textsuperscript{2}}
+\DeclareUnicodeCharacter{2026}{\ldots}
+\DeclareUnicodeCharacter{00B0}{\textdegree}
+
+\usepackage[a4paper,margin=2cm,headheight=24pt]{geometry}
+\usepackage{graphicx}
+\graphicspath{{img/}}
+\usepackage[table]{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage[nobottomtitles*]{titlesec}
+\usepackage{needspace}
+\usepackage{fancyhdr}
+\usepackage{fontawesome5}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,calc,decorations.pathreplacing,patterns,angles,quotes}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween}
+\usepackage{pdfpages}
+\usepackage[colorlinks=true,linkcolor=sky,urlcolor=sky,bookmarksopen=true,bookmarksopenlevel=1,
+  pdftitle={Coupole},
+  pdfauthor={ARP273-ROSE}]{hyperref}
+\usepackage{bookmark}
+% Les notes posées dans des tableaux (annexes) par \footnotemark/\footnotetext cassent les ancres
+% de hyperref : les appels de note ne sont donc pas des liens.
+\hypersetup{hyperfootnotes=false}
+\usepackage{xurl}
+\usepackage{fvextra}
+\fvset{breaklines=true,fontsize=\small}
+
+% ---------------------------------------------------------------- Langue des titres d'encadrés
+\newcommand{\tr}[2]{\ifdefstring{\langue}{english}{#2}{#1}}
+
+% ---------------------------------------------------------------- Couleurs
+\definecolor{sky}{HTML}{1C6DB4}
+\definecolor{skyl}{HTML}{E7F0F9}
+\definecolor{alert}{HTML}{B5382B}
+\definecolor{alertl}{HTML}{FBEAE7}
+\definecolor{night}{HTML}{1B2A4A}
+\definecolor{ink}{HTML}{1F2430}
+\definecolor{summit}{HTML}{6B7A8F}
+\definecolor{gold}{HTML}{B8860B}
+\definecolor{goldl}{HTML}{FBF3DC}
+\definecolor{pine}{HTML}{2C7A55}
+\definecolor{pinel}{HTML}{E2F1E9}
+\definecolor{prune}{HTML}{5B3F8C}
+\definecolor{prunel}{HTML}{EEE8F6}
+\AtBeginDocument{\color{ink}}
+
+% ---------------------------------------------------------------- Titres
+% \section = chapitre du cours (« Chapitre 1 : ... »), \subsection = I, II, III..., \subsubsection = A, B, C...
+\titleformat{\section}[display]
+  {\sffamily\color{night}}
+  {\large\bfseries\color{alert}\MakeUppercase{\sectionname}~\thesection}{2pt}{\LARGE\bfseries}
+  [{\vspace{2pt}\color{night!35}\titlerule[1.3pt]}]
+\titlespacing*{\section}{0pt}{6pt}{10pt}
+\newcommand{\sectionname}{\nomchapitre}
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{}
+\titleformat{\subsection}
+  {\large\bfseries\sffamily\color{sky}}{\thesubsection}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{12pt}{5pt}
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\sffamily\color{alert}}{}{0em}{}
+\titlespacing*{\subsubsection}{0pt}{9pt}{3pt}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+
+\usepackage{etoolbox}
+\pretocmd{\section}{\clearpage}{}{}
+\pretocmd{\subsection}{\needspace{8\baselineskip}}{}{}
+\pretocmd{\subsubsection}{\needspace{5\baselineskip}}{}{}
+\renewcommand{\bottomtitlespace}{0.15\textheight}
+\widowpenalty=10000
+\clubpenalty=10000
+\raggedbottom
+
+% ---------------------------------------------------------------- En-têtes
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{night!40}\leaders\hrule height \headrulewidth\hfill}}
+\fancyhead[L]{\sffamily\small\color{night}\textbf{COUPOLE · \titrecourt}}
+\fancyhead[R]{\sffamily\small\color{summit}\partiecourante}
+\fancyfoot[L]{\sffamily\scriptsize\color{summit}Coupole \versioncoupole{} · GPL-3.0 · ARP273-ROSE}
+\fancyfoot[R]{\sffamily\small\color{summit}\thepage}
+\newcommand{\partiecourante}{}
+\newcommand{\partie}[1]{\clearpage\renewcommand{\partiecourante}{#1}}
+
+
+% ---------------------------------------------------------------- Parties
+\titleformat{\part}[display]{\centering\sffamily\color{night}}
+  {\Large\bfseries\color{alert}PARTIE \thepart}{8pt}{\Huge\bfseries}
+\pretocmd{\part}{\clearpage}{}{}
+\setcounter{tocdepth}{2}
+
+% ---------------------------------------------------------------- Encadrés du site (une icône par type de section)
+\tcbset{maison/.style={enhanced,breakable,boxrule=0.9pt,arc=2.5pt,left=2.5mm,right=2.5mm,top=1.5mm,bottom=1.5mm,
+  fonttitle=\bfseries\sffamily\small,coltitle=white,
+  before upper={\widowpenalties 4 10000 10000 10000 0 \clubpenalties 4 10000 10000 10000 0}}}
+% \typesite{env}{icône}{libellé}{fond}{cadre}
+\newcommand{\typesite}[5]{\newtcolorbox{#1}[1][]{maison,colback=#4,colframe=#5,title={#2~~#3\ifx\relax##1\relax\else~·~##1\fi}}%
+  \BeforeBeginEnvironment{#1}{\par\needspace{6\baselineskip}}}
+\typesite{cdefinition}{\faBook}{\tr{Définition}{Definition}}{skyl}{sky}
+\typesite{crappel}{\faUndo}{\tr{Rappel}{Reminder}}{goldl}{gold!85!black}
+\typesite{cremarque}{\faInfoCircle}{\tr{Remarque}{Note}}{skyl}{sky!70!black}
+\typesite{cattention}{\faExclamationTriangle}{\tr{Attention}{Warning}}{alertl}{alert}
+\typesite{cexemple}{\faLightbulb}{\tr{Exemple}{Example}}{pinel}{pine}
+\typesite{cexercice}{\faPencil*}{\tr{Exercice}{Exercise}}{white}{pine}
+\typesite{cdemonstration}{\faCalculator}{\tr{Démonstration}{Proof}}{prunel}{prune}
+\typesite{cconseil}{\faThumbsUp}{\tr{Conseil}{Tip}}{pinel}{pine!80!black}
+\typesite{ccomplement}{\faPlusCircle}{\tr{Complément}{Supplement}}{prunel}{prune!80!black}
+\typesite{censavoirplus}{\faSearchPlus}{\tr{En savoir plus}{Further reading}}{prunel}{prune!70!black}
+\typesite{cactivite}{\faFlask}{\tr{Activité}{Activity}}{goldl}{gold}
+\typesite{cqcm}{\faCheckSquare}{\tr{QCM}{Quiz}}{white}{sky}
+\typesite{cobjectifs}{\faBullseye}{\tr{Objectifs}{Goals}}{skyl}{night}
+\typesite{cprerequis}{\faListUl}{\tr{Prérequis}{Prerequisites}}{skyl}{night}
+\typesite{ccadre}{\faStar}{\tr{À retenir}{Key point}}{goldl}{gold}
+\newtcolorbox{ccode}{maison,colback=night!4,colframe=night!50,fontupper=\small\ttfamily,title={\faTerminal~~\tr{Commande}{Command}}}
+
+\newcommand{\intertitre}[2][]{\par\needspace{4\baselineskip}\medskip\noindent{\sffamily\bfseries\color{night}#2}\par\smallskip}
+\newcommand{\question}[1]{\par\smallskip\noindent{\sffamily\bfseries\color{pine}#1}~}
+\newcommand{\auteurs}[1]{\par\noindent{\sffamily\small\color{summit}\faUserEdit~#1}\par\medskip}
+\newcommand{\appli}{\textcolor{summit}{\faMousePointer~\textit{(application interactive en ligne)}}}
+% \figsite{titre}{image}{légende}{crédit}
+\newcommand{\figsite}[4]{\par\needspace{8\baselineskip}\begin{center}\begin{minipage}{\linewidth}\centering
+  \if\relax\detokenize{#1}\relax\else{\sffamily\small\bfseries\color{sky}#1}\par\smallskip\fi
+  \if\relax\detokenize{#2}\relax{\sffamily\small\color{summit}\faFilm~\textit{animation ou vidéo en ligne, non reproduite}}\par\else#2\par\fi
+  \if\relax\detokenize{#3}\relax\else\smallskip{\small #3}\par\fi
+  \if\relax\detokenize{#4}\relax\else{\scriptsize\color{summit}Crédit : #4}\par\fi
+  \end{minipage}\end{center}}
+\DeclareUnicodeCharacter{2009}{\,}
+\DeclareUnicodeCharacter{2013}{--}
+\DeclareUnicodeCharacter{2014}{---}
+\DeclareUnicodeCharacter{2019}{'}
+\DeclareUnicodeCharacter{2018}{`}
+\DeclareUnicodeCharacter{201C}{``}
+\DeclareUnicodeCharacter{201D}{''}
+% \ressource{titre}{niveau · format · volume}{url}{description} — guide du portail
+\newcommand{\ressource}[4]{\par\needspace{5\baselineskip}\noindent{\sffamily\bfseries\color{night}#1}\\
+  {\sffamily\footnotesize\color{summit}#2 · \href{#3}{\faExternalLink*~lien}}\\
+  {\small #4}\par\smallskip}

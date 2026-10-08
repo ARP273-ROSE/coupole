@@ -45,6 +45,7 @@ class Panneau(QWidget):
         self.onglets.addTab(self._onglet_lots(), tr('ohp_onglet_lots'))
         self.onglets.addTab(self._onglet_anomalies(), tr('ohp_onglet_anomalies'))
         self.onglets.addTab(self._onglet_ciel(), tr('ohp_onglet_ciel'))
+        self._remplir_lots()
         sc = QShortcut(QKeySequence('Ctrl+R'), self)
         sc.activated.connect(lambda: self.charger(True))
         self.charger(False)
