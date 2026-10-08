@@ -9,9 +9,9 @@ from ...core.i18n import tr
 
 def enregistrer(p):
     p.add_argument('--ajouter', '--add', nargs='+', metavar='X', help=tr('sit_aide_ajouter'))
-    p.add_argument('--supprimer', '--delete', metavar='ID', help=tr('sit_aide_supprimer'))
-    p.add_argument('--heure', '--time', metavar='ISO', help=tr('sit_aide_heure'))
-    p.add_argument('--site', default='ohp', metavar='ID', help=tr('sit_aide_site'))
+    p.add_argument('--supprimer', '--delete', metavar=tr('cli_meta_id'), help=tr('sit_aide_supprimer'))
+    p.add_argument('--heure', '--time', metavar=tr('cli_meta_iso'), help=tr('sit_aide_heure'))
+    p.add_argument('--site', default='ohp', metavar=tr('cli_meta_id'), help=tr('sit_aide_site'))
     p.set_defaults(fonction=cmd)
 
 

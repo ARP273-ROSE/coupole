@@ -44,9 +44,13 @@ def main() -> int:
         demander_consentement_si_besoin(f)
         rapports.signaler_demarrage()
         rapports.reprendre_file_en_fond()
+        from ..core import sources
+        sources.rafraichir_en_fond()            # fichier de sources publié : repli silencieux
         if config.reglages()['maj_auto']:
             verifier_maj(f, silencieux=True)
     QTimer.singleShot(300, apres_affichage)
+    from .outils import attendre_taches
+    app.aboutToQuit.connect(lambda: (vigie.arreter(), attendre_taches()))
     return app.exec()
 
 

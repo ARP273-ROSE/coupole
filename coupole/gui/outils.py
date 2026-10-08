@@ -103,14 +103,30 @@ class _Signaux(QObject):
     erreur = pyqtSignal(str)
 
 
+_actives: set = set()
+
+
+def attendre_taches(delai_ms: int = 5000):
+    """À la fermeture : laisse finir les travaux en cours (jamais de QThread détruit en marche)."""
+    for t in list(_actives):
+        t.wait(delai_ms)
+
+
 class Tache(QThread):
-    """Exécute `fonction(*args)` hors du fil graphique ; `fini(resultat)` ou `erreur(texte)` à la fin."""
+    """Exécute `fonction(*args)` hors du fil graphique ; `fini(resultat)` ou `erreur(texte)` à la fin.
+
+    Le fil n'a pas de parent Qt : il survit à la fermeture du panneau qui l'a lancé (un QThread détruit
+    pendant qu'il tourne fait planter le processus) ; une référence est gardée jusqu'à la fin.
+    `parent` est accepté pour compatibilité mais ignoré.
+    """
 
     def __init__(self, fonction, *args, parent=None, **kwargs):
-        super().__init__(parent)
+        super().__init__(None)
         self.fonction, self.args, self.kwargs = fonction, args, kwargs
         self.s = _Signaux()
         self.fini, self.erreur = self.s.fini, self.s.erreur
+        _actives.add(self)
+        self.finished.connect(lambda: _actives.discard(self))
 
     def run(self):
         try:

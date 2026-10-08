@@ -398,4 +398,23 @@ TEXTES = {
                          'en': 'Offline: plain background (map © OpenStreetMap contributors when the network is back)'},
     'carte_legende_ciel': {'fr': 'Aitoff, AD croissante vers la gauche, 12 h au centre — tirets dorés : écliptique ; pointillés : plan galactique',
                            'en': 'Aitoff, RA increasing to the left, 12 h at centre — gold dashes: ecliptic; dots: galactic plane'},
+'reg_onglets_aide': {'fr': 'Réglages généraux et adresses des services.', 'en': 'General settings and service addresses.'},
+    'reg_onglet_general': {'fr': 'Général', 'en': 'General'},
+    'reg_onglet_sources': {'fr': 'Sources', 'en': 'Sources'},
+    'reg_sources_intro': {'fr': "Adresses des services. Une valeur modifiée ici est « forcée » : ni une mise à jour ni le fichier "
+                                "distant ne la remplacent. « Défaut » revient à la valeur livrée (ou publiée dans le dépôt).",
+                          'en': "Service addresses. A value changed here is « forced »: neither an update nor the remote file "
+                                "replaces it. « Default » goes back to the shipped (or published) value."},
+    'reg_source_aide': {'fr': 'Adresse du service (modifiable).', 'en': 'Service address (editable).'},
+    'reg_source_defaut': {'fr': 'Défaut', 'en': 'Default'},
+    'reg_source_defaut_aide': {'fr': 'Revient à la valeur par défaut pour cette adresse.', 'en': 'Go back to the default value for this address.'},
+    'reg_source_tester': {'fr': 'Tester', 'en': 'Test'},
+    'reg_source_tester_aide': {'fr': 'Teste la connexion (une requête minuscule).', 'en': 'Test the connection (one tiny request).'},
+    'reg_sources_reinit': {'fr': 'Tout revenir aux valeurs par défaut', 'en': 'Reset everything to defaults'},
+    'reg_sources_reinit_aide': {'fr': 'Annule toutes les valeurs forcées.', 'en': 'Cancel every forced value.'},
+    'reg_sources_distant': {'fr': 'Récupérer le fichier publié', 'en': 'Fetch the published file'},
+    'reg_sources_distant_aide': {'fr': 'Télécharge maintenant le fichier de sources publié dans le dépôt (contrôle de forme, domaines autorisés).',
+                                 'en': 'Download now the sources file published in the repository (shape check, allowed domains).'},
+'cli_meta_id': {'fr': 'ID', 'en': 'ID'},
+    'cli_meta_iso': {'fr': 'DATE_ISO', 'en': 'ISO_DATE'},
 }
