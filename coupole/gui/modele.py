@@ -24,6 +24,19 @@ class ModeleTableau(QAbstractTableModel):
         self.infobulles = list(infobulles) if infobulles is not None else []
         self.endResetModel()
 
+    def ajouter(self, lignes, donnees=None, infobulles=None):
+        """Ajoute des lignes sans reconstruire le modèle (beginInsertRows) : la vue ne redessine que l'ajout."""
+        lignes = list(lignes)
+        if not lignes:
+            return
+        debut = len(self.lignes)
+        self.beginInsertRows(QModelIndex(), debut, debut + len(lignes) - 1)
+        self.lignes.extend(lignes)
+        self.donnees.extend(list(donnees) if donnees is not None else [None] * len(lignes))
+        if self.infobulles or infobulles:
+            self.infobulles.extend(list(infobulles) if infobulles is not None else [''] * len(lignes))
+        self.endInsertRows()
+
     def rowCount(self, parent=QModelIndex()):
         return 0 if parent.isValid() else len(self.lignes)
 

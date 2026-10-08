@@ -98,8 +98,15 @@ def tap_sync(url_service: str, adql: str, delai=300) -> bytes:
 def taille_distante(url: str, delai=60) -> int:
     """Taille exacte annoncée par le serveur (requête Range sur 1 octet)."""
     with requete(url, en_tetes={'Range': 'bytes=0-0'}, delai=delai) as r:
-        cr = r.headers.get('Content-Range', '')
-        return int(cr.rsplit('/', 1)[1]) if '/' in cr else int(r.headers.get('Content-Length', 0))
+        return _taille_totale(r)
+
+
+def _taille_totale(r) -> int:
+    """Taille complète de la ressource d'après une réponse (Content-Range d'un 206, sinon Content-Length)."""
+    cr = r.headers.get('Content-Range', '')
+    if '/' in cr and cr.rsplit('/', 1)[1].strip().isdigit():
+        return int(cr.rsplit('/', 1)[1])
+    return int(r.headers.get('Content-Length') or 0)
 
 
 def telecharger(url: str, chemin: str, taille_attendue: int | None = None, tolerance=2048,
@@ -107,47 +114,55 @@ def telecharger(url: str, chemin: str, taille_attendue: int | None = None, toler
                 progression=None, essais=4, verifier=None):
     """Télécharge avec reprise (.part + HTTP Range) et contrôles.
 
-    Renvoie ('ok'|'deja', octets reçus).  Lève IOError après `essais` échecs, Annule si arrêt.
-    `verifier(chemin_part)` : contrôle supplémentaire (ex. en-tête FITS), lève IOError si mauvais.
+    Une seule requête par essai : le GET (avec « Range: bytes=<déjà reçu>- ») renseigne aussi la taille
+    totale (Content-Range), ce qui évite la requête préalable de sondage — deux connexions par image
+    devenaient une.  Renvoie ('ok'|'deja', octets reçus).  Lève IOError après `essais` échecs, Annule si
+    arrêt.  `verifier(chemin_part)` : contrôle supplémentaire (ex. en-tête FITS), lève IOError si mauvais.
     """
     part = chemin + '.part'
     dernier = ''
+    if taille_attendue is not None and os.path.exists(chemin) and os.path.getsize(chemin) == taille_attendue:
+        return 'deja', 0                      # déjà complet : aucune requête
     for essai in range(1, essais + 1):
         if arret is not None and arret.is_set():
             raise Annule()
         try:
-            total = taille_distante(url)
-            if taille_attendue is not None and abs(total - taille_attendue) > tolerance:
-                raise IOError('server size %d != inventory %d' % (total, taille_attendue))
-            if os.path.exists(chemin) and os.path.getsize(chemin) == total:
-                return 'deja', 0
             debut = os.path.getsize(part) if os.path.exists(part) else 0
-            if debut > total:
-                os.remove(part)
-                debut = 0
             recu = 0
-            if debut < total:
-                with requete(url, en_tetes={'Range': 'bytes=%d-' % debut}, delai=120) as r, \
-                        open(part, 'ab' if debut else 'wb') as f:
-                    if debut and r.status != 206:          # Range ignoré : on repart de zéro
-                        f.seek(0)
-                        f.truncate()
-                        debut = 0
-                    while True:
-                        if arret is not None and arret.is_set():
-                            raise Annule()
-                        b = r.read(1 << 16)
-                        if not b:
-                            break
-                        if limiteur is not None:
-                            limiteur.prendre(len(b), arret)
-                        f.write(b)
-                        recu += len(b)
-                        if progression is not None:
-                            progression(len(b))
+            with requete(url, en_tetes={'Range': 'bytes=%d-' % debut}, delai=120) as r:
+                total = _taille_totale(r)
+                if r.status != 206:               # Range ignoré (ou fichier complet renvoyé) : on repart de zéro
+                    debut = 0
+                if taille_attendue is not None and total and abs(total - taille_attendue) > tolerance:
+                    raise IOError('server size %d != inventory %d' % (total, taille_attendue))
+                if os.path.exists(chemin) and total and os.path.getsize(chemin) == total:
+                    return 'deja', 0
+                if total and debut > total:
+                    debut = 0
+                if r.status == 206 and total and debut >= total:   # .part déjà complet
+                    pass
+                else:
+                    with open(part, 'ab' if debut else 'wb') as f:
+                        if not debut:
+                            f.seek(0)
+                            f.truncate()
+                        while True:
+                            if arret is not None and arret.is_set():
+                                raise Annule()
+                            b = r.read(1 << 16)
+                            if not b:
+                                break
+                            if limiteur is not None:
+                                limiteur.prendre(len(b), arret)
+                            f.write(b)
+                            recu += len(b)
+                            if progression is not None:
+                                progression(len(b))
             t = os.path.getsize(part)
-            if t != total:
+            if total and t != total:
                 raise IOError('received %d of %d bytes' % (t, total))
+            if taille_attendue is not None and not total and abs(t - taille_attendue) > tolerance:
+                raise IOError('received %d bytes, inventory says %d' % (t, taille_attendue))
             if verifier is not None:
                 verifier(part)
             os.replace(part, chemin)
@@ -156,6 +171,11 @@ def telecharger(url: str, chemin: str, taille_attendue: int | None = None, toler
             raise
         except (urllib.error.URLError, OSError, ValueError) as e:
             dernier = str(e)
+            if isinstance(e, urllib.error.HTTPError) and e.code == 416:    # Range hors du fichier : .part faux
+                try:
+                    os.remove(part)
+                except OSError:
+                    pass
             if arret is not None:
                 if arret.wait(2 * essai):
                     raise Annule()

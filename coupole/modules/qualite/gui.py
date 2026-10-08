@@ -63,9 +63,7 @@ class Panneau(QWidget):
         if self.occupe():
             return
         racine = dossier or texte_reel(self.l_dossier.text())
-        lots = rapport.fichiers(racine)
-        total = sum(len(v) for v in lots.values())
-        self.barre.setMaximum(max(1, total))
+        self.barre.setMaximum(1)
         self.barre.setValue(0)
         self._lignes = []
         self.modele.remplir([])
@@ -73,6 +71,8 @@ class Panneau(QWidget):
         self._evts = FileEvenements(self, self._evenements)
 
         def travail():
+            lots = rapport.fichiers(racine)            # parcours du disque (réseau ?) hors du fil graphique
+            self._evts(('total', sum(len(v) for v in lots.values())))
             fait = 0
             for d, imgs in lots.items():
                 lignes = rapport.analyser_lot(imgs, lambda k, n, r: self._evts(('image', r)), self._arret)
@@ -87,27 +87,38 @@ class Panneau(QWidget):
             self._evts(('fin', fait, len(lots)))
         self.b_lancer.setEnabled(False)
         self.b_arreter.setEnabled(True)
-        self._fil = threading.Thread(target=travail, daemon=True)
-        self._fil.start()
+        from ...gui.outils import enregistrer_arret, lancer_fil
+        enregistrer_arret(self._arret)
+        self._fil = lancer_fil(travail)
 
     def arreter(self):
         self._arret.set()
+        if self._fil is not None and self._fil.is_alive():
+            self._fil.join(5)
+
+    def _ligne(self, l):
+        return tuple(rapport._fmt(l.get(c), '%.4g') if c != 'echantillonnage' or not l.get(c)
+                     else tr('qual_ech_' + l[c]) for c in rapport.COLONNES)
 
     def _evenements(self, evs):
+        nouvelles = []
         for ev in evs:
             if ev[0] == 'image':
                 r = ev[1]
                 self._lignes.append(r)
+                nouvelles.append(self._ligne(r))
                 self.barre.setValue(len(self._lignes))
+            elif ev[0] == 'total':
+                self.barre.setMaximum(max(1, ev[1]))
             elif ev[0] == 'lot':
                 self.resume.setPlainText('%s\n%s' % (ev[1], '\n'.join(rapport.resume(ev[2], langue()))))
             elif ev[0] == 'fin':
                 self.resume.appendPlainText('\n' + tr('qual_fini', n=ev[1], lots=ev[2]))
                 self.b_lancer.setEnabled(mesures.disponible())
                 self.b_arreter.setEnabled(False)
-                self._evts.timer.stop()
-        self.modele.remplir([tuple(rapport._fmt(l.get(c), '%.4g') if c != 'echantillonnage' or not l.get(c)
-                                   else tr('qual_ech_' + l[c]) for c in rapport.COLONNES) for l in self._lignes])
+                self._evts.arreter()
+        if nouvelles:                                  # ajout incrémental : le modèle n'est pas reconstruit
+            self.modele.ajouter(nouvelles)
 
     def aide_html(self):
         return tr('qual_aide_html')

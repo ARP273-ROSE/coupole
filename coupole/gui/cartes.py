@@ -40,10 +40,12 @@ def aitoff(ra_deg, dec_deg):
 
 
 _lignes_ciel = None
+_VIDE = ((np.array([]), np.array([])), (np.array([]), np.array([])))
 
 
-def lignes_ciel():
-    """(écliptique, plan galactique) en (ra, dec) degrés ; calculé une fois."""
+def calculer_lignes_ciel():
+    """(écliptique, plan galactique) en (ra, dec) degrés — astropy, ~1 s au premier appel : à faire hors du
+    fil graphique (CarteCiel le lance par une Tache) ; le résultat est gardé."""
     global _lignes_ciel
     if _lignes_ciel is None:
         try:
@@ -54,8 +56,13 @@ def lignes_ciel():
             gal = SkyCoord(l=t * u.deg, b=0 * t * u.deg, frame=Galactic()).icrs
             _lignes_ciel = ((ecl.ra.deg, ecl.dec.deg), (gal.ra.deg, gal.dec.deg))
         except Exception:
-            _lignes_ciel = ((np.array([]), np.array([])), (np.array([]), np.array([])))
+            _lignes_ciel = _VIDE
     return _lignes_ciel
+
+
+def lignes_ciel():
+    """Valeur déjà calculée, ou lignes vides (jamais de calcul dans le fil graphique)."""
+    return _lignes_ciel if _lignes_ciel is not None else _VIDE
 
 
 class CarteCiel(QWidget):
@@ -66,6 +73,15 @@ class CarteCiel(QWidget):
         self.points = []          # (ra, dec, rayon_px, QColor, étiquette, donnée)
         self.setMouseTracking(True)
         self.setMinimumSize(400, 220)
+        self._t = None
+
+    def showEvent(self, ev):
+        super().showEvent(ev)
+        if _lignes_ciel is None and self._t is None:          # premier affichage : lignes calculées en fond
+            from .outils import Tache
+            self._t = Tache(calculer_lignes_ciel, parent=self)
+            self._t.quand_fini(lambda _: self.update())
+            self._t.start()
 
     def definir(self, points):
         self.points = points
