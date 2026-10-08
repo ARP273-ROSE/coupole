@@ -39,6 +39,14 @@ def _g(v, chiffres=4) -> str:
     return s.replace('.', ',') if langue() == 'fr' else s
 
 
+def _court(v) -> str:
+    """Valeur telle que publiée, sans zéros ajoutés (« -100 », « -0,000334 »)."""
+    if v is None:
+        return '—'
+    s = '%.7g' % v
+    return s.replace('.', ',') if langue() == 'fr' else s
+
+
 def _sexa(texte: str, dec: int) -> str:
     """« 20 12 06.5418877464 » → « 20 12 06.54 » (précision affichée raisonnable)."""
     import re
@@ -97,7 +105,7 @@ def html_fiche(r: dict) -> str:
                 s += ' — %s' % d['reference']
             out.append(_ligne('fiche_distance', e(s)))
         if f.get('vr') is not None or f.get('z') is not None:
-            s = tr('fiche_vitesse_val', v=_g(f.get('vr'), 6), z=_g(f.get('z'), 6))
+            s = tr('fiche_vitesse_val', v=_court(f.get('vr')), z=_court(f.get('z')))
             if f.get('rv_qualite'):
                 s += ' (%s %s)' % (tr('fiche_qualite'), f['rv_qualite'])
             out.append(_ligne('fiche_vitesse', e(s)))
