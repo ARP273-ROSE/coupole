@@ -31,7 +31,7 @@ def spectre_exemple(dossier):
     h = fits.Header()
     h.update(CTYPE1='FREQ', CUNIT1='Hz', CRVAL1=f[0], CDELT1=df, CRPIX1=1.0, RESTFRQ=f0, SPECSYS='TOPOCENT', BUNIT='K',
              BTYPE='Ta')
-    p = Path(dossier) / '_spectre_HI_synthetique.fits'
+    p = Path.home() / 'spectre_HI_synthetique.fits'
     fits.PrimaryHDU(y, header=h).writeto(p, overwrite=True)
     return str(p)
 

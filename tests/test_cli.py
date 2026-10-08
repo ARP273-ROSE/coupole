@@ -67,3 +67,12 @@ def test_version_unique():
     from pathlib import Path
     import coupole
     assert coupole.__version__ == (Path(__file__).resolve().parents[1] / 'VERSION').read_text().strip()
+
+
+def test_manuel_accessible(capsys, langue):
+    for l in ('fr', 'en'):
+        langue(l)
+        p = cli.chemin_manuel()
+        assert p.endswith('manuel_%s.pdf' % l)
+        with open(p, 'rb') as f:
+            assert f.read(5) == b'%PDF-'

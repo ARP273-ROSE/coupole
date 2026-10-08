@@ -171,7 +171,7 @@ def detecter(executable: str = '', catalogue: str = '') -> EtatASTAP:
         vus.append(str(c))
         try:
             if c.is_file() and (sys.platform == 'win32' or os.access(c, os.X_OK)):
-                exe = c.resolve()
+                exe = c.absolute()
                 break
         except OSError:
             continue
