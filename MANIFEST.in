@@ -1,0 +1,2 @@
+include VERSION README.md CHANGELOG.md CHANGELOG.en.md CONTRIBUTING.md LICENSE
+recursive-include coupole *.json *.json.gz *.svg *.png *.pdf
