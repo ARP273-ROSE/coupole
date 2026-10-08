@@ -112,10 +112,10 @@ class Panneau(QWidget):
         sp.addWidget(droite)
         sp.setSizes([560, 620])
         v.addWidget(sp, 1)
-        h = QHBoxLayout()
         self.l_estimation = QLabel(tr('ohp_aucune_selection'))
         self.l_estimation.setWordWrap(True)
-        h.addWidget(self.l_estimation, 1)
+        v.addWidget(self.l_estimation)
+        h = Flux()                                 # boutons : passent à la ligne sur un écran étroit
         h.addWidget(bouton('ohp_corriger', self.corriger))
         h.addWidget(bouton('ohp_voir_fiche', lambda: self.onglets.setCurrentIndex(self.onglet_fiche)))
         self.b_vers_traitement = bouton('ohp_vers_traitement', self.vers_traitement)
