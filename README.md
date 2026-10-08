@@ -51,13 +51,19 @@ python -m coupole            # interface ;   coupole --help : ligne de commande
 coupole ohp catalogue --type neb                       # les nébuleuses de la banque
 coupole ohp estimer "NGC 6888" --nuit 2025-07-16      # 800 images, 6,72 Go → 2,44 Go en XISF
 coupole ohp traiter "(914) Palisana" --dest ~/OHP      # télécharge, vérifie, corrige, convertit, range
+coupole ohp tout --dest ~/OHP --oui                    # toute la banque (≈ 78 Go → ≈ 30 Go), reprenable
+coupole ohp nouveautes --dest ~/OHP                    # ce qui est apparu dans la banque depuis votre copie
+coupole ohp reorganiser ~/Vrac --dest ~/OHP            # range des fichiers déjà convertis (déplacement, jamais d'écrasement)
 coupole ohp anomalies --csv anomalies.csv              # ce qui est écarté, et pourquoi
 coupole qualite ~/OHP --ecrire                         # QUALITE.csv et QUALITE.txt par lot
 coupole --lang en ohp catalog                           # tout existe aussi en anglais
 ```
 
 Tout ce que fait l'interface se fait en ligne de commande (`--json` pour les scripts). Le traitement est
-**reprenable** : relancer la même commande reprend là où il s'était arrêté.
+**reprenable** : relancer la même commande reprend là où il s'était arrêté ; il peut être mis en **pause** ; un
+**journal lisible et bilingue** (`_traitement/JOURNAL.txt`) garde la trace de chaque session et de chaque image.
+« Tout télécharger » affiche volume, durée estimée et place libre **avant** de demander confirmation ; au démarrage,
+Coupole peut signaler (sans jamais télécharger seul) les **nouveautés** de la banque absentes de votre copie.
 
 ### Pourquoi XISF par défaut (et quand préférer autre chose)
 
@@ -94,8 +100,9 @@ ou 2 cœurs, bridage manuel possible.
 ### Rapports d'incident et mises à jour
 
 Au premier lancement, Coupole demande s'il peut envoyer des rapports **anonymes** en cas de plantage (version,
-système, processeur, mémoire, trace d'erreur aux chemins tronqués ; jamais de nom de machine, d'utilisateur ni
-d'image). Sans accord, rien ne part. Les paquets se mettent à jour d'eux-mêmes depuis les Releases GitHub (archive
+système, processeur, mémoire, trace d'erreur aux chemins tronqués, 64 ko au plus ; jamais de nom de machine,
+d'utilisateur ni d'image). Sans accord, rien ne part. Audit complet (performance, parallélisme, robustesse,
+sécurité, multiplateforme, bilinguisme) : [docs/AUDIT_2026-10.md](docs/AUDIT_2026-10.md). Les paquets se mettent à jour d'eux-mêmes depuis les Releases GitHub (archive
 du code seulement, aucun exécutable téléchargé) ; une installation par pip/pipx indique la commande à lancer.
 
 ### Évolutif
@@ -193,7 +200,9 @@ available memory; automatic economy mode below 4 GB or 2 cores; manual limits).
 
 ### Incident reports and updates
 
-At first launch Coupole asks whether it may send **anonymous** crash reports; without consent nothing is sent.
+At first launch Coupole asks whether it may send **anonymous** crash reports (64 kB at most, never a computer or user
+name); without consent nothing is sent. Full audit (performance, parallelism, robustness, security, cross-platform,
+bilingualism): [docs/AUDIT_2026-10.md](docs/AUDIT_2026-10.md) (French).
 Packages update themselves from GitHub Releases (code archive only, no executable downloaded); a pip/pipx installation
 shows the command to run.
 

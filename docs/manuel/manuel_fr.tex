@@ -21,7 +21,7 @@
 \vspace{1.4cm}
 \begin{minipage}{0.78\linewidth}\centering\sffamily\color{ink}
 Boîte à outils libre pour les étudiants du DU « Explorer et Comprendre l'Univers » (Observatoire de Paris).\\[4pt]
-Banque d'images de l'OHP · qualité des images · spectres et séries · sites et heures.
+Banque d'images de l'OHP · qualité des images · spectres et séries · sites et heures · cosmologie.
 \end{minipage}
 \vfill
 {\sffamily\small\color{summit}Auteur : ARP273-ROSE · Licence GNU GPL version 3 ou ultérieure\\
@@ -133,8 +133,9 @@ Ctrl+Maj+A & assistant ASTAP\\ Ctrl+R & Banque OHP : rafraîchir l'inventaire\\ 
 
 \capture{img/reglages_fr.png}{0.62}
 Préférences (Ctrl+,) : langue de l'interface ; langue des noms de dossiers, d'objets et des commentaires FITS ;
-apparence (thème clair ou sombre, propre à Coupole et indépendant du thème du système : style, couleurs et taille de police fixes, contraste WCAG $\geq$ 4,5) ; dossier de sortie ; format ; parallélisme ; débit maximal ; mode économe ; recherche de mise à jour. L'onglet
-\emph{Sources} donne les adresses des services (chapitre~\ref{chap:evolutif}).
+apparence (thème clair ou sombre, propre à Coupole et indépendant du thème du système : style, couleurs et taille de police fixes, contraste WCAG $\geq$ 4,5) ; dossier de sortie ; format ; parallélisme ; débit maximal ; mode économe ; recherche de mise à jour ; vérification des nouveautés de la banque au démarrage et sa fréquence maximale (section~\ref{sec:nouveautes}). L'onglet
+\emph{Sources} donne les adresses des services (chapitre~\ref{chap:evolutif}). Un fichier de réglages illisible est
+mis de côté (suffixe \texttt{.corrompu-…}) et les valeurs par défaut reprennent : l'application démarre toujours.
 
 % =====================================================================
 \section{Module Banque OHP}
@@ -172,6 +173,43 @@ L'état est gardé dans \texttt{\_traitement/etat.sqlite} : \emph{Arrêter} puis
 commande) reprend sans rien refaire. Un dossier garde la langue de noms et le format de son premier traitement.
 \emph{Garder les doublons} traite aussi ce qui serait écarté ; \emph{Garder les FITS d'origine} les conserve dans
 \texttt{\_traitement/fits\_origine}.
+
+La chaîne est un \emph{pipeline} : les téléchargements (fils) et les conversions (processus séparés, un par cœur
+disponible) se recouvrent, la file des FITS en attente est bornée ($2\times$ conversions + téléchargements), et le
+débit global est celui du réseau ou du plafond choisi (mesuré : 24 images de 8 Mo à 8 Mo/s en 24,5 s, soit la durée
+du seul téléchargement ; sans plafond, 86 Mo/s de FITS convertis sur 6 cœurs). \emph{Pause} suspend
+l'alimentation du pipeline (les images en cours se terminent) et \emph{Reprendre} la rétablit ; \emph{Arrêter}
+interrompt téléchargements et conversions sans attendre (les processus sont terminés, ASTAP compris). À la fin, un
+rapport résume images, durée, converties, doublons, échecs (avec leur raison), volume écrit et lots.
+
+\subsection{Tout télécharger, journal, réorganiser}\label{sec:tout}
+\emph{Tout télécharger…} prend la banque entière (environ 8~000 images, 78 Go de FITS, 30 Go en XISF). Au premier
+usage (ou si aucun dossier de sortie n'est défini), Coupole demande le dossier de destination par un dialogue natif et
+propose \texttt{Documents/Coupole/OHP\_DU\_ECU} ; puis il affiche, \textbf{avant toute confirmation}, le volume à
+télécharger, le volume attendu en sortie, la durée estimée au débit plafond (78 Go à 8 Mo/s : 2~h~42) et la place
+libre ; il refuse clairement s'il en manque. Le traitement est celui de toute sélection : reprise après coupure ou
+fermeture (état par image dans \texttt{\_traitement/etat.sqlite}, FITS déjà téléchargés retrouvés), pause, rapport
+de fin. Ligne de commande : \cmd{coupole ohp tout --oui}.
+
+\emph{Ouvrir le journal} affiche \texttt{\_traitement/JOURNAL.txt} : une ligne horodatée (UTC) et bilingue par
+événement --- début et fin de session (reprise, pause), chaque image téléchargée, convertie ou écartée avec sa raison,
+chaque erreur, chaque conflit de nom ; rotation à 5 Mo (\texttt{JOURNAL-1.txt}, \texttt{JOURNAL-2.txt}). Le détail
+tabulaire reste dans \texttt{journal.csv}.
+
+\emph{Réorganiser des fichiers…} range dans l'arborescence des lots des images déjà converties par Coupole qui se
+trouvent ailleurs ou selon un ancien rangement : chaque fichier est reconnu par son en-tête (adresse d'origine
+\texttt{OHP:Source:URL}, ou carte \texttt{HISTORY} « converti de … »), rattaché à l'inventaire et \textbf{déplacé}
+(jamais copié) ; un nom déjà pris par un fichier étranger reçoit un suffixe et une ligne de journal ; rien n'est
+jamais écrasé. Ligne de commande : \cmd{coupole ohp reorganiser DOSSIER --dest DEST}.
+
+\subsection{Nouveautés de la banque}\label{sec:nouveautes}
+À l'ouverture (au plus une fois par jour, réglable, désactivable dans les Préférences), si Internet est disponible et
+qu'une copie locale existe dans le dossier de sortie, Coupole compare l'inventaire TAP frais à la copie. S'il y a des
+images nouvelles, un bandeau apparaît dans la Banque OHP (et un message dans la barre d'état) : « N nouvelles images
+(M objets, X Go) depuis le JJ/MM --- Télécharger maintenant ? / Plus tard / Voir ». \emph{Télécharger} traite les
+seules nouveautés dans la même arborescence ; \emph{Voir} filtre le catalogue ; rien n'est jamais téléchargé sans
+accord explicite. Le bouton \emph{Vérifier les nouveautés} lance la comparaison à la demande. Ligne de commande :
+\cmd{coupole ohp nouveautes} (liste) et \cmd{coupole ohp nouveautes --telecharger}.
 
 \subsection{Solution astrométrique}\label{sec:astrometrie}
 Contrôles de cohérence, toujours faits : solution présente et lisible ; échelle à moins de 2~\% de la nominale
@@ -458,20 +496,29 @@ coupole cosmo --courbes 0,001 1500 300 --csv courbes.csv
 Détection sans dépendance obligatoire : système, architecture, processeur, cœurs physiques et logiques (bornés par
 l'affinité et le quota du conteneur), mémoire totale et disponible, place libre, cartes graphiques (nvidia-smi,
 \texttt{/sys/class/drm}, system\_profiler, CIM). Parallélisme : téléchargements 3 (4 au plus), conversions = cœurs
-physiques − 1 bornées par la mémoire disponible à raison de 500 Mo par conversion ; mode économe (1 conversion,
-2 téléchargements) automatique sous 4 Go ou 2 cœurs ; bridage manuel. La carte graphique n'est pas utilisée par la
-Banque OHP (travail limité par le réseau, le disque et Zstandard) ; \texttt{coupole.core.calcul} offre CuPy aux
-modules futurs.
+physiques − 1 bornées par la mémoire disponible à raison de 500 Mo par conversion (pic mesuré sur une image IRIS
+4096², la moitié de la mémoire libre au plus) ; mode économe (1 conversion, 2 téléchargements) automatique sous 4 Go
+ou 2 cœurs ; bridage manuel, lui aussi borné par la mémoire. Exemples : 2 cœurs et 2 Go → 2 téléchargements,
+1 conversion ; 6 cœurs et 20 Go libres → 3 et 5 ; 32 cœurs et 60 Go libres → 3 et 16 (plafond). La carte
+graphique n'est pas utilisée par la Banque OHP (travail limité par le réseau, le disque et Zstandard) ;
+\texttt{coupole.core.calcul} offre CuPy aux modules futurs.
+
+Rien de lourd ne s'exécute dans le fil graphique : astropy, scipy et SEP ne sont chargés qu'au premier besoin, les
+sondes de la machine et la détection d'ASTAP tournent en fond, et la fermeture de la fenêtre arrête puis attend tous
+les fils, tâches et processus (voir \texttt{docs/AUDIT\_2026-10.md}).
 
 \begin{center}\small
 \begin{tabular}{@{}lr@{}}
 \toprule
-\textbf{Mesure (Ryzen 5 8500G, NVMe)} & \textbf{Valeur}\\
+\textbf{Mesure (Ryzen 5 8500G, 6 cœurs, NVMe ; conteneur Debian)} & \textbf{Valeur}\\
 \midrule
 \texttt{coupole --version} & 0,1–0,2 s\\
-fenêtre affichée & 0,4–0,5 s\\
-inventaire chargé (fil de fond) & 3,1 s au premier lancement, 0,7 s ensuite\\
-pic mémoire d'une conversion T120 / IRIS 4096² & 144 Mo / 600 Mo\\
+fenêtre affichée (astropy, scipy, SEP non chargés) & 0,42 s (1,5 s avant l'audit)\\
+inventaire chargé (fil de fond) & 3,3 s au premier lancement, 0,8 s ensuite\\
+chaîne complète, 24 images T120 de 8 Mo, plafond 8 Mo/s & 24,5 s = durée du téléchargement seul (24,2 s)\\
+même chaîne sans plafond (serveur local) & 2,3 s, 86 Mo/s de FITS, 10 images/s\\
+conversion d'une image T120 (un processus) & 0,13 s (zstd 14 ms, lecture 18 ms, écriture et relecture 29 ms)\\
+pic mémoire d'une conversion T120 / IRIS 4096² & voir \texttt{docs/AUDIT\_2026-10.md}\\
 interface pendant 3 téléchargements (28 Mo/s) & écart max. du minuteur 20 ms : 20,8 ms\\
 \bottomrule
 \end{tabular}
@@ -503,14 +550,20 @@ en ligne facultative (JPL SBDB, CDS Sesame), en cache ; regroupement par positio
 « non classé ». Tout classement automatique est marqué « à vérifier ».
 \paragraph{Base.} Colonnes ObsCore en plus ignorées, en moins remplacées par une valeur par défaut, instruments et
 filtres inconnus rangés à part, données non images jamais signalées « de jour » ; testé sur inventaires simulés.
+\paragraph{Sécurité.} Aucun secret dans le dépôt ; fichier de sources distant et point de collecte en HTTPS
+obligatoire, taille bornée, liste blanche de domaines ; archive de mise à jour téléchargée seulement depuis GitHub,
+contrôlée avant extraction (chemins absolus ou « .. » refusés, liens symboliques refusés, taille dépliée et nombre de
+membres bornés), remplacement avec retour arrière en cas d'échec ; XISF et FITS lus avec des bornes de taille ; noms
+de dossiers construits depuis la base rendus sûrs (ASCII, caractères interdits, noms réservés de Windows, longueur) ;
+ASTAP lancé sans interpréteur de commandes ; aucun \texttt{eval} ni \texttt{pickle} sur des données externes.
 
 % =====================================================================
 \section{Rapports d'incident et confidentialité}
 Au premier lancement, Coupole demande s'il peut envoyer des rapports anonymes : installation, preuve de vie (une
 fois par jour), plantage, crash natif, interface figée, signalement écrit. Contenu : version, système, processeur,
 mémoire, carte graphique, identifiant d'installation tiré au hasard, trace d'erreur avec le dossier personnel
-remplacé par « \textasciitilde », le nom d'utilisateur masqué et les chemins profonds tronqués. Jamais de nom de
-machine, d'utilisateur, ni d'image. Sans accord, rien ne part : les rapports restent dans \texttt{\_rapports} du
+remplacé par « \textasciitilde », le nom d'utilisateur et le nom de la machine masqués et les chemins profonds
+tronqués ; un rapport ne dépasse jamais 64 ko. Jamais de nom de machine, d'utilisateur, ni d'image. Sans accord, rien ne part : les rapports restent dans \texttt{\_rapports} du
 dossier de réglages. Choix modifiable (menu Aide, \cmd{coupole rapports --activer|--desactiver}).
 
 % =====================================================================
@@ -536,6 +589,9 @@ Place insuffisante & choisir un autre dossier de sortie ; la place nécessaire i
 Machine lente & mode économe, ou moins de conversions simultanées.\\
 Nom de cible inconnu & onglet Catalogue, case « À vérifier », \emph{Corriger le classement}.\\
 Qualité indisponible & \texttt{pip install sep} (inclus dans les paquets).\\
+Réglages revenus par défaut & le fichier \texttt{reglages.json} était illisible : il est gardé à côté avec le suffixe \texttt{.corrompu-…}.\\
+Dossier de sortie non inscriptible & message clair au lancement ; choisir un autre dossier (Préférences ou champ Dossier).\\
+Fichier \texttt{.part} ou \texttt{.tmp} dans \texttt{\_traitement} & reste d'une coupure : la reprise le réutilise (\texttt{.part}) ou le remplace ; rien à faire.\\
 \bottomrule
 \end{tabularx}
 \end{center}

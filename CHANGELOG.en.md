@@ -6,6 +6,29 @@ French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
 First release.
 
+- **Full audit** (`docs/AUDIT_2026-10.md`, French): performance (window shown in 0.42 s instead of 1.51 s: astropy,
+  scipy and SEP no longer load before display; peak memory of an IRIS 4096² conversion down from 573 to 365 MB; one
+  HTTP request per image instead of two; progress aggregated at 10 Hz), parallelism (manual limit bounded by
+  memory; cancellation that terminates conversion processes and ASTAP; a crashed process is survived; closing stops
+  and waits for every thread), robustness (corrupt settings set aside; atomic writes everywhere; full disk,
+  unwritable folder, damaged FITS and XISF, unknown time zone, cut network tested; Qt signals protected against
+  destroyed widgets; freeze watchdog and native crash tested), security (HTTPS required for the remote sources file
+  and the collection point; update archive checked: zip slip, symbolic links, bomb; reports bounded to 64 kB,
+  computer name masked; safe folder names; no file overwritten when sorting; pip-audit clean), cross-platform
+  (Windows cp1252 console; Windows locales; macOS menu roles; long paths), bilingualism (language leak test).
+  **Fix**: with « Keep duplicates », an image with identical pixels was deleted instead of kept (and vice versa).
+- **OHP bank — Download everything**: the whole bank (≈ 8,000 images, 78 GB → ≈ 30 GB as XISF) with volume,
+  estimated duration at the rate cap and free space shown before confirmation; folder asked on first use
+  (`Documents/Coupole/OHP_DU_ECU` proposed); resume after a cut or a close; **pause / resume**; end report;
+  `coupole ohp all`.
+- **Readable log** `_traitement/JOURNAL.txt` (UTC timestamps, bilingual, rotation), « Open the log » button.
+- **Reorganise**: sorts files already converted by Coupole (elsewhere, older layout) into the stack tree — moved,
+  never copied nor overwritten, logged; `coupole ohp reorganise`.
+- **New images in the bank**: check at startup (at most once a day, adjustable, can be disabled) of the TAP inventory
+  against the local copy; banner « N new images (M objects, X GB) since … — Download now? / Later / Show »; never a
+  download without consent; `coupole ohp new [--download]`.
+- **Cosmology**: model list never cut; curves below the table when space is short (SH0ES column always visible
+  without scrolling).
 - **Cosmology** (new module): from redshift to line-of-sight and transverse comoving, luminosity, angular diameter
   and light-travel distances, lookback time, age at z and present age, E(z) and H(z), distance modulus, scale in kpc
   per arcsecond, comoving volume, three recession velocities; Planck 2018 by default (1σ uncertainty with the
