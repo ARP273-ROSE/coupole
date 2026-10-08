@@ -29,6 +29,7 @@ class Panneau(QWidget):
         h.addWidget(self.b_arreter)
         self.l_dossier = QLabel(coupable(config.reglages()['dossier_sortie'] or
                                         str(config.dossier_sortie_defaut() / 'OHP_DU_ECU')))
+        self.l_dossier.setWordWrap(True)
         h.addWidget(self.l_dossier, 1)
         v.addLayout(h)
         if not mesures.disponible():
