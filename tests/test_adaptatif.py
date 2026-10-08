@@ -64,7 +64,12 @@ def test_fenetre_principale_tient_sur_l_ecran(app_qt, fenetre_adaptative, largeu
         if largeur >= 1024:
             trop = [(w.minimumSizeHint().width(), type(w).__name__) for w in f.panneaux[i].findChildren(QWidget)
                     if w.isVisibleTo(f.panneaux[i]) and w.minimumSizeHint().width() > dispo + 2]
-            assert not trop, (largeur, i, dispo, trop[:4])
+            # pour le diagnostic : tous les descendants larges, visibles ou non (onglets cachés compris)
+            larges = sorted(((w.minimumSizeHint().width(), type(w).__name__, (w.text()[:30] if hasattr(w, 'text')
+                              and callable(w.text) else '') or w.toolTip()[:30])
+                             for w in f.panneaux[i].findChildren(QWidget) if w.minimumSizeHint().width() > 500),
+                            key=lambda x: x[0], reverse=True)
+            assert not trop, (largeur, i, dispo, trop[:4], larges[:12])
     compacte = all(not f.barre.item(i).text() for i in range(f.barre.count()))
     assert compacte == (largeur < f.SEUIL_COMPACT)
 
