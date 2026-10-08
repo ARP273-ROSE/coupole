@@ -121,6 +121,7 @@ class CarteCiel(QWidget):
         p.setPen(self.palette().text().color())
         p.drawText(QRectF(8, self.height() - 18, self.width() - 16, 16), Qt.AlignmentFlag.AlignLeft,
                    tr('carte_legende_ciel'))
+        p.end()
 
     def _ligne(self, p, ra, dec, coupe=False):
         x, y = self._px(np.asarray(ra), np.asarray(dec))
@@ -318,6 +319,7 @@ class CarteMonde(QWidget):
         p.fillRect(r, QColor(255, 255, 255, 210))
         p.setPen(QColor('#1F2430'))
         p.drawText(r, Qt.AlignmentFlag.AlignCenter, texte)
+        p.end()
 
     def _proche(self, pos):
         ox, oy = self._origine()

@@ -85,6 +85,10 @@ def main():
             p.axe.setCurrentIndex(2)
         if mid == 'sites':
             p.en_ligne.setChecked(False)           # pas de tuiles téléchargées pour les captures
+        if mid == 'qualite' and len(sys.argv) > 3:
+            p.l_dossier.setText(sys.argv[3])
+            p.lancer()
+            attendre(app, lambda: not p.occupe(), 120)
         if mid and mid != 'ohp':
             f.barre.setCurrentRow(i)
             attendre(app, lambda: False, 1.5)
