@@ -23,8 +23,8 @@ from ...gui.dialogues import DialogueASTAP, ouvrir_fichier
 from ...gui import memoire, pastilles
 from ...gui.modele import (DelegueProgression, ModeleParesseux, ModeleTableau, Progression, lignes_choisies,
                            vue_tableau)
-from ...gui.outils import (FileEvenements, Tache, aide, bouton, case, champ, decimal, enregistrer_arret, lancer_fil,
-                           liste, nombre)
+from ...gui.outils import (FileEvenements, Tache, aide, bouton, case, champ, decimal, enregistrer_arret, est_detruit,
+                           lancer_fil, liste, nombre)
 from . import cibles
 from .possession import Possession
 
@@ -1290,6 +1290,13 @@ class Panneau(QWidget):
             self._fil.join(15)
         if getattr(self, '_evts', None) is not None:
             self._evts.arreter()
+        # panneau fermé : plus aucune étape d'affichage ni minuterie différée ne repart vers ses widgets
+        if getattr(self, '_etapes', None):
+            self._etapes.clear()
+        for nom in ('_minuteur_etapes', '_minuteur_chargement', '_minuteur_choix', '_minuteur_estimation'):
+            m = getattr(self, nom, None)
+            if m is not None and not est_detruit(m):
+                m.stop()
 
     def _log(self, texte):
         self.journal.appendPlainText(texte)

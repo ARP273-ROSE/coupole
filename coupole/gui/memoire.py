@@ -45,12 +45,12 @@ class Memoire(QObject):
         self.minuteur = QTimer(self)
         self.minuteur.setSingleShot(True)
         self.minuteur.setInterval(DELAI_MS)
-        self.minuteur.timeout.connect(self.ecrire)
+        self.minuteur.timeout.connect(self._ecrire_protege)
         self._relier()
         etat().verifier_existence_en_fond()
         app = QApplication.instance()
         if app is not None:
-            app.aboutToQuit.connect(self.ecrire)
+            app.aboutToQuit.connect(self._ecrire_protege)
 
     def _relier(self):
         """Branche les rappels « valeur modifiée » sur l'état et les réglages en vigueur (les tests les recréent)."""
@@ -82,6 +82,15 @@ class Memoire(QObject):
                 continue
             if v is not None:
                 e.ecrire(cle, v)
+
+    def _ecrire_protege(self):
+        """Slot du minuteur : une erreur imprévue d'écriture est journalisée, jamais fatale (PyQt6 ferait d'une
+        exception dans un slot un arrêt brutal du processus)."""
+        try:
+            self.ecrire()
+        except Exception:
+            import logging
+            logging.getLogger(__name__).exception('interface state not written')
 
     def ecrire(self):
         """Écrit maintenant (minuteur, fermeture) ce qui a changé ; rien si rien n'a changé."""

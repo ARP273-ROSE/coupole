@@ -2,6 +2,29 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.1.7 — 9 octobre 2026
+
+**Correction d'un plantage intermittent** (fermeture brutale de l'application, environ une fois sur cinq dans la
+série de tests la plus exposée, jamais au même endroit en apparence).
+
+- **Cause** : le ramasse-miettes de Python, qui libère les objets liés entre eux par des références circulaires, se
+  déclenchait dans le fil qui allouait de la mémoire à ce moment-là — souvent un fil de calcul (chargement de
+  l'inventaire, sondes, tuiles de carte). Une fenêtre fermée qui n'était plus retenue que par ces références
+  circulaires était alors détruite **par ce fil de calcul**, pendant que le fil de l'interface servait encore les
+  minuteurs de ses widgets : un minuteur du panneau Banque OHP lisait un champ déjà détruit (« wrapped C/C++ object
+  of type QLineEdit has been deleted »), et PyQt6 arrête alors le processus.
+- **Correction** : le ramassage automatique est remplacé par un ramassage à cadence fixe (toutes les 100 ms) dans le
+  fil de l'interface (`coupole/gui/fil_graphique.py`) ; tout objet Qt est désormais détruit dans ce fil. Les
+  ramassages complets sont bornés (au plus un toutes les 10 s et 2 % du temps) pour ne jamais geler l'interface.
+- Panneau Banque OHP fermé : ses étapes d'affichage en attente et ses minuteries sont arrêtées. Écriture différée
+  des réglages : une erreur imprévue est journalisée, jamais fatale.
+- **Garde permanente dans les tests** : un test échoue si une méthode d'affichage est appelée hors du fil de
+  l'interface, si Qt signale un objet manipulé depuis un autre fil, ou si le ramasse-miettes tourne hors du fil de
+  l'interface (`COUPOLE_GARDE_FIL=1` l'active aussi dans l'application).
+- Tests : `test_fil_graphique.py` (+6), qui reproduisent l'ordre exact du plantage (fenêtre fermée, puis fil de
+  calcul qui alloue) et échouent sur la 0.1.6. Budget du test de chargement à dix fois la banque porté à 1,2 s sur
+  l'intégration continue (×3 la mesure la plus lente observée : 0,39 s sur macOS) ; 0,3 s en local.
+
 ## 0.1.6 — 9 octobre 2026
 
 **Réglages conservés d'une fermeture à l'autre** : tout ce qui se règle à l'écran et tous les chemins saisis sont

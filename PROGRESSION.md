@@ -298,7 +298,9 @@ lignes) ; avant/après avec le code de 0.1.3 (`git archive 794092c`) dans le mê
   dépôt sans `build/` ni `dist/`, `pip install ".[test]"`, offscreen) : **python:3.12-slim 278 réussis, 11 sautés,
   code 0 ; python:3.10-slim 278 réussis, 11 sautés, code 0** ; `test_adaptatif` + `test_gui_robustesse` +
   `test_echelle` à `QT_SCALE_FACTOR=1.5` et `2` : 36 réussis, code 0 (sous 3.12 et 3.10). CI GitHub non utilisée
-  (minutes du dépôt privé épuisées).
+  pour cette version (minutes du dépôt privé épuisées) ; *correction 0.1.7 : depuis le passage du dépôt en
+  public, la CI `tests.yml` (Linux, Windows, macOS × 3.10, 3.12) tourne à chaque poussée sur `main` (6/6 depuis le
+  commit `94b34be`).*
 - Manuels FR/EN : traitement sur partage, réorganiser (progression, Arrêter), Qualité (cache, CSV toutes les 5 s),
   tableau des mesures du second audit ; recompilés. Aide : info-bulles Arrêter / Réorganiser.
 - Reste proposé (§ 5 du rapport) : gel de 0,8 s au chargement à ×10 (0,17 s à l'échelle réelle), tri sur colonnes
@@ -352,7 +354,60 @@ Demande de Kevin : tous les réglages de personnalisation et tous les chemins sa
   Validation (copie sans `build/` ni `dist/`, `pip install ".[test]"`, offscreen) : **python:3.12-slim 294 réussis,
   11 sautés, code 0 ; python:3.10-slim 294 réussis, 11 sautés, code 0** ; `test_adaptatif` + `test_reglages_conserves`
   + `test_gui_robustesse` + `test_echelle` à `QT_SCALE_FACTOR=1.5` et `2` : 51 réussis, code 0 (3.12 et 3.10).
-  Un plantage natif isolé (1 suite complète sur ~10, sous 3.12, non reproduit ensuite) : à surveiller.
+  Un plantage natif isolé (1 suite complète sur ~10, sous 3.12, non reproduit ensuite) : à surveiller. *→ Cause
+  trouvée et corrigée en 0.1.7 (ramasse-miettes cyclique dans un fil de calcul, voir plus bas).*
 - Manuels FR/EN : section « Réglages conservés » (3.2), option `--reinitialiser-interface` dans les tableaux générés,
   captures Préférences / Spectres / Cosmologie refaites ; recompilés. CHANGELOG FR puis EN.
 - **Aucun tag posé** (publication par Kevin).
+
+## 2026-10-09 — version 0.1.7 : cause du plantage natif intermittent trouvée et corrigée
+Le plantage « isolé » de la 0.1.6 n'était pas isolé : **reproduit 8 fois**, toujours à la même place.
+- Reproduction : image `python:3.12-slim` + `gdb` (`/mnt/apps_pool/claude-code/coupole-crash/`, `boucle.sh`), copie
+  sans `build/`/`dist/`, `pip install`, offscreen, `PYTHONFAULTHANDLER=1`, chaque suite sous
+  `gdb -batch -ex run -ex 'thread apply all bt'`, 6 à 9 suites en parallèle (charge 8–10 sur 12 fils). Avant
+  correction : suite complète **1 plantage sur 49** ; série `test_reglages_conserves` + `test_gui_robustesse` +
+  `test_interface` **7 plantages sur 36 (≈ 20 %)**. Les 8 plantages tombent au même endroit ; les 7 relevés
+  avec `-s` (sans quoi pytest avale la trace Python) ont la même signature : SIGABRT par `qFatal` de PyQt6 (`pyqt6_err_print` dans `PyQtSlotProxy::unislot`, slot d'un
+  `QTimer`) après `RuntimeError: wrapped C/C++ object of type QLineEdit has been deleted` dans
+  `Panneau._etape_suivante → _charger_possession → _possession_prete → _filtrer_objets` (`self.recherche.text()`),
+  pendant `_ouvrir()` de `test_aucune_ecriture_disque_pendant_la_frappe`.
+- **Cause** : le panneau en cause est celui de la fenêtre du test PRÉCÉDENT. Fermée (`close()`, pas détruite), elle
+  reste retenue par des fermetures (`memoire.suivre(..., lambda: …self…)`) ; la fixture `propre` remet la mémoire à
+  zéro → la fenêtre n'est plus qu'un **cycle de références**, que seul le ramasse-miettes cyclique libère. Celui-ci
+  se déclenche dans le fil qui alloue quand le seuil est franchi : ici le fil `Tache` qui charge l'inventaire de la
+  NOUVELLE fenêtre (piles natives : fils « Dummy »/`Tache` en plein `gc`). Le destructeur C++ de l'ancienne fenêtre
+  (fenêtre sans parent : possédée par Python) tourne alors **dans ce fil de calcul**, widget après widget, pendant
+  que le fil graphique sert encore le minuteur d'étapes (enfant du panneau, pas encore détruit) → champ déjà
+  détruit → exception dans un slot → qFatal. Démontré à part (`exp2.py`) : `gc.collect()` dans un fil ordinaire
+  détruit la fenêtre fermée. Dans l'application, même risque pour tout dialogue ou panneau devenu cycle (langue
+  changée, Préférences fermées) ; l'application, elle, pose un `sys.excepthook` (exception journalisée), mais une
+  destruction concurrente peut aussi écrire en mémoire libérée (SIGSEGV).
+- Exclu : signaux de `Tache` vers des widgets détruits (protégés depuis l'audit), pools de processus, `QThread`
+  détruit en marche (Qt 6 attend `isInFinish`), concurrence `json.dumps` / réglages (clés existantes seulement).
+- **Correction (application)** : `coupole/gui/fil_graphique.py` — `installer_ramasse_miettes()` coupe le
+  ramassage automatique et le refait toutes les 100 ms par un `QTimer` du fil graphique (`app.py` ; procédé de
+  pyqtgraph) : un objet Qt meurt toujours dans le fil graphique. Ramassage complet borné (≥ 10 s d'écart, ≤ 2 % du
+  temps) pour ne pas geler à 80 000 lignes. En plus : `Panneau.arreter()` (OHP) vide les étapes en attente et arrête
+  ses minuteries ; `Memoire` écrit par un slot protégé (`_ecrire_protege`).
+- **Garde permanente en mode test** (`installer_garde()`, posée par `conftest.py`, ou `COUPOLE_GARDE_FIL=1`) :
+  méthodes d'affichage non virtuelles courantes (`setText`, `update`, `showMessage`, `setValue`…) → `RuntimeError`
+  hors du fil graphique ; avertissements Qt « another thread / different thread / Destroyed while thread is still
+  running » relevés ; ramassage cyclique hors du fil graphique relevé (`gc.callbacks`) ; fixture autouse qui fait
+  échouer le test et ramasse les fenêtres laissées, dans le fil graphique, avant le suivant.
+- Tests `tests/test_fil_graphique.py` (+6) : widget en cycle + fil qui alloue → détruit dans `MainThread` ; **ordre
+  exact du plantage** (vraie fenêtre fermée avec une étape en attente, mémoire remise à zéro, fil de calcul qui
+  alloue pendant que le fil graphique tourne) ; cycles toujours libérés ; les trois volets de la garde. Sur le code
+  0.1.6 (ramassage automatique), 3 échouent (fenêtre détruite dans `fil-de-calcul` / `Dummy-1`).
+- `test_chargement_a_dix_fois_la_banque_sans_gel` : budget 1,2 s sur la CI (variable `CI` ; ×3 la mesure CI la plus
+  lente, 0,39 s sur macOS 3.10, comme le test du filtre), 0,3 s en local (garde la détection de la régression 0.1.4).
+- Ordre aléatoire (`pytest-randomly`, graine notée) : aucun plantage, mais deux dépendances d'ordre des TESTS
+  corrigées — un test de la CLI (`--lang en`) laissait l'anglais au suivant (`conftest.py` remet le français avant
+  chaque test) ; `test_fenetre_fermee_…` attend que plus aucune `Tache` ne tourne (des tests remplacent
+  `Tache.start` : leurs tâches jamais lancées restent dans `_actives`).
+- Validation après correction (code final, mêmes conteneurs sous `gdb`, 8 à 10 suites en parallèle, charge ≈ 14) :
+  **python:3.12-slim 42 suites complètes consécutives sans plantage (301 réussis, 11 sautés chacune)** ;
+  **python:3.10-slim 10/10** ; ordre aléatoire 3.12 : 6/6 (graines notées dans `out_v1`/`out`), plus 12 passages
+  aléatoires sans plantage avant les deux corrections de tests ; série la plus exposée (celle à 20 % de plantages)
+  **45/45** ; `test_adaptatif` + `test_reglages_conserves` + `test_gui_robustesse` + `test_echelle` +
+  `test_fil_graphique` à `QT_SCALE_FACTOR=1.5` et `2` : 57 réussis, code 0 (3.12 et 3.10).
+- **Aucun tag posé** (publication v0.1.6 en cours, non touchée).
