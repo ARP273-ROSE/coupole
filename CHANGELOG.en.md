@@ -2,6 +2,26 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.1.5 — 9 October 2026
+
+The two slow spots left by the second audit (`docs/AUDIT2_2026-10.md`, § 8), measured at ten times the bank
+(80,000 rows); nothing displayed changes (sort orders identical to 0.1.4 on the real bank and at ×10; cells,
+anomalies, sky map and batches identical).
+
+- **Loading without freezes**: longest silence of the GUI thread while loading **0.55–0.8 s → 55–66 ms** at 80,000
+  rows (0.16 s → 40 ms on the bank). It was no longer a GUI-thread computation but GIL contention: sky map,
+  anomalies and ownership ran in three threads while the tables were first painted, and every Qt-to-Python callback
+  waited for the GIL. They are now computed one after the other by the loading thread, before the inventory is
+  handed over; display then happens in short steps; loading starts 0.2 s after the window is first painted (catalogue
+  ready ~0.2 s later than before).
+- **Sorting by site time and by flags**: integer keys computed once at load time (in the background), numpy sort:
+  **0.66–0.78 s → 50–60 ms** at 80,000 rows; every column of the image table now has a fast key (40–80 ms at 80,000
+  rows), and the double sort requested by `QTableView.sortByColumn` is no longer done twice.
+- "Select all" without a filter no longer walks the inventory (the already sorted list is reused as is).
+- Tests: `test_echelle.py` (+4) — real loading of 80,000 rows with no silence > 100 ms (×3 budget), sorting the site
+  time / flags columns < 150 ms (×3), every fast key equal to the order of the cells on the real bank, numpy sort
+  identical to `sorted`.
+
 ## 0.1.4 — 9 October 2026
 
 Second performance audit, under real use and at full scale (`docs/AUDIT2_2026-10.md`): every function that can take

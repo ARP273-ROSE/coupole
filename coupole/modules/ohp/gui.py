@@ -11,7 +11,7 @@ import os
 import threading
 import time
 
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtCore import QEvent, Qt, QTimer
 from PyQt6.QtGui import QKeySequence, QShortcut
 from PyQt6.QtWidgets import (QDialog, QFileDialog, QFormLayout, QFrame, QGridLayout, QGroupBox, QHBoxLayout, QLabel,
                              QMessageBox, QPlainTextEdit, QProgressBar, QSplitter, QTabWidget, QVBoxLayout, QWidget)
@@ -34,6 +34,62 @@ def _taille(o: float) -> str:
 
 
 from .gui_sans_qt import duree_lisible  # noqa: E402
+
+# bits du code « drapeaux » d'une image (clé de tri précalculée ; le texte affiché en dépend seul)
+_D_DOUBLON, _D_DATE, _D_DIURNE, _D_NOUVEAU = 1, 2, 4, 8
+
+
+def texte_drapeaux(doublon, date_partagee, diurne, nouveau, vu_le) -> str:
+    """Colonne « drapeaux » de la table des images (une seule écriture : affichage et clé de tri)."""
+    dr = []
+    if doublon:
+        dr.append(tr('ohp_drapeau_doublon'))
+    if date_partagee:
+        dr.append(tr('ohp_drapeau_date'))
+    if diurne:
+        dr.append(tr('ohp_drapeau_diurne'))
+    if nouveau:
+        dr.append(tr('ohp_etat_nouveau', date=vu_le))
+    return ', '.join(dr)
+
+
+def cles_de_tri_images(images) -> tuple[dict, dict, list]:
+    """Clés de tri des colonnes « heure du site » et « drapeaux », calculées UNE fois par inventaire (fil de fond).
+
+    * heure du site : la cellule affiche « HH:MM:SS (UTC±hhmm) » (vide sans site connu) et se triait comme ce
+      texte ; la clé entière ``secondes_du_jour × 100000 + signe × 10000 + hhmm`` (signe 0 pour « + », 1 pour
+      « − », comme l'ordre des caractères) donne exactement le même ordre, −1 pour une cellule vide ;
+    * drapeaux : un code (bits doublon / date partagée / plein jour / nouveau + rang de la date « vu le ») ; le
+      rang du texte affiché est calculé au moment du tri pour les quelques codes distincts (langue courante).
+
+    Rend ({id(image): clé heure}, {id(image): code drapeaux}, [dates « vu le »])."""
+    from ...core import sites as sites_mod
+    from ...core.temps import mjd_vers_utc
+    zones = {s_.id: s_.zone() for s_ in sites_mod.sites()}
+    heure, drap, vus, rang_vu = {}, {}, [], {}
+    for x in images:
+        z = zones.get(x.get('site'))
+        if z is None:
+            kh = -1
+        else:
+            loc = mjd_vers_utc(x['t_min']).astimezone(z)
+            o = int(loc.utcoffset().total_seconds())
+            a = -o if o < 0 else o
+            kh = ((loc.hour * 3600 + loc.minute * 60 + loc.second) * 100000 + (10000 if o < 0 else 0)
+                  + (a // 3600) * 100 + (a % 3600) // 60)
+        c = ((_D_DOUBLON if x['doublon'] else 0) | (_D_DATE if x['date_partagee'] else 0)
+             | (_D_DIURNE if x['diurne'] else 0))
+        if x['nouveau']:
+            v = x['vu_le']
+            r = rang_vu.get(v)
+            if r is None:
+                r = rang_vu[v] = len(vus)
+                vus.append(v)
+            c |= _D_NOUVEAU | (r << 4)
+        i = id(x)
+        heure[i] = kh
+        drap[i] = c
+    return heure, drap, vus
 
 
 class Panneau(QWidget):
@@ -68,8 +124,35 @@ class Panneau(QWidget):
         self._remplir_lots()
         sc = QShortcut(QKeySequence('Ctrl+R'), self)
         sc.activated.connect(lambda: self.charger(True))
-        self.charger(False)
         self._etat_astap = None
+        self._charger_apres_premier_dessin()
+
+    # ================================================================ chargement initial
+    def _charger_apres_premier_dessin(self):
+        """Le chargement de l'inventaire part 200 ms après le premier dessin du catalogue (au plus tard 500 ms après
+        la construction, si le panneau n'est pas affiché).  Second audit : lancé dès la construction, le fil de
+        chargement (Python pur, GIL gardé jusqu'à 5 ms d'affilée) disputait le GIL à chaque rappel Python de la
+        mise en place de la fenêtre (premier dessin, mises en page des rangées souples, polices) — 100 à 180 ms
+        de gel à 10 × la banque, rien une fois l'affichage posé (≈ 0,1–0,3 s après le premier dessin)."""
+        self._chargement_lance = False
+        self._premier_dessin = False
+        self._minuteur_chargement = QTimer(self)
+        self._minuteur_chargement.setSingleShot(True)
+        self._minuteur_chargement.timeout.connect(self._chargement_initial)
+        self._minuteur_chargement.start(500)
+        self.v_obj.viewport().installEventFilter(self)
+
+    def eventFilter(self, objet, evenement):
+        if not self._premier_dessin and evenement.type() == QEvent.Type.Paint and objet is self.v_obj.viewport():
+            self._premier_dessin = True
+            if not self._chargement_lance:
+                self._minuteur_chargement.start(200)
+        return super().eventFilter(objet, evenement)
+
+    def _chargement_initial(self):
+        self.v_obj.viewport().removeEventFilter(self)
+        if not self._chargement_lance:
+            self.charger(False)
 
     # ================================================================ bandeau des nouveautés
     def _bandeau_nouveautes(self):
@@ -91,14 +174,24 @@ class Panneau(QWidget):
         """Compare l'inventaire TAP frais à la copie locale (fil de fond) ; bandeau si quelque chose est nouveau."""
         if self.occupe() or getattr(self, '_t_nouv', None) is not None and self._t_nouv.isRunning():
             return
-        from .inventaire import verifier_nouveautes
         dest = os.path.abspath(os.path.expanduser(self.dest.text().strip())) if hasattr(self, 'dest') else ''
         if forcer:
             self.window().statusBar().showMessage(tr('ohp_nouv_verification'), 5000)
-        self._t_nouv = Tache(verifier_nouveautes, dest, forcer, parent=self)
+        self._t_nouv = Tache(self.nouveautes_preparees, dest, forcer, self._dest_courante(), self.dest.text(),
+                             self.ciel_cat.currentData(), parent=self)
         self._t_nouv.quand_fini(lambda n, f=forcer: self._nouveautes_pretes(n, f))
         self._t_nouv.quand_erreur(lambda e, f=forcer: f and self.window().statusBar().showMessage(tr('ohp_nouv_hors_ligne'), 8000))
         self._t_nouv.start()
+
+    @staticmethod
+    def nouveautes_preparees(dest, forcer, dest_courante, texte, cat):
+        """Fil de fond : vérification des nouveautés, et l'inventaire frais préparé comme au chargement."""
+        from .inventaire import verifier_nouveautes
+        n = verifier_nouveautes(dest, forcer)
+        if n is not None and n.get('inv') is not None:
+            Panneau.preparer_objets(n['inv'])
+            n['_pre'] = Panneau.precharger(n['inv'], dest_courante, texte, cat)
+        return n
 
     def _nouveautes_pretes(self, n, forcer):
         if n is None:
@@ -106,8 +199,9 @@ class Panneau(QWidget):
                 self.window().statusBar().showMessage(tr('ohp_nouv_hors_ligne'), 8000)
             return
         inv = n.pop('inv', None)
+        pre = n.pop('_pre', None)
         if inv is not None:
-            self._inventaire_pret(inv)
+            self._inventaire_pret(inv, pre)
         self._nouveautes = n
         dest = self.dest.text().strip() if hasattr(self, 'dest') else ''
         if not n['copie']:
@@ -230,21 +324,90 @@ class Panneau(QWidget):
     def charger(self, rafraichir):
         if self.occupe():
             return
+        self._chargement_lance = True
         self.b_rafraichir.setEnabled(False)
         self.l_inventaire.setText(tr('ohp_interrogation_tap') if rafraichir else tr('ohp_chargement'))
-        self._t_inv = Tache(self.charger_et_preparer, rafraichir, parent=self)
-        self._t_inv.quand_fini(self._inventaire_pret)
+        self._t_inv = Tache(self.charger_et_preparer, rafraichir, self._dest_courante(), self.dest.text(),
+                            self.ciel_cat.currentData(), parent=self)
+        self._t_inv.quand_fini(self._chargement_pret)
         self._t_inv.quand_erreur(self._inventaire_erreur)
         self._t_inv.start()
 
     @staticmethod
-    def charger_et_preparer(rafraichir):
-        """Dans le fil de fond : inventaire, catalogue des objets et chaîne de recherche de chaque objet (le fil
-        graphique n'a plus qu'à afficher)."""
+    def charger_et_preparer(rafraichir, dest='', texte='', cat=''):
+        """Dans le fil de fond : inventaire, catalogue des objets, chaîne de recherche de chaque objet, clés de tri,
+        PUIS tout ce que l'affichage du chargement demande (points du ciel, anomalies, possession de la
+        destination et ses lots) — en série, dans ce seul fil.
+
+        Second audit : à 10 × la banque, le fil graphique restait figé 0,5–0,8 s après le chargement alors que
+        chacun de ses créneaux Python durait moins de 40 ms.  Cause : trois calculs de fond (anomalies,
+        possession, carte du ciel) tournaient EN MÊME TEMPS que le premier dessin des tables ; chaque rappel de
+        Qt vers Python (une cellule, un rôle) doit reprendre le GIL à un fil de calcul qui le garde jusqu'à
+        5 ms.  Calculés ici avant la remise de l'inventaire, ils ne disputent plus rien au dessin.
+        Rend (inventaire, préchargement)."""
         from .inventaire import Inventaire
         inv = Inventaire.charger(rafraichir)
         Panneau.preparer_objets(inv)
-        return inv
+        return inv, Panneau.precharger(inv, dest, texte, cat)
+
+    @staticmethod
+    def precharger(inv, dest, texte='', cat=''):
+        """Résultats de fond de l'affichage initial, pour CET inventaire et CETTE destination (ignorés sinon).
+
+        dest : destination absolue (possession) ; texte : le champ tel quel (anomalies du traitement, lots),
+        exactement comme les calculs faits un par un."""
+        pre = {'images': inv.images, 'dest': dest, 'texte': texte, 'langue': i18n.langue()}
+        pre['ciel'] = (cat, Panneau.points_ciel(inv.images, cat))
+        pre['anomalies'] = Panneau.anomalies_de(inv, texte)
+        if dest:
+            poss, infos = Possession.lire_avec_infos(dest)
+            pre['possession'] = (poss, infos, poss.compte_objets(inv.images), inv.images)
+            pre['lots'] = Panneau.lire_lots(texte, inv.images, poss, infos)
+        return pre
+
+    @staticmethod
+    def anomalies_de(inv, dest):
+        """Anomalies de l'inventaire (médoïdes, détection : calculées une fois par inventaire) + celles du
+        traitement de la destination (relues à chaque fois)."""
+        from . import anomalies
+        from .astrometrie import attentes
+        memo = getattr(inv, '_anom_memo', (None,))
+        if memo[0] is not inv.images:
+            med, medo = attentes(inv.images)
+            memo = inv._anom_memo = (inv.images, anomalies.detecter(inv.images, medo))
+        return memo[1] + anomalies.depuis_traitement(os.path.join(dest, '_traitement', 'etat.sqlite'))
+
+    def _chargement_pret(self, resultat):
+        inv, pre = resultat if isinstance(resultat, tuple) else (resultat, None)
+        self._inventaire_pret(inv, pre)
+
+    def _prendre(self, cle):
+        """Un résultat préchargé en fond, s'il vaut encore (même inventaire, même destination, même langue) ;
+        consommé (un second appel recalcule)."""
+        pre = getattr(self, '_pre', None)
+        if not pre or cle not in pre or self.inv is None or pre['images'] is not self.inv.images:
+            return None
+        if pre['dest'] != self._dest_courante() or pre['texte'] != self.dest.text() or pre['langue'] != i18n.langue():
+            return None
+        return pre.pop(cle)
+
+    def _plus_tard(self, f, *args):
+        """Une étape d'affichage au prochain tour de boucle : le dessin des tables passe entre deux étapes."""
+        if not hasattr(self, '_etapes'):
+            self._etapes = []
+            self._minuteur_etapes = QTimer(self)        # enfant du panneau : rien ne part vers un panneau fermé
+            self._minuteur_etapes.setSingleShot(True)
+            self._minuteur_etapes.setInterval(0)
+            self._minuteur_etapes.timeout.connect(self._etape_suivante)
+        self._etapes.append((f, args))
+        self._minuteur_etapes.start()
+
+    def _etape_suivante(self):
+        if self._etapes:
+            f, args = self._etapes.pop(0)
+            if self._etapes:
+                self._minuteur_etapes.start()
+            f(*args)
 
     @staticmethod
     def preparer_objets(inv):
@@ -267,13 +430,16 @@ class Panneau(QWidget):
             inv._resume_memo = {'doublons': sum(1 for x in inv.images if x['doublon']),
                                 'octets': sum(x['access_estsize'] * 1024 for x in inv.images),
                                 'nuits': len({str(x['nuit']) for x in inv.images})}
+        if getattr(inv, '_cles_memo', (None,))[0] is not inv.images:
+            inv._cles_memo = (inv.images,) + cles_de_tri_images(inv.images)
 
     def _inventaire_erreur(self, e):
         self.b_rafraichir.setEnabled(True)
         self.l_inventaire.setText(tr('ohp_inventaire_erreur', erreur=e))
 
-    def _inventaire_pret(self, inv):
+    def _inventaire_pret(self, inv, pre=None):
         self.inv = inv
+        self._pre = pre
         self.b_rafraichir.setEnabled(True)
         m = inv.meta
         n = inv.nouveautes or {}
@@ -288,9 +454,14 @@ class Panneau(QWidget):
                                 depuis=n.get('depuis') or '?').rstrip(' :')
         self.l_inventaire.setText(texte)
         self._remplir_objets()
-        self._remplir_anomalies()
-        self._remplir_ciel()
-        self._charger_possession()
+        if pre:                                      # préchargé en fond : une étape par tour de boucle
+            self._plus_tard(self._remplir_anomalies)
+            self._plus_tard(self._remplir_ciel)
+            self._plus_tard(self._charger_possession)
+        else:
+            self._remplir_anomalies()
+            self._remplir_ciel()
+            self._charger_possession()
         if not getattr(self, '_nouveautes_verifiees', False) and hasattr(self, 'dest'):
             self._nouveautes_verifiees = True        # une fois par lancement, si le réglage le demande (délai respecté)
             if config.reglages()['ohp_verifier_nouveautes'] and not os.environ.get('COUPOLE_SANS_RESEAU'):
@@ -326,6 +497,10 @@ class Panneau(QWidget):
         dest = self._dest_courante()
         if not dest:
             return
+        pre = self._prendre('possession')
+        if pre is not None:
+            self._possession_prete(pre)
+            return
         images = self.inv.images if self.inv else []
 
         def lire(d=dest, imgs=images):
@@ -337,6 +512,7 @@ class Panneau(QWidget):
 
     def _possession_prete(self, resultat):
         self.possession, self._infos_ok = resultat[:2]
+        self._pre_possession = self.possession       # lots préchargés valables pour cette possession seulement
         if len(resultat) > 3 and self.inv is not None and resultat[3] is self.inv.images:
             self._comptes = resultat[2]              # comptes calculés en fond pour CET inventaire
         else:
@@ -455,8 +631,12 @@ class Panneau(QWidget):
             source = heapq.merge(*(par_objet.get(o, []) for o in objs), key=lambda x: (x['t_min'], x['access_url']))
         else:                                        # beaucoup : l'inventaire trié, filtré
             source = triees
+            if len(objs) >= len(par_objet) and all(o in objs for o in par_objet):
+                objs = None                          # tous les objets choisis : aucun à écarter
+                if not (nuit or filtre or dates or manquantes):
+                    return list(triees)              # « tout sélectionner » sans filtre : rien à parcourir
         for x in source:
-            if x['objet'] not in objs:
+            if objs is not None and x['objet'] not in objs:
                 continue
             if nuit and str(x['nuit']) != nuit:
                 continue
@@ -479,20 +659,13 @@ class Panneau(QWidget):
     def _ligne_image(self, x):
         """Cellules d'une ligne d'image, calculées seulement quand la vue l'affiche (modèle paresseux)."""
         from ...core import temps
-        dr = []
-        if x['doublon']:
-            dr.append(tr('ohp_drapeau_doublon'))
-        if x['date_partagee']:
-            dr.append(tr('ohp_drapeau_date'))
-        if x['diurne']:
-            dr.append(tr('ohp_drapeau_diurne'))
-        if x['nouveau']:
-            dr.append(tr('ohp_etat_nouveau', date=x['vu_le']))
         u = temps.mjd_vers_utc(x['t_min'])
         s_ = self._sites_par_id().get(x.get('site'))
         loc = temps.heure_locale(u, s_).strftime('%H:%M:%S (UTC%z)') if s_ else ''
         return (tr('ohp_statut_possession_' + self.possession.statut(x)), u.strftime('%Y-%m-%d %H:%M:%S'), loc,
-                str(x['nuit']), x['tel'], x['filter_name'], x['t_exptime'], ', '.join(dr), x['target_name'])
+                str(x['nuit']), x['tel'], x['filter_name'], x['t_exptime'],
+                texte_drapeaux(x['doublon'], x['date_partagee'], x['diurne'], x['nouveau'], x['vu_le']),
+                x['target_name'])
 
     def _bulle_image(self, x):
         from ...core import temps
@@ -514,17 +687,46 @@ class Panneau(QWidget):
         return tr('ohp_bulle_possession', statut=tr('ohp_statut_possession_' + d['statut']),
                   date=d['date'] or '—', chemin=d['chemin'] or '—')
 
+    def _cles_tri(self):
+        if getattr(self.inv, '_cles_memo', (None,))[0] is not self.inv.images:
+            self.preparer_objets(self.inv)
+        return self.inv._cles_memo
+
     def _cle_image(self, col):
-        """Clés de tri rapides (sans calculer les cellules) pour les colonnes courantes de la table des images."""
+        """Clés de tri rapides (sans calculer les cellules) pour toutes les colonnes de la table des images.
+
+        Chaque clé donne exactement l'ordre de la valeur affichée triée par `cle_de_tri` (même rang pour un même
+        texte : le tri stable garde alors l'ordre courant).  Heure du site et drapeaux : clés entières
+        précalculées en fond au chargement (`cles_de_tri_images`), triées par numpy (second audit : ces deux
+        colonnes calculaient sinon toutes leurs cellules, ~0,5 s à 80 000 lignes)."""
         from ...gui.modele import cle_de_tri
+
+        def rangs(textes):                           # {valeur: rang de sa cellule dans l'ordre de cle_de_tri}
+            cles = {v: cle_de_tri(t) for v, t in textes.items()}
+            r = {c: k for k, c in enumerate(sorted(set(cles.values())))}
+            return {v: r[c] for v, c in cles.items()}
         if col == 0:
-            cles = {st: cle_de_tri(tr('ohp_statut_possession_' + st)) for st in ('ok', 'doublon', 'echec', 'absente')}
+            cles = rangs({st: tr('ohp_statut_possession_' + st) for st in ('ok', 'doublon', 'echec', 'absente')})
             return lambda x: cles[self.possession.statut(x)]
-        if col in (1, 3):
-            return lambda x: (0, x['t_min'], 0)
+        if col in (1, 3):                            # (même ordre que (0, t_min, 0) : une seule catégorie)
+            return lambda x: float(x['t_min'])
+        if col in (2, 7) and self.inv is not None:
+            _, heure, drap, vus = self._cles_tri()
+            if not all(id(x) in heure for x in self.m_img.donnees):
+                return None                          # image hors de l'inventaire indexé : valeur des cellules
+            if col == 2:
+                return lambda x: heure[id(x)]
+            codes = rangs({c: texte_drapeaux(c & _D_DOUBLON, c & _D_DATE, c & _D_DIURNE, c & _D_NOUVEAU,
+                                             vus[c >> 4] if c & _D_NOUVEAU else '')
+                           for c in set(drap.values())})
+            return lambda x: codes[drap[id(x)]]
         champ = {4: 'tel', 5: 'filter_name', 6: 't_exptime', 8: 'target_name'}.get(col)
         if champ:
-            return lambda x: cle_de_tri(x[champ])
+            try:                                     # rang de chaque valeur distincte (clés entières → numpy)
+                r = rangs({x[champ]: x[champ] for x in self.m_img.donnees})
+                return lambda x: r[x[champ]]
+            except (TypeError, KeyError):            # valeur non hachable : clé de la cellule
+                return lambda x: cle_de_tri(x[champ])
         return None
 
     def _restyler_images(self, lignes=True):
@@ -1093,6 +1295,10 @@ class Panneau(QWidget):
     def _remplir_lots(self):
         dest = self.dest.text()
         images = self.inv.images if self.inv else None
+        pre = self._prendre('lots') if images is not None else None
+        if pre is not None and getattr(self, '_pre_possession', None) is self.possession:
+            self._lots_prets(dest, pre)
+            return
         self._t_lots = Tache(self.lire_lots, dest, images, self.possession, self._infos_ok, parent=self)
         self._t_lots.quand_fini(lambda r, d=dest: self._lots_prets(d, r))
         self._t_lots.start()
@@ -1158,15 +1364,12 @@ class Panneau(QWidget):
     def _remplir_anomalies(self):
         if not self.inv:
             return
-        from . import anomalies
-        from .astrometrie import attentes
         inv, dest = self.inv, self.dest.text()
-
-        def calcul():
-            med, medo = attentes(inv.images)
-            a = anomalies.detecter(inv.images, medo)
-            return a + anomalies.depuis_traitement(os.path.join(dest, '_traitement', 'etat.sqlite'))
-        self._t_anom = Tache(calcul, parent=self)
+        pre = self._prendre('anomalies')
+        if pre is not None:
+            self._anomalies_pretes(pre)
+            return
+        self._t_anom = Tache(self.anomalies_de, inv, dest, parent=self)
         self._t_anom.quand_fini(self._anomalies_pretes)
         self._t_anom.start()
 
@@ -1228,6 +1431,10 @@ class Panneau(QWidget):
         if not self.inv:
             return
         cat = self.ciel_cat.currentData()
+        pre = self._prendre('ciel')
+        if pre is not None and pre[0] == cat:
+            self._ciel_pret(pre[1])
+            return
         self._t_ciel = Tache(self.points_ciel, self.inv.images, cat, parent=self)
         self._t_ciel.quand_fini(self._ciel_pret)
         self._t_ciel.start()

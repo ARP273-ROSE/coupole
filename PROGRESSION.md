@@ -304,3 +304,25 @@ lignes) ; avant/après avec le code de 0.1.3 (`git archive 794092c`) dans le mê
 - Reste proposé (§ 5 du rapport) : gel de 0,8 s au chargement à ×10 (0,17 s à l'échelle réelle), tri sur colonnes
   sans clé rapide à ×10, Windows non vérifiable ici (§ 6).
 - **Aucun tag posé** (CI de publication bloquée par la facturation GitHub du dépôt privé : à décider par Kevin).
+
+## 2026-10-09 — version 0.1.5 : les deux lenteurs restantes du second audit (rapport : `docs/AUDIT2_2026-10.md` § 8)
+Mesures à 10 × la banque (79 890 lignes) et sur la banque réelle, destination copiée de la banque (possession,
+lots, anomalies réels), avant (0.1.4) / après dans le même conteneur `python:3.12-slim` ; copies et scripts de travail
+dans `/mnt/apps_pool/_transfert/coupole_audit3/`.
+- **Gel au chargement** : le gel de 0,55–0,8 s n'était dans aucun créneau Python (tous < 40 ms) mais dans la
+  concurrence pour le GIL : anomalies, possession et carte du ciel calculées par trois fils pendant le premier dessin
+  des tables (chaque rappel Qt → Python attend le GIL), puis le fil de chargement pendant la mise en place de la
+  fenêtre. Corrigé : tout est calculé en série par le fil de chargement avant la remise de l'inventaire
+  (`precharger`), affiché par étapes d'un tour de boucle, et le chargement part 200 ms après le premier dessin.
+  Plus long gel ×10 **549–572 → 54–66 ms** ; n réel 155 → 40–52 ms ; catalogue complet ~0,2–0,3 s plus tard.
+- **Tri heure du site / drapeaux** : clés entières précalculées en fond, `numpy.argsort` stable ; toutes les colonnes
+  ont une clé rapide (rangs) ; le double tri de `sortByColumn` n'est plus refait. ×10 : **757–775 → 52–53 ms**
+  (heure du site), ~0,6 s → 49–56 ms (drapeaux), autres colonnes 35–65 ms.
+- **Rien d'affiché ne change** : 41 empreintes par échelle (cellules, objets, anomalies, ciel, lots, ordre après 36
+  tris) identiques 0.1.4 / 0.1.5 sur la banque réelle et à ×10 (`outils/audit2/mesure_ordre_tri.py`).
+- Tests : `test_echelle.py` 21 → 25 (chargement sans silence > 0,3 s, tris < 0,45 s, clés = ordre des cellules,
+  `permutation_triee` = `sorted`) ; échouent sur le code 0.1.4 (0,64 s ; 0,81 s) sauf l'équivalence des clés.
+  Validation locale (copie sans `build/` ni `dist/`, `pip install ".[test]"`, offscreen) : **python:3.12-slim 282
+  réussis, 11 sautés, code 0 ; python:3.10-slim 282 réussis, 11 sautés, code 0** ; `test_adaptatif` + `test_echelle`
+  à `QT_SCALE_FACTOR=1.5` et `2` : 33 réussis, code 0 (3.12 et 3.10).
+- **Aucun tag posé.**
