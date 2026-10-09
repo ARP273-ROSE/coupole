@@ -166,6 +166,38 @@ def main():
             p.l_dossier.setText(sys.argv[3])
             p.lancer()
             attendre(app, lambda: not p.occupe(), 120)
+        if mid == 'archives':                      # vraie recherche (M 16) ; images préparées du dossier neutre
+            f.barre.setCurrentRow(i)
+            p.l_dossier.setText(os.path.join(DOSSIER_NEUTRE, 'Coupole'))
+            p.e_nom.setText('M 16')
+            p.s_rayon.setValue(6.0)
+            p.e_instrument.setText('')
+            p.e_filtre.setText('')
+            for k, c in p.cases_archives.items():
+                c.setChecked(k in ('mast', 'eso', 'irsa'))
+            p.chercher()
+            attendre(app, lambda: p.b_chercher.isEnabled() and p.observations, 120)
+            for r, o in enumerate(p.modele.donnees):
+                if o['mission'] == 'JWST' and 'miri_f770w' in o['fichier']:
+                    p.vue.selectRow(p.proxy.mapFromSource(p.modele.index(r, 0)).row())
+                    break
+            attendre(app, lambda: p.l_vignette.pixmap() is not None and not p.l_vignette.pixmap().isNull(), 30)
+            capture('module_archives')
+            p.onglets.setCurrentIndex(1)
+            p.rafraichir_possession()
+            attendre(app, lambda: p.l_fichiers.count() > 0, 20)
+            for k in range(p.l_fichiers.count()):
+                it = p.l_fichiers.item(k)
+                if 'MIRI' in it.text():
+                    from PyQt6.QtCore import Qt
+                    it.setCheckState(Qt.CheckState.Checked)
+            if p.fichiers_coches():
+                p.c_reference.setCurrentIndex(0)
+                p.aligner()
+                attendre(app, lambda: p.b_aligner.isEnabled() and p.l_apercu.pixmap() is not None, 300)
+            capture('archives_alignement')
+            p.onglets.setCurrentIndex(0)
+            continue
         if mid and mid != 'ohp':
             f.barre.setCurrentRow(i)
             attendre(app, lambda: False, 1.5)

@@ -121,15 +121,16 @@ def telecharger(url: str, chemin: str, taille_attendue: int | None = None, toler
     """
     part = chemin + '.part'
     dernier = ''
+    sans_range = False                    # serveur qui refuse toute requête Range (416 dès l'octet 0)
     if taille_attendue is not None and os.path.exists(chemin) and os.path.getsize(chemin) == taille_attendue:
         return 'deja', 0                      # déjà complet : aucune requête
     for essai in range(1, essais + 1):
         if arret is not None and arret.is_set():
             raise Annule()
         try:
-            debut = os.path.getsize(part) if os.path.exists(part) else 0
+            debut = 0 if sans_range else (os.path.getsize(part) if os.path.exists(part) else 0)
             recu = 0
-            with requete(url, en_tetes={'Range': 'bytes=%d-' % debut}, delai=120) as r:
+            with requete(url, en_tetes={} if sans_range else {'Range': 'bytes=%d-' % debut}, delai=120) as r:
                 total = _taille_totale(r)
                 if r.status != 206:               # Range ignoré (ou fichier complet renvoyé) : on repart de zéro
                     debut = 0
@@ -172,10 +173,13 @@ def telecharger(url: str, chemin: str, taille_attendue: int | None = None, toler
         except (urllib.error.URLError, OSError, ValueError) as e:
             dernier = str(e)
             if isinstance(e, urllib.error.HTTPError) and e.code == 416:    # Range hors du fichier : .part faux
+                if not os.path.exists(part) or os.path.getsize(part) == 0:
+                    sans_range = True               # 416 dès l'octet 0 : le serveur ne gère pas Range (archive ESO)
                 try:
                     os.remove(part)
                 except OSError:
                     pass
+                continue                            # nouvel essai immédiat, sans attente
             if arret is not None:
                 if arret.wait(2 * essai):
                     raise Annule()

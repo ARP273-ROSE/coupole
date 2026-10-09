@@ -1,0 +1,15 @@
+{
+  "id": "archives",
+  "version": "1.0.0",
+  "nom": {"fr": "Archives des observatoires", "en": "Observatory archives"},
+  "description": {
+    "fr": "Images publiques des grands observatoires et des sondes (Hubble, JWST, ESO, Spitzer, WISE, 2MASS, NOIRLab, Keck, SDSS, Voyager, Cassini, Juno) : recherche, téléchargement, extraction de l'image scientifique, alignement et composition couleur",
+    "en": "Public images from major observatories and space probes (Hubble, JWST, ESO, Spitzer, WISE, 2MASS, NOIRLab, Keck, SDSS, Voyager, Cassini, Juno): search, download, science image extraction, alignment and colour composition"
+  },
+  "icone": "icone.svg",
+  "ordre": 15,
+  "textes": "textes:TEXTES",
+  "gui": "gui:Panneau",
+  "cli": "cli:enregistrer",
+  "coupole_min": "0.2.0"
+}
