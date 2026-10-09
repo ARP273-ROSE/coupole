@@ -744,3 +744,11 @@ passées, comme la Banque OHP ; méthode tirée des pratiques publiées (fils et
   et ancienne URI refusée sur le vrai lecteur) ; `test_machine_parallele.py` (bibliothèques).
 - Manuels FR/EN (Installation : bibliothèques embarquées ; partage réseau : Windows, dossier de suivi,
   reconnaissance ; Dépannage), tableaux des commandes régénérés, aide F1, README, CHANGELOG FR puis EN.
+- Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 573 réussis,
+  21 sautés, code 0 (reproject 0.21.0) ; python:3.10-slim 573 / 21, code 0 (reproject 0.14.1)**.
+- CI `tests.yml` : commit `b7e04db` **6/6**. Sous Windows (3.10 et 3.12), `net use X:` sur le partage `C$` de la
+  machine : `GetDriveTypeW(X:) = 4` (lecteur distant) ; les 4 tests Windows de `test_partage_windows.py` ont tourné
+  (aucun sauté) et passent — dont **la cause reproduite sur le vrai lecteur mappé** (`Path.resolve()` rend le chemin
+  UNC, l'URI de la 0.2.0 est refusée par SQLite) et la possession complète (WAL et DELETE, UNC et lettre, premier
+  lancement, base de travail ancienne).
+- **Aucun tag posé** (publication et vérification du paquet par le mainteneur).
