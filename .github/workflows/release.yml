@@ -419,7 +419,10 @@ jobs:
             x86_64) ARCH=amd64 ;;
             arm64)  ARCH=arm64 ;;
           esac
-          docker run --rm -v "$PWD:/src:ro" -e DEBIAN_FRONTEND=noninteractive ubuntu:24.04 bash -euxc '
+          # Image Ubuntu officielle depuis ECR Public (pas de quota anonyme comme Docker Hub), Docker Hub en secours.
+          IMAGE=public.ecr.aws/ubuntu/ubuntu:24.04
+          for i in 1 2 3; do docker pull -q "$IMAGE" && break || { IMAGE=ubuntu:24.04; sleep 20; docker pull -q "$IMAGE" && break; }; done
+          docker run --rm -v "$PWD:/src:ro" -e DEBIAN_FRONTEND=noninteractive "$IMAGE" bash -euxc '
             apt-get update -qq
             apt-get install -y -qq --no-install-recommends /src/coupole-linux-'"$ARCH"'.deb >/dev/null
             coupole --version
