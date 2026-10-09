@@ -175,6 +175,8 @@ def guide_astap_texte() -> str:
     for etape in c['etapes']:
         n += 1
         l.append('%d. %s' % (n, tr(etape, dossier=c['dossier'])))
+    for note in c.get('notes', ()):
+        l += ['', tr(note)]
     l += ['', tr('astap_guide_detection'), tr('astap_guide_page', page=c['page'])]
     return '\n'.join(l)
 

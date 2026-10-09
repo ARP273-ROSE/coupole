@@ -30,3 +30,9 @@ jobs:
         env:
           QT_QPA_PLATFORM: offscreen
         run: python -m pytest -q -rs
+      - name: "Liens du guide ASTAP (réseau : chaque adresse, pour chaque système, doit répondre 200)"
+        if: runner.os == 'Linux' && matrix.python == '3.12'
+        env:
+          QT_QPA_PLATFORM: offscreen
+          COUPOLE_TEST_LIENS: '1'
+        run: python -m pytest -q -rs tests/test_cli.py -k liens_astap

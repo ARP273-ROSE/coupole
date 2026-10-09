@@ -1,5 +1,10 @@
 """Textes du cœur de Coupole (FR/EN) : ligne de commande, fenêtre principale, aide, ASTAP, rapports."""
 
+# commande vérifiée sur le vrai paquet : voir core/astap.py (EXTRAIRE_D80_DEB, gardée identique par un test)
+EXTRAIRE = ("bsdtar -xf d80_star_database.deb data.tar.xz && sudo mkdir -p /opt/astap && "
+            "sudo tar -xJf data.tar.xz -C /opt/astap --strip-components=3 --no-same-owner "
+            "--wildcards './opt/astap/d80_*'")
+
 TEXTES = {
     # ------------------------------------------------------------ généraux
     'oui': {'fr': 'oui', 'en': 'yes'},
@@ -138,15 +143,20 @@ TEXTES = {
     'astap_lien_pkg_intel': {'fr': 'Paquet macOS Intel (astap.pkg)', 'en': 'macOS Intel package (astap.pkg)'},
     'astap_lien_deb': {'fr': 'Paquet Debian/Ubuntu (.deb)', 'en': 'Debian/Ubuntu package (.deb)'},
     'astap_lien_rpm': {'fr': 'Paquet Fedora/openSUSE (.rpm)', 'en': 'Fedora/openSUSE package (.rpm)'},
-    'astap_lien_arch': {'fr': 'Paquet Arch/Manjaro (.pkg.tar.zst)', 'en': 'Arch/Manjaro package (.pkg.tar.zst)'},
+    'astap_lien_arch': {'fr': 'Paquet Arch/Manjaro (.pkg.tar.zst, interface GTK2)', 'en': 'Arch/Manjaro package (.pkg.tar.zst, GTK2 interface)'},
+    'astap_lien_arch_gtk3': {'fr': 'Paquet Arch/Manjaro, interface GTK3 (.pkg.tar.zst)', 'en': 'Arch/Manjaro package, GTK3 interface (.pkg.tar.zst)'},
+    'astap_lien_d80_aur': {'fr': 'Catalogue D80, paquet AUR d80-star-db-astap (conseillé)',
+                           'en': 'D80 catalogue, AUR package d80-star-db-astap (recommended)'},
+    'astap_lien_d50_arch': {'fr': 'Catalogue D50, paquet Arch officiel (.pkg.tar.zst, plus léger)',
+                            'en': 'D50 catalogue, official Arch package (.pkg.tar.zst, lighter)'},
     'astap_lien_targz': {'fr': 'Archive pour toute distribution (.tar.gz)', 'en': 'Archive for any distribution (.tar.gz)'},
     'astap_lien_d80_exe': {'fr': 'Catalogue D80, installeur Windows (conseillé)', 'en': 'D80 catalogue, Windows installer (recommended)'},
     'astap_lien_d50_exe': {'fr': 'Catalogue D50, installeur Windows (plus léger)', 'en': 'D50 catalogue, Windows installer (lighter)'},
     'astap_lien_d80_pkg': {'fr': 'Catalogue D80, paquet macOS (conseillé)', 'en': 'D80 catalogue, macOS package (recommended)'},
     'astap_lien_d50_pkg': {'fr': 'Catalogue D50, paquet macOS (plus léger)', 'en': 'D50 catalogue, macOS package (lighter)'},
-    'astap_lien_d80_deb': {'fr': 'Catalogue D80, paquet .deb (conseillé)', 'en': 'D80 catalogue, .deb package (recommended)'},
+    'astap_lien_d80_deb': {'fr': 'Catalogue D80, paquet .deb (conseillé ; seul format Linux du D80)',
+                           'en': 'D80 catalogue, .deb package (recommended; the only Linux format of D80)'},
     'astap_lien_d50_deb': {'fr': 'Catalogue D50, paquet .deb (plus léger)', 'en': 'D50 catalogue, .deb package (lighter)'},
-    'astap_lien_d80_zip': {'fr': 'Catalogue D80, archive zip (conseillé)', 'en': 'D80 catalogue, zip archive (recommended)'},
     'astap_lien_d50_zip': {'fr': 'Catalogue D50, archive zip (plus léger)', 'en': 'D50 catalogue, zip archive (lighter)'},
     'astap_etape_win_1': {'fr': "Lancer astap_setup.exe. Windows peut afficher « Windows a protégé votre ordinateur » "
                                 "(éditeur inconnu) : « Informations complémentaires », puis « Exécuter quand même ».",
@@ -162,8 +172,12 @@ TEXTES = {
                           'en': 'All files (program and catalogue) must be in the same folder.'},
     'astap_etape_win_arm_1': {'fr': "Créer le dossier {dossier} et y décompresser astap_cli.exe.",
                               'en': 'Create the folder {dossier} and unzip astap_cli.exe into it.'},
-    'astap_etape_win_arm_2': {'fr': "Décompresser le catalogue D80 dans ce même dossier.",
-                              'en': 'Unzip the D80 catalogue into the same folder.'},
+    'astap_etape_win_arm_2': {'fr': "Catalogue : lancer d80_star_database.exe (installeur x86, que Windows 11 ARM "
+                                    "exécute par émulation) en choisissant ce même dossier, ou décompresser "
+                                    "d50_star_database.zip dans ce dossier (il n'existe pas de D80 en zip).",
+                              'en': 'Catalogue: run d80_star_database.exe (x86 installer, which Windows 11 ARM runs '
+                                    'through emulation) choosing this same folder, or unzip d50_star_database.zip into '
+                                    'it (there is no D80 zip).'},
     'astap_etape_win_arm_3': {'fr': "Indiquer ce dossier à Coupole (bouton « Choisir » ou coupole astap --definir {dossier}).",
                               'en': 'Point Coupole to this folder (« Choose » button or coupole astap --set {dossier}).'},
     'astap_etape_mac_1': {'fr': "Clic droit sur le paquet du programme, « Ouvrir », puis suivre l'installation "
@@ -182,14 +196,45 @@ TEXTES = {
                                 'en': 'Install the program: sudo apt install ./astap_*.deb (or double-click the file).'},
     'astap_etape_linux_deb_2': {'fr': "Installer le catalogue : sudo apt install ./d80_star_database.deb (il va dans {dossier}).",
                                 'en': 'Install the catalogue: sudo apt install ./d80_star_database.deb (it goes into {dossier}).'},
-    'astap_etape_linux_autre_1': {'fr': "Installer le paquet de la distribution (rpm : sudo dnf install ./astap_amd64.rpm ; "
-                                        "Arch : sudo pacman -U ./astap_*.pkg.tar.zst), ou décompresser l'archive / "
-                                        "astap_cli dans {dossier}.",
-                                  'en': 'Install the distribution package (rpm: sudo dnf install ./astap_amd64.rpm; Arch: '
-                                        'sudo pacman -U ./astap_*.pkg.tar.zst), or unpack the archive / astap_cli into '
-                                        '{dossier}.'},
-    'astap_etape_linux_autre_2': {'fr': "Décompresser le catalogue dans {dossier} (sudo unzip d80_star_database.zip -d {dossier}).",
-                                  'en': 'Unzip the catalogue into {dossier} (sudo unzip d80_star_database.zip -d {dossier}).'},
+    'astap_etape_linux_autre_1': {'fr': "Installer le paquet de la distribution (rpm : sudo dnf install ./astap_amd64.rpm), "
+                                        "ou décompresser l'archive / astap_cli dans {dossier} (astap_cli suffit à Coupole).",
+                                  'en': 'Install the distribution package (rpm: sudo dnf install ./astap_amd64.rpm), or '
+                                        'unpack the archive / astap_cli into {dossier} (astap_cli is all Coupole needs).'},
+    'astap_etape_linux_autre_2': {'fr': "Catalogue D80 (fourni seulement en .deb) : l'extraire du .deb dans {dossier}, "
+                                        "sans toucher aux droits de / : " + EXTRAIRE + " (bsdtar : paquet "
+                                        "libarchive/bsdtar ; sinon « ar x d80_star_database.deb data.tar.xz »). "
+                                        "Jamais « sudo tar -x … -C / » : l'archive contient « ./ » et « ./opt/ ». "
+                                        "Ou le D50 en zip : sudo unzip d50_star_database.zip -d {dossier}.",
+                                  'en': 'D80 catalogue (only provided as .deb): extract it from the .deb into {dossier} '
+                                        'without touching the permissions of /: ' + EXTRAIRE + ' (bsdtar: libarchive/'
+                                        'bsdtar package; otherwise « ar x d80_star_database.deb data.tar.xz »). Never '
+                                        '« sudo tar -x … -C / »: the archive contains « ./ » and « ./opt/ ». Or the zipped '
+                                        'D50: sudo unzip d50_star_database.zip -d {dossier}.'},
+    'astap_etape_linux_arch_1': {'fr': "Programme : sudo pacman -U ./astap_amd64_gtk3.pkg.tar.zst (ou le paquet GTK2 "
+                                       "./astap_amd64.pkg.tar.zst). Le paquet met astap et astap_cli dans {dossier} "
+                                       "seulement (rien dans /usr/bin : astap_cli n'est pas dans le PATH ; Coupole le "
+                                       "trouve quand même dans {dossier}).",
+                                 'en': 'Program: sudo pacman -U ./astap_amd64_gtk3.pkg.tar.zst (or the GTK2 package '
+                                       './astap_amd64.pkg.tar.zst). The package puts astap and astap_cli in {dossier} '
+                                       'only (nothing in /usr/bin: astap_cli is not on the PATH; Coupole finds it in '
+                                       '{dossier} anyway).'},
+    'astap_etape_linux_arch_2': {'fr': "Catalogue D80 : paquet AUR d80-star-db-astap (par exemple yay -S "
+                                       "d80-star-db-astap), ou extrait du .deb officiel : " + EXTRAIRE + ". "
+                                       "Ou le D50 officiel : sudo pacman -U ./d50_star_database.pkg.tar.zst.",
+                                 'en': 'D80 catalogue: AUR package d80-star-db-astap (for instance yay -S '
+                                       'd80-star-db-astap), or extracted from the official .deb: ' + EXTRAIRE + '. Or '
+                                       'the official D50: sudo pacman -U ./d50_star_database.pkg.tar.zst.'},
+    'astap_note_arch_cli': {'fr': "Arch/Manjaro récents : le programme graphique « astap » du paquet officiel demande "
+                                  "GTK2 (libgtk-x11-2.0), absent des dépôts officiels (AUR seulement) et non déclaré "
+                                  "par le paquet ; seul astap_cli fonctionne sans gtk2 de l'AUR — et Coupole n'a besoin "
+                                  "que de lui (il est autonome : lié statiquement). Pour l'interface graphique d'ASTAP : le paquet GTK3 de la "
+                                  "page officielle (gtk3 est dans les dépôts officiels).",
+                            'en': 'Recent Arch/Manjaro: the graphical « astap » of the official package needs GTK2 '
+                                  '(libgtk-x11-2.0), missing from the official repositories (AUR only) and not declared '
+                                  'by the package; only astap_cli works without gtk2 from the AUR — and Coupole only '
+                                  'needs that one (it is self-contained: statically linked). For ASTAP\'s graphical '
+                                  'interface: the GTK3 package from the official page (gtk3 is in the official '
+                                  'repositories).'},
     'astap_etape_linux_3': {'fr': "Pas d'AppImage officielle d'ASTAP. ASTAP cherche son catalogue dans {dossier} puis "
                                   "/usr/share/astap/data ; Coupole aussi.",
                             'en': 'There is no official ASTAP AppImage. ASTAP looks for its catalogue in {dossier} then '
