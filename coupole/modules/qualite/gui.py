@@ -66,6 +66,8 @@ class Panneau(QWidget):
         self._arret = threading.Event()
         self._lignes = []
         self._evts = None
+        self._mesureur = None
+        self._question = None
         self.bilan = None
 
     def _memoriser(self):
@@ -99,9 +101,13 @@ class Panneau(QWidget):
     def occupe(self):
         return self._fil is not None and self._fil.is_alive()
 
-    # ---------------------------------------------------------------- lancement en deux temps : plan, puis mesure
+    # ---------------------------------------------------------------- lancement : inventaire et mesure en flux
     def lancer(self, dossier=None, tout: bool | None = None):
-        """`tout` : None = demander si le dossier est gros ; True = tout mesurer ; False = échantillon."""
+        """`tout` : None = demander si le dossier est gros ; True = tout mesurer ; False = échantillon.
+
+        La mesure commence dès le premier lot trouvé, pendant que l'inventaire continue ; pour un gros dossier la
+        question (échantillon ou tout) est posée quand l'inventaire est fini, sans arrêter la mesure de
+        l'échantillon, qui sert dans les deux cas."""
         if self.occupe():
             return
         racine = dossier or texte_reel(self.l_dossier.text())
@@ -113,67 +119,65 @@ class Panneau(QWidget):
         self.l_progression.setText(tr('qual_inventaire'))
         n_lot = int(self.n_echantillon.value())
         ech = n_lot if (tout is False or (tout is None and self.echantillon.isChecked())) else None
-        evts = FileEvenements(self, self._evenements)
-        self._evts = evts
-        demander = tout is None and ech is None
+        self._demarrer(racine, ech, demander=tout is None and ech is None, n_lot=n_lot)
 
-        def preparer():
-            plan_ = moteur.planifier(racine, ech)
-            estimation = None
-            if demander and plan_['total_dossier'] > moteur.SEUIL_GROS_DOSSIER and plan_['a_mesurer'] > 3:
-                plan_['chemin'] = racine
-                estimation = moteur.estimer_duree(plan_, moteur.processus_pour(None, plan_['reseau']))
-            evts({'type': 'plan', 'plan': plan_, 'estimation': estimation, 'racine': racine, 'echantillon': ech,
-                  'n_lot': n_lot, 'demander': demander})
-        from ...gui.outils import lancer_fil
-        self._fil = lancer_fil(preparer)
-
-    def _plan_pret(self, ev):
-        plan_, est, racine, ech = ev['plan'], ev['estimation'], ev['racine'], ev['echantillon']
-        if est is not None:                        # gros dossier : on demande avant d'engager des heures
-            texte = tr('qual_gros_dossier', images=plan_['total_dossier'], lots=len(plan_['lots']),
-                       a_mesurer=plan_['a_mesurer'], par_image='%.1f' % est['par_image_s'],
-                       processus=est['processus'], duree=duree_lisible(est['duree_s']), n=ev['n_lot'])
-            if plan_['reseau']:
-                texte += '\n\n' + tr('qual_reseau')
-            b = QMessageBox(QMessageBox.Icon.Question, tr('qual_gros_dossier_titre'), texte, parent=self)
-            b_ech = b.addButton(tr('qual_btn_echantillon', n=ev['n_lot']), QMessageBox.ButtonRole.AcceptRole)
-            b_tout = b.addButton(tr('qual_btn_tout', duree=duree_lisible(est['duree_s'])), QMessageBox.ButtonRole.AcceptRole)
-            b.addButton(QMessageBox.StandardButton.Cancel)
-            b.exec()
-            if b.clickedButton() is b_ech:
-                ech = ev['n_lot']
-                self.echantillon.setChecked(True)
-            elif b.clickedButton() is b_tout:
-                ech = None
-            else:
-                self.b_lancer.setEnabled(mesures.disponible())
-                self.l_progression.setText('')
-                self._evts.arreter()
-                return
-        self._demarrer(racine, ech, plan_)
-
-    def _demarrer(self, racine, ech, plan_dossier=None):
-        self.barre.setMaximum(1)
+    def _demarrer(self, racine, ech, demander: bool = False, n_lot: int = moteur.ECHANTILLON_DEFAUT):
+        self.barre.setMaximum(0)                     # inventaire : barre animée tant que le total est inconnu
         self.barre.setValue(0)
         self._lignes = []
         self.modele.remplir([])
         self.resume.setPlainText('')
         self._arret.clear()
-        evts, arret = self._evts, self._arret
+        if self._question is not None:
+            self._question.close()
+            self._question = None
+        evts = FileEvenements(self, self._evenements)
+        self._evts = evts
+        arret = self._arret
         plan = None                                  # plan machine calculé dans le fil de mesure (sondes hors du fil graphique)
-        # le plan du dossier (parcours, tailles, cache) déjà fait pour le dialogue est repris tel quel
-        m = moteur.Mesureur(racine, plan, ech, rapporter=evts, arret=arret, langue=langue(), plan_dossier=plan_dossier)
+        m = moteur.Mesureur(racine, plan, ech, rapporter=evts, arret=arret, langue=langue(), demander=demander,
+                            n_echantillon=n_lot)
+        self._mesureur = m
 
         def travail():
             try:
                 m.lancer()
             except Exception as e:
                 evts({'type': 'erreur', 'erreur': '%s: %s' % (type(e).__name__, e)})
-        self.b_arreter.setEnabled(True)
+        self.b_arreter.setEnabled(True)              # l'inventaire lui-même s'annule
         from ...gui.outils import enregistrer_arret, lancer_fil
         enregistrer_arret(self._arret)
         self._fil = lancer_fil(travail)
+
+    def _questionner(self, ev):
+        """Gros dossier : échantillon ou tout ?  Boîte non modale (la mesure de l'échantillon continue)."""
+        texte = tr('qual_gros_dossier', images=ev['total_dossier'], lots=ev['lots'], a_mesurer=ev['a_mesurer'],
+                   par_image='%.1f' % ev['par_image_s'], processus=ev['processus'],
+                   duree=duree_lisible(ev['duree_s']), n=ev['n'])
+        if ev['reseau']:
+            texte += '\n\n' + tr('qual_reseau')
+        b = QMessageBox(QMessageBox.Icon.Question, tr('qual_gros_dossier_titre'), texte, parent=self)
+        b_ech = b.addButton(tr('qual_btn_echantillon', n=ev['n']), QMessageBox.ButtonRole.AcceptRole)
+        b_tout = b.addButton(tr('qual_btn_tout', duree=duree_lisible(ev['duree_s'])), QMessageBox.ButtonRole.AcceptRole)
+        b.addButton(QMessageBox.StandardButton.Cancel)
+        m = self._mesureur
+
+        def repondre(*_):
+            if self._question is b:
+                self._question = None
+            clic = b.clickedButton()
+            if m is not self._mesureur or not self.occupe():
+                return
+            if clic is b_ech:
+                self.echantillon.setChecked(True)
+                m.decider('echantillon')
+            elif clic is b_tout:
+                m.decider('tout')
+            else:
+                self.arreter()
+        b.finished.connect(repondre)
+        self._question = b
+        b.open()
 
     def arreter(self):
         """Annulation immédiate : les processus de mesure sont terminés, les mesures faites restent au cache."""
@@ -198,8 +202,12 @@ class Panneau(QWidget):
         nouvelles = []
         for ev in evs:
             t = ev['type']
-            if t == 'plan':
-                self._plan_pret(ev)
+            if t == 'inventaire':
+                if not ev['fini']:
+                    self.l_progression.setText(tr('qual_inventaire_n', trouves=ev['trouves'], lots=ev['lots'],
+                                                  fait=ev['fait']))
+            elif t == 'question':
+                self._questionner(ev)
             elif t == 'debut':
                 self.barre.setMaximum(max(1, ev['total']))
                 texte = tr('qual_debut', total=ev['total'], lots=ev['lots'], deja=ev['deja'], processus=ev['processus'])
@@ -213,9 +221,11 @@ class Panneau(QWidget):
                 self._lignes.append(ev['ligne'])
                 nouvelles.append(self._ligne(ev['ligne']))
             elif t == 'progression':
-                self.barre.setValue(ev['fait'])
-                self.l_progression.setText(tr('qual_progression', fait=ev['fait'], total=ev['total'],
-                                              eta=duree_lisible(ev['eta_s']), debit='%.1f' % ev['debit']))
+                if ev['inventaire_fini']:
+                    self.barre.setMaximum(max(1, ev['total']))
+                    self.barre.setValue(ev['fait'])
+                    self.l_progression.setText(tr('qual_progression', fait=ev['fait'], total=ev['total'],
+                                                  eta=duree_lisible(ev['eta_s']), debit='%.1f' % ev['debit']))
             elif t == 'lot':
                 self.resume.setPlainText('%s\n%s' % (ev['lot'], '\n'.join(rapport.resume(ev['lignes'], langue()))))
             elif t == 'erreur':
@@ -223,6 +233,7 @@ class Panneau(QWidget):
                 self._terminer()
             elif t == 'fin':
                 self.bilan = ev
+                self.barre.setMaximum(max(1, ev['n']))
                 self.barre.setValue(ev['n'])
                 self.resume.appendPlainText('\n' + tr('qual_fini', n=ev['n'], lots=ev['lots'], deja=ev['deja'],
                                                       duree=duree_lisible(ev['duree'])) +
@@ -234,6 +245,9 @@ class Panneau(QWidget):
             self.modele.ajouter(nouvelles)
 
     def _terminer(self):
+        if self._question is not None:
+            self._question.close()
+            self._question = None
         self.b_lancer.setEnabled(mesures.disponible())
         self.b_arreter.setEnabled(False)
         if self._evts is not None:

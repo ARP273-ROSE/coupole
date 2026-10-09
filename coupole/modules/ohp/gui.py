@@ -135,7 +135,8 @@ class Panneau(QWidget):
         self.bandeau = self._bandeau_nouveautes()
         self.bandeau.setVisible(False)
         v.addWidget(self.bandeau)
-        self.onglets = aide(QTabWidget(), 'ohp_onglets_aide')
+        self.onglets = QTabWidget()                 # aide sur la barre et sur chaque onglet, pas sur tout le contenu
+        aide(self.onglets.tabBar(), 'ohp_onglets_aide')
         v.addWidget(self.onglets)
         self.onglets.addTab(self._onglet_catalogue(), tr('ohp_onglet_catalogue'))
         self.onglets.addTab(self._onglet_traitement(), tr('ohp_onglet_traitement'))
@@ -145,6 +146,9 @@ class Panneau(QWidget):
         from ...gui.fiche import FicheEnLigne
         self.fiche = FicheEnLigne()
         self.onglet_fiche = self.onglets.addTab(self.fiche, tr('fiche_titre'))
+        for k, cle in enumerate(('ohp_onglet_catalogue_aide', 'ohp_onglet_traitement_aide', 'ohp_onglet_lots_aide',
+                                 'ohp_onglet_anomalies_aide', 'ohp_onglet_ciel_aide', 'ohp_onglet_fiche_aide')):
+            self.onglets.setTabToolTip(k, tr(cle))
         self.onglets.currentChanged.connect(self._maj_fiche)
         self._remplir_lots()
         sc = QShortcut(QKeySequence('Ctrl+R'), self)
@@ -1399,11 +1403,9 @@ class Panneau(QWidget):
         plan_machine = self._plan()[1]
 
         def travail():
-            # échantillon par lot au-delà de 200 images : le contrôle après traitement doit rester court
-            plan_dossier = moteur.planifier(dest, None)          # un seul parcours, repris par le moteur
-            ech = moteur.ECHANTILLON_DEFAUT if plan_dossier['total_dossier'] > moteur.SEUIL_GROS_DOSSIER else None
-            moteur.Mesureur(dest, plan_machine, ech, rapporter=rapporter, arret=arret, langue=L,
-                            plan_dossier=plan_dossier).lancer()
+            # échantillon par lot au-delà de 200 images (choisi d'office) : le contrôle après traitement doit
+            # rester court ; inventaire en flux, lu dans la base d'état de la destination
+            moteur.Mesureur(dest, plan_machine, None, rapporter=rapporter, arret=arret, langue=L, auto=True).lancer()
         lancer_fil(travail)
 
     def arreter_traitement(self):

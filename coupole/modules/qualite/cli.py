@@ -24,18 +24,16 @@ def cmd(a):
         return 3
     from .gui_sans_qt import duree_lisible
     ech = a.echantillon
-    plan_dossier = moteur.planifier(a.dossier, ech)        # un seul parcours du dossier, repris par le moteur
-    if ech is None and not a.tout:
-        total = plan_dossier['total_dossier']
-        if total > moteur.SEUIL_GROS_DOSSIER:
-            ech = moteur.ECHANTILLON_DEFAUT
-            print(tr('qual_cli_echantillon_auto', total=total, n=ech))
+    # inventaire et mesure en flux ; au-delà de 200 images (sans --tout), échantillon choisi d'office
+    auto = ech is None and not a.tout
     racine = a.dossier
     etat = {'dernier': 0.0}
 
     def rapporter(ev):
         t = ev['type']
-        if t == 'debut':
+        if t == 'decision':
+            print(tr('qual_cli_echantillon_auto', total=ev['total_dossier'], n=ev['n']))
+        elif t == 'debut':
             texte = tr('qual_debut', total=ev['total'], lots=ev['lots'], deja=ev['deja'], processus=ev['processus'])
             if ev['echantillon']:
                 texte += ' ' + tr('qual_debut_echantillon', n=ev['echantillon'], dossier=ev['total_dossier'])
@@ -58,7 +56,7 @@ def cmd(a):
                 print(tr('interrompu_reprise'))
     arret = threading.Event()
     m = moteur.Mesureur(racine, None, ech, rapporter=rapporter, arret=arret, ecrire_rapports=a.ecrire,
-                        processus_max=a.processus, langue=langue(), plan_dossier=plan_dossier)
+                        processus_max=a.processus, langue=langue(), auto=auto)
     try:
         b = m.lancer()
     except KeyboardInterrupt:

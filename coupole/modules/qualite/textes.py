@@ -31,15 +31,17 @@ TEXTES = {
                                 'en': 'Number of images measured per stack when sampling is on.'},
     'qual_n_suffixe': {'fr': 'images / lot', 'en': 'images / stack'},
     'qual_inventaire': {'fr': 'Inventaire du dossier…', 'en': 'Listing the folder…'},
+    'qual_inventaire_n': {'fr': 'Inventaire du dossier : {trouves} fichiers trouvés dans {lots} lots… ({fait} déjà affichés)',
+                          'en': 'Listing the folder: {trouves} files found in {lots} stacks… ({fait} already shown)'},
     'qual_gros_dossier_titre': {'fr': 'Gros dossier', 'en': 'Large folder'},
     'qual_gros_dossier': {'fr': "{images} images dans {lots} lots ({a_mesurer} à mesurer, le reste est déjà en cache). "
-                                "Sur les 3 premières : {par_image} s par image ; avec {processus} processus, tout mesurer "
+                                "Mesuré jusqu'ici : {par_image} s par image ; avec {processus} processus, tout mesurer "
                                 "prendrait environ {duree}.\n\nUn échantillon de {n} images par lot suffit en général à juger "
-                                "chaque lot (quelques minutes).",
-                          'en': '{images} images in {lots} stacks ({a_mesurer} to measure, the rest is already cached). On the '
-                                'first 3: {par_image} s per image; with {processus} processes, measuring everything would '
-                                'take about {duree}.\n\nA sample of {n} images per stack is usually enough to judge each '
-                                'stack (a few minutes).'},
+                                "chaque lot ; sa mesure a déjà commencé et continue pendant que vous choisissez.",
+                          'en': '{images} images in {lots} stacks ({a_mesurer} to measure, the rest is already cached). '
+                                'Measured so far: {par_image} s per image; with {processus} processes, measuring everything '
+                                'would take about {duree}.\n\nA sample of {n} images per stack is usually enough to judge '
+                                'each stack; it is already being measured and goes on while you choose.'},
     'qual_btn_echantillon': {'fr': 'Échantillon ({n} par lot)', 'en': 'Sample ({n} per stack)'},
     'qual_btn_tout': {'fr': 'Tout mesurer (≈ {duree})', 'en': 'Measure everything (≈ {duree})'},
     'qual_reseau': {'fr': "Dossier réseau : la lecture limite la vitesse (au plus 3 lecteurs en parallèle).",
@@ -116,10 +118,15 @@ TEXTES = {
                              "<h4>Vitesse, reprise, échantillon</h4><p>Les mesures tournent dans des processus parallèles "
                              "(plan machine, mode économe et bridage des Préférences respectés ; au plus 3 sur un dossier "
                              "réseau). Chaque image mesurée est écrite aussitôt dans le QUALITE.csv de son lot et gardée en "
-                             "cache (_traitement/qualite.sqlite, par chemin, taille et date) : relancer ne refait rien, "
-                             "fermer puis rouvrir reprend ; <b>Arrêter</b> est immédiat. Au-delà de 200 images, Coupole "
-                             "propose un <b>échantillon</b> (5 images par lot, réparties dans le temps) ou tout mesurer, avec "
-                             "la durée estimée sur les 3 premières images ; progression avec temps restant et débit.</p>",
+                             "cache (par chemin, taille et date : _traitement/qualite.sqlite sur un disque local, dossier de "
+                             "cache de l'utilisateur pour un dossier réseau) : relancer ne refait rien, "
+                             "fermer puis rouvrir reprend ; <b>Arrêter</b> est immédiat, même pendant l'inventaire.</p>"
+                             "<p>La mesure commence dès le premier lot trouvé, pendant que l'inventaire continue (nombre de "
+                             "fichiers trouvés affiché). L'inventaire n'ouvre aucun fichier ; dans une sortie de Coupole, il "
+                             "lit la liste des images dans _traitement/etat.sqlite au lieu de parcourir le dossier. "
+                             "Au-delà de 200 images, Coupole propose un <b>échantillon</b> (5 images par lot, réparties dans "
+                             "le temps, mesurées en premier) ou tout mesurer, avec la durée estimée sur les images déjà "
+                             "mesurées ; progression avec temps restant et débit.</p>",
                        'en': "<h3>Image quality (optional)</h3><p>Measurements made with SEP (Source Extractor in Python) and "
                              "numpy, validated on synthetic images with known parameters (FWHM better than 2 % for Gaussian and "
                              "Moffat profiles from 2.5 to 7 px, ellipticity ± 0.02, background 0.5 %, noise 5 %).</p>"
@@ -129,9 +136,13 @@ TEXTES = {
                              "QUALITE.csv and QUALITE.txt. Never run automatically.</p>"
                              "<h4>Speed, resume, sample</h4><p>Measurements run in parallel processes (machine plan, economy "
                              "mode and the Preferences limit respected; at most 3 on a network folder). Each measured image "
-                             "is written at once to its stack's QUALITE.csv and kept in a cache (_traitement/qualite.sqlite, by "
-                             "path, size and date): starting again redoes nothing, closing then reopening resumes; <b>Stop</b> "
-                             "is immediate. Above 200 images, Coupole offers a <b>sample</b> (5 images per stack, spread in "
-                             "time) or measuring everything, with the duration estimated on the first 3 images; progress "
-                             "with time left and rate.</p>"},
+                             "is written at once to its stack's QUALITE.csv and kept in a cache (by path, size and date: "
+                             "_traitement/qualite.sqlite on a local disk, the user's cache folder for a network folder): "
+                             "starting again redoes nothing, closing then reopening resumes; <b>Stop</b> is immediate, even "
+                             "while listing.</p><p>Measuring starts with the first stack found, while the listing goes on "
+                             "(number of files found shown). Listing opens no file; in a Coupole output it reads the list of "
+                             "images from _traitement/etat.sqlite instead of walking the folder. Above 200 images, Coupole "
+                             "offers a <b>sample</b> (5 images per stack, spread in time, measured first) or measuring "
+                             "everything, with the duration estimated on the images already measured; progress with time "
+                             "left and rate.</p>"},
 }

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import math
 
-from PyQt6.QtCore import QAbstractItemModel, QAbstractTableModel, QModelIndex, QRect, QSortFilterProxyModel, Qt
+from PyQt6.QtCore import QAbstractItemModel, QAbstractTableModel, QEvent, QModelIndex, QRect, QSortFilterProxyModel, Qt
 from PyQt6.QtGui import QColor, QPainter
 from PyQt6.QtWidgets import (QAbstractItemView, QHeaderView, QStyle, QStyledItemDelegate, QStyleOptionHeader,
                              QTableView)
@@ -247,8 +247,9 @@ class ModeleTableau(QAbstractTableModel):
         return None
 
     def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
-        if role == Qt.ItemDataRole.DisplayRole and orientation == Qt.Orientation.Horizontal:
-            return self.entetes[section]
+        if orientation == Qt.Orientation.Horizontal and role in (Qt.ItemDataRole.DisplayRole,
+                                                                  Qt.ItemDataRole.ToolTipRole):
+            return self.entetes[section]          # info-bulle : le titre entier, même si l'on a rétréci la vue
         return None
 
     # accès par ligne (redéfinis par ModeleParesseux)
@@ -453,6 +454,66 @@ class EnTete(QHeaderView):
     les mêmes options, sans cette information purement décorative (rendu identique au pixel près, vérifié).
     """
 
+    MARGE = 6                                   # pixels logiques en plus de la place du titre et de la flèche
+
+    def __init__(self, orientation, parent=None):
+        super().__init__(orientation, parent)
+        self._ajustement = False
+        self.sectionResized.connect(self._section_redimensionnee)
+
+    # ------------------------------------------------ jamais de titre tronqué
+    def largeur_titre(self, logique: int) -> int:
+        """Largeur qu'il faut à la section `logique` pour montrer tout son titre (texte, marges du style,
+        flèche de tri) : celle que le style calcule pour ce texte, dans la police de l'en-tête (échelle comprise)."""
+        return super().sectionSizeFromContents(logique).width() + self.MARGE
+
+    def ajuster_minimums(self):
+        """Élargit les sections plus étroites que leur titre (largeurs gardées d'une version précédente, colonnes
+        ajustées sur des cellules vides, police ou échelle qui grandit)."""
+        if self.orientation() != Qt.Orientation.Horizontal or self.model() is None or self._ajustement:
+            return
+        self._ajustement = True
+        try:
+            for c in range(self.count()):
+                if self.isSectionHidden(c):
+                    continue
+                mini = self.largeur_titre(c)
+                if self.sectionSize(c) < mini and not (self.stretchLastSection() and
+                                                       self.visualIndex(c) == self.count() - 1):
+                    self.resizeSection(c, mini)
+        finally:
+            self._ajustement = False
+
+    def _section_redimensionnee(self, logique, _ancienne, nouvelle):
+        if self._ajustement or self.orientation() != Qt.Orientation.Horizontal or self.model() is None:
+            return
+        if self.stretchLastSection() and self.visualIndex(logique) == self.count() - 1:
+            return                                  # la dernière, étirée, suit la vue : voir VueTableau
+        mini = self.largeur_titre(logique)
+        if nouvelle < mini:
+            self._ajustement = True
+            try:
+                self.resizeSection(logique, mini)
+            finally:
+                self._ajustement = False
+
+    def setModel(self, modele):
+        super().setModel(modele)
+        if modele is not None:
+            modele.headerDataChanged.connect(lambda *_: self.ajuster_minimums())
+            modele.modelReset.connect(self.ajuster_minimums)
+            modele.layoutChanged.connect(self.ajuster_minimums)
+        self.ajuster_minimums()
+
+    def changeEvent(self, ev):
+        super().changeEvent(ev)
+        if ev.type() in (QEvent.Type.FontChange, QEvent.Type.StyleChange):
+            self.ajuster_minimums()
+
+    def showEvent(self, ev):
+        super().showEvent(ev)
+        self.ajuster_minimums()
+
     def paintSection(self, painter, rect, logique):
         if not rect.isValid():
             return
@@ -540,6 +601,25 @@ def vue_tableau(modele: ModeleTableau, cle_aide: str, selection_multiple=True,
     v.horizontalHeader().setStretchLastSection(True)
     aide(v, cle_aide)
     return v, proxy
+
+
+def equiper_entete(table):
+    """QTableWidget (ou toute QTableView sans `vue_tableau`) : en-tête qui ne tronque jamais un titre (`EnTete`) et
+    titre entier en info-bulle.  À appeler après avoir posé les titres."""
+    ancien = table.horizontalHeader()
+    if not isinstance(ancien, EnTete):
+        h = EnTete(Qt.Orientation.Horizontal, table)
+        h.setSectionsClickable(ancien.sectionsClickable())
+        h.setVisible(not ancien.isHidden())
+        h.setStretchLastSection(ancien.stretchLastSection())
+        h.setDefaultAlignment(ancien.defaultAlignment())
+        table.setHorizontalHeader(h)
+    if hasattr(table, 'horizontalHeaderItem'):
+        for c in range(table.columnCount()):
+            it = table.horizontalHeaderItem(c)
+            if it is not None:
+                it.setToolTip(it.text())
+    table.horizontalHeader().ajuster_minimums()
 
 
 def lignes_choisies(vue: QTableView, proxy: Proxy, modele: ModeleTableau) -> list:
