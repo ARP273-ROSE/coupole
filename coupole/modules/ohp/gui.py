@@ -158,6 +158,9 @@ class Panneau(QWidget):
         self.bandeau = self._bandeau_nouveautes()
         self.bandeau.setVisible(False)
         v.addWidget(self.bandeau)
+        self.bandeau_base = self._bandeau_base()     # base de suivi illisible, ou absente avec des fichiers rangés
+        self.bandeau_base.setVisible(False)
+        v.addWidget(self.bandeau_base)
         self.onglets = QTabWidget()                 # aide sur la barre et sur chaque onglet, pas sur tout le contenu
         aide(self.onglets.tabBar(), 'ohp_onglets_aide')
         v.addWidget(self.onglets)
@@ -293,6 +296,107 @@ class Panneau(QWidget):
         h.addWidget(bouton('ohp_nouv_voir', self.voir_nouveautes))
         h.addWidget(bouton('ohp_nouv_plus_tard', lambda: self.bandeau.setVisible(False)))
         return w
+
+    # ================================================================ bandeau de la base de suivi (0.2.1)
+    def _bandeau_base(self):
+        w = QFrame()
+        w.setObjectName('bandeauBase')
+        w.setFrameShape(QFrame.Shape.StyledPanel)
+        aide(w, 'ohp_bandeau_base_aide')
+        h = Flux(w, marge=6)
+        self.l_bandeau_base = QLabel('')
+        self.l_bandeau_base.setWordWrap(True)
+        self.l_bandeau_base.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        h.addWidget(self.l_bandeau_base)
+        self.b_reconnaitre = bouton('ohp_reconnaitre', self.reconnaitre)
+        h.addWidget(self.b_reconnaitre)
+        return w
+
+    def _maj_bandeau_base(self, poss):
+        """Base présente mais illisible : on le DIT (jamais un « tout à télécharger » muet).  Pas de base mais des
+        fichiers rangés : « Reconnaître les fichiers existants »."""
+        if poss.erreur:
+            chemin = os.path.join(poss.dest, '_traitement', 'etat.sqlite')
+            self.l_bandeau_base.setText(tr('ohp_base_illisible', erreur=poss.erreur[:400], chemin=chemin))
+            self.b_reconnaitre.setVisible(False)
+            self.bandeau_base.setVisible(True)
+        elif poss.fichiers_sans_base:
+            self.l_bandeau_base.setText(tr('ohp_base_absente_fichiers'))
+            self.b_reconnaitre.setVisible(True)
+            self.b_reconnaitre.setEnabled(True)
+            self.bandeau_base.setVisible(True)
+        else:
+            self.bandeau_base.setVisible(False)
+
+    def texte_suivi(self) -> str:
+        """« Dossier de suivi : <chemin> — N images possédées lues » : le dossier RÉELLEMENT lu, et ce qu'on y a lu."""
+        poss = self.possession
+        dest = poss.dest
+        if not dest:                                 # pas encore lue (ou pas de dossier)
+            return ''
+        if poss.erreur:
+            return tr('ohp_suivi_illisible', dest=dest)
+        if poss.base_absente:
+            return tr('ohp_suivi_sans_base', dest=dest)
+        n = sum(1 for s_ in poss.statuts.values() if s_ in ('ok', 'doublon'))
+        return tr('ohp_suivi_dossier', dest=dest, n=_entier(n))
+
+    def reconnaitre(self):
+        """Reconstruit la base de suivi depuis les fichiers rangés du dossier de sortie (en fond, avec progression ;
+        ne télécharge rien)."""
+        if self.occupe() or not self.inv:
+            return
+        dest = self._dest_courante()
+        if not dest:
+            return
+        from .reconnaissance import reconnaitre
+        inv = self.inv
+        arret = self.arret = enregistrer_arret(threading.Event())
+        evts = FileEvenements(self, self._progression_reconnaissance)
+
+        def travail():
+            try:
+                return reconnaitre(dest, inv, progression=lambda fait, total: evts((fait, total)), arret=arret,
+                                   rapporter=lambda cle, **v: evts({'type': 'base_locale', 'cle': cle, 'valeurs': v}))
+            except base_partagee.Divergence as e:
+                return {'divergence': (e.partage, os.path.dirname(e.locale))}
+
+        def fini(r):
+            evts.arreter()
+            self.b_lancer.setEnabled(True)
+            self.b_arreter.setEnabled(False)
+            self.b_reconnaitre.setEnabled(True)
+            if 'divergence' in r:
+                self.proposer_fusion(*r['divergence'])
+                return
+            texte = tr('ohp_reconnaitre_fait', n=_entier(r['reconnus']), deja=_entier(r['deja']),
+                       ignores=_entier(len(r['ignores'])))
+            self._log(texte)
+            self._statut(texte)
+            self._remplir_lots()
+            self._charger_possession()
+
+        def erreur(e):
+            evts.arreter()
+            self.b_lancer.setEnabled(True)
+            self.b_arreter.setEnabled(False)
+            self.b_reconnaitre.setEnabled(True)
+            QMessageBox.warning(self, tr('ohp_reconnaitre'), e)
+        self.b_lancer.setEnabled(False)
+        self.b_arreter.setEnabled(True)
+        self.b_reconnaitre.setEnabled(False)
+        self._t_reconnaitre = Tache(travail, parent=self)
+        self._t_reconnaitre.quand_fini(fini)
+        self._t_reconnaitre.quand_erreur(erreur)
+        self._t_reconnaitre.start()
+
+    def _progression_reconnaissance(self, evs):
+        for ev in evs:
+            if isinstance(ev, dict):
+                self._evenements([ev])
+            else:
+                fait, total = ev
+                self.l_bandeau_base.setText(tr('ohp_reconnaitre_progression', fait=_entier(fait), total=_entier(total)))
 
     def verifier_nouveautes(self, forcer=False):
         """Compare l'inventaire TAP frais à la copie locale (fil de fond) ; bandeau si quelque chose est nouveau."""
@@ -680,6 +784,10 @@ class Panneau(QWidget):
             if hasattr(fen, 'statusBar'):
                 fen.statusBar().showMessage(self.message_possession, 10000)
         self.possession, self._infos_ok = resultat[:2]
+        self._maj_bandeau_base(self.possession)
+        fen = self.window()
+        if poss.dest and hasattr(fen, 'statusBar'):     # le dossier réellement lu, et ce qu'on y a lu
+            fen.statusBar().showMessage(self.texte_suivi(), 15000)
         self._pre_possession = self.possession       # lots préchargés valables pour cette possession seulement
         if len(resultat) > 3 and self.inv is not None and resultat[3] is self.inv.images:
             self._comptes = resultat[2]              # comptes calculés en fond pour CET inventaire
@@ -779,6 +887,9 @@ class Panneau(QWidget):
             texte += ' — ' + tr('ohp_resume_possession', possedees=_entier(tot['possedees']),
                                 doublons=_entier(tot['doublons']), echecs=_entier(tot['echecs']),
                                 a_telecharger=_entier(tot['absentes'] + tot['echecs']))
+        suivi = self.texte_suivi() if hasattr(self, 'dest') else ''
+        if suivi:
+            texte += '\n' + suivi
         self.l_inventaire.setText(texte)
 
     def _message_objets_vide(self) -> str:

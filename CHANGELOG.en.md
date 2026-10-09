@@ -2,6 +2,43 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.2.1 — 9 October 2026
+
+**Ownership recognised on Windows on a network drive; optional libraries bundled in every package.**
+
+- **Ownership not recognised on Windows (user report).** A full copy of the bank on an SMB share, seen through a
+  network drive letter (`O:\OHP_DU_ECU`), showed as fully owned on Linux and « everything to download » on Windows,
+  state database in DELETE journal mode. **Cause**: the SQLite read URI was built by `Path.resolve().as_uri()`; on
+  Windows, `resolve()` replaces a network drive letter by the share's UNC path, and `as_uri()` turns it into
+  `file://server/share/…`, which SQLite rejects (« invalid uri authority »). The error was swallowed: unreadable
+  database → nothing owned, without a word. UNC paths typed directly (`\\server\share\…`) were not affected. Same
+  consequences for processing anomalies and the Archives module database on a network
+  drive.
+- **Fixes.** URI built without resolving (`file:///O:/…`, `file:////server/share/…`, special characters escaped).
+  The state database is read through a **local copy** (user cache, redone only when the database changes) when the
+  folder is on a share or the database is in WAL mode (`-wal` copied and checkpointed); direct reading as a
+  fallback, and the other way round. A WAL database on a share is therefore never unreadable from Windows any more.
+- **Never fail silently again.** Tracking database present but unreadable: **error banner** in the OHP bank (« The
+  tracking database of this folder could not be read: … ») with the cause, message on standard error from the command
+  line, and a line in `coupole.log`. Every read is recorded there (folder, working database, copy or direct read,
+  number of owned images read), as is every synchronisation with a share (direction, working database used).
+- **« Tracking folder: <path> — N owned images read »** in the OHP bank summary line and in the status bar: the
+  folder really read, and what was found there.
+- **Recognise existing files.** When `_traitement/` is missing while converted images are sorted, the banner offers
+  it: each file's header (`OHP:Source:URL`, otherwise `HISTORY « converted from … »`) gives the original image,
+  recorded as owned with its relative path; in the background, with progress; nothing is downloaded, moved or
+  rewritten. Command line: `coupole ohp recognise --dest FOLDER`. Reorganising now prefers the full address in the
+  header to the file name alone.
+- **Refresh the inventory** also re-reads ownership (checked by a test).
+- **Optional libraries bundled.** The standalone packages (Windows installer, .dmg, tar.gz, .deb) did not bundle
+  `reproject`: the Archives module fell back on scipy bilinear resampling. They now bundle `reproject` (with
+  `astropy-healpix`, `dask`, `zarr`), `sep`, `psutil` and `lxml`; only CuPy (NVIDIA card, unused) stays out. Each
+  built package imports and runs them (small resampling, SEP extraction) during its CI check, otherwise publishing
+  fails. « My computer » and « About » show the optional libraries present and missing, with their version.
+- Windows continuous integration: the machine's real `C$` administrative share (machine name, not « localhost » which SQLite tolerates) as UNC **and** through a network drive letter set
+  by `net use` (DRIVE_REMOTE), database in WAL then DELETE mode, first start without a working database and an old
+  working database from an earlier attempt.
+
 ## 0.2.0 — 9 October 2026
 
 **New « Observatory archives » module: public images from major observatories and space probes, current and past,

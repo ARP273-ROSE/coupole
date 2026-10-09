@@ -56,6 +56,9 @@ pip install ".[alignement]"                                     # + reproject (a
 python -m coupole            # interface ;   coupole --help : ligne de commande
 ```
 
+Les paquets autonomes (installeur Windows, .dmg, .deb, tar.gz) embarquent déjà SEP, reproject, psutil et lxml
+(0.2.1) ; « Ma machine » et « À propos » listent les bibliothèques facultatives présentes.
+
 ### En deux minutes
 
 ```bash
@@ -185,7 +188,8 @@ which pulls the Qt system libraries; `coupole` command and menu entry; `sudo apt
 **For Python users**: `pipx install git+https://github.com/ARP273-ROSE/coupole` (or `pip install .`);
 `pip install ".[qualite]"` adds the Quality module, `pip install ".[alignement]"` adds reproject (adaptive and
 exact alignment); `python -m coupole` starts the interface, `coupole --help`
-the command line.
+the command line. The standalone packages (Windows installer, .dmg, .deb, tar.gz) already bundle SEP, reproject,
+psutil and lxml (0.2.1); « My computer » and « About » list the optional libraries present.
 
 ### In two minutes
 

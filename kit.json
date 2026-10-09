@@ -23,6 +23,7 @@
     "kit.json"
   ],
   "requirements": "requirements.txt",
+  "essai_embarquees": "coupole.core.bibliotheques:essai_embarquees",
   "pip": [],
   "binaires": [],
   "fichiers_proteges": [],
@@ -35,7 +36,13 @@
     "coupole.gui.fenetre",
     "astropy.io.fits",
     "zstandard",
-    "lz4.block"
+    "lz4.block",
+    "sep",
+    "reproject",
+    "reproject.mosaicking",
+    "astropy_healpix",
+    "psutil",
+    "lxml.etree"
   ],
   "_note": "Dépôt de distribution à créer (public) : ARP273-ROSE/coupole. appid tiré au hasard pour Coupole (GUID de l'installeur Windows)."
 }

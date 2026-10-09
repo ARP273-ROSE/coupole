@@ -121,7 +121,7 @@ def analyser(chemin) -> dict:
         taille = None
     return {'chemin': chemin, 'raison': '', 'source': source, 'date_obs': ent.gets('DATE-OBS'), 'nx': nx, 'ny': ny,
             'sol': sol, 'statut': props.get('OHP:Astrometry:Status'), 'objet_entete': ent.gets('OBJECT'),
-            'taille': taille}
+            'taille': taille, 'url': props.get('OHP:Source:URL', '')}
 
 
 def index_par_fichier(inventaire) -> dict:
@@ -144,6 +144,10 @@ def rattacher_analyse(a: dict, index: dict) -> tuple[dict | None, dict | None, s
         return None, None, 'inconnu_inventaire'
     d_hdr = a.get('date_obs')
     x = candidats[0]
+    exacts = [y for y in candidats if a.get('url') and y['access_url'] == a['url']]
+    if exacts:                                   # adresse complète dans l'en-tête : plus d'ambiguïté (T120/T152…)
+        candidats = exacts
+        x = exacts[0]
     if len(candidats) > 1 and d_hdr:
         try:
             d = D.datetime.fromisoformat(d_hdr[:23])

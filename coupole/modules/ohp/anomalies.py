@@ -72,16 +72,10 @@ def depuis_traitement(chemin_etat) -> list[dict]:
     """Doublons de pixels trouvés au traitement (base d'état d'un dossier de destination)."""
     if not os.path.exists(chemin_etat):
         return []
-    import sqlite3
-    from ...core.base_partagee import chemin_lecture
-    from ...core.chemins import uri_sqlite_lecture_seule
+    from ...core.base_partagee import lire_base
     try:                                       # lecture seule (ne gêne pas un traitement qui écrit) ; jamais d'exception
-        db = sqlite3.connect(uri_sqlite_lecture_seule(chemin_lecture(chemin_etat)), uri=True, timeout=5)
-        try:
-            rows = db.execute("SELECT url, info FROM images WHERE statut='doublon'").fetchall()
-        finally:
-            db.close()
-    except sqlite3.Error:
+        rows = lire_base(chemin_etat, "SELECT url, info FROM images WHERE statut='doublon'")[0]
+    except Exception:                          # BaseIllisible : déjà notée au journal, et signalée par la possession
         return []
     out = []
     for url, info in rows:

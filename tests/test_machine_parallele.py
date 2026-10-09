@@ -60,3 +60,45 @@ def test_limiteur_de_debit():
         lim.prendre(50_000)                 # 500 ko à 200 ko/s : ≈ 1,5 s après le premier seau
     dt = time.monotonic() - t0
     assert 1.2 < dt < 3.0
+
+
+# ---------------------------------------------------------------- 0.2.1 : bibliothèques facultatives
+def test_bibliotheques_facultatives_listees():
+    from coupole.core import bibliotheques
+    from coupole.modules.machine import cli
+    liste = bibliotheques.facultatives()
+    noms = [b['module'] for b in liste]
+    assert noms[:2] == ['sep', 'reproject'] and 'cupy' in noms
+    presentes, absentes = bibliotheques.resume(liste)
+    # installées par l'extra « test » : présentes, avec leur version
+    assert 'sep ' in presentes and 'reproject ' in presentes
+    d = cli.rapport()
+    lignes = dict(cli.lignes(d))
+    assert 'reproject' in lignes['Bibliothèques facultatives']
+    assert 'Bibliothèques facultatives' in cli.infobulles()
+
+
+def test_essai_des_bibliotheques_embarquees():
+    from coupole.core import bibliotheques
+    v = bibliotheques.essai_embarquees()
+    assert set(v) == set(bibliotheques.EMBARQUEES) and all(v.values())
+
+
+def test_a_propos_donne_les_bibliotheques():
+    from coupole.gui.dialogues import texte_configuration
+    assert 'Bibliothèques facultatives : sep ' in texte_configuration()
+
+
+def test_paquets_embarquent_reproject_et_sep():
+    """requirements.txt (paquets autonomes) et contrôle des paquets en CI (kit.json)."""
+    import json
+    from pathlib import Path
+    racine = Path(__file__).resolve().parents[1]
+    req = (racine / 'requirements.txt').read_text(encoding='utf-8')
+    for nom in ('sep', 'reproject', 'psutil', 'lxml'):
+        assert any(l.startswith(nom) for l in req.splitlines()), nom
+    kit = json.loads((racine / 'kit.json').read_text(encoding='utf-8'))
+    assert {'sep', 'reproject', 'astropy_healpix', 'psutil'} <= set(kit['verification_import'])
+    assert kit['essai_embarquees'] == 'coupole.core.bibliotheques:essai_embarquees'
+    wf = (racine / '.github' / 'workflows' / 'release.yml').read_text(encoding='utf-8')
+    assert wf.count('essai_embarquees') >= 3

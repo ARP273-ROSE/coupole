@@ -27,6 +27,19 @@ jobs:
             poppler-utils
       - name: Installation
         run: python -m pip install ".[test]"
+      # 0.2.1 : dossier de sortie sur un lecteur RÉSEAU mappé (DRIVE_REMOTE ; `subst` ne suffit pas) — le cas d'un
+      # retour d'utilisateur (possession non reconnue sous Windows) ; tests/test_partage_windows.py
+      - name: Lecteur réseau de test (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          # nom de la machine, pas « localhost » : SQLite accepte l'autorité « localhost » dans une URI, et le
+          # défaut de la 0.2.0 (lettre résolue en UNC → file://serveur/…) ne se verrait pas
+          $partage = '\\' + $env:COMPUTERNAME + '\C$'
+          net use X: $partage /persistent:no
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          python -c "import ctypes; t = ctypes.windll.kernel32.GetDriveTypeW('X:\\'); print('GetDriveTypeW(X:) =', t); assert t == 4"
+          "COUPOLE_TEST_LECTEUR_RESEAU=X:" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: "Tests (sans réseau ni traitement de référence : les tests concernés sont sautés)"
         env:
           QT_QPA_PLATFORM: offscreen

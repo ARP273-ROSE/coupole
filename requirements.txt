@@ -7,4 +7,8 @@ lz4>=4.0
 PyQt6>=6.5
 tzdata
 lxml>=4.9
+# Facultatives côté pip (extras), mais embarquées dans TOUS les paquets autonomes (0.2.1) : ce qui sert à
+# l'utilisateur final.  reproject tire astropy-healpix, dask, zarr... ; contrôlés par kit.json « verification_import ».
 sep>=1.4
+reproject>=0.13
+psutil>=5.9

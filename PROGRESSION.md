@@ -702,3 +702,45 @@ passées, comme la Banque OHP ; méthode tirée des pratiques publiées (fils et
 - CI `tests.yml` : commit `9d21622` **6/6** du premier coup (Linux, Windows, macOS × 3.10, 3.12), garde-fou de
   confidentialité compris.
 - **Aucun tag posé.**
+
+## 2026-10-09 — version 0.2.1 : possession sous Windows (lecteur réseau), bibliothèques embarquées
+- **Retour d'utilisateur** : copie complète de la banque sur un partage SMB, vue sous Windows par une lettre de
+  lecteur réseau (dossier pré-rempli par le réglage `dossier_sortie`, le bon dossier, `_traitement/` dedans), base
+  d'état en journal DELETE depuis l'après-midi : « tout à télécharger » sous Windows, tout possédé sous Linux.
+- **Cause trouvée** : `chemins.uri_sqlite_lecture_seule` faisait `Path(chemin).resolve().as_uri()`. Sous Windows,
+  `resolve()` (realpath → `GetFinalPathNameByHandle`) rend le chemin UNC d'un fichier sur une lettre de lecteur
+  réseau ; `as_uri()` en fait `file://serveur/partage/…`, que SQLite refuse (« invalid uri authority », vérifié) ;
+  l'exception était avalée par `Possession.lire_avec_infos` → statuts vides → « tout à télécharger ». Le chemin
+  UNC tapé directement passait (branche `est_unc`). Pistes vérifiées et écartées pour ce cas : base WAL (DELETE au
+  moment de l'essai ; gérée quand même), identifiant d'image (SHA-1 de l'URL, indépendant du système), lecture de
+  `journal.csv` (BOM, « ; » : n'intervient pas dans les statuts), séparateurs d'`emplacements` (idem), dossier
+  pré-rempli (le champ affiché est celui qui est lu ; `_dest_courante` = `abspath` du champ), clé de la base de
+  travail (lettre et UNC = deux clés, deux bases de travail qui suivent chacune le partage : sans perte, divergence
+  signalée au pire), sens de synchronisation (une base de travail n'est lue que si l'état du partage noté à la
+  dernière synchronisation est identique ; sinon c'est la base du partage qui est lue), « Rafraîchir l'inventaire »
+  (relit bien la possession : test ajouté). Base réelle relue en lecture seule (copie temporaire, 18 Mo, DELETE,
+  7 625 ok + 364 doublons) : lisible, aucune anomalie.
+- **Corrections** : URI construite sans résolution (`file:///O:/…`, `file:////serveur/…`, échappements) ;
+  `base_partagee.lire_base` (base de travail à jour, sinon copie locale si partage ou WAL, sinon lecture directe ;
+  chaque échec mène à l'autre voie ; `BaseIllisible` sinon) utilisée par la possession et les anomalies ;
+  `Possession.erreur`, `base_absente`, `fichiers_sans_base` ; bandeau d'erreur et « Reconnaître les fichiers
+  existants » (module `ohp/reconnaissance.py`, CLI `coupole ohp reconnaitre`) ; ligne « Dossier de suivi : … — N
+  images possédées lues » (résumé + barre d'état) ; journal `coupole.log` : chaque lecture (provenance, nombre) et
+  chaque synchronisation (sens). La réorganisation préfère l'adresse complète de l'en-tête (`OHP:Source:URL`).
+- **Bibliothèques embarquées** : `requirements.txt` des paquets + `reproject` (et ses dépendances) + `psutil`
+  (`sep`, `lxml` y étaient déjà) ; `kit.json` : `verification_import` étendu et `essai_embarquees`
+  (`coupole.core.bibliotheques.essai_embarquees` : petit `reproject_interp` + extraction SEP), exécuté par
+  `build_unix.py` après l'élagage, par `release.yml` (Windows, étape dédiée Linux/macOS, conteneur Debian) : sans
+  elles, échec de la publication. « Ma machine » et « À propos » listent les bibliothèques facultatives.
+  Roues vérifiées pour cp312 win_amd64, macOS arm64 et x86_64, manylinux x86_64 et aarch64 (aucune compilation).
+- **Tailles mesurées** (paquet Linux x86_64 construit ici, `build_unix.py`, avant = 0.2.0 / après) : élagué
+  525 → 562 Mo dépliés ; archive tar.gz 101 → 121 Mo ; .deb 109,3 → 120,9 Mo. Windows (estimation par les roues
+  cp312 win_amd64 ajoutées, non construit ici) : + 13 Mo compressés, + 36 Mo dépliés avant élagage.
+- **Tests** : `tests/test_partage_windows.py` (URI lettre/UNC/caractères spéciaux, la cause reproduite, lecture
+  WAL/DELETE × local/partage, copie refaite seulement si la base change, secours si lecture directe refusée, base
+  abîmée dite et journalisée, reconnaissance avec URL ou HISTORY, bandeau et reconnaissance dans l'interface,
+  « Rafraîchir » relit la possession ; Windows : partage `C$` sous le nom de la machine (pas « localhost », que SQLite accepte comme autorité) en UNC et lettre posée par `net use` dans
+  `tests.yml`, WAL et DELETE, premier lancement, base de travail ancienne d'un essai antérieur, `resolve()` → UNC
+  et ancienne URI refusée sur le vrai lecteur) ; `test_machine_parallele.py` (bibliothèques).
+- Manuels FR/EN (Installation : bibliothèques embarquées ; partage réseau : Windows, dossier de suivi,
+  reconnaissance ; Dépannage), tableaux des commandes régénérés, aide F1, README, CHANGELOG FR puis EN.

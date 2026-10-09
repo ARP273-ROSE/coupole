@@ -423,7 +423,12 @@ def step_verifier(version):
     if not modules:
         return
     code = 'import sys; sys.path.insert(0, "app")\n' + \
-           '\n'.join(f'import {m}' for m in modules) + '\nprint("ok")'
+           '\n'.join(f'import {m}' for m in modules) + '\n'
+    essai = KIT.get('essai_embarquees')         # 0.2.1 : bibliotheques facultatives embarquees, essayees pour de vrai
+    if essai:
+        module, _, fonction = essai.partition(':')
+        code += f'import {module}; print({module}.{fonction}())\n'
+    code += 'print("ok")'
     # -B : sans cela la verification recree des .pyc dans app/ — apres
     # l'elagage, qui les avait retires — et ils partent dans le paquet.
     r = subprocess.run([str(exe), '-B', '-c', code], cwd=base,
@@ -431,7 +436,7 @@ def step_verifier(version):
                        env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1'})
     if r.returncode != 0:
         raise RuntimeError('Le paquet ne s\'importe pas :\n' + r.stderr[-2000:])
-    log('verification d\'import : ok')
+    log('verification d\'import : ok ' + r.stdout.strip().replace('\n', ' '))
 
 
 def step_archive(version):

@@ -2,6 +2,47 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.2.1 — 9 octobre 2026
+
+**Possession reconnue sous Windows sur un lecteur réseau ; bibliothèques facultatives embarquées dans tous les
+paquets.**
+
+- **Possession non reconnue sous Windows (retour d'utilisateur).** Une copie complète de la banque sur un partage
+  SMB, vue par une lettre de lecteur réseau (`O:\OHP_DU_ECU`), apparaissait entièrement possédée sous Linux et
+  « tout à télécharger » sous Windows, base d'état en journal DELETE. **Cause** : l'URI SQLite de lecture était
+  construite par `Path.resolve().as_uri()` ; sous Windows, `resolve()` remplace la lettre d'un lecteur réseau par
+  le chemin UNC du partage, et `as_uri()` en fait `file://serveur/partage/…`, que SQLite refuse (« invalid uri
+  authority »). L'erreur était avalée : base illisible → rien de possédé, sans un mot. Les chemins UNC tapés
+  directement (`\\serveur\partage\…`) n'étaient pas touchés. Mêmes conséquences pour les anomalies du traitement
+  et la base du module Archives sur un lecteur réseau.
+- **Corrections.** URI construite sans résolution (`file:///O:/…`, `file:////serveur/partage/…`, caractères
+  spéciaux échappés). Lecture de la base d'état par **copie locale** (cache de l'utilisateur, refaite seulement si
+  la base change) quand le dossier est sur un partage ou que la base est en WAL (`-wal` recopié et reporté) ;
+  lecture directe en secours, et inversement. Une base WAL sur un partage n'est donc plus jamais illisible depuis
+  Windows.
+- **Ne plus jamais échouer en silence.** Base de suivi présente mais illisible : **bandeau d'erreur** dans la Banque
+  OHP (« La base de suivi de ce dossier n'a pas pu être lue : … ») avec la cause, message sur la sortie d'erreur en
+  ligne de commande, et ligne dans `coupole.log`. Chaque lecture y est notée (dossier, base de travail, copie ou
+  lecture directe, nombre d'images possédées lues), de même que chaque synchronisation avec un partage (sens,
+  base de travail utilisée).
+- **« Dossier de suivi : <chemin> — N images possédées lues »** dans la ligne de résumé de la Banque OHP et dans la
+  barre d'état : le dossier réellement lu, et ce qu'on y a trouvé.
+- **Reconnaître les fichiers existants.** Si `_traitement/` manque alors que des images converties sont rangées,
+  le bandeau le propose : l'en-tête de chaque fichier (`OHP:Source:URL`, sinon `HISTORY « converti de … »`) donne
+  l'image d'origine, inscrite comme possédée avec son chemin relatif ; en fond, avec progression ; rien n'est
+  téléchargé, déplacé ni réécrit. Ligne de commande : `coupole ohp reconnaitre --dest DOSSIER`. La réorganisation
+  préfère désormais l'adresse complète de l'en-tête au seul nom de fichier.
+- **Rafraîchir l'inventaire** relit aussi la possession (vérifié par un test).
+- **Bibliothèques facultatives embarquées.** Les paquets autonomes (installeur Windows, .dmg, tar.gz, .deb)
+  n'embarquaient pas `reproject` : le module Archives retombait sur un rééchantillonnage bilinéaire de scipy. Ils
+  embarquent désormais `reproject` (avec `astropy-healpix`, `dask`, `zarr`), `sep`, `psutil` et `lxml` ; seul CuPy
+  (carte NVIDIA, inutilisé) reste à part. Chaque paquet construit les importe et les fait tourner (petit
+  rééchantillonnage, extraction SEP) à son essai en CI, sinon la publication échoue. « Ma machine » et « À propos »
+  affichent les bibliothèques facultatives présentes et absentes, avec leur version.
+- Intégration continue Windows : le vrai partage administratif `C$` de la machine (nom de la machine, pas « localhost » que SQLite tolère) en UNC **et** par une lettre de lecteur réseau
+  posée par `net use` (DRIVE_REMOTE), base en WAL puis en DELETE, premier lancement sans base de travail et base de
+  travail ancienne d'un essai antérieur.
+
 ## 0.2.0 — 9 octobre 2026
 
 **Nouveau module « Archives des observatoires » : les images publiques des grands observatoires et des sondes,

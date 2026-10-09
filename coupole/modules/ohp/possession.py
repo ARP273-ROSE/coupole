@@ -3,7 +3,9 @@
 La source de vérité est ``<destination>/_traitement/etat.sqlite`` (statut ``ok`` / ``doublon`` / ``echec`` par
 identifiant d'image, tenu par le pilote).  Ce module la lit en entier (quelques milliers de lignes, quelques
 millisecondes), sans Qt, et répond : cette image est-elle possédée ?  combien d'images de cet objet a-t-on ?
-que reste-t-il à télécharger ?  Il ne lève jamais : sans dossier, sans base ou base illisible → rien n'est possédé.
+que reste-t-il à télécharger ?  Il ne lève jamais.  Sans dossier ou sans base : rien n'est possédé.  Base présente
+mais illisible (0.2.1) : rien n'est possédé ET `erreur` le dit (l'interface affiche un bandeau, le journal note la
+cause) — jamais plus un « tout à télécharger » silencieux.
 
 Statuts rendus (``STATUTS``) :
   * ``ok`` — convertie et rangée (possédée) ;
@@ -15,20 +17,38 @@ from __future__ import annotations
 
 import collections as C
 import json
+import logging
 import os
 
 from .conversion import ident
 
 STATUTS = ('ok', 'doublon', 'echec', 'absente')
 POSSEDES = ('ok', 'doublon')                 # ce qui n'est plus à télécharger
+log = logging.getLogger('coupole.possession')
 
 
-def _uri_lecture_seule(chemin: str) -> str:
-    """URI SQLite en lecture seule (chemins avec espaces, accents ou « ? », UNC et gvfs compris) de la base à lire :
-    la base de travail locale si elle est à jour (dossier sur un partage, voir core/base_partagee), sinon celle-ci."""
-    from ...core.base_partagee import chemin_lecture
-    from ...core.chemins import uri_sqlite_lecture_seule
-    return uri_sqlite_lecture_seule(chemin_lecture(chemin))
+def _lire(chemin: str, requete: str) -> list:
+    """Lignes de la base d'état `chemin` : base de travail locale à jour, copie locale (partage réseau, base WAL)
+    ou la base elle-même en lecture seule (core/base_partagee.lire_base).  Lève BaseIllisible."""
+    from ...core.base_partagee import lire_base
+    return lire_base(chemin, requete)[0]
+
+
+def fichiers_ranges_presents(dest) -> bool:
+    """Des fichiers convertis sont-ils rangés dans `dest` (dossiers de type « 07_Nebuleuses »…) ?  Rapide : on
+    s'arrête au premier fichier trouvé.  Sert à proposer « Reconnaître les fichiers existants » quand
+    `_traitement/` manque."""
+    from .emplacements import _dossiers_type
+    from .reorganisation import EXTENSIONS
+    try:
+        noms = set(os.listdir(str(dest)))
+    except OSError:
+        return False
+    for d in sorted(noms & _dossiers_type()):
+        for _racine, _dossiers, fichiers in os.walk(os.path.join(str(dest), d)):
+            if any(f.lower().endswith(EXTENSIONS) for f in fichiers):
+                return True
+    return False
 
 
 def _relatif(chemin: str, dest: str) -> str:
@@ -52,6 +72,9 @@ class Possession:
         self.details: dict[str, dict] = details or {}       # id → {'date': …, 'chemin': …}
         self.existe = bool(self.statuts)
         self.a_migrer: list = []                            # [(id, chemin relatif)] trouvés par journal.csv
+        self.erreur = ''                                    # base présente mais illisible : la cause
+        self.base_absente = False                           # pas de _traitement/etat.sqlite dans `dest`
+        self.fichiers_sans_base = False                     # … mais des fichiers convertis y sont rangés
 
     @classmethod
     def vide(cls) -> 'Possession':
@@ -75,18 +98,22 @@ class Possession:
         dest = str(dest or '')
         chemin = os.path.join(dest, '_traitement', 'etat.sqlite') if dest else ''
         if not chemin or not os.path.exists(chemin):
-            return cls(dest), []
-        import sqlite3
+            p = cls(dest)
+            if dest:
+                p.base_absente = True
+                p.fichiers_sans_base = os.path.isdir(dest) and fichiers_ranges_presents(dest)
+                log.info('possession de %s : pas de base de suivi (_traitement/etat.sqlite)%s', dest,
+                         ', fichiers convertis présents' if p.fichiers_sans_base else '')
+            return p, []
         statuts, details, infos_ok = {}, {}, []
         try:
-            # URI en lecture seule : on ne crée rien, on ne modifie rien, on ne gêne pas un pilote qui écrit.
-            db = sqlite3.connect(_uri_lecture_seule(chemin), uri=True, timeout=5)
-            try:
-                lignes = db.execute('SELECT id, statut, maj, info FROM images').fetchall()
-            finally:
-                db.close()
-        except Exception:                        # sqlite3.Error, OSError : rien de possédé plutôt qu'un plantage
-            return cls(dest), []
+            # lecture seule : on ne crée rien, on ne modifie rien, on ne gêne pas un pilote qui écrit
+            lignes = _lire(chemin, 'SELECT id, statut, maj, info FROM images')
+        except Exception as e:                   # BaseIllisible, sqlite3.Error, OSError : DIT, jamais muet
+            p = cls(dest)
+            p.erreur = str(e) or type(e).__name__
+            log.warning('possession de %s : base de suivi illisible : %s', dest, p.erreur)
+            return p, []
         journal = None
         a_migrer = []
         for i, statut, maj, info in lignes:
@@ -115,6 +142,8 @@ class Possession:
                           'origine': origine}
         poss = cls(dest, statuts, details)
         poss.a_migrer = a_migrer
+        log.info('possession de %s : %d image(s) possédée(s) lue(s) (%d ligne(s) dans la base)', dest,
+                 sum(1 for v in statuts.values() if v in POSSEDES), len(lignes))
         return poss, infos_ok
 
     # ---------------------------------------------------------------- par image
@@ -218,14 +247,10 @@ def lire_statuts(dest) -> dict:
     chemin = os.path.join(str(dest or ''), '_traitement', 'etat.sqlite') if dest else ''
     if not chemin or not os.path.exists(chemin):
         return {}
-    import sqlite3
     try:
-        db = sqlite3.connect(_uri_lecture_seule(chemin), uri=True, timeout=5)
-        try:
-            return dict(db.execute('SELECT id, statut FROM images').fetchall())
-        finally:
-            db.close()
-    except Exception:
+        return dict(_lire(chemin, 'SELECT id, statut FROM images'))
+    except Exception as e:
+        log.warning('statuts de %s illisibles : %s', dest, e)
         return {}
 
 
@@ -234,12 +259,8 @@ def lire_infos_ok(dest) -> list:
     chemin = os.path.join(str(dest or ''), '_traitement', 'etat.sqlite') if dest else ''
     if not chemin or not os.path.exists(chemin):
         return []
-    import sqlite3
     try:
-        db = sqlite3.connect(_uri_lecture_seule(chemin), uri=True, timeout=5)
-        try:
-            return [(i, json.loads(s)) for i, s in db.execute("SELECT id, info FROM images WHERE statut='ok'") if s]
-        finally:
-            db.close()
-    except Exception:
+        return [(i, json.loads(s)) for i, s in _lire(chemin, "SELECT id, info FROM images WHERE statut='ok'") if s]
+    except Exception as e:
+        log.warning('infos de %s illisibles : %s', dest, e)
         return []
