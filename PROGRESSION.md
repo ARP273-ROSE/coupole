@@ -588,4 +588,6 @@ Retours de Kevin (Linux/KDE, 0.1.10, `/mnt/nas/Astronomie/OHP_DU_ECU` = copie pr
   octet par octet, arborescence N.I.N.A. + WBPP + ASIAIR). Manuels FR/EN (42 p.) complétés et recompilés.
 - Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 480 réussis,
   15 sautés, code 0 ; python:3.10-slim 480 / 15, code 0**.
+- CI `tests.yml` : commit `0f261ca` 4/6 (Windows : test du dossier de départ qui supposait « / » comme racine) ;
+  commit `b459b98` **6/6** (Linux, Windows, macOS × 3.10, 3.12).
 - **Aucun tag posé.**
