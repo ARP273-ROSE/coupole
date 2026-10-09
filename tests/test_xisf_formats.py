@@ -176,3 +176,19 @@ def test_metadonnees_fits_sans_toucher_aux_pixels(tmp_path):
     r = metadonnees.reecrire_dossier(tmp_path)
     assert r == {'fichiers': 1, 'modifies': 0, 'inchanges': 1, 'erreurs': 0, 'base': 0}
     assert (tmp_path / '_traitement' / 'metadonnees.csv').exists()
+
+
+def test_fichiers_d_exemple_pour_les_testeurs():
+    """tests/donnees : trois petits fichiers (image de synthèse) pour essayer PixInsight, Siril, N.I.N.A., ASTAP."""
+    from pathlib import Path
+    from coupole.core import logiciels, xisf as X
+    d = Path(__file__).parent / 'donnees'
+    assert logiciels.nature(d / 'exemple_pixinsight.xisf') == 'xisf_flottant'
+    assert logiciels.nature(d / 'exemple_compatible.xisf') == 'xisf_entier'
+    assert logiciels.nature(d / 'exemple.fits') == 'fits_flottant'
+    a, inf = X.lire(d / 'exemple_pixinsight.xisf')
+    b, inf_b = X.lire(d / 'exemple_compatible.xisf')
+    assert a.shape == b.shape == (256, 256) and inf['bounds'] == '-1000.0:65535.0' and inf_b['format'] == 'UInt16'
+    assert abs((b.astype(float) - 1000 - a).max()) <= 0.5                     # piédestal de 1 000 ADU, arrondi
+    assert inf['proprietes']['Instrument:Sensor:XPixelSize'] == '27.0'
+    assert all(p.stat().st_size < 1_000_000 for p in d.iterdir())

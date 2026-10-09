@@ -1,6 +1,9 @@
 """Captures d'écran de l'interface (pour le manuel et les tests visuels), sans écran :
 
-    QT_QPA_PLATFORM=offscreen python outils/captures.py fr docs/manuel/img
+    QT_QPA_PLATFORM=offscreen python outils/captures.py fr docs/manuel/img [DOSSIER_QUALITE] [DESTINATION]
+
+DESTINATION : un dossier de sortie (INDEX_LOTS.csv et quelques images par lot) pour l'onglet Lots et son encadré
+« Pour PixInsight / N.I.N.A. ».
 """
 import os
 import sys
@@ -101,6 +104,13 @@ def main():
     ohp.onglets.setCurrentIndex(4)
     capture('ciel')
     ohp.onglets.setCurrentIndex(2)
+    if len(sys.argv) > 4:                          # vraie destination : lots, focale, pixel, échelle
+        ohp.dest.setText(sys.argv[4])
+        ohp._remplir_lots()
+        attendre(app, lambda: ohp.m_lots.rowCount() > 0 and getattr(ohp, '_inst_lots', None), 30)
+        r = next((k for k, l in enumerate(ohp.m_lots.lignes) if l[0].endswith('champ_1_T120/V')), 0)
+        ohp.v_lots.selectRow(ohp.p_lots.mapFromSource(ohp.m_lots.index(r, 0)).row())
+        attendre(app, lambda: ohp._astro_valeurs['focale'].text() != '—', 20)
     capture('lots')
     # fiche en ligne de NGC 6888 (vraie requête SIMBAD si Internet est disponible, sinon message hors ligne)
     ohp.onglets.setCurrentIndex(ohp.onglet_fiche)
@@ -121,6 +131,14 @@ def main():
             p.recevoir_redshift(0.158, '3C 273')
             attendre(app, lambda: p.resultat is not None and abs(p.resultat['z'] - 0.158) < 1e-9
                      and 'shoes' in p.resultat, 60)
+            # les deux dispositions : côte à côte sur un grand écran (2 000 px), empilée à 1 400 px
+            f.barre.setCurrentRow(i)
+            f.resize(2000, 1000)
+            p.definir_disposition('cote')
+            attendre(app, lambda: False, 1.5)
+            capture('module_cosmo_cote')
+            p.definir_disposition('auto')
+            f.resize(1400, 860)
         if mid == 'qualite' and len(sys.argv) > 3:
             p.l_dossier.setText(sys.argv[3])
             p.lancer()

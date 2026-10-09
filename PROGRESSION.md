@@ -459,3 +459,43 @@ Retours d'usage de Kevin (Manjaro, KDE Plasma, paquet autonome 0.1.7, dossier de
   dépannage, installeur), captures Catalogue et Préférences refaites.
 - CI `tests.yml` du commit `f2cf35c` : **6/6** (Linux, Windows, macOS × 3.10, 3.12) ; sous Windows, le test UNC réel (`\\localhost\C$\…`) passe. Premier passage rouge sous Windows : tests seulement (possession simulée avec un dossier non absolu, ignorée comme périmée ; « : » interdit dans un nom de dossier).
 - **Aucun tag posé** (publication par Kevin).
+
+## 2026-10-09 — version 0.1.9 : Qualité sur un vrai partage SMB, compatibilité vérifiée, métadonnées PixInsight
+Retours de Kevin (Manjaro, 0.1.8, `/mnt/nas/Astronomie/OHP_DU_ECU/09_Galaxies` sur un partage SMB). Détail et
+mesures : `docs/AUDIT2_2026-10.md` § 9.
+- **Inventaire Qualité** : vrai Samba en conteneur, client cifs du noyau, `tc netem` ; arborescence réelle de la
+  banque en fichiers vides. Cause : SQLite n'écrit pas à travers les verrous SMB (« database is locked », fichier de
+  0 octet — le même que sur le NAS, créé par Kevin à 13 h 33) ; trois ouvertures du cache × 30 s = **90,4 s** avant
+  la première mesure (92,7 s à 10 ms). Cache local pour un partage, repli en 3 s ; inventaire producteur/consommateur
+  (`moteur.inventorier`, `parcours.parcourir`) ; dossiers des lots d'après INDEX_LOTS.csv / la base d'état ; dates
+  tirées de `scandir` ; 32 fils sur un partage ; échantillon mesuré d'abord, question non modale. **Après : inventaire
+  0,13–0,22 s (0 ms), 0,24–0,56 s (10 ms), 0,57–1,05 s (20 ms) ; premier résultat 0,2–0,6 s.** `strace` : 0 ouverture,
+  ≈ 1 `stat` par image (déjà en 0.1.8). Outil : `outils/audit2/mesure_inventaire_qualite.py`.
+- **Non corrigé, à décider** : la base d'état du pilote (`etat.sqlite`) sur un partage cifs par défaut a le même
+  défaut (« database is locked ») ; `vfs=unix-dotfile` fonctionne (essai) mais un verrou orphelin bloquerait.
+- **En-têtes de tableaux** : `EnTete` garde chaque section au moins à la largeur de son titre, info-bulle du titre ;
+  `equiper_entete` pour les QTableWidget ; info-bulles des QTabWidget sur la barre d'onglets. Tests génériques
+  (tous les tableaux visibles, 1 366 / 2 000 px, échelles 1,5 et 2 ; aucun conteneur avec info-bulle propre).
+- **Cosmologie** : colonnes au contenu, disposition auto (hystérésis 1 550 / 1 450) / côte à côte / empilée (menu
+  Affichage + liste), séparateur gardé par disposition ; unités km s⁻¹ Mpc⁻¹ (CSV et cp1252 en ASCII ; test anti
+  « x/y/z »). Captures des deux dispositions.
+- **ASTAP** : D80 en zip inexistant (404) ; extraction du .deb vérifiée sur le vrai paquet (md5 1d0683cb…, 1 476
+  tuiles) ; paquets Arch examinés (GTK2 non résolu, gtk3 dans extra, astap_cli statique) ; astap_cli préféré partout ;
+  test des 30 liens en CI (`COUPOLE_TEST_LIENS=1`, étape dédiée de `tests.yml`).
+- **Compatibilité** (`core/logiciels.py`, sources citées) : Siril AppImage 1.2.0/1.2.6 sans XISF, 1.4.0/1.4.4 bit à
+  bit mais flottants hors [0, 1] ; paquets Debian 13 / Ubuntu 24.04 sans XISF ; N.I.N.A. 3.2 (code) sans zstd,
+  flottants supposés [0, 1] ; ASTAP XISF non compressé seulement ; PCL inchangé ; spécification XISF 1.0 rév. 1
+  (sept. 2026), XSD identique. Écart noté : `Observation:Center` = centre de la solution (rév. 1 : pointage).
+- **XISF compatible** (`xisf16`) : UInt16 + piédestal 1 000 ADU, zlib+sh ; perte mesurée sur 66 poses de la banque
+  (`outils/audit2/mesure_perte_uint16.py`). Sans piédestal : 99,75 % de pixels perdus sur une pose de 10 s.
+- **Ouvrir** : double-clic / menu contextuel (Banque OHP images, objets, lots ; Qualité) ; « Ouvrir avec » selon la
+  table ; emplacement par D-Bus/Finder/Explorateur. Colonne « lots » et répartition (possédé ≠ empilable).
+- **PixInsight / N.I.N.A.** : FOCALLEN accordé à l'échelle, propriétés Instrument:* (spéc. rév. 1) ; encadré de
+  l'onglet Lots, colonnes, LOT.txt ; `coupole ohp metadonnees --reecrire` (bloc recopié, relu ; base d'état mise à
+  jour). Fichiers d'essai `tests/donnees/`.
+- Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 371 réussis,
+  13 sautés, code 0 ; python:3.10-slim 371 / 13, code 0** ; `test_adaptatif`, `test_echelle`, `test_gui_robustesse`
+  à `QT_SCALE_FACTOR` 1,5 et 2 : 47 réussis, code 0 (les deux versions). Tests de référence (`COUPOLE_REFERENCE`)
+  passés à part. Manuels FR/EN (41 p.) recompilés, temporaires supprimés ; captures refaites (Lots avec l'encadré,
+  Cosmologie côte à côte et empilée, Traitement avec « qui lit quoi »).
+- **Aucun tag posé.**

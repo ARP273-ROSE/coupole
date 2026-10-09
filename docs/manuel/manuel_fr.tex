@@ -387,6 +387,49 @@ filtre, pose ; tri par nom = tri dans le temps. Noms sûrs sous Windows. L'ongle
 \emph{complet} : poses converties contre poses de la banque pour la même clé (objet, instrument, filtre, et nuit
 pour un objet mobile) ; un objet fixe découpé en plusieurs champs compte ses lots ensemble.
 
+\paragraph{Possédé $\neq$ empilable ensemble.} « 840 / 840 » dans la colonne \emph{possédé} dit que toutes les
+images d'un objet sont là, pas qu'elles forment un seul empilement : la colonne \emph{lots} de la liste des objets
+et son info-bulle donnent la répartition (« 840 images rangées en 9 lots : champ 1 T120 : B 200 · V 300 · R 300 ;
+… — on empile lot par lot »), et le clic droit sur un objet propose \emph{Voir les lots de cet objet} (onglet Lots
+filtré, bouton \emph{Tous les lots}) et \emph{Ouvrir le dossier de la cible} (double-clic : de même).
+
+\paragraph{Pour PixInsight / N.I.N.A.} Sous le tableau des lots, un encadré donne, pour le lot choisi, ce qu'il
+faut saisir dans PixInsight (ImageSolver, panneau \emph{Astrometric solution} de WBPP) ou N.I.N.A. : instrument,
+\textbf{focale} (celle qui donne l'échelle mesurée : $f = 206{,}265 \times \mathrm{XPIXSZ} / \mathrm{PIXSCALE}$,
+par exemple 7~234,1~mm pour le T120 au lieu des 7~200 de l'en-tête d'origine), \textbf{pixel effectif} (binning
+compris : T120 iKon-L en binning 2 : 27~\textmu m), binning, \textbf{échelle} (\si{\arcsecond}\,px$^{-1}$), champ et
+centre, chacun avec \emph{Copier}, plus \emph{Tout copier} (aussi au clic droit d'un lot : \emph{Copier les
+paramètres d'astrométrie}). Les valeurs sont lues dans l'en-tête des images du lot, jamais codées en dur ; les
+colonnes \emph{focale}, \emph{pixel} et \emph{échelle} du tableau se masquent au clic droit sur l'en-tête.
+\texttt{LOT.txt} donne les mêmes valeurs. Si un logiciel affiche le double de l'échelle, il a appliqué le binning
+deux fois : saisir le pixel non binné (13,5~\textmu m) avec le binning 2, ou le pixel effectif avec le binning 1.
+
+Vérifié dans le code de PixInsight (PJSR : \texttt{AstrometricMetadata.js}, \texttt{BPP-Solver.js}) : ImageSolver
+lit les propriétés \texttt{Instrument:Telescope:FocalLength} (m) et \texttt{Instrument:Sensor:XPixelSize}
+(\textmu m), sinon \texttt{FOCALLEN} et \texttt{XPIXSZ}, sans multiplier par \texttt{XBINNING} ; WBPP résout le
+\emph{master} intégré avec ses métadonnées si elles survivent à l'intégration, sinon avec les valeurs de son panneau,
+qui restent celles du dernier instrument utilisé : y saisir focale et pixel (un fichier de réglages WBPP par
+instrument évite de les ressaisir). Coupole écrit donc \texttt{FOCALLEN} accordé à l'échelle mesurée (ancienne valeur
+en \texttt{HISTORY}) et les propriétés \texttt{Instrument:Sensor:XPixelSize}/\texttt{YPixelSize},
+\texttt{Instrument:Camera:XBinning}/\texttt{YBinning}, \texttt{Instrument:Camera:Name},
+\texttt{Instrument:Telescope:FocalLength} et \texttt{Aperture} (T120 : 1,2~m). Pour les fichiers déjà convertis :
+\cmd{coupole ohp metadonnees DOSSIER --reecrire} (sans \texttt{--reecrire} : simulation) complète les en-têtes
+\emph{sans toucher aux pixels} (bloc recopié octet pour octet, relu et comparé ; écriture atomique ; journal
+\texttt{\_traitement/metadonnees.csv}) et note focale et pixel dans la base d'état ; \cmd{coupole ohp ranger} récrit
+ensuite les \texttt{LOT.txt}. Pour vérifier un master : l'ouvrir, \emph{FITSHeader} ou \emph{Image > Properties},
+chercher \texttt{XPIXSZ}, \texttt{FOCALLEN} et \texttt{Instrument:*}.
+
+\subsection{Ouvrir une image}\label{sec:ouvrir}
+Double-clic sur une image possédée (liste des images, tableau du module Qualité) : l'application associée du
+système. Clic droit : \emph{Ouvrir}, \emph{Ouvrir avec} et \emph{Ouvrir l'emplacement du fichier} (fichier
+sélectionné : Explorateur \texttt{/select}, Finder \texttt{open -R}, gestionnaire freedesktop par D-Bus
+\texttt{FileManager1.ShowItems} — Dolphin, Nautilus… —, sinon le dossier). \emph{Ouvrir avec} ne propose que les
+logiciels d'astronomie trouvés sur la machine (PixInsight, Siril, ASTAP, Aladin, N.I.N.A. : PATH, emplacements
+usuels, flatpak, \texttt{/Applications}, Program Files) \emph{et} capables de lire ce fichier d'après la table
+vérifiée de la section~\ref{sec:compat} ; les autres apparaissent grisés avec la raison (« ASTAP ne lit que le XISF
+non compressé : choisir le format FITS dans le Traitement »). Une image pas encore téléchargée : la barre d'état le
+dit.
+
 \subsection{Anomalies}
 \capture{img/anomalies_fr.png}{1.0}
 \begin{center}\small
@@ -459,19 +502,34 @@ confirmées sur 7~625) ; D50 (environ 0,9 Go) convient aussi pour IRIS.
 \textbf{Système} & \textbf{Programme (liens de la page officielle)}\\
 \midrule
 Windows x64 & \texttt{astap\_setup.exe} puis \texttt{d80\_star\_database.exe} (même dossier, \texttt{C:\textbackslash Program Files\textbackslash astap}) ; facultatif : \texttt{astap\_command-line\_version\_win64.zip}\\
-Windows ARM64 & \texttt{astap\_command-line\_version\_win11\_aarch64.zip} et \texttt{d80\_star\_database.zip}, dans un même dossier\\
+Windows ARM64 & \texttt{astap\_command-line\_version\_win11\_aarch64.zip} dans \texttt{C:\textbackslash astap} ; catalogue : \texttt{d80\_star\_database.exe} (installeur x86, émulé) vers ce dossier, ou \texttt{d50\_star\_database.zip} (pas de D80 en zip)\\
 macOS Apple Silicon & \texttt{astap\_M1.pkg}, \texttt{d80\_star\_database.pkg} ; une fois : \texttt{codesign --force -s - /Applications/ASTAP.app/Contents/MacOS/astap}\\
 macOS Intel & \texttt{astap.pkg}, \texttt{d80\_star\_database.pkg}\\
 Linux Debian/Ubuntu & \texttt{astap\_amd64.deb} (ou \texttt{astap\_aarch64.deb}), \texttt{d80\_star\_database.deb} (dans \texttt{/opt/astap})\\
-Linux Fedora/openSUSE & \texttt{astap\_amd64.rpm}, catalogue \texttt{d80\_star\_database.zip} décompressé dans \texttt{/opt/astap}\\
-Linux Arch & \texttt{astap\_amd64.pkg.tar.zst}, catalogue en zip\\
+Linux Fedora/openSUSE & \texttt{astap\_amd64.rpm} ; D80 extrait du \texttt{.deb} (ci-dessous) ou D50 en zip dans \texttt{/opt/astap}\\
+Linux Arch/Manjaro & \texttt{astap\_amd64\_gtk3.pkg.tar.zst} (ou GTK2) ; D80 : paquet AUR \texttt{d80-star-db-astap} ou extrait du \texttt{.deb} ; D50 : \texttt{d50\_star\_database.pkg.tar.zst}\\
 Autres Linux & \texttt{astap\_amd64.tar.gz} ou \texttt{astap\_command-line\_version\_Linux\_amd64.zip} ; pas d'AppImage officielle\\
 \bottomrule
 \end{tabularx}
 \end{center}
 
+\paragraph{Pas de D80 en zip.} Le lien « D80 (zipped) » de la page officielle est mort (404, vérifié le 9/10/2026) :
+le D80 n'existe qu'en \texttt{.exe}, \texttt{.pkg} et \texttt{.deb}. Hors Debian, l'extraire du \texttt{.deb} sans
+toucher aux droits de \texttt{/} (commande vérifiée sur le vrai paquet : 1~213~392~756 octets, 1~476 tuiles) :
+\begin{ccode}
+bsdtar -xf d80\_star\_database.deb data.tar.xz\\
+sudo mkdir -p /opt/astap\\
+sudo tar -xJf data.tar.xz -C /opt/astap --strip-components=3 --no-same-owner\\
+\hspace*{2em}--wildcards \textquotesingle./opt/astap/d80\_*\textquotesingle
+\end{ccode}
+(jamais \texttt{sudo tar -x … -C /} : l'archive contient \texttt{./} et \texttt{./opt/}). \textbf{Arch/Manjaro} : le
+paquet officiel met \texttt{astap} et \texttt{astap\_cli} dans \texttt{/opt/astap} seulement (rien dans le PATH :
+Coupole les y trouve) ; l'\texttt{astap} graphique GTK2 demande \texttt{libgtk-x11-2.0}, absent des dépôts officiels
+(AUR seulement) et non déclaré ; \texttt{astap\_cli} est autonome (lié statiquement) et suffit à Coupole ; pour
+l'interface d'ASTAP, le paquet GTK3. Un test de l'intégration continue vérifie chaque lien, pour chaque système.
+
 \begin{sloppypar}\noindent\textbf{Détection.} Ordre : chemin choisi (Préférences, \cmd{coupole astap --definir}), variable
-\texttt{COUPOLE\_ASTAP}, PATH (\texttt{astap\_cli}, puis \texttt{astap}), emplacements par défaut (Windows
+\texttt{COUPOLE\_ASTAP}, \texttt{astap\_cli} partout (PATH puis emplacements par défaut), puis seulement \texttt{astap}, emplacements par défaut (Windows
 \texttt{Program Files\textbackslash astap}, \texttt{\%LOCALAPPDATA\%\textbackslash astap} ; macOS
 \texttt{/Applications/ASTAP.app}, \texttt{/usr/local/opt/astap} ; Linux \texttt{/opt/astap}, \texttt{/usr/bin},
 \texttt{/usr/local/bin}, \texttt{\textasciitilde/astap}). Catalogue : dossier choisi, \texttt{COUPOLE\_ASTAP\_CATALOGUE},
@@ -486,6 +544,7 @@ est déclaré complet avec ses 1~476 tuiles ; la version est lue sur \texttt{ast
 \textbf{Format} & \textbf{Contenu} & \textbf{Lecteurs}\\
 \midrule
 XISF (défaut) & Float32 en ADU, \texttt{bounds="-1000:65535"} ; UInt16 pour les FITS IRIS entiers ; compression zstd+sh niveau 9 ; propriétés \texttt{Observation:*}, \texttt{Instrument:*} & PixInsight\\
+XISF compatible & UInt16 + piédestal de 1~000~ADU (\texttt{PEDESTAL}), zlib+sh (ce qu'écrit N.I.N.A.) & PixInsight, Siril $\geq$ 1.4, N.I.N.A.\\
 FITS \texttt{.fits.fz} & compression par tuiles sans perte : GZIP\_2 sans quantification (flottants), RICE\_1 (entiers) & Siril, astropy, DS9\\
 FITS & float32 (ou UInt16) non compressé & tous\\
 \bottomrule
@@ -497,7 +556,51 @@ Taille : 36~\% du FITS d'origine pour le T120 (float64), 62~\% pour IRIS. \textb
 astropy 8.0, RICE\_1 et HCOMPRESS\_1 quantifient les flottants (écart d'un ADU, même avec
 \texttt{quantize\_level=0}) ; seuls GZIP\_1 et GZIP\_2 sans quantification restituent les flottants bit à bit.
 \textbf{FITS float32} : dans PixInsight, régler la plage de lecture FITS sur 0–65~535 avec \emph{Truncate}.
-Pour tous les formats, l'écart au FITS d'origine reste sous le demi-ULP du float32 (vérifié pixel par pixel).
+Pour tous les formats sauf le XISF compatible, l'écart au FITS d'origine reste sous le demi-ULP du float32
+(vérifié pixel par pixel).
+
+\paragraph{XISF compatible (N.I.N.A., Siril).} UInt16 = ADU + 1~000 arrondis, écrêtés à [0, 65~535] ; le piédestal
+garde les fonds négatifs des poses courtes calibrées et figure dans l'en-tête (\texttt{PEDESTAL}, convention de
+PixInsight). Mesuré sur 66 poses de la banque (\texttt{outils/audit2/mesure\_perte\_uint16.py}) : arrondi
+$\le 0{,}5$~ADU, moyenne du fond changée de 0,014~ADU au plus (bruit du fond : 10 à 109~ADU) ; pixels écrêtés en
+haut : 0,012~\% au plus (étoiles au-delà de 64~535~ADU) ; plus aucun pixel perdu en bas. Sans piédestal, une pose
+T120 de 10~s au fond sur-soustrait (−220~ADU) perdait 99,75~\% de ses pixels à 0 et 6,1~\% des pixels des poses de
+1–2~s tombaient à 0 : d'où le piédestal. Les IRIS entiers restent sans perte.
+
+\subsection*{Qui lit quoi (vérifié)}\label{sec:compat}
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.25\linewidth}ccccX@{}}
+\toprule
+\textbf{Fichier} & \textbf{PixInsight} & \textbf{Siril} & \textbf{N.I.N.A.} & \textbf{ASTAP} & \textbf{Remarque}\\
+\midrule
+XISF Float32 (défaut) & oui & non & non & non & Siril $\geq$ 1.4 le lit mais hors de sa plage [0, 1] ; N.I.N.A. : image blanche\\
+XISF compatible (UInt16, zlib) & oui & $\geq$ 1.4.0 & oui & non & ASTAP : XISF non compressé seulement\\
+XISF UInt16 zstd (IRIS entiers) & oui & $\geq$ 1.4.0 & non (3.2) & non & zstd lu par N.I.N.A. depuis janvier 2026 (développement)\\
+FITS Float32 & oui & oui & non & oui & N.I.N.A. suppose [0, 1] ; Aladin, astropy : oui\\
+FITS UInt16 & oui & oui & oui & oui & \\
+\texttt{.fits.fz} Float32 (GZIP) & — & oui & — & non & ASTAP : Rice seulement\\
+\texttt{.fits.fz} UInt16 (Rice) & — & oui & — & $\geq$ 2026.07.16 & — : non vérifié\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Sources : \textbf{PixInsight}, code de PCL (\texttt{XISF.cpp} : codecs zlib, lz4, lz4hc, zstd, avec ou sans
+\texttt{+sh} ; \texttt{XISFReader.cpp} : \texttt{bounds} obligatoire pour un flottant, écrêtage puis ramené à
+[0, 1]) ; spécification XISF 1.0 révision 1 (septembre 2026, \url{https://pixinsight.com/doc/docs/XISF-1.0-spec/XISF-1.0-spec.html}),
+schéma XSD identique à celui qu'emploie Coupole. \textbf{Siril}, essai réel des AppImage officielles (siril-cli,
+pixels relus et comparés) : 1.2.0 et 1.2.6 ne lisent pas le XISF (« file type not supported »), 1.4.0 et 1.4.4
+lisent tous nos codecs bit à bit ; mais les flottants XISF y restent en ADU (statistiques multipliées par 65~535),
+alors que les FITS flottants sont ramenés à [0, 1] ; paquets Debian 13 et Ubuntu 24.04 (Siril 1.2.x) : pas de XISF.
+\textbf{N.I.N.A.}, code (étiquette \texttt{Version-3.2}, 27/11/2025 : \texttt{XISF.cs} l.~304–328 : lz4, lz4hc,
+zlib, avec ou sans \texttt{+sh} ; \texttt{Float32Converter.cs} l.~23 : $(\text{ushort})(v \times 65535)$,
+\texttt{bounds} jamais lu) et décodage réel d'un de nos fichiers. \textbf{ASTAP}, page officielle (XISF « uncompressed »,
+\texttt{.fits.fz} Rice depuis 2026.07.16, GZIP non). Fichiers d'essai pour les testeurs : \texttt{tests/donnees/}
+(image de synthèse en XISF par défaut, XISF compatible et FITS, moins de 300~Ko chacun).
+
+\paragraph{Écart à la révision 1.} Coupole écrit dans \texttt{Observation:Center:RA/Dec} le centre de la solution
+astrométrique (choix du traitement de référence, antérieur à la révision) ; la révision 1 réserve ces propriétés au
+point visé par le télescope et normalise la solution dans l'espace \texttt{AstrometricSolution:} (non écrit : la
+solution reste dans les mots-clés WCS, que PixInsight lit). Gardé tel quel en 0.1.9 pour ne pas changer les fichiers
+par rapport au traitement de référence.
 
 % =====================================================================
 \section{Qualité des images (facultatif)}
@@ -512,11 +615,22 @@ réseau, détecté et signalé, car la lecture limite alors la vitesse), la lect
 autres ; l'interface reste libre, \emph{Arrêter} est immédiat. Chaque image mesurée est gardée aussitôt dans le
 cache \texttt{\_traitement/qualite.sqlite} par (chemin, taille, date) et affichée ; le \texttt{QUALITE.csv} de son
 lot (écriture atomique) est réécrit au plus toutes les 5~s et à la fin du lot ou de l'arrêt : relancer ne refait pas
-ce qui est fait, fermer puis rouvrir reprend. Le dossier n'est parcouru qu'une fois (lecture des dossiers et des dates
-en parallèle, cache lu en une requête) : relancer sur la banque entière déjà mesurée, par un partage, prend 2~s au
-lieu de 72~s. Au-delà de 200 images, Coupole propose un \textbf{échantillon} de 5 images par lot (réparties dans
+ce qui est fait, fermer puis rouvrir reprend.
+
+\paragraph{Inventaire en flux.} La mesure commence dès le premier lot trouvé, pendant que l'inventaire continue
+(« Inventaire du dossier : 1 234 fichiers trouvés dans 56 lots… », \emph{Arrêter} immédiat) ; l'inventaire n'ouvre
+aucun fichier et lit taille et date dans la liste de chaque dossier (un \texttt{stat} au plus par image). Dans une
+sortie de Coupole, seuls les dossiers des lots sont lus, d'après \texttt{INDEX\_LOTS.csv} ou la base d'état ; les
+restes de traitement (\texttt{converties}, \texttt{telechargements}) ne sont jamais pris pour des lots. Sur un
+partage, 32 fils lisent les dossiers. Le cache n'est \textbf{jamais} écrit sur un partage réseau : le client SMB de
+Linux transmet les verrous de SQLite au serveur, qui les refuse (« database is locked » au bout de 30~s, trois fois
+avant la première mesure en 0.1.8 : les 90~s d'« Inventaire du dossier… » observées sur un vrai partage) ; il va dans
+le dossier de cache de l'utilisateur (un ancien cache du partage est relu). Mesuré sur un vrai partage Samba, 831
+XISF de 09\_Galaxies : 0.1.8 92,7~s avant la première mesure (latence de 10~ms) ; 0.1.9 inventaire complet en
+0,24–0,57~s (10~ms) et 0,57–1,05~s (20~ms), premier résultat en 0,2–0,6~s. Au-delà de 200 images, Coupole propose un \textbf{échantillon} de 5 images par lot (réparties dans
 le temps : première, dernière, milieu…, réglable dans l'onglet et par \cmd{--echantillon N}), qui suffit à juger un
-lot, ou \emph{Tout mesurer} avec la durée estimée d'après les 3 premières images ; la progression donne le temps
+lot (mesuré en premier, pendant que vous choisissez), ou \emph{Tout mesurer} avec la durée estimée d'après les
+images déjà mesurées ; la progression donne le temps
 restant et le débit (images/min). Sur le NAS de l'auteur (Ryzen 5 8500G) : 1,21 → 0,33~s par image T120
 (modèle de Moffat vectorisé, dérivées analytiques, 120 étoiles par image), soit la banque entière en une dizaine de
 minutes sur 5 processus.
@@ -540,7 +654,7 @@ RSN & seulement avec le gain (EGAIN/GAIN) & donné ou absent\\
 \end{center}
 Sur 14 images IRIS (12 nuits, FWHM de 2,4 à 11,3 px), la FWHM mesurée et celle écrite par PinPoint dans l'en-tête
 sont corrélées (r = 0,974), rapport médian 1,046 (0,85 à 1,16) : les deux estimateurs diffèrent (méthode de PinPoint
-non décrite). Non proposés faute de validation : mag/arcsec² (pas de point zéro), détection des « donuts » de
+non décrite). Non proposés faute de validation : mag\,arcsec$^{-2}$ (pas de point zéro), détection des « donuts » de
 poussière. Une FWHM qui croît vers un bord peut venir du capteur, de la courbure de champ, de la collimation, mais
 aussi de la turbulence, du suivi ou de la mise au point : la carte seule ne tranche pas.
 
@@ -611,9 +725,19 @@ l'univers est opaque. Tableau et courbes s'exportent en CSV (« ; », UTF-8 ; va
 tableau des valeurs suivent en direct : les valeurs sont alors \emph{interpolées} sur la grille des courbes (300
 points logarithmiques, écart typique $< 0{,}5$~\%, colonnes $\sigma$ et SH0ES suspendues) et la ligne d'état le dit ;
 au relâchement, le calcul exact reprend. Flèches : pas fin (1~\% d'une décade) ; Page haut/bas : une décade. Le
-champ $z$ et le curseur restent synchronisés dans les deux sens. Les courbes suivent le redimensionnement de la
-fenêtre, y compris quand elles passent sous le tableau (fenêtre de moins de 1500 px de large) : la moitié de la
-hauteur visible leur revient.
+champ $z$ et le curseur restent synchronisés dans les deux sens.
+
+\capture{img/module_cosmo_cote_fr.png}{1.0}
+\paragraph{Disposition.} Côte à côte, le tableau prend la largeur de ses colonnes (au contenu, jamais tronquées) et
+les courbes tout le reste ; empilés, le tableau montre ses 18 lignes si la place le permet, sinon la place est
+partagée en gardant au moins 300~px aux courbes. \emph{Affichage > Disposition de la Cosmologie} (ou la liste
+\emph{Disposition} du module) : automatique (côte à côte à partir de 1~550~px de large, retour à l'empilement sous
+1~450~px : pas de bascule pendant un redimensionnement), toujours côte à côte, ou toujours empilés ; le choix et la
+position du séparateur de chaque disposition sont gardés.
+
+\paragraph{Unités.} Notation à exposants négatifs : $H_0$ en km\,s$^{-1}$\,Mpc$^{-1}$, vitesses en km\,s$^{-1}$ ;
+dans les CSV, en ASCII non ambigu (\texttt{km s\^{}-1 Mpc\^{}-1}), de même sur une console qui ne sait pas afficher
+les exposants (Windows cp1252).
 
 \paragraph{Origine et vérification.} Le noyau de calcul est repris du calculateur « cosmologie-redshift » du même
 auteur (dépôt public \url{https://github.com/ARP273-ROSE/cosmologie-redshift}), avec astropy.cosmology. Avant
@@ -748,6 +872,8 @@ Dialogue de fichiers sans le NAS, ou générique & Linux : installer \texttt{xdg
 Dialogue du système qui ne s'ouvre pas & Préférences > Boîtes de dialogue de fichiers : Qt.\\
 \texttt{\textasciitilde/.local/bin/coupole} introuvable & ajouter \texttt{\textasciitilde/.local/bin} au \texttt{PATH} (ligne donnée par l'installeur).\\
 Fichier \texttt{.part} ou \texttt{.tmp} dans \texttt{\_traitement} & reste d'une coupure : la reprise le réutilise (\texttt{.part}) ou le remplace ; rien à faire.\\
+WBPP ne trouve pas focale et pixel & saisir les valeurs de l'encadré \emph{Pour PixInsight / N.I.N.A.} (onglet Lots) dans le panneau \emph{Astrometric solution} ; fichiers anciens : \cmd{coupole ohp metadonnees DOSSIER --reecrire}.\\
+Image blanche dans N.I.N.A. ou Siril & format XISF compatible (onglet Traitement), section~\ref{sec:compat}.\\
 \bottomrule
 \end{tabularx}
 \end{center}

@@ -2,6 +2,56 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.1.9 — 9 October 2026
+
+**The Quality module starts at once on a network share, astronomy programs really open our files, and PixInsight
+finds focal length and pixel.** Feedback from Kevin (Manjaro, 0.1.8, folder on an SMB share).
+
+- **Endless « Listing the folder… » on an SMB share: cause found and measured.** On a real Samba share mounted by the
+  kernel cifs client, SQLite cannot write through SMB byte-range locks (« database is locked »): the measurement cache
+  was opened three times on the share before the first measurement, 30 s of waiting each — 90.4 s of listing for 831
+  XISF, and no cache in the end (0-byte file, found on the NAS). The cache is never written on a share any more (the
+  user's cache folder; an old cache on the share is read; local fallback within 3 s if a local database is locked).
+- **Listing as a stream**: measuring starts with the first stack found, while the listing goes on (« 1,234 files
+  found in 56 stacks… », *Stop* immediate). No file opened while listing, size and date taken from the folder
+  listing (at most one `stat` per image); in a Coupole output only the stack folders are read (`INDEX_LOTS.csv`,
+  otherwise the state database copied in one block); 32 reading threads on a share. Large folder: the sample is
+  measured first and the question (sample or everything) is asked without stopping, with a duration taken from the
+  images already measured. Measured on the real share: 92.7 s before the first measurement (10 ms latency) → full
+  listing in 0.24–0.57 s, first result in 0.2–0.6 s; at 20 ms: 0.57–1.05 s.
+- **Column titles never truncated** (« étoiles mesurées » showed as « toiles mesurée »): every section keeps at least
+  its title's width, full title as tooltip, in every table (tested at 100, 150 and 200 %). OHP bank tab tooltips on
+  each tab (it stayed displayed over the « Astrometric solution » group).
+- **Cosmology**: side by side, the table takes the width of its columns (the « value » column is no longer cut) and
+  the curves the rest; stacked, all rows when there is room, curves of at least 300 px. *View > Cosmology layout*:
+  automatic (1,550 / 1,450 px hysteresis), side by side or stacked, kept with each layout's splitter position.
+  Unambiguous **units**: km s⁻¹ Mpc⁻¹, km s⁻¹, mag arcsec⁻² (CSV and cp1252 console: `km s^-1 Mpc^-1`).
+- **Compatibility checked, not assumed**: Siril 1.2.x does not read XISF; 1.4.0 and 1.4.4 (official AppImages, real
+  test) read all our codecs bit for bit but keep ADU floats outside their [0, 1] range; N.I.N.A. 3.2 does not
+  decompress zstd and maps any float to [0, 1] without reading `bounds` (white image); ASTAP only reads uncompressed
+  XISF; PixInsight (PCL code) unchanged. « Who reads what » table in the manuals and under the format list.
+- **New « XISF compatible with N.I.N.A. and Siril » format** (`--format xisf16`): UInt16 with a 1,000 ADU pedestal
+  (`PEDESTAL`), zlib+sh compression like N.I.N.A. Loss measured on 66 bank exposures: rounding ≤ 0.5 ADU, background
+  mean changed by at most 0.014 ADU, 0.012 % of pixels clipped high; without the pedestal, a 10-s exposure with an
+  over-subtracted background lost 99.75 % of its pixels. The PixInsight default does not change.
+- **Opening an image**: double-click an owned image (OHP bank, Quality) → system application; right-click → *Open
+  with* (only installed programs that really read this file, the others greyed with the reason) and *Open file
+  location* (file selected: Explorer, Finder, Dolphin/Nautilus through D-Bus). Objects: *Open the target folder*,
+  *Show this object's stacks*.
+- **Owned ≠ stackable together**: « stacks » column and breakdown by field, instrument and filter in the tooltip
+  (« 840 images sorted into 9 stacks: field 1 T120: B 200 · V 300 · R 300; … »).
+- **Focal length and pixel for PixInsight and N.I.N.A.**: `FOCALLEN` matched to the measured scale (7,234.1 mm instead
+  of 7,200 for the T120, old value in HISTORY) and `Instrument:Sensor:XPixelSize`, `Instrument:Camera:XBinning`…
+  properties (what ImageSolver reads, checked in PixInsight's code); Stacks tab: « For PixInsight / N.I.N.A. » box
+  (focal length, effective pixel, binning, scale, field, centre, Copy buttons), hideable focal/pixel/scale columns,
+  same values in `LOT.txt`; `coupole ohp metadata FOLDER --rewrite` completes already converted files without
+  touching the pixels.
+- **ASTAP guide**: the official page's « zipped D80 » link is dead (D80 only exists as .exe, .pkg and .deb); outside
+  Debian, safe extraction from the `.deb` (checked on the real package); Arch/Manjaro: nothing on the PATH, GTK2
+  graphical `astap` not in the official repositories, `astap_cli` is enough (and Coupole now prefers it everywhere);
+  a continuous-integration test checks every link for every system.
+- Three small test files for testers in `tests/donnees/` (default XISF, compatible XISF, FITS).
+
 ## 0.1.8 — 9 October 2026
 
 **The real system file manager, and seeing at a glance what you already own.** Feedback from Manjaro (KDE Plasma,
