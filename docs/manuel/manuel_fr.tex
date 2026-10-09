@@ -211,6 +211,11 @@ interrompt téléchargements et conversions sans attendre (les processus sont te
 sous Linux et macOS, par un \emph{job object} sous Windows). À la fin, un
 rapport résume images, durée, converties, doublons, échecs (avec leur raison), volume écrit et lots.
 
+Sur un partage réseau (NAS par SMB), où chaque accès est un aller-retour, l'état est validé au plus une fois par
+seconde et 	exttt{JOURNAL.txt} écrit par paquets (une coupure ne fait refaire que la dernière seconde) ; le rangement
+final ne réécrit que les 	exttt{LOT.txt} qui ont changé et ne parcourt plus toute l'arborescence : relancer un
+traitement pour une image ne coûte plus une minute de rangement.
+
 \subsection{Tout télécharger, journal, réorganiser}\label{sec:tout}
 \emph{Tout télécharger…} prend la banque entière (environ 8~000 images, 78 Go de FITS, 30 Go en XISF). Au premier
 usage (ou si aucun dossier de sortie n'est défini), Coupole demande le dossier de destination par un dialogue natif et
@@ -229,7 +234,9 @@ tabulaire reste dans \texttt{journal.csv}.
 trouvent ailleurs ou selon un ancien rangement : chaque fichier est reconnu par son en-tête (adresse d'origine
 \texttt{OHP:Source:URL}, ou carte \texttt{HISTORY} « converti de … »), rattaché à l'inventaire et \textbf{déplacé}
 (jamais copié) ; un nom déjà pris par un fichier étranger reçoit un suffixe et une ligne de journal ; rien n'est
-jamais écrasé. Ligne de commande : \cmd{coupole ohp reorganiser DOSSIER --dest DEST}.
+jamais écrasé. Les en-têtes sont lus par plusieurs processus, la progression s'affiche (« 1 200 / 7 625 en-têtes
+lus ») et \emph{Arrêter} interrompt la lecture (ce qui est déjà reconnu est rangé). Ligne de commande :
+\cmd{coupole ohp reorganiser DOSSIER --dest DEST}.
 
 \subsection{Nouveautés de la banque}\label{sec:nouveautes}
 À l'ouverture (au plus une fois par jour, réglable, désactivable dans les Préférences), si Internet est disponible et
@@ -424,10 +431,12 @@ automatiquement (bouton \emph{Mesurer}, case \emph{Vérifier la qualité des ima
 \paragraph{Vitesse, reprise, échantillon.} Les mesures tournent dans des processus séparés (nombre donné par le plan
 machine : cœurs, mémoire, mode économe et bridage des Préférences ; au plus 3 quand le dossier est sur un partage
 réseau, détecté et signalé, car la lecture limite alors la vitesse), la lecture d'une image recouvrant le calcul des
-autres ; l'interface reste libre, \emph{Arrêter} est immédiat. Chaque image mesurée est écrite aussitôt dans le
-\texttt{QUALITE.csv} de son lot (écriture atomique) et affichée ; les mesures sont gardées en cache dans
-\texttt{\_traitement/qualite.sqlite} par (chemin, taille, date) : relancer ne refait pas ce qui est fait, fermer puis
-rouvrir reprend. Au-delà de 200 images, Coupole propose un \textbf{échantillon} de 5 images par lot (réparties dans
+autres ; l'interface reste libre, \emph{Arrêter} est immédiat. Chaque image mesurée est gardée aussitôt dans le
+cache \texttt{\_traitement/qualite.sqlite} par (chemin, taille, date) et affichée ; le \texttt{QUALITE.csv} de son
+lot (écriture atomique) est réécrit au plus toutes les 5~s et à la fin du lot ou de l'arrêt : relancer ne refait pas
+ce qui est fait, fermer puis rouvrir reprend. Le dossier n'est parcouru qu'une fois (lecture des dossiers et des dates
+en parallèle, cache lu en une requête) : relancer sur la banque entière déjà mesurée, par un partage, prend 2~s au
+lieu de 72~s. Au-delà de 200 images, Coupole propose un \textbf{échantillon} de 5 images par lot (réparties dans
 le temps : première, dernière, milieu…, réglable dans l'onglet et par \cmd{--echantillon N}), qui suffit à juger un
 lot, ou \emph{Tout mesurer} avec la durée estimée d'après les 3 premières images ; la progression donne le temps
 restant et le débit (images/min). Sur le NAS de l'auteur (Ryzen 5 8500G) : 1,21 → 0,33~s par image T120
@@ -560,7 +569,10 @@ graphique n'est pas utilisée par la Banque OHP (travail limité par le réseau,
 
 Rien de lourd ne s'exécute dans le fil graphique : astropy, scipy et SEP ne sont chargés qu'au premier besoin, les
 sondes de la machine et la détection d'ASTAP tournent en fond, et la fermeture de la fenêtre arrête puis attend tous
-les fils, tâches et processus (voir \texttt{docs/AUDIT\_2026-10.md}).
+les fils, tâches et processus (voir \texttt{docs/AUDIT\_2026-10.md}). Les grandes listes restent fluides à 80~000
+lignes : les cellules ne sont calculées que pour les lignes affichées, le tri se fait sur une clé par ligne (et non par
+comparaisons deux à deux), la sélection ne fait plus parcourir toutes les lignes à chaque dessin, et le changement de
+thème ne recalcule que les couleurs (voir \texttt{docs/AUDIT2\_2026-10.md}).
 
 \begin{center}\small
 \begin{tabular}{@{}lr@{}}
@@ -575,6 +587,14 @@ même chaîne sans plafond (serveur local) & 2,3 s, 86 Mo/s de FITS, 10 images/s
 conversion d'une image T120 (un processus) & 0,13 s (zstd 14 ms, lecture 18 ms, écriture et relecture 29 ms)\\
 pic mémoire d'une conversion T120 / IRIS 4096² (processus dédié) & 163 Mo / 365 Mo (170 / 573 avant)\\
 interface pendant 3 téléchargements (28 Mo/s) & écart max. du minuteur 20 ms : 20,8 ms\\
+\midrule
+\multicolumn{2}{@{}l}{\emph{Second audit (0.1.4) : banque réelle de 7~625 XISF ; partage réseau simulé à 2 ms par accès}}\\
+rangement final sans rien à déplacer, sur le partage & 1,5 s (60,7 s avant)\\
+48 images vers une destination sur le partage & 4,9 s (20,3 s avant)\\
+qualité, relance de la banque déjà mesurée (partage) & 1,9 s (72 s avant)\\
+réorganiser la banque (lecture des 7~625 en-têtes) & 57 s (243 s avant)\\
+tout sélectionner, 80~000 images (10 × la banque) & 0,2 s (3,1 s avant ; 0,5 s → 0,17 s sur la banque)\\
+trier 80~000 images & 0,1–0,2 s (3,7–4,1 s avant)\\
 \bottomrule
 \end{tabular}
 \end{center}

@@ -16,6 +16,7 @@ relancer ne refait pas ce qui est déjà mesuré, fermer puis rouvrir reprend.
 """
 from __future__ import annotations
 
+import collections
 import concurrent.futures as F
 import json
 import multiprocessing as mp
@@ -33,6 +34,9 @@ SEUIL_GROS_DOSSIER = 200          # au-delà, l'échantillon par lot est propos�
 ECHANTILLON_DEFAUT = 5
 LECTEURS_RESEAU_MAX = 3           # processus au plus quand le dossier est sur un partage
 CADENCE_PROGRESSION = 0.1         # secondes entre deux événements « progression » (10 Hz)
+DELAI_VALIDATION = 1.0            # secondes : le cache est validé (commit) au plus une fois par seconde
+ECRITURE_CSV_S = 5.0              # secondes : QUALITE.csv d'un lot en cours réécrit au plus toutes les 5 s
+FILS_STAT = 16                    # fils pour lire tailles et dates (allers-retours réseau recouverts)
 
 
 # ============================================================================ dossier réseau
@@ -79,10 +83,13 @@ class CacheMesures:
     """``_traitement/qualite.sqlite`` : une mesure par (chemin, taille, mtime).  Jamais d'exception vers l'appelant :
     un cache illisible ou non inscriptible se comporte comme un cache vide."""
 
-    def __init__(self, racine):
+    def __init__(self, racine, delai: float = 0.0):
         self.chemin = self._chemin(racine)
         self.db = None
         self.verrou = threading.Lock()
+        self.delai = float(delai)            # > 0 : validations groupées (voir DELAI_VALIDATION)
+        self._derniere = time.monotonic()
+        self._en_attente = False
         try:
             os.makedirs(os.path.dirname(self.chemin), exist_ok=True)
             self.db = sqlite3.connect(self.chemin, check_same_thread=False, timeout=30)
@@ -115,6 +122,16 @@ class CacheMesures:
             pass
         return None
 
+    def tout(self) -> dict:
+        """{chemin: (taille, mtime, mesure en JSON)} en UNE requête (et non une par image)."""
+        if self.db is None:
+            return {}
+        try:
+            with self.verrou:
+                return {c: (t, m, j) for c, t, m, j in self.db.execute('SELECT chemin, taille, mtime, mesure FROM mesures')}
+        except sqlite3.Error:
+            return {}
+
     def ecrire(self, chemin: str, taille: int, mtime: float, mesure: dict):
         if self.db is None:
             return
@@ -123,7 +140,21 @@ class CacheMesures:
                 self.db.execute('INSERT OR REPLACE INTO mesures VALUES (?,?,?,?,?)',
                                 (chemin, taille, mtime, json.dumps(mesure, ensure_ascii=False, default=str),
                                  time.strftime('%Y-%m-%dT%H:%M:%S')))
+                self._en_attente = True
+                t = time.monotonic()
+                if self.delai <= 0 or t - self._derniere >= self.delai:
+                    self.db.commit()
+                    self._derniere, self._en_attente = t, False
+        except sqlite3.Error:
+            pass
+
+    def valider(self):
+        if self.db is None or not self._en_attente:
+            return
+        try:
+            with self.verrou:
                 self.db.commit()
+                self._derniere, self._en_attente = time.monotonic(), False
         except sqlite3.Error:
             pass
 
@@ -138,6 +169,7 @@ class CacheMesures:
 
     def fermer(self):
         if self.db is not None:
+            self.valider()
             try:
                 with self.verrou:
                     self.db.close()
@@ -209,30 +241,60 @@ def processus_pour(plan: Plan | None, reseau: bool, maximum: int | None = None) 
     return n
 
 
-def planifier(racine, echantillon_par_lot: int | None) -> dict:
-    """Inventaire du dossier en une passe (os.walk unique) et ce qu'il reste à mesurer.
+def empreintes(chemins: list, fils: int = FILS_STAT) -> dict:
+    """{chemin: (taille, mtime) ou None (illisible)} ; par plusieurs fils au-delà de 64 fichiers : sur un partage
+    réseau chaque `stat` est un aller-retour, que les fils recouvrent (le GIL est rendu pendant l'appel)."""
+    def un(f):
+        try:
+            return f, _empreinte(f)
+        except OSError:
+            return f, None
+    if len(chemins) <= 64 or fils <= 1:
+        return dict(un(f) for f in chemins)
+    with F.ThreadPoolExecutor(fils, thread_name_prefix='stat') as pool:
+        return dict(pool.map(un, chemins, chunksize=32))
 
-    Rend {'lots': {dossier: [images retenues]}, 'total_dossier', 'a_mesurer', 'deja', 'reseau', 'echantillon'}.
+
+def _deja(retenus: dict, emp: dict, connus: dict) -> int:
+    n = 0
+    for imgs in retenus.values():
+        for f in imgs:
+            e, c = emp.get(f), connus.get(f)
+            if e is not None and c is not None and c[0] == e[0] and abs(c[1] - e[1]) < 1e-3:
+                n += 1
+    return n
+
+
+def planifier(racine, echantillon_par_lot: int | None) -> dict:
+    """Inventaire du dossier en une passe (os.walk unique), tailles et dates lues une fois (en parallèle), cache
+    lu en une requête : ce qu'il reste à mesurer.
+
+    Rend {'lots': {dossier: [images retenues]}, 'tous', 'empreintes', 'connus', 'total_dossier', 'a_mesurer',
+    'deja', 'reseau', 'echantillon'} ; `Mesureur(plan_dossier=…)` le réutilise sans rien relire.
     `echantillon_par_lot` : None ou 0 = tout ; n = n images par lot."""
     lots = rapport.fichiers(racine)
-    total = sum(len(v) for v in lots.values())
-    retenus = {d: echantillon(v, echantillon_par_lot) for d, v in lots.items()}
     cache = CacheMesures(racine)
-    deja = 0
     try:
-        for d, imgs in retenus.items():
-            for f in imgs:
-                try:
-                    taille, mtime = _empreinte(f)
-                except OSError:
-                    continue
-                if cache.lire(f, taille, mtime) is not None:
-                    deja += 1
+        connus = cache.tout()
     finally:
         cache.fermer()
+    plan_ = {'tous': lots, 'connus': connus, 'reseau': est_reseau(racine), 'racine': os.path.abspath(str(racine)),
+             'empreintes': {}}
+    return replanifier(plan_, echantillon_par_lot)
+
+
+def replanifier(plan_: dict, echantillon_par_lot: int | None) -> dict:
+    """Autre échantillon sur le même dossier : sans relire le disque ni le cache (tailles et dates déjà lues
+    sont gardées, seules les nouvelles images retenues sont lues)."""
+    lots = plan_['tous']
+    retenus = {d: echantillon(v, echantillon_par_lot) for d, v in lots.items()}
+    emp = dict(plan_.get('empreintes') or {})
+    manquent = [f for imgs in retenus.values() for f in imgs if f not in emp]
+    emp.update(empreintes(manquent))
+    deja = _deja(retenus, emp, plan_['connus'])
     n_retenus = sum(len(v) for v in retenus.values())
-    return {'lots': retenus, 'total_dossier': total, 'retenus': n_retenus, 'a_mesurer': n_retenus - deja, 'deja': deja,
-            'reseau': est_reseau(racine), 'echantillon': echantillon_par_lot or 0}
+    return dict(plan_, lots=retenus, empreintes=emp, total_dossier=sum(len(v) for v in lots.values()),
+                retenus=n_retenus, a_mesurer=n_retenus - deja, deja=deja, echantillon=echantillon_par_lot or 0)
 
 
 def estimer_duree(plan_: dict, processus: int, n_essai: int = 3) -> dict:
@@ -241,18 +303,26 @@ def estimer_duree(plan_: dict, processus: int, n_essai: int = 3) -> dict:
     cache = CacheMesures(plan_['chemin']) if 'chemin' in plan_ else None
     essais = []
     t_total = 0.0
+    emp, connus = plan_.get('empreintes') or {}, plan_.get('connus') or {}
     for f in (f for imgs in plan_['lots'].values() for f in imgs):
         if len(essais) >= max(1, n_essai):
             break
-        try:
-            taille, mtime = _empreinte(f)
-        except OSError:
-            continue
-        if cache is not None and cache.lire(f, taille, mtime) is not None:
+        e = emp.get(f) if f in emp else None
+        if e is None:
+            try:
+                e = _empreinte(f)
+            except OSError:
+                continue
+        taille, mtime = e
+        c = connus.get(f)
+        if c is not None and c[0] == taille and abs(c[1] - mtime) < 1e-3:
             continue                                 # déjà mesurée : on chronomètre une image qui reste à faire
+        if cache is not None and cache.lire(f, taille, mtime) is not None:
+            continue
         r = mesurer_une(f)
         if cache is not None and 'erreur' not in r:
             cache.ecrire(f, taille, mtime, r)
+            connus[f] = (taille, mtime, json.dumps(r, ensure_ascii=False, default=str))
         essais.append(r['duree'])
         t_total += r['duree']
     if cache is not None:
@@ -270,7 +340,7 @@ class Mesureur:
 
     def __init__(self, racine, plan: Plan | None = None, echantillon_par_lot: int | None = None, rapporter=None,
                  arret: threading.Event | None = None, ecrire_rapports: bool = True, processus_max: int | None = None,
-                 langue: str | None = None):
+                 langue: str | None = None, plan_dossier: dict | None = None):
         self.racine = os.path.abspath(os.path.expanduser(str(racine)))
         self.plan = plan
         self.echantillon = echantillon_par_lot
@@ -280,11 +350,20 @@ class Mesureur:
         self.processus_max = processus_max
         self.langue = langue
         self.cache = None
+        self.plan_dossier = plan_dossier          # plan déjà calculé (dialogue « gros dossier ») : rien n'est relu
+        self._ecrit_le = {}
 
     # ---------------------------------------------------------------- utilitaires
-    def _ecrire_lot(self, dossier, lignes, final: bool):
+    def _ecrire_lot(self, dossier, lignes, final: bool, force: bool = False):
+        """QUALITE.csv du lot : à la fin du lot, et en cours de lot au plus toutes les ECRITURE_CSV_S secondes
+        (le réécrire après CHAQUE image coûtait O(n²) octets par lot et, sur un partage, plusieurs allers-retours
+        par image ; chaque mesure est de toute façon gardée au cache dès qu'elle arrive)."""
         if not self.ecrire_rapports:
             return
+        t = time.monotonic()
+        if not (final or force) and t - self._ecrit_le.get(dossier, 0.0) < ECRITURE_CSV_S:
+            return
+        self._ecrit_le[dossier] = t
         try:
             rapport.ecrire(dossier, lignes, txt=final)
         except OSError:
@@ -310,32 +389,43 @@ class Mesureur:
     # ---------------------------------------------------------------- lancement
     def lancer(self) -> dict:
         t0 = time.monotonic()
-        plan_ = planifier(self.racine, self.echantillon)
+        p = self.plan_dossier
+        if p is not None and p.get('racine') == self.racine:
+            plan_ = p if (p.get('echantillon') or 0) == (self.echantillon or 0) else replanifier(p, self.echantillon)
+        else:
+            plan_ = planifier(self.racine, self.echantillon)
         lots = plan_['lots']
+        emp, connus = plan_['empreintes'], plan_['connus']
         n_proc = processus_pour(self.plan, plan_['reseau'], self.processus_max)
-        self.cache = CacheMesures(self.racine)
+        self.cache = CacheMesures(self.racine, DELAI_VALIDATION)
         total = plan_['retenus']
         self.rapporter({'type': 'debut', 'total': total, 'deja': plan_['deja'], 'processus': n_proc,
                         'reseau': plan_['reseau'], 'echantillon': plan_['echantillon'], 'lots': len(lots),
                         'total_dossier': plan_['total_dossier']})
         resultats = {d: [None] * len(imgs) for d, imgs in lots.items()}
         restant = {d: len(imgs) for d, imgs in lots.items()}
-        file_ = []                                   # (dossier, indice, chemin, taille, mtime)
+        file_ = collections.deque()                  # (dossier, indice, chemin, taille, mtime)
         fait = 0
         deja = 0
         echecs = 0
         # 1) ce que le cache connaît déjà : affiché tout de suite
         for d, imgs in lots.items():
             for i, f in enumerate(imgs):
-                try:
-                    taille, mtime = _empreinte(f)
-                except OSError as e:
-                    resultats[d][i] = {'fichier': os.path.basename(f), 'chemin': f, 'erreur': str(e)[:200]}
+                e = emp.get(f)
+                if e is None:
+                    resultats[d][i] = {'fichier': os.path.basename(f), 'chemin': f, 'erreur': 'unreadable (stat)'}
                     restant[d] -= 1
                     fait += 1
                     echecs += 1
                     continue
-                r = self.cache.lire(f, taille, mtime)
+                taille, mtime = e
+                c = connus.get(f)
+                r = None
+                if c is not None and c[0] == taille and abs(c[1] - mtime) < 1e-3:
+                    try:
+                        r = json.loads(c[2])
+                    except ValueError:
+                        r = None
                 if r is not None:
                     resultats[d][i] = r
                     restant[d] -= 1
@@ -361,7 +451,7 @@ class Mesureur:
             try:
                 while (file_ or en_cours) and not self.arret.is_set():
                     while file_ and len(en_cours) < fenetre:
-                        d, i, f, taille, mtime = file_.pop(0)
+                        d, i, f, taille, mtime = file_.popleft()
                         en_cours[pool.submit(mesurer_une, f)] = (d, i, f, taille, mtime)
                     finis, _ = F.wait(list(en_cours), timeout=0.2, return_when=F.FIRST_COMPLETED)
                     for fut in finis:
@@ -397,6 +487,9 @@ class Mesureur:
                 else:
                     pool.shutdown(wait=True)
         self.cache.fermer()
+        for d in lots:                               # lots interrompus : leur QUALITE.csv contient tout ce qui est fait
+            if 0 < restant[d] < len(lots[d]):
+                self._ecrire_lot(d, [x for x in resultats[d] if x is not None], final=False, force=True)
         bilan = {'type': 'fin', 'n': fait, 'mesurees': mesurees, 'deja': deja, 'lots': len(lots), 'echecs': echecs,
                  'duree': time.monotonic() - t0, 'annule': annule, 'processus': n_proc, 'reseau': plan_['reseau'],
                  'lignes': {d: [x for x in v if x is not None] for d, v in resultats.items()}}

@@ -12,7 +12,7 @@ from PyQt6.QtWidgets import (QFileDialog, QHBoxLayout, QLabel, QMessageBox, QPla
 from ...core import config
 from ...core.i18n import langue, tr
 from ...gui.adaptatif import Flux, coupable, texte_reel
-from ...gui.modele import ModeleTableau, vue_tableau
+from ...gui.modele import ModeleTableau, Nombre, vue_tableau
 from ...gui.outils import FileEvenements, aide, bouton, case, nombre
 from . import mesures, moteur, rapport
 from .gui_sans_qt import duree_lisible
@@ -123,21 +123,19 @@ class Panneau(QWidget):
                 self.l_progression.setText('')
                 self._evts.arreter()
                 return
-        self._demarrer(racine, ech)
+        self._demarrer(racine, ech, plan_)
 
-    def _demarrer(self, racine, ech):
+    def _demarrer(self, racine, ech, plan_dossier=None):
         self.barre.setMaximum(1)
         self.barre.setValue(0)
         self._lignes = []
         self.modele.remplir([])
         self.resume.setPlainText('')
         self._arret.clear()
-        from ...core import machine, parallele
-        r = config.reglages()
-        plan = parallele.planifier(machine.detecter(), conversions=int(r['conversions_max'] or 0),
-                                   econome=bool(r['mode_econome']) or None)
         evts, arret = self._evts, self._arret
-        m = moteur.Mesureur(racine, plan, ech, rapporter=evts, arret=arret, langue=langue())
+        plan = None                                  # plan machine calculé dans le fil de mesure (sondes hors du fil graphique)
+        # le plan du dossier (parcours, tailles, cache) déjà fait pour le dialogue est repris tel quel
+        m = moteur.Mesureur(racine, plan, ech, rapporter=evts, arret=arret, langue=langue(), plan_dossier=plan_dossier)
 
         def travail():
             try:
@@ -156,8 +154,17 @@ class Panneau(QWidget):
 
     # ---------------------------------------------------------------- événements du moteur (fil graphique)
     def _ligne(self, l):
-        return tuple(rapport._fmt(l.get(c), '%.4g') if c != 'echantillonnage' or not l.get(c)
-                     else tr('qual_ech_' + l[c]) for c in rapport.COLONNES)
+        """Cellules d'une image : nombres triés comme nombres (FWHM, fond, RSN…), affichés comme dans QUALITE.csv."""
+        out = []
+        for c in rapport.COLONNES:
+            v = l.get(c)
+            if c == 'echantillonnage' and v:
+                out.append(tr('qual_ech_' + v))
+            elif isinstance(v, (int, float)) and not isinstance(v, bool):
+                out.append(Nombre(v))
+            else:
+                out.append(rapport._fmt(v, '%.4g'))
+        return tuple(out)
 
     def _evenements(self, evs):
         nouvelles = []

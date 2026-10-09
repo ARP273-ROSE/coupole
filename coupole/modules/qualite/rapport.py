@@ -16,18 +16,16 @@ COLONNES = ['fichier', 'etoiles', 'fwhm_px', 'fwhm_arcsec', 'ellipticite', 'fond
 
 
 def fichiers(racine) -> dict:
-    """{dossier de lot: [fichiers image]} ; un dossier = un lot (fichiers d'image au même niveau)."""
-    out = {}
+    """{dossier de lot: [fichiers image]} ; un dossier = un lot (fichiers d'image au même niveau).
+
+    Parcours parallèle (`core.parcours`) : sur un partage réseau, la lecture de chaque dossier est un aller-retour."""
+    from ...core import parcours
     p = Path(racine)
     if p.is_file():
         return {str(p.parent): [str(p)]}
-    for d, _, fs in os.walk(p):
-        if '_traitement' in Path(d).parts:
-            continue
-        imgs = sorted(os.path.join(d, f) for f in fs if f.lower().endswith(EXTENSIONS))
-        if imgs:
-            out[d] = imgs
-    return out
+    if '_traitement' in p.parts:
+        return {}
+    return parcours.lister(p, EXTENSIONS)
 
 
 def analyser_lot(images, progression=None, arret=None):

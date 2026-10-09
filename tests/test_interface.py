@@ -99,7 +99,8 @@ def test_catalogue_selection_et_estimation(app_qt, fenetre):
     for r, o in enumerate(ohp.m_obj.donnees):
         if o['objet'] == '(914) Palisana':
             ohp.v_obj.selectRow(ohp.p_obj.mapFromSource(ohp.m_obj.index(r, 0)).row())
-    app_qt.processEvents()
+    # sélection appliquée après l'anti-rebond (40 ms), estimation calculée en fond
+    attendre(app_qt, lambda: len(ohp.selection) == 16 and '10' in ohp.l_estimation.text(), 10)
     assert len(ohp.selection) == 16 and '10' in ohp.l_estimation.text()
 
 
@@ -232,7 +233,8 @@ def test_possession_pastilles_filtre_et_estimation(app_qt, fenetre, tmp_path, in
             if o['objet'] == '(914) Palisana':
                 rang = r
                 ohp.v_obj.selectRow(ohp.p_obj.mapFromSource(ohp.m_obj.index(r, 0)).row())
-        app_qt.processEvents()
+        attendre(app_qt, lambda: len(ohp.selection) == 16 and 'manquante' in ohp.l_estimation.text()
+                 and str(ohp.m_obj.lignes[rang][ohp.COL_POSSEDE]) == '5 / 10', 10)
         # objets : colonne « possédé » = (4 converties + 1 doublon) / 10, pastille « partiel »
         prog = ohp.m_obj.lignes[rang][ohp.COL_POSSEDE]
         assert isinstance(prog, Progression) and (prog.n, prog.total) == (5, 10) and str(prog) == '5 / 10'
@@ -264,7 +266,8 @@ def test_possession_pastilles_filtre_et_estimation(app_qt, fenetre, tmp_path, in
         assert len([x for x in ohp.selection if not x['doublon']]) == 5
         ohp.f_manquantes.setChecked(False)
         # lots : colonne complet / incomplet
-        ohp._remplir_lots()
+        ohp._remplir_lots()                       # lu en fond (la destination peut être un partage réseau)
+        attendre(app_qt, lambda: ohp.m_lots.rowCount() == 1, 10)
         assert ohp.m_lots.rowCount() == 1
         assert 'incomplet' in ohp.m_lots.lignes[0][ohp.COL_LOT_COMPLET]
         # légende dans la langue et aux couleurs du thème

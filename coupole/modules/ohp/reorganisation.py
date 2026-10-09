@@ -89,8 +89,11 @@ def _entete(mots):
     return Entete(cartes)
 
 
-def rattacher(chemin, inventaire) -> tuple[dict | None, dict | None, str]:
-    """(ligne d'inventaire, info prête pour le rangement, raison d'échec) pour un fichier converti."""
+def analyser(chemin) -> dict:
+    """Lecture de l'en-tête d'un fichier converti (sans les pixels) et de sa solution astrométrique.
+
+    Sans l'inventaire : s'exécute dans un processus de lecture (le WCS d'astropy coûte ~8 ms par fichier, la
+    lecture un aller-retour réseau).  Rend {'raison'} en cas d'échec, sinon les champs utiles au rattachement."""
     bas = chemin.lower()
     try:
         if bas.endswith('.xisf'):
@@ -98,17 +101,44 @@ def rattacher(chemin, inventaire) -> tuple[dict | None, dict | None, str]:
         elif bas.endswith(('.fits', '.fits.fz', '.fit')):
             mots, props = lire_entete_fits(chemin)
         else:
-            return None, None, 'format'
+            return {'chemin': chemin, 'raison': 'format'}
     except Exception:
-        return None, None, 'illisible'
+        return {'chemin': chemin, 'raison': 'illisible'}
     source = source_de(mots, props)
     if not source:
-        return None, None, 'pas_coupole'
+        return {'chemin': chemin, 'raison': 'pas_coupole'}
     ent = _entete(mots)
-    candidats = [x for x in inventaire.images if x['access_url'].rsplit('/', 1)[-1] == source]
+    nx = int(props.get('_nx') or ent.getf('NAXIS1') or 0)
+    ny = int(props.get('_ny') or ent.getf('NAXIS2') or 0)
+    sol = wcs_de(ent, nx, ny) if nx and ny else None
+    try:
+        taille = os.path.getsize(chemin)
+    except OSError:
+        taille = None
+    return {'chemin': chemin, 'raison': '', 'source': source, 'date_obs': ent.gets('DATE-OBS'), 'nx': nx, 'ny': ny,
+            'sol': sol, 'statut': props.get('OHP:Astrometry:Status'), 'objet_entete': ent.gets('OBJECT'),
+            'taille': taille}
+
+
+def index_par_fichier(inventaire) -> dict:
+    """{nom du FITS d'origine: [lignes d'inventaire]} : un dictionnaire, et non un parcours de l'inventaire par
+    fichier (7 625 fichiers × 7 989 lignes = 61 millions de comparaisons)."""
+    idx = {}
+    for x in inventaire.images:
+        idx.setdefault(x['access_url'].rsplit('/', 1)[-1], []).append(x)
+    return idx
+
+
+def rattacher_analyse(a: dict, index: dict) -> tuple[dict | None, dict | None, str]:
+    """(ligne d'inventaire, info prête pour le rangement, raison d'échec) à partir de `analyser()`."""
+    if a.get('raison'):
+        return None, None, a['raison']
+    chemin = a['chemin']
+    bas = chemin.lower()
+    candidats = index.get(a['source'], [])
     if not candidats:
         return None, None, 'inconnu_inventaire'
-    d_hdr = ent.gets('DATE-OBS')
+    d_hdr = a.get('date_obs')
     x = candidats[0]
     if len(candidats) > 1 and d_hdr:
         try:
@@ -116,10 +146,10 @@ def rattacher(chemin, inventaire) -> tuple[dict | None, dict | None, str]:
             x = min(candidats, key=lambda y: abs((utc(y['t_min']) - d).total_seconds()))
         except ValueError:
             pass
-    nx, ny = int(props.get('_nx') or ent.getf('NAXIS1') or x['s_xel1']), int(props.get('_ny') or ent.getf('NAXIS2') or x['s_xel2'])
+    nx, ny = int(a['nx'] or x['s_xel1']), int(a['ny'] or x['s_xel2'])
     info = info_de_base(x)
-    sol = wcs_de(ent, nx, ny) if nx and ny else None
-    statut = props.get('OHP:Astrometry:Status') or ('validee' if sol else 'echec')
+    sol = a.get('sol')
+    statut = a.get('statut') or ('validee' if sol else 'echec')
     if sol is not None:
         info.update(ra=sol['ra'], dec=sol['dec'], echelle=sol['echelle'], angle=sol['angle'], parite=sol['parite'])
     info['wcs'] = statut if statut in ('confirmee', 'validee', 'refaite', 'douteuse', 'echec') else 'echec'
@@ -128,37 +158,115 @@ def rattacher(chemin, inventaire) -> tuple[dict | None, dict | None, str]:
     f_norm, f_sys, f_dos = FILTRES.get(x['filter_name'], (x['filter_name'], '', sur(x['filter_name'])))
     info.update(filtre=f_norm, filtre_sys=f_sys, filtre_dossier=f_dos, nx=nx, ny=ny,
                 debut=(d_hdr or utc(x['t_min']).isoformat(timespec='milliseconds')),
-                objet_affiche=ent.gets('OBJECT') or x['objet'], format='xisf' if bas.endswith('.xisf') else
+                objet_affiche=a.get('objet_entete') or x['objet'], format='xisf' if bas.endswith('.xisf') else
                 ('fz' if bas.endswith('.fz') else 'fits'), reorganise=True)
-    try:
-        info['octets_sortie'] = os.path.getsize(chemin)
-    except OSError:
-        pass
+    if a.get('taille') is not None:
+        info['octets_sortie'] = a['taille']
     return x, info, ''
 
 
-def inventorier(dossier_source, inventaire, racine) -> tuple[list, list]:
-    """Parcourt `dossier_source` : ([(chemin, x, info)], [(chemin, raison)]) ; `_traitement/` est ignoré."""
+def rattacher(chemin, inventaire) -> tuple[dict | None, dict | None, str]:
+    """(ligne d'inventaire, info prête pour le rangement, raison d'échec) pour un fichier converti."""
+    return rattacher_analyse(analyser(chemin), index_par_fichier(inventaire))
+
+
+SEUIL_PROCESSUS = 64            # au-delà, les en-têtes sont lus par plusieurs processus
+
+
+def lister(dossier_source) -> list[str]:
+    """Fichiers convertis sous `dossier_source` (parcours parallèle, `_traitement/` ignoré), triés."""
+    from ...core import parcours
+    return [f for fs in parcours.lister(os.path.abspath(dossier_source), EXTENSIONS).values() for f in fs
+            if not f.lower().endswith('.tmp')]
+
+
+def inventorier(dossier_source, inventaire, racine, progression=None, arret=None, processus=None) -> tuple[list, list]:
+    """Parcourt `dossier_source` : ([(chemin, x, info)], [(chemin, raison)]) ; `_traitement/` est ignoré.
+
+    En-têtes lus par un bassin de processus (au-delà de SEUIL_PROCESSUS fichiers), progression `progression(fait,
+    total)` au plus 10 fois par seconde, arrêt immédiat par `arret` (threading.Event) : ce qui est déjà rattaché est
+    rendu, le reste sera vu à la prochaine réorganisation."""
+    import time
+    fichiers = lister(dossier_source)
+    index = index_par_fichier(inventaire)
     trouves, ignores = [], []
-    dossier_source = os.path.abspath(dossier_source)
-    for d, sous, fs in os.walk(dossier_source):
-        sous[:] = [s for s in sous if s != '_traitement']
-        for f in sorted(fs):
-            if not f.lower().endswith(EXTENSIONS) or f.lower().endswith('.tmp'):
+    total = len(fichiers)
+    dernier = [0.0]
+
+    def suivre(a, fait):
+        x, info, raison = rattacher_analyse(a, index)
+        if x is None:
+            ignores.append((a['chemin'], raison))
+        else:
+            trouves.append((a['chemin'], x, info))
+        if progression is not None and (time.monotonic() - dernier[0] >= 0.1 or fait == total):
+            dernier[0] = time.monotonic()
+            progression(fait, total)
+    if total <= SEUIL_PROCESSUS or processus == 1:
+        for k, f in enumerate(fichiers, 1):
+            if arret is not None and arret.is_set():
+                break
+            suivre(analyser(f), k)
+        return trouves, ignores
+    import concurrent.futures as F
+    import multiprocessing as mp
+    n = processus or max(1, min(8, (os.cpu_count() or 2) - 1))
+    pool = F.ProcessPoolExecutor(n, mp_context=mp.get_context('spawn'))
+    # par paquets : peu d'échanges entre processus, et l'arrêt est vu entre deux paquets
+    paquets = [fichiers[k:k + 32] for k in range(0, total, 32)]
+    faits = set()
+    fait = 0
+    try:
+        en_cours = {}
+        suivant = 0
+        while (suivant < len(paquets) or en_cours) and not (arret is not None and arret.is_set()):
+            while suivant < len(paquets) and len(en_cours) < 2 * n:
+                en_cours[pool.submit(_analyser_paquet, paquets[suivant])] = suivant
+                suivant += 1
+            finis, _ = F.wait(list(en_cours), timeout=0.2, return_when=F.FIRST_COMPLETED)
+            for fut in finis:
+                k = en_cours.pop(fut)
+                for a in fut.result():
+                    fait += 1
+                    suivre(a, fait)
+                faits.add(k)
+    except Exception:                       # bassin cassé (processus tué, mémoire) : on finit ici, un par un
+        for k, paquet in enumerate(paquets):
+            if k in faits:
                 continue
-            chemin = os.path.join(d, f)
-            x, info, raison = rattacher(chemin, inventaire)
-            if x is None:
-                ignores.append((chemin, raison))
-            else:
-                trouves.append((chemin, x, info))
+            for f in paquet:
+                if arret is not None and arret.is_set():
+                    break
+                fait += 1
+                suivre(analyser(f), fait)
+    finally:
+        pool.shutdown(wait=not (arret is not None and arret.is_set()), cancel_futures=True)
+    trouves.sort(key=lambda t: t[0])
+    ignores.sort(key=lambda t: t[0])
     return trouves, ignores
 
 
-def nettoyer_dossiers_vides(dossier_source, racine):
-    """Retire les dossiers vidés par la réorganisation (hors la racine de sortie et `_traitement`)."""
+def _analyser_paquet(chemins):
+    return [analyser(c) for c in chemins]
+
+
+def nettoyer_dossiers_vides(dossier_source, racine, dossiers=None):
+    """Retire les dossiers vidés par la réorganisation (hors la racine de sortie et `_traitement`).
+
+    `dossiers` : ceux d'où des fichiers sont partis — seuls eux et leurs parents sont examinés (sans parcourir
+    toute l'arborescence source, coûteux sur un partage) ; None = toute l'arborescence."""
     dossier_source = os.path.abspath(dossier_source)
-    for d, sous, fs in sorted(os.walk(dossier_source), key=lambda t: -len(t[0])):
+    if dossiers is None:
+        candidats = [d for d, _, _ in os.walk(dossier_source)]
+    else:
+        vus = set()
+        for d in dossiers:
+            d = os.path.abspath(d)
+            while d.startswith(dossier_source + os.sep) and d not in vus:
+                vus.add(d)
+                d = os.path.dirname(d)
+        candidats = list(vus)
+    for d in sorted(candidats, key=lambda c: -len(c)):
         if d in (dossier_source, os.path.abspath(racine)) or '_traitement' in d.split(os.sep):
             continue
         try:

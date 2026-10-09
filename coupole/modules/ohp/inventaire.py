@@ -142,13 +142,9 @@ def nouveautes_locales(inv, dest) -> dict:
     etat_p = os.path.join(str(dest), '_traitement', 'etat.sqlite') if dest else ''
     copie = bool(etat_p) and os.path.exists(etat_p)
     locaux = {}
-    if copie:
-        from .pilote import Etat
-        e = Etat(etat_p)
-        try:
-            locaux = e.statuts()
-        finally:
-            e.fermer()
+    if copie:                                  # lecture seule : rien n'est créé ni validé sur la destination
+        from .possession import lire_statuts
+        locaux = lire_statuts(dest)
     ref = historique().get('reference', '')
     nouv = [x for x in inv.images if x.get('nouveau') and not x['doublon']
             and locaux.get(ident(x)) not in ('ok', 'doublon')]
@@ -234,7 +230,7 @@ SOLAIRES_FILTRE = ('cak', 'ca k', 'ca-k', 'caii', 'white light', 'lumiere blanch
 def est_solaire(x) -> bool:
     """Observation du Soleil : jamais signalée « de jour »."""
     from .selection import norm
-    if norm(x['target_name']) in {norm(c) for c in SOLAIRES_CIBLE}:
+    if norm(x['target_name']) in SOLAIRES_CIBLE:          # déjà normalisés (minuscules sans ponctuation)
         return True
     f = (x['filter_name'] or '').lower()
     return any(m in f for m in SOLAIRES_FILTRE) or 'solaire' in (x['instrument_name'] or '').lower() \
@@ -330,6 +326,9 @@ def enrichir(lignes: list[dict]) -> list[dict]:
     for o, pts in centres.items():
         import numpy as np
         medianes[o] = (float(np.median([p[0] for p in pts])), float(np.median([p[1] for p in pts])))
+    premier_par_objet = {}
+    for y in d:
+        premier_par_objet.setdefault(y['objet'], y)
     for x in d:
         if x['classement'] != 'inconnu' or not medianes:
             continue
@@ -337,7 +336,7 @@ def enrichir(lignes: list[dict]) -> list[dict]:
         o, dist = min(((o, sep_deg(x['s_ra'], x['s_dec'], c[0], c[1])) for o, c in medianes.items()),
                       key=lambda t: t[1])
         if dist <= lim:
-            ex = next(y for y in d if y['objet'] == o)
+            ex = premier_par_objet[o]           # (dictionnaire : plus de parcours de l'inventaire par nom inconnu)
             x['objet'], x['cat'], x['sbdb'], x['rem'] = o, ex['cat'], None, ''
             x['classement'] = 'position'
     vus_c = set()
@@ -372,7 +371,17 @@ class Inventaire:
         return cls(*charger_brut())
 
     def objets(self) -> list[dict]:
-        """Catalogue des objets : une entrée par objet canonique."""
+        """Catalogue des objets : une entrée par objet canonique (calculé une fois par inventaire : l'interface
+        et la ligne de commande le demandent plusieurs fois)."""
+        cle = (id(self.images), len(self.images))
+        memo = getattr(self, '_objets_memo', None)
+        if memo is not None and memo[0] == cle:
+            return list(memo[1])
+        out = self._calculer_objets()
+        self._objets_memo = (cle, out)
+        return list(out)
+
+    def _calculer_objets(self) -> list[dict]:
         ordre = list(cibles.CATEGORIES)
         par = C.OrderedDict()
         for x in sorted(self.images, key=lambda x: (ordre.index(x['cat']) if x['cat'] in ordre else 99, x['objet'])):

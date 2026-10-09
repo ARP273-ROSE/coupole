@@ -206,6 +206,11 @@ progress finish) and \emph{Resume} restores it; \emph{Stop} interrupts downloads
 (processes are terminated, ASTAP included: by signal on Linux and macOS, by a \emph{job object} on Windows). At the end, a report sums up images, duration, converted, duplicates,
 failures (with their reason), volume written and stacks.
 
+On a network share (NAS over SMB), where every access is a round trip, the state is committed at most once per second
+and \texttt{JOURNAL.txt} is written in batches (a power cut only redoes the last second); the final sorting rewrites
+only the \texttt{LOT.txt} files that changed and no longer walks the whole tree: running a processing again for one
+image no longer costs a minute of sorting.
+
 \subsection{Download everything, log, reorganise}\label{sec:tout}
 \emph{Download everything…} takes the whole bank (about 8,000 images, 78 GB of FITS, 30 GB as XISF). On first use
 (or when no output folder is set), Coupole asks for the destination folder through a native dialog and proposes
@@ -223,8 +228,9 @@ name conflict; rotation at 5 MB (\texttt{JOURNAL-1.txt}, \texttt{JOURNAL-2.txt})
 \emph{Reorganise files…} sorts into the stack tree images already converted by Coupole that live elsewhere or in an
 older layout: each file is recognised by its header (source address \texttt{OHP:Source:URL}, or \texttt{HISTORY}
 card « converted from … »), attached to the inventory and \textbf{moved} (never copied); a name already taken by a
-foreign file gets a suffix and a log line; nothing is ever overwritten. Command line:
-\cmd{coupole ohp reorganise FOLDER --dest DEST}.
+foreign file gets a suffix and a log line; nothing is ever overwritten. Headers are read by several processes,
+progress is shown (« 1,200 / 7,625 headers read ») and \emph{Stop} interrupts the reading (whatever is already
+recognised is sorted). Command line: \cmd{coupole ohp reorganise FOLDER --dest DEST}.
 
 \subsection{New images in the bank}\label{sec:nouveautes}
 At startup (at most once a day, adjustable, can be disabled in Preferences), when the Internet is available and a
@@ -419,9 +425,11 @@ Report per stack: \texttt{QUALITE.csv} and \texttt{QUALITE.txt}.
 \paragraph{Speed, resume, sample.} Measurements run in separate processes (count given by the machine plan: cores,
 memory, economy mode and the Preferences limit; at most 3 when the folder is on a network share, detected and
 announced, since reading then limits the speed), one image being read while the others are computed; the interface
-stays free, \emph{Stop} is immediate. Each measured image is written at once to its stack's \texttt{QUALITE.csv}
-(atomic write) and shown; measurements are cached in \texttt{\_traitement/qualite.sqlite} by (path, size, date):
-starting again redoes nothing, closing then reopening resumes. Above 200 images, Coupole offers a \textbf{sample} of
+stays free, \emph{Stop} is immediate. Each measured image is kept at once in the cache
+\texttt{\_traitement/qualite.sqlite} by (path, size, date) and shown; its stack's \texttt{QUALITE.csv} (atomic write)
+is rewritten at most every 5~s and at the end of the stack or on stop: starting again redoes nothing, closing then
+reopening resumes. The folder is walked only once (folders and dates read in parallel, cache read in one query):
+starting again on the whole, already measured bank over a share takes 2~s instead of 72~s. Above 200 images, Coupole offers a \textbf{sample} of
 5 images per stack (spread in time: first, last, middle…, adjustable in the tab and with \cmd{--sample N}), enough to
 judge a stack, or \emph{Measure everything} with the duration estimated from the first 3 images; progress shows the
 time left and the rate (images/min). On the author's NAS (Ryzen 5 8500G): 1.21 → 0.33~s per T120 image (vectorised
@@ -548,7 +556,9 @@ and Zstandard); \texttt{coupole.core.calcul} offers CuPy to future modules.
 
 Nothing heavy runs on the GUI thread: astropy, scipy and SEP are loaded only when first needed, the machine probes and
 the ASTAP detection run in the background, and closing the window stops then waits for every thread, task and process
-(see \texttt{docs/AUDIT\_2026-10.md}).
+(see \texttt{docs/AUDIT\_2026-10.md}). Large lists stay smooth at 80,000 rows: cells are computed only for the rows
+shown, sorting uses one key per row (not pairwise comparisons), selecting no longer makes every drawing walk all rows,
+and changing the theme only recomputes colours (see \texttt{docs/AUDIT2\_2026-10.md}).
 
 \begin{center}\small
 \begin{tabular}{@{}lr@{}}
@@ -563,6 +573,14 @@ same chain without a cap (local server) & 2.3 s, 86 MB/s of FITS, 10 images/s\\
 conversion of one T120 image (one process) & 0.13 s (zstd 14 ms, reading 18 ms, writing and reading back 29 ms)\\
 memory peak of a T120 / IRIS 4096² conversion (dedicated process) & 163 MB / 365 MB (170 / 573 before)\\
 interface during 3 downloads (28 MB/s) & max gap of a 20 ms timer: 20.8 ms\\
+\midrule
+\multicolumn{2}{@{}l}{\emph{Second audit (0.1.4): real bank of 7,625 XISF; network share simulated at 2 ms per access}}\\
+final sorting with nothing to move, on the share & 1.5 s (60.7 s before)\\
+48 images to a destination on the share & 4.9 s (20.3 s before)\\
+quality, starting again on the already measured bank (share) & 1.9 s (72 s before)\\
+reorganise the bank (reading the 7,625 headers) & 57 s (243 s before)\\
+select all, 80,000 images (10 × the bank) & 0.2 s (3.1 s before; 0.5 s → 0.17 s on the bank)\\
+sort 80,000 images & 0.1–0.2 s (3.7–4.1 s before)\\
 \bottomrule
 \end{tabular}
 \end{center}

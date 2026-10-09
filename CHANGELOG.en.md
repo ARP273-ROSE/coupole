@@ -2,6 +2,36 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.1.4 — 9 October 2026
+
+Second performance audit, under real use and at full scale (`docs/AUDIT2_2026-10.md`): every function that can take
+time was timed on the whole bank (7,625 XISF), on a simulated network share (2 ms per access) and, for the interface,
+at ten times the bank (80,000 rows). 33 findings, all fixed; no computed result changed.
+
+- **Large lists stay smooth**: sorting uses one key per row in the model (not pairwise Python comparisons: 4 s →
+  0.1–0.2 s for 80,000 images, 0.3–0.5 s → 0.05 s on the bank); **lazy** image table (cells computed for the rows shown
+  only): “select all” 2.5 s → 0.06–0.37 s at 80,000 images, 0.48 → 0.04 s on the bank; table headers no longer walk
+  every row at each drawing after “select all” (0.77 s → 0.02 s, identical rendering); changing the theme only
+  recomputes colours (1 s → 0.02 s; 7.4 s at 80,000 rows); catalogue filter in one pass; selection debounced.
+- **Nothing slow on the GUI thread**: stack index, estimate (free space included), ownership and per-object counts,
+  sky-map points computed in the background; sky map: hovering 14 ms → 0.1 ms; world map: tile decoding capped at
+  30 ms per drawing, LRU cache; spectrum plot: hovering 30 ms → 1 ms; CSV export in the background; medoids and field
+  grouping in numpy (0.63 and 0.67 s → 0.07 and 0.09 s, identical results).
+- **Network share (NAS)**: state database committed at most once per second (instead of 3 times per image: 7.7 s →
+  0.07 s for 100 writes), JOURNAL.txt written in batches, duplicates recorded in one pass (12.5 s → 0.06 s); final
+  sorting with nothing to move **60.7 s → 1.5 s** (LOT.txt and INDEX_LOTS.csv rewritten only when they changed, no
+  more `stat` per file nor full walk); 48 images to a destination on the share: 20.3 → 4.9 s.
+- **Reorganise**: no more walk through the inventory for each file (61 million comparisons), headers read by several
+  processes, **progress shown and Stop** (interface and command line); whole bank: 243 → 57 s (bound by disk reads).
+- **Quality**: a single (parallel) walk of the folder, sizes and dates read in parallel, cache read in one query, the
+  dialog's plan reused by the engine: starting again on the already measured bank over a share **72 s → 2 s**;
+  QUALITE.csv rewritten at most every 5 s and at the end of a stack (not after each image: O(n²) bytes per stack);
+  cache committed in batches. **Fix**: the table sorted FWHM, background, SNR… as text.
+- **Fixes**: the new-images check opened the destination database for writing; reading pixel duplicates for the
+  anomaly report could raise an exception.
+- Tests: +21 (`tests/test_echelle.py`, tolerant time budgets and exact counters: writes, commits, reads per image);
+  measurement tools in `outils/audit2/`.
+
 ## 0.1.3 — 9 October 2026
 
 - Build: the v0.1.2 release run failed on an apostrophe that slipped into a comment of the `.deb` test

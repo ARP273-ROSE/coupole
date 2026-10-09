@@ -74,6 +74,8 @@ class CarteCiel(QWidget):
         self.setMouseTracking(True)
         self.setMinimumSize(400, 220)
         self._t = None
+        self._proj = None         # (taille du widget, x px, y px, rayons) : projection calculée une fois
+        self._survol = None
 
     def showEvent(self, ev):
         super().showEvent(ev)
@@ -85,7 +87,24 @@ class CarteCiel(QWidget):
 
     def definir(self, points):
         self.points = points
+        self._proj = None
         self.update()
+
+    def _projection(self):
+        """Positions à l'écran de TOUS les points, en une projection numpy par taille de fenêtre (et non une
+        projection par point à chaque dessin et à chaque mouvement de souris : 8 000 points rendaient le survol
+        saccadé)."""
+        taille = (self.width(), self.height())
+        if self._proj is None or self._proj[0] != taille:
+            if self.points:
+                ra = np.fromiter((p[0] for p in self.points), float, len(self.points))
+                de = np.fromiter((p[1] for p in self.points), float, len(self.points))
+                x, y = self._px(ra, de)
+                r = np.fromiter((p[2] for p in self.points), float, len(self.points))
+            else:
+                x = y = r = np.zeros(0)
+            self._proj = (taille, np.asarray(x, float), np.asarray(y, float), r)
+        return self._proj[1:]
 
     def _geo(self):
         w, h = self.width() - 20, self.height() - 40
@@ -130,11 +149,14 @@ class CarteCiel(QWidget):
         for h in range(2, 24, 4):
             x, y = self._px(h * 15, 0)
             p.drawText(QRectF(x - 20, c.y() + sy + 4, 40, 14), Qt.AlignmentFlag.AlignHCenter, '%d h' % h)
-        for ra, dec, rayon, coul, _, _ in self.points:
-            x, y = self._px(ra, dec)
-            p.setPen(Qt.PenStyle.NoPen)
-            p.setBrush(QBrush(coul))
-            p.drawEllipse(QPointF(float(x), float(y)), rayon, rayon)
+        xs, ys, _ = self._projection()
+        p.setPen(Qt.PenStyle.NoPen)
+        couleur = None
+        for (_, _, rayon, coul, _, _), x, y in zip(self.points, xs.tolist(), ys.tolist()):
+            if coul is not couleur:
+                p.setBrush(QBrush(coul))
+                couleur = coul
+            p.drawEllipse(QPointF(x, y), rayon, rayon)
         p.setPen(self.palette().text().color())
         p.drawText(QRectF(8, self.height() - 18, self.width() - 16, 16), Qt.AlignmentFlag.AlignLeft,
                    tr('carte_legende_ciel'))
@@ -153,20 +175,28 @@ class CarteCiel(QWidget):
         p.drawPath(chemin)
 
     def _proche(self, pos):
-        meilleur, dmin = None, 12.0
-        for pt in self.points:
-            x, y = self._px(pt[0], pt[1])
-            d = math.hypot(float(x) - pos.x(), float(y) - pos.y())
-            if d < max(dmin, pt[2] + 2) and (meilleur is None or d < dmin):
-                meilleur, dmin = pt, d
-        return meilleur
+        """Point le plus proche du curseur (dans son rayon + 2 px, ou à moins de 12 px) : distances numpy."""
+        if not self.points:
+            return None
+        xs, ys, rs = self._projection()
+        d = np.hypot(xs - pos.x(), ys - pos.y())
+        portee = np.maximum(12.0, rs + 2)
+        ok = d < portee
+        if not ok.any():
+            return None
+        k = int(np.flatnonzero(ok)[np.argmin(d[ok])])
+        return self.points[k]
 
     def mouseMoveEvent(self, ev):
         pt = self._proche(ev.position())
         if pt is not None:
-            QToolTip.showText(ev.globalPosition().toPoint(), pt[4], self)
+            if pt is not self._survol:              # l'info-bulle ne change qu'en changeant de point
+                QToolTip.showText(ev.globalPosition().toPoint(), pt[4], self)
+            self._survol = pt
         else:
-            QToolTip.hideText()
+            if self._survol is not None:
+                QToolTip.hideText()
+            self._survol = None
 
     def mousePressEvent(self, ev):
         pt = self._proche(ev.position())
@@ -202,9 +232,13 @@ class CacheTuiles:
     def __init__(self, rappel):
         self.dossier = config.dossier_cache() / 'tuiles'
         self.pool = F.ThreadPoolExecutor(2, thread_name_prefix='tuiles')
+        self.pool_disque = F.ThreadPoolExecutor(2, thread_name_prefix='tuiles-disque')
         self.en_cours = set()
+        self.en_lecture = set()
         self.echecs = {}
-        self.memoire = {}
+        import collections
+        self.memoire = collections.OrderedDict()   # LRU : les plus anciennes sortent une à une (plus de vidage
+        #                                            complet qui faisait relire et décoder tout l'écran d'un coup)
         self.rappel = rappel
         self.verrou = threading.Lock()
         self.hors_ligne = False
@@ -214,26 +248,68 @@ class CacheTuiles:
         """Arrête les téléchargements (fermeture de la carte ou de l'application) ; plus aucun rappel ensuite."""
         self.ferme = True
         self.pool.shutdown(wait=False, cancel_futures=True)
+        self.pool_disque.shutdown(wait=False, cancel_futures=True)
 
     def chemin(self, z, x, y) -> Path:
         return self.dossier / str(z) / str(x) / ('%d.png' % y)
 
-    def tuile(self, z, x, y):
+    MEMOIRE_MAX = 600
+
+    def _garder(self, cle, im):
+        with self.verrou:
+            self.memoire[cle] = im
+            self.memoire.move_to_end(cle)
+            while len(self.memoire) > self.MEMOIRE_MAX:
+                self.memoire.popitem(last=False)
+
+    def _lire_disque(self, cle):
+        """Lecture et décodage PNG d'une tuile du cache disque ; None si absente ou illisible."""
+        p = self.chemin(*cle)
+        try:
+            st = p.stat()
+        except OSError:
+            return None
+        im = QImage(str(p))
+        if im.isNull():
+            return None
+        self._garder(cle, im)
+        if time.time() - st.st_mtime > self.AGE_MAX:
+            self._demander(cle)
+        return im
+
+    def tuile(self, z, x, y, synchrone=True):
+        """La tuile en mémoire ; sinon lue sur le disque — tout de suite si `synchrone` (le dessin a encore du
+        temps), sinon par un fil (le dessin suivant l'aura) ; sinon téléchargée."""
         cle = (z, x, y)
-        if cle in self.memoire:
-            return self.memoire[cle]
-        p = self.chemin(z, x, y)
-        if p.exists():
-            im = QImage(str(p))
-            if not im.isNull():
-                if len(self.memoire) > 400:
-                    self.memoire.clear()
-                self.memoire[cle] = im
-                if time.time() - p.stat().st_mtime > self.AGE_MAX:
-                    self._demander(cle)
+        with self.verrou:
+            im = self.memoire.get(cle)
+            if im is not None:
+                self.memoire.move_to_end(cle)
                 return im
-        self._demander(cle)
+        if synchrone:
+            im = self._lire_disque(cle)
+            if im is not None:
+                return im
+            if not self.chemin(*cle).exists():
+                self._demander(cle)
+            return None
+        with self.verrou:
+            if self.ferme or cle in self.en_lecture:
+                return None
+            self.en_lecture.add(cle)
+        self.pool_disque.submit(self._lire_puis_rappeler, cle)
         return None
+
+    def _lire_puis_rappeler(self, cle):
+        try:
+            im = self._lire_disque(cle)
+            if im is None and not self.chemin(*cle).exists():
+                self._demander(cle)
+        finally:
+            with self.verrou:
+                self.en_lecture.discard(cle)
+            if not self.ferme:
+                self.rappel()
 
     def _demander(self, cle):
         with self.verrou:
@@ -254,7 +330,8 @@ class CacheTuiles:
             tmp = p.with_suffix('.tmp')
             tmp.write_bytes(data)
             os.replace(tmp, p)
-            self.memoire.pop(cle, None)
+            with self.verrou:
+                self.memoire.pop(cle, None)
         except Exception:
             self.echecs[cle] = time.time()
             if len(self.echecs) > 6 and not any(self.chemin(*k).exists() for k in list(self.echecs)[:6]):
@@ -269,6 +346,7 @@ class CacheTuiles:
 class CarteMonde(QWidget):
     site_clique = pyqtSignal(object)
     _rafraichir = pyqtSignal()
+    BUDGET_TUILES_S = 0.03
 
     def __init__(self, parent=None, en_ligne=True):
         super().__init__(parent)
@@ -332,11 +410,15 @@ class CarteMonde(QWidget):
         if self.en_ligne:
             zt, k = self._zoom_tuiles()
             cote = TAILLE_TUILE / k                 # taille logique d'une tuile du niveau dessiné
+            # décodage des tuiles du disque dans le dessin pendant BUDGET_TUILES_S au plus, le reste par un fil
+            # (redessin à l'arrivée) : un changement de zoom à 2× (≈ 100 tuiles) ne fige plus l'interface
+            fin_budget = time.perf_counter() + self.BUDGET_TUILES_S
             for tx in range(int(ox // TAILLE_TUILE), int((ox + self.width()) // TAILLE_TUILE) + 1):
                 for ty in range(max(0, int(oy // TAILLE_TUILE)), min(n, int((oy + self.height()) // TAILLE_TUILE) + 1)):
                     for i in range(k):
                         for j in range(k):
-                            im = self.cache.tuile(zt, (tx * k + i) % (n * k), ty * k + j)
+                            im = self.cache.tuile(zt, (tx * k + i) % (n * k), ty * k + j,
+                                                  synchrone=time.perf_counter() < fin_budget)
                             if im is not None:
                                 p.drawImage(QRectF(tx * TAILLE_TUILE - ox + i * cote, ty * TAILLE_TUILE - oy + j * cote,
                                                    cote, cote), im)

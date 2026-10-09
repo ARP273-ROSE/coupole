@@ -29,6 +29,18 @@ def _uri_lecture_seule(chemin: str) -> str:
     return Path(chemin).resolve().as_uri() + '?mode=ro'
 
 
+def _relatif(chemin: str, dest: str) -> str:
+    """Chemin local relatif à la destination quand il est dedans (sinon tel quel)."""
+    if chemin and dest:
+        try:
+            rel = os.path.relpath(chemin, dest)
+            if not rel.startswith('..'):
+                return rel
+        except ValueError:                       # lecteurs différents sous Windows
+            pass
+    return chemin
+
+
 class Possession:
     """Lecture seule de l'état d'une destination ; `vide()` quand il n'y a rien."""
 
@@ -45,12 +57,18 @@ class Possession:
     @classmethod
     def lire(cls, dest) -> 'Possession':
         """Lit `<dest>/_traitement/etat.sqlite` ; jamais d'exception (base absente, verrouillée, abîmée → vide)."""
+        return cls.lire_avec_infos(dest)[0]
+
+    @classmethod
+    def lire_avec_infos(cls, dest) -> tuple['Possession', list]:
+        """(Possession, [(id, info)] des converties) en UNE lecture de la base : l'interface demandait les deux
+        et décodait deux fois les 7 625 JSON (et, sur un partage, ouvrait deux fois la base)."""
         dest = str(dest or '')
         chemin = os.path.join(dest, '_traitement', 'etat.sqlite') if dest else ''
         if not chemin or not os.path.exists(chemin):
-            return cls(dest)
+            return cls(dest), []
         import sqlite3
-        statuts, details = {}, {}
+        statuts, details, infos_ok = {}, {}, []
         try:
             # URI en lecture seule : on ne crée rien, on ne modifie rien, on ne gêne pas un pilote qui écrit.
             db = sqlite3.connect(_uri_lecture_seule(chemin), uri=True, timeout=5)
@@ -64,14 +82,16 @@ class Possession:
                         try:
                             d = json.loads(info)
                             chemin_local = d.get('final') or ''
+                            if statut == 'ok':
+                                infos_ok.append((i, d))
                         except ValueError:
                             pass
-                    details[i] = {'date': (maj or '')[:19].replace('T', ' '), 'chemin': chemin_local}
+                    details[i] = {'date': (maj or '')[:19].replace('T', ' '), 'chemin': _relatif(chemin_local, dest)}
             finally:
                 db.close()
         except Exception:                        # sqlite3.Error, OSError : rien de possédé plutôt qu'un plantage
-            return cls(dest)
-        return cls(dest, statuts, details)
+            return cls(dest), []
+        return cls(dest, statuts, details), infos_ok
 
     # ---------------------------------------------------------------- par image
     def statut(self, x: dict) -> str:
@@ -81,15 +101,8 @@ class Possession:
         """{'statut', 'date', 'chemin'} ; le chemin local est relatif à la destination quand il est dedans."""
         i = ident(x)
         d = self.details.get(i, {})
-        chemin = d.get('chemin') or ''
-        if chemin and self.dest:
-            try:
-                rel = os.path.relpath(chemin, self.dest)
-                if not rel.startswith('..'):
-                    chemin = rel
-            except ValueError:                   # lecteurs différents sous Windows
-                pass
-        return {'statut': self.statuts.get(i, 'absente'), 'date': d.get('date', ''), 'chemin': chemin}
+        # chemin déjà rendu relatif à la lecture (fil de fond) : rien à recalculer à chaque affichage
+        return {'statut': self.statuts.get(i, 'absente'), 'date': d.get('date', ''), 'chemin': d.get('chemin') or ''}
 
     def possedee(self, x: dict) -> bool:
         """Plus rien à télécharger pour cette image (convertie, ou écartée comme doublon de pixels)."""
@@ -158,6 +171,22 @@ class Possession:
             tot = sum(base.get(k, 0) for k in cles)
             out[dossier] = {'converties': conv, 'base': tot, 'complet': tot > 0 and conv >= tot}
         return out
+
+
+def lire_statuts(dest) -> dict:
+    """{id: statut} en lecture seule, sans décoder les infos ; {} si rien (sans exception, sans rien créer)."""
+    chemin = os.path.join(str(dest or ''), '_traitement', 'etat.sqlite') if dest else ''
+    if not chemin or not os.path.exists(chemin):
+        return {}
+    import sqlite3
+    try:
+        db = sqlite3.connect(_uri_lecture_seule(chemin), uri=True, timeout=5)
+        try:
+            return dict(db.execute('SELECT id, statut FROM images').fetchall())
+        finally:
+            db.close()
+    except Exception:
+        return {}
 
 
 def lire_infos_ok(dest) -> list:
