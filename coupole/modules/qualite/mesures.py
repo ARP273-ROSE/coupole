@@ -255,7 +255,7 @@ def entete(chemin) -> dict:
 
 def lire_image(chemin):
     """(données float32, en-tête dict) depuis XISF (lecture tolérante : N.I.N.A., ASIAIR, PixInsight…), FITS ou
-    FITS compressé.  Float32 : une pose de 61 Mpx (ASI 6200) tient en 245 Mo au lieu de 490 Mo en float64 ; une
+    FITS compressé.  Float32 : une pose de 61 Mpx tient en 245 Mo au lieu de 490 Mo en float64 ; une
     image couleur est ramenée à la moyenne de ses canaux."""
     p = str(chemin)
     if p.lower().endswith('.xisf'):

@@ -256,7 +256,8 @@ class FenetrePrincipale(QMainWindow):
             return
         titre = p.module.nom_local() if hasattr(p, 'module') else 'Coupole'
         texte = p.aide_html() if hasattr(p, 'aide_html') else tr('aide_generale')
-        dialogues.afficher_aide(self, titre, texte + tr('aide_dossier_reseau') + tr('aide_reglages_conserves'))
+        dialogues.afficher_aide(self, titre, texte + tr('aide_dossier_reseau') + tr('aide_ouvrir_avec') +
+                                 tr('aide_reglages_conserves'))
 
     def manuel(self):
         from ..cli import chemin_manuel

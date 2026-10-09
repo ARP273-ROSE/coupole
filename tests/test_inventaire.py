@@ -69,20 +69,20 @@ def test_valeurs_malformees_et_nouveautes_de_la_base():
 def test_alias_par_position():
     l, _ = inventaire_brut()
     ngc = next(x for x in l if x['target_name'] == 'NGC 6888')
-    inconnu = dict(ngc, access_url='http://exemple/croissant.fits', target_name='Croissant de ARP273-ROSE')
+    inconnu = dict(ngc, access_url='http://exemple/croissant.fits', target_name='Croissant de Test')
     d = inventaire.enrichir([inventaire._convertir(x) for x in l[:400] + [ngc, inconnu]])
     x = next(y for y in d if y['access_url'].endswith('croissant.fits'))
     assert x['objet'] == 'NGC 6888' and x['classement'] == 'position' and x['a_verifier']
 
 
 def test_correction_utilisateur_memorisee():
-    cibles.corriger('Croissant de ARP273-ROSE', 'NGC 6888', 'neb')
+    cibles.corriger('Croissant de Test', 'NGC 6888', 'neb')
     try:
-        assert cibles.classer('Croissant de ARP273-ROSE')[:2] == ('NGC 6888', 'neb')
-        assert cibles.classer('Croissant de ARP273-ROSE')[4] == 'utilisateur'
+        assert cibles.classer('Croissant de Test')[:2] == ('NGC 6888', 'neb')
+        assert cibles.classer('Croissant de Test')[4] == 'utilisateur'
     finally:
-        cibles.corriger('Croissant de ARP273-ROSE', None)
-    assert cibles.classer('Croissant de ARP273-ROSE')[4] == 'inconnu'
+        cibles.corriger('Croissant de Test', None)
+    assert cibles.classer('Croissant de Test')[4] == 'inconnu'
 
 
 def test_nouveautes_detectees(tmp_path, monkeypatch):

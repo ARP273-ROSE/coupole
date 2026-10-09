@@ -117,7 +117,8 @@ def test_ouvrir_avec_suit_la_table(tmp_path):
         assert logiciels.nature(p) == nat, (nom, logiciels.nature(p))
         props = logiciels.propositions(p, tous)
         actifs = {lg for lg, ok, _ in props if ok}
-        assert actifs == {lg for lg, ok in logiciels.LECTURE[nat].items() if ok}, (nat, actifs)
+        # N.I.N.A. lit certains formats mais n'ouvre pas un fichier passé en argument (0.1.12) : toujours grisé
+        assert actifs == {lg for lg, ok in logiciels.LECTURE[nat].items() if ok} - {'nina'}, (nat, actifs)
         assert ('astap' in actifs) == (nat in ('fits_flottant', 'fits_entier', 'fz_entier'))
         assert all(r for _, ok, r in props if not ok)               # chaque logiciel grisé dit pourquoi
     from coupole.core import xisf as X

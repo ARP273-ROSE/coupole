@@ -1,12 +1,12 @@
 """0.1.11 — copie produite par l'ancien script `ohp_xisf.py` (avant Coupole), lue d'une autre machine.
 
-Retour de ARP273-ROSE (Linux, 0.1.10, `/mnt/partage/Astronomie/OHP_DU_ECU`) : objets entièrement possédés (4/4, pastille
+Retour d'utilisateur (Linux, 0.1.10, `/mnt/partage/OHP_DU_ECU`) : objets entièrement possédés (4/4, pastille
 verte) mais « Ouvrir le dossier de la cible », « Ouvrir avec », « Ouvrir l'emplacement » et le double-clic grisés
 ou sans effet (« Rien n'est encore téléchargé pour cet objet »).  Cause : la base d'état de cette copie ne note que
-le chemin absolu de la machine qui a traité (`final` = « /srv/espace/OHP_DU_ECU/… », conteneur) ; le
+le chemin absolu de la machine qui a traité (`final` = « /srv/ancien/OHP_DU_ECU/… », conteneur) ; le
 chemin relatif est dans `_traitement/journal.csv`.
 
-Reproduction réduite : 20 lignes RÉELLES de la base et du journal de la copie de ARP273-ROSE ((914) Palisana : 10
+Reproduction réduite : 20 lignes RÉELLES de la base et du journal de la copie d'un utilisateur ((914) Palisana : 10
 converties + 6 doublons ; NGC 5866 : 4 converties), `tests/donnees/copie_ohp_xisf/`, et des XISF factices aux
 chemins de `destination`.
 """
@@ -26,7 +26,7 @@ from coupole.modules.ohp.conversion import ident
 from coupole.modules.ohp.possession import Possession
 
 DONNEES = Path(__file__).parent / 'donnees' / 'copie_ohp_xisf'
-ANCIENNE = '/srv/espace/OHP_DU_ECU'
+ANCIENNE = '/srv/ancien/OHP_DU_ECU'
 
 
 def _journal():
@@ -36,7 +36,7 @@ def _journal():
 
 
 def faire_copie(racine: Path, journal=True, fichiers=True) -> Path:
-    """Dossier de sortie comme celui de ARP273-ROSE : base (mode WAL, comme ohp_xisf.py), journal.csv, INDEX_LOTS.csv,
+    """Dossier de sortie comme celui d'un utilisateur : base (mode WAL, comme ohp_xisf.py), journal.csv, INDEX_LOTS.csv,
     XISF factices (en-tête instrument) aux chemins du journal."""
     from coupole.core import xisf
     dest = racine / 'OHP_DU_ECU'
@@ -323,7 +323,9 @@ def test_toutes_les_actions_sur_la_copie(panneau, app_qt, tmp_path, monkeypatch,
     dest = faire_copie(tmp_path)
     appels = []
     monkeypatch.setattr(logiciels, 'montrer_dans_dossier', lambda c: appels.append(('montrer', str(c))) or True)
-    monkeypatch.setattr(logiciels, 'lancer', lambda cmd, c: appels.append(('lancer', cmd[0], str(c))) or True)
+    monkeypatch.setattr(logiciels, 'lancer_logiciel',
+                        lambda lg, c, *a, **k: appels.append(('lancer', lg, str(c))) or True)
+    monkeypatch.setattr(logiciels, 'pixinsight_ouvert', lambda *a, **k: False)
     monkeypatch.setattr(ouvrir, 'ouvrir_defaut', lambda c: appels.append(('defaut', str(c))) or True)
     monkeypatch.setattr(ouvrir, 'installes', lambda rafraichir=False: {'pixinsight': ['/opt/PixInsight/bin/PixInsight']})
     p = panneau
@@ -387,7 +389,7 @@ def test_toutes_les_actions_sur_la_copie(panneau, app_qt, tmp_path, monkeypatch,
     px = _action(avec.menu(), 'PixInsight')
     assert px.isEnabled()
     px.trigger()
-    assert appels.pop() == ('lancer', '/opt/PixInsight/bin/PixInsight', fichier)
+    assert appels.pop() == ('lancer', 'pixinsight', fichier)
     e = _action(mi, "Ouvrir l'emplacement")
     assert e.isEnabled()
     e.trigger()

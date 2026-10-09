@@ -1899,8 +1899,8 @@ class Panneau(QWidget):
     def _ouvrir_dossier_objet(self):
         d = self.dossier_objet(self._objet_sous())
         if d and os.path.isdir(d):
-            from ...core import logiciels
-            logiciels.montrer_dans_dossier(d)
+            from ...gui import ouvrir
+            ouvrir.montrer_emplacement(d)
         else:
             self._statut(tr('ohp_objet_rien'))
 
@@ -1909,13 +1909,12 @@ class Panneau(QWidget):
         if o is None:
             return
         from PyQt6.QtWidgets import QMenu
-        from ...core import logiciels
         from ...gui import ouvrir
         m = QMenu(self)
         d = self.dossier_objet(o)
         a = ouvrir.action(m, tr('ohp_objet_dossier'), bool(d) and os.path.isdir(d), tr('ohp_objet_dossier_aide'),
                           tr('ohp_objet_rien'), tr('lg_motif_rien'))
-        a.triggered.connect(lambda: logiciels.montrer_dans_dossier(d))
+        a.triggered.connect(lambda: ouvrir.montrer_emplacement(d))
         lots = getattr(self, '_lots_par_objet', {}) or {}
         b = ouvrir.action(m, tr('ohp_objet_lots'), bool(lots.get(o['objet']) or lots.get(cibles.nom_affiche(o['objet']))),
                           tr('ohp_objet_lots_aide'), tr('ohp_objet_pas_de_lot'), tr('ohp_motif_pas_de_lot'))
@@ -1948,12 +1947,11 @@ class Panneau(QWidget):
         r = self.p_lots.mapToSource(i).row()
         dossier = self.m_lots.donnees[r] if 0 <= r < len(self.m_lots.donnees) else ''
         from PyQt6.QtWidgets import QMenu
-        from ...core import logiciels
         from ...gui import ouvrir
         m = QMenu(self)
         a = ouvrir.action(m, tr('ohp_lot_ouvrir_dossier'), bool(dossier) and os.path.isdir(dossier), '',
                           tr('ohp_lot_absent'), tr('ohp_motif_dossier_absent'))
-        a.triggered.connect(lambda: logiciels.montrer_dans_dossier(dossier))
+        a.triggered.connect(lambda: ouvrir.montrer_emplacement(dossier))
         c = ouvrir.action(m, tr('ohp_astro_copier_lot'), bool(self.texte_astrometrie(dossier)))
         c.triggered.connect(lambda: self._copier(self.texte_astrometrie(dossier)))
         b = m.addAction(tr('ohp_lots_ouvrir'))

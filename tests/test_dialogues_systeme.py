@@ -172,10 +172,10 @@ def test_emplacements_reseau_dans_la_barre_laterale(tmp_path):
         return
     gvfs = tmp_path / 'gvfs'
     (gvfs / 'smb-share:server=nas,share=astronomie').mkdir(parents=True)
-    lieux = chemins.emplacements_systeme({'USER': 'utilisateur', 'XDG_RUNTIME_DIR': str(tmp_path)}, montages, uid=1000,
+    lieux = chemins.emplacements_systeme({'USER': 'astro', 'XDG_RUNTIME_DIR': str(tmp_path)}, montages, uid=1000,
                                          existe=lambda p: p.startswith(str(tmp_path)) or p.startswith(('/mnt', '/run/media', '/media')))
     assert str(gvfs) in lieux and str(gvfs / 'smb-share:server=nas,share=astronomie') in lieux
-    assert '/mnt/partage/Astronomie' in lieux and '/mnt/photo NAS' in lieux and '/run/media/user' in lieux
+    assert '/mnt/partage/Astronomie' in lieux and '/mnt/photo NAS' in lieux and '/run/media/astro' in lieux
     assert '/mnt' in lieux and '/tmp' not in lieux
 
 
