@@ -253,6 +253,117 @@ FOLDER & output folder (or one stack)\\
 \par\medskip
 \begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
 \toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives liste (list)\newline\normalfont\small list the known archives (stage, missions, status)}\\
+\midrule
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives chercher (search)\newline\normalfont\small Search MAST, ESO and IRSA (by default) for public final products around an object; --archive opus or pds with --body for planetary probes.}\\
+\midrule
+OBJECT & object (name or coordinates)\\
+--rayon,\allowbreak{} --radius ARCMIN & search radius in arcminutes (default: 3)\\
+--archive A & archive to query (repeatable): mast, eso, irsa, noirlab, koa, sdss, goa, smoka, opus, pds\\
+--mission M & mission (repeatable): JWST, HST, GALEX, ESO, Spitzer, WISE, 2MASS, NOIRLab, Keck, SDSS, Voyager, Cassini, Juno\\
+--instrument I & instrument (part of the name, repeatable)\\
+--filtre,\allowbreak{} --filter F & filter (exact name, repeatable)\\
+--debut,\allowbreak{} --from YYYY-MM-DD & observations on or after this date\\
+--fin,\allowbreak{} --to YYYY-MM-DD & observations up to this date\\
+--tous-niveaux,\allowbreak{} --all-levels & also the calibrated single frames and the raw data\\
+--non-publiques,\allowbreak{} --proprietary & also the still proprietary data (for information: not downloadable)\\
+--corps,\allowbreak{} --body BODY & Solar System body (Voyager, Cassini, Juno)\\
+--limite,\allowbreak{} --limit N & maximum number of rows per archive (default: 2000)\\
+--id ID & keep only this identifier (repeatable)\\
+--json & JSON output (for scripts)\\
+--csv FILE & also write the results to this CSV file\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives estimer (estimate)\newline\normalfont\small Like « search », then add up the sizes (announced or measured) without downloading anything.}\\
+\midrule
+OBJECT & object (name or coordinates)\\
+--rayon,\allowbreak{} --radius ARCMIN & search radius in arcminutes (default: 3)\\
+--archive A & archive to query (repeatable): mast, eso, irsa, noirlab, koa, sdss, goa, smoka, opus, pds\\
+--mission M & mission (repeatable): JWST, HST, GALEX, ESO, Spitzer, WISE, 2MASS, NOIRLab, Keck, SDSS, Voyager, Cassini, Juno\\
+--instrument I & instrument (part of the name, repeatable)\\
+--filtre,\allowbreak{} --filter F & filter (exact name, repeatable)\\
+--debut,\allowbreak{} --from YYYY-MM-DD & observations on or after this date\\
+--fin,\allowbreak{} --to YYYY-MM-DD & observations up to this date\\
+--tous-niveaux,\allowbreak{} --all-levels & also the calibrated single frames and the raw data\\
+--non-publiques,\allowbreak{} --proprietary & also the still proprietary data (for information: not downloadable)\\
+--corps,\allowbreak{} --body BODY & Solar System body (Voyager, Cassini, Juno)\\
+--limite,\allowbreak{} --limit N & maximum number of rows per archive (default: 2000)\\
+--id ID & keep only this identifier (repeatable)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives telecharger (download)\newline\normalfont\small Like « search », then download (confirmation beyond the threshold: --yes), extract the science image and file it in <dest>/Archives.}\\
+\midrule
+OBJECT & object (name or coordinates)\\
+--rayon,\allowbreak{} --radius ARCMIN & search radius in arcminutes (default: 3)\\
+--archive A & archive to query (repeatable): mast, eso, irsa, noirlab, koa, sdss, goa, smoka, opus, pds\\
+--mission M & mission (repeatable): JWST, HST, GALEX, ESO, Spitzer, WISE, 2MASS, NOIRLab, Keck, SDSS, Voyager, Cassini, Juno\\
+--instrument I & instrument (part of the name, repeatable)\\
+--filtre,\allowbreak{} --filter F & filter (exact name, repeatable)\\
+--debut,\allowbreak{} --from YYYY-MM-DD & observations on or after this date\\
+--fin,\allowbreak{} --to YYYY-MM-DD & observations up to this date\\
+--tous-niveaux,\allowbreak{} --all-levels & also the calibrated single frames and the raw data\\
+--non-publiques,\allowbreak{} --proprietary & also the still proprietary data (for information: not downloadable)\\
+--corps,\allowbreak{} --body BODY & Solar System body (Voyager, Cassini, Juno)\\
+--limite,\allowbreak{} --limit N & maximum number of rows per archive (default: 2000)\\
+--id ID & keep only this identifier (repeatable)\\
+--dest FOLDER & output folder (default: the one of the Preferences)\\
+--format \{xisf,\allowbreak{}fits\} & format of the prepared images (default: xisf)\\
+--sans-original,\allowbreak{} --no-original & delete the original file once the image is prepared\\
+--debit,\allowbreak{} --rate MB/S & rate cap in MB/s (default: setting, 8)\\
+--paralleles,\allowbreak{} --parallel N & simultaneous downloads (default: 2, at most 6)\\
+--max N & at most N files (the closest)\\
+--oui,\allowbreak{} --yes & confirm a download beyond the threshold\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives preparer (prepare)\newline\normalfont\small Extract the science image of a multi-extension FITS, or convert a planetary product, to XISF or FITS Float32 next to the file.}\\
+\midrule
+FILE & files to prepare\\
+--format \{xisf,\allowbreak{}fits\} & format of the prepared images (default: xisf)\\
+--etiquette,\allowbreak{} --label FILE & detached PDS3 (.LBL) or PDS4 (.xml) label\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives aligner (align)\newline\normalfont\small Resample the images (WCS) onto the grid of one of them or an optimal grid; write the aligned files, the common mask, the colour preview and composition.txt.}\\
+\midrule
+FILE & prepared images (FITS or XISF with WCS)\\
+--dest FOLDER & folder of the aligned files\\
+--reference N & index of the reference image (default: 0, the first)\\
+--optimale,\allowbreak{} --optimal & optimal grid covering every image\\
+--methode,\allowbreak{} --method \{bilineaire,\allowbreak{}adaptative,\allowbreak{}exacte,\allowbreak{}proche\} & resampling: bilineaire (bilinear), adaptative (adaptive), exacte (exact, reproject), proche (nearest)\\
+--echelle,\allowbreak{} --scale X & output pixel size factor (default: 1)\\
+--sans-recadrage,\allowbreak{} --no-crop & do not crop to the common area\\
+--format \{xisf,\allowbreak{}fits\} & format of the prepared images (default: xisf)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives bilan (status)\newline\normalfont\small what is already downloaded and prepared}\\
+\midrule
+--dest FOLDER & output folder (default: the one of the Preferences)\\
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole qualite\newline\normalfont\small Optional: background, noise, FWHM and ellipticity (3×3 map), background gradient, saturation, trails, sampling}\\
 \midrule
 FOLDER & folder of stacks (or one image file)\\

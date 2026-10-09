@@ -19,6 +19,7 @@ anglais, sur Windows, macOS et Linux. Architecture **modulaire** : d'autres modu
 | Module | Ce qu'il fait |
 |---|---|
 | **Banque OHP** | Récupère la banque d'images « OHP student observations » (T120 et IRIS, 7 989 images, 78 Go) par le service TAP public de l'Observatoire ; catalogue des 166 objets ; téléchargement avec reprise ; doublons écartés (et expliqués) ; solution astrométrique contrôlée (ASTAP facultatif) ; en-têtes corrigés avec traçabilité ; conversion **XISF** (PixInsight), **FITS compressé sans perte** (`.fits.fz` : Siril, astropy) ou FITS float32 ; tri en **lots empilables** avec fiche `LOT.txt` ; carte du ciel ; rapport d'anomalies ; **fiche en ligne** facultative (SIMBAD, JPL, liens Aladin et NED). |
+| **Archives des observatoires** (0.2.0) | Images publiques des grands observatoires et des sondes, actuelles et passées : **Hubble, JWST, GALEX** (MAST), **ESO** (produits Phase 3), **Spitzer, WISE, 2MASS** (IRSA), **NOIRLab** (DECam…), **Keck** (KOA, poses brutes), **SDSS**, **Voyager et Cassini** (OPUS, PDS), **Juno** (JunoCam, PDS). Recherche par nom ou coordonnées (ou par corps pour les sondes), produits finaux et données publiques par défaut, **volume estimé avant téléchargement** et confirmation au-delà d'un seuil, débit plafonné et reprise ; extraction de l'image scientifique (WCS, unités, NaN masqués, crédit dans l'en-tête), XISF ou FITS ; conversion PDS3/VICAR/PDS4 ; **alignement** par l'astrométrie sur une grille commune et **composition couleur** dans l'ordre des longueurs d'onde (aperçu, PixelMath). Gemini (compte exigé) et SMOKA (formulaire web) signalés. Méthode et sources : [docs/archives_methode.md](docs/archives_methode.md). |
 | **Qualité des images** | Facultatif : FWHM, ellipticité (carte 3 × 3), fond, bruit, gradient, saturation, traînées, échantillonnage — mesures validées sur images synthétiques. |
 | **Spectres et séries** | Lecture et tracé de données 1D (spectres H I à 21 cm avec axe fréquence ↔ vitesse radio, courbes de lumière, tables FITS ou CSV). |
 | **Cosmologie** | Du redshift aux distances (comobile, luminosité, angulaire, trajet de la lumière), âges, volume comobile, module de distance, échelle en kpc/″ ; Planck 2018 avec incertitudes, SH0ES, Planck 2015, WMAP 9, jeu personnalisé ; redshift d'un objet demandé à SIMBAD ; courbes, export CSV. Noyau repris du calculateur [cosmologie-redshift](https://github.com/ARP273-ROSE/cosmologie-redshift), vérifié sous SageMath. |
@@ -26,6 +27,7 @@ anglais, sur Windows, macOS et Linux. Architecture **modulaire** : d'autres modu
 | **Ma machine** | Diagnostic matériel et parallélisme retenu (exemple minimal de module). |
 
 <p align="center"><img src="docs/manuel/img/catalogue_fr.png" width="820" alt="Catalogue de la banque OHP"></p>
+<p align="center"><img src="docs/manuel/img/module_archives_fr.png" width="820" alt="Archives des observatoires"></p>
 
 ### Installer
 
@@ -50,6 +52,7 @@ install.bat            # Windows (double-clic) : idem, raccourcis Bureau et menu
 ```bash
 pipx install git+https://github.com/ARP273-ROSE/coupole        # ou : pip install .
 pip install ".[qualite]"                                        # + module Qualité (SEP)
+pip install ".[alignement]"                                     # + reproject (alignement adaptatif et exact)
 python -m coupole            # interface ;   coupole --help : ligne de commande
 ```
 
@@ -64,6 +67,10 @@ coupole ohp nouveautes --dest ~/OHP                    # ce qui est apparu dans 
 coupole ohp reorganiser ~/Vrac --dest ~/OHP            # range des fichiers déjà convertis (déplacement, jamais d'écrasement)
 coupole ohp anomalies --csv anomalies.csv              # ce qui est écarté, et pourquoi
 coupole qualite ~/OHP --ecrire                         # QUALITE.csv et QUALITE.txt par lot
+coupole archives chercher "M 16" --mission JWST        # produits finaux publics de JWST autour des Piliers
+coupole archives telecharger "M 16" --mission JWST --instrument MIRI --dest ~/Ciel   # estimation, confirmation
+coupole archives aligner ~/Ciel/Archives/JWST/M_16/MIRI_IMAGE/*/*_sci.xisf --dest ~/Ciel/Piliers --optimale
+coupole archives chercher --archive opus --corps Io --debut 1979-03-01 --fin 1979-03-10   # Voyager 1
 coupole --lang en ohp catalog                           # tout existe aussi en anglais
 ```
 
@@ -136,6 +143,10 @@ service TAP public, licence Etalab 2.0. Méthode de traitement : guide officiel 
 inventaire de la banque de l'auteur. Format XISF : spécification de Pleiades Astrophoto. ASTAP : Han Kleijn
 (www.hnsky.org), non inclus. SEP : Source Extractor en Python (LGPL). Cartes : © OpenStreetMap contributors.
 Fiche en ligne : SIMBAD et Sesame (CDS, Strasbourg), Aladin Lite (CDS), NED (NASA/IPAC), JPL Small-Body Database.
+Archives : MAST (STScI ; NASA/ESA, NASA/ESA/CSA), ESO Science Archive Facility, IRSA (NASA/IPAC), Astro Data Archive
+de NOIRLab, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (nœud Anneaux et Lunes : OPUS ; Imaging
+Node) ; chaque image téléchargée porte le crédit de son archive (`CREDIT`), à reprendre sous toute image publiée ;
+reproject (Astropy, BSD, facultatif).
 Cosmologie : noyau de calcul repris du calculateur « cosmologie-redshift » du même auteur (publié sans licence
 formelle, intégré ici par son auteur sous GPL-3), astropy.cosmology, paramètres Planck 2018 / 2015, WMAP 9, SH0ES.
 Auteur : ARP273-ROSE. Licence : GNU GPL version 3 ou ultérieure.
@@ -152,6 +163,7 @@ English, on Windows, macOS and Linux. **Modular** architecture: more modules wil
 | Module | What it does |
 |---|---|
 | **OHP image bank** | Fetches the « OHP student observations » bank (T120 and IRIS, 7,989 images, 78 GB) through the Observatory's public TAP service; catalogue of 166 objects; resumable downloads; duplicates left out (and explained); astrometric solution checked (ASTAP optional); headers fixed with traceability; **XISF** (PixInsight), **lossless compressed FITS** (`.fits.fz`: Siril, astropy) or float32 FITS output; sorting into **stackable sets** with a `LOT.txt` sheet; sky map; anomaly report; optional **online record** (SIMBAD, JPL, Aladin and NED links). |
+| **Observatory archives** (0.2.0) | Public images from major observatories and space probes, current and past: **Hubble, JWST, GALEX** (MAST), **ESO** (Phase 3 products), **Spitzer, WISE, 2MASS** (IRSA), **NOIRLab** (DECam…), **Keck** (KOA, raw frames), **SDSS**, **Voyager and Cassini** (OPUS, PDS), **Juno** (JunoCam, PDS). Search by name or coordinates (or by body for probes), final products and public data by default, **volume estimated before downloading** and confirmation beyond a threshold, capped rate and resume; science image extraction (WCS, units, masked NaN, credit in the header), XISF or FITS; PDS3/VICAR/PDS4 conversion; **alignment** by astrometry onto a common grid and **colour composition** in wavelength order (preview, PixelMath). Gemini (account required) and SMOKA (web form) reported. Method and sources: [docs/archives_methode.md](docs/archives_methode.md) (French, English summary). |
 | **Image quality** | Optional: FWHM, ellipticity (3 × 3 map), background, noise, gradient, saturation, trails, sampling — measurements validated on synthetic images. |
 | **Spectra and series** | Reading and plotting 1D data (21 cm H I spectra with frequency ↔ radio velocity axis, light curves, FITS or CSV tables). |
 | **Cosmology** | From redshift to distances (comoving, luminosity, angular, light travel), ages, comoving volume, distance modulus, scale in kpc/″; Planck 2018 with uncertainties, SH0ES, Planck 2015, WMAP 9, custom set; an object's redshift requested from SIMBAD; curves, CSV export. Core taken from the [cosmologie-redshift](https://github.com/ARP273-ROSE/cosmologie-redshift) calculator, checked with SageMath. |
@@ -171,7 +183,8 @@ which pulls the Qt system libraries; `coupole` command and menu entry; `sudo apt
 (Windows) — virtual environment, dependencies, launchers; press Enter to confirm.
 
 **For Python users**: `pipx install git+https://github.com/ARP273-ROSE/coupole` (or `pip install .`);
-`pip install ".[qualite]"` adds the Quality module; `python -m coupole` starts the interface, `coupole --help`
+`pip install ".[qualite]"` adds the Quality module, `pip install ".[alignement]"` adds reproject (adaptive and
+exact alignment); `python -m coupole` starts the interface, `coupole --help`
 the command line.
 
 ### In two minutes
@@ -182,6 +195,9 @@ coupole --lang en ohp estimate "NGC 6888" --night 2025-07-16
 coupole --lang en ohp process "(914) Palisana" --dest ~/OHP
 coupole --lang en ohp anomalies --csv anomalies.csv
 coupole --lang en qualite ~/OHP --write
+coupole --lang en archives search "M 16" --mission JWST
+coupole --lang en archives download "M 16" --mission JWST --instrument MIRI --dest ~/Sky
+coupole --lang en archives align ~/Sky/Archives/JWST/M_16/MIRI_IMAGE/*/*_sci.xisf --dest ~/Sky/Pillars --optimal
 ```
 
 Everything the interface does is available on the command line (`--json` for scripts); processing is
@@ -230,6 +246,9 @@ format: [CONTRIBUTING.md](CONTRIBUTING.md). History: [CHANGELOG.en.md](CHANGELOG
 Data: « OHP student observations », Observatoire de Paris / PADC, public TAP service, Etalab 2.0 licence. XISF:
 Pleiades Astrophoto specification. ASTAP: Han Kleijn (www.hnsky.org), not included. SEP (LGPL). Maps: ©
 OpenStreetMap contributors. Online record: SIMBAD and Sesame (CDS, Strasbourg), Aladin Lite (CDS), NED (NASA/IPAC),
-JPL Small-Body Database. Cosmology: computation core taken from the same author's « cosmologie-redshift » calculator
+JPL Small-Body Database. Archives: MAST (STScI; NASA/ESA, NASA/ESA/CSA), ESO Science Archive Facility, IRSA
+(NASA/IPAC), NOIRLab Astro Data Archive, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (Ring-Moon
+Systems Node: OPUS; Imaging Node); every downloaded image carries its archive's credit (`CREDIT`), to repeat under any
+published image; reproject (Astropy, BSD, optional). Cosmology: computation core taken from the same author's « cosmologie-redshift » calculator
 (published without a formal licence, included here by its author under GPL-3), astropy.cosmology, Planck 2018 / 2015,
 WMAP 9, SH0ES parameters. Author: ARP273-ROSE. Licence: GNU GPL version 3 or later.

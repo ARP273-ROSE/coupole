@@ -43,6 +43,7 @@ anglais ; la langue du système est détectée, et peut être imposée (menu \em
 \textbf{Module} & \textbf{Fonction}\\
 \midrule
 Banque OHP & Inventaire, catalogue, téléchargement, contrôle astrométrique, en-têtes corrigés, conversion, lots empilables, anomalies, carte du ciel.\\
+Archives des observatoires & Images publiques de Hubble, JWST, ESO, Spitzer, WISE, 2MASS, NOIRLab, Keck, SDSS, Voyager, Cassini, Juno : recherche, volume, téléchargement, extraction, alignement, couleur.\\
 Qualité des images & Facultatif. FWHM, ellipticité, fond, bruit, gradient, saturation, traînées, échantillonnage.\\
 Spectres et séries & Lecture et tracé de données 1D (spectres radio, courbes de lumière, tables).\\
 Cosmologie & Du redshift aux distances, âges, volume, module de distance, échelle (Planck 2018 et autres).\\
@@ -587,6 +588,132 @@ tout envoi. Les adresses (\texttt{simbad.base}, \texttt{simbad.page}, \texttt{al
 \texttt{sbdb.page}, \texttt{resolution.sbdb}, \texttt{resolution.sesame}) se règlent comme les autres sources.
 
 % =====================================================================
+\section{Archives des observatoires}\label{sec:archives}
+\capture{img/module_archives_fr.png}{1.0}
+Les grands observatoires publient leurs images une fois écoulée la période réservée à l'équipe qui les a
+demandées (souvent douze mois). Le module cherche ces images publiques, actuelles et passées, les télécharge
+poliment, en extrait l'image scientifique et aide à les aligner et à les colorer, comme la Banque OHP le fait pour
+les stages. Méthode détaillée et sources : \texttt{docs/archives\_methode.md}.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+\textbf{Archive} & \textbf{Étape} & \textbf{Ce qui est proposé}\\
+\midrule
+MAST (STScI) & 1 & Hubble (\texttt{\_drz}, \texttt{\_drc}), JWST (\texttt{\_i2d}), GALEX (\texttt{-int}) ; service TAP officiel, vue \texttt{dbo.obspointing}\\
+ESO & 1 & produits réduits « Phase 3 » (VISTA, VST, HAWK-I, FORS, MUSE…) ; TAP ObsCore\\
+IRSA (NASA/IPAC) & 1 & Spitzer (mosaïques SEIP), WISE (Atlas AllWISE), 2MASS (Atlas) ; SIA 2\\
+NOIRLab & 2 & piles et images rééchantillonnées (DECam, Mosaic…)\\
+Keck (KOA) & 2 & poses brutes NIRC2, OSIRIS, MOSFIRE (aucun produit final d'imagerie)\\
+SDSS & 2 & images calibrées u, g, r, i, z\\
+Gemini & 2 & \textbf{compte exigé} même pour les données publiques : signalé, rien n'est téléchargé\\
+SMOKA (Subaru) & 2 & formulaire web seulement : signalé, non pris en charge\\
+OPUS (PDS) & 3 & Voyager ISS (\texttt{\_GEOMED}, distorsion corrigée), Cassini ISS (\texttt{\_CALIB})\\
+PDS Imaging Atlas & 3 & JunoCam (RDR, bandes de \emph{framelets})\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Chercher}
+Un nom (résolu par SIMBAD puis Sesame), des coordonnées en degrés (\texttt{83.82 -5.39}) ou sexagésimales
+(\texttt{05:35:17 -05:23:28}), un rayon (3~minutes d'arc par défaut) et les archives à interroger (MAST, ESO et IRSA
+par défaut). Pour Voyager, Cassini et Juno : un corps du Système solaire (Jupiter, Saturne, Io, Encelade… ; les noms
+français sont traduits) et leurs archives cochées. Filtres : instrument (morceau du nom : \texttt{NIRCAM},
+\texttt{ACS}), filtre (nom exact : \texttt{F444W}), dates d'observation. Deux cases cochées par défaut :
+\emph{Produits finaux seulement} (JWST \texttt{\_i2d}, Hubble \texttt{\_drz}/\texttt{\_drc}, Phase 3, SEIP, Atlas)
+et \emph{Données publiques seulement} (date de mise à disposition passée). Une observation est gardée si son centre
+est dans le cercle ou si son empreinte contient la position ; les plus proches d'abord. Les archives répondent en
+parallèle ; celle qui est injoignable, exige un compte ou n'a pas d'interface est signalée dans la barre d'état sans
+empêcher les autres. Une réponse tronquée par la limite (2~000 lignes par archive en ligne de commande, 20~000 dans
+l'interface) est signalée : affiner la recherche.
+
+\paragraph{Fiche.} Un clic sur une ligne montre la vignette fournie par l'archive (gardée en cache) et la fiche :
+mission, instrument, filtre, longueur d'onde, dates d'observation et de mise à disposition, cible, programme,
+investigateur principal, titre, niveau de calibration, fichier, taille, \textbf{crédit} et \textbf{conditions
+d'usage}, lien vers la page de l'archive. Pastilles : verte = déjà téléchargée et préparée, orange = échec, flèche =
+à télécharger ; ligne grisée : pas encore publique.
+
+\subsection{Télécharger et préparer}
+Choisir des lignes, puis \emph{Estimer le volume} : les tailles annoncées (ESO, IRSA, NOIRLab, PDS) sont
+additionnées, les autres mesurées par une requête d'un octet (au-delà de 60 fichiers, un échantillon par instrument,
+extrapolé et marqué « ≈ »). Ordres de grandeur réels : une \texttt{i2d} NIRCam des Piliers de la Création 5,4~Go,
+une \texttt{i2d} MIRI 153~Mo, une \texttt{drz} WFC3/IR 37 à 87~Mo. \emph{Télécharger la sélection} estime d'abord, et
+demande confirmation au-delà de 2~Go (réglage \texttt{archives\_seuil\_go}). Débit plafonné (8~Mo/s, réglage
+\texttt{archives\_debit\_mo\_s}), deux fichiers à la fois, une requête de recherche par seconde au plus par service ;
+un fichier interrompu reprend (requête partielle), sauf sur un serveur qui les refuse (ESO, KOA) où il recommence.
+\emph{Pause} et \emph{Annuler} sont immédiats.
+
+Chaque fichier est rangé dans \texttt{<dossier>/Archives/<mission>/<cible>/<instrument>/<filtre>/} et préparé :
+\begin{itemize}
+\item extension scientifique extraite (\texttt{SCI} ; à défaut la première image), un fichier par détecteur pour une
+  pose à plusieurs détecteurs de l'ESO (\texttt{\_d1}, \texttt{\_d2}…) ;
+\item en-tête : WCS (distorsions SIP comprises), \texttt{BUNIT}, constantes photométriques (\texttt{PHOTMJSR},
+  \texttt{PIXAR\_SR}, \texttt{PHOTFLAM}…), télescope, instrument, filtre, dates, temps de pose, programme,
+  investigateur, puis \texttt{ARCHIVE}, \texttt{ARCHID}, \texttt{ORIGFILE}, \texttt{LAMBDA}, \texttt{CREDIT} et les
+  conditions d'usage en commentaire ;
+\item pixels sans donnée (NaN : bords des mosaïques) remplacés par 0, masque \texttt{\_masque.fits} (1 = donnée) ;
+\item XISF Float32 (bornes = minimum et maximum des données : les valeurs physiques sont gardées) ou FITS Float32 ;
+\item fichier d'origine gardé (case décochée : effacé une fois l'image préparée).
+\end{itemize}
+L'état est tenu dans \texttt{Archives/\_etat/etat.sqlite} (même logique de partage réseau que la Banque OHP,
+section~\ref{sec:partage}) et le journal bilingue dans \texttt{Archives/\_etat/JOURNAL.txt} ; un fichier déjà préparé
+n'est jamais refait. Double-clic : ouvrir l'image préparée ; clic droit : \emph{Ouvrir avec}, emplacement, page de
+l'archive.
+
+\paragraph{Formats planétaires.} Les produits de Voyager et de Cassini sont des fichiers VICAR accompagnés d'un label
+PDS3 ; ceux de Juno des fichiers PDS3 ; le PDS4 (label XML) est lu aussi. Coupole lit ces formats lui-même (entiers
+8 à 32 bits, réels IEEE, ordre des octets, préfixes de ligne, mise à l'échelle), retourne les lignes pour que l'image
+s'affiche comme dans l'archive et écrit FITS ou XISF. Particularité : le label PDS3 des images calibrées de Cassini
+place l'image une ligne trop tôt (une ligne binaire VICAR la précède) ; les données sont lues d'après l'en-tête
+VICAR. Non gérés (message clair) : fichiers compressés (EDR de Voyager), réels VAX, entrelacement BIL/BIP à
+plusieurs bandes, cubes ; une image JunoCam est convertie telle quelle (bandes de 128 lignes par filtre), sans
+reconstruction géométrique.
+
+\subsection{Aligner et colorer}
+\capture{img/archives_alignement_fr.png}{1.0}
+Les images d'archive ont une astrométrie exacte : on ne cherche pas d'étoiles (elles changent d'aspect d'un
+instrument et d'une longueur d'onde à l'autre), on \textbf{rééchantillonne} chaque image sur une grille commune :
+celle d'une image (souvent le filtre le plus fin) ou une \emph{grille optimale} qui les couvre toutes, au pas le plus
+fin, éventuellement agrandi (\emph{Pixels ×}). Méthodes : bilinéaire (défaut, rapide), adaptative (anti-crénelage,
+meilleure quand les pas diffèrent beaucoup), exacte (recouvrement exact des pixels, lente ; sous 0,05″ par pixel,
+l'adaptative la remplace), plus proche voisin. Adaptative et exacte demandent la bibliothèque facultative
+\texttt{reproject} (\cmd{pip install ".[alignement]"}) ; sans elle, la bilinéaire est faite par scipy. Une quantité
+\textbf{par pixel} (électrons/s de Hubble, nanomaggies de SDSS) est multipliée par le rapport des surfaces de pixel ;
+une brillance de surface (MJy/sr de JWST) est gardée telle quelle. Recadrage facultatif sur le plus grand rectangle
+couvert par toutes les images (une colonne morte au milieu d'une mosaïque ne le réduit pas). La précision vaut celle
+des astrométries des archives : un écart résiduel de l'ordre du pixel peut subsister entre missions ; l'alignement
+par étoiles de PixInsight ou de Siril sur les fichiers rééchantillonnés n'a plus alors qu'une translation à corriger.
+
+Sortie dans \texttt{Archives/\_alignes/<date>/} : un fichier par filtre (\texttt{\_aligne}), le masque commun, un
+aperçu couleur (\texttt{apercu\_couleur.png}, étirement asinh) et \texttt{composition.txt}. Les filtres sont rangés
+par longueur d'onde (\emph{ordre chromatique} des images de presse de Hubble et de JWST) : trois filtres donnent
+bleu, vert et rouge ; davantage, des teintes réparties du bleu au rouge. \texttt{composition.txt} donne le tableau des
+couleurs et l'expression PixelMath (identifiants d'image tels que PixInsight les crée à l'ouverture) ; dans Siril,
+la composition RVB se fait avec les mêmes fichiers, déjà alignés.
+
+\subsection{Ligne de commande}
+\begin{verbatim}
+coupole archives liste
+coupole archives chercher "M 16" --rayon 6 --mission JWST --instrument MIRI
+coupole archives estimer "M 16" --mission JWST
+coupole archives telecharger "M 16" --mission JWST --instrument MIRI --dest ~/Ciel
+coupole archives telecharger M51 --archive sdss --filtre g --filtre r --filtre i --dest ~/Ciel --oui
+coupole archives chercher --archive opus --corps Io --debut 1979-03-01 --fin 1979-03-10
+coupole archives preparer fichier_i2d.fits --format fits
+coupole archives aligner A_sci.xisf B_sci.xisf C_sci.xisf --dest ~/Ciel/Piliers --optimale
+coupole archives bilan --dest ~/Ciel
+\end{verbatim}
+\cmd{--id} garde des observations précises (identifiant, avec ou sans le préfixe de l'archive, ou début du nom de
+fichier) ; \cmd{--tous-niveaux} montre aussi les poses calibrées et brutes ; \cmd{--json} et \cmd{--csv} pour les
+scripts. Au-delà du seuil, \cmd{telecharger} demande \cmd{--oui}.
+
+\paragraph{Crédits.} Toute image publiée à partir de ces données doit citer l'archive et la mission : « NASA/ESA/CSA,
+STScI » (JWST), « NASA/ESA, STScI » (Hubble), « ESO » et l'identifiant du programme, « NASA/JPL-Caltech » (Spitzer),
+« NASA/JPL-Caltech/UCLA » (WISE), « 2MASS/UMass/IPAC-Caltech/NASA/NSF », NOIRLab, KOA, SDSS, et pour les sondes
+« NASA/JPL-Caltech » (Voyager), « NASA/JPL-Caltech/Space Science Institute » (Cassini), « NASA/JPL-Caltech/SwRI/MSSS »
+(Juno). Coupole l'écrit dans la fiche et dans l'en-tête de chaque fichier (\texttt{CREDIT}).
+
+% =====================================================================
 \section{ASTAP (facultatif)}
 Sans ASTAP, Coupole fait tout le reste. ASTAP (Han Kleijn, licence MPL~2.0, \url{https://www.hnsky.org/astap.htm})
 ajoute la vérification indépendante de chaque solution. Il faut le programme et un catalogue d'étoiles.
@@ -1015,5 +1142,5 @@ Barbary (2016), Bertin \& Arnouts (1996). Moments adaptatifs : Bernstein \& Jarv
 © OpenStreetMap contributors. SIMBAD et Sesame : CDS, Strasbourg (Wenger et al. 2000) ; Aladin Lite (CDS) ;
 NED (NASA/IPAC) ; JPL Small-Body Database (NASA/JPL). Cosmologie : Planck Collaboration (2020, A\&A 641, A6) ;
 Hinshaw et al. (2013, WMAP 9) ; Riess et al. (2022, SH0ES) ; Hogg (1999, astro-ph/9905116) ; Komatsu et al. (2011)
-pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur).
+pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur). Archives : MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), Astro Data Archive de NOIRLab, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS du nœud Anneaux et Lunes, Imaging Node) ; reproject (Astropy) ; Rector et al. (2007, AJ 133, 598) pour l'ordre chromatique ; pratiques des amateurs : voir \texttt{docs/archives\_methode.md}.
 \end{document}
