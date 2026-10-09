@@ -358,6 +358,7 @@ Demande de Kevin : tous les réglages de personnalisation et tous les chemins sa
   trouvée et corrigée en 0.1.7 (ramasse-miettes cyclique dans un fil de calcul, voir plus bas).*
 - Manuels FR/EN : section « Réglages conservés » (3.2), option `--reinitialiser-interface` dans les tableaux générés,
   captures Préférences / Spectres / Cosmologie refaites ; recompilés. CHANGELOG FR puis EN.
+- CI `tests.yml` du commit `f2cf35c` : **6/6** (Linux, Windows, macOS × 3.10, 3.12) ; sous Windows, le test UNC réel (`\\localhost\C$\…`) passe. Premier passage rouge sous Windows : tests seulement (possession simulée avec un dossier non absolu, ignorée comme périmée ; « : » interdit dans un nom de dossier).
 - **Aucun tag posé** (publication par Kevin).
 
 ## 2026-10-09 — version 0.1.7 : cause du plantage natif intermittent trouvée et corrigée
@@ -456,4 +457,5 @@ Retours d'usage de Kevin (Manjaro, KDE Plasma, paquet autonome 0.1.7, dossier de
 - Validation locale : **python:3.12-slim 345 réussis, 12 sautés, code 0 ; python:3.10-slim 345 / 12, code 0**.
   Manuels FR/EN (38 p.) recompilés (section « Choisir un fichier ou un dossier, dossier sur un NAS », possession,
   dépannage, installeur), captures Catalogue et Préférences refaites.
+- CI `tests.yml` du commit `f2cf35c` : **6/6** (Linux, Windows, macOS × 3.10, 3.12) ; sous Windows, le test UNC réel (`\\localhost\C$\…`) passe. Premier passage rouge sous Windows : tests seulement (possession simulée avec un dossier non absolu, ignorée comme périmée ; « : » interdit dans un nom de dossier).
 - **Aucun tag posé** (publication par Kevin).
