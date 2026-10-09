@@ -113,9 +113,13 @@ def ecrire(chemin, donnees, mots_cles, proprietes=(), bounds=None, codec='zstd+s
         raise ValueError('bounds required for a floating point image (XISF 11.5.1)')
     taille_item = a.dtype.itemsize
     n_brut = a.nbytes
-    bloc = compresser(a, codec, niveau, taille_item)              # le tableau lui-même : aucune copie en bytes
-    compression = ('%s:%d:%d' % (codec, n_brut, taille_item)) if codec.endswith('+sh') \
-        else '%s:%d' % (codec, n_brut)
+    if codec:
+        bloc = compresser(a, codec, niveau, taille_item)          # le tableau lui-même : aucune copie en bytes
+        compression = ('%s:%d:%d' % (codec, n_brut, taille_item)) if codec.endswith('+sh') \
+            else '%s:%d' % (codec, n_brut)
+    else:                                                         # sans compression (codec None ou '')
+        bloc = a.tobytes()
+        compression = None
     somme = hashlib.sha1(bloc).hexdigest()
     ny, nx = a.shape
     uid = str(_uuid.uuid4())
@@ -125,9 +129,9 @@ def ecrire(chemin, donnees, mots_cles, proprietes=(), bounds=None, codec='zstd+s
         attrs = ['geometry="%d:%d:1"' % (nx, ny), 'sampleFormat="%s"' % fmt]
         if bounds is not None:
             attrs.append('bounds="%s:%s"' % (repr(float(bounds[0])), repr(float(bounds[1]))))
-        attrs += ['colorSpace="Gray"', 'imageType="%s"' % type_image, 'compression="%s"' % compression,
-                  'checksum="sha1:%s"' % somme, 'location="attachment:%d:%d"' % (position, len(bloc)),
-                  'uuid="%s"' % uid]
+        attrs += ['colorSpace="Gray"', 'imageType="%s"' % type_image] + \
+            (['compression="%s"' % compression] if compression else []) + \
+            ['checksum="sha1:%s"' % somme, 'location="attachment:%d:%d"' % (position, len(bloc)), 'uuid="%s"' % uid]
         lignes = ['<?xml version="1.0" encoding="UTF-8"?>',
                   '<!--\nExtensible Image Serialization Format - XISF version 1.0\nCreated with %s\n-->'
                   % escape(createur),
@@ -314,3 +318,84 @@ def lire(chemin, xsd=None):
     return data, {'format': fmt, 'bounds': bounds, 'compression': im.get('compression'), 'mots_cles': mots,
                   'proprietes': props, 'taille_bloc': taille, 'position': pos, 'image_type': im.get('imageType'),
                   'xml': xml}
+
+
+# ======================================================================== en-tête seul (sans les pixels)
+def lire_entete(chemin) -> dict:
+    """En-tête d'un XISF sans lire ni décompresser les pixels (une lecture des premiers Ko, même sur un partage) :
+    {'mots_cles': [(nom, valeur, commentaire)], 'proprietes': {id: valeur}, 'types': {id: type},
+     'geometrie': (nx, ny), 'format', 'compression'}."""
+    with open(chemin, 'rb') as f:
+        debut = f.read(16)
+        _verifier(debut[:8] == b'XISF0100', 'signature missing')
+        lg = int.from_bytes(debut[8:12], 'little')
+        _verifier(lg <= ENTETE_MAX, 'header too large: %d bytes' % lg)
+        xml = f.read(lg)
+    try:
+        racine = ET.fromstring(xml)
+    except ET.ParseError as e:
+        raise ErreurXISF('invalid XML header: %s' % e)
+    im = racine.find(NS + 'Image')
+    _verifier(im is not None, 'no image')
+    geo = [int(v) for v in (im.get('geometry') or '0:0:1').split(':')]
+    props, types = {}, {}
+    for p in im.findall(NS + 'Property'):
+        props[p.get('id')] = p.get('value') if p.get('value') is not None else (p.text or '')
+        types[p.get('id')] = p.get('type')
+    return {'mots_cles': [(k.get('name'), k.get('value'), k.get('comment')) for k in im.findall(NS + 'FITSKeyword')],
+            'proprietes': props, 'types': types, 'geometrie': (geo[0], geo[1]), 'format': im.get('sampleFormat'),
+            'compression': im.get('compression')}
+
+
+def reecrire_entete(chemin, mots_cles, proprietes) -> None:
+    """Remplace les mots-clés FITS et les propriétés de l'image d'un XISF sans toucher aux pixels : le bloc de
+    données (compressé) est recopié octet pour octet (même somme SHA-1), seul l'en-tête change ; écriture
+    atomique (fichier temporaire puis remplacement).  `proprietes` : [(id, type, valeur)]."""
+    with open(chemin, 'rb') as f:
+        debut = f.read(16)
+        _verifier(debut[:8] == b'XISF0100', 'signature missing')
+        lg = int.from_bytes(debut[8:12], 'little')
+        xml = f.read(lg).decode('utf-8')
+    a = re.search(r'<Image\b[^>]*>', xml)
+    b = xml.find('</Image>')
+    _verifier(a is not None and b > a.end(), 'Image element not found')
+    m = re.search(r'location="attachment:(\d+):(\d+)"', a.group(0))
+    _verifier(m is not None, 'location')
+    pos, taille = int(m.group(1)), int(m.group(2))
+    interieur = [_propriete(pid, ptype, val) for pid, ptype, val in proprietes]
+    interieur += ['<FITSKeyword name=%s value=%s comment=%s/>' % (quoteattr(xml_texte(n)), quoteattr(xml_texte(v)),
+                                                                   quoteattr(xml_texte(c))) for n, v, c in mots_cles]
+    with open(chemin, 'rb') as f:
+        f.seek(pos)
+        bloc = f.read(taille)
+    _verifier(len(bloc) == taille, 'block outside the file')
+
+    def entete(position):
+        balise = a.group(0).replace(m.group(0), 'location="attachment:%d:%d"' % (position, taille))
+        return (xml[:a.start()] + balise + '\n' + '\n'.join(interieur) + '\n' + xml[b:]).encode('utf-8')
+    position = ALIGNEMENT
+    for _ in range(10):
+        x = entete(position)
+        besoin = -(-(16 + len(x)) // ALIGNEMENT) * ALIGNEMENT
+        if besoin == position:
+            break
+        position = besoin
+    else:
+        raise RuntimeError('unstable block position')
+    tmp = str(chemin) + '.tmp'
+    try:
+        with open(tmp, 'wb') as f:
+            f.write(b'XISF0100')
+            f.write(len(x).to_bytes(4, 'little'))
+            f.write(b'\0\0\0\0')
+            f.write(x)
+            f.write(b'\0' * (position - 16 - len(x)))
+            f.write(bloc)
+            f.flush()
+        os.replace(tmp, chemin)
+    except BaseException:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+        raise

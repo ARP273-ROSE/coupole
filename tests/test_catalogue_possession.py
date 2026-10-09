@@ -4,6 +4,7 @@ résumé de la possession, listes vides qui s'expliquent, dossier de sortie chan
 Retour d'usage : avec la banque complète déjà téléchargée, « À télécharger seulement » vidait bien les listes…
 sans rien dire, et la colonne « possédé » était hors de vue : on croyait que rien ne marchait.
 """
+import os
 import time
 
 import pytest
@@ -258,3 +259,60 @@ def test_changer_de_dossier_relit_la_possession(panneau, app_qt, tmp_path, monke
     vieux = Possession(str(b), {ident(x): 'ok' for x in utiles})
     p._possession_prete((vieux, [], vieux.compte_objets(p.inv.images), p.inv.images))
     assert p.possession.dest == str(a)
+
+
+def test_lots_d_un_objet_dossier_cible_et_valeurs_pour_pixinsight(panneau, app_qt, inventaire, tmp_path, monkeypatch):
+    """« 840 / 840 » ≠ un seul empilement : colonne « lots » et répartition dans l'info-bulle ; dossier de la cible
+    et image possédée ouvrables ; encadré « Pour PixInsight / N.I.N.A. » lu dans l'en-tête des images du lot."""
+    import numpy as np
+    from PyQt6.QtCore import Qt
+    from coupole.core import xisf
+    p = panneau
+    par_objet = {}
+    for x in inventaire.images:
+        if not x['doublon'] and x['tel'] == 'T120':
+            par_objet.setdefault(x['objet'], []).append(x)
+    nom, imgs = next((o, l) for o, l in sorted(par_objet.items()) if len(l) >= 4)
+    o = next(o for o in p.m_obj.donnees if o['objet'] == nom)
+    dest = tmp_path / 'OHP_DU_ECU'
+    lot1 = dest / '07_Nebuleuses' / 'Cible' / 'champ_1_T120' / 'R'
+    lot2 = dest / '07_Nebuleuses' / 'Cible' / 'champ_1_T120' / 'V'
+    for d in (lot1, lot2):
+        d.mkdir(parents=True)
+    mc = [('NAXIS1', '1024', ''), ('NAXIS2', '1024', ''), ('TELESCOP', "'T120'", ''), ('XPIXSZ', '27.0', ''),
+          ('XBINNING', '2', ''), ('FOCALLEN', '7234.1', ''), ('PIXSCALE', '0.76985', ''), ('RA', '303.0', ''),
+          ('DEC', '38.35', '')]
+    statuts, details = {}, {}
+    for k, x in enumerate(imgs[:3]):
+        f = (lot1 if k < 2 else lot2) / ('img%d.xisf' % k)
+        xisf.ecrire(f, np.zeros((4, 4), '<u2'), mc)
+        statuts[ident(x)] = 'ok'
+        details[ident(x)] = {'date': '', 'chemin': os.path.relpath(f, dest)}
+    (dest / 'INDEX_LOTS.csv').write_text(
+        '﻿dossier;type;objet;lot;filtre;poses;pose_totale_s;nuits;centre_ra;centre_dec;angle_deg;alignement\n'
+        '07_Nebuleuses/Cible/champ_1_T120/R;07_Nebuleuses;%s;champ_1_T120;R;2;120.0;2025-07-16;303;38;0;StarAlignment\n'
+        '07_Nebuleuses/Cible/champ_1_T120/V;07_Nebuleuses;%s;champ_1_T120;V;1;60.0;2025-07-16;303;38;0;StarAlignment\n'
+        % (nom, nom), encoding='utf-8')
+    p.dest.setText(str(dest))
+    poss = Possession(p._dest_courante(), statuts, details)
+    p._possession_prete((poss, [], poss.compte_objets(p.inv.images), p.inv.images))
+    assert attendre(app_qt, lambda: getattr(p, '_lots_par_objet', {}).get(nom) and p._inst_lots)
+    r = next(r for r, oo in enumerate(p.m_obj.donnees) if oo['objet'] == nom)
+    assert str(p.m_obj.data(p.m_obj.index(r, p.COL_LOTS))) == '2'
+    bulle = p.m_obj.data(p.m_obj.index(r, p.COL_POSSEDE), Qt.ItemDataRole.ToolTipRole)
+    assert '2 lots' in bulle and 'champ 1 T120 : R 2 · V 1' in bulle and 'lot par lot' in bulle
+    assert p.dossier_objet(o) == os.path.join(p._dest_courante(), '07_Nebuleuses', 'Cible')
+    x = imgs[0]
+    assert p.chemin_image(x) == str(lot1 / 'img0.xisf') and os.path.exists(p.chemin_image(x))
+    assert p.chemin_image(imgs[3]) == ''                              # pas téléchargée : rien à ouvrir
+    p.voir_lots_objet(o)
+    assert p.onglets.currentIndex() == 2 and p.b_tous_lots.isVisible()
+    p.v_lots.selectRow(0)
+    assert attendre(app_qt, lambda: p._astro_valeurs['focale'].text() != '—')
+    assert p._astro_valeurs['focale'].text() == '7234.1 mm' and p._astro_valeurs['pixel'].text() == '27 µm'
+    assert p._astro_valeurs['binning'].text() == '2 × 2' and p._astro_valeurs['echelle'].text() == '0.7699 ″ px⁻¹'
+    texte = p.texte_astrometrie()
+    assert 'Focale : 7234.1 mm' in texte and '1.540 ″ px⁻¹' in texte and '13.5 µm' in texte
+    assert str(p.m_lots.data(p.m_lots.index(0, p.COL_LOT_FOCALE))) == '7234.1'
+    p.voir_lots_objet(None)
+    assert not p.b_tous_lots.isVisible()

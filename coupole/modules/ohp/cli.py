@@ -59,7 +59,7 @@ def enregistrer(p):
     s = sous.add_parser('estimer', aliases=['estimate'], help=tr('ohp_cli_estimer'),
                         description=tr('ohp_cli_estimer_desc'), formatter_class=fmt)
     _selection_args(s)
-    s.add_argument('--format', choices=['xisf', 'fz', 'fits'], default=None, help=tr('ohp_aide_format'))
+    s.add_argument('--format', choices=['xisf', 'xisf16', 'fz', 'fits'], default=None, help=tr('ohp_aide_format'))
     s.add_argument('--dest', metavar=tr('cli_meta_dossier'), help=tr('ohp_aide_dest'))
     s.set_defaults(fonction=cmd_estimer)
 
@@ -121,7 +121,36 @@ def enregistrer(p):
     s.add_argument('--dest', required=True, metavar=tr('cli_meta_dossier'), help=tr('ohp_aide_dest'))
     s.add_argument('--json', action='store_true', help=tr('cli_aide_json'))
     s.set_defaults(fonction=cmd_bilan)
+
+    s = sous.add_parser('metadonnees', aliases=['metadata'], help=tr('ohp_cli_metadonnees'),
+                        description=tr('ohp_cli_metadonnees_desc'))
+    s.add_argument('dossier', metavar=tr('cli_meta_dossier'), help=tr('ohp_aide_metadonnees_dossier'))
+    s.add_argument('--reecrire', '--rewrite', action='store_true', help=tr('ohp_aide_metadonnees_reecrire'))
+    s.add_argument('--noms', '--names', choices=['fr', 'en'], default=None, help=tr('ohp_aide_noms'))
+    s.set_defaults(fonction=cmd_metadonnees)
     p.set_defaults(fonction=lambda a: (p.print_help(), 0)[1])
+
+
+def cmd_metadonnees(a):
+    """Complète FOCALLEN et les propriétés Instrument:* des fichiers convertis (pixels intacts) ; sans --reecrire,
+    dit seulement ce qui changerait."""
+    from . import metadonnees
+    if not os.path.isdir(a.dossier):
+        print(tr('ohp_metadonnees_absent', dossier=a.dossier), file=sys.stderr)
+        return 2
+    L = a.noms or i18n.langue()
+    etat = {'t': 0.0}
+
+    def rapporter(k, n):
+        import time
+        if time.monotonic() - etat['t'] >= 5 or k == n:
+            etat['t'] = time.monotonic()
+            print('  %d / %d' % (k, n))
+    r = metadonnees.reecrire_dossier(a.dossier, L, simuler=not a.reecrire, rapporter=rapporter)
+    if not a.reecrire:
+        r['base'] = ''
+    print(tr('ohp_metadonnees_bilan' if a.reecrire else 'ohp_metadonnees_simulation', **r))
+    return 1 if r['erreurs'] else 0
 
 
 def _categories():
@@ -131,7 +160,7 @@ def _categories():
 
 def _options_traitement(s):
     s.add_argument('--dest', metavar=tr('cli_meta_dossier'), help=tr('ohp_aide_dest'))
-    s.add_argument('--format', choices=['xisf', 'fz', 'fits'], default=None, help=tr('ohp_aide_format'))
+    s.add_argument('--format', choices=['xisf', 'xisf16', 'fz', 'fits'], default=None, help=tr('ohp_aide_format'))
     s.add_argument('--noms', '--names', choices=['fr', 'en'], default=None, help=tr('ohp_aide_noms'))
     s.add_argument('--astap', choices=['auto', 'tous', 'suspectes', 'jamais', 'all', 'suspicious', 'never'],
                    default='auto', help=tr('ohp_aide_astap'))

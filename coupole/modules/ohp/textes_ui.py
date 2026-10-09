@@ -36,8 +36,34 @@ TEXTES = {
                             'en': "query the Observatory's TAP service again (one request)"},
     'ohp_aide_chercher': {'fr': 'filtre les objets dont le nom contient ce texte', 'en': 'keep objects whose name contains this text'},
     'ohp_aide_csv': {'fr': 'écrit aussi la liste dans ce fichier CSV', 'en': 'also write the list to this CSV file'},
-    'ohp_aide_format': {'fr': 'format de sortie : xisf (PixInsight, défaut), fz (FITS compressé sans perte), fits (float32)',
-                        'en': 'output format: xisf (PixInsight, default), fz (lossless compressed FITS), fits (float32)'},
+    'ohp_cli_metadonnees': {'fr': "complète focale, pixel et binning des fichiers déjà convertis (pour PixInsight, N.I.N.A.)",
+                            'en': 'completes focal length, pixel and binning of already converted files (for PixInsight, N.I.N.A.)'},
+    'ohp_cli_metadonnees_desc': {'fr': "Pour chaque XISF/FITS du dossier : FOCALLEN accordé à l'échelle mesurée (ancienne valeur en "
+                                       "HISTORY) et propriétés XISF Instrument:Sensor:XPixelSize, Instrument:Camera:XBinning, "
+                                       "Instrument:Telescope:FocalLength… Les pixels ne sont pas touchés (relus et comparés), "
+                                       "écriture atomique, journal dans _traitement/metadonnees.csv. Sans --reecrire : simulation.",
+                                 'en': 'For each XISF/FITS of the folder: FOCALLEN matched to the measured scale (old value in '
+                                       'HISTORY) and the XISF properties Instrument:Sensor:XPixelSize, Instrument:Camera:XBinning, '
+                                       'Instrument:Telescope:FocalLength… Pixels are not touched (read back and compared), atomic '
+                                       'writing, log in _traitement/metadonnees.csv. Without --rewrite: dry run.'},
+    'ohp_aide_metadonnees_dossier': {'fr': 'dossier de sortie (ou un lot)', 'en': 'output folder (or one stack)'},
+    'ohp_aide_metadonnees_reecrire': {'fr': 'écrit vraiment (sinon : dit seulement ce qui changerait)',
+                                      'en': 'really write (otherwise: only say what would change)'},
+    'ohp_metadonnees_absent': {'fr': 'Dossier introuvable : {dossier}', 'en': 'Folder not found: {dossier}'},
+    'ohp_metadonnees_bilan': {'fr': '{fichiers} fichier(s) : {modifies} complété(s), {inchanges} déjà à jour, {erreurs} erreur(s) '
+                                    '(journal : _traitement/metadonnees.csv) ; {base} image(s) notée(s) dans la base d\'état : '
+                                    '« coupole ohp ranger » récrit alors les LOT.txt avec focale et pixel.',
+                              'en': '{fichiers} file(s): {modifies} completed, {inchanges} already up to date, {erreurs} error(s) '
+                                    '(log: _traitement/metadonnees.csv); {base} image(s) noted in the state database: '
+                                    '« coupole ohp sort » then rewrites the LOT.txt files with focal length and pixel.'},
+    'ohp_metadonnees_simulation': {'fr': 'Simulation : {fichiers} fichier(s), {modifies} à compléter, {inchanges} déjà à jour, '
+                                         '{erreurs} erreur(s){base}. Ajouter --reecrire pour écrire.',
+                                   'en': 'Dry run: {fichiers} file(s), {modifies} to complete, {inchanges} already up to date, '
+                                         '{erreurs} error(s){base}. Add --rewrite to write.'},
+    'ohp_aide_format': {'fr': 'format de sortie : xisf (PixInsight, défaut), xisf16 (XISF compatible N.I.N.A. et Siril : '
+                              'entiers 16 bits, zlib), fz (FITS compressé sans perte), fits (float32)',
+                        'en': 'output format: xisf (PixInsight, default), xisf16 (XISF compatible with N.I.N.A. and Siril: '
+                              '16-bit integers, zlib), fz (lossless compressed FITS), fits (float32)'},
     'ohp_aide_dest': {'fr': 'dossier de destination (défaut : ~/Coupole/OHP_DU_ECU ou celui des réglages)',
                       'en': 'destination folder (default: ~/Coupole/OHP_DU_ECU or the one in the settings)'},
     'ohp_aide_noms': {'fr': 'langue des noms de dossiers, d\'objets et des en-têtes (défaut : langue de l\'interface)',
@@ -269,6 +295,61 @@ TEXTES = {
                               'en': 'Objects of the bank. Select one or several objects to see their images (Ctrl/Shift for several).'},
     'ohp_table_images_aide': {'fr': "Images des objets sélectionnés : c'est la sélection qui sera traitée.",
                               'en': 'Images of the selected objects: this is the selection that will be processed.'},
+    'ohp_col_focale': {'fr': 'focale (mm)', 'en': 'focal length (mm)'},
+    'ohp_col_pixel': {'fr': 'pixel (µm)', 'en': 'pixel (µm)'},
+    'ohp_col_echelle': {'fr': 'échelle (″ px⁻¹)', 'en': 'scale (″ px⁻¹)'},
+    'ohp_astro_titre': {'fr': 'Pour PixInsight / N.I.N.A.', 'en': 'For PixInsight / N.I.N.A.'},
+    'ohp_astro_aide': {'fr': "Valeurs du lot choisi, lues dans l'en-tête de ses images : à saisir dans PixInsight (ImageSolver, "
+                             "panneau « Astrometric solution » de WBPP) ou N.I.N.A. La focale est celle qui donne l'échelle "
+                             "mesurée ; le pixel est le pixel effectif, binning compris.",
+                       'en': 'Values of the selected stack, read from its images\' header: to enter in PixInsight (ImageSolver, '
+                             'WBPP « Astrometric solution » panel) or N.I.N.A. The focal length is the one giving the measured '
+                             'scale; the pixel is the effective pixel, binning included.'},
+    'ohp_astro_instrument': {'fr': 'Instrument', 'en': 'Instrument'},
+    'ohp_astro_focale': {'fr': 'Focale', 'en': 'Focal length'},
+    'ohp_astro_pixel': {'fr': 'Pixel effectif', 'en': 'Effective pixel'},
+    'ohp_astro_binning': {'fr': 'Binning', 'en': 'Binning'},
+    'ohp_astro_avert_binning': {'fr': "Si le logiciel affiche {e2} ″ px⁻¹ (le double), il a appliqué le binning deux fois : saisir le "
+                                "pixel non binné ({pnb} µm) avec le binning {b}, ou le pixel effectif avec le binning 1.",
+                          'en': 'If the program shows {e2} ″ px⁻¹ (twice as much), it applied the binning twice: enter the '
+                                'unbinned pixel ({pnb} µm) with binning {b}, or the effective pixel with binning 1.'},
+    'ohp_astro_echelle': {'fr': 'Échelle', 'en': 'Scale'},
+    'ohp_astro_champ': {'fr': 'Champ', 'en': 'Field'},
+    'ohp_astro_centre': {'fr': 'Centre', 'en': 'Centre'},
+    'ohp_astro_copier': {'fr': 'Copier', 'en': 'Copy'},
+    'ohp_astro_copier_aide': {'fr': 'Copie cette valeur dans le presse-papiers.', 'en': 'Copies this value to the clipboard.'},
+    'ohp_astro_tout': {'fr': 'Tout copier', 'en': 'Copy all'},
+    'ohp_astro_tout_aide': {'fr': 'Copie toutes les valeurs du lot, au format texte.', 'en': 'Copies all the stack values, as text.'},
+    'ohp_astro_copie': {'fr': 'Copié dans le presse-papiers.', 'en': 'Copied to the clipboard.'},
+    'ohp_astro_copier_lot': {'fr': "Copier les paramètres d'astrométrie", 'en': 'Copy the astrometry parameters'},
+    'ohp_astro_note': {'fr': "WBPP résout le master avec ses métadonnées si elles survivent à l'intégration, sinon avec les valeurs "
+                             "de son panneau « Astrometric solution », qui restent celles du dernier instrument utilisé : y saisir "
+                             "focale et pixel ci-dessus (un fichier de réglages WBPP par instrument évite de les ressaisir). "
+                             "Vérifier : ouvrir le master, FITSHeader ou Image > Properties, chercher XPIXSZ, FOCALLEN et "
+                             "Instrument:*.",
+                       'en': 'WBPP solves the master with its metadata if they survive integration, otherwise with the values of '
+                             'its « Astrometric solution » panel, which stay those of the last instrument used: enter the focal '
+                             'length and pixel above there (one WBPP settings file per instrument avoids typing them again). '
+                             'To check: open the master, FITSHeader or Image > Properties, look for XPIXSZ, FOCALLEN and '
+                             'Instrument:*.'},
+    'ohp_col_lots': {'fr': 'lots', 'en': 'stacks'},
+    'ohp_repartition_lots': {'fr': "{n} images rangées en {lots} lots : {detail} — on empile lot par lot (même champ, même "
+                                   "instrument, même filtre) : posséder toutes les images d'un objet ne veut pas dire qu'elles "
+                                   "s'empilent ensemble.",
+                             'en': '{n} images sorted into {lots} stacks: {detail} — stack each stack separately (same field, '
+                                   'same instrument, same filter): owning all the images of an object does not mean they '
+                                   'stack together.'},
+    'ohp_objet_dossier': {'fr': 'Ouvrir le dossier de la cible', 'en': 'Open the target folder'},
+    'ohp_objet_dossier_aide': {'fr': 'Ouvre le dossier de cet objet dans le dossier de sortie (gestionnaire de fichiers).',
+                               'en': 'Opens this object\'s folder in the output folder (file manager).'},
+    'ohp_objet_rien': {'fr': "Rien n'est encore téléchargé pour cet objet.", 'en': 'Nothing downloaded yet for this object.'},
+    'ohp_objet_lots': {'fr': 'Voir les lots de cet objet', 'en': 'Show this object\'s stacks'},
+    'ohp_objet_lots_aide': {'fr': "Onglet Lots, limité à cet objet : chaque lot s'empile à part.",
+                            'en': 'Stacks tab, limited to this object: each stack is stacked separately.'},
+    'ohp_lots_tous': {'fr': 'Tous les lots', 'en': 'All stacks'},
+    'ohp_lots_tous_aide': {'fr': 'Retire le filtre sur un objet.', 'en': 'Removes the filter on an object.'},
+    'ohp_lots_filtre': {'fr': 'Lots de {objet} : {n}', 'en': 'Stacks of {objet}: {n}'},
+    'ohp_lot_ouvrir_dossier': {'fr': 'Ouvrir le dossier du lot', 'en': 'Open the stack folder'},
     'ohp_col_etat': {'fr': 'état', 'en': 'status'},
     # ------------------------------------------------------------ ce qu'on possède déjà
     'ohp_col_possede': {'fr': 'possédé', 'en': 'owned'},
@@ -422,7 +503,12 @@ TEXTES = {
               "site MPC 511, centre réel, échelle, angle ; anciennes valeurs en HISTORY), conversion vérifiée pixel à pixel, "
               "rangement en lots. Arrêter puis relancer reprend là où c'était.</p><h4>Lots</h4><p>Objets fixes : un lot par "
               "champ (toutes nuits) et par filtre → StarAlignment. Objets mobiles : un lot par nuit → CometAlignment. "
-              "LOT.txt donne le conseil d'empilement.</p><h4>Anomalies</h4><p>Doublons, dates partagées ou diurnes, champs "
+              "LOT.txt donne le conseil d'empilement. <b>Possédé ≠ empilable ensemble</b> : « 840 / 840 » dit que toutes "
+              "les images d'un objet sont là, pas qu'elles forment un seul empilement ; la colonne « lots » et l'info-bulle "
+              "donnent la répartition (champ, instrument, filtre), et le clic droit « Voir les lots de cet objet ».</p>"
+              "<h4>Ouvrir une image</h4><p>Double-clic sur une image possédée (images, Qualité) : l'application du système ; "
+              "clic droit : « Ouvrir avec » (seuls les logiciels qui lisent vraiment ce format : table vérifiée du manuel) et "
+              "« Ouvrir l'emplacement du fichier ». Sur un objet : dossier de la cible, lots de l'objet.</p><h4>Anomalies</h4><p>Doublons, dates partagées ou diurnes, champs "
               "incohérents, noms à vérifier : tout est expliqué, rien n'est supprimé.</p>"
               "<h4>Fiche en ligne</h4><p>Facultative, si Internet est disponible : pour l'objet choisi, SIMBAD (type, "
               "coordonnées, magnitudes, parallaxe, distance mesurée, vitesse radiale et redshift, taille, identifiants, "
@@ -438,7 +524,12 @@ TEXTES = {
               "solution check (consistency; ASTAP if installed), fixed header (object, filter, MPC 511 site, true centre, "
               "scale, angle; old values in HISTORY), conversion checked pixel by pixel, sorting into stacks. Stopping then "
               "starting again resumes where it was.</p><h4>Stacks</h4><p>Fixed objects: one stack per field (all nights) and "
-              "filter → StarAlignment. Moving objects: one stack per night → CometAlignment. LOT.txt gives stacking advice.</p>"
+              "filter → StarAlignment. Moving objects: one stack per night → CometAlignment. LOT.txt gives stacking advice. <b>Owned ≠ stackable together</b>: « 840 / 840 » "
+              "says all the images of an object are there, not that they form one stack; the « stacks » column and the "
+              "tooltip give the breakdown (field, instrument, filter), and right-click « Show this object's stacks ».</p>"
+              "<h4>Opening an image</h4><p>Double-click an owned image (images, Quality): the system application; "
+              "right-click: « Open with » (only programs that really read this format: checked table in the manual) and "
+              "« Open file location ». On an object: target folder, the object's stacks.</p>"
               "<h4>Anomalies</h4><p>Duplicates, shared or daytime dates, inconsistent fields, names to check: everything is "
               "explained, nothing is deleted.</p>"
               "<h4>Online record</h4><p>Optional, when the Internet is available: for the selected object, SIMBAD (type, "
