@@ -33,7 +33,9 @@ def test_conversion_sans_astap_comme_la_reference(ex, reference):
     assert info['position'] == 'inversee' and info['site_mots_cles'] == 'ok'
     with open(reference / 'traitement' / 'journal.csv', encoding='utf-8-sig') as f:
         ref = next(r for r in csv.DictReader(f, delimiter=';') if r['url'] == x['access_url'] and r['statut'] == 'ok')
-    assert ' '.join(info['modifs']) == ref['mots_cles_modifies']
+    # 0.1.9 : FOCALLEN est désormais toujours accordé à l'échelle mesurée (PixInsight, N.I.N.A.) ; le reste comme
+    # le traitement de référence
+    assert set(info['modifs']) - {'FOCALLEN'} == set(ref['mots_cles_modifies'].split()) - {'FOCALLEN'}
     assert abs(info['ratio'] - float(ref['ratio'])) < 0.002
     assert abs(info['ecart_max'] - float(ref['ecart_max_adu'])) < 1e-9
     data, inf = xisf.lire(d / 'ex.xisf')
@@ -43,6 +45,12 @@ def test_conversion_sans_astap_comme_la_reference(ex, reference):
     assert any("valeur d'origine : LATITUDE = '05 42 44'" in c for k, v, c in inf['mots_cles'] if k == 'HISTORY')
     assert inf['proprietes']['OHP:Astrometry:Status'] == 'validee'
     assert inf['bounds'] == '-1000.0:65535.0' and data.dtype == np.dtype('<f4')
+    pr = inf['proprietes']
+    f_mes = 206.264806 * float(mots['XPIXSZ']) / float(mots['PIXSCALE'])
+    assert abs(float(mots['FOCALLEN']) - f_mes) <= 0.06 and abs(float(pr['Instrument:Telescope:FocalLength']) * 1000 - f_mes) < 0.1
+    assert float(pr['Instrument:Sensor:XPixelSize']) == float(mots['XPIXSZ'])
+    assert int(pr['Instrument:Camera:XBinning']) == int(float(mots['XBINNING']))
+    assert abs(float(pr['Instrument:Telescope:Aperture']) - 1.2) < 1e-6
 
 
 def test_en_tetes_en_anglais(ex):

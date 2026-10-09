@@ -337,10 +337,18 @@ def convertir(x: dict, fic: str, sortie: str, med: dict, medo: dict, options: di
     else:
         info['pose_ctrl'] = 'ok' if abs(e_hdr - x['t_exptime']) < 0.01 else 'ecart base %.3f' % x['t_exptime']
 
-    # ------------------------------------------------------------ précision float32
+    # ------------------------------------------------------------ XISF compatible (UInt16) : perte mesurée et notée
     ecart = 0.0
     r_ = s_ = s64 = f_ = diff = None
-    if sortie_px.dtype.kind == 'f':
+    if fmt == 'xisf16' and sortie_px.dtype.kind == 'f':
+        sortie_px, perte = formats.vers_uint16(ref)
+        info.update(perte)
+        ecart = perte['u16_ecart_max']
+        ent.poser('PEDESTAL', fnum(perte['u16_piedestal'], '%g'), H('pedestal'))
+        ent.histoire.append(H('u16', neg=perte['u16_negatifs'], haut=perte['u16_hauts'],
+                              fond='%.3g' % perte['u16_ecart_fond'], ped='%g' % perte['u16_piedestal']))
+    # ------------------------------------------------------------ précision float32
+    elif sortie_px.dtype.kind == 'f':
         # contrôle pixel à pixel par blocs de lignes : la mémoire de pointe ne dépend pas de la taille de l'image
         pas = max(1, (1 << 20) // max(1, nx))
         hors = 0
@@ -389,6 +397,16 @@ def convertir(x: dict, fic: str, sortie: str, med: dict, medo: dict, options: di
                   ('Observation:Center:Dec', 'Float64', sol_final['dec'])]
     if foc:
         props.append(('Instrument:Telescope:FocalLength', 'Float32', (ent.getf('FOCALLEN') or foc) / 1000))
+    # focale accordée à l'échelle mesurée, pixel effectif, binning, caméra, ouverture : ce que lisent ImageSolver,
+    # WBPP et N.I.N.A. (metadonnees.py, vérifié dans le code de PixInsight)
+    from . import metadonnees
+    changes = metadonnees.completer(mots, props, lambda nom, ancien: H('origine', nom=nom, valeur=ancien, raison=' (%s)'
+                                                                       % H('raison_focale_mesuree')))
+    if 'FOCALLEN' in changes:
+        info['modifs'] = sorted(set(info['modifs']) | {'FOCALLEN'})
+    inst = metadonnees.instrument(mots)
+    info.update(focale_mm=round(inst['focale_mm'], 1) if inst['focale_mm'] else None, pixel_um=inst['pixel_um'],
+                binning=list(inst['binning']) if inst['binning'] else None)
     del ref
     info['octets_sortie'] = formats.ecrire(fmt, sortie, sortie_px, mots, props,
                                            options.get('createur', 'Coupole'))

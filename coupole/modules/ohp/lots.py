@@ -312,6 +312,15 @@ def _textes_lot(cle, infos, items, L):
         l += [T('centre', ra=sexa(ra, heures=True, signe=False, dec=1), de=sexa(de, dec=0), rad='%.5f' % ra,
                 ded='%+.5f' % de, dmax='%.1f' % dmax),
               T('angle', a='%.1f' % ang, e='%.3f' % ech)]
+        # 0.1.9 : ce qu'il faut saisir dans PixInsight (ImageSolver, WBPP) ou N.I.N.A., lu dans les en-têtes
+        pix = [x['pixel_um'] for x in ok if x.get('pixel_um')]
+        if pix:
+            p_ = float(np.median(pix))
+            b_ = C.Counter(tuple(x['binning']) for x in ok if x.get('binning')).most_common(1)
+            b_ = b_[0][0][0] if b_ else 1
+            l += [T('astrometrie', f='%.1f' % (206.264806 * p_ / ech), p='%g' % p_, b=b_, e='%.4f' % ech),
+                  T('astrometrie_binning', e2='%.3f' % (2 * ech), pnb='%g' % (p_ / b_ if b_ else p_), b=b_),
+                  T('astrometrie_wbpp')]
     st = C.Counter(x.get('wcs') for x in infos)
     l.append(T('solutions', v=', '.join('%s %d' % ((k if L == 'fr' else tr('ohp_wcs_' + (k or 'aucune'), 'en')), n)
                                          for k, n in sorted(st.items(), key=lambda kv: str(kv[0])))))

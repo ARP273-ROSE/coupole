@@ -381,9 +381,9 @@ class Panneau(QWidget):
             h = self.hauteur_tableau() if self.m_res.rowCount() else 160
             if h + COURBES_MIN <= disponible:
                 table = h                                           # toutes les lignes, le reste aux courbes
-            else:
-                table = max(140, min(h, disponible - COURBES_MIN))  # partage, courbes lisibles
-            courbes_min = max(COURBES_MIN, disponible - table) if h + COURBES_MIN <= disponible else COURBES_MIN
+            else:                                                   # partage équilibré, courbes lisibles
+                table = max(140, disponible - max(COURBES_MIN, disponible // 2))
+            courbes_min = max(COURBES_MIN, disponible - table)
             self.v_res.setMinimumHeight(table)
             self.v_res.setMinimumWidth(0)
             self.trace.setMinimumHeight(courbes_min)

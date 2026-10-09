@@ -107,7 +107,7 @@ class DialogueReglages(QDialog):
         h.addWidget(self.dest, 1)
         h.addWidget(bouton('reg_parcourir', self._parcourir))
         f.addRow(tr('reg_dest'), h)
-        self.format = liste('reg_format_aide', [(tr('fmt_xisf'), 'xisf'), (tr('fmt_fz'), 'fz'), (tr('fmt_fits'), 'fits')])
+        self.format = liste('reg_format_aide', [(tr('fmt_' + k), k) for k in ('xisf', 'xisf16', 'fz', 'fits')])
         self.format.setCurrentIndex(max(0, self.format.findData(r['format_sortie'])))
         f.addRow(tr('reg_format'), self.format)
         self.dl = nombre('reg_dl_aide', 0, 4, int(r['telechargements_max'] or 0), 'reg_auto')

@@ -150,8 +150,8 @@ class _CompteurPaint(QObject):
 
 
 def test_les_courbes_suivent_la_fenetre(app_qt, fenetre):
-    """1024 → 1800 px : la largeur du widget de courbes change et il est redessiné, dans les deux dispositions
-    (courbes sous le tableau sous 1500 px, à côté au-dessus)."""
+    """1024 → 1800 px : le widget de courbes change de taille et il est redessiné, dans les deux dispositions
+    (courbes sous le tableau sous 1450 px, à côté au-dessus de 1550 px)."""
     p = fenetre.ouvrir_module('cosmo')
     assert attendre(app_qt, lambda: p.resultat is not None and p.courbes is not None, 60)
     compteur = _CompteurPaint()
@@ -164,24 +164,28 @@ def test_les_courbes_suivent_la_fenetre(app_qt, fenetre):
     n1 = compteur.n
     fenetre.resize(1800, 1000)
     app_qt.processEvents()
-    attendre(app_qt, lambda: p.trace.width() > l1 + 200, 5)
-    assert p.trace.width() > l1 + 200
-    from coupole.modules.cosmo.gui import LARGEUR_COTE_A_COTE
-    if p.width() >= LARGEUR_COTE_A_COTE:                      # l'écran virtuel de certains serveurs de CI est plus étroit
+    from coupole.modules.cosmo.gui import LARGEUR_VERS_COTE
+    # 0.1.9 : côte à côte, le tableau prend la largeur de son contenu et les courbes TOUT le reste
+    attendre(app_qt, lambda: p.trace.width() != l1 or p.trace.height() != h1, 5)
+    assert (p.trace.width(), p.trace.height()) != (l1, h1)
+    if p.width() >= LARGEUR_VERS_COTE:                        # l'écran virtuel de certains serveurs de CI est plus étroit
         assert p.splitter.orientation() == Qt.Orientation.Horizontal
+        assert abs(sum(p.splitter.sizes()) + p.splitter.handleWidth() - p.splitter.width()) <= 4
+        assert p.trace.width() >= p.splitter.width() - p.largeur_tableau() - 40
     assert compteur.n > n1                                    # un nouveau paint a eu lieu
-    # sous 1500 px, les courbes grandissent avec la hauteur de la fenêtre au lieu de rester figées à leur minimum
+    # empilé, les courbes grandissent avec la hauteur de la fenêtre au lieu de rester figées à leur minimum
     fenetre.resize(1200, 600)
     app_qt.processEvents()
     attendre(app_qt, lambda: p.splitter.orientation() == Qt.Orientation.Vertical, 5)
     h_bas, h_fenetre, d_bas = p.trace.height(), fenetre.height(), dict(p.disposition)
-    fenetre.resize(1200, 1000)
+    fenetre.resize(1200, 1400)
     app_qt.processEvents()
     attendre(app_qt, lambda: p.trace.height() > h_bas + 30, 5)
     d = dict(p.disposition)
     # la disposition a bien vu la zone visible grandir, et les courbes ont reçu la part qu'elle leur a attribuée
     assert d['visible'] > d_bas['visible'] or fenetre.height() < h_fenetre + 300, (d_bas, d, fenetre.height(), h_fenetre)
     assert p.trace.height() >= d['courbes_min'] - 2, (d, p.trace.height())
-    if d['disponible'] >= 500:                                # assez de place visible (écran virtuel du serveur de CI)
-        assert d['courbes_min'] > 220 and p.trace.height() > h_bas + 30, (d_bas, d, h_bas, p.trace.height())
+    if d['disponible'] >= 700:                                # assez de place visible (écran virtuel du serveur de CI)
+        # 0.1.9 : partage équilibré quand toutes les lignes ne tiennent pas, courbes d'au moins 300 px
+        assert d['courbes_min'] >= 300 and p.trace.height() > h_bas + 30, (d_bas, d, h_bas, p.trace.height())
     p.trace.removeEventFilter(compteur)

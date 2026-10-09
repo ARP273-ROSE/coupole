@@ -6,6 +6,40 @@ EXTRAIRE = ("bsdtar -xf d80_star_database.deb data.tar.xz && sudo mkdir -p /opt/
             "--wildcards './opt/astap/d80_*'")
 
 TEXTES = {
+    # ------------------------------------------------------------ ouvrir une image (0.1.9)
+    'lg_ouvrir': {'fr': 'Ouvrir', 'en': 'Open'},
+    'lg_ouvrir_aide': {'fr': "Ouvre le fichier avec l'application associée du système (double-clic).",
+                       'en': 'Opens the file with the system\'s associated application (double-click).'},
+    'lg_ouvrir_avec': {'fr': 'Ouvrir avec', 'en': 'Open with'},
+    'lg_ouvrir_avec_aide': {'fr': 'Ouvre le fichier dans {logiciel} (il sait lire ce format : vérifié).',
+                            'en': 'Opens the file in {logiciel} (it reads this format: checked).'},
+    'lg_aucun_logiciel': {'fr': "Aucun logiciel d'astronomie trouvé sur cette machine",
+                          'en': 'No astronomy software found on this computer'},
+    'lg_emplacement': {'fr': "Ouvrir l'emplacement du fichier", 'en': 'Open file location'},
+    'lg_emplacement_aide': {'fr': 'Ouvre le dossier dans le gestionnaire de fichiers, le fichier sélectionné.',
+                            'en': 'Opens the folder in the file manager, with the file selected.'},
+    'lg_pas_telechargee': {'fr': "Pas encore téléchargée : lancer le traitement de cette image d'abord.",
+                           'en': 'Not downloaded yet: process this image first.'},
+    'lg_raison_siril_flottant': {'fr': "Siril (≥ 1.4) lit ce XISF mais garde les flottants en ADU hors de sa plage "
+                                       "[0, 1] : image fausse. Choisir « XISF compatible » ou FITS dans le Traitement.",
+                                 'en': 'Siril (≥ 1.4) reads this XISF but keeps ADU floats outside its [0, 1] range: '
+                                       'wrong image. Choose « compatible XISF » or FITS in Processing.'},
+    'lg_raison_nina_flottant': {'fr': "N.I.N.A. suppose des flottants dans [0, 1] (bounds ignoré) : image blanche. "
+                                      "Choisir « XISF compatible » (entiers 16 bits) dans le Traitement.",
+                                'en': 'N.I.N.A. assumes floats in [0, 1] (bounds ignored): white image. Choose '
+                                      '« compatible XISF » (16-bit integers) in Processing.'},
+    'lg_raison_nina_zstd': {'fr': "N.I.N.A. 3.2 ne décompresse pas zstd (ajouté en 2026 dans sa version de "
+                                  "développement) : choisir « XISF compatible » (zlib).",
+                            'en': 'N.I.N.A. 3.2 does not decompress zstd (added in 2026 to its development version): '
+                                  'choose « compatible XISF » (zlib).'},
+    'lg_raison_astap_xisf': {'fr': "ASTAP ne lit que le XISF non compressé : choisir le format FITS dans le Traitement.",
+                             'en': 'ASTAP only reads uncompressed XISF: choose the FITS format in Processing.'},
+    'lg_raison_astap_gzip': {'fr': "ASTAP lit le .fits.fz Rice (entiers) mais pas GZIP (flottants) : choisir FITS.",
+                             'en': 'ASTAP reads Rice .fits.fz (integers) but not GZIP (floats): choose FITS.'},
+    'lg_raison_format': {'fr': 'Ce logiciel ne lit pas ce format.', 'en': 'This program does not read this format.'},
+    'lg_raison_non_verifie': {'fr': "Lecture de ce format par ce logiciel non vérifiée : non proposé.",
+                              'en': 'Reading of this format by this program not checked: not offered.'},
+
     # ------------------------------------------------------------ généraux
     'oui': {'fr': 'oui', 'en': 'yes'},
     'non': {'fr': 'non', 'en': 'no'},
@@ -351,6 +385,28 @@ TEXTES = {
     'dlg_annuler_aide': {'fr': 'Ferme sans rien changer.', 'en': 'Close without changing anything.'},
     'unite_mos': {'fr': 'Mo/s', 'en': 'MB/s'},
     'fmt_xisf': {'fr': 'XISF compressé (PixInsight)', 'en': 'Compressed XISF (PixInsight)'},
+    'fmt_xisf16': {'fr': 'XISF compatible N.I.N.A. et Siril (entiers 16 bits, zlib)',
+                   'en': 'XISF compatible with N.I.N.A. and Siril (16-bit integers, zlib)'},
+    'fmt_compat_xisf': {'fr': "Qui lit quoi (vérifié) : PixInsight ✓ · Siril ≥ 1.4 ✗ (flottants en ADU hors de sa plage "
+                               "[0, 1]) · N.I.N.A. ✗ (image blanche ; zstd illisible en 3.2) · ASTAP ✗ (XISF compressé) · "
+                               "astropy ✗.",
+                         'en': 'Who reads what (checked): PixInsight ✓ · Siril ≥ 1.4 ✗ (ADU floats outside its [0, 1] '
+                               'range) · N.I.N.A. ✗ (white image; zstd unreadable in 3.2) · ASTAP ✗ (compressed XISF) · '
+                               'astropy ✗.'},
+    'fmt_compat_xisf16': {'fr': "Qui lit quoi (vérifié) : PixInsight ✓ · Siril ≥ 1.4 ✓ · N.I.N.A. ✓ (zlib, entiers comme "
+                                 "les siens) · ASTAP ✗ (XISF compressé) · astropy ✗. Prix : ADU arrondis à l'entier, "
+                                 "valeurs négatives mises à 0 (comptées dans l'en-tête).",
+                           'en': 'Who reads what (checked): PixInsight ✓ · Siril ≥ 1.4 ✓ · N.I.N.A. ✓ (zlib, integers like '
+                                 'its own) · ASTAP ✗ (compressed XISF) · astropy ✗. Cost: ADU rounded to integers, negative '
+                                 'values set to 0 (counted in the header).'},
+    'fmt_compat_fz': {'fr': "Qui lit quoi (vérifié) : Siril ✓ · astropy ✓ · ASTAP ✓ pour les entiers (Rice, depuis "
+                             "2026.07.16), ✗ pour les flottants (GZIP) · PixInsight, N.I.N.A. : non vérifié.",
+                       'en': 'Who reads what (checked): Siril ✓ · astropy ✓ · ASTAP ✓ for integers (Rice, since '
+                             '2026.07.16), ✗ for floats (GZIP) · PixInsight, N.I.N.A.: not checked.'},
+    'fmt_compat_fits': {'fr': "Qui lit quoi (vérifié) : PixInsight ✓ · Siril ✓ · ASTAP ✓ · astropy ✓ · Aladin ✓ · "
+                               "N.I.N.A. ✓ pour les entiers, ✗ pour les flottants en ADU (image blanche).",
+                         'en': 'Who reads what (checked): PixInsight ✓ · Siril ✓ · ASTAP ✓ · astropy ✓ · Aladin ✓ · '
+                               'N.I.N.A. ✓ for integers, ✗ for ADU floats (white image).'},
     'fmt_fz': {'fr': 'FITS compressé sans perte (.fits.fz : Siril, astropy, DS9)', 'en': 'Lossless compressed FITS (.fits.fz: Siril, astropy, DS9)'},
     'fmt_fits': {'fr': 'FITS float32 non compressé', 'en': 'Uncompressed float32 FITS'},
 
@@ -420,8 +476,8 @@ TEXTES = {
               'which can also be typed into the folder field.</p>'},
     'reg_parcourir_aide': {'fr': 'Choisir le dossier.', 'en': 'Choose the folder.'},
     'reg_format': {'fr': 'Format de sortie', 'en': 'Output format'},
-    'reg_format_aide': {'fr': 'XISF pour PixInsight (défaut) ; .fits.fz pour Siril et astropy ; FITS float32 si un logiciel ne lit rien d\'autre.',
-                        'en': 'XISF for PixInsight (default); .fits.fz for Siril and astropy; float32 FITS if a program reads nothing else.'},
+    'reg_format_aide': {'fr': 'XISF pour PixInsight (défaut) ; XISF compatible (entiers 16 bits) pour N.I.N.A. et Siril ; .fits.fz pour Siril et astropy ; FITS float32 si un logiciel ne lit rien d\'autre. Le tableau sous la liste dit qui lit quoi (vérifié).',
+                        'en': 'XISF for PixInsight (default); compatible XISF (16-bit integers) for N.I.N.A. and Siril; .fits.fz for Siril and astropy; float32 FITS if a program reads nothing else. The table under the list says who reads what (checked).'},
     'reg_dl': {'fr': 'Téléchargements simultanés', 'en': 'Simultaneous downloads'},
     'reg_dl_aide': {'fr': 'Auto : 3 (2 en mode économe). 4 au plus : le serveur de l\'Observatoire est public.',
                     'en': "Auto: 3 (2 in economy mode). At most 4: the Observatory's server is public."},

@@ -226,8 +226,8 @@ class FenetrePrincipale(QMainWindow):
         groupe.setExclusive(True)
         self.act_disposition_cosmo = {}
         for d in DISPOSITIONS:
-            a = action(self, 'cosmo_disposition_' + d, lambda _=False, x=d: p.definir_disposition(x),
-                       cle_aide='cosmo_disposition_aide')
+            cle = 'cosmo_disposition_' + d
+            a = action(self, cle, lambda _=False, x=d: p.definir_disposition(x), cle_aide='cosmo_disposition_aide')
             a.setCheckable(True)
             a.setChecked(p.disposition_choisie == d)
             groupe.addAction(a)

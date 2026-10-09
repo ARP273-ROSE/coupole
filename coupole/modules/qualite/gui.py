@@ -54,7 +54,11 @@ class Panneau(QWidget):
         v.addWidget(self.l_progression)
         sp = QSplitter(Qt.Orientation.Vertical)
         self.modele = ModeleTableau([tr('qual_col_' + c) for c in rapport.COLONNES])
-        self.vue, _ = vue_tableau(self.modele, 'qual_table_aide')
+        self.vue, self.proxy = vue_tableau(self.modele, 'qual_table_aide')
+        # double-clic : l'image avec l'application du système ; clic droit : ouvrir, ouvrir avec, emplacement
+        self.vue.doubleClicked.connect(lambda *_: self._ouvrir_image())
+        self.vue.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.vue.customContextMenuRequested.connect(self._menu_image)
         sp.addWidget(self.vue)
         self.resume = aide(QPlainTextEdit(), 'qual_resume_aide')
         self.resume.setReadOnly(True)
@@ -242,7 +246,34 @@ class Panneau(QWidget):
                                               duree=duree_lisible(ev['duree'])))
                 self._terminer()
         if nouvelles:                                  # ajout incrémental : le modèle n'est pas reconstruit
-            self.modele.ajouter(nouvelles)
+            self.modele.ajouter(nouvelles, [ev['ligne'] for ev in evs if ev['type'] == 'image'])
+
+    def _image_choisie(self, pos=None):
+        from ...gui.modele import lignes_choisies
+        if pos is not None:
+            i = self.vue.indexAt(pos)
+            if i.isValid():
+                r = self.proxy.mapToSource(i).row()
+                if 0 <= r < len(self.modele.donnees):
+                    return self.modele.donnees[r]
+        ch = lignes_choisies(self.vue, self.proxy, self.modele)
+        return ch[0] if ch else None
+
+    def _ouvrir_image(self):
+        l = self._image_choisie()
+        if l and l.get('chemin'):
+            from ...gui import ouvrir
+            ouvrir.ouvrir_defaut(l['chemin'])
+
+    def _menu_image(self, pos):
+        l = self._image_choisie(pos)
+        if not l or not l.get('chemin'):
+            return
+        from PyQt6.QtWidgets import QMenu
+        from ...gui import ouvrir
+        m = QMenu(self)
+        ouvrir.remplir_menu(m, l['chemin'])
+        m.exec(self.vue.viewport().mapToGlobal(pos))
 
     def _terminer(self):
         if self._question is not None:

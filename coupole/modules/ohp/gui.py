@@ -21,7 +21,7 @@ from ...core.i18n import tr
 from ...gui.adaptatif import Flux, coupable
 from ...gui.dialogues import DialogueASTAP, ouvrir_fichier
 from ...gui import fichiers, memoire, pastilles
-from ...gui.modele import (DelegueProgression, ModeleParesseux, ModeleTableau, Progression, lignes_choisies,
+from ...gui.modele import (DelegueProgression, ModeleParesseux, ModeleTableau, Nombre, Progression, lignes_choisies,
                            vue_tableau)
 from ...gui.outils import (FileEvenements, Tache, aide, bouton, case, champ, decimal, enregistrer_arret, est_detruit,
                            lancer_fil, liste, nombre)
@@ -59,6 +59,28 @@ class ProgressionEtat(Progression):
 
 
 from .gui_sans_qt import duree_lisible  # noqa: E402
+
+
+def _premiere_image(dossier) -> str:
+    """Première image (ordre des noms) d'un dossier de lot, '' s'il n'y en a pas."""
+    try:
+        with os.scandir(dossier) as it:
+            noms = sorted(e.path for e in it if e.name.lower().endswith(('.xisf', '.fits', '.fit', '.fts', '.fits.fz')))
+    except OSError:
+        return ''
+    return noms[0] if noms else ''
+
+
+def _instruments_lots(dossiers) -> dict:
+    """{dossier: metadonnees.instrument(en-tête de sa première image)} ; 16 fils (allers-retours recouverts)."""
+    import concurrent.futures as F
+    from . import metadonnees
+
+    def un(d):
+        f = _premiere_image(d)
+        return d, (metadonnees.instrument_fichier(f) if f else None)
+    with F.ThreadPoolExecutor(16, thread_name_prefix='instrument') as pool:
+        return dict(pool.map(un, dossiers))
 
 # bits du code « drapeaux » d'une image (clé de tri précalculée ; le texte affiché en dépend seul)
 _D_DOUBLON, _D_DATE, _D_DIURNE, _D_NOUVEAU = 1, 2, 4, 8
@@ -370,9 +392,11 @@ class Panneau(QWidget):
         sp = QSplitter(Qt.Orientation.Horizontal)
         self.m_obj = ModeleTableau([tr('ohp_col_type'), tr('ohp_col_objet'), tr('ohp_col_remarque'), tr('ohp_col_images'),
                                     tr('ohp_col_possede'), tr('ohp_col_volume'), tr('ohp_col_nuits'),
-                                    tr('ohp_col_telescopes'), tr('ohp_col_filtres'), tr('ohp_col_etat')])
+                                    tr('ohp_col_telescopes'), tr('ohp_col_filtres'), tr('ohp_col_etat'),
+                                    tr('ohp_col_lots')])
         self.COL_POSSEDE = 4
         self.COL_OBJET = 1
+        self.COL_LOTS = 10
         self.v_obj, self.p_obj = vue_tableau(self.m_obj, 'ohp_table_objets_aide', filtrable=True)
         # « possédé » juste après « objet » (0.1.8) : visible sans défiler ; l'ordre logique ne change pas, si bien
         # que largeurs et tri gardés restent valables (memoire.entete migre un ordre d'origine jamais modifié)
@@ -411,6 +435,13 @@ class Panneau(QWidget):
         self.v_img.horizontalHeader().setToolTip(tr('ohp_legende_aide'))
         self.v_img.message_vide = self._message_images_vide
         self._raison_vide_images = 'choisir'
+        # double-clic : l'image possédée avec l'application du système ; clic droit : ouvrir, ouvrir avec, emplacement
+        self.v_img.doubleClicked.connect(lambda *_: self._ouvrir_image())
+        self.v_img.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.v_img.customContextMenuRequested.connect(self._menu_image)
+        self.v_obj.doubleClicked.connect(lambda *_: self._ouvrir_dossier_objet())
+        self.v_obj.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.v_obj.customContextMenuRequested.connect(self._menu_objet)
         vd.addWidget(self.v_img)
         sp.addWidget(droite)
         sp.setSizes([560, 620])
@@ -593,7 +624,7 @@ class Panneau(QWidget):
                 etat.append(tr('ohp_etat_verifier'))
             lignes.append((tr('ohp_cat_' + o['cat']), cibles.nom_affiche(o['objet']), cibles.remarque(o['rem']),
                            o['images'], Progression(0, o['images']), _taille(o['octets']), len(o['nuits']),
-                           ', '.join(sorted(o['tel'])), ', '.join(sorted(o['filtres'])), ', '.join(etat)))
+                           ', '.join(sorted(o['tel'])), ', '.join(sorted(o['filtres'])), ', '.join(etat), ''))
             donnees.append(o)
             bulles.append(tr('ohp_bulle_objet', noms=', '.join(sorted(o['noms'])), doublons=o['doublons']))
         self.m_obj.remplir(lignes, donnees, bulles)
@@ -677,20 +708,39 @@ class Panneau(QWidget):
         tete = self.v_obj.horizontalHeader().logicalIndex(0)
         tete = tete if tete >= 0 else 0
         communs = {}
+        lots = getattr(self, '_lots_par_objet', {}) or {}
         for ligne, o in zip(self.m_obj.lignes, self.m_obj.donnees):
             c = comptes.get(o['objet'], {'possedees': 0, 'doublons': 0, 'echecs': 0, 'absentes': 0, 'total': o['images']})
             etat = Possession.etat_agrege(c)
             l = list(ligne)
             l[self.COL_POSSEDE] = ProgressionEtat(c['possedees'] + c['doublons'], c['total'], etat)
+            les_lots = lots.get(o['objet']) or lots.get(cibles.nom_affiche(o['objet']))
+            l[self.COL_LOTS] = Nombre(len(les_lots)) if les_lots else ''
             lignes.append(tuple(l))
             bulle = self.bulle_etat_objet(c)
+            if les_lots:
+                bulle += '\n' + self.repartition_lots(les_lots)
             if etat not in communs:
                 nom = PASTILLE_ETAT[etat]
                 communs[etat] = (pastilles.pastille(nom), pastilles.couleur_statut(nom))
             icone, couleur = communs[etat]
             styles.append({'icones': {tete: icone}, 'couleurs': {self.COL_OBJET: couleur},
-                           'bulles': {tete: bulle, self.COL_POSSEDE: bulle}})
+                           'bulles': {tete: bulle, self.COL_POSSEDE: bulle, self.COL_LOTS: bulle}})
         self.m_obj.remplacer_lignes(lignes, styles)
+
+    @staticmethod
+    def repartition_lots(les_lots) -> str:
+        """« 840 images en 9 lots : champ 1 T120 : B 200 · V 300 · R 300 ; … — on empile lot par lot (même champ,
+        même instrument, même filtre) » : posséder toutes les images d'un objet ne veut pas dire qu'elles
+        s'empilent ensemble."""
+        groupes = {}
+        for groupe, filtre, poses in les_lots:
+            groupes.setdefault(groupe, []).append('%s %s' % (filtre, _entier(poses)))
+        morceaux = ['%s : %s' % (g, ' · '.join(v)) for g, v in groupes.items()]
+        if len(morceaux) > 8:
+            morceaux = morceaux[:8] + ['… (+%d)' % (len(morceaux) - 8)]
+        return tr('ohp_repartition_lots', n=_entier(sum(p for _, _, p in les_lots)), lots=len(les_lots),
+                  detail=' ; '.join(morceaux))
 
     @staticmethod
     def bulle_etat_objet(c: dict) -> str:
@@ -1031,12 +1081,19 @@ class Panneau(QWidget):
         h.addWidget(self.dest, 1)
         h.addWidget(bouton('reg_parcourir', self._parcourir))
         f.addRow(tr('reg_dest'), h)
-        self.format = liste('reg_format_aide', [(tr('fmt_xisf'), 'xisf'), (tr('fmt_fz'), 'fz'), (tr('fmt_fits'), 'fits')])
+        self.format = liste('reg_format_aide', [(tr('fmt_' + k), k) for k in ('xisf', 'xisf16', 'fz', 'fits')])
         self.format.setCurrentIndex(max(0, self.format.findData(r['format_sortie'])))
         self.format.currentIndexChanged.connect(self._estimer)
         self.format.currentIndexChanged.connect(
             lambda *_: memoire.reglage_differe('format_sortie', self.format.currentData()))
         f.addRow(tr('reg_format'), self.format)
+        # assistant de format : qui lit quoi, d'après les vérifications (core/logiciels.py)
+        self.l_compat = QLabel('')
+        self.l_compat.setWordWrap(True)
+        self.format.currentIndexChanged.connect(
+            lambda *_: self.l_compat.setText(tr('fmt_compat_' + (self.format.currentData() or 'xisf'))))
+        self.l_compat.setText(tr('fmt_compat_' + (self.format.currentData() or 'xisf')))
+        f.addRow('', self.l_compat)
         noms = r['langue_noms'] if r['langue_noms'] in ('fr', 'en') else i18n.langue()
         self.noms = liste('reg_noms_aide', [('Français', 'fr'), ('English', 'en')])
         self.noms.setCurrentIndex(max(0, self.noms.findData(noms)))
@@ -1513,12 +1570,303 @@ class Panneau(QWidget):
         v.addWidget(self.l_lots)
         self.m_lots = ModeleTableau([tr('csv_dossier'), tr('csv_objet'), tr('csv_filtre'), tr('csv_poses'),
                                      tr('ohp_col_complet'), tr('csv_pose_totale_s'), tr('csv_nuits'),
-                                     tr('csv_alignement')])
+                                     tr('csv_alignement'), tr('ohp_col_focale'), tr('ohp_col_pixel'),
+                                     tr('ohp_col_echelle')])
         self.COL_LOT_COMPLET = 4
+        self.COL_LOT_FOCALE = 8
         self.v_lots, self.p_lots = vue_tableau(self.m_lots, 'ohp_table_lots_aide')
         self.v_lots.doubleClicked.connect(lambda *_: self._ouvrir_lot())
-        v.addWidget(self.v_lots, 1)
+        self.v_lots.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.v_lots.customContextMenuRequested.connect(self._menu_lot)
+        h = Flux()
+        self.l_filtre_lots = QLabel('')
+        self.b_tous_lots = bouton('ohp_lots_tous', lambda: self.voir_lots_objet(None))
+        self.b_tous_lots.setVisible(False)
+        h.addWidget(self.l_filtre_lots)
+        h.addWidget(self.b_tous_lots)
+        v.addLayout(h)
+        self._filtre_lots_objet = None
+        sp = QSplitter(Qt.Orientation.Vertical)
+        sp.addWidget(self.v_lots)
+        sp.addWidget(self._encadre_astrometrie())
+        sp.setStretchFactor(0, 3)
+        sp.setStretchFactor(1, 1)
+        v.addWidget(sp, 1)
+        self._inst_lots = {}
+        self.v_lots.selectionModel().selectionChanged.connect(lambda *_: self._maj_encadre())
+        # colonnes masquables : clic droit sur l'en-tête
+        h_lots = self.v_lots.horizontalHeader()
+        h_lots.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        h_lots.customContextMenuRequested.connect(self._menu_colonnes_lots)
         return w
+
+    # ---------------------------------------------------------------- valeurs pour PixInsight / N.I.N.A.
+    CHAMPS_ASTRO = ('instrument', 'focale', 'pixel', 'binning', 'echelle', 'champ', 'centre')
+
+    def _encadre_astrometrie(self):
+        """Encadré « Pour PixInsight / N.I.N.A. » du lot choisi : valeurs lues dans les en-têtes de ses images, une
+        par ligne avec « Copier », et « Tout copier »."""
+        g = QGroupBox(tr('ohp_astro_titre'))
+        grille = QGridLayout(g)
+        self._astro_valeurs = {}
+        for k, cle in enumerate(self.CHAMPS_ASTRO):
+            lab = aide(QLabel(tr('ohp_astro_' + cle)), 'ohp_astro_aide')
+            val = aide(QLabel('—'), 'ohp_astro_aide')
+            val.setWordWrap(True)
+            val.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+            b = bouton('ohp_astro_copier', lambda _=False, c=cle: self._copier(self._astro_valeurs[c].text()))
+            grille.addWidget(lab, k, 0)
+            grille.addWidget(val, k, 1)
+            grille.addWidget(b, k, 2)
+            self._astro_valeurs[cle] = val
+        grille.setColumnStretch(1, 1)
+        h = Flux()
+        self.b_astro_tout = bouton('ohp_astro_tout', lambda: self._copier(self.texte_astrometrie()))
+        h.addWidget(self.b_astro_tout)
+        n = len(self.CHAMPS_ASTRO)
+        grille.addLayout(h, n, 0, 1, 3)
+        self.l_astro_note = QLabel(tr('ohp_astro_note'))
+        self.l_astro_note.setWordWrap(True)
+        grille.addWidget(self.l_astro_note, n + 1, 0, 1, 3)
+        self._astro_lot = None
+        return g
+
+    @staticmethod
+    def valeurs_astrometrie(inst: dict | None) -> dict:
+        """Textes affichés (et copiés) pour un lot, d'après `metadonnees.instrument`."""
+        from ...core.astro import sexa
+        if not inst:
+            return {}
+        out = {'instrument': inst.get('instrument') or '—'}
+        out['focale'] = '%.1f mm' % inst['focale_mm'] if inst.get('focale_mm') else '—'
+        out['pixel'] = ('%g µm' % inst['pixel_um']) if inst.get('pixel_um') else '—'
+        b = inst.get('binning')
+        out['binning'] = ('%d × %d' % b) if b else '—'
+        out['echelle'] = ('%.4f ″ px⁻¹' % inst['echelle']) if inst.get('echelle') else '—'
+        c = inst.get('champ_arcmin')
+        out['champ'] = ('%.1f′ × %.1f′' % c) if c else '—'
+        if inst.get('ra') is not None and inst.get('dec') is not None:
+            out['centre'] = 'RA %s  Dec %s  (%.5f°, %+.5f°)' % (sexa(inst['ra'], heures=True, signe=False, dec=1),
+                                                             sexa(inst['dec'], dec=0), inst['ra'], inst['dec'])
+        else:
+            out['centre'] = '—'
+        return out
+
+    def texte_astrometrie(self, dossier=None) -> str:
+        d = dossier or self._astro_lot
+        inst = self._inst_lots.get(d) if d else None
+        v = self.valeurs_astrometrie(inst)
+        if not v:
+            return ''
+        lignes = [tr('ohp_astro_titre') + ' — ' + os.path.basename(os.path.dirname(d or '')) + '/' +
+                  os.path.basename(d or '')]
+        lignes += ['%s : %s' % (tr('ohp_astro_' + k), v[k]) for k in self.CHAMPS_ASTRO]
+        if inst and inst.get('binning') and inst['binning'][0] > 1 and inst.get('pixel_um') and inst.get('echelle'):
+            b = inst['binning'][0]
+            lignes.append(tr('ohp_astro_avert_binning', e2='%.3f' % (2 * inst['echelle']), pnb='%g' % (inst['pixel_um'] / b),
+                             b=b))
+        return '\n'.join(lignes)
+
+    def _copier(self, texte):
+        from PyQt6.QtWidgets import QApplication
+        if texte and texte != '—':
+            QApplication.clipboard().setText(texte)
+            self._statut(tr('ohp_astro_copie'))
+
+    def _maj_encadre(self):
+        ch = lignes_choisies(self.v_lots, self.p_lots, self.m_lots)
+        d = ch[0] if ch else None
+        self._astro_lot = d
+        if d and d not in self._inst_lots:
+            from . import metadonnees
+            t = Tache(lambda dd=d: (dd, metadonnees.instrument_fichier(_premiere_image(dd))), parent=self)
+            t.quand_fini(self._instrument_lu)
+            t.start()
+            self._t_inst = t
+        v = self.valeurs_astrometrie(self._inst_lots.get(d)) if d else {}
+        for cle, lab in self._astro_valeurs.items():
+            lab.setText(v.get(cle, '—'))
+        inst = self._inst_lots.get(d) if d else None
+        note = tr('ohp_astro_note')
+        if inst and inst.get('binning') and inst['binning'][0] > 1 and inst.get('pixel_um') and inst.get('echelle'):
+            b = inst['binning'][0]
+            note = tr('ohp_astro_avert_binning', e2='%.3f' % (2 * inst['echelle']), pnb='%g' % (inst['pixel_um'] / b),
+                      b=b) + ' ' + note
+        self.l_astro_note.setText(note)
+
+    def _instrument_lu(self, r):
+        d, inst = r
+        self._inst_lots[d] = inst
+        if d == self._astro_lot:
+            self._maj_encadre()
+
+    def _instruments_prets(self, resultat: dict):
+        self._inst_lots.update(resultat)
+        if not self.m_lots.lignes:
+            return
+        lignes = []
+        for ligne, d in zip(self.m_lots.lignes, self.m_lots.donnees):
+            i = self._inst_lots.get(d) or {}
+            l = list(ligne)
+            l[self.COL_LOT_FOCALE] = Nombre(i['focale_mm'], '%.1f') if i.get('focale_mm') else ''
+            l[self.COL_LOT_FOCALE + 1] = Nombre(i['pixel_um']) if i.get('pixel_um') else ''
+            l[self.COL_LOT_FOCALE + 2] = Nombre(i['echelle'], '%.4f') if i.get('echelle') else ''
+            lignes.append(tuple(l))
+        self.m_lots.remplacer_lignes(lignes)
+        self._maj_encadre()
+
+    def _menu_colonnes_lots(self, pos):
+        from PyQt6.QtWidgets import QMenu
+        h = self.v_lots.horizontalHeader()
+        m = QMenu(self)
+        for c in range(self.m_lots.columnCount()):
+            a = m.addAction(str(self.m_lots.headerData(c, Qt.Orientation.Horizontal)))
+            a.setCheckable(True)
+            a.setChecked(not h.isSectionHidden(c))
+            a.toggled.connect(lambda oui, cc=c: self.v_lots.setColumnHidden(cc, not oui))
+        m.exec(h.mapToGlobal(pos))
+
+    # ---------------------------------------------------------------- ouvrir (double-clic, menus contextuels)
+    def _statut(self, texte):
+        fen = self.window()
+        if hasattr(fen, 'statusBar'):
+            fen.statusBar().showMessage(texte, 8000)
+
+    def chemin_image(self, x) -> str:
+        """Fichier local d'une image possédée (convertie), ou '' : le chemin noté par le traitement, rapporté au
+        dossier de sortie courant."""
+        if not self.possession.possedee(x):
+            return ''
+        rel = self.possession.detail(x).get('chemin') or ''
+        if not rel:
+            return ''
+        return rel if os.path.isabs(rel) else os.path.join(self._dest_courante(), rel)
+
+    def _image_sous(self, pos=None):
+        if pos is not None:
+            i = self.v_img.indexAt(pos)
+            if i.isValid():
+                r = self.p_img.mapToSource(i).row()
+                if 0 <= r < len(self.m_img.donnees):
+                    return self.m_img.donnees[r]
+        ch = lignes_choisies(self.v_img, self.p_img, self.m_img)
+        return ch[0] if ch else None
+
+    def _ouvrir_image(self):
+        x = self._image_sous()
+        if x is None:
+            return
+        p = self.chemin_image(x)
+        if p and os.path.exists(p):
+            from ...gui import ouvrir
+            ouvrir.ouvrir_defaut(p)
+        else:
+            self._statut(tr('lg_pas_telechargee'))
+
+    def _menu_image(self, pos):
+        x = self._image_sous(pos)
+        if x is None:
+            return
+        from PyQt6.QtWidgets import QMenu
+        from ...gui import ouvrir
+        m = QMenu(self)
+        p = self.chemin_image(x)
+        ouvrir.remplir_menu(m, p, existe=bool(p) and os.path.exists(p))
+        m.exec(self.v_img.viewport().mapToGlobal(pos))
+
+    def dossier_objet(self, o) -> str:
+        """Dossier de la cible dans la sortie (« <sortie>/07_Nebuleuses/NGC_6888 »), d'après une image possédée ;
+        '' si rien n'est encore téléchargé."""
+        if not self.inv or not o:
+            return ''
+        par_objet = getattr(self.inv, '_index_memo', (None, None, {}))[2] or {}
+        dest = self._dest_courante()
+        for x in par_objet.get(o['objet'], ()):
+            p = self.chemin_image(x)
+            if p:
+                try:
+                    rel = os.path.relpath(p, dest).split(os.sep)
+                except ValueError:
+                    continue
+                if len(rel) >= 3 and rel[0] != '..':
+                    return os.path.join(dest, rel[0], rel[1])
+        return ''
+
+    def _objet_sous(self, pos=None):
+        if pos is not None:
+            i = self.v_obj.indexAt(pos)
+            if i.isValid():
+                r = self.p_obj.mapToSource(i).row()
+                if 0 <= r < len(self.m_obj.donnees):
+                    return self.m_obj.donnees[r]
+        ch = lignes_choisies(self.v_obj, self.p_obj, self.m_obj)
+        return ch[0] if ch else None
+
+    def _ouvrir_dossier_objet(self):
+        d = self.dossier_objet(self._objet_sous())
+        if d and os.path.isdir(d):
+            from ...core import logiciels
+            logiciels.montrer_dans_dossier(d)
+        else:
+            self._statut(tr('ohp_objet_rien'))
+
+    def _menu_objet(self, pos):
+        o = self._objet_sous(pos)
+        if o is None:
+            return
+        from PyQt6.QtWidgets import QMenu
+        from ...core import logiciels
+        m = QMenu(self)
+        m.setToolTipsVisible(True)
+        d = self.dossier_objet(o)
+        a = m.addAction(tr('ohp_objet_dossier'))
+        a.setEnabled(bool(d) and os.path.isdir(d))
+        a.setToolTip(tr('ohp_objet_dossier_aide') if a.isEnabled() else tr('ohp_objet_rien'))
+        a.triggered.connect(lambda: logiciels.montrer_dans_dossier(d))
+        lots = getattr(self, '_lots_par_objet', {}) or {}
+        b = m.addAction(tr('ohp_objet_lots'))
+        b.setEnabled(bool(lots.get(o['objet']) or lots.get(cibles.nom_affiche(o['objet']))))
+        b.setToolTip(tr('ohp_objet_lots_aide'))
+        b.triggered.connect(lambda: self.voir_lots_objet(o))
+        m.exec(self.v_obj.viewport().mapToGlobal(pos))
+
+    def voir_lots_objet(self, o):
+        """Onglet Lots filtré sur un objet (None : tous les lots)."""
+        self._filtre_lots_objet = None if o is None else {o['objet'], cibles.nom_affiche(o['objet'])}
+        self._filtrer_lots()
+        if o is not None:
+            self.onglets.setCurrentIndex(2)
+
+    def _filtrer_lots(self):
+        f = getattr(self, '_filtre_lots_objet', None)
+        n = 0
+        for r in range(self.p_lots.rowCount()):
+            src = self.p_lots.mapToSource(self.p_lots.index(r, 0)).row()
+            objet = self.m_lots.lignes[src][1] if 0 <= src < len(self.m_lots.lignes) else ''
+            cache = bool(f) and objet not in f
+            self.v_lots.setRowHidden(r, cache)
+            n += not cache
+        self.b_tous_lots.setVisible(bool(f))
+        self.l_filtre_lots.setText(tr('ohp_lots_filtre', objet=' / '.join(sorted(f)[:1]), n=n) if f else '')
+
+    def _menu_lot(self, pos):
+        i = self.v_lots.indexAt(pos)
+        if not i.isValid():
+            return
+        r = self.p_lots.mapToSource(i).row()
+        dossier = self.m_lots.donnees[r] if 0 <= r < len(self.m_lots.donnees) else ''
+        from PyQt6.QtWidgets import QMenu
+        from ...core import logiciels
+        m = QMenu(self)
+        a = m.addAction(tr('ohp_lot_ouvrir_dossier'))
+        a.setEnabled(bool(dossier) and os.path.isdir(dossier))
+        a.triggered.connect(lambda: logiciels.montrer_dans_dossier(dossier))
+        c = m.addAction(tr('ohp_astro_copier_lot'))
+        c.setEnabled(bool(self.texte_astrometrie(dossier)))
+        c.triggered.connect(lambda: self._copier(self.texte_astrometrie(dossier)))
+        b = m.addAction(tr('ohp_lots_ouvrir'))
+        b.triggered.connect(self._ouvrir_lot)
+        m.exec(self.v_lots.viewport().mapToGlobal(pos))
 
     @staticmethod
     def lire_lots(dest, images, possession, infos_ok):
@@ -1568,11 +1916,27 @@ class Panneau(QWidget):
         lignes, donnees, styles = [], [], []
         for ligne, dossier, c in resultat:
             etat, style = self._style_lot(c)
-            lignes.append(ligne[:self.COL_LOT_COMPLET] + (etat,) + ligne[self.COL_LOT_COMPLET + 1:])
+            i = self._inst_lots.get(dossier) or {}
+            fin = (Nombre(i['focale_mm'], '%.1f') if i.get('focale_mm') else '',
+                   Nombre(i['pixel_um']) if i.get('pixel_um') else '',
+                   Nombre(i['echelle'], '%.4f') if i.get('echelle') else '')
+            lignes.append(ligne[:self.COL_LOT_COMPLET] + (etat,) + ligne[self.COL_LOT_COMPLET + 1:] + fin)
             donnees.append(dossier)
             styles.append(style)
         self.m_lots.remplir(lignes, donnees, None, styles)
         memoire.ajuster_colonnes(self.v_lots)
+        # focale, pixel, échelle de chaque lot : un en-tête par lot, lu en fond (plusieurs fils : partage réseau)
+        self._t_inst_lots = Tache(_instruments_lots, [d for _, d, _c in resultat], parent=self)
+        self._t_inst_lots.quand_fini(self._instruments_prets)
+        self._t_inst_lots.start()
+        par_objet = {}
+        for ligne, dossier, _c in resultat:
+            rel = ligne[0].replace('\\', '/').split('/')
+            groupe = rel[-2].replace('_', ' ') if len(rel) >= 2 else ''
+            par_objet.setdefault(ligne[1], []).append((groupe, ligne[2], ligne[3]))
+        self._lots_par_objet = par_objet
+        self._appliquer_possession_objets()
+        self._filtrer_lots()
         self.l_lots.setText(tr('ohp_lots_resume', n=len(lignes), dest=coupable(dest)) if lignes
                             else tr('ohp_lots_aucun', dest=coupable(dest)))
 

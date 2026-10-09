@@ -6,6 +6,8 @@ version française est identique à celle d'ohp_xisf.py.
 """
 TEXTES = {
     # ------------------------------------------------------------ en-têtes FITS (ASCII)
+    'hdr_raison_focale_mesuree': {'fr': 'focale accordee a l echelle mesuree : 206.265 x XPIXSZ / PIXSCALE',
+                                  'en': 'focal length matching the measured scale: 206.265 x XPIXSZ / PIXSCALE'},
     'hdr_origine': {'fr': "valeur d'origine : {nom} = {valeur}{raison}", 'en': 'original value: {nom} = {valeur}{raison}'},
     'hdr_converti': {'fr': '{version} : converti de {source}', 'en': '{version}: converted from {source}'},
     'hdr_tan_sans_sip': {'fr': 'TAN projection (pas de coefficients SIP)', 'en': 'TAN projection (no SIP coefficients)'},
@@ -44,6 +46,9 @@ TEXTES = {
                      'en': 'DATE-OBS shared with another exposure of the database'},
     'hdr_exptime': {'fr': '[s] duree de pose', 'en': '[s] exposure time'},
     'hdr_xisfconv': {'fr': 'conversion par Coupole', 'en': 'conversion by Coupole'},
+    'hdr_u16': {'fr': 'XISF UInt16 + {ped} ADU : {neg} px < -{ped} mis a 0, {haut} px ecretes en haut, fond {fond} ADU',
+                'en': 'XISF UInt16 + {ped} ADU: {neg} px < -{ped} set to 0, {haut} px clipped high, background {fond} ADU'},
+    'hdr_pedestal': {'fr': '[ADU] piedestal ajoute a chaque pixel (a retirer)', 'en': '[ADU] pedestal added to every pixel (to subtract)'},
     'hdr_ecart': {'fr': '{conv} ; ecart max |FITS - sortie| = {ecart} ADU',
                   'en': '{conv}; max |FITS - output| difference = {ecart} ADU'},
 
@@ -58,6 +63,23 @@ TEXTES = {
     'lot_nuits': {'fr': 'Nuits (date du soir) : {v}', 'en': 'Nights (evening date): {v}'},
     'lot_centre': {'fr': 'Centre moyen : RA {ra}  Dec {de}  ({rad}, {ded} deg) ; ecart max au centre : {dmax} arcmin',
                    'en': 'Mean centre: RA {ra}  Dec {de}  ({rad}, {ded} deg); max offset from centre: {dmax} arcmin'},
+    'lot_astrometrie': {'fr': 'Pour PixInsight (ImageSolver, WBPP) et N.I.N.A. : focale {f} mm ; pixel effectif {p} um '
+                              '(binning {b} compris) ; echelle mesuree {e} arcsec/px',
+                        'en': 'For PixInsight (ImageSolver, WBPP) and N.I.N.A.: focal length {f} mm; effective pixel {p} um '
+                              '(binning {b} included); measured scale {e} arcsec/px'},
+    'lot_astrometrie_binning': {'fr': "Si le logiciel affiche {e2} arcsec/px (le double), il a applique le binning deux fois : "
+                                      "saisir le pixel non binne {pnb} um avec le binning {b}, ou le pixel effectif avec le "
+                                      "binning 1.",
+                                'en': 'If the program shows {e2} arcsec/px (twice as much), it applied the binning twice: enter '
+                                      'the unbinned pixel {pnb} um with binning {b}, or the effective pixel with binning 1.'},
+    'lot_astrometrie_wbpp': {'fr': "WBPP resout le master avec les metadonnees de l'image si elles survivent a l'integration, "
+                                   "sinon avec les valeurs de son panneau Astrometric solution, qui restent celles du dernier "
+                                   "instrument : y saisir la focale et le pixel ci-dessus (un fichier de reglages WBPP par "
+                                   "instrument evite de les ressaisir).",
+                             'en': 'WBPP solves the master with the image metadata if they survive integration, otherwise with '
+                                   'the values of its Astrometric solution panel, which stay those of the last instrument: '
+                                   'enter the focal length and pixel above there (one WBPP settings file per instrument avoids '
+                                   'typing them again).'},
     'lot_angle': {'fr': 'Angle de position moyen (axe Y, E depuis N) : {a} deg ; echelle : {e} arcsec/px',
                   'en': 'Mean position angle (Y axis, E of N): {a} deg; scale: {e} arcsec/px'},
     'lot_solutions': {'fr': 'Solutions astrometriques : {v}', 'en': 'Astrometric solutions: {v}'},
