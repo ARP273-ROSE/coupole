@@ -13,14 +13,14 @@ import time
 
 from PyQt6.QtCore import QEvent, Qt, QTimer
 from PyQt6.QtGui import QKeySequence, QShortcut
-from PyQt6.QtWidgets import (QDialog, QFileDialog, QFormLayout, QFrame, QGridLayout, QGroupBox, QHBoxLayout, QLabel,
+from PyQt6.QtWidgets import (QDialog, QFormLayout, QFrame, QGridLayout, QGroupBox, QHBoxLayout, QLabel,
                              QMessageBox, QPlainTextEdit, QProgressBar, QSplitter, QTabWidget, QVBoxLayout, QWidget)
 
 from ...core import config, i18n
 from ...core.i18n import tr
 from ...gui.adaptatif import Flux, coupable
 from ...gui.dialogues import DialogueASTAP, ouvrir_fichier
-from ...gui import memoire, pastilles
+from ...gui import fichiers, memoire, pastilles
 from ...gui.modele import (DelegueProgression, ModeleParesseux, ModeleTableau, Progression, lignes_choisies,
                            vue_tableau)
 from ...gui.outils import (FileEvenements, Tache, aide, bouton, case, champ, decimal, enregistrer_arret, est_detruit,
@@ -31,6 +31,31 @@ from .possession import Possession
 
 def _taille(o: float) -> str:
     return tr('taille_go', v='%.2f' % (o / 1e9)) if o >= 1e8 else tr('taille_mo', v='%.1f' % (o / 1e6))
+
+
+def _entier(n) -> str:
+    """7 989 (espace fine insécable, français) ou 7,989 (anglais)."""
+    t = '{:,}'.format(int(n))
+    return t.replace(',', '\u202f') if i18n.langue() == 'fr' else t
+
+
+# état agrégé d'un objet → pastille (mêmes dessins et couleurs que la légende des images)
+PASTILLE_ETAT = {'complet': 'ok', 'partiel': 'partiel', 'absente': 'absente', 'echec': 'echec'}
+
+
+class ProgressionEtat(Progression):
+    """Colonne « possédé » de la liste des objets : « n / total » et mini-barre, triée d'abord par état
+    (échec, rien, partiel, complet) puis par fraction possédée."""
+
+    __slots__ = ('etat',)
+    RANGS = {'echec': 0, 'absente': 1, 'partiel': 2, 'complet': 3}
+
+    def __init__(self, n: int, total: int, etat: str = 'absente'):
+        super().__init__(n, total)
+        self.etat = etat
+
+    def cle(self):
+        return (self.RANGS.get(self.etat, 1), self.fraction, self.total)
 
 
 from .gui_sans_qt import duree_lisible  # noqa: E402
@@ -144,7 +169,7 @@ class Panneau(QWidget):
         memoire.case(self.f_anom_nouv, k + 'anomalies_nouvelles')
         memoire.liste(self.ciel_cat, k + 'ciel_type')
         memoire.separateur(self.sp_catalogue, k + 'separateur')
-        memoire.entete(self.v_obj, k + 'colonnes_objets')
+        memoire.entete(self.v_obj, k + 'colonnes_objets', version=2)
         memoire.entete(self.v_img, k + 'colonnes_images')
         memoire.entete(self.v_lots, k + 'colonnes_lots')
         memoire.entete(self.v_anom, k + 'colonnes_anomalies')
@@ -156,6 +181,8 @@ class Panneau(QWidget):
         self._genre_attendu = e.lire(k + 'genre_anomalie', None, str) or None
         objets = e.lire(k + 'objets', None, list)
         self._objets_attendus = [o for o in objets if isinstance(o, str)][:200] if objets else None
+        # premier lancement (rien de gardé) : le premier objet est choisi, la liste des images n'est pas vide
+        self._premier_objet_par_defaut = objets is None
         m.suivre(k + 'nuit', lambda: self._nuit_attendue or self.f_nuit.currentData() or '', self.f_nuit,
                  self.f_nuit.currentIndexChanged)
         m.suivre(k + 'filtre', lambda: self._filtre_attendu or self.f_filtre.currentData() or '', self.f_filtre,
@@ -168,11 +195,21 @@ class Panneau(QWidget):
 
     def _restaurer_selection(self):
         """Objets choisis à la dernière fermeture : sélectionnés une fois, au premier remplissage du catalogue."""
-        voulus = self._objets_attendus
-        if not voulus or not self.m_obj.donnees:
-            return
-        self._objets_attendus = None
         from PyQt6.QtCore import QItemSelection, QItemSelectionModel
+        voulus = self._objets_attendus
+        if not self.m_obj.donnees:
+            return
+        if not voulus:
+            if getattr(self, '_premier_objet_par_defaut', False):
+                self._premier_objet_par_defaut = False
+                idx = self.p_obj.index(0, 0)
+                if idx.isValid() and not self.v_obj.selectionModel().hasSelection():
+                    self.v_obj.selectionModel().select(idx, QItemSelectionModel.SelectionFlag.ClearAndSelect |
+                                                       QItemSelectionModel.SelectionFlag.Rows)
+                    self.v_obj.setCurrentIndex(idx)
+            return
+        self._premier_objet_par_defaut = False
+        self._objets_attendus = None
         voulus = set(voulus)
         sel = QItemSelection()
         premier = None
@@ -331,7 +368,14 @@ class Panneau(QWidget):
                                     tr('ohp_col_possede'), tr('ohp_col_volume'), tr('ohp_col_nuits'),
                                     tr('ohp_col_telescopes'), tr('ohp_col_filtres'), tr('ohp_col_etat')])
         self.COL_POSSEDE = 4
+        self.COL_OBJET = 1
         self.v_obj, self.p_obj = vue_tableau(self.m_obj, 'ohp_table_objets_aide', filtrable=True)
+        # « possédé » juste après « objet » (0.1.8) : visible sans défiler ; l'ordre logique ne change pas, si bien
+        # que largeurs et tri gardés restent valables (memoire.entete migre un ordre d'origine jamais modifié)
+        h_obj = self.v_obj.horizontalHeader()
+        h_obj.moveSection(h_obj.visualIndex(self.COL_POSSEDE), h_obj.visualIndex(self.COL_OBJET) + 1)
+        h_obj.sectionMoved.connect(lambda *_: self._appliquer_possession_objets())
+        self.v_obj.message_vide = self._message_objets_vide
         self.v_obj.setItemDelegateForColumn(self.COL_POSSEDE, DelegueProgression(self.v_obj, lambda: pastilles.couleur_statut('ok')))
         self.v_obj.horizontalHeader().setToolTip(tr('ohp_legende_aide'))
         # sélection à la souris (glisser, Maj+clic) : une rafale de signaux → un seul remplissage, 40 ms après
@@ -361,16 +405,20 @@ class Panneau(QWidget):
                                      self._ligne_image, self._style_image, self._bulle_image, self._cle_image)
         self.v_img, self.p_img = vue_tableau(self.m_img, 'ohp_table_images_aide')
         self.v_img.horizontalHeader().setToolTip(tr('ohp_legende_aide'))
+        self.v_img.message_vide = self._message_images_vide
+        self._raison_vide_images = 'choisir'
         vd.addWidget(self.v_img)
-        self.l_legende = QLabel()                 # légende compacte des pastilles (FR/EN, couleurs du thème)
-        self.l_legende.setWordWrap(True)
-        aide(self.l_legende, 'ohp_legende_aide')
-        self._maj_legende()
-        vd.addWidget(self.l_legende)
         sp.addWidget(droite)
         sp.setSizes([560, 620])
         self.sp_catalogue = sp
         v.addWidget(sp, 1)
+        # légende compacte des pastilles (FR/EN, couleurs du thème), sous les DEUX tableaux : elle vaut pour les
+        # images (à droite) comme pour les objets (à gauche)
+        self.l_legende = QLabel()
+        self.l_legende.setWordWrap(True)
+        aide(self.l_legende, 'ohp_legende_aide')
+        self._maj_legende()
+        v.addWidget(self.l_legende)
         self.l_estimation = QLabel(tr('ohp_aucune_selection'))
         self.l_estimation.setWordWrap(True)
         v.addWidget(self.l_estimation)
@@ -507,13 +555,14 @@ class Panneau(QWidget):
         self.preparer_objets(inv)                    # déjà fait en fond (sans effet), sauf inventaire passé à la main
         r = inv._resume_memo
         self._comptes = None
-        texte = tr('ohp_inventaire_resume', n=len(inv.images), objets=len(inv.objets()), doublons=r['doublons'],
-                   taille=_taille(r['octets']), nuits=r['nuits'], date=m.get('date', '?')[:16],
-                   source=m.get('source', '?')).replace('\n', ' — ')
+        texte = tr('ohp_inventaire_resume', n=_entier(len(inv.images)), objets=_entier(len(inv.objets())),
+                   doublons=_entier(r['doublons']), taille=_taille(r['octets']), nuits=_entier(r['nuits']),
+                   date=m.get('date', '?')[:16], source=m.get('source', '?')).replace('\n', ' — ')
         if n and not n.get('premiere') and (n.get('images') or n.get('noms')):
             texte += ' — ' + tr('ohp_nouveautes', images=len(n['images']), noms=len(n['noms']),
                                 depuis=n.get('depuis') or '?').rstrip(' :')
-        self.l_inventaire.setText(texte)
+        self._texte_inventaire = texte
+        self._maj_resume()
         self._remplir_objets()
         if pre:                                      # préchargé en fond : une étape par tour de boucle
             self._plus_tard(self._remplir_anomalies)
@@ -546,6 +595,14 @@ class Panneau(QWidget):
         self.m_obj.remplir(lignes, donnees, bulles)
         self._appliquer_possession_objets()
         memoire.ajuster_colonnes(self.v_obj)
+        if not self.v_obj.property(memoire.PROPRIETE_LARGEURS):
+            # largeurs automatiques : type et nom bornés, pour que « possédé » reste visible sans défiler (0.1.8) ;
+            # le texte coupé reste lisible dans l'info-bulle de la ligne
+            fm = self.v_obj.fontMetrics()
+            for col, modele in ((0, 'Nébuleuses planétaires'), (self.COL_OBJET, 'M' * 13)):
+                borne = fm.horizontalAdvance(modele) + 34
+                if self.v_obj.columnWidth(col) > borne:
+                    self.v_obj.setColumnWidth(col, borne)
         self._filtrer_objets()
         self._restaurer_selection()
 
@@ -557,13 +614,14 @@ class Panneau(QWidget):
     def _charger_possession(self):
         """Relit l'état de la destination hors du fil graphique, puis rafraîchit pastilles, comptes et lots."""
         dest = self._dest_courante()
+        images = self.inv.images if self.inv else []
         if not dest:
+            self._possession_prete((Possession.vide(), [], Possession.vide().compte_objets(images), images))
             return
         pre = self._prendre('possession')
         if pre is not None:
             self._possession_prete(pre)
             return
-        images = self.inv.images if self.inv else []
 
         def lire(d=dest, imgs=images):
             poss, infos = Possession.lire_avec_infos(d)
@@ -573,6 +631,18 @@ class Panneau(QWidget):
         self._t_poss.start()
 
     def _possession_prete(self, resultat):
+        poss = resultat[0]
+        if poss.dest and poss.dest != self._dest_courante():
+            return                                   # destination changée entre-temps : une relecture est en route
+        precedente = getattr(self, '_dest_possession', None)
+        self._dest_possession = poss.dest
+        if precedente is not None and precedente != poss.dest and poss.dest:
+            # dossier de sortie changé (Préférences, onglet Traitement) : on le dit dans la barre d'état
+            n = sum(1 for s_ in poss.statuts.values() if s_ in ('ok', 'doublon'))
+            self.message_possession = tr('ohp_possession_recalculee', n=_entier(n), dest=poss.dest)
+            fen = self.window()
+            if hasattr(fen, 'statusBar'):
+                fen.statusBar().showMessage(self.message_possession, 10000)
         self.possession, self._infos_ok = resultat[:2]
         self._pre_possession = self.possession       # lots préchargés valables pour cette possession seulement
         if len(resultat) > 3 and self.inv is not None and resultat[3] is self.inv.images:
@@ -581,6 +651,7 @@ class Panneau(QWidget):
             self._comptes = None
         self._appliquer_possession_objets()
         self._filtrer_objets()
+        self._maj_resume()
         if self.f_manquantes.isChecked():
             self._remplir_images()                   # la liste elle-même dépend de la possession
         else:
@@ -598,26 +669,70 @@ class Panneau(QWidget):
                 self._charger_possession()           # comptes recalculés en fond, appliqués au retour
             return                                   # en attendant : barres à zéro (« 0 / n »)
         lignes, styles = [], []
+        # pastille en tête de ligne : sur la première colonne AFFICHÉE (l'utilisateur a pu réordonner)
+        tete = self.v_obj.horizontalHeader().logicalIndex(0)
+        tete = tete if tete >= 0 else 0
+        communs = {}
         for ligne, o in zip(self.m_obj.lignes, self.m_obj.donnees):
             c = comptes.get(o['objet'], {'possedees': 0, 'doublons': 0, 'echecs': 0, 'absentes': 0, 'total': o['images']})
-            etat = Possession.etat_objet(c)
+            etat = Possession.etat_agrege(c)
             l = list(ligne)
-            l[self.COL_POSSEDE] = Progression(c['possedees'] + c['doublons'], c['total'])
+            l[self.COL_POSSEDE] = ProgressionEtat(c['possedees'] + c['doublons'], c['total'], etat)
             lignes.append(tuple(l))
-            bulle = tr('ohp_bulle_possession_objet', possedees=c['possedees'], doublons=c['doublons'],
-                       echecs=c['echecs'], absentes=c['absentes'], total=c['total'])
-            styles.append({'icones': {self.COL_POSSEDE: pastilles.pastille(etat)} if etat != 'aucun' else {},
-                           'bulles': {self.COL_POSSEDE: bulle}})
+            bulle = self.bulle_etat_objet(c)
+            if etat not in communs:
+                nom = PASTILLE_ETAT[etat]
+                communs[etat] = (pastilles.pastille(nom), pastilles.couleur_statut(nom))
+            icone, couleur = communs[etat]
+            styles.append({'icones': {tete: icone}, 'couleurs': {self.COL_OBJET: couleur},
+                           'bulles': {tete: bulle, self.COL_POSSEDE: bulle}})
         self.m_obj.remplacer_lignes(lignes, styles)
+
+    @staticmethod
+    def bulle_etat_objet(c: dict) -> str:
+        """« 12 possédées / 12 · 0 à télécharger · 0 échec · 3 doublons écartés » (doublons écartés comptés
+        comme possédés : il n'y a plus rien à télécharger pour eux)."""
+        return tr('ohp_bulle_etat_objet', possedees=_entier(c['possedees'] + c['doublons']), total=_entier(c['total']),
+                  absentes=_entier(c['absentes']), echecs=_entier(c['echecs']), doublons=_entier(c['doublons']))
+
+    def _maj_resume(self):
+        """Ligne de résumé : l'inventaire, puis ce que le dossier de sortie possède déjà et ce qui reste."""
+        texte = getattr(self, '_texte_inventaire', None)
+        if texte is None:
+            return
+        comptes = getattr(self, '_comptes', None)
+        if comptes is not None and self._dest_courante():
+            tot = {k: sum(c[k] for c in comptes.values()) for k in ('possedees', 'doublons', 'echecs', 'absentes')}
+            texte += ' — ' + tr('ohp_resume_possession', possedees=_entier(tot['possedees']),
+                                doublons=_entier(tot['doublons']), echecs=_entier(tot['echecs']),
+                                a_telecharger=_entier(tot['absentes'] + tot['echecs']))
+        self.l_inventaire.setText(texte)
+
+    def _message_objets_vide(self) -> str:
+        if not self.inv:
+            return ''
+        if getattr(self, '_tout_possede', False):
+            return tr('ohp_vide_tout_possede', dest=coupable(self._dest_courante()))
+        return tr('ohp_vide_aucun_objet')
+
+    def _message_images_vide(self) -> str:
+        if not self.inv:
+            return ''
+        raison = getattr(self, '_raison_vide_images', 'choisir')
+        if raison == 'tout':
+            return tr('ohp_vide_tout_possede', dest=coupable(self._dest_courante()))
+        return tr('ohp_vide_choisir' if raison == 'choisir' else 'ohp_vide_filtres')
 
     def _maj_legende(self):
         if not hasattr(self, 'l_legende'):
             return
-        c = {k: pastilles.couleur_statut(k).name() for k in ('ok', 'ecarte', 'echec', 'absente')}
+        c = {k: pastilles.couleur_statut(k).name() for k in ('ok', 'ecarte', 'echec', 'absente', 'partiel')}
         self.l_legende.setText(
-            '<span style="color:%s">&#10004;</span> %s &nbsp; <span style="color:%s">&#9679;</span> %s &nbsp; '
+            '<span style="color:%s">&#10004;</span> %s &nbsp; <span style="color:%s">&#9680;</span> %s &nbsp; '
+            '<span style="color:%s">&#9679;</span> %s &nbsp; '
             '<span style="color:%s">&#9650;</span> %s &nbsp; <span style="color:%s">&#8681;</span> %s'
-            % (c['ok'], tr('ohp_statut_possession_ok'), c['ecarte'], tr('ohp_statut_possession_doublon'),
+            % (c['ok'], tr('ohp_statut_possession_ok'), c['partiel'], tr('ohp_statut_possession_partiel'),
+               c['ecarte'], tr('ohp_statut_possession_doublon'),
                c['echec'], tr('ohp_statut_possession_echec'), c['absente'], tr('ohp_statut_possession_absente')))
 
     def _filtrer_objets(self):
@@ -626,16 +741,21 @@ class Panneau(QWidget):
         nouveaux, verifier, manquantes = (self.f_nouveaux.isChecked(), self.f_verifier.isChecked(),
                                           self.f_manquantes.isChecked())
         visibles = set()
+        sans_manquantes = 0                          # objets visibles si « à télécharger seulement » était décoché
         for ligne, o in zip(self.m_obj.lignes, self.m_obj.donnees):
             ok = (not cat or o['cat'] == cat) and (not tel or tel in o['tel']) and \
                  (not nouveaux or o['nouveau']) and (not verifier or o['a_verifier'])
-            if ok and manquantes:
-                prog = ligne[self.COL_POSSEDE]
-                ok = not (isinstance(prog, Progression) and prog.total > 0 and prog.n >= prog.total)
             if ok and q:
                 ok = q in (o.get('_recherche') or o['objet'].lower())
             if ok:
+                sans_manquantes += 1
+            if ok and manquantes:
+                prog = ligne[self.COL_POSSEDE]
+                ok = not (isinstance(prog, Progression) and prog.total > 0 and prog.n >= prog.total)
+            if ok:
                 visibles.add(id(o))
+        # tout est déjà là : la liste vide le dit (au lieu de laisser croire que rien ne marche)
+        self._tout_possede = bool(manquantes and not visibles and sans_manquantes and self.possession.existe)
         # un seul passage du filtre du proxy (et non un setRowHidden par ligne) ; suit les re-tris
         self.p_obj.definir_visibles(None if len(visibles) == len(self.m_obj.donnees) else visibles)
 
@@ -807,6 +927,7 @@ class Panneau(QWidget):
 
     def _remplir_images(self, *_):
         imgs = self._images_filtrees()               # déjà dans l'ordre (date, adresse)
+        self._raison_vide_images = '' if imgs else self._raison_vide()
         vide_avant = self.m_img.rowCount() == 0
         self.m_img.remplir_objets(imgs)              # aucune ligne construite ici : seulement à l'affichage
         if vide_avant or not getattr(self, '_colonnes_images_ajustees', False):
@@ -814,6 +935,20 @@ class Panneau(QWidget):
             self._colonnes_images_ajustees = bool(imgs)
         self.selection = imgs
         self._estimer()
+
+    def _raison_vide(self) -> str:
+        """Pourquoi la liste des images est vide : « choisir » (aucun objet choisi), « tout » (tout est déjà
+        téléchargé), « filtres » (les filtres de la vue écartent tout)."""
+        objs = getattr(self, '_objets', set())
+        if getattr(self, '_tout_possede', False):
+            return 'tout'
+        if not objs:
+            return 'choisir'
+        if self.f_manquantes.isChecked() and self.inv:
+            par_objet = self._index_inventaire()[2]
+            if not self.possession.manquantes(x for o in objs for x in par_objet.get(o, ())):
+                return 'tout'
+        return 'filtres'
 
     def _estimer(self, *_):
         """Volume, place libre (un appel système sur la destination, peut-être un partage réseau) et images
@@ -979,7 +1114,7 @@ class Panneau(QWidget):
         return w
 
     def _parcourir(self):
-        d = QFileDialog.getExistingDirectory(self, tr('reg_dest'), self.dest.text())
+        d = fichiers.choisir_dossier(self, tr('reg_dest'), self.dest.text())
         if d:
             self.dest.setText(d)
             memoire.reglage_differe('dossier_sortie', d)
@@ -1065,7 +1200,7 @@ class Panneau(QWidget):
             return os.path.abspath(os.path.expanduser(actuel))
         propose = actuel or dossier_sortie_propose()
         QMessageBox.information(self, tr('ohp_choisir_dest_titre'), tr('ohp_choisir_dest_texte', dest=propose))
-        d = QFileDialog.getExistingDirectory(self, tr('ohp_choisir_dest_titre'), os.path.dirname(propose) or propose)
+        d = fichiers.choisir_dossier(self, tr('ohp_choisir_dest_titre'), os.path.dirname(propose) or propose)
         if not d:
             return None
         if os.path.basename(d) != 'OHP_DU_ECU' and not os.path.exists(os.path.join(d, '_traitement')):
@@ -1105,8 +1240,8 @@ class Panneau(QWidget):
         """Range des fichiers déjà convertis (ailleurs, ancien rangement) dans l'arborescence des lots."""
         if self.occupe() or not self.inv:
             return
-        src = QFileDialog.getExistingDirectory(self, tr('ohp_reorganiser_titre'),
-                                               memoire.dossier('ohp_reorganiser', self.dest.text()))
+        src = fichiers.choisir_dossier(self, tr('ohp_reorganiser_titre'),
+                                       memoire.dossier('ohp_reorganiser', self.dest.text()))
         if not src:
             return
         memoire.retenir('ohp_reorganiser', src)
@@ -1512,9 +1647,9 @@ class Panneau(QWidget):
 
     def _exporter_anomalies(self):
         from . import anomalies
-        f, _ = QFileDialog.getSaveFileName(self, tr('ohp_anom_csv'),
-                                           os.path.join(memoire.dossier('ohp_anomalies'), 'anomalies.csv'),
-                                           'CSV (*.csv)')
+        f, _ = fichiers.choisir_enregistrement(self, tr('ohp_anom_csv'),
+                                               os.path.join(memoire.dossier('ohp_anomalies'), 'anomalies.csv'),
+                                               'CSV (*.csv)')
         if f:
             memoire.retenir('ohp_anomalies', f, est_fichier=True)
             anomalies.ecrire_csv(f, self._anoms)

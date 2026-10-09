@@ -38,6 +38,9 @@ class Progression:
     def __hash__(self):
         return hash((self.n, self.total))
 
+    def cle(self):
+        return (self.fraction, self.total)
+
 
 class Nombre:
     """Valeur numérique affichée avec un format choisi (« 2.345 ») mais triée par sa valeur (et non comme texte,
@@ -59,7 +62,7 @@ def cle_de_tri(v):
     if v is None:
         return (2, 0.0, '')
     if isinstance(v, Progression):
-        return (0, v.fraction, v.total)
+        return (0,) + tuple(v.cle())
     if isinstance(v, Nombre):
         return (2, 0.0, '') if math.isnan(v.v) else (0, v.v, 0)
     if isinstance(v, (int, float)) and not isinstance(v, bool):
@@ -97,8 +100,8 @@ def permutation_triee(cles: list, decroissant: bool = False) -> list[int]:
 class ModeleTableau(QAbstractTableModel):
     """lignes : liste de tuples de valeurs affichables ; donnees : objet associé à chaque ligne.
 
-    styles (facultatif) : un dict par ligne — ``couleur`` (QColor du texte de toute la ligne), ``icones``
-    ({colonne: QIcon}), ``bulles`` ({colonne: info-bulle propre à la cellule, prioritaire sur celle de la ligne}).
+    styles (facultatif) : un dict par ligne — ``couleur`` (QColor du texte de toute la ligne), ``couleurs``
+    ({colonne: QColor}, prioritaire sur ``couleur``), ``icones`` ({colonne: QIcon}), ``bulles`` ({colonne: info-bulle propre à la cellule, prioritaire sur celle de la ligne}).
 
     Le tri se fait ICI, dans le modèle source (`sort`), par une clé calculée une fois par ligne et le tri de
     Python (C) : 80 000 lignes en quelques dizaines de millisecondes.  Le `Proxy` ne trie plus lui-même (son
@@ -236,8 +239,9 @@ class ModeleTableau(QAbstractTableModel):
         if role == Qt.ItemDataRole.TextAlignmentRole and isinstance(v, (int, float, Nombre)):
             return int(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         if st:
-            if role == Qt.ItemDataRole.ForegroundRole and st.get('couleur') is not None:
-                return st['couleur']
+            if role == Qt.ItemDataRole.ForegroundRole:
+                c = (st.get('couleurs') or {}).get(index.column())
+                return c if c is not None else st.get('couleur')
             if role == Qt.ItemDataRole.DecorationRole:
                 return (st.get('icones') or {}).get(index.column())
         return None
@@ -479,11 +483,41 @@ class EnTete(QHeaderView):
         self.style().drawControl(QStyle.ControlElement.CE_Header, opt, painter, self)
 
 
+class VueTableau(QTableView):
+    """QTableView qui, vide, écrit au centre de sa zone un message d'explication (`message_vide`, une fonction
+    () -> texte, ou None) : dessiné dans la zone d'affichage même, aucun widget superposé."""
+
+    message_vide = None
+
+    def texte_vide(self) -> str:
+        m = self.model()
+        if m is None or m.rowCount() > 0 or self.message_vide is None:
+            return ''
+        try:
+            return self.message_vide() or ''
+        except Exception:
+            return ''
+
+    def paintEvent(self, ev):
+        super().paintEvent(ev)
+        texte = self.texte_vide()
+        if not texte:
+            return
+        p = QPainter(self.viewport())
+        try:
+            from . import theme
+            p.setPen(theme.couleur('texte_doux'))
+            zone = self.viewport().rect().adjusted(24, 16, -24, -16)
+            p.drawText(zone, int(Qt.AlignmentFlag.AlignCenter | Qt.TextFlag.TextWordWrap), texte)
+        finally:
+            p.end()
+
+
 def vue_tableau(modele: ModeleTableau, cle_aide: str, selection_multiple=True,
                 filtrable=False) -> tuple[QTableView, Proxy]:
     proxy = ProxyFiltre() if filtrable else Proxy()
     proxy.setSourceModel(modele)
-    v = QTableView()
+    v = VueTableau()
     entete = EnTete(Qt.Orientation.Horizontal, v)
     entete.setSectionsClickable(True)                          # (réglage par défaut de l'en-tête de QTableView)
     v.setHorizontalHeader(entete)

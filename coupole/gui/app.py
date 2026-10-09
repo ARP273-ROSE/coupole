@@ -29,11 +29,16 @@ def main() -> int:
     rapports.installer_crochets(config.dossier_config() / '_crash_natif.log')
     from PyQt6.QtCore import Qt
     from PyQt6.QtGui import QGuiApplication
-    if QApplication.instance() is None:     # mise à l'échelle fractionnaire exacte (125 %, 150 %…) sans arrondi
+    from . import plateforme
+    if QApplication.instance() is None:
+        # avant QApplication : explorateur du système (portail XDG sous Linux) plutôt que le dialogue de Qt
+        plateforme.preparer(config.reglages()['dialogues_fichiers'])     # mise à l'échelle fractionnaire exacte (125 %, 150 %…) sans arrondi
         QGuiApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
     app = QApplication.instance() or QApplication(sys.argv)
     app.setApplicationName('Coupole')
     app.setOrganizationName('Coupole')
+    from ..core import i18n
+    plateforme.installer_traductions(app, i18n.langue())   # boutons standard, menus des champs, dialogue de repli
     if sys.platform.startswith('linux'):        # relie la fenêtre à coupole.desktop (icône, regroupement du dock)
         app.setDesktopFileName('coupole')
     if sys.platform == 'win32':                 # verrou interrogé par l'installeur (AppMutex)
@@ -64,13 +69,13 @@ def main() -> int:
         from .outils import lancer_fil
         # sondes matérielles (PowerShell sous Windows : plusieurs secondes) et rapport de démarrage : hors du
         # fil graphique, jamais au prix d'un gel au lancement
-        lancer_fil(lambda: (machine.detecter(), rapports.signaler_demarrage()))
+        lancer_fil(lambda: (machine.detecter(), rapports.signaler_demarrage(), maj.reparer_lanceur()))
         rapports.reprendre_file_en_fond()
         from ..core import sources
         sources.rafraichir_en_fond()            # fichier de sources publié : repli silencieux
         if config.reglages()['maj_auto']:
             verifier_maj(f, silencieux=True)
-    from ..core import machine
+    from ..core import machine, maj
     QTimer.singleShot(300, apres_affichage)
     from .outils import arreter_tout
     app.aboutToQuit.connect(lambda: (vigie.arreter(), arreter_tout()))

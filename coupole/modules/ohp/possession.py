@@ -24,9 +24,9 @@ POSSEDES = ('ok', 'doublon')                 # ce qui n'est plus à télécharge
 
 
 def _uri_lecture_seule(chemin: str) -> str:
-    """URI SQLite en lecture seule (chemins avec espaces, accents ou « ? », Windows compris)."""
-    from pathlib import Path
-    return Path(chemin).resolve().as_uri() + '?mode=ro'
+    """URI SQLite en lecture seule (chemins avec espaces, accents ou « ? », UNC et gvfs compris)."""
+    from ...core.chemins import uri_sqlite_lecture_seule
+    return uri_sqlite_lecture_seule(chemin)
 
 
 def _relatif(chemin: str, dest: str) -> str:
@@ -140,6 +140,20 @@ class Possession:
         if traitees >= c['total']:
             return 'complet'
         return 'partiel' if traitees > 0 else 'aucun'
+
+    @staticmethod
+    def etat_agrege(c: dict) -> str:
+        """État d'un objet pour sa pastille dans la liste des objets, aux couleurs de la légende des images :
+        « echec » (au moins une image en échec, à retenter), « complet » (tout possédé, doublons écartés compris),
+        « partiel » (une partie manque), « absente » (rien de téléchargé)."""
+        if not c or c.get('total', 0) <= 0:
+            return 'absente'
+        if c.get('echecs', 0) > 0:
+            return 'echec'
+        traitees = c.get('possedees', 0) + c.get('doublons', 0)
+        if traitees >= c['total']:
+            return 'complet'
+        return 'partiel' if traitees > 0 else 'absente'
 
     # ---------------------------------------------------------------- par lot
     def lots(self, images, infos_ok) -> dict[str, dict]:

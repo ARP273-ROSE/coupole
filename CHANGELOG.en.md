@@ -2,6 +2,53 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.1.8 — 9 October 2026
+
+**The real system file manager, and seeing at a glance what you already own.** Feedback from Manjaro (KDE Plasma,
+standalone package 0.1.7, output folder on a NAS).
+
+- **Native file dialogs on Linux**: the standalone package bundles its own Qt, which cannot load the desktop plugin
+  installed on the system; the « Output folder » dialog fell back to Qt's, in English and without the system places
+  (the NAS mounted in Dolphin could not be reached). At startup, before the application is created and unless the
+  user set something (`QT_QPA_PLATFORMTHEME`), Coupole checks in under a second whether the **XDG portal** is
+  available with a backend able to choose files, and uses it: Dolphin on KDE, Files on GNOME. Otherwise, on a GTK
+  desktop, the GTK dialog; otherwise Qt's dialog, translated, its sidebar listing home folders, `/media`, `/mnt`,
+  `/run/media/$USER`, the shares opened in the file manager (gvfs) and cifs, nfs, sshfs mounts. Real test in a
+  container (Xvfb, session bus, `xdg-desktop-portal`): the dialog opens in `xdg-desktop-portal-kde` on KDE and
+  `xdg-desktop-portal-gtk` on GNOME, attached to Coupole's window. Windows and macOS keep their native dialog
+  (Explorer, Finder): no setting disables it. Every file choice goes through a single module (`gui/fichiers.py`),
+  with the parent window.
+- **Preferences > File dialogs**: *System* (default) or *Qt*, in case the portal is broken on someone's machine;
+  bilingual, with tooltip.
+- **Texts provided by Qt in French** (standard buttons, context menus of fields, fallback dialog): `qtbase_fr`
+  catalogue loaded, reloaded on every language change; the two labels Qt 6 does not translate yet (« Look in »,
+  « Files of type ») are completed by the application. Packages keep the `libqxdgdesktopportal` and `libqgtk3`
+  plugins and the translations: the build fails if they are missing (Linux, macOS, Windows), and the `.deb` is
+  checked in a bare container.
+- **Folder on a NAS**: manuals and screen help explain how to pick a share (Linux: gvfs, kio-fuse, cifs/nfs; macOS:
+  Connect to Server; Windows: network drive or UNC path). UNC paths fixed: the state database was opened through a
+  SQLite URI `file://server/…` that SQLite rejects (non-empty authority); long paths `\\?\UNC\…`; gvfs and
+  kio-fuse mounts recognised as network shares.
+- **What you own, visible in the object list**: a marker at the start of each row in the legend's colours (green
+  check: everything owned, left-out duplicates included; half disc: partly; orange triangle: at least one failure;
+  arrow: nothing), object name in the same colour (contrast ≥ 4.5 in both themes), tooltip « 12 owned / 12 · 0 to
+  download · 0 failed · 3 duplicate(s) left out ». The « owned » column follows the name (instead of being out of view
+  on the right; an order chosen by hand is kept, the original pre-0.1.8 order is migrated) and sorts by state. The
+  legend, with the « partly » state, sits below both lists.
+- **Ownership summary** in the inventory line (for instance « owned: 7,625 (+ 220 duplicates left out), failed: 0, to download:
+  0 »); **empty lists explain themselves** in their centre: « Pick one or more objects… », « Everything is already
+  downloaded in … »; at first start, the first object is selected.
+- **Changing the output folder** re-reads its ownership in the background (a stale result is ignored) and the status
+  bar says so (« Ownership recomputed: N images found in … »).
+- **Linux package launcher**: `Coupole.sh` follows symbolic links (links to links included, without `readlink -f`,
+  missing from macOS before 12.3); a link `~/.local/bin/coupole` failed (« …/.local/bin/python/bin/python3: no such
+  file »). `installer.sh` creates that link itself and reports a `~/.local/bin` missing from the `PATH`; the launcher
+  of an already installed package is repaired by the application at startup (updates only replace `app/`).
+- Tests: `test_dialogues_systeme.py` (+27, 1 of them Windows-only: theme decision per desktop, portal probe, preference, parented native or
+  Qt dialog, Qt translations, package pruning, UNC URI, gvfs path, real UNC on Windows, launcher through a link and a
+  link to a link, launcher repair, installer), `test_catalogue_possession.py` (+16: aggregated states, sorting by
+  state, markers and colours, columns, empty lists, summary, folder change).
+
 ## 0.1.7 — 9 October 2026
 
 **Fix for an intermittent crash** (the application stopped abruptly, about one time in five in the most exposed

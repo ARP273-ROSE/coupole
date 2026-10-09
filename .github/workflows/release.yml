@@ -169,6 +169,11 @@ jobs:
           for module in kit.get('verification_import', []):
               __import__(module)
               print('  import OK :', module)
+          # textes fournis par Qt (boutons standard, dialogue de repli) en francais : traductions gardees
+          from coupole.gui import plateforme
+          if not plateforme.installer_traductions(app, 'fr'):
+              raise SystemExit('Traductions de Qt absentes du paquet')
+          print('  traductions de Qt : OK')
           attendue = '${{ steps.version.outputs.value }}'
           vue = pathlib.Path(r'$PKG/app/' + kit['fichier_version']).read_text(encoding='utf-8').strip()
           if vue != attendue:
@@ -321,6 +326,31 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: python3 build_unix.py --version ${{ steps.version.outputs.value }}
 
+      # 0.1.8 : le lanceur suit les liens symboliques (~/.local/bin/coupole -> Coupole.sh, lien de lien) ;
+      # installer.sh pose lui-meme ~/.local/bin/coupole. Sous macOS, `readlink -f` n'existe pas avant 12.3 :
+      # le lanceur n'en depend pas, ce qu'on verifie ici sur le .app.
+      - name: Essai du lanceur par lien symbolique
+        shell: bash
+        run: |
+          NOM="${{ steps.kit.outputs.nom_fichier }}"
+          LIENS=$(mktemp -d)
+          if [ "${{ matrix.plateforme }}" = macos ]; then
+            CIBLE="$PWD/dist/$NOM.app/Contents/MacOS/$NOM"
+          else
+            CIBLE="$PWD/dist/$NOM/$NOM.sh"
+          fi
+          ln -s "$CIBLE" "$LIENS/lien1"
+          (cd "$LIENS" && ln -s lien1 lien2)
+          "$LIENS/lien2" --version
+          if [ "${{ matrix.plateforme }}" = linux ]; then
+            FAUX_HOME=$(mktemp -d)
+            HOME="$FAUX_HOME" PATH=/usr/bin:/bin sh "dist/$NOM/installer.sh" | tee "$LIENS/sortie.txt"
+            grep -q PATH "$LIENS/sortie.txt"
+            "$FAUX_HOME/.local/bin/coupole" --version
+            rm -rf "$FAUX_HOME"
+          fi
+          rm -rf "$LIENS"
+
       - name: Image disque (macOS)
         if: matrix.plateforme == 'macos'
         run: |
@@ -339,30 +369,9 @@ jobs:
         run: |
           NOM="${{ steps.kit.outputs.nom_fichier }}"
           TECH="${{ steps.kit.outputs.nom_technique }}"
-          # Un script d'installation dans le profil utilisateur : ni sudo, ni
-          # gestionnaire de paquets, comme l'installeur Windows.
-          cat > "dist/$NOM/installer.sh" <<'SH'
-          #!/bin/sh
-          set -e
-          ICI=$(cd "$(dirname "$0")" && pwd)
-          NOM_APP=__NOM__
-          TECH=__TECH__
-          CIBLE="${XDG_DATA_HOME:-$HOME/.local/share}/$TECH"
-          echo "Installation dans $CIBLE"
-          mkdir -p "$CIBLE"
-          # Les donnees de l'utilisateur ne sont jamais ecrasees.
-          rm -rf "$CIBLE/python" "$CIBLE/app"
-          cp -R "$ICI/python" "$ICI/app" "$ICI/$NOM_APP.sh" "$CIBLE/"
-          chmod +x "$CIBLE/$NOM_APP.sh"
-          APPS="${XDG_DATA_HOME:-$HOME/.local/share}/applications"
-          mkdir -p "$APPS"
-          sed -e "s|__ICI__|$CIBLE|" -e "s|__ICONE__|Icon=$CIBLE/app/coupole/ressources/coupole_256.png\n|" \
-              "$ICI/$TECH.desktop" > "$APPS/$TECH.desktop"
-          echo "Termine. Lancez « $NOM_APP » depuis votre menu, ou :"
-          echo "  $CIBLE/$NOM_APP.sh"
-          SH
-          sed -i "s|__NOM__|$NOM|; s|__TECH__|$TECH|" "dist/$NOM/installer.sh"
-          chmod +x "dist/$NOM/installer.sh"
+          # installer.sh (profil utilisateur, ni sudo ni gestionnaire de paquets, lien ~/.local/bin/coupole) est
+          # écrit par build_unix.py ; il doit être là, exécutable
+          test -x "dist/$NOM/installer.sh"
           ARCHIVE="$NOM-${{ steps.version.outputs.value }}-linux-${{ matrix.arch }}.tar.gz"
           rm -f "$ARCHIVE"
           tar -C dist -czf "$ARCHIVE" "$NOM"
@@ -398,6 +407,11 @@ jobs:
             apt-get update -qq
             apt-get install -y -qq --no-install-recommends /src/coupole-linux-'"$ARCH"'.deb >/dev/null
             coupole --version
+            # dialogues natifs (portail XDG, GTK) et textes de Qt en francais : presents dans le paquet
+            Q=$(ls -d /opt/coupole/python/lib/python3*/site-packages/PyQt6/Qt6)
+            test -f "$Q/plugins/platformthemes/libqxdgdesktopportal.so"
+            test -f "$Q/plugins/platformthemes/libqgtk3.so"
+            test -f "$Q/translations/qtbase_fr.qm"
             # HTTPS depuis le Python embarque (mise a jour, SIMBAD) : exige ca-certificates dans Depends ; pas d apostrophe ici (chaine bash entre quotes simples)
             /opt/coupole/python/bin/python3 -c "import urllib.request; urllib.request.urlopen(\"https://api.github.com\", timeout=30); print(\"TLS OK\")"
             LANG=fr_FR.UTF-8 coupole --help | grep -q commandes

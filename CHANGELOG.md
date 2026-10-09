@@ -2,6 +2,54 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.1.8 — 9 octobre 2026
+
+**Le vrai explorateur de fichiers du système, et voir d'un coup d'œil ce qu'on possède déjà.** Retours d'usage sous
+Manjaro (KDE Plasma, paquet autonome 0.1.7, dossier de sortie sur un NAS).
+
+- **Dialogues de fichiers natifs sous Linux** : le paquet autonome embarque son propre Qt, qui ne peut pas charger le
+  greffon du bureau installé sur le système ; le dialogue « Dossier de sortie » retombait sur celui de Qt, en anglais
+  et sans les emplacements du système (le NAS monté dans Dolphin était inatteignable). Au démarrage, avant la
+  création de l'application et si l'utilisateur n'a rien imposé (`QT_QPA_PLATFORMTHEME`), Coupole regarde en moins
+  d'une seconde si le **portail XDG** est disponible avec un moteur qui sait choisir des fichiers, et le prend :
+  Dolphin sous KDE, Fichiers sous GNOME. Sinon, sous un bureau GTK, le dialogue GTK ; sinon le dialogue de Qt,
+  traduit, avec dans sa barre latérale les dossiers personnels, `/media`, `/mnt`, `/run/media/$USER`, les partages
+  ouverts dans le gestionnaire de fichiers (gvfs) et les montages cifs, nfs, sshfs. Essai réel dans un conteneur
+  (Xvfb, bus de session, `xdg-desktop-portal`) : le dialogue s'ouvre dans `xdg-desktop-portal-kde` sous KDE et
+  `xdg-desktop-portal-gtk` sous GNOME, rattaché à la fenêtre de Coupole. Windows et macOS gardent leur dialogue
+  natif (Explorateur, Finder) : aucun réglage ne le désactive. Tous les choix de fichiers passent par un seul
+  module (`gui/fichiers.py`), avec la fenêtre parente.
+- **Préférences > Boîtes de dialogue de fichiers** : *Système* (défaut) ou *Qt*, au cas où le portail serait cassé
+  chez quelqu'un ; bilingue, avec info-bulle.
+- **Textes fournis par Qt en français** (boutons standard, menus contextuels des champs, dialogue de repli) :
+  catalogue `qtbase_fr` chargé, rechargé à chaque changement de langue ; les deux libellés que Qt 6 ne traduit pas
+  encore (« Voir dans », « Fichiers de type ») sont complétés par l'application. Les paquets gardent les greffons
+  `libqxdgdesktopportal`, `libqgtk3` et les traductions : la construction échoue s'ils manquent (Linux, macOS,
+  Windows), et le `.deb` est vérifié dans un conteneur nu.
+- **Dossier sur un NAS** : manuels et aide de l'écran expliquent comment choisir un partage (Linux : gvfs, kio-fuse,
+  cifs/nfs ; macOS : Se connecter au serveur ; Windows : lecteur réseau ou chemin UNC). Chemins UNC corrigés : la
+  base d'état était ouverte par une URI SQLite `file://serveur/…` que SQLite refuse (autorité non vide) ; chemins
+  longs `\\?\UNC\…` ; montages gvfs et kio-fuse reconnus comme partages réseau.
+- **Ce qu'on possède, visible dans la liste des objets** : pastille en tête de ligne aux couleurs de la légende
+  (coche verte : tout possédé, doublons écartés compris ; demi-disque : en partie ; triangle orange : au moins un
+  échec ; flèche : rien), nom de l'objet de la même couleur (contraste ≥ 4,5 dans les deux thèmes), info-bulle
+  « 12 possédées / 12 · 0 à télécharger · 0 échec(s) · 3 doublon(s) écarté(s) ». La colonne « possédé » suit le nom
+  (au lieu d'être hors de vue à droite ; un ordre choisi à la main est gardé, l'ordre d'origine d'avant la 0.1.8 est
+  migré) et trie par état. La légende, avec l'état « en partie », est placée sous les deux listes.
+- **Résumé de la possession** dans la ligne de l'inventaire (par exemple « possédées : 7 625 (+ 220 doublons écartés), échecs :
+  0, à télécharger : 0 ») ; **listes vides qui s'expliquent** en leur centre : « Choisissez un ou plusieurs objets… »,
+  « Tout est déjà téléchargé dans … » ; au premier lancement, le premier objet est choisi.
+- **Changer de dossier de sortie** relit sa possession en fond (un résultat périmé est ignoré) et la barre d'état
+  l'annonce (« Possession recalculée : N images trouvées dans … »).
+- **Lanceur du paquet Linux** : `Coupole.sh` suit les liens symboliques (lien de lien compris, sans `readlink -f`,
+  absent de macOS avant 12.3) ; un lien `~/.local/bin/coupole` échouait (« …/.local/bin/python/bin/python3 : aucun
+  fichier »). `installer.sh` crée lui-même ce lien et signale un `~/.local/bin` absent du `PATH` ; le lanceur d'un
+  paquet déjà installé est réparé par l'application au démarrage (la mise à jour ne remplace que `app/`).
+- Tests : `test_dialogues_systeme.py` (+27 dont 1 propre à Windows : décision du thème selon le bureau, sonde du portail, préférence,
+  dialogue parenté et natif ou Qt, traductions de Qt, élagage des paquets, URI UNC, chemin gvfs, UNC réel sous
+  Windows, lanceur par lien et lien de lien, réparation du lanceur, installeur), `test_catalogue_possession.py`
+  (+16 : états agrégés, tri par état, pastilles et couleurs, colonnes, listes vides, résumé, changement de dossier).
+
 ## 0.1.7 — 9 octobre 2026
 
 **Correction d'un plantage intermittent** (fermeture brutale de l'application, environ une fois sur cinq dans la

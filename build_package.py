@@ -311,6 +311,23 @@ def step_prune():
     log(f'elagage : {freed / 1e6:.0f} Mo retires')
 
 
+# Ce que le Qt du paquet doit garder (0.1.8) : greffon de la plateforme (dialogues natifs de Windows) et
+# traductions de Qt (boutons standard, menus des champs de texte, dialogue de repli en francais).
+QT_ATTENDUS = ('plugins/platforms/qwindows.dll', 'translations/qtbase_fr.qm', 'translations/qt_fr.qm')
+
+
+def controler_qt(pkg=None) -> list:
+    qt = Path(pkg or PKG) / 'python' / 'Lib' / 'site-packages' / 'PyQt6' / 'Qt6'
+    return [rel for rel in QT_ATTENDUS if not (qt / rel).exists()]
+
+
+def step_controler_qt():
+    manque = controler_qt()
+    if manque:
+        raise RuntimeError('Qt incomplet dans le paquet : ' + ', '.join(manque))
+    log('Qt : greffon Windows et traductions presents')
+
+
 def step_launcher():
     """Lanceur sans console, plus un lanceur de diagnostic qui la montre."""
     pyw = PKG / 'python' / 'pythonw.exe'
@@ -382,6 +399,7 @@ def main():
         ('Application', step_app),
         ('Binaires', (lambda: log('ignore')) if args.skip_binaires else step_binaires),
         ('Elagage', (lambda: log('ignore')) if args.no_prune else step_prune),
+        ('Controle de Qt', step_controler_qt),
         ('Lanceurs', step_launcher),
         ('Pre-compilation', step_precompile),
     ]

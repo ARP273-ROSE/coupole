@@ -6,12 +6,12 @@ import os
 import threading
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import (QFileDialog, QHBoxLayout, QLabel, QMessageBox, QPlainTextEdit, QProgressBar, QSplitter,
+from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QMessageBox, QPlainTextEdit, QProgressBar, QSplitter,
                              QVBoxLayout, QWidget)
 
 from ...core import config
 from ...core.i18n import langue, tr
-from ...gui import memoire
+from ...gui import fichiers, memoire
 from ...gui.adaptatif import Flux, coupable, texte_reel
 from ...gui.modele import ModeleTableau, Nombre, vue_tableau
 from ...gui.outils import FileEvenements, aide, bouton, case, nombre
@@ -90,7 +90,7 @@ class Panneau(QWidget):
                                             str(config.dossier_sortie_defaut() / 'OHP_DU_ECU')))
 
     def choisir(self):
-        d = QFileDialog.getExistingDirectory(self, tr('qual_choisir'), texte_reel(self.l_dossier.text()))
+        d = fichiers.choisir_dossier(self, tr('qual_choisir'), texte_reel(self.l_dossier.text()))
         if d:
             self.l_dossier.setText(coupable(d))
             self._dossier_choisi = True

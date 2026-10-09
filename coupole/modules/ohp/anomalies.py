@@ -73,9 +73,9 @@ def depuis_traitement(chemin_etat) -> list[dict]:
     if not os.path.exists(chemin_etat):
         return []
     import sqlite3
-    from pathlib import Path
+    from ...core.chemins import uri_sqlite_lecture_seule
     try:                                       # lecture seule (ne gêne pas un traitement qui écrit) ; jamais d'exception
-        db = sqlite3.connect(Path(chemin_etat).resolve().as_uri() + '?mode=ro', uri=True, timeout=5)
+        db = sqlite3.connect(uri_sqlite_lecture_seule(chemin_etat), uri=True, timeout=5)
         try:
             rows = db.execute("SELECT url, info FROM images WHERE statut='doublon'").fetchall()
         finally:

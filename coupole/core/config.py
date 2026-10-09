@@ -76,6 +76,7 @@ DEFAUTS = {
     'langue_noms': 'auto',             # langue des noms de dossiers et d'objets
     'maj_auto': True,
     'apparence': 'sombre',             # thème de Coupole (sombre par défaut, ou clair), indépendant de celui du système
+    'dialogues_fichiers': 'systeme',   # systeme : explorateur du système (portail XDG sous Linux) ; qt : dialogue de Qt
     'services_en_ligne': True,         # fiches SIMBAD / JPL et redshift par nom (une requête par objet, cache)
     'ohp_verifier_nouveautes': True,   # Banque OHP : comparer l'inventaire TAP à la copie locale au démarrage
     'ohp_nouveautes_heures': 24,       # au plus une vérification par ce nombre d'heures
