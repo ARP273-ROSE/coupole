@@ -72,6 +72,7 @@ def _xdg(tmp_path, service=True, moteur='org.freedesktop.impl.portal.FileChooser
             'DISPLAY': ':0'}
 
 
+@pytest.mark.skipif(os.name == 'nt', reason='portail XDG : Linux (et Unix)')
 def test_sonde_du_portail(tmp_path):
     """Service activable + moteur qui choisit des fichiers → portail ; sans bus de session ou sans moteur
     FileChooser → non. Rapide (aucune attente) même quand le bus ne répond pas."""
@@ -279,6 +280,7 @@ def _base_etat(dest):
     db.close()
 
 
+@pytest.mark.skipif(os.name == 'nt', reason='« : » interdit dans un nom de dossier Windows ; gvfs : Linux')
 def test_dossier_au_nom_de_partage_gvfs(tmp_path):
     """Un chemin gvfs (« : », « , », « = ») : possession lue, place libre, inscriptible, affichage coupable."""
     from coupole.core.machine import disque_libre_go

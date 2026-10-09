@@ -44,7 +44,7 @@ standalone package 0.1.7, output folder on a NAS).
   missing from macOS before 12.3); a link `~/.local/bin/coupole` failed (« …/.local/bin/python/bin/python3: no such
   file »). `installer.sh` creates that link itself and reports a `~/.local/bin` missing from the `PATH`; the launcher
   of an already installed package is repaired by the application at startup (updates only replace `app/`).
-- Tests: `test_dialogues_systeme.py` (+27, 1 of them Windows-only: theme decision per desktop, portal probe, preference, parented native or
+- Tests: `test_dialogues_systeme.py` (+27, some Linux- or Windows-only: theme decision per desktop, portal probe, preference, parented native or
   Qt dialog, Qt translations, package pruning, UNC URI, gvfs path, real UNC on Windows, launcher through a link and a
   link to a link, launcher repair, installer), `test_catalogue_possession.py` (+16: aggregated states, sorting by
   state, markers and colours, columns, empty lists, summary, folder change).
