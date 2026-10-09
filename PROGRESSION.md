@@ -409,5 +409,6 @@ Le plantage « isolé » de la 0.1.6 n'était pas isolé : **reproduit 8 fois**,
   **python:3.10-slim 10/10** ; ordre aléatoire 3.12 : 6/6 (graines notées dans `out_v1`/`out`), plus 12 passages
   aléatoires sans plantage avant les deux corrections de tests ; série la plus exposée (celle à 20 % de plantages)
   **45/45** ; `test_adaptatif` + `test_reglages_conserves` + `test_gui_robustesse` + `test_echelle` +
-  `test_fil_graphique` à `QT_SCALE_FACTOR=1.5` et `2` : 57 réussis, code 0 (3.12 et 3.10).
+  `test_fil_graphique` à `QT_SCALE_FACTOR=1.5` et `2` : 57 réussis, code 0 (3.12 et 3.10). CI `tests.yml` du
+  commit `95145bd` : **6/6** (Linux, Windows, macOS × 3.10, 3.12).
 - **Aucun tag posé** (publication v0.1.6 en cours, non touchée).
