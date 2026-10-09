@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import math
 
-from PyQt6.QtCore import QLocale, Qt
+from PyQt6.QtCore import QEvent, QLocale, Qt
 from PyQt6.QtGui import QPainter
 from PyQt6.QtWidgets import (QDoubleSpinBox, QFileDialog, QGroupBox, QHBoxLayout, QLabel, QMessageBox, QScrollArea,
                              QSlider, QSplitter, QStyle, QStyleOptionSlider, QVBoxLayout, QWidget)
@@ -203,18 +203,33 @@ class Panneau(QWidget):
         if self._premier_affichage:
             self._premier_affichage = False
             self.calculer()
+        # Quand le panneau est plus haut que la zone défilante, agrandir la fenêtre ne le redimensionne pas (il
+        # garde sa hauteur de consigne) : on écoute donc la zone visible elle-même, pour que les courbes suivent.
+        zone = self._zone_defilante()
+        if zone is not None and getattr(self, '_viewport_surveille', None) is not zone.viewport():
+            self._viewport_surveille = zone.viewport()
+            zone.viewport().installEventFilter(self)
         self._disposer()
 
     def resizeEvent(self, ev):
         super().resizeEvent(ev)
         self._disposer()
 
-    def _hauteur_visible(self) -> int:
-        """Hauteur de la zone défilante qui contient le panneau (ou du panneau lui-même)."""
+    def eventFilter(self, obj, ev):
+        if ev.type() == QEvent.Type.Resize and obj is getattr(self, '_viewport_surveille', None):
+            self._disposer()
+        return super().eventFilter(obj, ev)
+
+    def _zone_defilante(self):
         w = self.parentWidget()
         while w is not None and not isinstance(w, QScrollArea):
             w = w.parentWidget()
-        return w.viewport().height() if w is not None else self.height()
+        return w
+
+    def _hauteur_visible(self) -> int:
+        """Hauteur de la zone défilante qui contient le panneau (ou du panneau lui-même)."""
+        zone = self._zone_defilante()
+        return zone.viewport().height() if zone is not None else self.height()
 
     def _disposer(self):
         """Tableau et courbes côte à côte sur un grand écran, l'un sous l'autre sinon : le tableau garde toutes
