@@ -100,3 +100,87 @@ def test_chemins_coupables_et_reversibles():
     for s in ('C:\\Users\\x\\OHP_DU_ECU', '/home/x/OHP_DU_ECU', 'http://tap-ufe.obspm.fr/tap', 'sans separateur'):
         assert texte_reel(coupable(s)) == s
     assert '\u200b' in coupable('/a/b')
+
+
+def _pages_affichees(app_qt, f):
+    """Chaque module, puis chaque onglet de chaque QTabWidget du module : (nom, panneau) après affichage."""
+    from PyQt6.QtWidgets import QTabWidget
+    for i in range(f.barre.count()):
+        f.barre.setCurrentRow(i)
+        _attendre(app_qt, 0.15)
+        p = f.panneaux[i]
+        onglets = [t for t in p.findChildren(QTabWidget) if t.isVisibleTo(p)]
+        if not onglets:
+            yield '%d' % i, p
+        for t in onglets:
+            for k in range(t.count()):
+                t.setCurrentIndex(k)
+                _attendre(app_qt, 0.1)
+                yield '%d/%s' % (i, t.tabText(k)), p
+
+
+@pytest.mark.parametrize('largeur', [1366, 2000])
+def test_entetes_de_tableaux_jamais_tronques(app_qt, fenetre_adaptative, largeur):
+    """Retour de Kevin (Qualité, 0.1.8) : « étoiles mesurées » affiché « toiles mesurée ».  Chaque section visible
+    de chaque tableau visible est au moins aussi large que son titre (police de l'en-tête, échelle comprise :
+    lancé aussi à QT_SCALE_FACTOR = 1,5 et 2), et le titre entier est en info-bulle."""
+    from PyQt6.QtCore import Qt
+    from PyQt6.QtWidgets import QTableView
+    f = fenetre_adaptative
+    f.resize(largeur, 900)
+    _attendre(app_qt)
+    vus, fautes = 0, []
+    for nom, p in _pages_affichees(app_qt, f):
+        for v in p.findChildren(QTableView):
+            h = v.horizontalHeader()
+            if not v.isVisibleTo(p) or v.model() is None or h.isHidden():
+                continue
+            fm = h.fontMetrics()
+            for c in range(h.count()):
+                if h.isSectionHidden(c):
+                    continue
+                texte = str(v.model().headerData(c, Qt.Orientation.Horizontal) or '')
+                if not texte:
+                    continue
+                vus += 1
+                besoin = fm.horizontalAdvance(texte)
+                if h.sectionSize(c) < besoin:
+                    fautes.append((nom, texte, h.sectionSize(c), besoin))
+                assert v.model().headerData(c, Qt.Orientation.Horizontal, Qt.ItemDataRole.ToolTipRole) == texte
+    assert vus > 20 and not fautes, fautes
+
+
+def test_entete_garde_la_largeur_du_titre(app_qt):
+    """Une largeur mémorisée trop petite, ou un glissement de la séparation, ne tronque pas le titre."""
+    from coupole.gui.modele import ModeleTableau, vue_tableau
+    m = ModeleTableau(['fichier', 'étoiles mesurées', 'FWHM (px)'])
+    v, _ = vue_tableau(m, 'qual_table_aide')
+    v.resize(800, 300)
+    v.show()
+    _attendre(app_qt, 0.1)
+    h = v.horizontalHeader()
+    besoin = h.fontMetrics().horizontalAdvance('étoiles mesurées')
+    assert h.sectionSize(1) >= besoin
+    v.setColumnWidth(1, 20)
+    assert h.sectionSize(1) >= besoin
+    v.close()
+
+
+def test_conteneurs_sans_info_bulle_sur_leurs_enfants(app_qt, fenetre_adaptative):
+    """Retour de Kevin : l'info-bulle des onglets de la Banque OHP restait affichée par-dessus le groupe
+    « Solution astrométrique ».  Un QTabWidget, une zone défilante ou un groupe n'a pas d'info-bulle propre (elle
+    s'afficherait au survol de n'importe lequel de ses enfants) : l'aide des onglets est sur chaque onglet."""
+    from PyQt6.QtWidgets import QGroupBox, QScrollArea, QStackedWidget, QTabWidget
+    f = fenetre_adaptative
+    fautes = []
+    for p in f.panneaux:
+        for typ in (QTabWidget, QScrollArea, QGroupBox, QStackedWidget):
+            for w in p.findChildren(typ):
+                if w.toolTip():
+                    fautes.append((type(w).__name__, w.toolTip()[:60]))
+                if isinstance(w, QScrollArea) and w.viewport().toolTip():
+                    fautes.append(('viewport', w.viewport().toolTip()[:60]))
+    for t in (t for p in f.panneaux for t in p.findChildren(QTabWidget)):
+        if t.count() > 1:
+            assert all(t.tabToolTip(k) for k in range(t.count())), [t.tabText(k) for k in range(t.count())]
+    assert not fautes, fautes

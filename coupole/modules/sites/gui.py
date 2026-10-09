@@ -34,6 +34,8 @@ class Panneau(QWidget):
         sp = QSplitter(Qt.Orientation.Vertical)
         self.table = aide(QTableWidget(0, len(COLS)), 'sit_table_aide')
         self.table.setHorizontalHeaderLabels([tr('sit_col_' + c) for c in COLS])
+        from ...gui.modele import equiper_entete
+        equiper_entete(self.table)
         self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.table.itemSelectionChanged.connect(self._choisi)

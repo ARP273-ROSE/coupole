@@ -78,11 +78,14 @@ class DialogueReglages(QDialog):
         self.setWindowTitle(tr('reg_titre'))
         r = config.reglages()
         racine = QVBoxLayout(self)
-        self.onglets = aide(QTabWidget(), 'reg_onglets_aide')
+        self.onglets = QTabWidget()                 # aide sur la barre d'onglets, pas sur tout le contenu
+        aide(self.onglets.tabBar(), 'reg_onglets_aide')
         racine.addWidget(self.onglets)
         general = QWidget()
         self.onglets.addTab(adaptatif.defilable(general), tr('reg_onglet_general'))
         self.onglets.addTab(adaptatif.defilable(self._onglet_sources()), tr('reg_onglet_sources'))
+        for k in range(self.onglets.count()):
+            self.onglets.setTabToolTip(k, tr('reg_onglets_aide'))
         f = QFormLayout(general)
         self.langue = liste('reg_langue_aide', [(tr('reg_langue_auto'), 'auto'), ('Français', 'fr'), ('English', 'en')])
         self.langue.setCurrentIndex(max(0, self.langue.findData(r['langue'])))

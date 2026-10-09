@@ -119,7 +119,7 @@ def test_annulation_immediate_puis_reprise(dossier, tmp_path):
         assert len((racine / d / 'T120' / 'R' / 'QUALITE.csv').read_text(encoding='utf-8-sig').splitlines()) == 51
 
 
-def test_echantillon_par_lot(dossier, tmp_path):
+def test_echantillon_par_lot(dossier, tmp_path, monkeypatch):
     import shutil
     racine = tmp_path / 'ech'
     shutil.copytree(dossier / 'Objet_3', racine / 'C')
@@ -133,13 +133,30 @@ def test_echantillon_par_lot(dossier, tmp_path):
         assert len(lignes) == 6
         noms = [l.split(';')[0] for l in lignes[1:]]
         assert noms[0] == '20250716-000000_img.xisf' and noms[-1] == '20250716-%06d_img.xisf' % ((PAR_LOT - 1) * 30)
-    # planifier / estimer_duree : ce qui reste et la durée annoncée
-    p = moteur.planifier(racine, None)
-    assert p['total_dossier'] == 100 and p['retenus'] == 100 and p['deja'] == 10 and p['a_mesurer'] == 90
-    p['chemin'] = str(racine)
-    est = moteur.estimer_duree(p, processus=2, n_essai=3)
-    assert est['essais'] == 3 and est['par_image_s'] > 0 and est['duree_s'] >= 0
-    assert moteur.planifier(racine, None)['deja'] == 13          # les essais sont allés au cache
+    # mode « demander » (seuil abaissé à 50 : 100 images = gros dossier) : l'échantillon (déjà en cache) d'abord,
+    # 3 images chronométrées, question avec la durée, puis la réponse
+    monkeypatch.setattr(moteur, 'SEUIL_GROS_DOSSIER', 50)
+    questions = []
+
+    def repondre(choix):
+        def r(ev):
+            if ev['type'] == 'question':
+                questions.append(ev)
+                m.decider(choix)
+        return r
+    m = moteur.Mesureur(racine, plan(), None, rapporter=repondre('echantillon'), demander=True, ecrire_rapports=False)
+    b = m.lancer()
+    q = questions[-1]
+    assert q['total_dossier'] == 100 and q['lots'] == 2 and q['deja'] == 10 and q['a_mesurer'] == 87
+    assert q['par_image_s'] > 0 and q['duree_s'] > 0 and q['n'] == moteur.ECHANTILLON_DEFAUT
+    assert b['n'] == 13 and b['mesurees'] == 3 and b['echantillon'] == moteur.ECHANTILLON_DEFAUT and not b['annule']
+    m = moteur.Mesureur(racine, plan(), None, rapporter=repondre('tout'), demander=True, ecrire_rapports=False)
+    b = m.lancer()
+    assert len(questions) == 2 and questions[-1]['a_mesurer'] == 84
+    assert b['n'] == 100 and b['mesurees'] == 87 and b['deja'] == 13
+    # tout est en cache : plus de question, tout est rendu
+    m = moteur.Mesureur(racine, plan(), None, rapporter=repondre('tout'), demander=True, ecrire_rapports=False)
+    assert m.lancer()['deja'] == 100 and len(questions) == 2
 
 
 def test_image_illisible_n_arrete_pas(tmp_path):

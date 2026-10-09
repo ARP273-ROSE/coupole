@@ -754,7 +754,7 @@ def petit_dossier(tmp_path):
     return tmp_path
 
 
-def test_qualite_plan_repris_sans_relire_le_disque(petit_dossier, monkeypatch):
+def test_qualite_csv_groupe_et_cache_en_une_requete(petit_dossier, monkeypatch):
     from coupole.modules.qualite import mesures as M, moteur, rapport
     if not M.disponible():
         pytest.skip('sep absent')
@@ -770,17 +770,12 @@ def test_qualite_plan_repris_sans_relire_le_disque(petit_dossier, monkeypatch):
     for d, _ in ecritures:
         par_lot[d] = par_lot.get(d, 0) + 1
     assert len(par_lot) == 3 and max(par_lot.values()) <= 4, par_lot
-    # relance avec le plan du dialogue : ni stat, ni requête par image
-    p = moteur.planifier(petit_dossier, None)
-    assert p['deja'] == 36 and p['a_mesurer'] == 0 and len(p['connus']) == 36
-    stats = []
-    monkeypatch.setattr(moteur, '_empreinte', lambda f: stats.append(f) or (0, 0.0))
+    # relance : tout vient du cache, lu en une requête (aucune lecture du cache par image)
     monkeypatch.setattr(moteur.CacheMesures, 'lire', lambda *a: pytest.fail('lecture du cache par image'))
-    b = moteur.Mesureur(petit_dossier, plan, None, plan_dossier=p, ecrire_rapports=False).lancer()
-    assert b['deja'] == 36 and b['mesurees'] == 0 and stats == []
-    # autre échantillon : seulement re-sélectionné, rien n'est relu
-    b = moteur.Mesureur(petit_dossier, plan, 2, plan_dossier=p, ecrire_rapports=False).lancer()
-    assert b['n'] == 6 and stats == []
+    b = moteur.Mesureur(petit_dossier, plan, None, ecrire_rapports=False).lancer()
+    assert b['deja'] == 36 and b['mesurees'] == 0
+    b = moteur.Mesureur(petit_dossier, plan, 2, ecrire_rapports=False).lancer()
+    assert b['n'] == 6 and b['deja'] == 6
 
 
 def test_cache_qualite_validations_groupees(tmp_path):
