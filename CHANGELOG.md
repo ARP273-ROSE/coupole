@@ -2,6 +2,11 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.1.3 — 9 octobre 2026
+
+- Construction : le run de release v0.1.2 a échoué sur une apostrophe glissée dans un commentaire de l'essai du `.deb`
+  (`release.yml`) ; aucun changement de l'application. Les actifs de la 0.1.3 sont ceux attendus pour la 0.1.2.
+
 ## 0.1.2 — 9 octobre 2026
 
 - **Paquet `.deb` : dépendance `ca-certificates` ajoutée.** L'interpréteur embarqué (OpenSSL statique) lit les autorités de
