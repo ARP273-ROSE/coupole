@@ -1,5 +1,6 @@
 """Ligne de commande : tout est faisable sans interface, dans les deux langues."""
 import json
+import re
 
 import pytest
 
@@ -120,16 +121,42 @@ def test_astap_cli_prefere_a_l_executable_graphique(tmp_path, monkeypatch):
 @pytest.mark.skipif(not __import__('os').environ.get('COUPOLE_TEST_LIENS'),
                     reason='essai réseau : COUPOLE_TEST_LIENS=1 (lancé par la CI, étape « Liens du guide ASTAP »)')
 def test_liens_astap_repondent():
-    """Chaque adresse du guide, pour chaque système et architecture : HEAD (redirections suivies) → 200."""
+    """Chaque adresse du guide, pour chaque système et architecture : HEAD (redirections suivies) → 200.  SourceForge
+    refuse parfois les machines de l'intégration continue (403 anti-robots) : le fichier est alors cherché dans le
+    flux RSS officiel de son dossier (présent = lien valable ; un fichier retiré, comme le D80 en zip, n'y est pas)."""
+    import urllib.parse
     import urllib.request
     from coupole.core import astap
+    ua = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0'}
+    rss = {}
+
+    def dans_rss(u):
+        m = re.match(r'https://sourceforge\.net/projects/([^/]+)/files/(.+)/download$', u)
+        if not m:
+            return False
+        projet, chemin = m.group(1), urllib.parse.unquote(m.group(2))
+        dossier = chemin.rsplit('/', 1)[0]
+        if dossier not in rss:
+            q = 'https://sourceforge.net/projects/%s/rss?path=/%s' % (projet, urllib.parse.quote(dossier))
+            with urllib.request.urlopen(urllib.request.Request(q, headers=ua), timeout=60) as r:
+                rss[dossier] = urllib.parse.unquote(r.read().decode('utf-8', 'replace'))
+        return '/%s/download' % chemin in rss[dossier] or '/%s</' % chemin in rss[dossier] or chemin + ']' in rss[dossier]
     fautes = []
     for u in sorted({u for *_x, u in astap.urls_conseillees()}):
         try:
-            req = urllib.request.Request(u, method='HEAD', headers={'User-Agent': 'Mozilla/5.0 (Coupole tests)'})
+            req = urllib.request.Request(u, method='HEAD', headers=ua)
             with urllib.request.urlopen(req, timeout=60) as r:
                 if r.status != 200:
                     fautes.append((u, r.status))
-        except Exception as e:                       # 404, 403… : en faute
+        except urllib.error.HTTPError as e:
+            if e.code in (403, 429) and 'sourceforge.net' in u:
+                try:
+                    if dans_rss(u):
+                        continue
+                except Exception as e2:
+                    fautes.append((u, 'RSS: %s' % str(e2)[:60]))
+                    continue
+            fautes.append((u, 'HTTP %s' % e.code))
+        except Exception as e:
             fautes.append((u, str(e)[:80]))
     assert not fautes, fautes

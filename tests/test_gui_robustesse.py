@@ -168,8 +168,11 @@ def test_cosmologie_sans_defilement_horizontal_a_1400(app_qt):
     v = p.v_res
     visibles = [c for c in range(p.m_res.columnCount()) if not v.isColumnHidden(c)]
     assert 3 in visibles                                            # colonne SH0ES affichée
-    assert sum(v.columnWidth(c) for c in visibles) <= v.viewport().width() + 2
-    assert v.horizontalScrollBar().maximum() == 0
+    # 0.1.9 : jamais de valeur tronquée ; si la police du système est large (Windows), défilement horizontal plutôt
+    # que des valeurs coupées
+    assert not _cellules_elidees(p), _cellules_elidees(p)[:3]
+    if sum(v.columnWidth(c) for c in visibles) <= v.viewport().width() + 2:
+        assert v.horizontalScrollBar().maximum() == 0
     f.resize(1920, 1080)
     _tourner(app_qt, 0.3)
     assert p.splitter.orientation() == Qt.Orientation.Horizontal
