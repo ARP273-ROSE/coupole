@@ -2,14 +2,14 @@
 from __future__ import annotations
 
 from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtGui import QAction, QIcon, QKeySequence
+from PyQt6.QtGui import QAction, QActionGroup, QIcon, QKeySequence
 from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QMainWindow, QMessageBox,
                              QStackedWidget, QWidget)
 
 from .. import __version__
 from ..core import config, i18n, modules
 from ..core.i18n import tr
-from . import adaptatif, dialogues
+from . import adaptatif, dialogues, theme
 from .outils import action, aide
 from .ressources import icone_application
 
@@ -111,6 +111,22 @@ class FenetrePrincipale(QMainWindow):
                        QKeySequence('Ctrl+%d' % (i + 1)), cle_aide='act_module_aide')
             a.setText(mod.nom_local())
             m.addAction(a)
+        m.addSeparator()
+        # Apparence : le thème sombre (défaut) ou clair, propre à Coupole ; même réglage que les Préférences.
+        sm = self.menu_apparence = m.addMenu(tr('menu_apparence'))
+        aide(sm.menuAction(), 'menu_apparence_aide')
+        groupe = QActionGroup(self)
+        groupe.setExclusive(True)
+        self.act_apparence = {}
+        for nom, cle in (('clair', 'act_apparence_clair'), ('sombre', 'act_apparence_sombre')):
+            a = action(self, cle, lambda _=False, n=nom: self.changer_apparence(n), cle_aide='act_apparence_aide')
+            a.setCheckable(True)
+            groupe.addAction(a)
+            sm.addAction(a)
+            self.act_apparence[nom] = a
+        sm.addSeparator()
+        sm.addAction(action(self, 'act_apparence_basculer', self.basculer_apparence, QKeySequence('Ctrl+Shift+D')))
+        self.synchroniser_apparence()
         m = mb.addMenu(tr('menu_langue'))
         for code, nom in (('auto', tr('reg_langue_auto')), ('fr', 'Français'), ('en', 'English')):
             a = action(self, 'act_langue', lambda _=False, c=code: self.changer_langue(c), cle_aide='act_langue_aide')
@@ -178,9 +194,33 @@ class FenetrePrincipale(QMainWindow):
         if d.exec() and getattr(d, 'langue_changee', False):
             self.changer_langue(config.reglages()['langue'])
         else:
+            self.synchroniser_apparence()          # le dialogue a pu changer le thème : le menu suit
             for p in self.panneaux:
                 if hasattr(p, 'reglages_changes'):
                     p.reglages_changes()
+
+    # ---------------------------------------------------------------- apparence (menu Affichage, Préférences)
+    def changer_apparence(self, nom: str):
+        """Applique le thème `nom` tout de suite, l'enregistre, et met le menu d'accord."""
+        if nom not in theme.THEMES:
+            return
+        if config.reglages()['apparence'] != nom:
+            config.reglages()['apparence'] = nom      # enregistré : le réglage prime sur le défaut au prochain lancement
+        theme.appliquer(nom=nom)
+        self.synchroniser_apparence()
+        for p in self.panneaux:                      # courbes et carte dessinées avec les couleurs du thème
+            if hasattr(p, 'reglages_changes'):
+                p.reglages_changes()
+        self.statusBar().showMessage(tr('apparence_appliquee', nom=tr('reg_apparence_' + nom)), 4000)
+
+    def basculer_apparence(self):
+        self.changer_apparence('clair' if config.reglages()['apparence'] == 'sombre' else 'sombre')
+
+    def synchroniser_apparence(self):
+        """Coche l'entrée du thème en vigueur (après les Préférences, un raccourci, ou à la construction)."""
+        courant = config.reglages()['apparence']
+        for nom, a in getattr(self, 'act_apparence', {}).items():
+            a.setChecked(nom == courant)
 
     def astap(self):
         dialogues.DialogueASTAP(self).exec()

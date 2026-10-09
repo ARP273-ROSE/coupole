@@ -176,6 +176,8 @@ class CarteCiel(QWidget):
 
 # ======================================================================== monde
 TAILLE_TUILE = 256
+ZOOM_MAX = 19                 # dernier niveau servi par les tuiles OSM standard
+DPR_TUILES_FINES = 1.5        # à partir de ce facteur d'échelle d'écran, on dessine les tuiles du niveau z + 1
 
 
 def lonlat_vers_monde(lon, lat, z):
@@ -304,20 +306,42 @@ class CarteMonde(QWidget):
         cx, cy = lonlat_vers_monde(self.centre[0], self.centre[1], self.z)
         return cx - self.width() / 2, cy - self.height() / 2
 
+    def _zoom_tuiles(self) -> tuple[int, int]:
+        """(niveau de zoom des tuiles dessinées, nombre de tuiles par côté d'une tuile logique).
+
+        Sur un écran dense (facteur d'échelle ≥ 1,5 : Windows à 150 %, Mac Retina), une tuile de 256 px dessinée
+        en 256 pixels logiques est agrandie par le système et devient floue.  On prend alors les tuiles du niveau
+        z + 1 — quatre par tuile logique, chacune dessinée à demi-taille (l'équivalent « @2x ») : à 2× le rendu
+        est exactement à un pixel physique par pixel de tuile.  Le cache ne change pas (ce sont des tuiles
+        ordinaires d'un autre niveau)."""
+        try:
+            dpr = float(self.devicePixelRatioF())
+        except Exception:
+            dpr = 1.0
+        if dpr >= DPR_TUILES_FINES and self.z + 1 <= ZOOM_MAX:
+            return self.z + 1, 2
+        return self.z, 1
+
     def paintEvent(self, ev):
         p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)   # tuiles redimensionnées sans crénelage
         p.fillRect(self.rect(), QColor('#DDE6EE'))
         ox, oy = self._origine()
         n = 2 ** self.z
         manque = 0
         if self.en_ligne:
+            zt, k = self._zoom_tuiles()
+            cote = TAILLE_TUILE / k                 # taille logique d'une tuile du niveau dessiné
             for tx in range(int(ox // TAILLE_TUILE), int((ox + self.width()) // TAILLE_TUILE) + 1):
                 for ty in range(max(0, int(oy // TAILLE_TUILE)), min(n, int((oy + self.height()) // TAILLE_TUILE) + 1)):
-                    im = self.cache.tuile(self.z, tx % n, ty)
-                    if im is not None:
-                        p.drawImage(QPointF(tx * TAILLE_TUILE - ox, ty * TAILLE_TUILE - oy), im)
-                    else:
-                        manque += 1
+                    for i in range(k):
+                        for j in range(k):
+                            im = self.cache.tuile(zt, (tx * k + i) % (n * k), ty * k + j)
+                            if im is not None:
+                                p.drawImage(QRectF(tx * TAILLE_TUILE - ox + i * cote, ty * TAILLE_TUILE - oy + j * cote,
+                                                   cote, cote), im)
+                            else:
+                                manque += 1
         if not self.en_ligne or manque:
             p.setPen(QPen(QColor(100, 120, 140, 90), 1))
             for lon in range(-180, 181, 30):

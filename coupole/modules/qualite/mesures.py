@@ -88,21 +88,73 @@ def moments_adaptatifs(cut, x0, y0, s0=2.0, iterations=40):
     return x, y, mxx, myy, mxy
 
 
+LOG_ALPHA_MIN, LOG_ALPHA_MAX = math.log(0.2), math.log(400.0)      # α en pixels : de 0,2 à 400
+LOG_BETA_MIN, LOG_BETA_MAX = -8.0, math.log(199.0)                    # β de 1,0003 à 200 (gaussienne)
 _SOUS = (np.arange(3) + 0.5) / 3 - 0.5        # intégration du modèle sur le pixel (3 × 3 points)
 
 
-def _moffat(p, xx, yy):
-    """Moffat elliptique intégré sur les pixels.  p = (fond, amplitude, x0, y0, ln αa, ln αb, θ, ln(β−1))."""
+_SOUS_X = np.repeat(_SOUS, 3)                 # les 9 décalages (3 × 3) à plat : une seule passe numpy par évaluation
+_SOUS_Y = np.tile(_SOUS, 3)
+
+
+def _grille9(xx, yy):
+    """Coordonnées des 9 sous-points de chaque pixel, en une fois : (9, n) — calculées une fois par étoile."""
+    return xx[None, :] + _SOUS_X[:, None], yy[None, :] + _SOUS_Y[:, None]
+
+
+def _moffat9(p, xx9, yy9):
+    """Moffat elliptique intégré sur les pixels, sur la grille (9, n) de `_grille9` ; vectorisé : une évaluation
+    coûte quelques opérations numpy au lieu de 9 × 8 (c'était 80 % du temps de mesure d'une image).
+    p = (fond, amplitude, x0, y0, ln αa, ln αb, θ, ln(β−1))."""
     fond, amp, x0, y0, la, lb, th, lbeta = p
-    aa, ab, beta = math.exp(la), math.exp(lb), 1.0 + math.exp(lbeta)
+    # bornes : un pas de Levenberg-Marquardt aberrant (étoile réelle mal isolée, pixel chaud) faisait déborder exp()
+    aa, ab = math.exp(min(max(la, LOG_ALPHA_MIN), LOG_ALPHA_MAX)), math.exp(min(max(lb, LOG_ALPHA_MIN), LOG_ALPHA_MAX))
+    beta = 1.0 + math.exp(min(max(lbeta, LOG_BETA_MIN), LOG_BETA_MAX))
     c, s = math.cos(th), math.sin(th)
-    tot = 0.0
-    for ox in _SOUS:
-        for oy in _SOUS:
-            dx, dy = xx + ox - x0, yy + oy - y0
-            u, v = c * dx + s * dy, -s * dx + c * dy
-            tot = tot + (1.0 + (u / aa) ** 2 + (v / ab) ** 2) ** (-beta)
-    return fond + amp * tot / 9.0
+    dx, dy = xx9 - x0, yy9 - y0
+    u = (c * dx + s * dy) * (1.0 / aa)
+    v = (c * dy - s * dx) * (1.0 / ab)
+    u *= u
+    v *= v
+    u += v
+    u += 1.0
+    np.power(u, -beta, out=u)
+    return fond + amp * u.mean(axis=0)
+
+
+def _moffat9_jacobien(p, xx9, yy9):
+    """Modèle ET dérivées partielles analytiques par rapport aux 8 paramètres, en une passe : (mod (n,), J (n, 8)).
+
+    Remplace 8 évaluations par différences finies à chaque itération (vérifié contre elles dans les tests)."""
+    fond, amp, x0, y0, la, lb, th, lbeta = p
+    aa, ab = math.exp(min(max(la, LOG_ALPHA_MIN), LOG_ALPHA_MAX)), math.exp(min(max(lb, LOG_ALPHA_MIN), LOG_ALPHA_MAX))
+    e_beta = math.exp(min(max(lbeta, LOG_BETA_MIN), LOG_BETA_MAX))
+    beta = 1.0 + e_beta
+    c, s = math.cos(th), math.sin(th)
+    dx, dy = xx9 - x0, yy9 - y0
+    u = (c * dx + s * dy) * (1.0 / aa)
+    v = (c * dy - s * dx) * (1.0 / ab)
+    q1 = u * u + v * v + 1.0                                   # 1 + q
+    w = np.power(q1, -beta)
+    dw_dq = -beta * w / q1                                     # dw/dq
+    du_dth = v * (ab / aa)
+    dv_dth = -u * (aa / ab)
+    n = xx9.shape[1]
+    J = np.empty((n, 8))
+    J[:, 0] = 1.0
+    J[:, 1] = w.mean(axis=0)
+    J[:, 2] = amp * (dw_dq * (2 * u * (-c / aa) + 2 * v * (s / ab))).mean(axis=0)        # x0
+    J[:, 3] = amp * (dw_dq * (2 * u * (-s / aa) + 2 * v * (-c / ab))).mean(axis=0)       # y0
+    J[:, 4] = amp * (dw_dq * (-2 * u * u)).mean(axis=0)                                   # ln αa
+    J[:, 5] = amp * (dw_dq * (-2 * v * v)).mean(axis=0)                                   # ln αb
+    J[:, 6] = amp * (dw_dq * (2 * u * du_dth + 2 * v * dv_dth)).mean(axis=0)              # θ
+    J[:, 7] = amp * (-e_beta * w * np.log(q1)).mean(axis=0)                               # ln(β − 1)
+    return fond + amp * J[:, 1], J
+
+
+def _moffat(p, xx, yy):
+    """Même modèle sur des coordonnées de pixels (n,) : forme de référence, gardée pour les tests."""
+    return _moffat9(p, *_grille9(np.asarray(xx, dtype=float).ravel(), np.asarray(yy, dtype=float).ravel()))
 
 
 def ajuster_moffat(cut, x0, y0, moments, iterations=60):
@@ -113,8 +165,8 @@ def ajuster_moffat(cut, x0, y0, moments, iterations=60):
     """
     ny, nx = cut.shape
     yy, xx = np.mgrid[0:ny, 0:nx].astype(float)
-    z = cut.ravel()
-    xx, yy = xx.ravel(), yy.ravel()
+    z = np.asarray(cut, dtype=float).ravel()
+    xx, yy = _grille9(xx.ravel(), yy.ravel())
     beta0 = 3.0
     # départ : axes et orientation des moments adaptatifs (sinon θ n'a aucun gradient à αa = αb)
     _, fa0, fb0, _, ang0 = forme(*moments)
@@ -122,15 +174,10 @@ def ajuster_moffat(cut, x0, y0, moments, iterations=60):
     p = np.array([float(np.median(cut[[0, -1], :])), float(cut.max()), x0, y0, math.log(max(0.4, fa0 / k0)),
                   math.log(max(0.4, fb0 / k0)), math.radians(ang0), math.log(beta0 - 1)])
     lam = 1e-3
-    mod = _moffat(p, xx, yy)
+    mod = _moffat9(p, xx, yy)
     chi2 = float(((z - mod) ** 2).sum())
     for _ in range(iterations):
-        J = np.empty((z.size, p.size))
-        for k in range(p.size):
-            h = 1e-4 * max(1.0, abs(p[k])) if k != 1 else 1e-4 * max(1.0, abs(p[1]))
-            q = p.copy()
-            q[k] += h
-            J[:, k] = (_moffat(q, xx, yy) - mod) / h
+        mod, J = _moffat9_jacobien(p, xx, yy)
         g = J.T @ (z - mod)
         H = J.T @ J
         amelioree = False
@@ -140,8 +187,12 @@ def ajuster_moffat(cut, x0, y0, moments, iterations=60):
             except np.linalg.LinAlgError:
                 return None
             q = p + pas
-            q[7] = min(q[7], math.log(199.0))           # β ≤ 200 : au-delà, profil gaussien à mieux que 0,1 %
-            m2 = _moffat(q, xx, yy)
+            if not np.all(np.isfinite(q)):
+                return None
+            q[4] = min(max(q[4], LOG_ALPHA_MIN), LOG_ALPHA_MAX)
+            q[5] = min(max(q[5], LOG_ALPHA_MIN), LOG_ALPHA_MAX)
+            q[7] = min(max(q[7], LOG_BETA_MIN), LOG_BETA_MAX)     # β ≤ 200 : au-delà, profil gaussien à mieux que 0,1 %
+            m2 = _moffat9(q, xx, yy)
             c2 = float(((z - m2) ** 2).sum())
             if c2 < chi2:
                 rel = (chi2 - c2) / max(chi2, 1e-30)
@@ -217,7 +268,7 @@ def echelle(ent):
     return abs(c1) * 3600 if c1 else None
 
 
-def analyser(data, ent=None, max_etoiles=400):
+def analyser(data, ent=None, max_etoiles=120):
     """Mesure une image ; renvoie un dictionnaire (valeurs None quand la mesure n'est pas possible)."""
     import sep
     ent = ent or {}
@@ -270,10 +321,13 @@ def analyser(data, ent=None, max_etoiles=400):
                 continue
             xi, yi = int(round(x)), int(round(y))
             cut = sub[yi - demi:yi + demi + 1, xi - demi:xi + demi + 1]
-            m = moments_adaptatifs(cut, x - xi + demi, y - yi + demi, s0=max(1.0, float(o['a'])))
-            if m is None:
-                continue
-            fit = ajuster_moffat(cut, m[0], m[1], m[2:])
+            try:
+                m = moments_adaptatifs(cut, x - xi + demi, y - yi + demi, s0=max(1.0, float(o['a'])))
+                if m is None:
+                    continue
+                fit = ajuster_moffat(cut, m[0], m[1], m[2:])
+            except (OverflowError, ValueError, FloatingPointError, ZeroDivisionError):
+                continue                                    # une étoile inajustable n'arrête pas l'image
             if fit is None:
                 continue
             fw, fa, fb, e, ang, beta = fit

@@ -68,7 +68,8 @@ install. They update themselves. ASTAP stays optional and is not included.
 Windows 10/11 64-bit & Coupole-Setup-x.y.z.exe & Double-click. SmartScreen warning at first launch (unsigned installer): « More info », « Run anyway ». Installed in the user profile, no administrator rights.\\
 macOS Apple Silicon & Coupole-x.y.z-macos-arm64.dmg & Drag Coupole into Applications. First launch: right click, « Open ».\\
 macOS Intel & Coupole-x.y.z-macos-x86\_64.dmg & Same.\\
-Linux x86\_64 / ARM64 & Coupole-x.y.z-linux-*.tar.gz & Unpack, run \texttt{installer.sh} (copied into \texttt{\textasciitilde/.local/share/coupole}, menu entry).\\
+Ubuntu / Debian x86\_64, ARM64 & coupole\_x.y.z\_amd64.deb & \texttt{sudo apt install ./coupole\_x.y.z\_amd64.deb} (\texttt{\_arm64.deb} on ARM): apt installs the Qt system libraries; \texttt{coupole} command, menu entry. Ubuntu 22.04 or newer, Debian 12 or newer. Uninstall: \texttt{sudo apt remove coupole}.\\
+Other Linux x86\_64 / ARM64 & Coupole-x.y.z-linux-*.tar.gz & Unpack, run \texttt{installer.sh} (copied into \texttt{\textasciitilde/.local/share/coupole}, menu entry).\\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -98,8 +99,11 @@ Extras: \texttt{qualite} (SEP), \texttt{validation} (lxml, xisf: XSD validation 
 \subsection{Updates, uninstallation, data}
 At startup (can be disabled) the packages check the latest release on GitHub and offer to install it: only the
 code archive (\texttt{coupole-app-x.y.z.zip}, about 1 MB) is downloaded and unpacked by the application, the
-previous version being restored on failure. A pip/pipx installation shows the command to run. Settings, cache and
-reports live outside the installation folder and survive updates:
+previous version being restored on failure. A pip/pipx installation shows the command to run. The \texttt{.deb}
+package does not update through the archive: its files (\texttt{/opt/coupole}) belong to dpkg; Coupole announces the
+new version, gives the address of the new \texttt{.deb} and the \texttt{apt} command to run (\emph{Download the
+package} button). Settings, cache and reports live outside the installation folder and survive updates as well as
+removal:
 
 \begin{center}\small
 \begin{tabular}{@{}ll@{}}
@@ -122,16 +126,25 @@ report a problem, incident reports, check for updates, About (version, licence, 
 \begin{tabular}{@{}ll@{}}
 \toprule
 F1 & help on the screen\\ Shift+F1 & PDF manual\\ Ctrl+1 … Ctrl+9 & module 1 to 9\\ Ctrl+, & Preferences\\
-Ctrl+Shift+A & ASTAP assistant\\ Ctrl+R & OHP bank: refresh the inventory\\ Ctrl+Q & quit\\
+Ctrl+Shift+A & ASTAP assistant\\ Ctrl+Shift+D & dark / light theme\\ Ctrl+R & OHP bank: refresh the inventory\\ Ctrl+Q & quit\\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \capture{img/reglages_en.png}{0.62}
 Preferences (Ctrl+,): interface language; language of folder names, object names and FITS comments;
-appearance (light or dark theme, Coupole's own and independent of the system theme: fixed style, colours and font size, WCAG contrast $\geq$ 4.5); output folder; format; parallelism; maximum rate; economy mode; update check; check of the bank for new images at startup and its maximum frequency (section~\ref{sec:nouveautes}). The \emph{Sources} tab lists the service
+appearance (section~\ref{sec:apparence}); output folder; format; parallelism; maximum rate; economy mode; update check; check of the bank for new images at startup and its maximum frequency (section~\ref{sec:nouveautes}). The \emph{Sources} tab lists the service
 addresses (chapter~\ref{chap:evolutif}). An unreadable settings file is set aside (suffix \texttt{.corrompu-…}) and
 the defaults take over: the application always starts.
+
+\subsection{Appearance}\label{sec:apparence}
+Coupole has its own theme, independent of the computer's (a system in dark mode no longer mixes its colours with the
+application's: Fusion style, complete palette, fixed font size, WCAG contrast $\geq$ 4.5 for text, fields, buttons,
+tooltips and selection). The \textbf{dark} theme is the default; the light theme remains available. It is changed
+through the \emph{View} > \emph{Appearance} menu (checkable \emph{Light} / \emph{Dark} entries, Ctrl+Shift+D to
+toggle) or in the Preferences: the same setting, applied at once and saved; both stay in sync. A user who had chosen
+the light theme keeps it: the saved setting takes precedence over the default. The screenshots of this manual are
+taken in the default theme.
 
 % =====================================================================
 \section{OHP image bank module}
@@ -151,6 +164,19 @@ Database names are grouped into canonical objects; selecting one or several obje
 right, filtered by night, filter and doubtful dates; this list is the selection to process. The estimate gives the
 volume to download, the expected output volume and the free space. Times are shown in UTC and in site time (hover:
 also the user's time).
+
+\paragraph{What you already own.} According to the output folder (\texttt{\_traitement/etat.sqlite}, read again in
+the background when opening, after each run and whenever the folder changes, never blocking), the image list tells
+apart with a marker and a soft text colour (readable in both themes, contrast $\geq 4.5$): \textbf{owned} (converted
+and sorted, green check), \textbf{duplicate left out} (same pixels as an image already converted, grey dot),
+\textbf{failed} (to retry, orange triangle) and \textbf{to download} (normal text, arrow); the marker's tooltip gives
+the status, the date and the local path of the file. In the object table, the \emph{owned} column (« 120 / 300 »,
+mini progress bar, sortable) and its marker (full disc: everything owned; half disc: partly; empty circle: nothing)
+sum up each object. The \emph{To download only} box hides fully owned objects and, in the list, the images already
+processed; the estimate then counts only what is missing (« 180 missing images out of 300: 1.5 GB »). A compact
+legend under the list explains the markers. Command line: \cmd{coupole ohp inventory --missing [--dest FOLDER]
+[--json]}, and \texttt{possedee}, \texttt{statut\_local}, \texttt{fichier\_local} columns in the CSV of \cmd{coupole
+ohp list}.
 
 \subsection{Processing}
 \capture{img/traitement_en.png}{1.0}
@@ -266,7 +292,9 @@ IRIS-4096), same filter, and same field for a fixed object (all nights) or same 
 \texttt{LOT.txt} (French then English) gives object, database names, instrument, filter, exposures and total
 exposure, nights, mean centre, angle, solution status, doubtful dates and stacking advice (StarAlignment or
 CometAlignment, rejection suited to the number of exposures). File names: UTC date and time of the exposure start,
-object, filter, exposure; sorting by name = sorting in time. Names are safe under Windows.
+object, filter, exposure; sorting by name = sorting in time. Names are safe under Windows. The \emph{Stacks} tab adds a \emph{complete} column: converted exposures against the
+bank's exposures for the same key (object, instrument, filter, and night for a moving object); a fixed object split
+into several fields counts its stacks together.
 
 \subsection{Anomalies}
 \capture{img/anomalies_en.png}{1.0}
@@ -388,6 +416,17 @@ The module needs the SEP library (Source Extractor in Python, LGPL, about 1 MB);
 (\emph{Measure} button, \emph{Check image quality} box of the processing, or \cmd{coupole qualite FOLDER --write}).
 Report per stack: \texttt{QUALITE.csv} and \texttt{QUALITE.txt}.
 
+\paragraph{Speed, resume, sample.} Measurements run in separate processes (count given by the machine plan: cores,
+memory, economy mode and the Preferences limit; at most 3 when the folder is on a network share, detected and
+announced, since reading then limits the speed), one image being read while the others are computed; the interface
+stays free, \emph{Stop} is immediate. Each measured image is written at once to its stack's \texttt{QUALITE.csv}
+(atomic write) and shown; measurements are cached in \texttt{\_traitement/qualite.sqlite} by (path, size, date):
+starting again redoes nothing, closing then reopening resumes. Above 200 images, Coupole offers a \textbf{sample} of
+5 images per stack (spread in time: first, last, middle…, adjustable in the tab and with \cmd{--sample N}), enough to
+judge a stack, or \emph{Measure everything} with the duration estimated from the first 3 images; progress shows the
+time left and the rate (images/min). On the author's NAS (Ryzen 5 8500G): 1.21 → 0.33~s per T120 image (vectorised
+Moffat model, analytic derivatives, 120 stars per image), i.e. the whole bank in about ten minutes on 5 processes.
+
 \begin{center}\small
 \begin{tabularx}{\linewidth}{@{}lXl@{}}
 \toprule
@@ -428,7 +467,9 @@ date » of a night is the site's local date at the previous noon; daylight is co
 site (astropy, no IERS download). Shipped sites: OHP (MPC 511), Meudon (005), Paris (007), geodetic coordinates
 computed from the Minor Planet Center parallax constants. Partner sites are added (IANA time zone, MPC code if any)
 once their coordinates are known from a reliable source. Map: OpenStreetMap tiles cached on disk, at most two
-downloads at a time, User-Agent naming the application, attribution shown; offline, plain background and points.
+downloads at a time, User-Agent naming the application, attribution shown; offline, plain background and points. On
+a dense screen (scaling $\geq 150$~\%, Mac Retina) the map draws the tiles of the next zoom level at half size (four
+per logical tile, the « @2x » equivalent): it stays sharp instead of being upscaled by the system.
 
 % =====================================================================
 \section{Cosmology}\label{sec:cosmo}
@@ -468,6 +509,14 @@ GN-z11, reionisation, CMB), or an object name: its redshift is requested from SI
 « ngc4486 »; several candidates: you choose). $z \le 0$ (approaching object, like M\,31) gives no distance; below
 $z = 0.03$ the object's peculiar velocity dominates (warning); beyond $z \approx 1090$ the universe is opaque. Table
 and curves export to CSV (« ; », UTF-8; raw values in Mpc, Gyr, Gpc$^3$).
+
+\paragraph{Slider.} Under the $z$ field, a slider spans the whole range on a logarithmic scale (0.001 to 1100,
+marks at 0.01 / 0.1 / 1 / 10 / 100 / 1000). While dragging, the vertical marker of the curves and the table of values
+follow live: values are then \emph{interpolated} on the curve grid (300 logarithmic points, typical deviation
+$< 0.5$~\%, $\sigma$ and SH0ES columns suspended) and the status line says so; on release the exact computation
+resumes. Arrows: fine step (1~\% of a decade); Page up/down: one decade. The $z$ field and the slider stay in sync
+both ways. The curves follow the window when it is resized, including when they sit under the table (window
+narrower than 1500 px): half of the visible height goes to them.
 
 \paragraph{Origin and checks.} The computation core is taken from the same author's « cosmologie-redshift »
 calculator (public repository \url{https://github.com/ARP273-ROSE/cosmologie-redshift}), with astropy.cosmology.

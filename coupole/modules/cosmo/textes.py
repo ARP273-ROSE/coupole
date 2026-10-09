@@ -50,6 +50,16 @@ TEXTES = {
                            'calculer.',
                      'en': 'Redshift, from 0 (excluded) to 1500. Comma or point accepted. Enter: compute.'},
     'cosmo_z_indice': {'fr': 'ex. 0,158', 'en': 'e.g. 0.158'},
+    'cosmo_curseur_aide': {'fr': 'Curseur de redshift, de 0,001 à 1100 (échelle logarithmique : repères 0,01, 0,1, 1, 10, 100, '
+                                 '1000). En glissant, le tableau et le marqueur des courbes suivent (valeurs lues sur la grille '
+                                 'des courbes) ; au relâchement, le calcul exact reprend. Flèches : pas fin ; Page haut/bas : '
+                                 'une décade. Le champ z et le curseur restent synchronisés.',
+                           'en': 'Redshift slider, from 0.001 to 1100 (logarithmic scale: marks at 0.01, 0.1, 1, 10, 100, '
+                                 '1000). While dragging, the table and the curve marker follow (values read on the curve '
+                                 'grid); on release the exact computation resumes. Arrows: fine step; Page up/down: one '
+                                 'decade. The z field and the slider stay in sync.'},
+    'cosmo_curseur_approx': {'fr': 'z = {z} — valeurs interpolées sur la grille des courbes pendant le glissement ; calcul exact au relâchement.',
+                             'en': 'z = {z} — values interpolated on the curve grid while dragging; exact computation on release.'},
     'cosmo_calculer': {'fr': 'Calculer', 'en': 'Compute'},
     'cosmo_calculer_aide': {'fr': 'Calcule toutes les grandeurs pour ce redshift et ces paramètres.',
                             'en': 'Compute every quantity for this redshift and these parameters.'},
@@ -306,7 +316,10 @@ TEXTES = {
               "toutes justes, qui répondent à des questions différentes. Ce module les calcule dans le modèle ΛCDM.</p>"
               "<h4>Saisir</h4><p>Tapez z (virgule ou point) et Entrée, ou cliquez un exemple, ou donnez le nom d'un "
               "objet : son redshift est demandé à SIMBAD si Internet est disponible (une requête, gardée en cache). "
-              "Depuis la Banque OHP, l'onglet <i>Fiche en ligne</i> envoie directement le redshift d'un objet ici.</p>"
+              "Depuis la Banque OHP, l'onglet <i>Fiche en ligne</i> envoie directement le redshift d'un objet ici. "
+              "Le <b>curseur</b> sous le champ parcourt tout le domaine (échelle logarithmique de 0,001 à 1100) : en "
+              "glissant, le marqueur des courbes et le tableau suivent en direct (valeurs lues sur la grille des courbes), "
+              "au relâchement le calcul exact reprend ; flèches = pas fin, Page haut/bas = une décade.</p>"
               "<h4>Quelle distance pour quoi ?</h4><ul><li><b>D_C</b>, comobile : où est l'objet aujourd'hui ;</li>"
               "<li><b>D_L</b>, luminosité : photométrie, F = L/(4πD_L²), module de distance ;</li><li><b>D_A</b>, "
               "angulaire : tailles sur le ciel, échelle en kpc par seconde d'arc ; elle passe par un maximum ;</li>"
@@ -328,7 +341,7 @@ TEXTES = {
               "correct, answering different questions. This module computes them in the ΛCDM model.</p>"
               "<h4>Input</h4><p>Type z (comma or point) and Enter, or click an example, or give an object's name: its "
               "redshift is requested from SIMBAD when the Internet is available (one request, cached). From the OHP "
-              "bank, the <i>Online record</i> tab sends an object's redshift straight here.</p>"
+              "bank, the <i>Online record</i> tab sends an object's redshift straight here. The <b>slider</b> under the field spans the whole range (logarithmic scale from 0.001 to 1100): while dragging, the curve marker and the table follow live (values read on the curve grid), on release the exact computation resumes; arrows = fine step, Page up/down = one decade.</p>"
               "<h4>Which distance for what?</h4><ul><li><b>D_C</b>, comoving: where the object is today;</li><li><b>D_L"
               "</b>, luminosity: photometry, F = L/(4πD_L²), distance modulus;</li><li><b>D_A</b>, angular: sizes on "
               "the sky, scale in kpc per arcsecond; it goes through a maximum;</li><li><b>c·t_L</b>: path travelled by "

@@ -89,7 +89,9 @@ def fetch(url, dest):
 def step_python():
     """Pose un CPython autonome dans <PKG>/python."""
     cible = cible_python()
-    nom = f'cpython-{PY_VERSION}+{PY_BUILD}-{cible}-install_only.tar.gz'
+    # « install_only_stripped » : le meme interpreteur sans les symboles de debogage. La variante « install_only »
+    # pesait 320 Mo de plus (libpython 219 Mo, binaire 102 Mo) pour rien a l'usage.
+    nom = f'cpython-{PY_VERSION}+{PY_BUILD}-{cible}-install_only_stripped.tar.gz'
     url = (f'https://github.com/astral-sh/python-build-standalone/releases/'
            f'download/{PY_BUILD}/{nom}')
     archive = fetch(url, CACHE / nom)
@@ -277,8 +279,50 @@ def step_elaguer():
             for f in qt.glob(m + '.*'):
                 f.unlink()
         for d in ('Qt6/plugins/sqldrivers', 'Qt6/plugins/multimedia', 'Qt6/plugins/qmltooling', 'Qt6/plugins/position',
-                  'Qt6/plugins/sensors', 'Qt6/plugins/designer', 'Qt6/plugins/texttospeech', 'bindings', 'Qt6/include'):
+                  'Qt6/plugins/sensors', 'Qt6/plugins/designer', 'Qt6/plugins/texttospeech', 'bindings', 'Qt6/include',
+                  # greffons dont la bibliotheque Qt a ete retiree ci-dessus (Qt3D, Qml, WebView, Help, Scxml) :
+                  # ils ne se chargeraient plus et pesaient 7 Mo
+                  'Qt6/plugins/assetimporters', 'Qt6/plugins/geometryloaders', 'Qt6/plugins/renderers',
+                  'Qt6/plugins/renderplugins', 'Qt6/plugins/sceneparsers', 'Qt6/plugins/qmllint', 'Qt6/plugins/qmlls',
+                  'Qt6/plugins/help', 'Qt6/plugins/webview', 'Qt6/plugins/scxmldatamodel'):
             shutil.rmtree(qt / d, ignore_errors=True)
+    # Tcl/Tk (tkinter est retire), en-tetes C et pages de manuel de l'interpreteur : inutiles a l'execution.
+    py = base / 'python'
+    for motif in ('include', 'share', 'lib/tcl*', 'lib/tk*', 'lib/itcl*', 'lib/thread*', 'lib/libtcl*', 'lib/libtk*',
+                  'lib/pkgconfig', 'lib/Tix*', 'lib/tdbc*', 'lib/sqlite3*', 'lib/python3*/lib-dynload/_tkinter*',
+                  # pip ne sert pas a l'execution ; ses scripts de bin/ portent en outre le chemin de la machine de
+                  # construction en shebang (lintian : wrong-path-for-interpreter)
+                  'lib/python3*/site-packages/pip', 'lib/python3*/site-packages/pip-*'):
+        for chemin in py.glob(motif):
+            if chemin.is_dir():
+                shutil.rmtree(chemin, ignore_errors=True)
+            else:
+                chemin.unlink(missing_ok=True)
+    # bin/ : seuls les interpreteurs restent (les scripts console de pip, astropy, PyQt6 ne servent pas au paquet)
+    for f in (py / 'bin').iterdir() if (py / 'bin').is_dir() else ():
+        if not f.name.startswith('python'):
+            f.unlink()
+    # donnees de test des dependances (astropy garde son paquet tests, importe a l'initialisation, mais pas ses
+    # fichiers de donnees : 10 Mo de FITS, XML et gz), fichiers de controle de version
+    for chemin in list(base.rglob('tests/data')) + list(base.rglob('.gitignore')):
+        if chemin.is_dir():
+            shutil.rmtree(chemin, ignore_errors=True)
+        else:
+            chemin.unlink(missing_ok=True)
+    # Qt : FFmpeg (multimedia retire), eglfs/linuxfb/vnc (pas de bureau sans X11/Wayland ici), lecteur PDF
+    for qt in base.rglob('PyQt6'):
+        if not qt.is_dir() or qt.parent.name != 'site-packages':
+            continue
+        for motif in ('Qt6/lib/libav*', 'Qt6/lib/libsw*', 'Qt6/lib/libQt6FFmpeg*', 'Qt6/lib/libQt6EglFS*',
+                      'Qt6/lib/libQt6EglFs*', 'Qt6/plugins/egldeviceintegrations', 'Qt6/plugins/imageformats/libqpdf.so',
+                      'Qt6/plugins/platforms/libqeglfs.so', 'Qt6/plugins/platforms/libqlinuxfb.so',
+                      'Qt6/plugins/platforms/libqvnc.so', 'Qt6/plugins/platforms/libqvkkhrdisplay.so',
+                      'Qt6/plugins/platforms/libqminimalegl.so'):
+            for chemin in qt.glob(motif):
+                if chemin.is_dir():
+                    shutil.rmtree(chemin, ignore_errors=True)
+                else:
+                    chemin.unlink(missing_ok=True)
     for chemin in list(base.rglob('*.pyc')):
         chemin.unlink(missing_ok=True)
     apres = sum(f.stat().st_size for f in base.rglob('*') if f.is_file())

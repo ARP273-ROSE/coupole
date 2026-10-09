@@ -276,19 +276,59 @@ def grille_z(zmin: float = 1e-3, zmax: float = Z_MAX, n: int = 300) -> np.ndarra
 
 
 def courbes(z_grille, modele: str = 'planck18', H0=None, Om=None, Ok: float = 0.0) -> dict:
-    """Distances (Mpc) et temps (Gyr) sur une grille de z (calcul vectoriel astropy)."""
+    """Toutes les grandeurs (GRANDEURS) sur une grille de z, en vectoriel (astropy) : distances en Mpc, temps en Gyr,
+    volume en Gpc³, vitesses en km/s.  Sert aux courbes et à la lecture interpolée pendant le glissement du curseur
+    (le calcul exact de `calculer` reprend au relâchement)."""
     u = _astropy()[1]
     m = construire(modele, H0, Om, Ok)
     z = np.asarray(z_grille, dtype=float)
+    dc = m.comoving_distance(z).to_value(u.Mpc)
     dm = m.comoving_transverse_distance(z).to_value(u.Mpc)
     tl = m.lookback_time(z).to_value(u.Gyr)
+    dl = (1 + z) * dm
+    da = dm / (1 + z)
+    ck = c_kms()
+    zp1sq = (1 + z) ** 2
+    with np.errstate(divide='ignore', invalid='ignore'):
+        distmod = np.where(dl > 0, 5 * np.log10(np.where(dl > 0, dl, 1.0) * 1e5), np.nan)
     return {
         'z': z,
-        'comoving': m.comoving_distance(z).to_value(u.Mpc),
+        'a': 1 / (1 + z), 'E': np.asarray(m.efunc(z), dtype=float), 'H_z': np.asarray(m.H(z).value, dtype=float),
+        'comoving': dc,
         'transverse': dm,
-        'luminosity': (1 + z) * dm,
-        'angular_diameter': dm / (1 + z),
+        'luminosity': dl,
+        'angular_diameter': da,
         'lookback': tl * 1e9 / al_par_mpc(),
         'lookback_gyr': tl,
         'age_at_z': m.age(z).to_value(u.Gyr),
+        't0_model': np.full_like(z, float(m.age(0).to_value(u.Gyr))),
+        'distmod': distmod,
+        'kpc_arcsec': da * 1e3 * math.pi / 648000,
+        'vol_gpc3': np.array([volume_comobile_gpc3(m, float(v)) for v in dm]),
+        'v_cz': ck * z, 'v_sr': ck * (zp1sq - 1) / (zp1sq + 1), 'v_flrw': m.H0.value * dc,
     }
+
+
+def interpoler(courbes_: dict, z: float) -> dict:
+    """Lecture des grandeurs à `z` par interpolation (log-log quand c'est possible) sur une grille de `courbes`.
+
+    Approximation pour l'affichage fluide pendant un glissement ; l'écart au calcul exact reste petit (grille de
+    300 points logarithmiques) mais ce n'est pas une valeur de référence : `calculer` fait foi."""
+    zg = np.asarray(courbes_['z'], dtype=float)
+    lz = math.log10(max(float(z), zg[0]))
+    lzg = np.log10(zg)
+    out = {'z': float(z)}
+    for k, _ in GRANDEURS:
+        y = courbes_.get(k)
+        if y is None:
+            continue
+        y = np.asarray(y, dtype=float)
+        fini = np.isfinite(y)
+        if not fini.any():
+            out[k] = float('nan')
+            continue
+        if (y[fini] > 0).all():                      # log-log : les distances et les temps sont des lois de puissance
+            out[k] = float(10 ** np.interp(lz, lzg[fini], np.log10(y[fini])))
+        else:
+            out[k] = float(np.interp(lz, lzg[fini], y[fini]))
+    return out

@@ -32,6 +32,7 @@ on:
 
 permissions:
   contents: write
+  actions: write          # suppression des artefacts de construction devenus inutiles (job « nettoyer »)
 
 jobs:
   # Un projet dont le paquet depend d'un artefact produit en amont (un moteur
@@ -367,6 +368,50 @@ jobs:
           tar -C dist -czf "$ARCHIVE" "$NOM"
           ls -lh "$ARCHIVE"
 
+      # Paquet Debian/Ubuntu, construit a partir du meme paquet autonome : fichiers sous /opt/coupole, lanceur
+      # /usr/bin/coupole, entree de menu, icones, dependances systeme de Qt resolues par apt. Deux noms : le nom
+      # versionne (coupole_0.1.1_amd64.deb) et un nom stable (coupole-linux-amd64.deb) dont l'adresse
+      # « releases/latest/download/... » ne change jamais — c'est elle que l'application installee indique.
+      - name: Paquet Debian (Linux)
+        if: matrix.plateforme == 'linux'
+        shell: bash
+        run: |
+          case "${{ matrix.arch }}" in
+            x86_64) ARCH=amd64 ;;
+            arm64)  ARCH=arm64 ;;
+          esac
+          python3 build_deb.py --version ${{ steps.version.outputs.value }} --arch "$ARCH"
+          ls -lh *.deb
+          dpkg-deb --info "coupole-linux-$ARCH.deb"
+
+      # Le paquet doit s'installer et repondre dans un systeme nu, dependances tirees par apt : c'est le seul moyen
+      # d'attraper ici une bibliotheque systeme oubliee dans « Depends », qui ne se verrait sinon que chez l'utilisateur.
+      - name: Essai du paquet Debian dans un conteneur nu (Linux)
+        if: matrix.plateforme == 'linux'
+        shell: bash
+        run: |
+          case "${{ matrix.arch }}" in
+            x86_64) ARCH=amd64 ;;
+            arm64)  ARCH=arm64 ;;
+          esac
+          docker run --rm -v "$PWD:/src:ro" -e DEBIAN_FRONTEND=noninteractive ubuntu:24.04 bash -euxc '
+            apt-get update -qq
+            apt-get install -y -qq --no-install-recommends /src/coupole-linux-'"$ARCH"'.deb >/dev/null
+            coupole --version
+            LANG=fr_FR.UTF-8 coupole --help | grep -q commandes
+            LANG=en_US.UTF-8 coupole --help | grep -q commands
+            coupole ohp inventaire --json | head -c 200 >/dev/null
+            QT_QPA_PLATFORM=offscreen timeout 60 coupole ohp catalogue --type pla >/dev/null
+            QT_QPA_PLATFORM=offscreen /opt/coupole/python/bin/python3 -c "
+          import sys; sys.path.insert(0, \"/opt/coupole/app\")
+          from PyQt6.QtWidgets import QApplication
+          app = QApplication(sys.argv)
+          from coupole.gui.fenetre import FenetrePrincipale
+          f = FenetrePrincipale(); f.show(); app.processEvents(); print(\"interface :\", f.windowTitle())"
+            apt-get remove -y -qq coupole >/dev/null
+            test ! -e /opt/coupole && test ! -e /usr/bin/coupole && echo "desinstallation propre"
+          '
+
       - name: Deposer les artefacts
         uses: actions/upload-artifact@v4
         with:
@@ -374,6 +419,7 @@ jobs:
           path: |
             *.dmg
             *-linux-*.tar.gz
+            *.deb
           if-no-files-found: error
 
   # ──────────────────────────────────────────────────────────────────────
@@ -445,8 +491,10 @@ jobs:
             | **Windows** | `${{ steps.kit.outputs.nom_fichier }}-Setup-${{ steps.version.outputs.value }}.exe` |
             | **macOS Apple Silicon** | `${{ steps.kit.outputs.nom_fichier }}-${{ steps.version.outputs.value }}-macos-arm64.dmg` |
             | **macOS Intel** | `${{ steps.kit.outputs.nom_fichier }}-${{ steps.version.outputs.value }}-macos-x86_64.dmg` |
-            | **Linux x86_64** | `${{ steps.kit.outputs.nom_fichier }}-${{ steps.version.outputs.value }}-linux-x86_64.tar.gz` |
-            | **Linux ARM64** | `${{ steps.kit.outputs.nom_fichier }}-${{ steps.version.outputs.value }}-linux-arm64.tar.gz` |
+            | **Ubuntu / Debian x86_64** | `${{ steps.kit.outputs.nom_technique }}_${{ steps.version.outputs.value }}_amd64.deb` |
+            | **Ubuntu / Debian ARM64** | `${{ steps.kit.outputs.nom_technique }}_${{ steps.version.outputs.value }}_arm64.deb` |
+            | **Autre Linux x86_64** | `${{ steps.kit.outputs.nom_fichier }}-${{ steps.version.outputs.value }}-linux-x86_64.tar.gz` |
+            | **Autre Linux ARM64** | `${{ steps.kit.outputs.nom_fichier }}-${{ steps.version.outputs.value }}-linux-arm64.tar.gz` |
 
             Tout est inclus (Python, PyQt6, numpy, astropy...) : rien d'autre à installer. ASTAP reste facultatif
             (menu Outils > Assistant ASTAP). Aucun mot de passe administrateur n'est demandé.
@@ -456,7 +504,11 @@ jobs:
 
             **macOS** refuse d'ouvrir une application non signée : **clic droit**, **Ouvrir**, confirmer.
 
-            **Linux** : décompresser, lancer `installer.sh` (installation dans `~/.local/share`, entrée de menu).
+            **Ubuntu 22.04+ / Debian 12+** : `sudo apt install ./coupole_${{ steps.version.outputs.value }}_amd64.deb`
+            (apt installe les bibliothèques Qt nécessaires ; commande `coupole`, entrée de menu ; `sudo apt remove coupole`
+            pour désinstaller). Nom stable : `coupole-linux-amd64.deb` / `coupole-linux-arm64.deb`.
+
+            **Autre Linux** : décompresser, lancer `installer.sh` (installation dans `~/.local/share`, entrée de menu).
 
             Sans paquet : `pipx install git+https://github.com/${{ steps.kit.outputs.depot_distribution }}`
             ou les scripts `install.sh` / `install.ps1` des sources (voir README).
@@ -464,7 +516,8 @@ jobs:
             ### Mise à jour
 
             Déjà installée ? Ne téléchargez rien : l'application propose cette version au démarrage, sur les trois
-            systèmes. L'archive `*-app-*.zip` sert à cette mise à jour automatique.
+            systèmes. L'archive `*-app-*.zip` sert à cette mise à jour automatique. Installation par `.deb` : l'application
+            signale la version et indique le `.deb` à installer (`sudo apt install ./coupole-linux-amd64.deb`).
 
             Historique : `CHANGELOG.md`.
 
@@ -477,8 +530,10 @@ jobs:
             | **Windows** | `${{ steps.kit.outputs.nom_fichier }}-Setup-${{ steps.version.outputs.value }}.exe` |
             | **macOS Apple Silicon** | `${{ steps.kit.outputs.nom_fichier }}-${{ steps.version.outputs.value }}-macos-arm64.dmg` |
             | **macOS Intel** | `${{ steps.kit.outputs.nom_fichier }}-${{ steps.version.outputs.value }}-macos-x86_64.dmg` |
-            | **Linux x86_64** | `${{ steps.kit.outputs.nom_fichier }}-${{ steps.version.outputs.value }}-linux-x86_64.tar.gz` |
-            | **Linux ARM64** | `${{ steps.kit.outputs.nom_fichier }}-${{ steps.version.outputs.value }}-linux-arm64.tar.gz` |
+            | **Ubuntu / Debian x86_64** | `${{ steps.kit.outputs.nom_technique }}_${{ steps.version.outputs.value }}_amd64.deb` |
+            | **Ubuntu / Debian ARM64** | `${{ steps.kit.outputs.nom_technique }}_${{ steps.version.outputs.value }}_arm64.deb` |
+            | **Other Linux x86_64** | `${{ steps.kit.outputs.nom_fichier }}-${{ steps.version.outputs.value }}-linux-x86_64.tar.gz` |
+            | **Other Linux ARM64** | `${{ steps.kit.outputs.nom_fichier }}-${{ steps.version.outputs.value }}-linux-arm64.tar.gz` |
 
             Everything is included (Python, PyQt6, numpy, astropy...): nothing else to install. ASTAP stays optional
             (Tools menu > ASTAP assistant). No administrator password is asked for.
@@ -488,7 +543,11 @@ jobs:
 
             **macOS** refuses to open an unsigned application: **right click**, **Open**, confirm.
 
-            **Linux**: unpack, run `installer.sh` (installs into `~/.local/share`, adds a menu entry).
+            **Ubuntu 22.04+ / Debian 12+**: `sudo apt install ./coupole_${{ steps.version.outputs.value }}_amd64.deb`
+            (apt installs the required Qt libraries; `coupole` command, menu entry; `sudo apt remove coupole` to
+            uninstall). Stable names: `coupole-linux-amd64.deb` / `coupole-linux-arm64.deb`.
+
+            **Other Linux**: unpack, run `installer.sh` (installs into `~/.local/share`, adds a menu entry).
 
             Without a package: `pipx install git+https://github.com/${{ steps.kit.outputs.depot_distribution }}`
             or the `install.sh` / `install.ps1` scripts of the sources (see README).
@@ -496,6 +555,77 @@ jobs:
             ### Updating
 
             Already installed? Download nothing: the application offers this version at startup, on all three
-            systems. The `*-app-*.zip` archive exists for that automatic update.
+            systems. The `*-app-*.zip` archive exists for that automatic update. `.deb` installation: the application
+            announces the version and points to the `.deb` to install (`sudo apt install ./coupole-linux-amd64.deb`).
 
             History: `CHANGELOG.en.md`.
+
+  # ──────────────────────────────────────────────────────────────────────
+  # Une seule Release en ligne. Une fois la nouvelle publiee ET complete (tous les actifs attendus presents), les
+  # Releases precedentes et leurs tags sont supprimes, ainsi que les artefacts de construction (la Release garde les
+  # fichiers). Jamais la Release qu'on vient de publier ; et si elle est incomplete, rien n'est supprime : une
+  # Release ancienne mais entiere vaut mieux qu'aucune. La mise a jour automatique de l'application interroge
+  # « releases/latest » et des noms stables (coupole-app-<version>.zip par prefixe, coupole-linux-<arch>.deb) :
+  # elle ne depend d'aucun tag fixe.
+  # ──────────────────────────────────────────────────────────────────────
+  nettoyer:
+    needs: publier
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      - name: Lire kit.json et la version
+        id: info
+        shell: bash
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          k = json.load(open('kit.json'))
+          print('depot=' + k['depot_distribution'])
+          print('nom_fichier=' + k['nom_fichier'])
+          print('nom_technique=' + k['nom_technique'])
+          PY
+          V="${{ inputs.version }}"
+          [ -n "$V" ] || V="${GITHUB_REF_NAME#v}"
+          echo "version=${V#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Verifier que la nouvelle Release est complete, puis supprimer les precedentes et les artefacts
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
+          GH_REPO: ${{ steps.info.outputs.depot }}
+        run: |
+          V="${{ steps.info.outputs.version }}"
+          NOM="${{ steps.info.outputs.nom_fichier }}"
+          TECH="${{ steps.info.outputs.nom_technique }}"
+          ACTIFS=$(gh release view "v$V" --json assets --jq '.assets[].name')
+          echo "Actifs de v$V :"; echo "$ACTIFS"
+          MANQUE=0
+          for ATTENDU in "$NOM-Setup-$V.exe" "$TECH-app-$V.zip" "$NOM-$V-macos-arm64.dmg" "$NOM-$V-macos-x86_64.dmg" \
+                         "$NOM-$V-linux-x86_64.tar.gz" "$NOM-$V-linux-arm64.tar.gz" \
+                         "${TECH}_${V}_amd64.deb" "${TECH}_${V}_arm64.deb" "$TECH-linux-amd64.deb" "$TECH-linux-arm64.deb"; do
+            if ! grep -qx "$ATTENDU" <<< "$ACTIFS"; then
+              echo "::warning::actif manquant : $ATTENDU"
+              MANQUE=1
+            fi
+          done
+          if [ "$MANQUE" != 0 ]; then
+            echo "Release v$V incomplete : les precedentes sont conservees, rien n'est supprime."
+            exit 0
+          fi
+          # Releases precedentes (jamais celle qu'on vient de publier) : Release + tag
+          for TAG in $(gh release list --limit 100 --json tagName --jq '.[].tagName'); do
+            if [ "$TAG" != "v$V" ]; then
+              echo "Suppression de la Release $TAG et de son tag"
+              gh release delete "$TAG" --cleanup-tag --yes || echo "::warning::echec de la suppression de $TAG"
+            fi
+          done
+          # Artefacts de construction : la Release garde les fichiers, ils ne servent plus a rien
+          for ID in $(gh api --paginate "repos/$GH_REPO/actions/artifacts" --jq '.artifacts[].id'); do
+            gh api -X DELETE "repos/$GH_REPO/actions/artifacts/$ID" >/dev/null && echo "artefact $ID supprime" \
+              || echo "::warning::artefact $ID non supprime"
+          done
+          echo "Une seule Release en ligne : v$V"

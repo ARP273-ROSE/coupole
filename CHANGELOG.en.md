@@ -2,6 +2,51 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.1.1 — 9 October 2026
+
+- **Debian/Ubuntu package** (`coupole_0.1.1_amd64.deb`, `_arm64.deb`, and stable names `coupole-linux-amd64.deb` /
+  `-arm64.deb`) built by `build_deb.py` from the standalone Linux package: files under `/opt/coupole`,
+  `/usr/bin/coupole` command (interface without argument, command line with), menu entry, icons, man page, GPL-3
+  `copyright`, Qt system dependencies resolved by apt (checked with `ldd` and by installing in bare Ubuntu 22.04 and
+  24.04 containers). A `.deb` installation does not update through the archive: Coupole announces the new version
+  and points to the Release's `.deb` (*Download the package* button, `coupole update`). `release.yml` builds the
+  `.deb`, tries it in a bare container, attaches it to the Release, then **keeps a single Release online** (previous
+  ones and their tags are deleted once the new one is complete, as well as the build artifacts); automatic updates
+  rely on `releases/latest` and stable names.
+- **Lighter Linux/macOS packages**: python-build-standalone « stripped » interpreter (−320 MB unpacked: libpython
+  219 MB and a 102 MB binary of debug symbols), Tcl/Tk, headers and orphan Qt plugins removed;
+  `Coupole-0.1.1-linux.tar.gz`: 229 → 137 MB; `.deb`: 106 MB.
+- **Dark theme by default**; *View > Appearance* menu (checkable *Light* / *Dark* entries, Ctrl+Shift+D toggles)
+  applied at once and saved, in sync with the Preferences; a user who had chosen the light theme keeps it. Manual
+  screenshots regenerated in dark.
+- **OHP bank — what you already own**: from `_traitement/etat.sqlite` (read again in the background when opening,
+  after each run and whenever the folder changes), marker and soft colour per image (owned, duplicate left out,
+  failed, to download; contrast ≥ 4.5 in both themes; tooltip with status, date and local file), *owned* column
+  « 120 / 300 » with mini bar and marker (complete / partial / none) per object, sortable; *To download only* box;
+  estimate counting only the missing images; legend; Stacks tab: *complete / incomplete* column;
+  `coupole ohp inventory --missing [--json]` and `possedee`, `statut_local`, `fichier_local` columns in the CSV of
+  `ohp list`.
+- **Cosmology**: redshift slider under the z field (logarithmic scale from 0.001 to 1100, marks per decade) moving
+  the curve marker and updating the table live by interpolation on the curve grid (every quantity is now computed
+  on it), exact computation on release, field and slider in sync, arrows = fine step. **Fix**: the curves did not
+  follow the window when resized while sitting under the table (the panel, taller than the scroll area, kept its
+  hinted height): half of the visible height now goes to them.
+- **Sharp OpenStreetMap map on dense screens** (Windows at 125–150 %, Mac Retina): tiles of the next zoom level drawn
+  at half size (« @2x » equivalent), smoothing on; the map was previously upscaled by the system and looked
+  pixelated.
+- **Image quality — speed and resume**: 3.7 × faster measurement (1.21 → 0.33 s per T120 image: vectorised Moffat
+  model, analytic derivatives, 120 stars per image); measurements in parallel processes (machine plan, economy
+  mode, limit; at most 3 on a network folder, detected and announced), free interface, immediate stop; each image
+  written at once to `QUALITE.csv` (atomic); `_traitement/qualite.sqlite` cache by (path, size, date): starting
+  again redoes nothing, closing then reopening resumes; above 200 images, a sample of 5 per stack is offered (or
+  everything, with the duration estimated on 3 images); progress with time left and rate;
+  `coupole quality --sample N | --all | --processes N`. **Fix**: on some real stars the fit overflowed
+  (`OverflowError`) and stopped the measurement of the image.
+- **My computer**: the « GPU computing » line no longer mentions CuPy (nothing to install: no function uses the
+  card for now); the detail for developers is in the tooltip and CONTRIBUTING.
+- Tests: +37 (ownership, Quality engine on 300 simulated XISF, slider, resizing, dense tiles, Appearance menu,
+  `.deb` case of the updater).
+
 ## 0.1.0 — 8 October 2026
 
 First release.

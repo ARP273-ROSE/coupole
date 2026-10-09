@@ -194,3 +194,60 @@ Consigne : « fais au mieux » → appliquer ce qui apporte un gain réel sans r
   travail). Deuxième CI : 5 verts, Windows 3.10 rouge sur `test_pause_suspend_puis_reprend` (délai fixe de 1,5 s
   avant de chercher l'événement « pause » : trop court pour le démarrage du pilote sur ce serveur) → attente scrutée
   de l'événement (≤ 20 s) puis contrôle qu'en pause rien n'avance. Troisième CI : 6 jobs verts.
+
+## 2026-10-09 — version 0.1.1 : paquet .deb, Release unique, retours de Kevin sur la 0.1.0
+- **Release v0.1.0** publiée par la CI (6 actifs : Setup Windows, 2 dmg, 2 tar.gz, zip applicatif).
+- **Paquet Debian/Ubuntu** : `build_deb.py` (Python + `dpkg-deb --root-owner-group`, sans root) à partir de
+  `dist/Coupole/` : `/opt/coupole/{python,app}` + `.pyc` précompilés (`unchecked-hash`, /opt n'étant pas inscriptible),
+  `/usr/bin/coupole`, `.desktop` (Name[fr], Keywords, StartupWMClass), icônes hicolor 16→512 + SVG, `copyright` DEP-5
+  GPL-3+, `changelog.gz`, page de manuel, postinst/postrm (update-desktop-database, gtk-update-icon-cache, sans échec),
+  marqueur `app/installation_systeme.json` lu par `core/maj.py`. Dépendances établies par `ldd` sur les .so de Qt 6.11
+  et de CPython (ICU embarqué, OpenSSL statique) avec alternatives `t64` (Ubuntu 24.04 / Debian 13).
+- **Mise à jour** : `maj.type_installation()` → `deb` / `systeme` (dossier non inscriptible) / `paquet` / `pip` ;
+  `verifier()` retient le `.deb` de l'architecture (nom stable d'abord) ; `consigne_systeme()` donne URL + commande
+  apt ; `appliquer()` refuse hors paquet autonome ; GUI : bouton « Télécharger le paquet ». Tests (4).
+- **Paquets allégés** : `install_only_stripped` de python-build-standalone (libpython 219 Mo + binaire 102 Mo de
+  symboles !), Tcl/Tk, include, share, pip, scripts de bin/, données de test, FFmpeg, eglfs, greffons Qt orphelins
+  (Qt3D, Qml, WebView…) retirés : tar.gz 229 → 137 Mo ; `.deb` 106 Mo (xz), 4 089 fichiers, 2 501 .pyc.
+- **Essais réels du .deb** (`/mnt/apps_pool/_transfert/coupole_deb_test/`) : ubuntu:22.04 et ubuntu:24.04 nus, `apt-get
+  install ./coupole-linux-amd64.deb` (71 paquets tirés), `ldd` sur tous les .so (ne manquent que libgtk-3 / libcups des
+  greffons facultatifs, en Recommends), `coupole --version`, `--help` FR et EN, `ohp inventaire` et `catalogue` **hors
+  ligne** (`--network none`), GUI offscreen capturée, `coupole maj` (version simulée 0.0.9), `apt-get remove` : aucun
+  reste hors `~/.config`. lintian (debian:bookworm) : seule erreur `dir-or-file-in-opt` (voulu), avertissements résiduels
+  sur des fichiers de la bibliothèque standard (shebang sans bit x) et `hardening-no-pie` de l’interpréteur amont.
+- **Thème sombre par défaut** + menu Affichage > Apparence (Ctrl+Maj+D) ; `conftest` applique le défaut ; captures
+  régénérées en sombre (`outils/captures.py` suit `config.DEFAUTS`).
+- **Banque OHP — possession** : `modules/ohp/possession.py` (lecture seule de `etat.sqlite`, URI `mode=ro`, jamais
+  d'exception), `gui/pastilles.py` (icônes dessinées, couleurs `statut_*` du thème, contraste ≥ 4,5 testé),
+  `gui/modele.py` : styles par ligne (couleur, icônes, bulles), `Progression` + `DelegueProgression` (mini-barre) ;
+  filtre « À télécharger seulement », estimation des manquantes, légende, colonne « complet » des lots (clé objet /
+  télescope / filtre / nuit si mobile, champs d'un objet fixe comptés ensemble) ; CLI `ohp inventaire --manquantes
+  [--json]`, colonnes `possedee`/`statut_local`/`fichier_local` dans `ohp images --csv`. Tests (5 + GUI dans les 2 thèmes).
+- **Cosmologie** : curseur log (0,001 → 1100, 1000 pas/décade, CURSEUR_MAX = 6041), repères dessinés sous le curseur
+  (`ReperesCurseur`, géométrie du style), `calcul.courbes()` rend toutes les GRANDEURS, `calcul.interpoler()` (log-log),
+  tableau mis à jour pendant le glissement, calcul exact au relâchement, synchro champ ↔ curseur, flèches = 10 pas.
+  **Cause du non-redimensionnement** : sous 1500 px, le tableau réclamait toutes ses lignes (min 460 px) → panneau plus
+  haut que la zone défilante → le splitter restait à sa hauteur de consigne et les courbes à leur minimum (220 px).
+  Correction : `_disposer()` lit la hauteur du viewport de la QScrollArea, donne 55 % de la place visible aux courbes
+  et le reste au tableau (qui défile). Tests : curseur (interpolation ≈ exact à 2e-3, exact à 1e-6 au relâchement),
+  1024 → 1800 px (largeur + paint), 600 → 1000 px (hauteur).
+- **Carte OSM nette** : `CarteMonde._zoom_tuiles()` → à DPR ≥ 1,5, tuiles z+1 dessinées à demi-taille (4 par tuile
+  logique), `SmoothPixmapTransform`. Test : DPR simulé → clés z+1 demandées au cache, 4× plus de tuiles. Captures
+  réelles 1× / 2× (`QT_SCALE_FACTOR=2`) : `/mnt/apps_pool/_transfert/coupole_carte_dpr/carte_{1x,2x}.png`.
+- **Qualité des images** — profil sur 50 XISF T120 réels (`/mnt/zpool2/Astronomie/OHP_DU_ECU`, lecture seule) :
+  **1,21 s/image** (lecture 0,06 s, analyse 1,15 s dont 80 % dans `_moffat`, 134 étoiles ajustées/image) ; bug trouvé :
+  `OverflowError` dans `math.exp` sur une étoile réelle (pas LM aberrant) → bornes sur ln α et ln β + `try/except`
+  par étoile. Optimisations : modèle vectorisé sur les 9 sous-points (`_moffat9`) → 0,44 s ; jacobien analytique
+  (`_moffat9_jacobien`, vérifié contre les différences finies à 1e-5) → **0,33 s/image** ; 120 étoiles par image.
+  Aucun O(n²) ni relecture du dossier par image (un seul `os.walk`). Nouveau `modules/qualite/moteur.py` :
+  `ProcessPoolExecutor` spawn dimensionné par `parallele.planifier` (≤ 3 lecteurs si partage : `est_reseau` via
+  /proc/mounts, `mount`, `GetDriveTypeW`), fenêtre 2×n (lecture recouverte), annulation par terminaison des processus,
+  progression ≤ 10 Hz avec ETA et débit, CSV atomique après chaque image, cache `qualite.sqlite` (chemin, taille,
+  mtime), `echantillon()` (première, dernière, milieu…), `planifier()` + `estimer_duree()` (3 images), GUI avec
+  dialogue « gros dossier », CLI `--echantillon/--tout/--processus`. Tests sur 300 XISF synthétiques (6 lots) :
+  complet, cache (0 refait), annulation < 30 s + reprise, échantillon, ETA décroissant, image illisible, CLI.
+- **Ma machine** : ligne GPU reformulée (rien à installer), CuPy seulement en info-bulle + CONTRIBUTING.
+- **Release unique** : job `nettoyer` de `release.yml` (vérifie les 10 actifs attendus, puis `gh release delete
+  --cleanup-tag` des précédentes et suppression des artefacts) ; permissions `actions: write`. Après la 0.1.1 :
+  suppression manuelle de v0.1.0 et de ses artefacts.
+- Manuels FR/EN recompilés (34 p. chacun), CHANGELOG FR/EN 0.1.1, README, CONTRIBUTING.

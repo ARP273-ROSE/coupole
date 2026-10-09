@@ -20,10 +20,12 @@ from ...core import config, i18n
 from ...core.i18n import tr
 from ...gui.adaptatif import Flux, coupable
 from ...gui.dialogues import DialogueASTAP, ouvrir_fichier
-from ...gui.modele import ModeleTableau, lignes_choisies, vue_tableau
+from ...gui import pastilles
+from ...gui.modele import DelegueProgression, ModeleTableau, Progression, lignes_choisies, vue_tableau
 from ...gui.outils import (FileEvenements, Tache, aide, bouton, case, champ, decimal, enregistrer_arret, lancer_fil,
                            liste, nombre)
 from . import cibles
+from .possession import Possession, lire_infos_ok
 
 
 def _taille(o: float) -> str:
@@ -44,6 +46,8 @@ class Panneau(QWidget):
         self._fil = None
         self._nouveautes = None
         self._mode_tout = False
+        self.possession = Possession.vide()        # ce qu'on possède déjà à destination (lu en fond, jamais bloquant)
+        self._infos_ok = []
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
         self.bandeau = self._bandeau_nouveautes()
@@ -157,6 +161,10 @@ class Panneau(QWidget):
         self.f_verifier = case('ohp_f_verifier')
         self.f_verifier.toggled.connect(self._filtrer_objets)
         h.addWidget(self.f_verifier)
+        self.f_manquantes = case('ohp_f_manquantes')
+        self.f_manquantes.toggled.connect(self._filtrer_objets)
+        self.f_manquantes.toggled.connect(self._remplir_images)
+        h.addWidget(self.f_manquantes)
         self.b_rafraichir = bouton('ohp_rafraichir', lambda: self.charger(True))
         h.addWidget(self.b_rafraichir)
         v.addLayout(h)
@@ -165,9 +173,12 @@ class Panneau(QWidget):
         v.addWidget(self.l_inventaire)
         sp = QSplitter(Qt.Orientation.Horizontal)
         self.m_obj = ModeleTableau([tr('ohp_col_type'), tr('ohp_col_objet'), tr('ohp_col_remarque'), tr('ohp_col_images'),
-                                    tr('ohp_col_volume'), tr('ohp_col_nuits'), tr('ohp_col_telescopes'),
-                                    tr('ohp_col_filtres'), tr('ohp_col_etat')])
+                                    tr('ohp_col_possede'), tr('ohp_col_volume'), tr('ohp_col_nuits'),
+                                    tr('ohp_col_telescopes'), tr('ohp_col_filtres'), tr('ohp_col_etat')])
+        self.COL_POSSEDE = 4
         self.v_obj, self.p_obj = vue_tableau(self.m_obj, 'ohp_table_objets_aide')
+        self.v_obj.setItemDelegateForColumn(self.COL_POSSEDE, DelegueProgression(self.v_obj, lambda: pastilles.couleur_statut('ok')))
+        self.v_obj.horizontalHeader().setToolTip(tr('ohp_legende_aide'))
         self.v_obj.selectionModel().selectionChanged.connect(self._objets_choisis)
         sp.addWidget(self.v_obj)
         droite = QWidget()
@@ -184,11 +195,17 @@ class Panneau(QWidget):
         hf.addWidget(self.f_filtre)
         hf.addWidget(self.f_dates)
         vd.addLayout(hf)
-        self.m_img = ModeleTableau([tr('ohp_col_date'), tr('ohp_col_heure_site'), tr('ohp_col_nuit'), tr('ohp_col_tel'),
-                                    tr('ohp_col_filtre'),
+        self.m_img = ModeleTableau([tr('ohp_col_possede'), tr('ohp_col_date'), tr('ohp_col_heure_site'), tr('ohp_col_nuit'),
+                                    tr('ohp_col_tel'), tr('ohp_col_filtre'),
                                     tr('ohp_col_pose'), tr('ohp_col_drapeaux'), tr('ohp_col_noms')])
         self.v_img, self.p_img = vue_tableau(self.m_img, 'ohp_table_images_aide')
+        self.v_img.horizontalHeader().setToolTip(tr('ohp_legende_aide'))
         vd.addWidget(self.v_img)
+        self.l_legende = QLabel()                 # légende compacte des pastilles (FR/EN, couleurs du thème)
+        self.l_legende.setWordWrap(True)
+        aide(self.l_legende, 'ohp_legende_aide')
+        self._maj_legende()
+        vd.addWidget(self.l_legende)
         sp.addWidget(droite)
         sp.setSizes([560, 620])
         v.addWidget(sp, 1)
@@ -235,6 +252,7 @@ class Panneau(QWidget):
         self._remplir_objets()
         self._remplir_anomalies()
         self._remplir_ciel()
+        self._charger_possession()
         if not getattr(self, '_nouveautes_verifiees', False) and hasattr(self, 'dest'):
             self._nouveautes_verifiees = True        # une fois par lancement, si le réglage le demande (délai respecté)
             if config.reglages()['ohp_verifier_nouveautes'] and not os.environ.get('COUPOLE_SANS_RESEAU'):
@@ -251,13 +269,64 @@ class Panneau(QWidget):
             if o['a_verifier']:
                 etat.append(tr('ohp_etat_verifier'))
             lignes.append((tr('ohp_cat_' + o['cat']), cibles.nom_affiche(o['objet']), cibles.remarque(o['rem']),
-                           o['images'], _taille(o['octets']), len(o['nuits']), ', '.join(sorted(o['tel'])),
-                           ', '.join(sorted(o['filtres'])), ', '.join(etat)))
+                           o['images'], Progression(0, o['images']), _taille(o['octets']), len(o['nuits']),
+                           ', '.join(sorted(o['tel'])), ', '.join(sorted(o['filtres'])), ', '.join(etat)))
             donnees.append(o)
             bulles.append(tr('ohp_bulle_objet', noms=', '.join(sorted(o['noms'])), doublons=o['doublons']))
         self.m_obj.remplir(lignes, donnees, bulles)
+        self._appliquer_possession_objets()
         self.v_obj.resizeColumnsToContents()
         self._filtrer_objets()
+
+    # ---------------------------------------------------------------- ce qu'on possède déjà
+    def _dest_courante(self) -> str:
+        return os.path.abspath(os.path.expanduser(self.dest.text().strip())) if hasattr(self, 'dest') and \
+            self.dest.text().strip() else ''
+
+    def _charger_possession(self):
+        """Relit l'état de la destination hors du fil graphique, puis rafraîchit pastilles, comptes et lots."""
+        dest = self._dest_courante()
+        if not dest:
+            return
+        self._t_poss = Tache(lambda d=dest: (Possession.lire(d), lire_infos_ok(d)), parent=self)
+        self._t_poss.quand_fini(self._possession_prete)
+        self._t_poss.start()
+
+    def _possession_prete(self, resultat):
+        self.possession, self._infos_ok = resultat
+        self._appliquer_possession_objets()
+        self._filtrer_objets()
+        self._remplir_images()
+        self._remplir_lots()
+
+    def _appliquer_possession_objets(self):
+        """Colonne « possédé » (n / total, mini-barre) et pastille de chaque objet, sans perdre la sélection."""
+        if not self.inv or not self.m_obj.lignes:
+            return
+        comptes = self.possession.compte_objets(self.inv.images)
+        lignes, styles = [], []
+        for ligne, o in zip(self.m_obj.lignes, self.m_obj.donnees):
+            c = comptes.get(o['objet'], {'possedees': 0, 'doublons': 0, 'echecs': 0, 'absentes': 0, 'total': o['images']})
+            etat = Possession.etat_objet(c)
+            l = list(ligne)
+            l[self.COL_POSSEDE] = Progression(c['possedees'] + c['doublons'], c['total'])
+            lignes.append(tuple(l))
+            bulle = tr('ohp_bulle_possession_objet', possedees=c['possedees'], doublons=c['doublons'],
+                       echecs=c['echecs'], absentes=c['absentes'], total=c['total'])
+            styles.append({'icones': {self.COL_POSSEDE: pastilles.pastille(etat)} if etat != 'aucun' else {},
+                           'bulles': {self.COL_POSSEDE: bulle}})
+        self.m_obj.lignes = lignes
+        self.m_obj.restyler(styles)
+
+    def _maj_legende(self):
+        if not hasattr(self, 'l_legende'):
+            return
+        c = {k: pastilles.couleur_statut(k).name() for k in ('ok', 'ecarte', 'echec', 'absente')}
+        self.l_legende.setText(
+            '<span style="color:%s">&#10004;</span> %s &nbsp; <span style="color:%s">&#9679;</span> %s &nbsp; '
+            '<span style="color:%s">&#9650;</span> %s &nbsp; <span style="color:%s">&#8681;</span> %s'
+            % (c['ok'], tr('ohp_statut_possession_ok'), c['ecarte'], tr('ohp_statut_possession_doublon'),
+               c['echec'], tr('ohp_statut_possession_echec'), c['absente'], tr('ohp_statut_possession_absente')))
 
     def _filtrer_objets(self):
         q = self.recherche.text().strip().lower()
@@ -266,6 +335,9 @@ class Panneau(QWidget):
             ok = (not cat or o['cat'] == cat) and (not tel or tel in o['tel']) and \
                  (not self.f_nouveaux.isChecked() or o['nouveau']) and \
                  (not self.f_verifier.isChecked() or o['a_verifier'])
+            if ok and self.f_manquantes.isChecked():
+                prog = self.m_obj.lignes[r][self.COL_POSSEDE]
+                ok = not (isinstance(prog, Progression) and prog.total > 0 and prog.n >= prog.total)
             if ok and q:
                 ok = q in o['objet'].lower() or q in cibles.nom_affiche(o['objet']).lower() or \
                      any(q in n.lower() for n in o['noms'])
@@ -315,6 +387,8 @@ class Panneau(QWidget):
                 continue
             if self.f_dates.isChecked() and (x['date_partagee'] or x['diurne']) and not x['doublon']:
                 continue
+            if self.f_manquantes.isChecked() and self.possession.possedee(x):
+                continue
             out.append(x)
         return out
 
@@ -323,8 +397,14 @@ class Panneau(QWidget):
         from ...core import sites as sites_mod, temps
         imgs = sorted(self._images_filtrees(), key=lambda x: (x['t_min'], x['access_url']))
         sites_par_id = {s.id: s for s in sites_mod.sites()}
-        lignes, bulles = [], []
+        lignes, bulles, styles = [], [], []
         for x in imgs:
+            st = self.possession.statut(x)
+            d = self.possession.detail(x)
+            styles.append({'icones': {0: pastilles.pastille(st)},
+                           'couleur': pastilles.couleur_statut(st) if st != 'absente' else None,
+                           'bulles': {0: tr('ohp_bulle_possession', statut=tr('ohp_statut_possession_' + st),
+                                            date=d['date'] or '—', chemin=d['chemin'] or '—')}})
             dr = []
             if x['doublon']:
                 dr.append(tr('ohp_drapeau_doublon'))
@@ -337,10 +417,10 @@ class Panneau(QWidget):
             u = temps.mjd_vers_utc(x['t_min'])
             s_ = sites_par_id.get(x.get('site'))
             loc = temps.heure_locale(u, s_).strftime('%H:%M:%S (UTC%z)') if s_ else ''
-            lignes.append((u.strftime('%Y-%m-%d %H:%M:%S'), loc, str(x['nuit']), x['tel'], x['filter_name'],
-                           x['t_exptime'], ', '.join(dr), x['target_name']))
+            lignes.append((tr('ohp_statut_possession_' + st), u.strftime('%Y-%m-%d %H:%M:%S'), loc, str(x['nuit']),
+                           x['tel'], x['filter_name'], x['t_exptime'], ', '.join(dr), x['target_name']))
             bulles.append(temps.formater(u, s_) + '\n' + x['access_url'])
-        self.m_img.remplir(lignes, imgs, bulles)
+        self.m_img.remplir(lignes, imgs, bulles, styles)
         self.v_img.resizeColumnsToContents()
         self.selection = imgs
         self._estimer()
@@ -352,12 +432,20 @@ class Panneau(QWidget):
             self.l_estimation.setText(tr('ohp_aucune_selection'))
             return
         fmt = self.format.currentData() if hasattr(self, 'format') else 'xisf'
-        e = estimer(self.selection, fmt)
         dest = self.dest.text() if hasattr(self, 'dest') else ''
-        self.l_estimation.setText(tr('ohp_estimation', images=e['images'], objets=e['objets'], nuits=e['nuits'],
-                                     doublons=e['doublons'], fits=_taille(e['octets_fits']),
-                                     sortie=_taille(e['octets_sortie']), format=fmt.upper()) + '  ' +
-                                  tr('ohp_libre', libre=_taille(disque_libre_go(dest or '.') * 1e9)))
+        manquantes = self.possession.manquantes(self.selection)
+        utiles = [x for x in self.selection if not x['doublon']]
+        if len(manquantes) < len(utiles):            # une partie est déjà là : on n'estime que ce qui manque
+            e = estimer(manquantes, fmt)
+            texte = tr('ohp_estimation_manquantes', manquantes=len(manquantes), total=len(utiles),
+                       possedees=len(utiles) - len(manquantes), fits=_taille(e['octets_fits']),
+                       sortie=_taille(e['octets_sortie']), format=fmt.upper())
+        else:
+            e = estimer(self.selection, fmt)
+            texte = tr('ohp_estimation', images=e['images'], objets=e['objets'], nuits=e['nuits'],
+                       doublons=e['doublons'], fits=_taille(e['octets_fits']),
+                       sortie=_taille(e['octets_sortie']), format=fmt.upper())
+        self.l_estimation.setText(texte + '  ' + tr('ohp_libre', libre=_taille(disque_libre_go(dest or '.') * 1e9)))
 
     def vers_traitement(self):
         if not self.selection:
@@ -388,6 +476,7 @@ class Panneau(QWidget):
         f = QFormLayout(g)
         h = QHBoxLayout()
         self.dest = champ('ohp_dest_aide', r['dossier_sortie'] or str(config.dossier_sortie_defaut() / 'OHP_DU_ECU'))
+        self.dest.editingFinished.connect(self._charger_possession)
         h.addWidget(self.dest, 1)
         h.addWidget(bouton('reg_parcourir', self._parcourir))
         f.addRow(tr('reg_dest'), h)
@@ -473,6 +562,7 @@ class Panneau(QWidget):
             self.dest.setText(d)
             self._estimer()
             self._remplir_lots()
+            self._charger_possession()
 
     def _astap(self):
         DialogueASTAP(self).exec()
@@ -482,6 +572,12 @@ class Panneau(QWidget):
         """Détection d'ASTAP (sous-processus) et sondes de la machine : hors du fil graphique."""
         from ...core import astap, machine
         r = config.reglages()
+        pastilles.vider_cache()                    # le thème a pu changer : pastilles et légende aux bonnes couleurs
+        self._maj_legende()
+        if self.inv and self.m_obj.lignes:
+            self._appliquer_possession_objets()
+            self._remplir_images()
+            self._remplir_lots()
         self.l_astap.setText(tr('astapdlg_recherche'))
 
         def sonder():
@@ -583,6 +679,7 @@ class Panneau(QWidget):
         self.b_lancer.setEnabled(False)
         self._t_reorg = Tache(travail, parent=self)
         self._t_reorg.quand_fini(lambda r: (self.b_lancer.setEnabled(True), self._remplir_lots(),
+                                            self._charger_possession(),
                                             self._log(tr('ohp_reorganise_fait', n=r['ranges'], lots=r['lots'],
                                                          ignores=len(r['ignores'])))))
         self._t_reorg.quand_erreur(lambda e: (self.b_lancer.setEnabled(True),
@@ -683,20 +780,26 @@ class Panneau(QWidget):
         if not mesures.disponible():
             self._log(tr('qual_absent'))
             return
+        from ..qualite import moteur
+        from ..qualite.gui_sans_qt import duree_lisible
         dest = self.dest.text()
         q = FileEvenements(self, lambda evs: [self._log(e) for e in evs])
         self._evts_qualite = q
+        arret = self.arret or enregistrer_arret(threading.Event())
+        L = i18n.langue()
+
+        def rapporter(ev):
+            if ev['type'] == 'lot':
+                q(tr('qual_lot', lot=os.path.relpath(ev['lot'], dest), n=len(ev['lignes'])) + ' — ' +
+                  rapport.resume(ev['lignes'], L)[1 if ev['lignes'] else 0])
+            elif ev['type'] == 'fin':
+                q(tr('qual_fini', n=ev['n'], lots=ev['lots'], deja=ev['deja'], duree=duree_lisible(ev['duree'])))
 
         def travail():
-            n = 0
-            lots = rapport.fichiers(dest)
-            for d, imgs in lots.items():
-                lignes = rapport.analyser_lot(imgs)
-                rapport.ecrire(d, lignes)
-                n += len(lignes)
-                q(tr('qual_lot', lot=os.path.relpath(d, dest), n=len(lignes)) + ' — ' +
-                  rapport.resume(lignes, i18n.langue())[1 if len(lignes) else 0])
-            q(tr('qual_fini', n=n, lots=len(lots)))
+            # échantillon par lot au-delà de 200 images : le contrôle après traitement doit rester court
+            total = sum(len(v) for v in rapport.fichiers(dest).values())
+            ech = moteur.ECHANTILLON_DEFAUT if total > moteur.SEUIL_GROS_DOSSIER else None
+            moteur.Mesureur(dest, self._plan()[1], ech, rapporter=rapporter, arret=arret, langue=L).lancer()
         lancer_fil(travail)
 
     def arreter_traitement(self):
@@ -779,6 +882,7 @@ class Panneau(QWidget):
                 self._evts.arreter()
                 self._remplir_lots()
                 self._remplir_anomalies()
+                self._charger_possession()
                 if self.qualite.isChecked() and not (self.arret and self.arret.is_set()):
                     self._verifier_qualite()
 
@@ -795,7 +899,9 @@ class Panneau(QWidget):
         self.l_lots.setWordWrap(True)
         v.addWidget(self.l_lots)
         self.m_lots = ModeleTableau([tr('csv_dossier'), tr('csv_objet'), tr('csv_filtre'), tr('csv_poses'),
-                                     tr('csv_pose_totale_s'), tr('csv_nuits'), tr('csv_alignement')])
+                                     tr('ohp_col_complet'), tr('csv_pose_totale_s'), tr('csv_nuits'),
+                                     tr('csv_alignement')])
+        self.COL_LOT_COMPLET = 4
         self.v_lots, self.p_lots = vue_tableau(self.m_lots, 'ohp_table_lots_aide')
         self.v_lots.doubleClicked.connect(lambda *_: self._ouvrir_lot())
         v.addWidget(self.v_lots, 1)
@@ -803,15 +909,26 @@ class Panneau(QWidget):
 
     def _remplir_lots(self):
         chemin = os.path.join(self.dest.text(), 'INDEX_LOTS.csv')
-        lignes, donnees = [], []
+        lignes, donnees, styles = [], [], []
+        completude = self.possession.lots(self.inv.images, self._infos_ok) if self.inv else {}
         if os.path.exists(chemin):
             with open(chemin, encoding='utf-8-sig') as f:
                 for i, r in enumerate(csv.reader(f, delimiter=';')):
                     if i == 0 or len(r) < 12:
                         continue
-                    lignes.append((r[0], r[2], r[4], int(r[5]), float(r[6]), r[7], r[11]))
-                    donnees.append(os.path.join(self.dest.text(), *r[0].split('/')))
-        self.m_lots.remplir(lignes, donnees)
+                    dossier = os.path.join(self.dest.text(), *r[0].split('/'))
+                    c = completude.get(os.path.normcase(os.path.abspath(dossier)))
+                    if c and c['base']:
+                        etat = tr('ohp_lot_complet' if c['complet'] else 'ohp_lot_incomplet',
+                                  converties=c['converties'], base=c['base'])
+                        styles.append({'icones': {self.COL_LOT_COMPLET: pastilles.pastille('complet' if c['complet'] else 'partiel')},
+                                       'bulles': {self.COL_LOT_COMPLET: tr('ohp_lot_complet_aide')}})
+                    else:
+                        etat = ''
+                        styles.append({})
+                    lignes.append((r[0], r[2], r[4], int(r[5]), etat, float(r[6]), r[7], r[11]))
+                    donnees.append(dossier)
+        self.m_lots.remplir(lignes, donnees, None, styles)
         self.v_lots.resizeColumnsToContents()
         self.l_lots.setText(tr('ohp_lots_resume', n=len(lignes), dest=coupable(self.dest.text())) if lignes
                             else tr('ohp_lots_aucun', dest=coupable(self.dest.text())))

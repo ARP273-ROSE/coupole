@@ -109,6 +109,93 @@ def test_hotes_de_confiance():
     assert not maj._de_confiance('http://github.com/a') and not maj._de_confiance('https://evil.com/a')
 
 
+def _faux_paquet(tmp_path, monkeypatch, marqueur=None):
+    """Un paquet autonome factice : python/bin/python3 et app/ ; `marqueur` = fiche d'installation système."""
+    (tmp_path / 'python' / 'bin').mkdir(parents=True)
+    (tmp_path / 'python' / 'bin' / 'python3').write_text('')
+    (tmp_path / 'app').mkdir()
+    if marqueur is not None:
+        (tmp_path / 'app' / maj.MARQUEUR_SYSTEME).write_text(json.dumps(marqueur), encoding='utf-8')
+    monkeypatch.setattr(maj, 'dossier_app', lambda: tmp_path / 'app')
+    monkeypatch.setattr(maj, '_architecture_deb', lambda: 'amd64')
+
+
+def test_installation_deb_signalee_jamais_appliquee(tmp_path, monkeypatch, capsys):
+    """Paquet .deb : les fichiers sont à dpkg sous /opt ; Coupole signale la version, montre le .deb et la commande
+    apt, et refuse d'appliquer l'archive."""
+    _faux_paquet(tmp_path, monkeypatch, {'type': 'deb', 'architecture': 'amd64', 'actif': 'coupole-linux-amd64.deb',
+                                         'commande': 'sudo apt install ./coupole-linux-amd64.deb'})
+    assert maj.est_paquet() and maj.type_installation() == 'deb' and not maj.peut_appliquer()
+    with pytest.raises(RuntimeError, match='system package'):
+        maj.appliquer({'url': 'https://github.com/x.zip', 'version': '9'})
+    # sans Release lue : adresse stable « latest/download »
+    c = maj.consigne_systeme(None)
+    assert c['url'].endswith('/releases/latest/download/coupole-linux-amd64.deb')
+    assert c['commande'] == 'sudo apt install ./coupole-linux-amd64.deb'
+    # avec la Release : l'actif .deb qu'elle contient
+    c = maj.consigne_systeme({'deb': 'https://github.com/d/coupole_0.9.0_amd64.deb', 'deb_nom': 'coupole_0.9.0_amd64.deb',
+                              'page': 'https://github.com/d'})
+    assert c['url'].endswith('coupole_0.9.0_amd64.deb') and c['commande'] == 'sudo apt install ./coupole_0.9.0_amd64.deb'
+    # la ligne de commande, dans les deux langues
+    from coupole import cli
+    monkeypatch.setattr(maj, 'verifier', lambda v: {'version': '9.9.9', 'url': 'https://github.com/x.zip', 'taille': 1,
+                                                    'notes': '## Français\nN\n## English\nN', 'page': 'https://github.com/p',
+                                                    'deb': 'https://github.com/p/coupole-linux-amd64.deb',
+                                                    'deb_nom': 'coupole-linux-amd64.deb'})
+    assert cli.main(['--lang', 'fr', 'maj', '--appliquer']) == 0
+    fr = capsys.readouterr().out
+    assert 'paquet système' in fr and 'sudo apt install ./coupole-linux-amd64.deb' in fr and 'coupole-linux-amd64.deb' in fr
+    assert cli.main(['--lang', 'en', 'update', '--apply']) == 0
+    en = capsys.readouterr().out
+    assert 'system package' in en and 'sudo apt install' in en and 'Mise à jour' not in en
+    assert not list((tmp_path / 'app').glob('*.py'))        # rien n'a été écrit dans app/
+
+
+def test_paquet_autonome_inscriptible_reste_un_paquet(tmp_path, monkeypatch):
+    _faux_paquet(tmp_path, monkeypatch)
+    assert maj.type_installation() == 'paquet' and maj.peut_appliquer()
+    monkeypatch.setattr(maj, 'est_paquet', lambda: False)
+    assert maj.type_installation() == 'pip'
+
+
+@pytest.mark.skipif(os.name == 'nt' or (hasattr(os, 'geteuid') and os.geteuid() == 0),
+                    reason='root écrit partout ; droits POSIX requis')
+def test_paquet_non_inscriptible_signale_sans_appliquer(tmp_path, monkeypatch):
+    _faux_paquet(tmp_path, monkeypatch)
+    (tmp_path / 'app').chmod(0o555)
+    try:
+        assert maj.type_installation() == 'systeme' and not maj.peut_appliquer()
+        with pytest.raises(RuntimeError, match='system package'):
+            maj.appliquer({'url': 'https://github.com/x.zip', 'version': '9'})
+    finally:
+        (tmp_path / 'app').chmod(0o755)
+
+
+def test_verifier_retient_le_deb_de_l_architecture(monkeypatch):
+    release = {'tag_name': 'v9.0.0', 'html_url': 'https://github.com/r', 'body': '## English\nx',
+               'assets': [{'name': 'coupole-app-9.0.0.zip', 'browser_download_url': 'https://github.com/a/app.zip', 'size': 5},
+                          {'name': 'coupole_9.0.0_arm64.deb', 'browser_download_url': 'https://github.com/a/arm.deb'},
+                          {'name': 'coupole_9.0.0_amd64.deb', 'browser_download_url': 'https://github.com/a/v.deb'},
+                          {'name': 'coupole-linux-amd64.deb', 'browser_download_url': 'https://github.com/a/s.deb'}]}
+
+    class Rep(io.BytesIO):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+    monkeypatch.setattr(maj, '_ouvrir', lambda url: Rep(json.dumps(release).encode()))
+    monkeypatch.setattr(maj, 'depot', lambda: 'x/y')
+    monkeypatch.setattr(maj, '_architecture_deb', lambda: 'amd64')
+    m = maj.verifier('0.1.0')
+    assert m['version'] == '9.0.0' and m['url'].endswith('app.zip')
+    assert m['deb'] == 'https://github.com/a/s.deb' and m['deb_nom'] == 'coupole-linux-amd64.deb'   # nom stable d'abord
+    release['assets'].pop()
+    assert maj.verifier('0.1.0')['deb'] == 'https://github.com/a/v.deb'
+    monkeypatch.setattr(maj, '_architecture_deb', lambda: 'arm64')
+    assert maj.verifier('0.1.0')['deb'] == 'https://github.com/a/arm.deb'
+
+
 # ---------------------------------------------------------------- réseau : reprise sur un serveur local avec Range
 class Gestionnaire(http.server.BaseHTTPRequestHandler):
     contenu = b'SIMPLE  =                    T' + bytes(2880 * 3 - 30)

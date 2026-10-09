@@ -2,6 +2,52 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.1.1 — 9 octobre 2026
+
+- **Paquet Debian/Ubuntu** (`coupole_0.1.1_amd64.deb`, `_arm64.deb`, et noms stables `coupole-linux-amd64.deb` /
+  `-arm64.deb`) construit par `build_deb.py` à partir du paquet Linux autonome : fichiers sous `/opt/coupole`,
+  commande `/usr/bin/coupole` (interface sans argument, ligne de commande avec), entrée de menu, icônes, page de
+  manuel, `copyright` GPL-3, dépendances système de Qt résolues par apt (vérifiées par `ldd` et par installation dans
+  des conteneurs Ubuntu 22.04 et 24.04 nus). Une installation `.deb` ne se met pas à jour par archive : Coupole
+  signale la nouvelle version et pointe vers le `.deb` de la Release (bouton *Télécharger le paquet*,
+  `coupole maj`). `release.yml` construit le `.deb`, l'essaie dans un conteneur nu, le joint à la Release, puis **ne
+  garde qu'une Release en ligne** (les précédentes et leurs tags sont supprimés une fois la nouvelle complète, ainsi
+  que les artefacts de construction) ; la mise à jour automatique s'appuie sur `releases/latest` et des noms stables.
+- **Paquets Linux/macOS allégés** : interpréteur python-build-standalone « stripped » (−320 Mo dépliés : libpython
+  219 Mo et binaire 102 Mo de symboles de débogage), Tcl/Tk, en-têtes et greffons Qt orphelins retirés ;
+  `Coupole-0.1.1-linux.tar.gz` : 229 → 137 Mo ; `.deb` : 106 Mo.
+- **Thème sombre par défaut** ; menu *Affichage > Apparence* (entrées cochables *Clair* / *Sombre*, Ctrl+Maj+D
+  bascule) appliqué immédiatement et enregistré, synchronisé avec les Préférences ; un utilisateur qui avait choisi
+  le thème clair le garde. Captures des manuels régénérées en sombre.
+- **Banque OHP — ce qu'on possède déjà** : d'après `_traitement/etat.sqlite` (relu en fond à l'ouverture, après chaque
+  traitement et à chaque changement de dossier), pastille et couleur douce par image (possédée, doublon écarté,
+  échec, à télécharger ; contraste ≥ 4,5 dans les deux thèmes ; info-bulle avec statut, date et fichier local),
+  colonne *possédé* « 120 / 300 » avec mini-barre et pastille (complet / partiel / rien) par objet, triable ; case
+  *À télécharger seulement* ; estimation qui ne compte que les manquantes ; légende ; onglet Lots : colonne
+  *complet / incomplet* ; `coupole ohp inventaire --manquantes [--json]` et colonnes `possedee`, `statut_local`,
+  `fichier_local` dans le CSV de `ohp images`.
+- **Cosmologie** : curseur de redshift sous le champ z (échelle logarithmique de 0,001 à 1100, repères par décade)
+  qui déplace le marqueur des courbes et met à jour le tableau en direct par interpolation sur la grille des
+  courbes (toutes les grandeurs y sont désormais calculées), calcul exact au relâchement, champ et curseur
+  synchronisés, flèches = pas fin. **Correctif** : les courbes ne suivaient pas le redimensionnement de la fenêtre
+  quand elles passent sous le tableau (le panneau, plus haut que la zone défilante, gardait sa hauteur de consigne) :
+  la moitié de la hauteur visible leur revient désormais.
+- **Carte OpenStreetMap nette sur les écrans denses** (Windows à 125–150 %, Mac Retina) : tuiles du niveau de zoom
+  supérieur dessinées à demi-taille (équivalent « @2x »), lissage activé ; la carte était auparavant agrandie par
+  le système et apparaissait pixelisée.
+- **Qualité des images — vitesse et reprise** : mesure 3,7 × plus rapide (1,21 → 0,33 s par image T120 : modèle de
+  Moffat vectorisé, dérivées analytiques, 120 étoiles par image) ; mesures en processus parallèles (plan machine,
+  mode économe, bridage ; au plus 3 sur un dossier réseau, détecté et signalé), interface libre, arrêt immédiat ;
+  chaque image écrite aussitôt dans `QUALITE.csv` (atomique) ; cache `_traitement/qualite.sqlite` par (chemin,
+  taille, date) : relancer ne refait rien, fermer puis rouvrir reprend ; au-delà de 200 images, échantillon de 5 par
+  lot proposé (ou tout, avec la durée estimée sur 3 images) ; progression avec temps restant et débit ;
+  `coupole qualite --echantillon N | --tout | --processus N`. **Correctif** : sur certaines étoiles réelles,
+  l'ajustement débordait (`OverflowError`) et arrêtait la mesure de l'image.
+- **Ma machine** : la ligne « Calcul sur carte graphique » n'évoque plus CuPy (rien à installer : aucune fonction
+  n'utilise la carte pour l'instant) ; le détail pour les développeurs est dans l'info-bulle et CONTRIBUTING.
+- Tests : +37 (possession, moteur Qualité sur 300 XISF simulés, curseur, redimensionnement, tuiles denses, menu
+  Apparence, cas `.deb` de la mise à jour).
+
 ## 0.1.0 — 8 octobre 2026
 
 Première version.

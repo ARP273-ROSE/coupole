@@ -7,7 +7,7 @@ cd "$ICI"
 V=$(cat ../../VERSION)
 [ -n "$COUPOLE_SANS_TABLES" ] || python3 ../../outils/tables_cli.py >/dev/null 2>&1 || true
 for L in fr en; do
-  if [ "$L" = fr ]; then D="8 octobre 2026"; else D="8 October 2026"; fi
+  if [ "$L" = fr ]; then D="9 octobre 2026"; else D="9 October 2026"; fi
   printf '\\newcommand{\\versioncoupole}{%s}\n\\newcommand{\\datecoupole}{%s}\n' "$V" "$D" > version.tex
   pdflatex -interaction=nonstopmode -halt-on-error manuel_$L.tex >/dev/null
   pdflatex -interaction=nonstopmode -halt-on-error manuel_$L.tex >/dev/null

@@ -90,12 +90,18 @@ def resume(lignes, L) -> list[str]:
     return out
 
 
-def ecrire(dossier, lignes):
-    with open(os.path.join(dossier, 'QUALITE.csv'), 'w', newline='', encoding='utf-8-sig') as f:
-        w = csv.writer(f, delimiter=';')
-        w.writerow(['%s (%s)' % (tr('qual_col_' + c, 'fr'), tr('qual_col_' + c, 'en')) for c in COLONNES])
-        for l in lignes:
-            w.writerow([_fmt(l.get(c), '%.4g') for c in COLONNES])
-    with open(os.path.join(dossier, 'QUALITE.txt'), 'w', encoding='utf-8') as f:
-        f.write('\n'.join(['=== Français ==='] + resume(lignes, 'fr') + ['', '=== English ==='] +
-                          resume(lignes, 'en')) + '\n')
+def ecrire(dossier, lignes, txt: bool = True):
+    """QUALITE.csv (écriture atomique : jamais de fichier à moitié écrit, même appelé après chaque image) et,
+    si `txt`, QUALITE.txt (résumé FR puis EN, écrit quand le lot est complet)."""
+    import io
+    from ...core.config import ecrire_atomique
+    buf = io.StringIO()
+    w = csv.writer(buf, delimiter=';')
+    w.writerow(['%s (%s)' % (tr('qual_col_' + c, 'fr'), tr('qual_col_' + c, 'en')) for c in COLONNES])
+    for l in lignes:
+        w.writerow([_fmt(l.get(c), '%.4g') for c in COLONNES])
+    ecrire_atomique(os.path.join(dossier, 'QUALITE.csv'), buf.getvalue(), 'utf-8-sig')
+    if txt:
+        ecrire_atomique(os.path.join(dossier, 'QUALITE.txt'),
+                        '\n'.join(['=== Français ==='] + resume(lignes, 'fr') + ['', '=== English ==='] +
+                                  resume(lignes, 'en')) + '\n')
