@@ -256,3 +256,17 @@ Consigne : « fais au mieux » → appliquer ce qui apporte un gain réel sans r
   alors que la Release existe → **HTTPS impossible sans `ca-certificates`** (OpenSSL statique de CPython, autorités lues
   dans /etc/ssl/certs). → **0.1.2** : `ca-certificates` dans Depends, contrôle TLS dans l'essai du paquet de
   `release.yml`.
+- **0.1.2 → 0.1.3** : le run de release v0.1.2 a échoué sur une apostrophe dans un commentaire de la chaîne bash de
+  l'essai du `.deb` (`release.yml`) ; tag v0.1.2 retiré (aucune Release n'existait), correction, **v0.1.3** posé.
+- 🔴 **BLOQUÉ PAR GITHUB (facturation)** : le run de release v0.1.3 (37868026954) et sa relance n'ont pas démarré :
+  « The job was not started because recent account payments have failed or your spending limit needs to be
+  increased » — minutes Actions du dépôt **privé** épuisées (macOS ×10, Windows ×2 ; 6 runs de tests + 3 de release
+  dans la journée). **À faire par Kevin** : Settings > Billing & plans (relever la limite de dépense ou corriger le
+  paiement), **ou rendre le dépôt public** (Actions gratuites, et de toute façon indispensable à la mise à jour
+  automatique : l'API `releases/latest` répond 404 tant que le dépôt est privé — vérifié depuis l'interpréteur
+  embarqué). Puis : `gh run rerun 37868026954` (ou `git push --delete origin v0.1.3 ; git push origin v0.1.3`).
+  En attendant, **la Release v0.1.1 reste en ligne et complète** (10 actifs dont les deux `.deb`) ; son `.deb` ne
+  déclare pas `ca-certificates` (installer `sudo apt install ca-certificates` à part sur un système minimal).
+- Essais locaux du `.deb` 0.1.2 (avec `ca-certificates`) dans ubuntu:24.04 nu : installation, `coupole --version`,
+  HTTPS OK (SIMBAD 200), désinstallation propre. Captures et profils : `/mnt/apps_pool/_transfert/coupole_deb_test/`
+  (`gui_ubuntu_22_04.png`, `gui_ubuntu_24_04.png`) et `/mnt/apps_pool/_transfert/coupole_carte_dpr/`.
