@@ -174,10 +174,14 @@ def test_les_courbes_suivent_la_fenetre(app_qt, fenetre):
     fenetre.resize(1200, 600)
     app_qt.processEvents()
     attendre(app_qt, lambda: p.splitter.orientation() == Qt.Orientation.Vertical, 5)
-    h_bas, h_fenetre = p.trace.height(), fenetre.height()
+    h_bas, h_fenetre, d_bas = p.trace.height(), fenetre.height(), dict(p.disposition)
     fenetre.resize(1200, 1000)
     app_qt.processEvents()
     attendre(app_qt, lambda: p.trace.height() > h_bas + 30, 5)
-    if fenetre.height() >= h_fenetre + 300:                   # la fenêtre a vraiment pu grandir (écran virtuel assez haut)
-        assert p.trace.height() > h_bas + 30
+    d = dict(p.disposition)
+    # la disposition a bien vu la zone visible grandir, et les courbes ont reçu la part qu'elle leur a attribuée
+    assert d['visible'] > d_bas['visible'] or fenetre.height() < h_fenetre + 300, (d_bas, d, fenetre.height(), h_fenetre)
+    assert p.trace.height() >= d['courbes_min'] - 2, (d, p.trace.height())
+    if d['disponible'] >= 500:                                # assez de place visible (écran virtuel du serveur de CI)
+        assert d['courbes_min'] > 220 and p.trace.height() > h_bas + 30, (d_bas, d, h_bas, p.trace.height())
     p.trace.removeEventFilter(compteur)

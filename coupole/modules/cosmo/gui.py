@@ -251,8 +251,12 @@ class Panneau(QWidget):
             self.v_res.setMinimumHeight(max(140, min(h, disponible - courbes_min)))
             self.trace.setMinimumHeight(courbes_min)
         else:
+            courbes_min = max(200, min(disponible, 320))
             self.v_res.setMinimumHeight(0)
-            self.trace.setMinimumHeight(max(200, min(disponible, 320)))
+            self.trace.setMinimumHeight(courbes_min)
+        # pour les tests et le diagnostic : ce que la disposition a vu et décidé
+        self.disposition = {'visible': visible, 'reste': reste, 'disponible': disponible, 'courbes_min': courbes_min,
+                            'orientation': voulu}
         self._ajuster_colonnes()
 
     def _ajuster_colonnes(self):
