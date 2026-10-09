@@ -451,7 +451,7 @@ Retours d'usage de Kevin (Manjaro, KDE Plasma, paquet autonome 0.1.7, dossier de
   réécrit au démarrage le lanceur d'un paquet ≤ 0.1.7 (la mise à jour ne touche que `app/`). `install.sh` posait déjà
   ses liens (venv) : inchangé. `release.yml` : essai par lien et lien de lien (Linux, .app macOS), installeur dans un
   HOME vide.
-- Tests : `test_dialogues_systeme.py` (27, dont 1 Windows), `test_catalogue_possession.py` (16) ; tests existants
+- Tests : `test_dialogues_systeme.py` (27, certains propres à Linux/Unix ou à Windows), `test_catalogue_possession.py` (16) ; tests existants
   adaptés (pastille en tête de ligne, `fichiers.choisir_*` simulés au lieu de `QFileDialog.get*`).
 - Validation locale : **python:3.12-slim 345 réussis, 12 sautés, code 0 ; python:3.10-slim 345 / 12, code 0**.
   Manuels FR/EN (38 p.) recompilés (section « Choisir un fichier ou un dossier, dossier sur un NAS », possession,

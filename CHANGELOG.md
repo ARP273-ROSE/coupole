@@ -45,7 +45,7 @@ Manjaro (KDE Plasma, paquet autonome 0.1.7, dossier de sortie sur un NAS).
   absent de macOS avant 12.3) ; un lien `~/.local/bin/coupole` échouait (« …/.local/bin/python/bin/python3 : aucun
   fichier »). `installer.sh` crée lui-même ce lien et signale un `~/.local/bin` absent du `PATH` ; le lanceur d'un
   paquet déjà installé est réparé par l'application au démarrage (la mise à jour ne remplace que `app/`).
-- Tests : `test_dialogues_systeme.py` (+27 dont 1 propre à Windows : décision du thème selon le bureau, sonde du portail, préférence,
+- Tests : `test_dialogues_systeme.py` (+27, certains propres à Linux ou à Windows : décision du thème selon le bureau, sonde du portail, préférence,
   dialogue parenté et natif ou Qt, traductions de Qt, élagage des paquets, URI UNC, chemin gvfs, UNC réel sous
   Windows, lanceur par lien et lien de lien, réparation du lanceur, installeur), `test_catalogue_possession.py`
   (+16 : états agrégés, tri par état, pastilles et couleurs, colonnes, listes vides, résumé, changement de dossier).

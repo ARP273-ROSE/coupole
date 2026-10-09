@@ -91,9 +91,10 @@ def panneau(app_qt, monkeypatch):
 
 
 def _possession(p, app_qt, dest, statuts):
-    """Possession simulée appliquée comme si elle revenait du fil de fond."""
-    poss = Possession(dest, statuts)
+    """Possession simulée appliquée comme si elle revenait du fil de fond (dossier absolu, comme le panneau le lit :
+    sous Windows, « /mnt/nas » devient « D:\\mnt\\nas »)."""
     p.dest.setText(dest)
+    poss = Possession(p._dest_courante(), statuts)
     p._possession_prete((poss, [], poss.compte_objets(p.inv.images), p.inv.images))
     app_qt.processEvents()
 
@@ -104,7 +105,8 @@ def test_colonne_possede_apres_le_nom(panneau):
     assert h.visualIndex(panneau.COL_POSSEDE) == h.visualIndex(panneau.COL_OBJET) + 1
     if not panneau.v_obj.property(memoire.PROPRIETE_LARGEURS):   # largeurs automatiques : visible sans défiler
         panneau.sp_catalogue.setSizes([560, 620])
-        assert h.sectionViewportPosition(panneau.COL_POSSEDE) + h.sectionSize(panneau.COL_POSSEDE) <= \
+        # au moins le début de la colonne (« n / total ») à l'écran, quelle que soit la police du système
+        assert h.sectionViewportPosition(panneau.COL_POSSEDE) + min(40, h.sectionSize(panneau.COL_POSSEDE)) <= \
             panneau.v_obj.viewport().width()
 
 
@@ -200,9 +202,9 @@ def test_tout_deja_telecharge(panneau, app_qt):
     p.f_manquantes.setChecked(True)
     app_qt.processEvents()
     assert p.p_obj.rowCount() == 0
-    assert p.v_obj.texte_vide().replace('​', '') == 'Tout est déjà téléchargé dans ' + dest
+    assert p.v_obj.texte_vide().replace('​', '') == 'Tout est déjà téléchargé dans ' + p._dest_courante()
     assert attendre(app_qt, lambda: p.m_img.rowCount() == 0, 5)   # objets cachés → plus d'objet choisi
-    assert p.v_img.texte_vide().replace('​', '') == 'Tout est déjà téléchargé dans ' + dest
+    assert p.v_img.texte_vide().replace('​', '') == 'Tout est déjà téléchargé dans ' + p._dest_courante()
     p.v_obj.viewport().grab()
     # un objet incomplet réapparaît, la liste n'est plus vide
     x = next(x for x in p.inv.images if not x['doublon'])
