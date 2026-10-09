@@ -231,7 +231,7 @@ def test_programme_direct_toutes_plates_formes(tmp_path, journal):
         assert journal()[-1]['args'] == [str(p)]
 
 
-@POSIX
+@pytest.mark.skipif(not sys.platform.startswith('linux'), reason='flatpak : Linux seulement (/tmp → /private/tmp sous macOS)')
 def test_flatpak_portail_et_permissions(tmp_path):
     cmd = ['flatpak', 'run', 'org.free_astro.siril']
     host = '[Context]\nshared=network;ipc;\nfilesystems=host;xdg-run/gvfs;\n'
