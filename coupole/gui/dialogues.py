@@ -334,7 +334,10 @@ def guide_astap_html() -> str:
                                                  for k, u in c['catalogue'])))
     for et in c['etapes']:
         p.append('<li>%s</li>' % e(tr(et, dossier=c['dossier'])))
-    p.append('</ol><p>%s</p>' % e(tr('astap_guide_detection')))
+    p.append('</ol>')
+    for note in c.get('notes', ()):
+        p.append('<p><b>%s</b></p>' % e(tr(note)))
+    p.append('<p>%s</p>' % e(tr('astap_guide_detection')))
     p.append('<p><a href="%s">%s</a></p>' % (e(c['page']), e(tr('astap_guide_page', page=c['page']))))
     return ''.join(p)
 

@@ -192,12 +192,15 @@ def detecter(executable: str = '', catalogue: str = '') -> EtatASTAP:
                 candidats += [p / n for n in _noms_executables()]
             else:
                 candidats.append(p)
+    # astap_cli d'abord, PARTOUT (PATH puis dossiers usuels), puis seulement l'exécutable graphique : sur
+    # Arch/Manjaro le paquet officiel ne met rien dans le PATH (/opt/astap seulement) et son « astap » graphique
+    # demande GTK2 (AUR) ; sous Debian, /usr/bin/astap (graphique) passait avant /opt/astap/astap_cli.
     for n in _noms_executables():
         w = shutil.which(n)
         if w:
             candidats.append(Path(w))
-    for b in emplacements_par_defaut():
-        candidats += [b / n for n in _noms_executables()]
+        for b in emplacements_par_defaut():
+            candidats.append(b / n)
     vus = []
     exe = None
     for c in candidats:
@@ -257,24 +260,37 @@ def _u(chemin: str) -> str:
     return SF + chemin + '/download'
 
 
+AUR_D80 = 'https://aur.archlinux.org/packages/d80-star-db-astap'
+# Extraction SÛRE du D80 depuis le .deb hors Debian (vérifiée sur le vrai paquet : 1 213 392 756 octets,
+# md5 1d0683cbc0d0330df03378fab9d899bf, 1 476 fichiers d80_*.1476 sous ./opt/astap).  Jamais « tar -x … -C / » en
+# root : l'archive contient « ./ » et « ./opt/ », dont les droits remplaceraient ceux de / et de /opt.
+EXTRAIRE_D80_DEB = ("bsdtar -xf d80_star_database.deb data.tar.xz && sudo mkdir -p /opt/astap && "
+                    "sudo tar -xJf data.tar.xz -C /opt/astap --strip-components=3 --no-same-owner "
+                    "--wildcards './opt/astap/d80_*'")
+
+
 def conseils_installation(systeme: str | None = None, arch: str | None = None,
                           famille: str | None = None) -> dict:
     """Ce qu'il faut télécharger et les étapes (clés de traduction) pour cette machine.
 
     Renvoie {'programme': [(libellé_clé, url)], 'cli': url|None, 'catalogue': [(clé, url)],
-             'etapes': [clés], 'dossier': chemin par défaut}.
-    Tous les liens figurent sur la page officielle www.hnsky.org/astap.htm (relevé du 8/10/2026).
+             'etapes': [clés], 'notes': [clés], 'dossier': chemin par défaut, 'page'}.
+    Liens relevés sur la page officielle www.hnsky.org/astap.htm et dans les dossiers SourceForge du projet
+    (9/10/2026) ; chacun est vérifié par un test réseau (HEAD, redirections suivies, 200 attendu).  Il n'existe
+    PAS de D80 en .zip (lien mort de la page officielle) : D80 en .exe (Windows), .pkg (macOS), .deb (Linux) ;
+    D50 en .exe, .pkg, .deb, .zip et .pkg.tar.zst (Arch).
     """
     s0, a0 = plateforme()
     s, a = systeme or s0, arch or a0
     fam = famille or (famille_linux() if s == 'linux' else '')
     r = {'systeme': s, 'arch': a, 'famille': fam, 'programme': [], 'cli': None, 'catalogue': [],
-         'etapes': [], 'dossier': '', 'page': SITE}
+         'etapes': [], 'notes': [], 'dossier': '', 'page': SITE}
     if s == 'windows':
         if a == 'arm64':
             r['cli'] = _u('windows_installer/astap_command-line_version_win11_aarch64.zip')
             r['programme'] = [('astap_lien_cli_zip', r['cli'])]
-            r['catalogue'] = [('astap_lien_d80_zip', _u('star_databases/d80_star_database.zip'))]
+            r['catalogue'] = [('astap_lien_d80_exe', _u('star_databases/d80_star_database.exe')),
+                              ('astap_lien_d50_zip', _u('star_databases/d50_star_database.zip'))]
             r['etapes'] = ['astap_etape_win_arm_1', 'astap_etape_win_arm_2', 'astap_etape_win_arm_3']
             r['dossier'] = 'C:\\astap'
         else:
@@ -303,24 +319,43 @@ def conseils_installation(systeme: str | None = None, arch: str | None = None,
             r['programme'] = prog.get(fam, [('astap_lien_targz', _u('linux_installer/astap_aarch64.tar.gz'))])
             r['cli'] = _u('linux_installer/astap_command-line_version_Linux_aarch64.zip')
         elif a == 'armhf':
-            r['programme'] = [('astap_lien_deb', _u('linux_installer/astap_armhf.deb'))]
+            prog = {'deb': [('astap_lien_deb', _u('linux_installer/astap_armhf.deb'))]}
+            r['programme'] = prog.get(fam, [('astap_lien_targz', _u('linux_installer/astap_armhf.tar.gz'))])
             r['cli'] = _u('linux_installer/astap_command-line_version_Linux_armhf.zip')
         else:
             prog = {'deb': [('astap_lien_deb', _u('linux_installer/astap_amd64.deb'))],
                     'rpm': [('astap_lien_rpm', _u('linux_installer/astap_amd64.rpm'))],
-                    'arch': [('astap_lien_arch', _u('linux_installer/astap_amd64.pkg.tar.zst'))]}
+                    'arch': [('astap_lien_arch_gtk3', _u('linux_installer/astap_amd64_gtk3.pkg.tar.zst')),
+                             ('astap_lien_arch', _u('linux_installer/astap_amd64.pkg.tar.zst'))]}
             r['programme'] = prog.get(fam, [('astap_lien_targz', _u('linux_installer/astap_amd64.tar.gz'))])
             r['cli'] = _u('linux_installer/astap_command-line_version_Linux_amd64.zip')
+        d80_deb = ('astap_lien_d80_deb', _u('star_databases/d80_star_database.deb'))
         if fam == 'deb':
-            r['catalogue'] = [('astap_lien_d80_deb', _u('star_databases/d80_star_database.deb')),
-                              ('astap_lien_d50_deb', _u('star_databases/d50_star_database.deb'))]
+            r['catalogue'] = [d80_deb, ('astap_lien_d50_deb', _u('star_databases/d50_star_database.deb'))]
             r['etapes'] = ['astap_etape_linux_deb_1', 'astap_etape_linux_deb_2', 'astap_etape_linux_3']
+        elif fam == 'arch':
+            r['catalogue'] = [('astap_lien_d80_aur', AUR_D80), d80_deb,
+                              ('astap_lien_d50_arch', _u('star_databases/d50_star_database.pkg.tar.zst'))]
+            r['etapes'] = ['astap_etape_linux_arch_1', 'astap_etape_linux_arch_2', 'astap_etape_linux_3']
+            r['notes'] = ['astap_note_arch_cli']
         else:
-            r['catalogue'] = [('astap_lien_d80_zip', _u('star_databases/d80_star_database.zip')),
-                              ('astap_lien_d50_zip', _u('star_databases/d50_star_database.zip'))]
+            r['catalogue'] = [d80_deb, ('astap_lien_d50_zip', _u('star_databases/d50_star_database.zip'))]
             r['etapes'] = ['astap_etape_linux_autre_1', 'astap_etape_linux_autre_2', 'astap_etape_linux_3']
         r['dossier'] = '/opt/astap'
     return r
+
+
+def urls_conseillees() -> list[tuple[str, str, str, str]]:
+    """Toutes les adresses que le guide peut donner : (système, architecture, famille, url), pour le test réseau."""
+    combos = [('windows', 'x86_64', ''), ('windows', 'arm64', ''), ('macos', 'arm64', ''), ('macos', 'x86_64', '')]
+    combos += [('linux', a, f) for a in ('x86_64', 'arm64', 'armhf') for f in ('deb', 'rpm', 'arch', 'autre')]
+    out = []
+    for s, a, f in combos:
+        c = conseils_installation(s, a, f)
+        for u in [u for _, u in c['programme'] + c['catalogue']] + ([c['cli']] if c['cli'] else []) + [c['page']]:
+            if (s, a, f, u) not in out:
+                out.append((s, a, f, u))
+    return out
 
 
 def catalogue_conseille(champ_deg: float) -> str:
