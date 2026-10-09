@@ -53,5 +53,5 @@ def app_qt():
     from PyQt6.QtWidgets import QApplication
     app = QApplication.instance() or QApplication([])
     from coupole.gui import theme
-    theme.appliquer(app, 'clair')
+    theme.appliquer(app)                        # le thème par défaut de Coupole (sombre), comme chez l'utilisateur
     yield app

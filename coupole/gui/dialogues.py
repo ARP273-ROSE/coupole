@@ -416,7 +416,8 @@ class DialogueSignaler(QDialog):
 
 # ======================================================================== raccourcis, aide d'écran
 RACCOURCIS = [('F1', 'racc_f1'), ('Shift+F1', 'racc_manuel'), ('Ctrl+1 … Ctrl+9', 'racc_modules'),
-              ('Ctrl+,', 'racc_reglages'), ('Ctrl+Shift+A', 'racc_astap'), ('Ctrl+R', 'racc_actualiser'),
+              ('Ctrl+,', 'racc_reglages'), ('Ctrl+Shift+A', 'racc_astap'), ('Ctrl+Shift+D', 'racc_apparence'),
+              ('Ctrl+R', 'racc_actualiser'),
               ('Ctrl+Q', 'racc_quitter')]
 
 
@@ -462,9 +463,22 @@ def verifier_maj(parent, silencieux=False):
                 QMessageBox.information(parent, tr('maj_titre'), tr('maj_aucune', version=__version__))
             return
         notes = maj.notes_dans_la_langue(m['notes'], i18n.langue())[:3000]
-        if not maj.est_paquet():
+        genre = maj.type_installation()
+        if genre == 'pip':
             QMessageBox.information(parent, tr('maj_titre'), tr('maj_disponible', version=m['version']) + '\n\n' +
                                     tr('maj_pip', commande=maj.commande_pip()) + '\n\n' + notes)
+            return
+        if genre != 'paquet':                   # paquet système (.deb) : signaler et ouvrir la page, ne rien écrire
+            c = maj.consigne_systeme(m)
+            b = QMessageBox(QMessageBox.Icon.Information, tr('maj_titre'),
+                            tr('maj_disponible', version=m['version']) + '\n\n' +
+                            tr('maj_systeme', url=c['url'], commande=c['commande']) + '\n\n' + notes, parent=parent)
+            ouvrir = b.addButton(tr('maj_ouvrir_page'), QMessageBox.ButtonRole.AcceptRole)
+            ouvrir.setToolTip(tr('maj_ouvrir_page_aide'))
+            b.addButton(QMessageBox.StandardButton.Close)
+            b.exec()
+            if b.clickedButton() is ouvrir:
+                QDesktopServices.openUrl(QUrl(c['url']))
             return
         if QMessageBox.question(parent, tr('maj_titre'), tr('maj_question', version=m['version']) + '\n\n' + notes) \
                 != QMessageBox.StandardButton.Yes:

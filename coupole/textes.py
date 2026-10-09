@@ -201,6 +201,12 @@ TEXTES = {
     'maj_disponible': {'fr': 'Version {version} disponible.', 'en': 'Version {version} available.'},
     'maj_pip': {'fr': 'Installation par pip/pipx : mettre à jour avec\n  {commande}',
                 'en': 'pip/pipx installation: update with\n  {commande}'},
+    'maj_systeme': {'fr': 'Installation par le paquet système (.deb) : Coupole ne se met pas à jour seul.\n'
+                          'Téléchargez le nouveau paquet :\n  {url}\npuis installez-le :\n  {commande}',
+                    'en': 'Installed from the system package (.deb): Coupole does not update itself.\n'
+                          'Download the new package:\n  {url}\nthen install it:\n  {commande}'},
+    'maj_ouvrir_page': {'fr': 'Télécharger le paquet', 'en': 'Download the package'},
+    'maj_ouvrir_page_aide': {'fr': 'Ouvre l\'adresse du paquet .deb dans le navigateur.', 'en': 'Opens the .deb package address in the browser.'},
     'maj_faite': {'fr': 'Mise à jour installée. Relancer Coupole.', 'en': 'Update installed. Restart Coupole.'},
     'maj_appliquer_cli': {'fr': 'Pour l\'installer : coupole maj --appliquer', 'en': 'To install it: coupole update --apply'},
 # ------------------------------------------------------------ sources
@@ -237,6 +243,17 @@ TEXTES = {
                          'en': 'Close Coupole (a running processing can be resumed later).'},
     'act_module': {'fr': 'Module', 'en': 'Module'},
     'act_module_aide': {'fr': 'Affiche ce module.', 'en': 'Show this module.'},
+    'menu_apparence': {'fr': 'Apparence', 'en': 'Appearance'},
+    'menu_apparence_aide': {'fr': 'Thème de Coupole : sombre (défaut) ou clair.', 'en': "Coupole's theme: dark (default) or light."},
+    'act_apparence_clair': {'fr': 'Clair', 'en': 'Light'},
+    'act_apparence_sombre': {'fr': 'Sombre', 'en': 'Dark'},
+    'act_apparence_aide': {'fr': "Applique ce thème tout de suite et l'enregistre. Il ne dépend pas du thème de l'ordinateur ; "
+                                 'même réglage que Préférences > Apparence.',
+                           'en': "Applies this theme at once and saves it. It does not depend on the computer's theme; "
+                                 'same setting as Preferences > Appearance.'},
+    'act_apparence_basculer': {'fr': 'Basculer clair / sombre', 'en': 'Toggle light / dark'},
+    'act_apparence_basculer_aide': {'fr': "Passe de l'un à l'autre (Ctrl+Maj+D).", 'en': 'Switches between the two (Ctrl+Shift+D).'},
+    'apparence_appliquee': {'fr': 'Thème {nom} appliqué.', 'en': '{nom} theme applied.'},
     'act_langue': {'fr': 'Langue', 'en': 'Language'},
     'act_langue_aide': {'fr': "Change la langue de l'interface (auto : celle du système).",
                         'en': 'Change the interface language (auto: system language).'},
@@ -271,8 +288,10 @@ TEXTES = {
                            'en': 'A processing is running. Quitting interrupts it (it will resume next time). Quit?'},
     'aide_ecran_titre': {'fr': 'Aide — {ecran}', 'en': 'Help — {ecran}'},
     'aide_ecran_aide': {'fr': "Aide de l'écran affiché.", 'en': 'Help on the screen shown.'},
-    'aide_generale': {'fr': '<p>Choisir un module dans la barre de gauche. F1 : aide de l\'écran ; Maj+F1 : manuel.</p>',
-                      'en': '<p>Pick a module in the left bar. F1: help on the screen; Shift+F1: manual.</p>'},
+    'aide_generale': {'fr': '<p>Choisir un module dans la barre de gauche. F1 : aide de l\'écran ; Maj+F1 : manuel. '
+                            'Affichage &gt; Apparence : thème sombre (défaut) ou clair, Ctrl+Maj+D pour basculer.</p>',
+                      'en': '<p>Pick a module in the left bar. F1: help on the screen; Shift+F1: manual. '
+                            'View &gt; Appearance: dark (default) or light theme, Ctrl+Shift+D to toggle.</p>'},
     'dlg_ok': {'fr': 'OK', 'en': 'OK'},
     'dlg_ok_aide': {'fr': 'Valide et ferme.', 'en': 'Confirm and close.'},
     'dlg_annuler': {'fr': 'Annuler', 'en': 'Cancel'},
@@ -408,6 +427,7 @@ TEXTES = {
     'racc_modules': {'fr': 'Aller au module 1 … 9', 'en': 'Go to module 1 … 9'},
     'racc_reglages': {'fr': 'Préférences', 'en': 'Preferences'},
     'racc_astap': {'fr': 'Assistant ASTAP', 'en': 'ASTAP assistant'},
+    'racc_apparence': {'fr': 'Thème clair / sombre', 'en': 'Light / dark theme'},
     'racc_actualiser': {'fr': "Banque OHP : rafraîchir l'inventaire", 'en': 'OHP bank: refresh the inventory'},
     'racc_quitter': {'fr': 'Quitter', 'en': 'Quit'},
     'maj_titre': {'fr': 'Mise à jour', 'en': 'Update'},

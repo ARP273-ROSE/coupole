@@ -1,4 +1,5 @@
 """Interface graphique (sans écran) : info-bulles partout, deux langues, aucun blocage."""
+import os
 import time
 
 import pytest
@@ -153,9 +154,122 @@ def test_theme_independant_du_systeme_et_lisible(app_qt):
                                 (R.ToolTipBase, R.ToolTipText), (R.Highlight, R.HighlightedText),
                                 (R.AlternateBase, R.Text)):
                 assert _contraste(p.color(fond), p.color(texte)) >= 4.5, (nom, fond, texte)
+            # couleurs de statut (possédée, doublon écarté, échec) lisibles sur tous les fonds des tableaux
+            for statut in ('statut_ok', 'statut_ecarte', 'statut_echec'):
+                for fond in ('base', 'alterne', 'fenetre'):
+                    assert _contraste(QColor(theme.THEMES[nom][statut]), QColor(theme.THEMES[nom][fond])) >= 4.5, \
+                        (nom, statut, fond)
             assert abs(app_qt.font().pointSizeF() - theme.TAILLE_POINTS) < 0.01
     finally:
-        theme.appliquer(app_qt, 'clair')
+        theme.appliquer(app_qt)
+
+
+def test_menu_apparence_bascule_et_enregistre(app_qt, fenetre):
+    """Affichage > Apparence : le thème sombre est le défaut ; la bascule (Ctrl+Maj+D) change la palette tout de
+    suite, enregistre le réglage, coche la bonne entrée ; les Préférences lisent le même réglage."""
+    from PyQt6.QtGui import QPalette
+    from coupole.core import config
+    from coupole.gui import theme
+    assert config.DEFAUTS['apparence'] == 'sombre'
+    config.reglages()['apparence'] = 'sombre'
+    theme.appliquer(app_qt)
+    fenetre.synchroniser_apparence()
+    assert fenetre.act_apparence['sombre'].isChecked() and not fenetre.act_apparence['clair'].isChecked()
+    fond_sombre = app_qt.palette().color(QPalette.ColorRole.Window)
+    actions = fenetre.menu_apparence.actions()
+    assert fenetre.act_apparence['sombre'] in actions and fenetre.act_apparence['clair'] in actions
+    bascule = [a for a in actions if a.shortcut().toString() == 'Ctrl+Shift+D']
+    assert len(bascule) == 1
+    bascule[0].trigger()
+    assert config.reglages()['apparence'] == 'clair'
+    assert fenetre.act_apparence['clair'].isChecked() and not fenetre.act_apparence['sombre'].isChecked()
+    fond_clair = app_qt.palette().color(QPalette.ColorRole.Window)
+    assert fond_clair != fond_sombre and fond_clair.lightness() > fond_sombre.lightness()
+    # enregistré sur le disque : un nouveau chargement des réglages retrouve « clair »
+    import json
+    assert json.loads(config.reglages().chemin.read_text(encoding='utf-8'))['apparence'] == 'clair'
+    # l'entrée du menu applique directement ; les Préférences montrent le même choix
+    fenetre.act_apparence['sombre'].trigger()
+    assert config.reglages()['apparence'] == 'sombre'
+    assert app_qt.palette().color(QPalette.ColorRole.Window) == fond_sombre
+    from coupole.gui import dialogues
+    d = dialogues.DialogueReglages(fenetre)
+    assert d.apparence.currentData() == 'sombre'
+    d.apparence.setCurrentIndex(d.apparence.findData('clair'))
+    d.accept()
+    assert config.reglages()['apparence'] == 'clair'
+    fenetre.synchroniser_apparence()
+    assert fenetre.act_apparence['clair'].isChecked()
+    # retour au défaut pour les tests suivants
+    fenetre.changer_apparence('sombre')
+    assert fenetre.act_apparence['sombre'].isChecked()
+
+
+def test_possession_pastilles_filtre_et_estimation(app_qt, fenetre, tmp_path, inventaire):
+    """État simulé du dossier de sortie (ok / doublon / échec / absente) : pastilles et couleurs dans la liste des
+    images, colonne « possédé » des objets, filtre « À télécharger seulement », estimation des manquantes, lots."""
+    from PyQt6.QtCore import Qt
+    from coupole.gui import pastilles
+    from coupole.gui.modele import Progression
+    from coupole.core import config
+    from .test_possession import etat_simule
+    ohp = fenetre.panneaux[0]
+    attendre(app_qt, lambda: ohp.inv is not None and ohp.m_obj.rowCount() > 0)
+    imgs = [x for x in inventaire.images if x['objet'] == '(914) Palisana']
+    utiles = [x for x in imgs if not x['doublon']]
+    finals = etat_simule(tmp_path, imgs, ok=utiles[:4], doublon=utiles[4:5], echec=utiles[5:6])
+    # un index de lots minimal pointant sur le dossier des converties
+    dossier_lot = os.path.relpath(os.path.dirname(next(iter(finals.values()))), str(tmp_path)).replace(os.sep, '/')
+    (tmp_path / 'INDEX_LOTS.csv').write_text('a;b;c;d;e;f;g;h;i;j;k;l\n%s;ast;(914) Palisana;x;R;4;120;1;0;0;0;Comet\n'
+                                             % dossier_lot, encoding='utf-8-sig')
+    for nom in ('clair', 'sombre'):
+        fenetre.changer_apparence(nom)
+        ohp.dest.setText(str(tmp_path))
+        ohp._charger_possession()
+        attendre(app_qt, lambda: ohp.possession.existe and ohp.possession.dest == str(tmp_path), 20)
+        ohp.f_manquantes.setChecked(False)
+        for r, o in enumerate(ohp.m_obj.donnees):
+            if o['objet'] == '(914) Palisana':
+                rang = r
+                ohp.v_obj.selectRow(ohp.p_obj.mapFromSource(ohp.m_obj.index(r, 0)).row())
+        app_qt.processEvents()
+        # objets : colonne « possédé » = (4 converties + 1 doublon) / 10, pastille « partiel »
+        prog = ohp.m_obj.lignes[rang][ohp.COL_POSSEDE]
+        assert isinstance(prog, Progression) and (prog.n, prog.total) == (5, 10) and str(prog) == '5 / 10'
+        idx = ohp.m_obj.index(rang, ohp.COL_POSSEDE)
+        assert ohp.m_obj.data(idx, Qt.ItemDataRole.DecorationRole) is not None
+        assert '4 / 10' in ohp.m_obj.data(idx, Qt.ItemDataRole.ToolTipRole)
+        # images : 16 lignes, statuts et couleurs par ligne, info-bulle avec le fichier local
+        assert len(ohp.selection) == 16 and ohp.m_img.rowCount() == 16
+        statuts = [ohp.m_img.lignes[r][0] for r in range(16)]
+        assert statuts.count('possédée') == 4 and statuts.count('doublon écarté') == 1 and statuts.count('échec') == 1
+        for r, x in enumerate(ohp.m_img.donnees):
+            st = ohp.possession.statut(x)
+            i0 = ohp.m_img.index(r, 0)
+            assert ohp.m_img.data(i0, Qt.ItemDataRole.DecorationRole) is not None
+            couleur = ohp.m_img.data(ohp.m_img.index(r, 3), Qt.ItemDataRole.ForegroundRole)
+            if st == 'absente':
+                assert couleur is None
+            else:
+                assert couleur == pastilles.couleur_statut(st)
+            bulle = ohp.m_img.data(i0, Qt.ItemDataRole.ToolTipRole)
+            if st == 'ok':
+                assert 'img' in bulle and '.xisf' in bulle
+        # estimation : seules les manquantes comptent (5 sur 10)
+        assert '5' in ohp.l_estimation.text() and ('manquante' in ohp.l_estimation.text())
+        # filtre « À télécharger seulement » : plus que les 5 manquantes + les 6 doublons de la base (jamais possédés)
+        ohp.f_manquantes.setChecked(True)
+        app_qt.processEvents()
+        assert all(not ohp.possession.possedee(x) for x in ohp.selection)
+        assert len([x for x in ohp.selection if not x['doublon']]) == 5
+        ohp.f_manquantes.setChecked(False)
+        # lots : colonne complet / incomplet
+        ohp._remplir_lots()
+        assert ohp.m_lots.rowCount() == 1
+        assert 'incomplet' in ohp.m_lots.lignes[0][ohp.COL_LOT_COMPLET]
+        # légende dans la langue et aux couleurs du thème
+        assert 'possédée' in ohp.l_legende.text() and pastilles.couleur_statut('ok').name() in ohp.l_legende.text()
+    fenetre.changer_apparence(config.DEFAUTS['apparence'])
 
 
 def test_module_cosmologie(app_qt, fenetre):

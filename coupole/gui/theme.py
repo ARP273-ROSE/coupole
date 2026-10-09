@@ -3,8 +3,9 @@
 Le style natif suit le thème du système (mode sombre de Windows 11/macOS, thèmes GTK/KDE) et mélange alors
 des couleurs fixées par l'application avec celles du système : texte noir sur fond sombre, info-bulles
 illisibles, tableaux sans contraste.  On impose donc partout le même style Qt (« Fusion »), une palette
-complète, une feuille de style et une police de taille fixe.  Le thème (clair ou sombre) se choisit dans
-les Réglages ; il ne dépend jamais de celui du système.
+complète, une feuille de style et une police de taille fixe.  Le thème (sombre par défaut, ou clair) se choisit
+dans le menu Affichage > Apparence (Ctrl+Maj+D bascule) ou dans les Réglages ; il ne dépend jamais de celui du
+système.
 """
 from __future__ import annotations
 
@@ -21,12 +22,15 @@ THEMES = {
         'texte_doux': '#646C77', 'desactive': '#A4AAB2', 'bouton': '#ECEDE8', 'bordure': '#D8DBD9',
         'selection': ACCENT, 'texte_selection': '#FFFFFF', 'bulle': '#FBF7EC', 'texte_bulle': '#2E333B',
         'lien': ACCENT, 'entete': '#EDEEE9', 'survol': '#E3EAF1',
+        # statuts de possession (Banque OHP) : contraste ≥ 4,5 sur base, alterne et fenêtre (tests/test_interface.py)
+        'statut_ok': '#1F7A3A', 'statut_ecarte': '#5F6873', 'statut_echec': '#A1500A',
     },
     'sombre': {
         'fenetre': '#262A31', 'base': '#1F2329', 'alterne': '#2A2E35', 'texte': '#D9DDE2',
         'texte_doux': '#A3ABB6', 'desactive': '#69717C', 'bouton': '#30353E', 'bordure': '#3B414B',
         'selection': '#3E6C99', 'texte_selection': '#FFFFFF', 'bulle': '#30353E', 'texte_bulle': '#D9DDE2',
         'lien': '#8DB4DA', 'entete': '#2C3139', 'survol': '#343C48',
+        'statut_ok': '#7CC47F', 'statut_ecarte': '#A3ABB6', 'statut_echec': '#F2A65A',
     },
 }
 
@@ -39,7 +43,7 @@ TAILLE_POINTS = 10
 
 
 def palette(nom: str) -> QPalette:
-    c = {k: QColor(v) for k, v in THEMES.get(nom, THEMES['clair']).items()}
+    c = {k: QColor(v) for k, v in THEMES.get(nom, THEMES['sombre']).items()}
     p = QPalette()
     R, G = QPalette.ColorRole, QPalette.ColorGroup
     for groupe in (G.Active, G.Inactive):
@@ -136,8 +140,8 @@ def appliquer(app: QApplication | None = None, nom: str | None = None) -> str:
         return ''
     if nom not in THEMES:
         nom = config.reglages()['apparence']
-    if nom not in THEMES:
-        nom = 'clair'
+    if nom not in THEMES:                       # réglage abîmé : le défaut de Coupole
+        nom = config.DEFAUTS['apparence']
     style = QStyleFactory.create('Fusion')
     if style is not None:
         app.setStyle(style)
@@ -157,4 +161,4 @@ def couleur(cle: str) -> QColor:
     """Couleur du thème courant (pour les widgets dessinés à la main)."""
     from ..core import config
     nom = config.reglages()['apparence']
-    return QColor(THEMES.get(nom, THEMES['clair'])[cle])
+    return QColor(THEMES.get(nom, THEMES[config.DEFAUTS['apparence']])[cle])

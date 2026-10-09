@@ -10,6 +10,11 @@ Installation par pip/pipx ou depuis les sources : la mise à jour n'est pas
 appliquée par l'application (elle n'a pas à modifier un environnement Python
 qu'elle ne possède pas) ; elle est seulement signalée, avec la commande à
 lancer.
+
+Installation par le paquet système ``.deb`` (Debian, Ubuntu) : les fichiers
+vivent sous ``/opt/coupole``, appartiennent à root et sont gérés par dpkg ;
+l'application ne les touche pas.  La nouvelle version est signalée avec
+l'adresse du ``.deb`` de la Release et la commande ``apt`` à lancer.
 """
 from __future__ import annotations
 
@@ -37,6 +42,8 @@ def depot() -> str:
 
 PREFIXE = 'coupole-app-'
 POINT_ENTREE = 'lancer.py'
+# Posé par build_deb.py dans app/ : dit à l'application qu'elle est installée par un paquet système.
+MARQUEUR_SYSTEME = 'installation_systeme.json'
 PROTEGES = {'reglages.json'}
 DELAI = 20
 ARCHIVE_MAX = 200 * 2**20          # octets téléchargés : l'archive applicative fait ~5 Mo
@@ -71,6 +78,49 @@ def dossier_app() -> Path:
 def est_paquet() -> bool:
     base = dossier_app().parent / 'python'
     return (base / 'python.exe').exists() or (base / 'bin' / 'python3').exists()
+
+
+def installation_systeme() -> dict | None:
+    """Fiche du paquet système (`.deb`…) qui a installé Coupole, ou None.
+
+    Clés : ``type`` (« deb »), ``architecture`` (« amd64 », « arm64 »), ``actif`` (nom stable du fichier dans la
+    Release), ``commande`` (ce qu'il faut lancer pour installer la nouvelle version).
+    """
+    marqueur = dossier_app() / MARQUEUR_SYSTEME
+    if not marqueur.exists():
+        return None
+    try:
+        fiche = json.loads(marqueur.read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return {'type': 'systeme'}
+    return fiche if isinstance(fiche, dict) else {'type': 'systeme'}
+
+
+def type_installation() -> str:
+    """« deb » (paquet système, /opt, géré par dpkg), « paquet » (autonome, se met à jour seul), « pip »."""
+    fiche = installation_systeme()
+    if fiche:
+        return fiche.get('type') or 'systeme'
+    if not est_paquet():
+        return 'pip'
+    # Paquet autonome posé dans un dossier que l'utilisateur ne peut pas modifier (copie sous /opt faite à la main,
+    # compte administrateur…) : l'archive ne pourrait pas s'appliquer ; on le dit plutôt que d'échouer à mi-chemin.
+    if not os.access(dossier_app(), os.W_OK):
+        return 'systeme'
+    return 'paquet'
+
+
+def peut_appliquer() -> bool:
+    """L'application peut-elle installer elle-même l'archive applicative ?"""
+    return type_installation() == 'paquet'
+
+
+def _architecture_deb() -> str:
+    import platform
+    m = platform.machine().lower()
+    if m in ('aarch64', 'arm64'):
+        return 'arm64'
+    return 'amd64'
 
 
 def plateforme() -> str:
@@ -130,15 +180,25 @@ def verifier(version_courante: str):
                   if (a.get('name') or '').lower().startswith(PREFIXE) and a['name'].lower().endswith('.zip')]
     choix = [a for a in candidates if '-%s.' % plateforme() in a['name'].lower()] or \
         [a for a in candidates if not any('-%s.' % p in a['name'].lower() for p in ('windows', 'macos', 'linux'))]
+    # Le paquet Debian/Ubuntu de cette architecture : le nom stable (coupole-linux-amd64.deb) d'abord, sinon le nom
+    # versionné (coupole_0.1.1_amd64.deb) ; une installation .deb s'en sert pour dire quoi télécharger.
+    arch = _architecture_deb()
+    debs = [a for a in data.get('assets', []) if (a.get('name') or '').lower().endswith('_%s.deb' % arch)
+            or (a.get('name') or '').lower().endswith('-%s.deb' % arch)]
+    debs.sort(key=lambda a: 0 if a['name'].lower() == 'coupole-linux-%s.deb' % arch else 1)
     return {'version': tag, 'url': choix[0]['browser_download_url'] if choix else '',
             'taille': choix[0].get('size', 0) if choix else 0, 'notes': data.get('body') or '',
-            'page': data.get('html_url') or 'https://github.com/%s/releases/latest' % depot()}
+            'page': data.get('html_url') or 'https://github.com/%s/releases/latest' % depot(),
+            'deb': debs[0]['browser_download_url'] if debs else '',
+            'deb_nom': debs[0]['name'] if debs else ''}
 
 
 def appliquer(maj: dict, progression=None) -> bool:
     """Télécharge l'archive et remplace le contenu de app/ ; restaure l'ancienne version en cas d'échec."""
     if not est_paquet():
         raise RuntimeError('not a standalone package: use pipx/pip to upgrade')
+    if type_installation() != 'paquet':
+        raise RuntimeError('system package (%s): install the new package instead' % type_installation())
     if not maj.get('url'):
         raise RuntimeError('no application archive in this release')
     cible = dossier_app()
@@ -247,3 +307,22 @@ def commande_pip() -> str:
     """Commande à proposer quand l'application est installée par pip/pipx."""
     url = 'git+https://github.com/%s' % depot()
     return 'pipx install --force %s   |   python -m pip install --upgrade %s' % (url, url)
+
+
+def consigne_systeme(maj: dict | None = None) -> dict:
+    """Quoi télécharger et quoi lancer quand Coupole est installé par un paquet système.
+
+    Renvoie ``{'fichier', 'url', 'commande', 'page'}`` ; l'adresse vient de la Release si elle a été lue, sinon du
+    nom stable du fichier (``releases/latest/download/…``).
+    """
+    fiche = installation_systeme() or {}
+    arch = fiche.get('architecture') or _architecture_deb()
+    fichier = fiche.get('actif') or 'coupole-linux-%s.deb' % arch
+    page = (maj or {}).get('page') or 'https://github.com/%s/releases/latest' % depot()
+    url = (maj or {}).get('deb') or 'https://github.com/%s/releases/latest/download/%s' % (depot(), fichier)
+    if (maj or {}).get('deb_nom'):
+        fichier = maj['deb_nom']
+    commande = fiche.get('commande') or 'sudo apt install ./%s' % fichier
+    if fichier not in commande:
+        commande = 'sudo apt install ./%s' % fichier
+    return {'fichier': fichier, 'url': url, 'commande': commande, 'page': page}

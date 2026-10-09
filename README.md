@@ -28,7 +28,8 @@ anglais, sur Windows, macOS et Linux. Architecture **modulaire** : d'autres modu
 |---|---|---|
 | Windows 10/11 64 bits | `Coupole-Setup-x.y.z.exe` | double-clic ; « Informations complémentaires » puis « Exécuter quand même » au premier lancement (installeur non signé) ; aucun mot de passe administrateur |
 | macOS Apple Silicon / Intel | `Coupole-x.y.z-macos-arm64.dmg` / `-x86_64.dmg` | glisser dans Applications ; premier lancement : clic droit, « Ouvrir » |
-| Linux x86_64 / ARM64 | `Coupole-x.y.z-linux-x86_64.tar.gz` | décompresser, lancer `installer.sh` (dans `~/.local/share`, entrée de menu) |
+| **Ubuntu / Debian** x86_64 / ARM64 | `coupole_x.y.z_amd64.deb` / `_arm64.deb` | `sudo apt install ./coupole_x.y.z_amd64.deb` (apt installe les bibliothèques Qt nécessaires) ; commande `coupole`, entrée de menu ; désinstaller : `sudo apt remove coupole`. Ubuntu 22.04 ou plus récent, Debian 12 ou plus récent |
+| Autre Linux x86_64 / ARM64 | `Coupole-x.y.z-linux-x86_64.tar.gz` | décompresser, lancer `installer.sh` (dans `~/.local/share`, entrée de menu) |
 
 **Avec le Python de l'ordinateur** (≥ 3.10) — depuis le dossier des sources :
 
@@ -103,7 +104,9 @@ Au premier lancement, Coupole demande s'il peut envoyer des rapports **anonymes*
 système, processeur, mémoire, trace d'erreur aux chemins tronqués, 64 ko au plus ; jamais de nom de machine,
 d'utilisateur ni d'image). Sans accord, rien ne part. Audit complet (performance, parallélisme, robustesse,
 sécurité, multiplateforme, bilinguisme) : [docs/AUDIT_2026-10.md](docs/AUDIT_2026-10.md). Les paquets se mettent à jour d'eux-mêmes depuis les Releases GitHub (archive
-du code seulement, aucun exécutable téléchargé) ; une installation par pip/pipx indique la commande à lancer.
+du code seulement, aucun exécutable téléchargé) ; une installation par pip/pipx indique la commande à lancer ; une
+installation par le paquet `.deb` (fichiers sous `/opt/coupole`, gérés par dpkg) signale la nouvelle version et
+pointe vers le `.deb` à installer.
 
 ### Évolutif
 
@@ -152,7 +155,9 @@ English, on Windows, macOS and Linux. **Modular** architecture: more modules wil
 **All-inclusive packages** (nothing else to install, automatic updates) — repository *Releases* page:
 `Coupole-Setup-x.y.z.exe` (Windows 10/11 64-bit; « More info » then « Run anyway » on first launch; no
 administrator password), `Coupole-x.y.z-macos-arm64.dmg` / `-x86_64.dmg` (first launch: right click, « Open »),
-`Coupole-x.y.z-linux-x86_64.tar.gz` / `-arm64` (unpack, run `installer.sh`).
+`coupole_x.y.z_amd64.deb` / `_arm64.deb` (Ubuntu 22.04+, Debian 12+: `sudo apt install ./coupole_x.y.z_amd64.deb`,
+which pulls the Qt system libraries; `coupole` command and menu entry; `sudo apt remove coupole` to uninstall),
+`Coupole-x.y.z-linux-x86_64.tar.gz` / `-arm64` for other Linux systems (unpack, run `installer.sh`).
 
 **With the computer's Python** (≥ 3.10), from the source folder: `sh install.sh` (Linux, macOS) or `install.bat`
 (Windows) — virtual environment, dependencies, launchers; press Enter to confirm.
@@ -204,7 +209,8 @@ At first launch Coupole asks whether it may send **anonymous** crash reports (64
 name); without consent nothing is sent. Full audit (performance, parallelism, robustness, security, cross-platform,
 bilingualism): [docs/AUDIT_2026-10.md](docs/AUDIT_2026-10.md) (French).
 Packages update themselves from GitHub Releases (code archive only, no executable downloaded); a pip/pipx installation
-shows the command to run.
+shows the command to run; a `.deb` installation (files under `/opt/coupole`, managed by dpkg) announces the new
+version and points to the `.deb` to install.
 
 ### Documentation, sources, credits
 

@@ -1,9 +1,12 @@
 """Panneau « Cosmologie » : redshift → distances, âges, volume, module de distance, échelle ; courbes ; export CSV."""
 from __future__ import annotations
 
+import math
+
 from PyQt6.QtCore import QLocale, Qt
-from PyQt6.QtWidgets import (QDoubleSpinBox, QFileDialog, QGroupBox, QHBoxLayout, QLabel, QMessageBox, QSplitter,
-                             QVBoxLayout, QWidget)
+from PyQt6.QtGui import QPainter
+from PyQt6.QtWidgets import (QDoubleSpinBox, QFileDialog, QGroupBox, QHBoxLayout, QLabel, QMessageBox, QScrollArea,
+                             QSlider, QSplitter, QStyle, QStyleOptionSlider, QVBoxLayout, QWidget)
 
 from ...core.i18n import langue, tr
 from ...gui.adaptatif import Flux
@@ -29,6 +32,54 @@ def _calcul_complet(z, modele, H0, Om, Ok, shoes, avec_courbes):
 
 
 LARGEUR_COTE_A_COTE = 1500      # pixels logiques : en dessous, les courbes passent sous le tableau
+
+# Curseur de redshift : échelle logarithmique de 0,001 à 1100, 1000 pas par décade (flèches : 10 pas, soit 2,3 % en z).
+CURSEUR_LOG_MIN = -3.0
+CURSEUR_Z_MAX = 1100.0
+CURSEUR_PAS_DECADE = 1000
+CURSEUR_MAX = int(round((math.log10(CURSEUR_Z_MAX) - CURSEUR_LOG_MIN) * CURSEUR_PAS_DECADE))      # 6041
+CURSEUR_REPERES = (0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0)
+
+
+def z_du_curseur(v: int) -> float:
+    return 10 ** (CURSEUR_LOG_MIN + v / CURSEUR_PAS_DECADE)
+
+
+def curseur_du_z(z: float) -> int:
+    if not z or z <= 0:
+        return 0
+    return int(round((math.log10(z) - CURSEUR_LOG_MIN) * CURSEUR_PAS_DECADE))
+
+
+class ReperesCurseur(QWidget):
+    """Les repères 0,001 … 1000 sous le curseur, alignés sur ses graduations (géométrie demandée au style)."""
+
+    def __init__(self, curseur: QSlider, parent=None):
+        super().__init__(parent)
+        self.curseur = curseur
+        self.setFixedHeight(self.fontMetrics().height() + 2)
+
+    def paintEvent(self, ev):
+        p = QPainter(self)
+        p.setPen(self.palette().placeholderText().color())
+        f = p.font()
+        f.setPointSizeF(max(7.0, f.pointSizeF() * 0.85))
+        p.setFont(f)
+        fm = p.fontMetrics()
+        opt = QStyleOptionSlider()
+        self.curseur.initStyleOption(opt)
+        st = self.curseur.style()
+        rainure = st.subControlRect(QStyle.ComplexControl.CC_Slider, opt, QStyle.SubControl.SC_SliderGroove, self.curseur)
+        poignee = st.subControlRect(QStyle.ComplexControl.CC_Slider, opt, QStyle.SubControl.SC_SliderHandle, self.curseur)
+        gauche = rainure.x() + poignee.width() // 2
+        largeur = max(1, rainure.width() - poignee.width())
+        for z in CURSEUR_REPERES:
+            x = gauche + QStyle.sliderPositionFromValue(0, CURSEUR_MAX, curseur_du_z(z), largeur)
+            texte = formats.court(z)
+            w = fm.horizontalAdvance(texte)
+            x = min(max(x - w / 2, 0), self.width() - w)
+            p.drawText(int(x), fm.ascent() + 1, texte)
+        p.end()
 
 
 def _paire(cle_libelle, widget):
@@ -95,6 +146,20 @@ class Panneau(QWidget):
         self.candidats.activated.connect(self._candidat_choisi)
         f.addWidget(self.candidats)
         v.addLayout(f)
+        # curseur de redshift (échelle log) : glisser lit les valeurs sur la grille déjà calculée, relâcher calcule
+        self.curseur = aide(QSlider(Qt.Orientation.Horizontal), 'cosmo_curseur_aide')
+        self.curseur.setRange(0, CURSEUR_MAX)
+        self.curseur.setSingleStep(10)
+        self.curseur.setPageStep(CURSEUR_PAS_DECADE)
+        self.curseur.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.curseur.setTickInterval(CURSEUR_PAS_DECADE)
+        self.curseur.setTracking(True)
+        self._curseur_sync = False
+        self.curseur.valueChanged.connect(self._curseur_bouge)
+        self.curseur.sliderReleased.connect(self._curseur_relache)
+        v.addWidget(self.curseur)
+        self.reperes = ReperesCurseur(self.curseur)
+        v.addWidget(self.reperes)
         f = Flux()
         for cle, zz in EXEMPLES:
             f.addWidget(bouton(cle, lambda _=False, x=zz: self.definir_z(x)))
@@ -144,19 +209,35 @@ class Panneau(QWidget):
         super().resizeEvent(ev)
         self._disposer()
 
+    def _hauteur_visible(self) -> int:
+        """Hauteur de la zone défilante qui contient le panneau (ou du panneau lui-même)."""
+        w = self.parentWidget()
+        while w is not None and not isinstance(w, QScrollArea):
+            w = w.parentWidget()
+        return w.viewport().height() if w is not None else self.height()
+
     def _disposer(self):
         """Tableau et courbes côte à côte sur un grand écran, l'un sous l'autre sinon : le tableau garde toutes
-        ses colonnes visibles (jamais de défilement horizontal pour la colonne SH0ES)."""
+        ses colonnes visibles (jamais de défilement horizontal pour la colonne SH0ES).
+
+        Les courbes suivent la fenêtre : leur hauteur minimale est une part de la zone visible, et le tableau ne
+        réclame que la place qui reste (il défile si besoin) — sinon le panneau, plus haut que la zone défilante,
+        gardait sa hauteur de consigne et les courbes restaient figées à leur minimum quand on agrandissait."""
         voulu = Qt.Orientation.Horizontal if self.width() >= LARGEUR_COTE_A_COTE else Qt.Orientation.Vertical
         if self.splitter.orientation() != voulu:
             self.splitter.setOrientation(voulu)
             self.splitter.setSizes([3, 2] if voulu == Qt.Orientation.Horizontal else [11, 7])   # tableau d'abord
-        # l'un sous l'autre : le tableau montre toutes ses lignes (la page défile si l'écran est bas)
+        visible = self._hauteur_visible()
+        reste = max(0, self.height() - self.splitter.height())      # tout ce qui n'est pas le tableau et les courbes
+        disponible = max(200, visible - reste - 8)
         if voulu == Qt.Orientation.Vertical and self.m_res.rowCount():
+            courbes_min = max(220, int(disponible * 0.55))          # plus de la moitié de la place visible aux courbes
             h = self.v_res.horizontalHeader().height() + self.v_res.rowHeight(0) * self.m_res.rowCount() + 6
-            self.v_res.setMinimumHeight(min(h, 460))
+            self.v_res.setMinimumHeight(max(140, min(h, disponible - courbes_min)))
+            self.trace.setMinimumHeight(courbes_min)
         else:
             self.v_res.setMinimumHeight(0)
+            self.trace.setMinimumHeight(max(200, min(disponible, 320)))
         self._ajuster_colonnes()
 
     def _ajuster_colonnes(self):
@@ -224,6 +305,43 @@ class Panneau(QWidget):
         self.z.setText(formats.court(z))
         self.calculer()
 
+    # ------------------------------------------------------------ curseur
+    def _placer_curseur(self, z: float):
+        """Met le curseur sur z sans déclencher de calcul (champ et curseur restent d'accord)."""
+        self._curseur_sync = True
+        try:
+            self.curseur.setValue(max(0, min(CURSEUR_MAX, curseur_du_z(z))))
+        finally:
+            self._curseur_sync = False
+
+    def _curseur_bouge(self, v: int):
+        if self._curseur_sync:
+            return
+        z = z_du_curseur(v)
+        self.z.setText(formats.court(z))
+        self.trace.placer_marqueur(z)
+        if self.curseur.isSliderDown():
+            self._afficher_interpole(z)             # fluide : lecture sur la grille, pas de recalcul
+        else:
+            self.calculer()                         # flèches du clavier, clic sur la rainure : calcul exact
+
+    def _curseur_relache(self):
+        self.calculer()
+
+    def _afficher_interpole(self, z: float):
+        """Pendant le glissement : valeurs interpolées sur la grille des courbes (sigma et SH0ES laissés en « … »)."""
+        if not self.courbes or not self.m_res.lignes:
+            return
+        d = calcul.interpoler(self.courbes, z)
+        lignes = []
+        for ligne, k in zip(self.m_res.lignes, self.m_res.donnees):
+            v = d.get(k)
+            lignes.append((ligne[0], formats.valeur(k, v) if v is not None else ligne[1],
+                           '…' if ligne[2] else '', '…' if ligne[3] else ''))
+        self.m_res.lignes = lignes
+        self.m_res.dataChanged.emit(self.m_res.index(0, 0), self.m_res.index(len(lignes) - 1, 3))
+        self.l_etat.setText(tr('cosmo_curseur_approx', z=formats.court(z)))
+
     def recevoir_redshift(self, z: float, nom: str = ''):
         """Point d'entrée des autres modules (fiche en ligne → « envoyer ce redshift »)."""
         self.objet.setText(nom)
@@ -283,6 +401,7 @@ class Panneau(QWidget):
             self.trace.format_x = 'z = {:.4g}'
             self.trace.format_y = '{:.4g}'
         self.trace.placer_marqueur(d['z'])
+        self._placer_curseur(d['z'])
         self.resultat = d
         p = d['parametres']
         self.l_params.setText(tr('cosmo_params', h0=self._n(p['H0']), om=formats.chiffres(p['Om'], 4),

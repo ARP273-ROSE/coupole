@@ -36,6 +36,9 @@ def enregistrer(p):
     s = sous.add_parser('inventaire', aliases=['inventory'], help=tr('ohp_cli_inventaire'),
                         description=tr('ohp_cli_inventaire_desc'), formatter_class=fmt)
     s.add_argument('--rafraichir', '--refresh', action='store_true', help=tr('ohp_aide_rafraichir'))
+    s.add_argument('--manquantes', '--missing', action='store_true', help=tr('ohp_aide_manquantes'))
+    s.add_argument('--dest', metavar=tr('cli_meta_dossier'), help=tr('ohp_aide_dest'))
+    s.add_argument('--json', action='store_true', help=tr('cli_aide_json'))
     s.set_defaults(fonction=cmd_inventaire)
 
     s = sous.add_parser('catalogue', aliases=['catalog'], help=tr('ohp_cli_catalogue'),
@@ -50,6 +53,7 @@ def enregistrer(p):
                         formatter_class=fmt)
     _selection_args(s)
     s.add_argument('--csv', metavar=tr('cli_meta_fichier'), help=tr('ohp_aide_csv'))
+    s.add_argument('--dest', metavar=tr('cli_meta_dossier'), help=tr('ohp_aide_dest'))
     s.set_defaults(fonction=cmd_images)
 
     s = sous.add_parser('estimer', aliases=['estimate'], help=tr('ohp_cli_estimer'),
@@ -159,9 +163,51 @@ def cmd_inventaire(a):
             if x:
                 print('   %-40s → %-30s %s' % (nom, x['objet'], tr('ohp_classement_' + x['classement'])))
     n_d = sum(1 for x in inv.images if x['doublon'])
+    if getattr(a, 'manquantes', False):
+        return _manquantes(a, inv)
     print(tr('ohp_inventaire_resume', n=len(inv.images), objets=len(inv.objets()), doublons=n_d,
              taille=_taille(sum(x['access_estsize'] * 1024 for x in inv.images)),
              nuits=len({(str(x['nuit'])) for x in inv.images}), date=m.get('date', '?'), source=m.get('source', '?')))
+    return 0
+
+
+def _manquantes(a, inv):
+    """`ohp inventaire --manquantes` : par objet, ce qui reste à télécharger d'après le dossier de sortie."""
+    from .cibles import nom_affiche
+    from .possession import Possession
+    dest = _dest(a)
+    poss = Possession.lire(dest)
+    comptes = poss.compte_objets(inv.images)
+    par_objet = {}
+    for x in inv.images:
+        par_objet.setdefault(x['objet'], []).append(x)
+    lignes = []
+    for o in inv.objets():
+        c = comptes.get(o['objet'])
+        if not c:
+            continue
+        manq = poss.manquantes(par_objet.get(o['objet'], []))
+        octets = sum(x['access_estsize'] * 1024 for x in manq)
+        lignes.append({'objet': o['objet'], 'nom': nom_affiche(o['objet']), 'manquantes': len(manq),
+                       'total': c['total'], 'possedees': c['possedees'], 'doublons': c['doublons'],
+                       'echecs': c['echecs'], 'octets': int(octets)})
+    total = {k: sum(l[k] for l in lignes) for k in ('manquantes', 'total', 'possedees', 'doublons', 'echecs', 'octets')}
+    total['objets'] = sum(1 for l in lignes if l['manquantes'])
+    if getattr(a, 'json', False):
+        print(json.dumps({'dest': dest, 'copie': poss.existe, 'objets': lignes, 'total': total},
+                         ensure_ascii=False, indent=1))
+        return 0
+    print(tr('ohp_manquantes_entete', dest=dest))
+    if not poss.existe:
+        print(tr('ohp_manquantes_rien', total=total['total'], taille=_taille(total['octets'])))
+        return 0
+    for l in lignes:
+        if l['manquantes']:
+            print(tr('ohp_manquantes_ligne', objet=l['nom'][:40], manquantes=l['manquantes'], total=l['total'],
+                     taille=_taille(l['octets'])))
+    print(tr('ohp_manquantes_total', manquantes=total['manquantes'], total=total['total'], objets=total['objets'],
+             taille=_taille(total['octets']), possedees=total['possedees'], doublons=total['doublons'],
+             echecs=total['echecs']))
     return 0
 
 
@@ -218,9 +264,12 @@ def cmd_images(a):
     if sel is None:
         return 2
     from .cibles import nom_affiche
+    from .possession import Possession
+    poss = Possession.lire(_dest(a))                  # colonne « possédé » d'après le dossier de sortie
     lignes = sorted(sel, key=lambda x: (x['t_min'], x['access_url']))
-    print('%-19s %-5s %-11s %7s %-28s %s' % (tr('ohp_col_date'), tr('ohp_col_tel'), tr('ohp_col_filtre'),
-                                             tr('ohp_col_pose'), tr('ohp_col_objet'), tr('ohp_col_drapeaux')))
+    print('%-19s %-5s %-11s %7s %-28s %-16s %s' % (tr('ohp_col_date'), tr('ohp_col_tel'), tr('ohp_col_filtre'),
+                                                   tr('ohp_col_pose'), tr('ohp_col_objet'), tr('ohp_col_possede'),
+                                                   tr('ohp_col_drapeaux')))
     from ...core.astro import utc
     for x in lignes:
         dr = []
@@ -230,20 +279,23 @@ def cmd_images(a):
             dr.append(tr('ohp_drapeau_date'))
         if x['diurne']:
             dr.append(tr('ohp_drapeau_diurne'))
-        print('%-19s %-5s %-11s %7g %-28s %s' % (utc(x['t_min']).isoformat(timespec='seconds'), x['tel'],
-                                                 x['filter_name'], x['t_exptime'], nom_affiche(x['objet'])[:28],
-                                                 ', '.join(dr)))
+        print('%-19s %-5s %-11s %7g %-28s %-16s %s' % (utc(x['t_min']).isoformat(timespec='seconds'), x['tel'],
+                                                       x['filter_name'], x['t_exptime'], nom_affiche(x['objet'])[:28],
+                                                       tr('ohp_statut_possession_' + poss.statut(x))[:16],
+                                                       ', '.join(dr)))
     if a.csv:
         with open(a.csv, 'w', newline='', encoding='utf-8-sig') as f:
             w = csv.writer(f, delimiter=';')
             w.writerow(['url', 'objet', 'nom_base', 'nuit', 'date_utc', 'telescope', 'filtre', 'pose_s', 'ra_deg',
-                        'dec_deg', 'octets', 'doublon', 'date_partagee', 'diurne'])
+                        'dec_deg', 'octets', 'doublon', 'date_partagee', 'diurne', 'possedee', 'statut_local',
+                        'fichier_local'])
             for x in lignes:
+                d = poss.detail(x)
                 w.writerow([x['access_url'], x['objet'], x['target_name'], x['nuit'],
                             utc(x['t_min']).isoformat(timespec='seconds'), x['tel'], x['filter_name'],
                             '%g' % x['t_exptime'], '%.5f' % x['s_ra'], '%.5f' % x['s_dec'],
                             int(x['access_estsize'] * 1024), int(x['doublon']), int(x['date_partagee']),
-                            int(x['diurne'])])
+                            int(x['diurne']), int(poss.possedee(x)), d['statut'], d['chemin']])
         print(tr('ecrit', chemin=a.csv))
     return 0
 

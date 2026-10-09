@@ -20,6 +20,11 @@ def rapport() -> dict:
             'destination': dest}
 
 
+def infobulles() -> dict:
+    """Info-bulle de certaines lignes (libellé → texte) ; le détail technique vit ici, pas dans la valeur affichée."""
+    return {tr('mach_gpu_usage'): tr('mach_gpu_usage_aide'), tr('mach_gpu'): tr('mach_gpu_val_aide')}
+
+
 def lignes(d: dict) -> list[tuple[str, str]]:
     """(libellé, valeur) traduits, pour l'affichage."""
     m, p, a, g = d['machine'], d['plan'], d['astap'], d['gpu']
@@ -36,7 +41,7 @@ def lignes(d: dict) -> list[tuple[str, str]]:
             out.append((tr('mach_gpu'), '%s [%s]%s' % (c['nom'], c['fabricant'], mem)))
     else:
         out.append((tr('mach_gpu'), tr('mach_gpu_aucune')))
-    out.append((tr('mach_gpu_usage'), tr('mach_gpu_cupy_oui') if g['cupy'] else tr('mach_gpu_cupy_non')))
+    out.append((tr('mach_gpu_usage'), tr('mach_gpu_usage_pret') if g['cupy'] else tr('mach_gpu_usage_val')))
     out.append((tr('mach_plan'), tr('mach_plan_val', dl=p['telechargements'], conv=p['conversions'])))
     out.append((tr('mach_plan_raison'), tr(p['raison'])))
     out.append((tr('mach_econome'), tr('oui') if p['econome'] else tr('non')))

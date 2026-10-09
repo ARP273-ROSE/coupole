@@ -55,6 +55,9 @@
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp inventaire (inventory)\newline\normalfont\small Inventaire de la banque par le service TAP public (http://tap-ufe.obspm.fr/tap, table ivoa.obscore), gardé en cache local.}\\
 \midrule
 --rafraichir,\allowbreak{} --refresh & réinterroge le service TAP de l'Observatoire (une requête)\\
+--manquantes,\allowbreak{} --missing & liste ce qui reste à télécharger par rapport au dossier de sortie (--dest)\\
+--dest DOSSIER & dossier de destination (défaut : \textasciitilde{}/Coupole/OHP\_DU\_ECU ou celui des réglages)\\
+--json & sortie JSON (pour les scripts)\\
 \bottomrule
 \end{tabularx}
 \par\medskip
@@ -81,6 +84,7 @@ OBJET & objet(s) : « NGC 6888 », « Pluton », « 1998 AG6 », ou un nom de la
 --sans-dates-douteuses,\allowbreak{} --no-doubtful-dates & écarte les poses à DATE-OBS partagée ou datées en plein jour\\
 --tout,\allowbreak{} --all & toute la banque (≈ 78 Go)\\
 --csv FICHIER & écrit aussi la liste dans ce fichier CSV\\
+--dest DOSSIER & dossier de destination (défaut : \textasciitilde{}/Coupole/OHP\_DU\_ECU ou celui des réglages)\\
 \bottomrule
 \end{tabularx}
 \par\medskip
@@ -234,6 +238,9 @@ NOM\_BASE & nom de cible tel qu'il figure dans la base\\
 \midrule
 DOSSIER & dossier de lots (ou un fichier image)\\
 --ecrire,\allowbreak{} --write & écrit QUALITE.csv et QUALITE.txt dans chaque lot\\
+--echantillon,\allowbreak{} --sample N & mesure N images par lot (réparties dans le temps) au lieu de toutes\\
+--tout,\allowbreak{} --all & tout mesurer même au-delà de 200 images (sinon : échantillon de 5 par lot, annoncé)\\
+--processus,\allowbreak{} --processes N & nombre de processus de mesure (défaut : plan machine)\\
 \bottomrule
 \end{tabularx}
 \par\medskip

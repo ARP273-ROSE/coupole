@@ -70,7 +70,8 @@ d'autre n'est à installer. Ils se mettent à jour d'eux-mêmes. ASTAP reste fac
 Windows 10/11 64 bits & Coupole-Setup-x.y.z.exe & Double-clic. Avertissement SmartScreen au premier lancement (installeur non signé) : « Informations complémentaires », « Exécuter quand même ». Installation dans le profil, sans droit administrateur.\\
 macOS Apple Silicon & Coupole-x.y.z-macos-arm64.dmg & Glisser Coupole dans Applications. Premier lancement : clic droit, « Ouvrir ».\\
 macOS Intel & Coupole-x.y.z-macos-x86\_64.dmg & Idem.\\
-Linux x86\_64 / ARM64 & Coupole-x.y.z-linux-*.tar.gz & Décompresser, lancer \texttt{installer.sh} (copie dans \texttt{\textasciitilde/.local/share/coupole}, entrée de menu).\\
+Ubuntu / Debian x86\_64, ARM64 & coupole\_x.y.z\_amd64.deb & \texttt{sudo apt install ./coupole\_x.y.z\_amd64.deb} (\texttt{\_arm64.deb} sur ARM) : apt installe les bibliothèques système de Qt ; commande \texttt{coupole}, entrée de menu. Ubuntu 22.04 ou plus récent, Debian 12 ou plus récent. Désinstaller : \texttt{sudo apt remove coupole}.\\
+Autre Linux x86\_64 / ARM64 & Coupole-x.y.z-linux-*.tar.gz & Décompresser, lancer \texttt{installer.sh} (copie dans \texttt{\textasciitilde/.local/share/coupole}, entrée de menu).\\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -102,7 +103,10 @@ Extras : \texttt{qualite} (SEP), \texttt{validation} (lxml, xisf : validation XS
 Les paquets vérifient au démarrage (désactivable) la dernière version publiée sur GitHub et proposent de
 l'installer : seule l'archive du code (\texttt{coupole-app-x.y.z.zip}, environ 1 Mo) est téléchargée, extraite par
 l'application, l'ancienne version étant restaurée en cas d'échec. Une installation par pip/pipx affiche la commande
-à lancer. Les réglages, le cache et les rapports vivent hors du dossier d'installation et survivent aux mises à jour :
+à lancer. Le paquet \texttt{.deb} ne se met pas à jour par archive : ses fichiers (\texttt{/opt/coupole}) appartiennent à
+dpkg ; Coupole signale la nouvelle version, donne l'adresse du nouveau \texttt{.deb} et la commande \texttt{apt} à
+lancer (bouton \emph{Télécharger le paquet}). Les réglages, le cache et les rapports vivent hors du dossier
+d'installation et survivent aux mises à jour comme à la désinstallation :
 
 \begin{center}\small
 \begin{tabular}{@{}ll@{}}
@@ -126,16 +130,25 @@ configuration détectée).
 \begin{tabular}{@{}ll@{}}
 \toprule
 F1 & aide de l'écran\\ Maj+F1 & manuel PDF\\ Ctrl+1 … Ctrl+9 & module 1 à 9\\ Ctrl+, & Préférences\\
-Ctrl+Maj+A & assistant ASTAP\\ Ctrl+R & Banque OHP : rafraîchir l'inventaire\\ Ctrl+Q & quitter\\
+Ctrl+Maj+A & assistant ASTAP\\ Ctrl+Maj+D & thème sombre / clair\\ Ctrl+R & Banque OHP : rafraîchir l'inventaire\\ Ctrl+Q & quitter\\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \capture{img/reglages_fr.png}{0.62}
 Préférences (Ctrl+,) : langue de l'interface ; langue des noms de dossiers, d'objets et des commentaires FITS ;
-apparence (thème clair ou sombre, propre à Coupole et indépendant du thème du système : style, couleurs et taille de police fixes, contraste WCAG $\geq$ 4,5) ; dossier de sortie ; format ; parallélisme ; débit maximal ; mode économe ; recherche de mise à jour ; vérification des nouveautés de la banque au démarrage et sa fréquence maximale (section~\ref{sec:nouveautes}). L'onglet
+apparence (section~\ref{sec:apparence}) ; dossier de sortie ; format ; parallélisme ; débit maximal ; mode économe ; recherche de mise à jour ; vérification des nouveautés de la banque au démarrage et sa fréquence maximale (section~\ref{sec:nouveautes}). L'onglet
 \emph{Sources} donne les adresses des services (chapitre~\ref{chap:evolutif}). Un fichier de réglages illisible est
 mis de côté (suffixe \texttt{.corrompu-…}) et les valeurs par défaut reprennent : l'application démarre toujours.
+
+\subsection{Apparence}\label{sec:apparence}
+Coupole a son propre thème, indépendant de celui de l'ordinateur (un système en mode sombre ne mélange plus ses
+couleurs à celles de l'application : style Fusion, palette complète, taille de police fixe, contraste WCAG $\geq$ 4,5
+pour le texte, les champs, les boutons, les info-bulles et la sélection). Le thème \textbf{sombre} est celui par défaut ;
+le thème clair reste au choix. Il se change par le menu \emph{Affichage} > \emph{Apparence} (entrées cochables
+\emph{Clair} / \emph{Sombre}, Ctrl+Maj+D pour basculer), ou dans les Préférences : c'est le même réglage, appliqué
+immédiatement et enregistré ; les deux restent synchronisés. Un utilisateur qui avait choisi le thème clair le garde :
+le réglage enregistré prime sur le défaut. Les captures de ce manuel sont prises dans le thème par défaut.
 
 % =====================================================================
 \section{Module Banque OHP}
@@ -155,6 +168,19 @@ ligne. \emph{Rafraîchir l'inventaire} (Ctrl+R) réinterroge le service et signa
 objets affiche leurs images à droite, filtrables par nuit, filtre et dates douteuses ; cette liste est la sélection
 à traiter. L'estimation donne le volume à télécharger, le volume attendu en sortie et la place libre. Les heures
 sont affichées en UTC et à l'heure du site (survol : également l'heure de l'utilisateur).
+
+\paragraph{Ce qu'on possède déjà.} D'après le dossier de sortie (\texttt{\_traitement/etat.sqlite}, relu en fond à
+l'ouverture, après chaque traitement et à chaque changement de dossier, jamais bloquant), la liste des images
+distingue par une pastille et une couleur de texte douce (lisible dans les deux thèmes, contraste $\geq 4{,}5$) :
+\textbf{possédée} (convertie et rangée, coche verte), \textbf{doublon écarté} (mêmes pixels qu'une image déjà
+convertie, rond gris), \textbf{échec} (à retenter, triangle orange) et \textbf{à télécharger} (texte normal,
+flèche) ; l'info-bulle de la pastille donne le statut, la date et le chemin local du fichier. Dans le tableau des
+objets, la colonne \emph{possédé} (« 120 / 300 », mini-barre de progression, triable) et sa pastille (disque plein :
+tout possédé ; demi-disque : en partie ; cercle vide : rien) résument chaque objet. La case \emph{À télécharger
+seulement} cache les objets entièrement possédés et, dans la liste, les images déjà traitées ; l'estimation ne
+compte alors que ce qui manque (« 180 images manquantes sur 300 : 1,5 Go »). Une légende compacte sous la liste
+explique les pastilles. Ligne de commande : \cmd{coupole ohp inventaire --manquantes [--dest DOSSIER] [--json]}, et
+colonnes \texttt{possedee}, \texttt{statut\_local}, \texttt{fichier\_local} dans le CSV de \cmd{coupole ohp images}.
 
 \subsection{Traitement}
 \capture{img/traitement_fr.png}{1.0}
@@ -272,7 +298,9 @@ IRIS-4096), même filtre, et même champ pour un objet fixe (toutes nuits) ou m�
 \texttt{LOT.txt} (français puis anglais) donne objet, noms de la base, instrument, filtre, poses et pose totale,
 nuits, centre moyen, angle, statut des solutions, dates douteuses et conseil d'empilement (StarAlignment ou
 CometAlignment, rejet adapté au nombre de poses). Noms de fichiers : date et heure UTC du début de pose, objet,
-filtre, pose ; tri par nom = tri dans le temps. Noms sûrs sous Windows.
+filtre, pose ; tri par nom = tri dans le temps. Noms sûrs sous Windows. L'onglet \emph{Lots} ajoute une colonne
+\emph{complet} : poses converties contre poses de la banque pour la même clé (objet, instrument, filtre, et nuit
+pour un objet mobile) ; un objet fixe découpé en plusieurs champs compte ses lots ensemble.
 
 \subsection{Anomalies}
 \capture{img/anomalies_fr.png}{1.0}
@@ -393,6 +421,19 @@ Le module demande la bibliothèque SEP (Source Extractor en Python, LGPL, enviro
 automatiquement (bouton \emph{Mesurer}, case \emph{Vérifier la qualité des images} du traitement, ou
 \cmd{coupole qualite DOSSIER --ecrire}). Rapport par lot : \texttt{QUALITE.csv} et \texttt{QUALITE.txt}.
 
+\paragraph{Vitesse, reprise, échantillon.} Les mesures tournent dans des processus séparés (nombre donné par le plan
+machine : cœurs, mémoire, mode économe et bridage des Préférences ; au plus 3 quand le dossier est sur un partage
+réseau, détecté et signalé, car la lecture limite alors la vitesse), la lecture d'une image recouvrant le calcul des
+autres ; l'interface reste libre, \emph{Arrêter} est immédiat. Chaque image mesurée est écrite aussitôt dans le
+\texttt{QUALITE.csv} de son lot (écriture atomique) et affichée ; les mesures sont gardées en cache dans
+\texttt{\_traitement/qualite.sqlite} par (chemin, taille, date) : relancer ne refait pas ce qui est fait, fermer puis
+rouvrir reprend. Au-delà de 200 images, Coupole propose un \textbf{échantillon} de 5 images par lot (réparties dans
+le temps : première, dernière, milieu…, réglable dans l'onglet et par \cmd{--echantillon N}), qui suffit à juger un
+lot, ou \emph{Tout mesurer} avec la durée estimée d'après les 3 premières images ; la progression donne le temps
+restant et le débit (images/min). Sur le NAS de l'auteur (Ryzen 5 8500G) : 1,21 → 0,33~s par image T120
+(modèle de Moffat vectorisé, dérivées analytiques, 120 étoiles par image), soit la banque entière en une dizaine de
+minutes sur 5 processus.
+
 \begin{center}\small
 \begin{tabularx}{\linewidth}{@{}lXl@{}}
 \toprule
@@ -435,7 +476,9 @@ calcule par la hauteur du Soleil au site (astropy, sans téléchargement IERS). 
 (005), Paris (007), coordonnées géodésiques calculées depuis les constantes de parallaxe du Minor Planet Center.
 Les sites partenaires s'ajoutent (fuseau IANA, code MPC s'il existe) quand leurs coordonnées sont connues de
 source sûre. Carte : tuiles OpenStreetMap en cache disque, deux téléchargements au plus, User-Agent identifiant
-l'application, attribution affichée ; hors ligne, fond simple et points.
+l'application, attribution affichée ; hors ligne, fond simple et points. Sur un écran dense (mise à l'échelle
+$\geq 150$~\%, Mac Retina), la carte dessine les tuiles du niveau de zoom supérieur à demi-taille (quatre par tuile
+logique, l'équivalent « @2x ») : elle reste nette au lieu d'être agrandie par le système.
 
 % =====================================================================
 \section{Cosmologie}\label{sec:cosmo}
@@ -475,6 +518,15 @@ GN-z11, réionisation, fond diffus), ou un nom d'objet : son redshift est demand
 « m87 », « ngc4486 » ; plusieurs candidats : vous choisissez). $z \le 0$ (objet qui s'approche, comme M\,31) ne donne
 pas de distance ; sous $z = 0{,}03$ la vitesse propre de l'objet domine (avertissement) ; au-delà de $z \approx 1090$
 l'univers est opaque. Tableau et courbes s'exportent en CSV (« ; », UTF-8 ; valeurs brutes en Mpc, Gyr, Gpc$^3$).
+
+\paragraph{Curseur.} Sous le champ $z$, un curseur parcourt tout le domaine sur une échelle logarithmique
+(de 0,001 à 1100, repères 0,01 / 0,1 / 1 / 10 / 100 / 1000). En glissant, le marqueur vertical des courbes et le
+tableau des valeurs suivent en direct : les valeurs sont alors \emph{interpolées} sur la grille des courbes (300
+points logarithmiques, écart typique $< 0{,}5$~\%, colonnes $\sigma$ et SH0ES suspendues) et la ligne d'état le dit ;
+au relâchement, le calcul exact reprend. Flèches : pas fin (1~\% d'une décade) ; Page haut/bas : une décade. Le
+champ $z$ et le curseur restent synchronisés dans les deux sens. Les courbes suivent le redimensionnement de la
+fenêtre, y compris quand elles passent sous le tableau (fenêtre de moins de 1500 px de large) : la moitié de la
+hauteur visible leur revient.
 
 \paragraph{Origine et vérification.} Le noyau de calcul est repris du calculateur « cosmologie-redshift » du même
 auteur (dépôt public \url{https://github.com/ARP273-ROSE/cosmologie-redshift}), avec astropy.cosmology. Avant

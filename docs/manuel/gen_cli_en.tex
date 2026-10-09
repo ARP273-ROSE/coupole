@@ -55,6 +55,9 @@
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp inventaire (inventory)\newline\normalfont\small Bank inventory from the public TAP service (http://tap-ufe.obspm.fr/tap, table ivoa.obscore), kept in a local cache.}\\
 \midrule
 --rafraichir,\allowbreak{} --refresh & query the Observatory's TAP service again (one request)\\
+--manquantes,\allowbreak{} --missing & list what remains to download compared with the output folder (--dest)\\
+--dest FOLDER & destination folder (default: \textasciitilde{}/Coupole/OHP\_DU\_ECU or the one in the settings)\\
+--json & JSON output (for scripts)\\
 \bottomrule
 \end{tabularx}
 \par\medskip
@@ -81,6 +84,7 @@ OBJECT & object(s): « NGC 6888 », « Pluto », « 1998 AG6 », or a database n
 --sans-dates-douteuses,\allowbreak{} --no-doubtful-dates & leave out exposures with a shared DATE-OBS or dated in daytime\\
 --tout,\allowbreak{} --all & the whole bank (≈ 78 GB)\\
 --csv FILE & also write the list to this CSV file\\
+--dest FOLDER & destination folder (default: \textasciitilde{}/Coupole/OHP\_DU\_ECU or the one in the settings)\\
 \bottomrule
 \end{tabularx}
 \par\medskip
@@ -234,6 +238,9 @@ DB\_NAME & target name as it appears in the database\\
 \midrule
 FOLDER & folder of stacks (or one image file)\\
 --ecrire,\allowbreak{} --write & write QUALITE.csv and QUALITE.txt in each stack\\
+--echantillon,\allowbreak{} --sample N & measure N images per stack (spread in time) instead of all\\
+--tout,\allowbreak{} --all & measure everything even above 200 images (otherwise: sample of 5 per stack, announced)\\
+--processus,\allowbreak{} --processes N & number of measuring processes (default: machine plan)\\
 \bottomrule
 \end{tabularx}
 \par\medskip

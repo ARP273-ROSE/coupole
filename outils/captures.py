@@ -49,7 +49,7 @@ def main():
     rapports.init()
     app = QApplication(sys.argv)
     from coupole.gui import theme
-    config.reglages()['apparence'] = os.environ.get('COUPOLE_THEME', 'clair')
+    config.reglages()['apparence'] = os.environ.get('COUPOLE_THEME', config.DEFAUTS['apparence'])   # le défaut : sombre
     theme.appliquer(app)
     from coupole.gui.fenetre import FenetrePrincipale
     f = FenetrePrincipale()

@@ -18,6 +18,7 @@ class Panneau(QWidget):
         self.table.horizontalHeader().setVisible(False)
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setStretchLastSection(True)
+        self.table.setWordWrap(True)
         v.addWidget(self.table, 1)
         note = QLabel(tr('mach_gpu_note'))
         note.setWordWrap(True)
@@ -37,11 +38,17 @@ class Panneau(QWidget):
 
     def _afficher(self, d):
         self._lignes = cli.lignes(d)
+        bulles = cli.infobulles()
         self.table.setRowCount(len(self._lignes))
         for i, (k, val) in enumerate(self._lignes):
-            self.table.setItem(i, 0, QTableWidgetItem(k))
-            self.table.setItem(i, 1, QTableWidgetItem(str(val)))
+            a, b = QTableWidgetItem(k), QTableWidgetItem(str(val))
+            if k in bulles:
+                a.setToolTip(bulles[k])
+                b.setToolTip(bulles[k])
+            self.table.setItem(i, 0, a)
+            self.table.setItem(i, 1, b)
         self.table.resizeColumnToContents(0)
+        self.table.resizeRowsToContents()
 
     def copier(self):
         QApplication.clipboard().setText('\n'.join('%s: %s' % kv for kv in self._lignes))

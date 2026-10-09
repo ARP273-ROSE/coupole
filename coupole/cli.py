@@ -217,8 +217,13 @@ def cmd_maj(a):
         return 0
     print(tr('maj_disponible', version=m['version']))
     print(maj.notes_dans_la_langue(m['notes'], i18n.langue())[:2000])
-    if not maj.est_paquet():
+    genre = maj.type_installation()
+    if genre == 'pip':
         print(tr('maj_pip', commande=maj.commande_pip()))
+        return 0
+    if genre != 'paquet':                       # .deb ou dossier non inscriptible : on indique, on ne touche à rien
+        c = maj.consigne_systeme(m)
+        print(tr('maj_systeme', url=c['url'], commande=c['commande']))
         return 0
     if a.appliquer:
         maj.appliquer(m)

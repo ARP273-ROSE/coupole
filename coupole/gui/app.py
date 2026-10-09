@@ -33,6 +33,8 @@ def main() -> int:
     app = QApplication.instance() or QApplication(sys.argv)
     app.setApplicationName('Coupole')
     app.setOrganizationName('Coupole')
+    if sys.platform.startswith('linux'):        # relie la fenêtre à coupole.desktop (icône, regroupement du dock)
+        app.setDesktopFileName('coupole')
     if sys.platform == 'win32':                 # verrou interrogé par l'installeur (AppMutex)
         try:
             import ctypes

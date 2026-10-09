@@ -146,6 +146,17 @@ avec une fréquence de repos connue.
 - Python 3.10+, dépendances légères ; tout ce qui est facultatif (ASTAP, SEP, CuPy) doit pouvoir manquer.
 - `pytest` doit passer (`pip install ".[test]"` puis `python -m pytest`).
 - Version : uniquement dans `VERSION`. Historique : `CHANGELOG.md` (français) et `CHANGELOG.en.md`.
+- **Carte graphique** : aucune fonction actuelle ne l'utilise. L'extra `coupole[gpu]` (= `cupy-cuda12x`, NVIDIA +
+  CUDA 12, installation pip uniquement) existe pour les modules futurs via `coupole.core.calcul.tableaux(preferer_gpu=True)` ;
+  il n'est **jamais** inclus dans les paquets autonomes (plusieurs Go, NVIDIA seulement) et l'interface n'en parle
+  que dans l'info-bulle de « Ma machine ».
+- **Publier** : mettre `VERSION` à jour, CHANGELOG FR puis EN, pousser `main` (CI de tests verte), poser le tag annoté
+  `vX.Y.Z` ; `release.yml` construit Windows, macOS (arm64, x86_64), Linux (tar.gz x86_64/arm64) **et les `.deb`**
+  (`build_deb.py`, essayés dans un conteneur Ubuntu nu), publie la Release, puis **ne garde qu'une Release en ligne** :
+  une fois la nouvelle complète (10 actifs attendus), les Releases précédentes et leurs tags sont supprimés, ainsi que
+  les artefacts de construction (job `nettoyer`). Une Release incomplète ne déclenche aucune suppression. La mise à
+  jour automatique (`coupole/core/maj.py`) interroge `releases/latest` et des noms stables (`coupole-app-<version>.zip`
+  par préfixe, `coupole-linux-<arch>.deb`) : elle ne dépend d'aucun tag fixe.
 
 ---
 
@@ -186,3 +197,15 @@ not state.
 
 Python 3.10+, light dependencies, optional components may be missing; `pytest` must pass; the version lives only in
 `VERSION`; history in `CHANGELOG.md` (French) and `CHANGELOG.en.md`.
+
+**Graphics card**: no current function uses it. The `coupole[gpu]` extra (= `cupy-cuda12x`, NVIDIA + CUDA 12, pip only)
+exists for future modules through `coupole.core.calcul.tableaux(preferer_gpu=True)`; it is **never** bundled in the
+standalone packages (several GB, NVIDIA only) and the interface only mentions it in the « My computer » tooltip.
+
+**Releasing**: update `VERSION`, CHANGELOG (French then English), push `main` (green test CI), push the annotated tag
+`vX.Y.Z`; `release.yml` builds Windows, macOS (arm64, x86_64), Linux (tar.gz x86_64/arm64) **and the `.deb` packages**
+(`build_deb.py`, tried in a bare Ubuntu container), publishes the Release, then **keeps a single Release online**: once
+the new one is complete (10 expected assets), the previous Releases and their tags are deleted, as well as the build
+artifacts (`nettoyer` job). An incomplete Release triggers no deletion. The automatic update (`coupole/core/maj.py`)
+queries `releases/latest` and stable names (`coupole-app-<version>.zip` by prefix, `coupole-linux-<arch>.deb`): it
+depends on no fixed tag.
