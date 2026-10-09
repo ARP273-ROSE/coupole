@@ -327,6 +327,7 @@ dans `/mnt/apps_pool/_transfert/coupole_audit3/`.
   Validation locale (copie sans `build/` ni `dist/`, `pip install ".[test]"`, offscreen) : **python:3.12-slim 282
   réussis, 11 sautés, code 0 ; python:3.10-slim 282 réussis, 11 sautés, code 0** ; `test_adaptatif` + `test_echelle`
   à `QT_SCALE_FACTOR=1.5` et `2` : 33 réussis, code 0 (3.12 et 3.10).
+- CI `tests.yml` du commit `c193ab5` : **6/6** (Linux, Windows, macOS × 3.10, 3.12), étape « Liens du guide ASTAP » comprise. Premiers passages rouges : tests sous Windows (police large : colonnes au contenu plus larges que la vue → défilement admis ; hauteur du tableau empilé qui oubliait l’ascenseur horizontal : corrigé dans le code) et SourceForge en 403 pour les machines de CI (repli sur le flux RSS du dossier).
 - **Aucun tag posé.**
 
 ## 2026-10-09 — version 0.1.6 : réglages conservés d'une fermeture à l'autre
@@ -498,4 +499,5 @@ mesures : `docs/AUDIT2_2026-10.md` § 9.
   à `QT_SCALE_FACTOR` 1,5 et 2 : 47 réussis, code 0 (les deux versions). Tests de référence (`COUPOLE_REFERENCE`)
   passés à part. Manuels FR/EN (41 p.) recompilés, temporaires supprimés ; captures refaites (Lots avec l'encadré,
   Cosmologie côte à côte et empilée, Traitement avec « qui lit quoi »).
+- CI `tests.yml` du commit `c193ab5` : **6/6** (Linux, Windows, macOS × 3.10, 3.12), étape « Liens du guide ASTAP » comprise. Premiers passages rouges : tests sous Windows (police large : colonnes au contenu plus larges que la vue → défilement admis ; hauteur du tableau empilé qui oubliait l’ascenseur horizontal : corrigé dans le code) et SourceForge en 403 pour les machines de CI (repli sur le flux RSS du dossier).
 - **Aucun tag posé.**
