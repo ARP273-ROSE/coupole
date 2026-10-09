@@ -128,6 +128,11 @@ def enregistrer(p):
     s.add_argument('--dest', required=True, metavar=tr('cli_meta_dossier'), help=tr('ohp_aide_dest'))
     s.set_defaults(fonction=cmd_fusionner)
 
+    s = sous.add_parser('reconnaitre', aliases=['recognise', 'recognize'], help=tr('ohp_cli_reconnaitre'),
+                        description=tr('ohp_reconnaitre_aide'), formatter_class=fmt)
+    s.add_argument('--dest', required=True, metavar=tr('cli_meta_dossier'), help=tr('ohp_aide_dest'))
+    s.set_defaults(fonction=cmd_reconnaitre)
+
     s = sous.add_parser('metadonnees', aliases=['metadata'], help=tr('ohp_cli_metadonnees'),
                         description=tr('ohp_cli_metadonnees_desc'))
     s.add_argument('dossier', metavar=tr('cli_meta_dossier'), help=tr('ohp_aide_metadonnees_dossier'))
@@ -212,6 +217,7 @@ def _manquantes(a, inv):
     from .possession import Possession
     dest = _dest(a)
     poss = Possession.lire(dest)
+    _avertir_possession(poss)
     comptes = poss.compte_objets(inv.images)
     par_objet = {}
     for x in inv.images:
@@ -301,6 +307,7 @@ def cmd_images(a):
     from .cibles import nom_affiche
     from .possession import Possession
     poss = Possession.lire(_dest(a))                  # colonne « possédé » d'après le dossier de sortie
+    _avertir_possession(poss)
     lignes = sorted(sel, key=lambda x: (x['t_min'], x['access_url']))
     print('%-19s %-5s %-11s %7s %-28s %-16s %s' % (tr('ohp_col_date'), tr('ohp_col_tel'), tr('ohp_col_filtre'),
                                                    tr('ohp_col_pose'), tr('ohp_col_objet'), tr('ohp_col_possede'),
@@ -625,6 +632,39 @@ def cmd_fusionner(a):
     print(tr('ohp_fusion_faite', total=r.get('total', 0), locale=r['de_la_locale'], conflits=r['conflits'],
              envoyee='✓' if r.get('envoyee') else '✗', dossier=os.path.dirname(r['copies'][0])))
     return 0 if r.get('envoyee') else 1
+
+
+def cmd_reconnaitre(a):
+    """Base de suivi reconstruite d'après les fichiers déjà rangés (en-têtes) : rien n'est téléchargé ni déplacé."""
+    import time
+    from ...core.base_partagee import Divergence
+    from .reconnaissance import reconnaitre
+    dest = _dest(a)
+    inv = _inventaire()
+    etat = {'t': time.monotonic()}
+
+    def progression(fait, total):
+        if time.monotonic() - etat['t'] >= 5 or fait == total and total > 200:
+            etat['t'] = time.monotonic()
+            print(tr('ohp_reconnaitre_progression', fait=fait, total=total), flush=True)
+    try:
+        r = reconnaitre(dest, inv, progression=progression,
+                        rapporter=lambda cle, **v: print(tr(cle, **v), flush=True))
+    except Divergence as e:
+        return _divergence(e, dest)
+    print(tr('ohp_reconnaitre_fait', n=r['reconnus'], deja=r['deja'], ignores=len(r['ignores'])))
+    for chemin, raison in r['ignores'][:50]:
+        print('   %s : %s' % (chemin, tr('reorg_' + raison)))
+    return 0
+
+
+def _avertir_possession(poss):
+    """Base de suivi présente mais illisible : dit sur stderr (au lieu de laisser croire que rien n'est possédé)."""
+    if poss.erreur:
+        print(tr('ohp_base_illisible', erreur=poss.erreur[:400],
+                 chemin=os.path.join(poss.dest, '_traitement', 'etat.sqlite')), file=sys.stderr)
+    elif poss.fichiers_sans_base:
+        print(tr('ohp_base_absente_fichiers'), file=sys.stderr)
 
 
 def cmd_bilan(a):

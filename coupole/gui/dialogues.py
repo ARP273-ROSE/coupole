@@ -351,15 +351,17 @@ def guide_astap_html() -> str:
 def texte_configuration() -> str:
     """Texte « configuration détectée ».  Sondes système et ASTAP : à appeler hors du fil graphique
     (les dialogues le font par une Tache) ; `machine.detecter()` est mis en cache après le premier appel."""
-    from ..core import astap, machine
+    from ..core import astap, bibliotheques, machine
     m = machine.detecter()
     r = config.reglages()
     a = astap.detecter(r['astap_executable'], r['astap_catalogue'])
     gpu = ', '.join('%s [%s]' % (c.nom, c.fabricant) for c in m.cartes) or tr('gpu_aucune')
+    presentes, absentes = bibliotheques.resume()
     return tr('apropos_config', os='%s %s (%s)' % (m.nom_systeme, m.version_systeme, m.architecture),
               cpu=m.processeur, p=m.coeurs_physiques, l=m.coeurs_logiques,
               ram='%.1f' % (m.memoire_totale_mo / 1024), gpu=gpu, python=platform.python_version(),
-              astap=tr(a.message_cle()) + ((' — ' + a.executable) if a.executable else ''))
+              astap=tr(a.message_cle()) + ((' — ' + a.executable) if a.executable else ''),
+              biblio=tr('apropos_biblio', presentes=presentes or '—', absentes=absentes or '—'))
 
 
 class DialogueAPropos(QDialog):

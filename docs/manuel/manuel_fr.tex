@@ -60,8 +60,18 @@ donnée n'est envoyée sans accord ; les composants facultatifs (ASTAP, SEP, CuP
 % =====================================================================
 \section{Installation}
 \subsection{Paquets tout compris}
-Les paquets embarquent Python et toutes les bibliothèques (PyQt6, numpy, astropy, zstandard, lz4, SEP) : rien
+Les paquets embarquent Python et toutes les bibliothèques (PyQt6, numpy, scipy, astropy, zstandard, lz4) : rien
 d'autre n'est à installer. Ils se mettent à jour d'eux-mêmes. ASTAP reste facultatif et n'est pas inclus.
+
+\textbf{Bibliothèques facultatives embarquées (0.2.1).} Facultatives pour une installation par pip (extras
+\texttt{qualite}, \texttt{alignement}), elles sont dans \emph{tous} les paquets (installeur Windows, .dmg, tar.gz,
+.deb) : \texttt{reproject} (alignement exact et adaptatif du module Archives, avec \texttt{astropy-healpix},
+\texttt{dask} et \texttt{zarr} qu'il demande ; jusqu'en 0.2.0 il manquait aux paquets, et l'alignement retombait sur
+un rééchantillonnage bilinéaire de scipy), \texttt{sep} (module Qualité des images), \texttt{psutil} (mesures de la
+machine) et \texttt{lxml} (validation XISF). Seul CuPy (carte NVIDIA, inutilisé pour l'instant) reste à part. Chaque
+paquet construit les importe et les fait tourner avant publication ; poids ajouté : environ 20~Mo à l'archive Linux
+(101 → 121~Mo), 12~Mo au .deb (109 → 121~Mo). Le module \emph{Ma machine} et \emph{Aide > À propos} donnent les
+bibliothèques facultatives présentes et absentes, avec leur version.
 
 \begin{center}\small
 \begin{tabularx}{\linewidth}{@{}l>{\ttfamily\small}lX@{}}
@@ -361,6 +371,31 @@ compilé) ; ce n'a pas pu être vérifié ici, Coupole n'en dépend donc pas et 
 risquent d'abîmer la base ; même base de travail, vérifiée en intégration continue sur
 \texttt{\textbackslash\textbackslash localhost\textbackslash C\$}. Si la base du partage est ouverte par un autre
 programme au moment du remplacement, Coupole réessaie puis attend le passage suivant.
+
+\textbf{Windows : lecteur réseau ou chemin UNC (0.2.1).} Un dossier de sortie sur une lettre de lecteur réseau
+(\texttt{O:\textbackslash OHP\_DU\_ECU}, partage mappé) ou sur un chemin UNC
+(\texttt{\textbackslash\textbackslash serveur\textbackslash partage\textbackslash OHP\_DU\_ECU}) est reconnu comme
+partage (\texttt{GetDriveTypeW} = lecteur distant). Jusqu'en 0.2.0, la base d'état d'un dossier sur une \emph{lettre}
+de lecteur réseau était illisible : le chemin était « résolu » en chemin UNC, et l'adresse SQLite qui en résultait
+(\texttt{file://serveur/…}) était refusée ; l'erreur passait inaperçue et tout paraissait à télécharger, alors que le
+même dossier vu de Linux était entièrement possédé. Depuis 0.2.1, l'adresse est construite sans résolution
+(\texttt{file:///O:/…}, \texttt{file:////serveur/partage/…}) et la base d'un partage est lue par une \textbf{copie
+locale} (cache de l'utilisateur, refaite seulement quand la base change) ; une base en journal WAL (ancien script)
+est recopiée avec son \texttt{-wal}, que Windows ne sait pas lire sur un partage. Lettre et chemin UNC d'un même
+partage ont chacun leur base de travail (la clé vient du chemin tapé) : sans conséquence, chacune suit le partage.
+Vérifié en intégration continue sur le partage administratif \texttt{C\$} de la machine, sous son nom (pas
+« localhost », que SQLite accepte dans une adresse), en UNC et par une lettre posée par \texttt{net use}.
+
+\textbf{Dossier de suivi.} La ligne de résumé de la Banque OHP et la barre d'état disent le dossier réellement lu et
+ce qu'on y a trouvé : « Dossier de suivi : <chemin> --- N images possédées lues ». Si la base de suivi existe mais
+ne peut pas être lue, un \textbf{bandeau d'erreur} le dit avec la cause (« La base de suivi de ce dossier n'a pas pu
+être lue : … ») au lieu d'afficher « rien de possédé » ; \texttt{coupole.log} note chaque lecture (base de travail,
+copie ou lecture directe, nombre d'images lues) et chaque synchronisation avec le partage. Si \texttt{\_traitement/}
+manque alors que des images converties sont rangées (copie partielle, sauvegarde restaurée), le bandeau propose
+\textbf{Reconnaître les fichiers existants} : l'en-tête de chaque fichier (\texttt{OHP:Source:URL}, sinon la carte
+\texttt{HISTORY} « converti de … ») donne l'image d'origine, inscrite comme possédée ; en fond, avec progression ;
+rien n'est téléchargé, déplacé ni réécrit (\cmd{coupole ohp reconnaitre --dest DOSSIER}). \emph{Rafraîchir
+l'inventaire} relit aussi la possession.
 
 \subsection{Nouveautés de la banque}\label{sec:nouveautes}
 À l'ouverture (au plus une fois par jour, réglable, désactivable dans les Préférences), si Internet est disponible et
@@ -1128,6 +1163,9 @@ WBPP ne trouve pas focale et pixel & saisir les valeurs de l'encadré \emph{Pour
 Image blanche dans N.I.N.A. ou Siril & format XISF compatible (onglet Traitement), section~\ref{sec:compat}.\\
 « database is locked » vers un NAS (0.1.9 et avant) & mettre à jour : la base de travail locale règle le problème (section~\ref{sec:partage}).\\
 « Deux versions de la base d'état » & deux ordinateurs (ou le NAS) ont traité vers le même dossier : accepter la fusion, ou \cmd{coupole ohp fusionner --dest DOSSIER} ; les deux bases d'origine sont gardées.\\
+Tout « à télécharger » sous Windows alors que le dossier (lecteur réseau) est complet & 0.2.0 et avant : mettre à jour (section~\ref{sec:partage}) ; la ligne « Dossier de suivi » dit ce qui est lu.\\
+« La base de suivi de ce dossier n'a pas pu être lue » & la cause suit le message (et \texttt{coupole.log}) : base abîmée, partage débranché, droits ; ne pas relancer un téléchargement complet.\\
+Pas de \texttt{\_traitement/} mais des images rangées & \emph{Reconnaître les fichiers existants} (bandeau), ou \cmd{coupole ohp reconnaitre --dest DOSSIER}.\\
 « Recopie de la base d'état sur le partage impossible » & partage débranché ou base ouverte ailleurs : rien n'est perdu, nouvel essai au passage suivant et au prochain lancement.\\
 \bottomrule
 \end{tabularx}

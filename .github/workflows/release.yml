@@ -169,6 +169,12 @@ jobs:
           for module in kit.get('verification_import', []):
               __import__(module)
               print('  import OK :', module)
+          # 0.2.1 : bibliotheques facultatives embarquees (reproject, sep...) essayees pour de vrai : sans elles le
+          # module Archives retombait en silence sur scipy et Qualite ne mesurait rien
+          essai = kit.get('essai_embarquees')
+          if essai:
+              m, _, f = essai.partition(':')
+              print('  bibliotheques embarquees :', getattr(__import__(m, fromlist=[f]), f)())
           # textes fournis par Qt (boutons standard, dialogue de repli) en francais : traductions gardees
           from coupole.gui import plateforme
           if not plateforme.installer_traductions(app, 'fr'):
@@ -326,6 +332,16 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: python3 build_unix.py --version ${{ steps.version.outputs.value }}
 
+      # 0.2.1 : le paquet (tar.gz, .app du .dmg, base du .deb) doit importer et faire tourner reproject et sep
+      # (build_unix.py l'essaie deja apres l'elagage ; refait ici, visible dans le journal de la CI)
+      - name: Bibliotheques facultatives embarquees
+        shell: bash
+        run: |
+          NOM="${{ steps.kit.outputs.nom_fichier }}"
+          if [ "${{ matrix.plateforme }}" = macos ]; then R="dist/$NOM.app/Contents/Resources"; else R="dist/$NOM"; fi
+          cd "$R"
+          ./python/bin/python3 -B -c "import sys; sys.path.insert(0, 'app'); from coupole.core.bibliotheques import essai_embarquees; print(essai_embarquees())"
+
       # 0.1.8 : le lanceur suit les liens symboliques (~/.local/bin/coupole -> Coupole.sh, lien de lien) ;
       # installer.sh pose lui-meme ~/.local/bin/coupole. Sous macOS, `readlink -f` n'existe pas avant 12.3 :
       # le lanceur n'en depend pas, ce qu'on verifie ici sur le .app.
@@ -414,6 +430,8 @@ jobs:
             test -f "$Q/translations/qtbase_fr.qm"
             # HTTPS depuis le Python embarque (mise a jour, SIMBAD) : exige ca-certificates dans Depends ; pas d apostrophe ici (chaine bash entre quotes simples)
             /opt/coupole/python/bin/python3 -c "import urllib.request; urllib.request.urlopen(\"https://api.github.com\", timeout=30); print(\"TLS OK\")"
+            # bibliotheques facultatives embarquees (reproject, sep, psutil, lxml) : importees et essayees (0.2.1)
+            /opt/coupole/python/bin/python3 -c "import sys; sys.path.insert(0, \"/opt/coupole/app\"); from coupole.core.bibliotheques import essai_embarquees; print(essai_embarquees())"
             LANG=fr_FR.UTF-8 coupole --help | grep -q commandes
             LANG=en_US.UTF-8 coupole --help | grep -q commands
             coupole ohp inventaire --json | head -c 200 >/dev/null

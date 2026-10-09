@@ -9,7 +9,7 @@ from ...core.i18n import tr
 
 def rapport() -> dict:
     """Diagnostic complet (dictionnaire) : partagé par la CLI et l'interface."""
-    from ...core import astap, calcul, machine, parallele
+    from ...core import astap, bibliotheques, calcul, machine, parallele
     m = machine.detecter(rafraichir=True)
     r = config.reglages()
     plan = parallele.planifier(m, r['telechargements_max'], r['conversions_max'], True if r['mode_econome'] else None)
@@ -17,12 +17,13 @@ def rapport() -> dict:
     dest = r['dossier_sortie'] or str(config.dossier_sortie_defaut())
     return {'machine': m.en_dict(), 'plan': plan.__dict__, 'astap': {**e.__dict__, 'utilisable': e.utilisable},
             'gpu': calcul.resume_gpu(), 'disque_libre_go': round(machine.disque_libre_go(dest), 1),
-            'destination': dest}
+            'destination': dest, 'bibliotheques': bibliotheques.facultatives()}
 
 
 def infobulles() -> dict:
     """Info-bulle de certaines lignes (libellé → texte) ; le détail technique vit ici, pas dans la valeur affichée."""
-    return {tr('mach_gpu_usage'): tr('mach_gpu_usage_aide'), tr('mach_gpu'): tr('mach_gpu_val_aide')}
+    return {tr('mach_gpu_usage'): tr('mach_gpu_usage_aide'), tr('mach_gpu'): tr('mach_gpu_val_aide'),
+            tr('mach_biblio'): tr('mach_biblio_aide')}
 
 
 def lignes(d: dict) -> list[tuple[str, str]]:
@@ -35,6 +36,11 @@ def lignes(d: dict) -> list[tuple[str, str]]:
                                    d='%.1f' % (m['memoire_disponible_mo'] / 1024))),
            (tr('mach_disque'), tr('mach_disque_val', g=d['disque_libre_go'], dest=d['destination'])),
            (tr('mach_python'), m['python'])]
+    if 'bibliotheques' in d:
+        from ...core.bibliotheques import resume
+        presentes, absentes = resume(d['bibliotheques'])
+        out.append((tr('mach_biblio'), tr('mach_biblio_val', presentes=presentes or tr('mach_aucune'),
+                                          absentes=absentes or tr('mach_aucune'))))
     if m['cartes']:
         for c in m['cartes']:
             mem = (' — ' + tr('taille_mo', v=c['memoire_mo'])) if c['memoire_mo'] else ''

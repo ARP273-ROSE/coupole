@@ -30,6 +30,7 @@ from __future__ import annotations
 import datetime as D
 import hashlib
 import json
+import logging
 import os
 import shutil
 import sqlite3
@@ -46,6 +47,7 @@ ATTENTE_VERROU_S = 3.0              # dossier non reconnu comme partage : au-del
 ESSAIS_REMPLACEMENT = 5             # os.replace refusé (Windows : fichier ouvert ailleurs) : nouvel essai
 CLE_VERSION = 'version_partage'
 RANG = {'ok': 4, 'doublon': 3, 'echec': 2, 'en_cours': 1}
+log = logging.getLogger('coupole.base')
 
 
 class Divergence(Exception):
@@ -169,7 +171,12 @@ class BasePartagee:
         self.partage = os.path.abspath(str(chemin))
         self.reseau = est_reseau(os.path.dirname(self.partage)) if reseau is None else bool(reseau)
         self.intervalle = float(intervalle)
-        self.rapporter = rapporter or (lambda cle, **v: None)
+        rappel = rapporter or (lambda cle, **v: None)
+
+        def rapporter_et_noter(cle_message, **valeurs):     # sens de chaque synchronisation : dans coupole.log
+            log.info('base %s : %s %s', self.partage, cle_message, valeurs or '')
+            rappel(cle_message, **valeurs)
+        self.rapporter = rapporter_et_noter
         self.locale = chemin_travail(self.partage)
         self.sync = self.locale + '.sync.json'
         self.mode = 'direct'
@@ -184,8 +191,11 @@ class BasePartagee:
         """Chemin à ouvrir.  Lève :class:`Divergence` (rien n'est écrasé) si les deux bases ont changé."""
         if not self.reseau and self._direct_possible():
             self.mode = 'direct'
+            log.info('base %s : ouverte directement (disque local)', self.partage)
             return self.partage
         self.mode = 'local'
+        log.info('base %s : base de travail locale %s (%s)', self.partage, self.locale,
+                 'partage réseau' if self.reseau else 'écriture directe refusée')
         os.makedirs(os.path.dirname(self.locale), exist_ok=True)
         try:
             self._preparer()
@@ -454,6 +464,96 @@ def chemin_lecture(chemin_partage) -> str:
     except (OSError, ValueError, AttributeError):
         pass
     return str(chemin_partage)
+
+
+class BaseIllisible(Exception):
+    """La base d'état existe mais n'a pu être lue d'aucune façon (directe, base de travail, copie locale)."""
+
+    def __init__(self, chemin: str, erreurs: list):
+        self.chemin, self.erreurs = str(chemin), list(erreurs)
+        super().__init__('; '.join(self.erreurs) or 'illisible')
+
+
+def en_wal(chemin) -> bool:
+    """Base en journal WAL (en-tête : octets 18-19 = 2) ou ``-wal`` non vide à côté.  Une base WAL ne se lit pas
+    sur un partage SMB depuis Windows (le ``-shm`` doit être projeté en mémoire, ce qu'un partage ne permet pas)."""
+    try:
+        with open(chemin, 'rb') as f:
+            tete = f.read(20)
+        if len(tete) >= 20 and tete[:16] == b'SQLite format 3\x00' and (tete[18] == 2 or tete[19] == 2):
+            return True
+    except OSError:
+        pass
+    try:
+        return os.path.getsize(str(chemin) + '-wal') > 0
+    except OSError:
+        return False
+
+
+def copie_lecture(chemin_partage) -> str:
+    """Copie locale (cache de l'utilisateur) de la base `chemin_partage`, à lire à la place de l'original : base
+    WAL (``-wal`` recopié et reporté), dossier sur un partage.  Refaite seulement si la base (ou son ``-wal``) a
+    changé depuis la dernière copie.  OSError / ValueError / sqlite3.Error si la copie échoue."""
+    dossier = dossier_travail(chemin_partage)
+    dossier.mkdir(parents=True, exist_ok=True)
+    dst = str(dossier / ('lecture-' + os.path.basename(str(chemin_partage))))
+    temoin = dst + '.json'
+    etat = {'chemin': os.path.abspath(str(chemin_partage)), 'base': _stat(chemin_partage),
+            'wal': _stat(str(chemin_partage) + '-wal')}
+    try:
+        with open(temoin, encoding='utf-8') as f:
+            if json.load(f) == etat and os.path.getsize(dst) > 0:
+                return dst
+    except (OSError, ValueError):
+        pass
+    _copier_base(str(chemin_partage), dst)
+    config.ecrire_json_atomique(temoin, etat)
+    return dst
+
+
+def _lire_ro(chemin, requete, params=()) -> list:
+    db = sqlite3.connect(uri_sqlite_lecture_seule(chemin), uri=True, timeout=5)
+    try:
+        return db.execute(requete, params).fetchall()
+    finally:
+        db.close()
+
+
+def lire_base(chemin_partage, requete: str, params=()) -> tuple[list, str]:
+    """Exécute une requête de LECTURE sur la base d'état d'un dossier de sortie, où qu'elle soit ; rend
+    (lignes, provenance) avec provenance ∈ 'travail' (base de travail locale à jour), 'directe' (la base
+    elle-même, en ``mode=ro``) ou 'copie' (copie locale : base WAL, partage réseau, ou lecture directe refusée).
+
+    Lève :class:`BaseIllisible` (avec chaque erreur rencontrée) si rien n'a pu être lu : l'appelant le DIT, au lieu
+    de conclure qu'il n'y a rien.  Chaque lecture est notée dans le journal (``coupole.log``)."""
+    chemin_partage = str(chemin_partage)
+    erreurs = []
+    lecture = chemin_lecture(chemin_partage)
+    if lecture != chemin_partage:
+        try:
+            lignes = _lire_ro(lecture, requete, params)
+            log.info('base %s : %d ligne(s) lue(s) dans la base de travail locale %s', chemin_partage, len(lignes),
+                     lecture)
+            return lignes, 'travail'
+        except (sqlite3.Error, OSError) as e:
+            erreurs.append('travail: %s' % e)
+    reseau = est_reseau(os.path.dirname(chemin_partage))
+    wal = en_wal(chemin_partage)
+    ordre = ('copie', 'directe') if (reseau or wal) else ('directe', 'copie')
+    for mode in ordre:
+        try:
+            if mode == 'directe':
+                lignes = _lire_ro(chemin_partage, requete, params)
+            else:
+                lignes = _lire_ro(copie_lecture(chemin_partage), requete, params)
+            log.info('base %s (%s%s) : %d ligne(s) lue(s), lecture %s', chemin_partage,
+                     'partage réseau' if reseau else 'disque local', ', WAL' if wal else '', len(lignes), mode)
+            return lignes, mode
+        except (sqlite3.Error, OSError, ValueError) as e:
+            erreurs.append('%s: %s' % (mode, e))
+    log.warning('base %s illisible (%s%s) : %s', chemin_partage, 'partage réseau' if reseau else 'disque local',
+                ', WAL' if wal else '', ' ; '.join(erreurs))
+    raise BaseIllisible(chemin_partage, erreurs)
 
 
 # ============================================================================ fusion

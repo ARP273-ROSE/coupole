@@ -94,15 +94,31 @@ def chemin_os(p: str) -> str:
 
 
 def uri_sqlite_lecture_seule(chemin: str, windows: bool | None = None) -> str:
-    """URI SQLite en lecture seule (espaces, accents, « ? », « : » et « , » des chemins gvfs, UNC Windows).
+    """URI SQLite en lecture seule (espaces, accents, « ? », « # », « % », « : » et « , » des chemins gvfs, UNC).
 
-    SQLite refuse une URI ``file://serveur/…`` (autorité non vide) : un chemin UNC s'écrit ``file:////serveur/…``,
-    autorité vide et chemin ``//serveur/partage/…``, que Windows ouvre comme ``\\\\serveur\\partage\\…``."""
+    SQLite refuse une URI ``file://serveur/…`` (autorité non vide : « invalid uri authority ») : un chemin UNC
+    s'écrit ``file:////serveur/…``, autorité vide et chemin ``//serveur/partage/…``, que Windows ouvre comme
+    ``\\\\serveur\\partage\\…`` ; une lettre de lecteur s'écrit ``file:///O:/…``.
+
+    0.2.1 : le chemin n'est plus « résolu » (``Path.resolve()``).  Sous Windows, ``resolve()`` remplace la lettre
+    d'un lecteur réseau (``O:\\…``) par le chemin UNC du partage ; ``as_uri()`` en faisait ``file://serveur/…``,
+    que SQLite refuse : la base d'un dossier de sortie sur un lecteur réseau était illisible, et la Banque OHP
+    affichait « rien de possédé »."""
+    import ntpath
+    import posixpath
     windows = (os.name == 'nt') if windows is None else windows
-    if windows and est_unc(str(chemin)):
-        p = str(chemin).replace('\\', '/')
-        return 'file://' + quote(p, safe='/') + '?mode=ro'
-    return Path(chemin).resolve().as_uri() + '?mode=ro'
+    if windows:
+        p = str(chemin).replace('/', '\\')
+        if not est_unc(p):
+            p = ntpath.abspath(p) if os.name == 'nt' else ntpath.normpath(p)
+        p = p.replace('\\', '/')
+        if p.startswith('//'):                       # UNC : autorité vide, chemin //serveur/partage/…
+            return 'file://' + quote(p, safe='/') + '?mode=ro'
+        if len(p) >= 2 and p[1] == ':':              # lettre de lecteur : file:///O:/…
+            return 'file:///' + p[:2] + quote(p[2:], safe='/') + '?mode=ro'
+        return 'file:' + quote(p, safe='/') + '?mode=ro'
+    p = posixpath.abspath(os.path.expanduser(str(chemin)))
+    return 'file://' + quote(p, safe='/') + '?mode=ro'
 
 
 def emplacements_systeme(env: dict | None = None, montages_texte: str | None = None, uid: int | None = None,

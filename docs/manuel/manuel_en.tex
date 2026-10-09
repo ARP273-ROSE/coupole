@@ -58,8 +58,18 @@ without consent; optional components (ASTAP, SEP, CuPy) may be missing.
 % =====================================================================
 \section{Installation}
 \subsection{All-inclusive packages}
-The packages bundle Python and every library (PyQt6, numpy, astropy, zstandard, lz4, SEP): nothing else to
+The packages bundle Python and every library (PyQt6, numpy, scipy, astropy, zstandard, lz4): nothing else to
 install. They update themselves. ASTAP stays optional and is not included.
+
+\textbf{Optional libraries bundled (0.2.1).} Optional for a pip installation (extras \texttt{qualite},
+\texttt{alignement}), they are in \emph{every} package (Windows installer, .dmg, tar.gz, .deb): \texttt{reproject}
+(exact and adaptive alignment in the Archives module, with the \texttt{astropy-healpix}, \texttt{dask} and
+\texttt{zarr} it needs; up to 0.2.0 it was missing from the packages, and alignment fell back on scipy bilinear
+resampling), \texttt{sep} (Image quality module), \texttt{psutil} (machine measurements) and \texttt{lxml} (XISF
+validation). Only CuPy (NVIDIA card, unused for now) stays out. Each built package imports and runs them before
+publishing; added weight: about 20~MB to the Linux archive (101 → 121~MB), 12~MB to the .deb (109 → 121~MB). The
+\emph{My computer} module and \emph{Help > About} list the optional libraries present and missing, with their
+version.
 
 \begin{center}\small
 \begin{tabularx}{\linewidth}{@{}l>{\ttfamily\small}lX@{}}
@@ -350,6 +360,30 @@ principle write on a share (native SMB locks), but several writers risk damaging
 database, checked in continuous integration on \texttt{\textbackslash\textbackslash localhost\textbackslash C\$}. If
 the database on the share is open in another program when it is replaced, Coupole retries, then waits for the next
 pass.
+
+\textbf{Windows: network drive or UNC path (0.2.1).} An output folder on a network drive letter
+(\texttt{O:\textbackslash OHP\_DU\_ECU}, mapped share) or on a UNC path
+(\texttt{\textbackslash\textbackslash server\textbackslash share\textbackslash OHP\_DU\_ECU}) is recognised as a share
+(\texttt{GetDriveTypeW} = remote drive). Up to 0.2.0, the state database of a folder on a network drive
+\emph{letter} was unreadable: the path was « resolved » into a UNC path, and the resulting SQLite address
+(\texttt{file://server/…}) was rejected; the error went unnoticed and everything looked to be downloaded, while the
+same folder seen from Linux was fully owned. Since 0.2.1, the address is built without resolving
+(\texttt{file:///O:/…}, \texttt{file:////server/share/…}) and a database on a share is read through a \textbf{local
+copy} (user cache, redone only when the database changes); a database in WAL journal mode (old script) is copied
+with its \texttt{-wal}, which Windows cannot read on a share. The letter and the UNC path of the same share each
+have their working database (the key comes from the path typed): harmless, each follows the share. Checked in
+continuous integration on the machine's \texttt{C\$} administrative share, under its name (not « localhost », which
+SQLite accepts in an address), as UNC and through a letter set by \texttt{net use}.
+
+\textbf{Tracking folder.} The OHP bank summary line and the status bar give the folder really read and what was
+found there: « Tracking folder: <path> --- N owned images read ». If the tracking database exists but cannot be
+read, an \textbf{error banner} says so with the cause (« The tracking database of this folder could not be read: … »)
+instead of showing « nothing owned »; \texttt{coupole.log} records each read (working database, copy or direct
+read, number of images read) and each synchronisation with the share. If \texttt{\_traitement/} is missing while
+converted images are sorted (partial copy, restored backup), the banner offers \textbf{Recognise existing files}:
+each file's header (\texttt{OHP:Source:URL}, otherwise the \texttt{HISTORY} card « converted from … ») gives the
+original image, recorded as owned; in the background, with progress; nothing is downloaded, moved or rewritten
+(\cmd{coupole ohp recognise --dest FOLDER}). \emph{Refresh the inventory} also re-reads ownership.
 
 \subsection{New images in the bank}\label{sec:nouveautes}
 At startup (at most once a day, adjustable, can be disabled in Preferences), when the Internet is available and a
@@ -1098,6 +1132,9 @@ WBPP does not find focal length and pixel & enter the values of the \emph{For Pi
 White image in N.I.N.A. or Siril & compatible XISF format (Processing tab), section~\ref{sec:compat}.\\
 « database is locked » towards a NAS (0.1.9 and earlier) & update: the local working database solves it (section~\ref{sec:partage}).\\
 « Two versions of the state database » & two computers (or the NAS) processed into the same folder: accept the merge, or \cmd{coupole ohp merge --dest FOLDER}; both original databases are kept.\\
+Everything « to download » on Windows although the folder (network drive) is complete & 0.2.0 and earlier: update (section~\ref{sec:partage}); the « Tracking folder » line says what is read.\\
+« The tracking database of this folder could not be read » & the cause follows the message (and \texttt{coupole.log}): damaged database, share unplugged, permissions; do not start a full download again.\\
+No \texttt{\_traitement/} but sorted images & \emph{Recognise existing files} (banner), or \cmd{coupole ohp recognise --dest FOLDER}.\\
 « Could not copy the state database to the share » & share unplugged or database open elsewhere: nothing is lost, retried on the next pass and at the next start.\\
 \bottomrule
 \end{tabularx}

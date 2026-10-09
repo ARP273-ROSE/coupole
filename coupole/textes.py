@@ -661,9 +661,12 @@ TEXTES = {
     'apropos_licence': {'fr': 'Licence : GNU GPL version 3 ou ultérieure. Logiciel fourni sans garantie.',
                         'en': 'Licence: GNU GPL version 3 or later. Software provided without warranty.'},
     'apropos_config': {'fr': 'Système : {os}\nProcesseur : {cpu} ({p} cœurs, {l} logiques)\nMémoire : {ram} Go\n'
-                             'Carte graphique : {gpu}\nPython : {python}\nASTAP : {astap}',
+                             'Carte graphique : {gpu}\nPython : {python}\nASTAP : {astap}\n'
+                             'Bibliothèques facultatives : {biblio}',
                        'en': 'System: {os}\nProcessor: {cpu} ({p} cores, {l} logical)\nMemory: {ram} GB\n'
-                             'Graphics card: {gpu}\nPython: {python}\nASTAP: {astap}'},
+                             'Graphics card: {gpu}\nPython: {python}\nASTAP: {astap}\n'
+                             'Optional libraries: {biblio}'},
+    'apropos_biblio': {'fr': '{presentes} (absentes : {absentes})', 'en': '{presentes} (missing: {absentes})'},
     'signaler_titre': {'fr': 'Signaler un problème', 'en': 'Report a problem'},
     'signaler_texte': {'fr': "Décrire ce qui s'est passé et ce qui était attendu. Aucune donnée personnelle n'est jointe.",
                        'en': 'Describe what happened and what was expected. No personal data is attached.'},

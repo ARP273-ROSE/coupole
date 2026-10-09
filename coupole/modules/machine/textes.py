@@ -10,6 +10,16 @@ TEXTES = {
     'mach_disque': {'fr': 'Disque', 'en': 'Disk'},
     'mach_disque_val': {'fr': '{g} Go libres ({dest})', 'en': '{g} GB free ({dest})'},
     'mach_python': {'fr': 'Python', 'en': 'Python'},
+    'mach_biblio': {'fr': 'Bibliothèques facultatives', 'en': 'Optional libraries'},
+    'mach_biblio_val': {'fr': 'présentes : {presentes} ; absentes : {absentes}', 'en': 'present: {presentes}; missing: {absentes}'},
+    'mach_biblio_aide': {'fr': "reproject : alignement exact du module Archives (sinon bilinéaire de scipy) ; sep : module "
+                               "Qualité des images ; psutil : mesures de la machine ; lxml : validation XISF ; cupy : "
+                               "calcul sur carte NVIDIA (inutilisé pour l'instant).  Toutes sont dans les paquets "
+                               "autonomes, sauf cupy.",
+                         'en': 'reproject: exact alignment in the Archives module (otherwise scipy bilinear); sep: Image '
+                               'quality module; psutil: machine measurements; lxml: XISF validation; cupy: NVIDIA GPU '
+                               'computing (unused for now).  All are in the standalone packages, except cupy.'},
+    'mach_aucune': {'fr': 'aucune', 'en': 'none'},
     'mach_gpu': {'fr': 'Carte graphique', 'en': 'Graphics card'},
     'mach_gpu_aucune': {'fr': 'aucune détectée', 'en': 'none detected'},
     'mach_gpu_usage': {'fr': 'Calcul sur carte graphique', 'en': 'GPU computing'},

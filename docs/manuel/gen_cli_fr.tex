@@ -243,6 +243,14 @@ NOM\_BASE & nom de cible tel qu'il figure dans la base\\
 \par\medskip
 \begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
 \toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp reconnaitre (recognise, recognize)\newline\normalfont\small Lit l'en-tête de chaque image convertie du dossier de sortie (OHP:Source:URL ou HISTORY) et l'inscrit comme possédée dans la base de suivi.  Ne télécharge rien, ne déplace rien, ne réécrit aucun fichier.}\\
+\midrule
+--dest DOSSIER & dossier de destination (défaut : \textasciitilde{}/Coupole/OHP\_DU\_ECU ou celui des réglages)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp metadonnees (metadata)\newline\normalfont\small Pour chaque XISF/FITS du dossier : FOCALLEN accordé à l'échelle mesurée (ancienne valeur en HISTORY) et propriétés XISF Instrument:Sensor:XPixelSize, Instrument:Camera:XBinning, Instrument:Telescope:FocalLength… Les pixels ne sont pas touchés (relus et comparés), écriture atomique, journal dans \_traitement/metadonnees.csv. Sans --reecrire : simulation.}\\
 \midrule
 DOSSIER & dossier de sortie (ou un lot)\\

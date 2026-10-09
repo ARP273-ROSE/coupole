@@ -243,6 +243,14 @@ DB\_NAME & target name as it appears in the database\\
 \par\medskip
 \begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
 \toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp reconnaitre (recognise, recognize)\newline\normalfont\small Reads the header of each converted image of the output folder (OHP:Source:URL or HISTORY) and records it as owned in the tracking database.  Downloads nothing, moves nothing, rewrites no file.}\\
+\midrule
+--dest FOLDER & destination folder (default: \textasciitilde{}/Coupole/OHP\_DU\_ECU or the one in the settings)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp metadonnees (metadata)\newline\normalfont\small For each XISF/FITS of the folder: FOCALLEN matched to the measured scale (old value in HISTORY) and the XISF properties Instrument:Sensor:XPixelSize, Instrument:Camera:XBinning, Instrument:Telescope:FocalLength… Pixels are not touched (read back and compared), atomic writing, log in \_traitement/metadonnees.csv. Without --rewrite: dry run.}\\
 \midrule
 FOLDER & output folder (or one stack)\\
