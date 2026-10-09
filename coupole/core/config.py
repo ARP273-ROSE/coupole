@@ -80,6 +80,11 @@ DEFAUTS = {
     'ohp_verifier_nouveautes': True,   # Banque OHP : comparer l'inventaire TAP à la copie locale au démarrage
     'ohp_nouveautes_heures': 24,       # au plus une vérification par ce nombre d'heures
     'ohp_derniere_verification': '',   # ISO UTC de la dernière vérification des nouveautés
+    # options de l'onglet Traitement (Banque OHP), gardées dès qu'elles changent (0.1.6)
+    'ohp_garder_doublons': False,
+    'ohp_garder_fits': False,
+    'ohp_mode_astap': 'tous',          # tous | suspectes | jamais
+    'ohp_verifier_qualite': False,
 }
 
 _verrou = threading.Lock()
@@ -147,6 +152,9 @@ class Reglages:
     def __init__(self, chemin: Path | None = None):
         self.chemin = chemin or dossier_config() / 'reglages.json'
         self.valeurs = dict(DEFAUTS)
+        self.ecritures = 0                 # écritures sur disque (tests du budget d'écriture)
+        self.quand_modifie = None          # rappel () d'une valeur différée : l'interface programme l'écriture
+        self._sale = False
         existait = self.chemin.exists()
         lu = lire_json_protege(self.chemin, None)
         self.valeurs.update(lu or {})
@@ -165,10 +173,41 @@ class Reglages:
     def get(self, cle, defaut=None):
         return self.valeurs.get(cle, defaut)
 
+    def lire(self, cle, types):
+        """Valeur de `cle` si elle a le type attendu, sinon la valeur par défaut (fichier modifié à la main,
+        ancienne version) : jamais d'exception."""
+        v = self.valeurs.get(cle, DEFAUTS.get(cle))
+        if not isinstance(types, tuple):
+            types = (types,)
+        if isinstance(v, bool) and bool not in types or not isinstance(v, types):
+            return DEFAUTS.get(cle)
+        return v
+
+    def differer(self, cle, valeur):
+        """Change une valeur EN MÉMOIRE ; l'écriture sur disque est groupée et différée (au plus toutes les 2 s,
+        et à la fermeture) par l'interface : une frappe dans un champ n'écrit jamais le fichier."""
+        if cle in self.valeurs and self.valeurs[cle] == valeur and type(self.valeurs[cle]) is type(valeur):
+            return
+        self.valeurs[cle] = valeur
+        self._sale = True
+        if self.quand_modifie is not None:
+            try:
+                self.quand_modifie()
+            except Exception:
+                pass
+
+    def enregistrer_si_modifie(self) -> bool:
+        if not self._sale:
+            return False
+        self.enregistrer()
+        return True
+
     def enregistrer(self):
         with _verrou:
             try:
                 ecrire_json_atomique(self.chemin, self.valeurs, indent=2)
+                self._sale = False
+                self.ecritures += 1
             except OSError as e:                       # disque plein, dossier en lecture seule : on continue
                 log.warning('settings not saved: %s', e)
 

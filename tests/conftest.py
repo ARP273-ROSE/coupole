@@ -55,3 +55,13 @@ def app_qt():
     from coupole.gui import theme
     theme.appliquer(app)                        # le thème par défaut de Coupole (sombre), comme chez l'utilisateur
     yield app
+
+
+@pytest.fixture(autouse=True)
+def interface_vierge():
+    """Chaque test part d'une disposition d'origine (interface.json effacé) : la fenêtre d'un test ne reprend pas
+    la taille, les filtres ou les colonnes laissés par le précédent."""
+    from coupole.core import etat_interface
+    etat_interface.effacer_fichier()
+    etat_interface.reinitialiser_pour_tests()
+    yield

@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QListWidget, QListWidgetItem, 
 from .. import __version__
 from ..core import config, i18n, modules
 from ..core.i18n import tr
-from . import adaptatif, dialogues, theme
+from . import adaptatif, dialogues, memoire, theme
 from .outils import action, aide
 from .ressources import icone_application
 
@@ -22,9 +22,20 @@ class FenetrePrincipale(QMainWindow):
         self.setMinimumSize(adaptatif.TAILLE_MIN.boundedTo(adaptatif.zone_utile(self)))
         self.panneaux = []
         self.construire()
+        # taille, position, écran et état maximisé de la dernière fois (garde-fous : écran disparu, position hors
+        # des écrans → fenêtre recentrée ; taille bornée à l'écran, comme adaptatif.ajuster)
+        from ..core.etat_interface import etat
+        self.placement = memoire.placer(self, etat().lire('fenetre.geometrie', None, dict),
+                                        adaptatif.TAILLE_MIN)
 
     # ---------------------------------------------------------------- construction (et reconstruction : langue)
-    def construire(self):
+    def construire(self, capturer: bool = True):
+        """(Re)construit menus et panneaux.  `capturer` : l'état des panneaux actuels (filtres, colonnes…) est
+        relu avant d'être rétabli dans les nouveaux (changement de langue) ; False après une réinitialisation."""
+        m = memoire.memoire()
+        if capturer:
+            m.capturer()
+        m.oublier_sources()
         self.setWindowTitle('Coupole %s' % __version__)
         self.menuBar().clear()
         central = QWidget()
@@ -65,9 +76,51 @@ class FenetrePrincipale(QMainWindow):
             self.panneaux.append(panneau)
         self.barre.currentRowChanged.connect(self.pile.setCurrentIndex)
         self.barre.setCurrentRow(0)
+        self._suivre_disposition()
         self._menus()
         self._largeur_barre()
         self.statusBar().showMessage(tr('fen_pret'))
+
+    # ---------------------------------------------------------------- disposition gardée (gui/memoire.py)
+    def _suivre_disposition(self):
+        """Module affiché et géométrie de la fenêtre : rétablis, puis relus à chaque écriture différée."""
+        from ..core.etat_interface import etat
+        m = memoire.memoire()
+        ident = etat().lire('fenetre.module', '', str)
+        for i, p in enumerate(self.panneaux):
+            if ident and getattr(getattr(p, 'module', None), 'id', '') == ident:
+                self.barre.setCurrentRow(i)
+                break
+
+        def module():
+            p = self.panneau_courant()
+            return getattr(getattr(p, 'module', None), 'id', None) if p is not None else None
+        m.suivre('fenetre.module', module, self.barre, self.barre.currentRowChanged)
+        m.suivre('fenetre.geometrie', lambda: memoire.geometrie_fenetre(self), self)
+
+    def moveEvent(self, ev):
+        super().moveEvent(ev)
+        memoire.memoire().signaler()
+
+    def changeEvent(self, ev):
+        super().changeEvent(ev)
+        from PyQt6.QtCore import QEvent
+        if ev.type() == QEvent.Type.WindowStateChange:
+            memoire.memoire().signaler()
+
+    def reinitialiser_disposition(self):
+        """Préférences > « Réinitialiser la disposition » : tout revient à l'origine, tout de suite si possible."""
+        m = memoire.memoire()
+        if any(getattr(p, 'occupe', lambda: False)() for p in self.panneaux):
+            m.reinitialiser()
+            m.suspendue = True                      # rien ne sera réécrit : l'origine reviendra au prochain lancement
+            QMessageBox.information(self, tr('reg_disposition'), tr('fen_disposition_plus_tard'))
+            return
+        m.reinitialiser()
+        self.showNormal()
+        adaptatif.ajuster(self, 1400, 900)
+        self.construire(capturer=False)
+        self.statusBar().showMessage(tr('fen_disposition_reinitialisee'), 6000)
 
     # ---------------------------------------------------------------- barre des modules adaptative
     SEUIL_COMPACT = 1100                 # en dessous (pixels logiques), la barre ne garde que les icônes
@@ -94,6 +147,7 @@ class FenetrePrincipale(QMainWindow):
         super().resizeEvent(ev)
         if hasattr(self, 'barre'):
             self._largeur_barre()
+        memoire.memoire().signaler()
 
     def _menus(self):
         mb = self.menuBar()
@@ -179,7 +233,7 @@ class FenetrePrincipale(QMainWindow):
             return
         titre = p.module.nom_local() if hasattr(p, 'module') else 'Coupole'
         texte = p.aide_html() if hasattr(p, 'aide_html') else tr('aide_generale')
-        dialogues.afficher_aide(self, titre, texte)
+        dialogues.afficher_aide(self, titre, texte + tr('aide_reglages_conserves'))
 
     def manuel(self):
         from ..cli import chemin_manuel
@@ -191,7 +245,13 @@ class FenetrePrincipale(QMainWindow):
 
     def reglages(self):
         d = dialogues.DialogueReglages(self)
-        if d.exec() and getattr(d, 'langue_changee', False):
+        ok = d.exec()
+        if ok and getattr(d, 'disposition_reinitialisee', False):
+            if getattr(d, 'langue_changee', False):
+                i18n.choisir_langue(config.reglages()['langue'])
+            self.reinitialiser_disposition()
+            return
+        if ok and getattr(d, 'langue_changee', False):
             self.changer_langue(config.reglages()['langue'])
         else:
             self.synchroniser_apparence()          # le dialogue a pu changer le thème : le menu suit
@@ -250,6 +310,10 @@ class FenetrePrincipale(QMainWindow):
                 ev.ignore()
                 return
         self.statusBar().showMessage(tr('fen_arret_en_cours'))
+        try:
+            memoire.memoire().ecrire()                # disposition et réglages différés : écrits avant l'arrêt
+        except Exception:
+            pass
         for p in self.panneaux:
             if hasattr(p, 'arreter'):
                 try:

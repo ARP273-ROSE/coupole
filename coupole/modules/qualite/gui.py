@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import (QFileDialog, QHBoxLayout, QLabel, QMessageBox, QPla
 
 from ...core import config
 from ...core.i18n import langue, tr
+from ...gui import memoire
 from ...gui.adaptatif import Flux, coupable, texte_reel
 from ...gui.modele import ModeleTableau, Nombre, vue_tableau
 from ...gui.outils import FileEvenements, aide, bouton, case, nombre
@@ -59,16 +60,41 @@ class Panneau(QWidget):
         self.resume.setReadOnly(True)
         sp.addWidget(self.resume)
         v.addWidget(sp, 1)
+        self.sp = sp
+        self._memoriser()
         self._fil = None
         self._arret = threading.Event()
         self._lignes = []
         self._evts = None
         self.bilan = None
 
+    def _memoriser(self):
+        """Dossier analysé, échantillon et N, séparateur, colonnes : gardés d'une fermeture à l'autre."""
+        from ...core.etat_interface import etat
+        k = 'modules.qualite.'
+        d = etat().lire_texte(k + 'dossier', '')
+        self._dossier_choisi = bool(d)               # sinon : le dossier de sortie (Préférences), qu'on suit
+        if d:
+            self.l_dossier.setText(coupable(d))      # affiché tel quel ; un dossier absent est signalé au lancement
+        memoire.memoire().suivre(k + 'dossier', lambda: texte_reel(self.l_dossier.text()) if self._dossier_choisi
+                                 else None, self.l_dossier)
+        memoire.case(self.echantillon, k + 'echantillon')
+        memoire.nombre(self.n_echantillon, k + 'echantillon_n')
+        memoire.separateur(self.sp, k + 'separateur')
+        memoire.entete(self.vue, k + 'colonnes')
+
+    def reglages_changes(self):
+        """Préférences modifiées : tant qu'aucun dossier n'a été choisi ici, on analyse le dossier de sortie."""
+        if not self._dossier_choisi and not self.occupe():
+            self.l_dossier.setText(coupable(config.reglages()['dossier_sortie'] or
+                                            str(config.dossier_sortie_defaut() / 'OHP_DU_ECU')))
+
     def choisir(self):
         d = QFileDialog.getExistingDirectory(self, tr('qual_choisir'), texte_reel(self.l_dossier.text()))
         if d:
             self.l_dossier.setText(coupable(d))
+            self._dossier_choisi = True
+            memoire.memoire().signaler()
 
     def occupe(self):
         return self._fil is not None and self._fil.is_alive()
@@ -81,6 +107,8 @@ class Panneau(QWidget):
         racine = dossier or texte_reel(self.l_dossier.text())
         if dossier:
             self.l_dossier.setText(coupable(dossier))
+            self._dossier_choisi = True
+            memoire.memoire().signaler()
         self.b_lancer.setEnabled(False)
         self.l_progression.setText(tr('qual_inventaire'))
         n_lot = int(self.n_echantillon.value())

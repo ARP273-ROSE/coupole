@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import math
+import os
 
 from PyQt6.QtCore import QEvent, QLocale, Qt
 from PyQt6.QtGui import QPainter
@@ -9,6 +10,7 @@ from PyQt6.QtWidgets import (QDoubleSpinBox, QFileDialog, QGroupBox, QHBoxLayout
                              QSlider, QSplitter, QStyle, QStyleOptionSlider, QVBoxLayout, QWidget)
 
 from ...core.i18n import langue, tr
+from ...gui import memoire
 from ...gui.adaptatif import Flux
 from ...gui.modele import ModeleTableau, vue_tableau
 from ...gui.outils import Tache, aide, bouton, case, champ, liste
@@ -115,6 +117,8 @@ class Panneau(QWidget):
             f.addWidget(_paire(cle, w))
         self.shoes = case('cosmo_shoes')
         f.addWidget(self.shoes)
+        self.echelle = liste('cosmo_echelle_aide', [(tr('cosmo_echelle_log'), 'log'), (tr('cosmo_echelle_lin'), 'lin')])
+        f.addWidget(_paire('cosmo_echelle', self.echelle))
         vg.addLayout(f)
         self.l_params = QLabel('')
         self.l_params.setWordWrap(True)
@@ -191,11 +195,50 @@ class Panneau(QWidget):
         v.addLayout(f)
         v.addWidget(self.l_credits)
 
+        self._memoriser()                            # avant les branchements : rien n'est calculé deux fois
         self.modele.currentIndexChanged.connect(self._modele_change)
         for w in (self.h0, self.om, self.ok):
             w.valueChanged.connect(self.calculer)
+        for w in (self.h0, self.om):
+            w.valueChanged.connect(self._retenir_perso)
         self.shoes.toggled.connect(self.calculer)
+        self.echelle.currentIndexChanged.connect(self._tracer_courbes)
         self._modele_change(calculer=False)          # premier calcul au premier affichage (showEvent)
+
+    # ------------------------------------------------------------ réglages gardés d'une fermeture à l'autre
+    def _memoriser(self):
+        """Jeu de paramètres, paramètres personnalisés (H0, Ωm gardés même quand on repasse à Planck), Ωk, z
+        courant, option SH0ES, échelle des courbes."""
+        from ...core.etat_interface import etat
+        e, m, k = etat(), memoire.memoire(), 'modules.cosmo.'
+        perso = e.lire(k + 'perso', None, list)
+        self._perso = (calcul.H0_PLANCK, calcul.OM_PLANCK)
+        if perso and len(perso) == 2 and all(isinstance(x, (int, float)) and not isinstance(x, bool)
+                                             for x in perso):
+            h0, om = float(perso[0]), float(perso[1])
+            if self.h0.minimum() <= h0 <= self.h0.maximum() and self.om.minimum() <= om <= self.om.maximum():
+                self._perso = (h0, om)
+        memoire.liste(self.modele, k + 'modele')
+        if self.modele.currentData() == 'perso':
+            self.h0.setValue(self._perso[0])
+            self.om.setValue(self._perso[1])
+        memoire.nombre(self.ok, k + 'ok')
+        memoire.case(self.shoes, k + 'shoes')
+        memoire.liste(self.echelle, k + 'echelle')
+        z = e.lire_texte(k + 'z', '')
+        if z.strip():
+            try:
+                calcul.verifier_z(z)                 # une valeur illisible garde le défaut (z = 1)
+                self.z.setText(z.strip()[:40])
+            except calcul.ErreurCosmo:
+                pass
+        m.suivre(k + 'perso', lambda: list(self._perso), self.h0)
+        m.suivre(k + 'z', self.z.text, self.z, self.z.editingFinished)
+
+    def _retenir_perso(self, *_):
+        if self.modele.currentData() == 'perso':
+            self._perso = (self.h0.value(), self.om.value())
+            memoire.memoire().signaler()
 
     # ------------------------------------------------------------ disposition
     def showEvent(self, ev):
@@ -309,13 +352,16 @@ class Panneau(QWidget):
             w.setEnabled(perso)
         self.ok.setEnabled(m in calcul.AVEC_COURBURE)
         self.shoes.setEnabled(m == 'planck18')
+        for w in (self.h0, self.om):
+            w.blockSignals(True)
         if not perso:
-            for w in (self.h0, self.om):
-                w.blockSignals(True)
             self.h0.setValue(calcul.H0_PLANCK)
             self.om.setValue(calcul.OM_PLANCK)
-            for w in (self.h0, self.om):
-                w.blockSignals(False)
+        else:                                        # on retrouve ses propres paramètres
+            self.h0.setValue(self._perso[0])
+            self.om.setValue(self._perso[1])
+        for w in (self.h0, self.om):
+            w.blockSignals(False)
         if calculer:
             self.calculer()
 
@@ -411,14 +457,7 @@ class Panneau(QWidget):
             return
         if c is not None:
             self.courbes, self._cle_courbes = c, cle
-            k = 1e-3 * calcul.al_par_mpc() / 1e6       # Mpc → G al
-            self.trace.definir([(tr('cosmo_courbe_dc'), c['z'], c['comoving'] * k),
-                                (tr('cosmo_courbe_dl'), c['z'], c['luminosity'] * k),
-                                (tr('cosmo_courbe_da'), c['z'], c['angular_diameter'] * k),
-                                (tr('cosmo_courbe_dlt'), c['z'], c['lookback'] * k)],
-                               tr('cosmo_axe_z'), tr('cosmo_axe_d'))
-            self.trace.format_x = 'z = {:.4g}'
-            self.trace.format_y = '{:.4g}'
+            self._tracer_courbes()
         self.trace.placer_marqueur(d['z'])
         self._placer_curseur(d['z'])
         self.resultat = d
@@ -447,6 +486,20 @@ class Panneau(QWidget):
         self._disposer()
         self.l_etat.setText(' '.join(tr(a) for a in d['avertissements']))
         self._suite()
+
+    def _tracer_courbes(self, *_):
+        """Courbes des distances en fonction de z ; distances en échelle logarithmique (défaut) ou linéaire."""
+        c = self.courbes
+        if not c:
+            return
+        k = 1e-3 * calcul.al_par_mpc() / 1e6       # Mpc → G al
+        self.trace.definir([(tr('cosmo_courbe_dc'), c['z'], c['comoving'] * k),
+                            (tr('cosmo_courbe_dl'), c['z'], c['luminosity'] * k),
+                            (tr('cosmo_courbe_da'), c['z'], c['angular_diameter'] * k),
+                            (tr('cosmo_courbe_dlt'), c['z'], c['lookback'] * k)],
+                           tr('cosmo_axe_z'), tr('cosmo_axe_d'), log_y=self.echelle.currentData() != 'lin')
+        self.trace.format_x = 'z = {:.4g}'
+        self.trace.format_y = '{:.4g}'
 
     # ------------------------------------------------------------ SIMBAD
     def chercher(self):
@@ -503,9 +556,11 @@ class Panneau(QWidget):
         if not self.resultat:
             QMessageBox.information(self, tr('cosmo_csv_table'), tr('cosmo_rien_a_exporter'))
             return
-        f, _ = QFileDialog.getSaveFileName(self, tr('cosmo_csv_table'), 'cosmologie_z%g.csv' % self.resultat['z'],
-                                           'CSV (*.csv)')
+        f, _ = QFileDialog.getSaveFileName(self, tr('cosmo_csv_table'),
+                                           os.path.join(memoire.dossier('cosmo_exporter'),
+                                                        'cosmologie_z%g.csv' % self.resultat['z']), 'CSV (*.csv)')
         if f:
+            memoire.retenir('cosmo_exporter', f, est_fichier=True)
             formats.ecrire_csv_resultats(f, [self.resultat])
             self.l_etat.setText(tr('cosmo_ecrit', chemin=f))
 
@@ -513,8 +568,11 @@ class Panneau(QWidget):
         if not self.courbes:
             QMessageBox.information(self, tr('cosmo_csv_courbes'), tr('cosmo_rien_a_exporter'))
             return
-        f, _ = QFileDialog.getSaveFileName(self, tr('cosmo_csv_courbes'), 'cosmologie_courbes.csv', 'CSV (*.csv)')
+        f, _ = QFileDialog.getSaveFileName(self, tr('cosmo_csv_courbes'),
+                                           os.path.join(memoire.dossier('cosmo_exporter'), 'cosmologie_courbes.csv'),
+                                           'CSV (*.csv)')
         if f:
+            memoire.retenir('cosmo_exporter', f, est_fichier=True)
             formats.ecrire_csv_courbes(f, self.courbes)
             self.l_etat.setText(tr('cosmo_ecrit', chemin=f))
 

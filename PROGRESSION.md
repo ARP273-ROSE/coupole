@@ -326,3 +326,33 @@ dans `/mnt/apps_pool/_transfert/coupole_audit3/`.
   réussis, 11 sautés, code 0 ; python:3.10-slim 282 réussis, 11 sautés, code 0** ; `test_adaptatif` + `test_echelle`
   à `QT_SCALE_FACTOR=1.5` et `2` : 33 réussis, code 0 (3.12 et 3.10).
 - **Aucun tag posé.**
+
+## 2026-10-09 — version 0.1.6 : réglages conservés d'une fermeture à l'autre
+Demande de Kevin : tous les réglages de personnalisation et tous les chemins saisis retrouvés au lancement suivant.
+- Mécanisme unique : `coupole/core/etat_interface.py` (fichier `interface.json` versionné, lecture tolérante, écriture
+  atomique seulement si quelque chose a changé, existence des chemins vérifiée dans un fil démon) et
+  `coupole/gui/memoire.py` (éléments « suivis » : valeur rétablie à la construction, LUE au moment d'écrire ;
+  minuteur unique : au plus une écriture toutes les 2 s, plus une à la fermeture ; `Reglages.differer` pour les
+  réglages de `reglages.json` tapés au clavier). Les choix de traitement restent dans `reglages.json` (nouvelles clés
+  `ohp_garder_doublons`, `ohp_garder_fits`, `ohp_mode_astap`, `ohp_verifier_qualite`), la disposition dans
+  `interface.json`.
+- Conservé : fenêtre (taille, position, écran, maximisée ; garde-fous écran disparu / hors écran → recentrée, trop
+  grande → ramenée sur l'écran), taille des dialogues (+ onglet des Préférences), module, onglet OHP, séparateurs
+  (catalogue, Qualité, Sites, Spectres), colonnes de tous les tableaux triables (largeur une fois choisie à la souris,
+  ordre, tri), filtres et recherche du catalogue, nuit/filtre/objets choisis (appliqués quand les listes se
+  remplissent), filtres anomalies et ciel, onglet Traitement (dossier dès la frappe, format, langue des noms, doublons,
+  FITS, mode ASTAP, qualité), Qualité (dossier, échantillon, N), Spectres (dossier d'ouverture, 10 récents, axe),
+  Cosmologie (modèle, H0/Ωm perso gardés même en repassant par Planck, Ωk, z, SH0ES, nouvelle échelle log/lin des
+  courbes), Sites (site, zoom/centre de la carte, carte en ligne), dossiers de tous les dialogues de fichiers.
+- Non conservé volontairement : traitement en cours (jamais relancé seul), sélection d'images à traiter, tableau de
+  la Cosmologie (disposition automatique), séparateur de la Cosmologie (orientation automatique selon la largeur).
+- Réinitialisation : Préférences > « Réinitialiser la disposition » (reconstruit l'interface tout de suite ; si un
+  traitement tourne : effacé, plus rien d'écrit, origine au prochain lancement) ; `coupole --reinitialiser-interface`.
+- Tests : `tests/test_reglages_conserves.py` (11) ; `conftest.py` efface la disposition avant chaque test.
+  Validation (copie sans `build/` ni `dist/`, `pip install ".[test]"`, offscreen) : **python:3.12-slim 294 réussis,
+  11 sautés, code 0 ; python:3.10-slim 294 réussis, 11 sautés, code 0** ; `test_adaptatif` + `test_reglages_conserves`
+  + `test_gui_robustesse` + `test_echelle` à `QT_SCALE_FACTOR=1.5` et `2` : 51 réussis, code 0 (3.12 et 3.10).
+  Un plantage natif isolé (1 suite complète sur ~10, sous 3.12, non reproduit ensuite) : à surveiller.
+- Manuels FR/EN : section « Réglages conservés » (3.2), option `--reinitialiser-interface` dans les tableaux générés,
+  captures Préférences / Spectres / Cosmologie refaites ; recompilés. CHANGELOG FR puis EN.
+- **Aucun tag posé** (publication par Kevin).

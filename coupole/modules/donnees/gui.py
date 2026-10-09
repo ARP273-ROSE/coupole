@@ -2,13 +2,15 @@
 from __future__ import annotations
 
 import csv
+import os
 
-from PyQt6.QtWidgets import (QDoubleSpinBox, QFileDialog, QFormLayout, QHBoxLayout, QLabel, QListWidget, QMessageBox,
-                             QSplitter, QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (QDoubleSpinBox, QFileDialog, QFormLayout, QHBoxLayout, QLabel, QListWidget, QMenu,
+                             QMessageBox, QSplitter, QVBoxLayout, QWidget)
 from PyQt6.QtCore import Qt
 
 from ...core import donnees
 from ...core.i18n import tr
+from ...gui import memoire
 from ...gui.adaptatif import coupable
 from ...gui.outils import Tache, aide, bouton, liste
 from ...gui.trace import Trace
@@ -22,6 +24,12 @@ class Panneau(QWidget):
         v = QVBoxLayout(self)
         h = QHBoxLayout()
         h.addWidget(bouton('don_ouvrir', self.ouvrir))
+        # fichiers récents (10 au plus, gardés d'une fermeture à l'autre) : menu reconstruit à chaque ouverture
+        self.b_recents = bouton('don_recents')
+        self.menu_recents = QMenu(self.b_recents)
+        self.menu_recents.aboutToShow.connect(self._remplir_recents)
+        self.b_recents.setMenu(self.menu_recents)
+        h.addWidget(self.b_recents)
         h.addWidget(bouton('don_exporter', self.exporter))
         self.l_fichier = QLabel(tr('don_aucun'))
         self.l_fichier.setWordWrap(True)
@@ -57,13 +65,44 @@ class Panneau(QWidget):
         sp.addWidget(self.trace)
         sp.setSizes([320, 900])
         v.addWidget(sp, 1)
+        memoire.separateur(sp, 'modules.donnees.separateur')
+        memoire.liste(self.axe, 'modules.donnees.axe')
+        self._maj_recents()
+
+    # ---------------------------------------------------------------- fichiers récents
+    def _maj_recents(self):
+        from ...core.etat_interface import etat
+        self.b_recents.setEnabled(bool(etat().recents('donnees')))
+
+    def _remplir_recents(self):
+        """Le menu « Récents » : un fichier dont on sait (vérification en fond) qu'il a disparu est grisé."""
+        from ...core.etat_interface import etat
+        e = etat()
+        self.menu_recents.clear()
+        for chemin in e.recents('donnees'):
+            absent = e.existence.get(chemin) is False
+            a = self.menu_recents.addAction(chemin + ('  ' + tr('don_recent_absent') if absent else ''))
+            a.setToolTip(chemin)
+            a.setEnabled(not absent)
+            a.triggered.connect(lambda _=False, c=chemin: self.ouvrir(c))
+        self.menu_recents.addSeparator()
+        a = self.menu_recents.addAction(tr('don_recents_vider'))
+        a.setToolTip(tr('don_recents_vider_aide'))
+        a.triggered.connect(self._vider_recents)
+
+    def _vider_recents(self):
+        from ...core.etat_interface import etat
+        etat().ecrire('recents.donnees', [])
+        self._maj_recents()
 
     def ouvrir(self, chemin=None):
         if not chemin:
             filtres = ' '.join('*' + e for ext, _, _ in donnees._lecteurs for e in ext)
-            chemin, _ = QFileDialog.getOpenFileName(self, tr('don_ouvrir'), '', '(%s)' % filtres)
+            chemin, _ = QFileDialog.getOpenFileName(self, tr('don_ouvrir'), memoire.dossier('donnees_ouvrir'),
+                                                    '(%s)' % filtres)
         if not chemin:
             return
+        memoire.retenir('donnees_ouvrir', chemin, est_fichier=True)
         self.l_fichier.setText(tr('don_lecture', fichier=coupable(chemin)))
         self._t = Tache(donnees.lire, chemin, parent=self)       # lecture FITS (parfois longue) hors du fil
         self._t.quand_fini(lambda ds, c=chemin: self._ouvert(c, ds))
@@ -72,6 +111,9 @@ class Panneau(QWidget):
         self._t.start()
 
     def _ouvert(self, chemin, ds):
+        from ...core.etat_interface import etat
+        etat().ajouter_recent('donnees', chemin)     # seulement s'il a pu être lu
+        self._maj_recents()
         self.ds = ds
         self.l_fichier.setText(coupable(chemin))
         self.liste.clear()
@@ -132,9 +174,12 @@ class Panneau(QWidget):
         d = self._courant()
         if d is None or d.x is None:
             return
-        f, _ = QFileDialog.getSaveFileName(self, tr('don_exporter'), 'donnees.csv', 'CSV (*.csv)')
+        f, _ = QFileDialog.getSaveFileName(self, tr('don_exporter'),
+                                           os.path.join(memoire.dossier('donnees_exporter'), 'donnees.csv'),
+                                           'CSV (*.csv)')
         if not f:
             return
+        memoire.retenir('donnees_exporter', f, est_fichier=True)
         tete, cols = cli.colonnes(d, self.axe.currentData() == 'vitesse', self.f0.value())
 
         def ecrire():                                 # hors du fil graphique : 10^6 lignes = plusieurs secondes

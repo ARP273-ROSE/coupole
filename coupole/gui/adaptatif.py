@@ -35,8 +35,11 @@ def zone_utile(widget: QWidget | None = None) -> QSize:
     return ecran.availableGeometry().size()
 
 
-def ajuster(fenetre: QWidget, largeur: int, hauteur: int, part: float = 0.92) -> None:
-    """Taille voulue, plafonnée à `part` de la zone utile de l'écran, puis fenêtre centrée sur cet écran."""
+def ajuster(fenetre: QWidget, largeur: int, hauteur: int, part: float = 0.92, cle: str | None = None) -> None:
+    """Taille voulue, plafonnée à `part` de la zone utile de l'écran, puis fenêtre centrée sur cet écran.
+
+    `cle` : dialogue dont la taille est gardée d'une ouverture à l'autre (et d'une session à l'autre), toujours
+    bornée à l'écran où il s'ouvre (gui/memoire.py)."""
     z = zone_utile(fenetre.parentWidget() or fenetre)
     l = min(largeur, int(z.width() * part))
     h = min(hauteur, int(z.height() * part))
@@ -46,6 +49,9 @@ def ajuster(fenetre: QWidget, largeur: int, hauteur: int, part: float = 0.92) ->
     if ecran is not None and fenetre.parentWidget() is None:
         g = ecran.availableGeometry()
         fenetre.move(g.x() + (g.width() - fenetre.width()) // 2, g.y() + (g.height() - fenetre.height()) // 2)
+    if cle:
+        from . import memoire
+        memoire.dialogue(fenetre, cle)
 
 
 def defilable(contenu: QWidget) -> QScrollArea:

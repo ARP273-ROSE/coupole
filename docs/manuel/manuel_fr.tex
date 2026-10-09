@@ -99,7 +99,7 @@ python -m coupole             \# interface ; coupole --help : ligne de commande
 Extras : \texttt{qualite} (SEP), \texttt{validation} (lxml, xisf : validation XSD et second lecteur),
 \texttt{gpu} (CuPy), \texttt{test} (pytest).
 
-\subsection{Mise à jour, désinstallation, données}
+\subsection{Mise à jour, désinstallation, données}\label{sec:donnees}
 Les paquets vérifient au démarrage (désactivable) la dernière version publiée sur GitHub et proposent de
 l'installer : seule l'archive du code (\texttt{coupole-app-x.y.z.zip}, environ 1 Mo) est téléchargée, extraite par
 l'application, l'ancienne version étant restaurée en cas d'échec. Une installation par pip/pipx affiche la commande
@@ -149,6 +149,40 @@ le thème clair reste au choix. Il se change par le menu \emph{Affichage} > \emp
 \emph{Clair} / \emph{Sombre}, Ctrl+Maj+D pour basculer), ou dans les Préférences : c'est le même réglage, appliqué
 immédiatement et enregistré ; les deux restent synchronisés. Un utilisateur qui avait choisi le thème clair le garde :
 le réglage enregistré prime sur le défaut. Les captures de ce manuel sont prises dans le thème par défaut.
+
+\subsection{Réglages conservés}\label{sec:conserves}
+Coupole retrouve à chaque lancement l'écran tel qu'on l'a laissé. Sont conservés :
+\begin{itemize}
+\item \textbf{fenêtre} : taille, position, écran, état maximisé ; taille de chaque dialogue (Préférences et son
+  onglet, assistant ASTAP, À propos, signalement, aide, correction d'un objet, ajout d'un site) ;
+\item \textbf{disposition} : module affiché, onglet de la Banque OHP, position des séparateurs, largeur et ordre des
+  colonnes, colonne et sens du tri de chaque tableau ;
+\item \textbf{Banque OHP} : recherche, type, télescope, cases \emph{Nouveaux}, \emph{À vérifier}, \emph{À télécharger
+  seulement}, \emph{Sans dates douteuses}, nuit et filtre, objets choisis (rétablis dès que l'inventaire est chargé),
+  filtres des anomalies et de la carte du ciel ; onglet Traitement : dossier de sortie \emph{dès qu'il est modifié},
+  format, langue des noms, \emph{Garder les doublons}, \emph{Garder les FITS}, mode ASTAP, \emph{Vérifier la qualité} ;
+\item \textbf{Qualité des images} : dossier analysé, mode échantillon et nombre d'images par lot ;
+\item \textbf{Spectres et séries} : dossier du dialogue d'ouverture et menu \emph{Récents} (10 derniers fichiers ;
+  un fichier disparu y est grisé) ; axe choisi ;
+\item \textbf{Cosmologie} : jeu de paramètres, paramètres personnalisés ($H_0$, $\Omega_m$, gardés même en repassant
+  par Planck), $\Omega_k$, $z$ courant, option SH0ES, échelle des courbes (logarithmique ou linéaire) ;
+\item \textbf{Sites et heures} : site choisi, zoom et centre de la carte du monde, \emph{Carte en ligne} ;
+\item \textbf{dialogues de fichiers} : chacun rouvre dans le dernier dossier utilisé (export CSV, réorganisation,
+  ASTAP, signalement…).
+\end{itemize}
+La disposition vit dans \texttt{interface.json}, à côté de \texttt{reglages.json} (section~\ref{sec:donnees}) ; les
+choix de traitement restent dans \texttt{reglages.json}. L'écriture est \emph{différée et groupée} : au plus une toutes
+les 2~s et une à la fermeture, atomique (fichier temporaire puis remplacement) ; une frappe dans un champ n'écrit
+jamais le disque. Lecture tolérante : une valeur absente, d'un mauvais type ou hors bornes laisse le défaut ; un
+fichier illisible est mis de côté (\texttt{.corrompu-…}). Garde-fous : un écran débranché ou une position hors des
+écrans recentre la fenêtre, une taille plus grande que l'écran est ramenée à l'écran (comme à 150 ou 200~\%). Un
+dossier gardé sur un partage réseau absent ne bloque jamais le démarrage : son existence est vérifiée en fond, et le
+dialogue s'ouvre au dossier par défaut tant qu'elle n'est pas confirmée. Rien de ce qui serait dangereux à rejouer
+n'est gardé : un traitement interrompu n'est jamais relancé seul (il reprend quand on le relance).
+
+Pour revenir à l'origine : Préférences > \emph{Réinitialiser la disposition} (immédiat ; la langue, le thème, le
+dossier de sortie et les autres réglages ne changent pas), ou \cmd{coupole --reinitialiser-interface}
+(\cmd{--reset-interface}).
 
 % =====================================================================
 \section{Module Banque OHP}
