@@ -535,4 +535,5 @@ partagée avec le NAS) : sous Linux, télécharger, *Tout télécharger* ou réo
 - Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 389 réussis,
   15 sautés, code 0 ; python:3.10-slim 389 / 15, code 0**. Banc Samba (`outils/audit2/samba/essai.sh`, conteneurs
   retirés ensuite) : tests avec `COUPOLE_TEST_SMB` réussis, essai réel refait (3 converties, base du partage intègre).
+- CI `tests.yml` du commit `09f8ae8` : **6/6** (Linux, Windows, macOS × 3.10, 3.12) ; sous Windows, `test_chemin_unc_reel` de la base de travail (`\\localhost\C$`) passe.
 - **Aucun tag posé.**
