@@ -98,7 +98,8 @@ def test_filtre_sans_nom_reçoit_un_nom():
 
 def test_depart_inexistant():
     assert fichiers._depart_existant('') == ''
-    assert fichiers._depart_existant('/inexistant/a/b') == '/'
+    racine = os.path.abspath(os.sep)                                     # « / » ou « D:\\ » (Windows)
+    assert fichiers._depart_existant(os.path.join(racine, 'inexistant', 'a', 'b')) == racine
     d = os.path.expanduser('~')
     assert fichiers._depart_existant(os.path.join(d, 'pas_la', 'x')) == d
     assert fichiers._depart_existant(os.path.join(d, 'rapport.json')) == os.path.join(d, 'rapport.json')
