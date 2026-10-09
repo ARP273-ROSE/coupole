@@ -639,6 +639,8 @@ n'en gardait aucune trace. Diagnostic sur le poste : `PixInsight.sh` (eval, guil
   .desktop sans `%F`), Préférences ; recompilés (42 p.), temporaires supprimés.
 - Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 509 réussis,
   15 sautés, code 0 ; python:3.10-slim 509 / 15, code 0**.
+- CI `tests.yml` : commit `ce9bed1` 4/6 (macOS : test flatpak, `/tmp` résolu en `/private/tmp` — flatpak n'existe
+  que sous Linux, test limité à Linux).
 - Non vérifiable ici : PixInsight réel (logiciel commercial, absent du serveur de développement) — le comportement
   du script et de `-n` vient de l'essai sur le poste de l'utilisateur ; macOS et Windows : commandes d'après les
   sources citées, non essayées avec PixInsight.
