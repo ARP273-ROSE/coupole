@@ -1,7 +1,7 @@
 """Prépare deux copies de la destination (locale et « réseau ») : etat.sqlite réécrit, INDEX_LOTS.csv, et
 7 625 fichiers vides aux emplacements « final » (pour ranger / réorganiser sans toucher à la banque)."""
 import json, os, shutil, sqlite3, sys
-ANCIEN = '/workspace/Workspace/OHP_DU_ECU'
+ANCIEN = '/srv/ancien/OHP_DU_ECU'
 def preparer(phys, vue):
     if os.path.exists(phys):
         shutil.rmtree(phys)

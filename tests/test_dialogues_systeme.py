@@ -163,19 +163,19 @@ def test_dialogue_dossier_natif_ou_qt_selon_le_reglage(app_qt, dialogue_simule, 
 def test_emplacements_reseau_dans_la_barre_laterale(tmp_path):
     """Montages cifs/nfs/sshfs, partages gvfs (Nautilus, Dolphin + kio-fuse), disques amovibles."""
     montages = ('/dev/nvme0n1p2 / ext4 rw 0 0\n'
-                '//nas/Astronomie /mnt/nas/Astronomie cifs rw,vers=3.1.1 0 0\n'
+                '//nas/Astronomie /mnt/partage/Astronomie cifs rw,vers=3.1.1 0 0\n'
                 'nas:/volume1/photo /mnt/photo\\040NAS nfs4 rw 0 0\n'
                 'gvfsd-fuse /run/user/1000/gvfs fuse.gvfsd-fuse rw 0 0\n'
                 'tmpfs /tmp tmpfs rw 0 0\n')
-    assert chemins.montages_reseau(montages) == ['/mnt/nas/Astronomie', '/mnt/photo NAS', '/run/user/1000/gvfs']
+    assert chemins.montages_reseau(montages) == ['/mnt/partage/Astronomie', '/mnt/photo NAS', '/run/user/1000/gvfs']
     if not LINUX:
         return
     gvfs = tmp_path / 'gvfs'
     (gvfs / 'smb-share:server=nas,share=astronomie').mkdir(parents=True)
-    lieux = chemins.emplacements_systeme({'USER': 'kevin', 'XDG_RUNTIME_DIR': str(tmp_path)}, montages, uid=1000,
+    lieux = chemins.emplacements_systeme({'USER': 'astro', 'XDG_RUNTIME_DIR': str(tmp_path)}, montages, uid=1000,
                                          existe=lambda p: p.startswith(str(tmp_path)) or p.startswith(('/mnt', '/run/media', '/media')))
     assert str(gvfs) in lieux and str(gvfs / 'smb-share:server=nas,share=astronomie') in lieux
-    assert '/mnt/nas/Astronomie' in lieux and '/mnt/photo NAS' in lieux and '/run/media/kevin' in lieux
+    assert '/mnt/partage/Astronomie' in lieux and '/mnt/photo NAS' in lieux and '/run/media/astro' in lieux
     assert '/mnt' in lieux and '/tmp' not in lieux
 
 
@@ -269,7 +269,7 @@ def test_uri_sqlite_d_un_chemin_unc():
     u = chemins.uri_sqlite_lecture_seule(r'\\nas\Astronomie\OHP DU ECU\_traitement\etat.sqlite', windows=True)
     assert u == 'file:////nas/Astronomie/OHP%20DU%20ECU/_traitement/etat.sqlite?mode=ro'
     assert chemins.est_unc(r'\\nas\partage') and chemins.est_unc('//nas/partage')
-    assert not chemins.est_unc(r'\\?\C:\x') and not chemins.est_unc('C:\\x') and not chemins.est_unc('/mnt/nas')
+    assert not chemins.est_unc(r'\\?\C:\x') and not chemins.est_unc('C:\\x') and not chemins.est_unc('/mnt/partage')
 
 
 def _base_etat(dest):

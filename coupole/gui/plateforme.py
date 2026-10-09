@@ -184,6 +184,7 @@ def preparer(preference: str = 'systeme', env=None) -> tuple[str | None, str]:
                                   gtk3=gtk3)
     if theme:
         env['QT_QPA_PLATFORMTHEME'] = theme
+        env['COUPOLE_QPA_THEME_POSE'] = theme    # retiré de l'environnement des programmes lancés (core/lancement)
     decision.update(theme=theme or env.get('QT_QPA_PLATFORMTHEME') or None, raison=raison)
     log.info('file dialogs: platform theme %s (%s)', decision['theme'], raison)
     return theme, raison

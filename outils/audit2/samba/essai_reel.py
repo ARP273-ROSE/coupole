@@ -1,4 +1,4 @@
-"""Essai réel : 3 images de (914) Palisana depuis le serveur de l'Observatoire vers /mnt/nas/OHP_DU_ECU_essai (Samba de
+"""Essai réel : 3 images de (914) Palisana depuis le serveur de l'Observatoire vers /mnt/partage/OHP_DU_ECU_essai (Samba de
 test, voir essai.sh) ; affiche les événements, la base finale du partage (statuts, meta, intégrité) et JOURNAL.txt."""
 import os, sqlite3, sys, time
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
@@ -12,7 +12,7 @@ def principal():
     inv = Inventaire.charger()
     sel = [x for x in inv.images if 'Palisana' in x['objet'] and not x['doublon']][2:5]
     print(len(sel), [x['access_url'].rsplit('/', 1)[1] for x in sel], sum(x['access_estsize'] for x in sel) / 1024, 'Mo')
-    dest = '/mnt/nas/OHP_DU_ECU_essai'
+    dest = '/mnt/partage/OHP_DU_ECU_essai'
     def rapporter(ev):
         if ev['type'] in ('octets',):
             return

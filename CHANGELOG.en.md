@@ -2,14 +2,47 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.1.12 — 9 October 2026
+
+**« Open with → PixInsight » really opens the image, and no launch is silent any more.** User feedback (Manjaro/KDE,
+0.1.11): nothing happened, and `coupole.log` said nothing.
+
+- **Every launch is logged**: *Open*, *Open with*, *Open file location*, target or stack folder, manual,
+  `JOURNAL.txt`, `LOT.txt` — method, program, arguments, process id in `coupole.log`; if the program stops within the
+  first 3 seconds, its exit code and the beginning of its output (stdout and stderr captured). The result shows in
+  the status bar (« Opening in Siril… », program not found, immediate stop with its message). Always a list of
+  arguments, never a shell (safeguard: a test rejects any `shell=True`).
+- **PixInsight (Linux)**: started through its `PixInsight.sh` script (the binary alone does not start, according to
+  the publisher). This script rebuilds its arguments with an `eval` and only quotes those containing a space: a path
+  with `$`, `` ` ``, `'`, `(`, `*`… would be interpreted → it then receives a temporary symbolic link with a safe
+  name. Windows: `PixInsight.exe`; macOS: `open -a` (new instance: `open -n -a … --args -n`).
+- **PixInsight already open**: without options it hands the image to the running instance and exits (« Yielded
+  execution to running application instance #1 »); busy with a script, that instance opens nothing. New setting
+  *Preferences > PixInsight already open*: new window (`-n`, **default**) or send to the open window (try). When an
+  instance is running, the menu offers both; if PixInsight yields, the status bar says so.
+- **Double-click**: if the associated application has a `.desktop` without `%F` (a hand-written
+  `pixinsight.desktop`: `xdg-open` started PixInsight without the image), Coupole detects it (`xdg-mime`) and starts
+  the program directly; help (F1) and the manual explain how to fix that `.desktop` (Coupole does not touch it).
+- **Siril as a flatpak**: `flatpak run --file-forwarding … @@ file @@`; if the sandbox cannot see the folder
+  (`flatpak override` setting), a message gives the command to type. **N.I.N.A.** greyed in *Open with*: it does
+  not open an image given as an argument (its options, checked in its code: profile, sequence, debug). ASTAP and
+  Aladin: program started directly, path as is.
+- Started programs no longer inherit the Qt theme Coupole chose for its own dialogs.
+- **Public repository: no personal data.** Manuals, history, audits, code, tests and tools reviewed: names, paths
+  of a personal infrastructure, machines and hardware replaced by neutral wording (« user feedback »,
+  `/mnt/partage/OHP_DU_ECU`…); screenshots redone with a generic home folder and machine;
+  `tests/test_confidentialite.py` scans every file of the repository (text, PDF text, PNG, .gz, strings in binaries)
+  and fails on these patterns. The reference processing folder of the tests is given by `COUPOLE_REFERENCE`.
+- README: badges (Python, licence, platforms, version, tests, languages).
+
 ## 0.1.11 — 9 October 2026
 
 **A copy made before Coupole finally opens, context menus can be clicked, Spectra and series' « Open a file » opens on
-KDE, and the Quality module really measures N.I.N.A. and ASIAIR frames — sky frames only.** Feedback from Kevin
-(Linux/KDE, 0.1.10, output folder `/mnt/nas/Astronomie/OHP_DU_ECU`).
+KDE, and the Quality module really measures N.I.N.A. and ASIAIR frames — sky frames only.** User feedback
+(Linux/KDE, 0.1.10, output folder `/mnt/partage/OHP_DU_ECU`).
 
-- **Owned objects (4/4, green dot) but nothing to open.** Kevin's copy was made by the older `ohp_xisf.py` script, in
-  a container: its state database only records the absolute path of the time (« /workspace/Workspace/OHP_DU_ECU/… »),
+- **Owned objects (4/4, green dot) but nothing to open.** A user's copy was made by the older `ohp_xisf.py` script, in
+  a container: its state database only records the absolute path of the time (« /srv/ancien/OHP_DU_ECU/… »),
   not found on the computer. Coupole now finds each file in the current output folder, in this order: relative path
   recorded in the database (`info.chemin`, new), `final` if inside the folder, `_traitement/journal.csv` (address, then
   original file; read once, cached, read again if it changes), former root or type folder, then the expected name in
@@ -36,7 +69,7 @@ KDE, and the Quality module really measures N.I.N.A. and ASIAIR frames — sky f
   fixed: « Open a file — Portal » window). Every dialog goes through a normalised filter (name, patterns without
   duplicates), a visible parent window, a start folder that exists; each opening, its result or exception is logged in
   `coupole.log`. Each of the 13 dialog buttons is tested.
-- **Quality: tolerant XISF reader.** Kevin's 70 N.I.N.A. frames (ASI 6200MM, 61 Mpx, zlib+sh) were refused
+- **Quality: tolerant XISF reader.** A user's 70 N.I.N.A. frames (61 Mpx camera, zlib+sh) were refused
   (« incomplete FITSKeyword »: N.I.N.A. writes `CD1_1` without a comment) and the result stayed empty without a word.
   Reading other programs' files accepts keywords without comment or value, missing `Metadata` (ASIAIR), unknown
   properties, extra elements, colour images; only what prevents reading the pixels is refused. Our own files are still
@@ -53,7 +86,7 @@ KDE, and the Quality module really measures N.I.N.A. and ASIAIR frames — sky f
 
 ## 0.1.10 — 9 October 2026
 
-**Processing works towards a folder on a network share.** Kevin's output folder is on the NAS (SMB share mounted
+**Processing works towards a folder on a network share.** A user's output folder is on the NAS (SMB share mounted
 by cifs on Manjaro): downloading new images, *Download everything* or reorganising into that folder failed.
 
 - **Cause (reproduced on a real Samba server, default cifs mount)**: SQLite cannot write through SMB byte-range
@@ -78,7 +111,7 @@ by cifs on Manjaro): downloading new images, *Download everything* or reorganisi
 ## 0.1.9 — 9 October 2026
 
 **The Quality module starts at once on a network share, astronomy programs really open our files, and PixInsight
-finds focal length and pixel.** Feedback from Kevin (Manjaro, 0.1.8, folder on an SMB share).
+finds focal length and pixel.** User feedback (Manjaro, 0.1.8, folder on an SMB share).
 
 - **Endless « Listing the folder… » on an SMB share: cause found and measured.** On a real Samba share mounted by the
   kernel cifs client, SQLite cannot write through SMB byte-range locks (« database is locked »): the measurement cache

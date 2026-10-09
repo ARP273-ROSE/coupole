@@ -137,7 +137,7 @@ Ctrl+Maj+A & assistant ASTAP\\ Ctrl+Maj+D & thème sombre / clair\\ Ctrl+R & Ban
 
 \capture{img/reglages_fr.png}{0.62}
 Préférences (Ctrl+,) : langue de l'interface ; langue des noms de dossiers, d'objets et des commentaires FITS ;
-apparence (section~\ref{sec:apparence}) ; boîtes de dialogue de fichiers (section~\ref{sec:dialogues}) ; dossier de sortie ; format ; parallélisme ; débit maximal ; mode économe ; recherche de mise à jour ; vérification des nouveautés de la banque au démarrage et sa fréquence maximale (section~\ref{sec:nouveautes}). L'onglet
+apparence (section~\ref{sec:apparence}) ; boîtes de dialogue de fichiers (section~\ref{sec:dialogues}) ; PixInsight déjà ouvert (section~\ref{sec:ouvrir}) ; dossier de sortie ; format ; parallélisme ; débit maximal ; mode économe ; recherche de mise à jour ; vérification des nouveautés de la banque au démarrage et sa fréquence maximale (section~\ref{sec:nouveautes}). L'onglet
 \emph{Sources} donne les adresses des services (chapitre~\ref{chap:evolutif}). Un fichier de réglages illisible est
 mis de côté (suffixe \texttt{.corrompu-…}) et les valeurs par défaut reprennent : l'application démarre toujours.
 
@@ -164,7 +164,7 @@ de repli) suivent la langue de l'interface et changent avec elle.
 \item \emph{Linux} : ouvrir d'abord le partage dans Dolphin ou Fichiers (\texttt{smb://serveur/partage}) ; il apparaît
   sous \texttt{/run/user/<uid>/gvfs/smb-share:server=serveur,share=partage} (GNOME ; KDE avec le paquet
   \texttt{kio-fuse}, sans lequel un partage \texttt{smb://} non monté ne peut pas être choisi par une application),
-  ou monter le partage en cifs ou nfs (\texttt{/mnt/nas}, conseillé pour de gros volumes ; options par défaut, \texttt{nobrl} inutile : section~\ref{sec:partage}) ;
+  ou monter le partage en cifs ou nfs (\texttt{/mnt/partage}, conseillé pour de gros volumes ; options par défaut, \texttt{nobrl} inutile : section~\ref{sec:partage}) ;
 \item \emph{macOS} : Finder > Aller > Se connecter au serveur (Cmd+K), \texttt{smb://serveur/partage}, puis choisir le
   volume sous \texttt{/Volumes} ;
 \item \emph{Windows} : lecteur réseau (\texttt{Z:}) ou chemin UNC \texttt{\textbackslash\textbackslash
@@ -477,8 +477,53 @@ dit. Une entrée désactivée porte son motif dans son libellé (« Ouvrir avec 
 complet s'affiche dans la barre d'état au survol : plus d'info-bulle par-dessus le menu (sous KDE, elle en captait
 la souris).
 
+\paragraph{Comment chaque logiciel est lancé (0.1.12).} Toujours le programme détecté, avec une \emph{liste}
+d'arguments (jamais d'interpréteur de commandes) ; chaque lancement est noté dans \texttt{coupole.log} (méthode,
+programme, arguments, numéro de processus ; si le programme s'arrête dans les 3~premières secondes : code de retour
+et début de ce qu'il a écrit) et son résultat s'affiche dans la barre d'état : « Ouverture dans Siril… », ou
+l'erreur (programme introuvable, arrêt immédiat avec son message). Jamais de silence.
+\begin{itemize}
+  \item \textbf{PixInsight} — Linux : le script \texttt{bin/PixInsight.sh} (l'éditeur précise que le binaire seul
+  ne démarre pas sous Linux). Ce script reconstruit ses arguments par un \texttt{eval} qui n'entoure de guillemets
+  que ceux qui contiennent une espace : un chemin avec \texttt{\$}, \texttt{`}, \texttt{'}, \texttt{"},
+  \texttt{\textbackslash}, \texttt{(}, \texttt{*}… serait interprété ; Coupole lui passe alors un \emph{lien
+  symbolique temporaire} au nom sans caractère spécial (pour enregistrer : « Enregistrer sous » dans le dossier
+  d'origine). Windows : \texttt{bin\textbackslash PixInsight.exe}. macOS : \texttt{open -a PixInsight.app
+  \emph{fichier}}, ou \texttt{open -n -a PixInsight.app --args -n \emph{fichier}} pour une nouvelle instance.
+  \item \textbf{PixInsight déjà ouvert.} Sans option, PixInsight confie le fichier à l'instance ouverte (« Yielded
+  execution to running application instance \#1 », code~0) ; si celle-ci est occupée (script en cours), \emph{rien
+  ne s'ouvre}. D'où le réglage \emph{Préférences > PixInsight déjà ouvert} : « Ouvrir une nouvelle fenêtre (-n) »
+  (par défaut, sûr) ou « Envoyer à la fenêtre ouverte (essai) ». Quand une instance tourne (processus détecté), le
+  menu propose les deux : « PixInsight (nouvelle fenêtre) » et « PixInsight (fenêtre ouverte, essai) », celle du
+  réglage d'abord ; si la sortie dit que PixInsight a cédé la main, la barre d'état le signale.
+  \item \textbf{Siril} : \texttt{siril \emph{fichier}} ; en flatpak : \texttt{flatpak run --file-forwarding
+  org.free\_astro.siril @@ \emph{fichier} @@} (le portail de documents ne transmet le fichier que si le bac à sable ne
+  le voit pas). Le paquet Flathub voit tout le système (\texttt{--filesystem=host}) sauf \texttt{/tmp}, \texttt{/run}
+  (hors \texttt{/run/media}), \texttt{/usr}… ; si un réglage \texttt{flatpak override} lui retire un dossier, la
+  barre d'état le dit et donne la commande : \cmd{flatpak override --user --filesystem=/mnt/partage
+  org.free\_astro.siril}.
+  \item \textbf{ASTAP, Aladin} : \texttt{\emph{programme} \emph{fichier}}.
+  \item \textbf{N.I.N.A.} n'ouvre pas une image passée en argument (ses seules options : profil, séquence, débogage,
+  accélération graphique) : il reste grisé dans \emph{Ouvrir avec}, avec la raison ; ouvrir l'image depuis N.I.N.A.
+\end{itemize}
+
+\paragraph{Double-clic qui ouvre PixInsight sans l'image (Linux).} \texttt{xdg-open} lance l'application associée
+au type du fichier par son fichier \texttt{.desktop}. Si sa ligne \texttt{Exec=} n'a pas de code \texttt{\%F}
+(\texttt{\%f}, \texttt{\%u}, \texttt{\%U}), l'application démarre \emph{sans} le fichier — cas d'un
+\texttt{pixinsight.desktop} écrit à la main. Coupole le détecte (\texttt{xdg-mime query filetype}, puis
+\texttt{xdg-mime query default}, lecture du \texttt{.desktop}) et lance alors le logiciel directement (barre
+d'état : « PixInsight lancé directement… ») ; une autre application dans ce cas n'est pas lancée, un message dit
+pourquoi. Pour corriger le bureau tout entier (Coupole ne modifie pas ce fichier), dans
+\texttt{\textasciitilde/.local/share/applications/pixinsight.desktop} :
+\begin{verbatim}
+Exec=/opt/PixInsight/bin/PixInsight.sh %F
+MimeType=image/x-xisf;image/fits;
+\end{verbatim}
+puis \cmd{update-desktop-database \textasciitilde/.local/share/applications} et, au besoin,
+\cmd{xdg-mime default pixinsight.desktop image/x-xisf}.
+
 \paragraph{Copie d'un ancien traitement.} Une sortie produite avant Coupole (script \texttt{ohp\_xisf.py}) ou sur
-une autre machine note dans sa base d'état le chemin absolu d'alors (« /workspace/Workspace/OHP\_DU\_ECU/… »).
+une autre machine note dans sa base d'état le chemin absolu d'alors (« /srv/ancien/OHP\_DU\_ECU/… »).
 Coupole retrouve chaque fichier dans le dossier de sortie courant, dans cet ordre : chemin relatif noté dans la base,
 \texttt{\_traitement/journal.csv} (colonne \texttt{destination}), ancienne racine ou dossier de type, puis le nom
 attendu dans le dossier du lot ; les chemins trouvés par le journal sont notés une fois pour toutes dans la base
@@ -667,7 +712,7 @@ automatiquement (bouton \emph{Mesurer}, case \emph{Vérifier la qualité des ima
 \cmd{coupole qualite DOSSIER --ecrire}). Rapport par lot : \texttt{QUALITE.csv} et \texttt{QUALITE.txt}.
 
 \paragraph{Poses de ciel seulement.} Par défaut, seules les poses de ciel (lights) sont mesurées. Sont exclus sans
-être ouverts : les dossiers Flat(s), Dark(s), Bias, Offset(s), DarkFlat(s), Calibration, Master(s) (« FLAT FSQ »,
+être ouverts : les dossiers Flat(s), Dark(s), Bias, Offset(s), DarkFlat(s), Calibration, Master(s) (« FLAT L »,
 « Dark-Bias » compris), cosmetized, calibrated, registered, debayered, \texttt{\_platesolve…} et leurs noms
 français (Plats, Noirs, Biais) ; les fichiers \texttt{FLAT\_}, \texttt{DARK\_}, \texttt{BIAS\_},
 \texttt{DARKFLAT\_} (N.I.N.A., ASIAIR), les masters (\texttt{masterDark}, \texttt{masterFlat},
@@ -683,7 +728,7 @@ Science ou Object sont mesurées. Le résumé dit « 70 image(s) trouvée(s), 66
 vraiment de lire les pixels est refusé ; nos propres fichiers restent contrôlés strictement. Un fichier non mesurable
 apparaît dans le tableau, colonne \emph{état}, avec son motif (« erreur : format XISF non lu (…) ») ; le résumé
 compte les erreurs et \texttt{coupole.log} garde la pile ; la ligne de commande sort avec le code 1 si aucune image
-n'a pu être mesurée. Pose N.I.N.A. de l'ASI~6200MM (9~576 × 6~388, 61~Mpx) : 4,2~s, 1~170~Mo de pointe (calcul en
+n'a pu être mesurée. Pose N.I.N.A. d'une caméra CMOS (9~576 × 6~388, 61~Mpx) : 4,2~s, 1~170~Mo de pointe (calcul en
 float32), FWHM 3,5″ à 1,695″/px ; le nombre de processus est réduit d'après la taille des images (moitié de la
 mémoire libre) et le nombre d'étoiles ajustées croît avec le capteur (120 à 400).
 
@@ -709,7 +754,7 @@ XISF de 09\_Galaxies : 0.1.8 92,7~s avant la première mesure (latence de 10~ms)
 le temps : première, dernière, milieu…, réglable dans l'onglet et par \cmd{--echantillon N}), qui suffit à juger un
 lot (mesuré en premier, pendant que vous choisissez), ou \emph{Tout mesurer} avec la durée estimée d'après les
 images déjà mesurées ; la progression donne le temps
-restant et le débit (images/min). Sur le NAS de l'auteur (Ryzen 5 8500G) : 1,21 → 0,33~s par image T120
+restant et le débit (images/min). Sur un processeur à 6 cœurs : 1,21 → 0,33~s par image T120
 (modèle de Moffat vectorisé, dérivées analytiques, 120 étoiles par image), soit la banque entière en une dizaine de
 minutes sur 5 processus.
 
@@ -857,7 +902,7 @@ thème ne recalcule que les couleurs (voir \texttt{docs/AUDIT2\_2026-10.md}).
 \begin{center}\small
 \begin{tabular}{@{}lr@{}}
 \toprule
-\textbf{Mesure (Ryzen 5 8500G, 6 cœurs, NVMe ; conteneur Debian)} & \textbf{Valeur}\\
+\textbf{Mesure (processeur à 6 cœurs, NVMe ; conteneur Debian)} & \textbf{Valeur}\\
 \midrule
 \texttt{coupole --version} & 0,1–0,2 s\\
 fenêtre affichée (astropy, scipy, SEP non chargés) & 0,42 s (1,5 s avant l'audit)\\

@@ -146,7 +146,7 @@ def test_aucune_fuite_de_langue():
 
 
 def test_unites_composees_non_ambigues():
-    """Retour de Kevin : « km/s/Mpc » est ambigu.  Aucune unité de la forme x/y/z (deux barres) dans les textes
+    """Retour d'utilisateur : « km/s/Mpc » est ambigu.  Aucune unité de la forme x/y/z (deux barres) dans les textes
     FR/EN ; H₀ s'écrit km s⁻¹ Mpc⁻¹ ; sur une console cp1252, repli ASCII « km s^-1 Mpc^-1 »."""
     import re
     from coupole import cli

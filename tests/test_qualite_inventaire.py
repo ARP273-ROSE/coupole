@@ -2,7 +2,7 @@
 sortie Coupole à la place du parcours (seuls les dossiers des lots sont lus), INDEX_LOTS.csv, mesure qui commence pendant l'inventaire, annulation
 pendant l'inventaire, cache jamais écrit sur un partage réseau ni bloqué par une base verrouillée.
 
-Retour de Kevin (0.1.8, partage SMB monté, ≈ 1 800 XISF) : « Inventaire du dossier… » interminable.  Mesuré sur
+Retour d'utilisateur (0.1.8, partage SMB monté, ≈ 1 800 XISF) : « Inventaire du dossier… » interminable.  Mesuré sur
 un vrai partage Samba monté par le client cifs du noyau : 90 s, dont 90,1 s d'attente de verrou SQLite (trois
 ouvertures du cache sur le partage, 30 s chacune, « database is locked », fichier de 0 octet)."""
 import builtins
@@ -159,8 +159,8 @@ def _sortie_coupole(base, lots=3, par_lot=5, ancienne='/ancienne/machine/SORTIE'
 @pytest.mark.parametrize('windows', [False, True])
 def test_sortie_coupole_inventaire_par_la_base_sans_parcours(tmp_path, monkeypatch, windows):
     base = tmp_path / 'OHP_DU_ECU'
-    attendu = _sortie_coupole(base, ancienne='C:\\Users\\k\\Coupole\\OHP_DU_ECU' if windows else
-                              '/workspace/Workspace/OHP_DU_ECU', windows=windows)
+    attendu = _sortie_coupole(base, ancienne='C:\\Users\\x\\Coupole\\OHP_DU_ECU' if windows else
+                              '/srv/ancien/OHP_DU_ECU', windows=windows)
     (base / '09_Galaxies' / '_traitement').mkdir()                 # cache d'un ancien passage : ignoré
     c = _Compteur(monkeypatch)
     source, lots = _inventaire(base / '09_Galaxies')

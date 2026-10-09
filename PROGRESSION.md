@@ -3,7 +3,7 @@
 État d'avancement, tenu à jour pendant le développement (reprise possible).
 
 ## 2026-10-08 — démarrage
-- [x] Lecture complète de `_docs/Observatoire-Paris/Banque-Images-OHP/` (README, Inventaire.pdf, scripts, TEST.md, index).
+- [x] Lecture complète de dossier du traitement de référence (scripts d'origine) (README, Inventaire.pdf, scripts, TEST.md, index).
 - [x] Lecture du kit (`_kit_windows`), de MountMonitor (multiplateforme, i18n), de `collecte.php`.
 - [x] Nom choisi : **Coupole** (PyPI : libre ; GitHub : seulement des dépôts personnels sans étoile, aucun logiciel d'astronomie connu).
 - [x] Service TAP direct vérifié : `http://tap-ufe.obspm.fr/tap/sync`, `SELECT COUNT(*) FROM ivoa.obscore` = 7 989.
@@ -33,7 +33,7 @@
   Défaut trouvé et corrigé : le paquet s'annonçait en 0.0.0 (VERSION ignoré faute de kit.json) → détection par
   `lancer.py`/`pyproject.toml`, et test `test_version_unique`.
 
-## 2026-10-08 — performance mesurée (`outils/mesures.py`, Ryzen 5 8500G, 6 cœurs, NVMe)
+## 2026-10-08 — performance mesurée (`outils/mesures.py`, processeur à 6 cœurs, NVMe)
 | Mesure | Résultat |
 |---|---|
 | `coupole --version` (ligne de commande) | 0,10 à 0,20 s |
@@ -60,7 +60,7 @@ nuits) comparées à la FWHM écrite par PinPoint dans l'en-tête : corrélation
 décrite dans les en-têtes). T120 (914) Palisana : FWHM 2,0 à 2,6″, cohérente avec le seeing du site.
 
 ## 2026-10-08 — documentation
-- Manuels LaTeX au format maison (préambule dérivé de `Ressources-Pedagogiques/latex/preambule.tex`) :
+- Manuels LaTeX au format maison (préambule dérivé de préambule LaTeX maison) :
   `docs/manuel/manuel_fr.pdf` (27 p.) et `manuel_en.pdf` (25 p.), captures FR et EN, tableaux des commandes
   générés depuis les vrais analyseurs (`outils/tables_cli.py`), compilés par `docs/manuel/compiler.sh` (deux passes,
   temporaires supprimés), copiés dans `coupole/docs/` (menu Aide > Manuel, `coupole manuel`).
@@ -195,7 +195,7 @@ Consigne : « fais au mieux » → appliquer ce qui apporte un gain réel sans r
   avant de chercher l'événement « pause » : trop court pour le démarrage du pilote sur ce serveur) → attente scrutée
   de l'événement (≤ 20 s) puis contrôle qu'en pause rien n'avance. Troisième CI : 6 jobs verts.
 
-## 2026-10-09 — version 0.1.1 : paquet .deb, Release unique, retours de Kevin sur la 0.1.0
+## 2026-10-09 — version 0.1.1 : paquet .deb, Release unique, retours d'utilisateur sur la 0.1.0
 - **Release v0.1.0** publiée par la CI (6 actifs : Setup Windows, 2 dmg, 2 tar.gz, zip applicatif).
 - **Paquet Debian/Ubuntu** : `build_deb.py` (Python + `dpkg-deb --root-owner-group`, sans root) à partir de
   `dist/Coupole/` : `/opt/coupole/{python,app}` + `.pyc` précompilés (`unchecked-hash`, /opt n'étant pas inscriptible),
@@ -209,7 +209,7 @@ Consigne : « fais au mieux » → appliquer ce qui apporte un gain réel sans r
 - **Paquets allégés** : `install_only_stripped` de python-build-standalone (libpython 219 Mo + binaire 102 Mo de
   symboles !), Tcl/Tk, include, share, pip, scripts de bin/, données de test, FFmpeg, eglfs, greffons Qt orphelins
   (Qt3D, Qml, WebView…) retirés : tar.gz 229 → 137 Mo ; `.deb` 106 Mo (xz), 4 089 fichiers, 2 501 .pyc.
-- **Essais réels du .deb** (`/mnt/apps_pool/_transfert/coupole_deb_test/`) : ubuntu:22.04 et ubuntu:24.04 nus, `apt-get
+- **Essais réels du .deb** (`<dossier de travail>/coupole_deb_test/`) : ubuntu:22.04 et ubuntu:24.04 nus, `apt-get
   install ./coupole-linux-amd64.deb` (71 paquets tirés), `ldd` sur tous les .so (ne manquent que libgtk-3 / libcups des
   greffons facultatifs, en Recommends), `coupole --version`, `--help` FR et EN, `ohp inventaire` et `catalogue` **hors
   ligne** (`--network none`), GUI offscreen capturée, `coupole maj` (version simulée 0.0.9), `apt-get remove` : aucun
@@ -233,8 +233,8 @@ Consigne : « fais au mieux » → appliquer ce qui apporte un gain réel sans r
   1024 → 1800 px (largeur + paint), 600 → 1000 px (hauteur).
 - **Carte OSM nette** : `CarteMonde._zoom_tuiles()` → à DPR ≥ 1,5, tuiles z+1 dessinées à demi-taille (4 par tuile
   logique), `SmoothPixmapTransform`. Test : DPR simulé → clés z+1 demandées au cache, 4× plus de tuiles. Captures
-  réelles 1× / 2× (`QT_SCALE_FACTOR=2`) : `/mnt/apps_pool/_transfert/coupole_carte_dpr/carte_{1x,2x}.png`.
-- **Qualité des images** — profil sur 50 XISF T120 réels (`/mnt/zpool2/Astronomie/OHP_DU_ECU`, lecture seule) :
+  réelles 1× / 2× (`QT_SCALE_FACTOR=2`) : `<dossier de travail>/coupole_carte_dpr/carte_{1x,2x}.png`.
+- **Qualité des images** — profil sur 50 XISF T120 réels (`/srv/banque/OHP_DU_ECU`, lecture seule) :
   **1,21 s/image** (lecture 0,06 s, analyse 1,15 s dont 80 % dans `_moffat`, 134 étoiles ajustées/image) ; bug trouvé :
   `OverflowError` dans `math.exp` sur une étoile réelle (pas LM aberrant) → bornes sur ln α et ln β + `try/except`
   par étoile. Optimisations : modèle vectorisé sur les 9 sous-points (`_moffat9`) → 0,44 s ; jacobien analytique
@@ -261,21 +261,21 @@ Consigne : « fais au mieux » → appliquer ce qui apporte un gain réel sans r
 - 🔴 **BLOQUÉ PAR GITHUB (facturation)** : le run de release v0.1.3 (37868026954) et sa relance n'ont pas démarré :
   « The job was not started because recent account payments have failed or your spending limit needs to be
   increased » — minutes Actions du dépôt **privé** épuisées (macOS ×10, Windows ×2 ; 6 runs de tests + 3 de release
-  dans la journée). **À faire par Kevin** : Settings > Billing & plans (relever la limite de dépense ou corriger le
+  dans la journée). **À faire par le mainteneur** : Settings > Billing & plans (relever la limite de dépense ou corriger le
   paiement), **ou rendre le dépôt public** (Actions gratuites, et de toute façon indispensable à la mise à jour
   automatique : l'API `releases/latest` répond 404 tant que le dépôt est privé — vérifié depuis l'interpréteur
   embarqué). Puis : `gh run rerun 37868026954` (ou `git push --delete origin v0.1.3 ; git push origin v0.1.3`).
   En attendant, **la Release v0.1.1 reste en ligne et complète** (10 actifs dont les deux `.deb`) ; son `.deb` ne
   déclare pas `ca-certificates` (installer `sudo apt install ca-certificates` à part sur un système minimal).
 - Essais locaux du `.deb` 0.1.2 (avec `ca-certificates`) dans ubuntu:24.04 nu : installation, `coupole --version`,
-  HTTPS OK (SIMBAD 200), désinstallation propre. Captures et profils : `/mnt/apps_pool/_transfert/coupole_deb_test/`
-  (`gui_ubuntu_22_04.png`, `gui_ubuntu_24_04.png`) et `/mnt/apps_pool/_transfert/coupole_carte_dpr/`.
+  HTTPS OK (SIMBAD 200), désinstallation propre. Captures et profils : `<dossier de travail>/coupole_deb_test/`
+  (`gui_ubuntu_22_04.png`, `gui_ubuntu_24_04.png`) et `<dossier de travail>/coupole_carte_dpr/`.
 
 ## 2026-10-09 — version 0.1.4 : second audit, usage réel à pleine échelle (rapport : `docs/AUDIT2_2026-10.md`)
-Demande de Kevin : le premier audit avait raté le module Qualité (image par image sur la banque entière) ; trouver
+Demande d'un utilisateur : le premier audit avait raté le module Qualité (image par image sur la banque entière) ; trouver
 **tous** les défauts de ce genre. Méthode : chaque fonction qui peut durer chronométrée sur la banque réelle
-(`/mnt/zpool2/Astronomie/OHP_DU_ECU`, 7 625 XISF, lecture seule ; `_traitement` et index copiés dans
-`/mnt/apps_pool/_transfert/coupole_audit2/`), sur un **partage réseau simulé** (FUSE, 2 ms par opération,
+(`/srv/banque/OHP_DU_ECU`, 7 625 XISF, lecture seule ; `_traitement` et index copiés dans
+`<dossier de travail>/coupole_audit2/`), sur un **partage réseau simulé** (FUSE, 2 ms par opération,
 `outils/audit2/partage_simule.py`, conteneur avec `/dev/fuse`), et pour l'interface à **10 × la banque** (79 890
 lignes) ; avant/après avec le code de 0.1.3 (`git archive 794092c`) dans le même conteneur.
 - **33 constats, tous corrigés** (13 🔴, 13 🟠, 7 🟡). Les 5 plus coûteux :
@@ -305,12 +305,12 @@ lignes) ; avant/après avec le code de 0.1.3 (`git archive 794092c`) dans le mê
   tableau des mesures du second audit ; recompilés. Aide : info-bulles Arrêter / Réorganiser.
 - Reste proposé (§ 5 du rapport) : gel de 0,8 s au chargement à ×10 (0,17 s à l'échelle réelle), tri sur colonnes
   sans clé rapide à ×10, Windows non vérifiable ici (§ 6).
-- **Aucun tag posé** (CI de publication bloquée par la facturation GitHub du dépôt privé : à décider par Kevin).
+- **Aucun tag posé** (CI de publication bloquée par la facturation GitHub du dépôt privé : à décider par le mainteneur).
 
 ## 2026-10-09 — version 0.1.5 : les deux lenteurs restantes du second audit (rapport : `docs/AUDIT2_2026-10.md` § 8)
 Mesures à 10 × la banque (79 890 lignes) et sur la banque réelle, destination copiée de la banque (possession,
 lots, anomalies réels), avant (0.1.4) / après dans le même conteneur `python:3.12-slim` ; copies et scripts de travail
-dans `/mnt/apps_pool/_transfert/coupole_audit3/`.
+dans `<dossier de travail>/coupole_audit3/`.
 - **Gel au chargement** : le gel de 0,55–0,8 s n'était dans aucun créneau Python (tous < 40 ms) mais dans la
   concurrence pour le GIL : anomalies, possession et carte du ciel calculées par trois fils pendant le premier dessin
   des tables (chaque rappel Qt → Python attend le GIL), puis le fil de chargement pendant la mise en place de la
@@ -331,7 +331,7 @@ dans `/mnt/apps_pool/_transfert/coupole_audit3/`.
 - **Aucun tag posé.**
 
 ## 2026-10-09 — version 0.1.6 : réglages conservés d'une fermeture à l'autre
-Demande de Kevin : tous les réglages de personnalisation et tous les chemins saisis retrouvés au lancement suivant.
+Demande d'un utilisateur : tous les réglages de personnalisation et tous les chemins saisis retrouvés au lancement suivant.
 - Mécanisme unique : `coupole/core/etat_interface.py` (fichier `interface.json` versionné, lecture tolérante, écriture
   atomique seulement si quelque chose a changé, existence des chemins vérifiée dans un fil démon) et
   `coupole/gui/memoire.py` (éléments « suivis » : valeur rétablie à la construction, LUE au moment d'écrire ;
@@ -360,11 +360,11 @@ Demande de Kevin : tous les réglages de personnalisation et tous les chemins sa
 - Manuels FR/EN : section « Réglages conservés » (3.2), option `--reinitialiser-interface` dans les tableaux générés,
   captures Préférences / Spectres / Cosmologie refaites ; recompilés. CHANGELOG FR puis EN.
 - CI `tests.yml` du commit `f2cf35c` : **6/6** (Linux, Windows, macOS × 3.10, 3.12) ; sous Windows, le test UNC réel (`\\localhost\C$\…`) passe. Premier passage rouge sous Windows : tests seulement (possession simulée avec un dossier non absolu, ignorée comme périmée ; « : » interdit dans un nom de dossier).
-- **Aucun tag posé** (publication par Kevin).
+- **Aucun tag posé** (publication par le mainteneur).
 
 ## 2026-10-09 — version 0.1.7 : cause du plantage natif intermittent trouvée et corrigée
 Le plantage « isolé » de la 0.1.6 n'était pas isolé : **reproduit 8 fois**, toujours à la même place.
-- Reproduction : image `python:3.12-slim` + `gdb` (`/mnt/apps_pool/claude-code/coupole-crash/`, `boucle.sh`), copie
+- Reproduction : image `python:3.12-slim` + `gdb` (`<dossier de travail>/coupole-crash/`, `boucle.sh`), copie
   sans `build/`/`dist/`, `pip install`, offscreen, `PYTHONFAULTHANDLER=1`, chaque suite sous
   `gdb -batch -ex run -ex 'thread apply all bt'`, 6 à 9 suites en parallèle (charge 8–10 sur 12 fils). Avant
   correction : suite complète **1 plantage sur 49** ; série `test_reglages_conserves` + `test_gui_robustesse` +
@@ -416,7 +416,7 @@ Le plantage « isolé » de la 0.1.6 n'était pas isolé : **reproduit 8 fois**,
 - **Aucun tag posé** (publication v0.1.6 en cours, non touchée).
 
 ## 2026-10-09 — 0.1.8 : explorateur du système, possession visible, lanceur par lien
-Retours d'usage de Kevin (Manjaro, KDE Plasma, paquet autonome 0.1.7, dossier de sortie `/mnt/nas/Astronomie/OHP_DU_ECU`).
+Retours d'usage d'un utilisateur (Manjaro, KDE Plasma, paquet autonome 0.1.7, dossier de sortie `/mnt/partage/OHP_DU_ECU`).
 - **Dialogue de fichiers générique, en anglais, sans le NAS** : cause = le Qt du paquet ne peut pas charger le greffon
   `kde` de plasma-integration (compilé pour le Qt du système) ; Qt prend alors son thème KDE intégré, sans dialogue
   natif ; le portail n'est choisi d'office que dans Flatpak/Snap. `gui/plateforme.py` : avant `QApplication`, si
@@ -459,14 +459,14 @@ Retours d'usage de Kevin (Manjaro, KDE Plasma, paquet autonome 0.1.7, dossier de
   Manuels FR/EN (38 p.) recompilés (section « Choisir un fichier ou un dossier, dossier sur un NAS », possession,
   dépannage, installeur), captures Catalogue et Préférences refaites.
 - CI `tests.yml` du commit `f2cf35c` : **6/6** (Linux, Windows, macOS × 3.10, 3.12) ; sous Windows, le test UNC réel (`\\localhost\C$\…`) passe. Premier passage rouge sous Windows : tests seulement (possession simulée avec un dossier non absolu, ignorée comme périmée ; « : » interdit dans un nom de dossier).
-- **Aucun tag posé** (publication par Kevin).
+- **Aucun tag posé** (publication par le mainteneur).
 
 ## 2026-10-09 — version 0.1.9 : Qualité sur un vrai partage SMB, compatibilité vérifiée, métadonnées PixInsight
-Retours de Kevin (Manjaro, 0.1.8, `/mnt/nas/Astronomie/OHP_DU_ECU/09_Galaxies` sur un partage SMB). Détail et
+Retours d'utilisateur (Manjaro, 0.1.8, `/mnt/partage/OHP_DU_ECU/09_Galaxies` sur un partage SMB). Détail et
 mesures : `docs/AUDIT2_2026-10.md` § 9.
 - **Inventaire Qualité** : vrai Samba en conteneur, client cifs du noyau, `tc netem` ; arborescence réelle de la
   banque en fichiers vides. Cause : SQLite n'écrit pas à travers les verrous SMB (« database is locked », fichier de
-  0 octet — le même que sur le NAS, créé par Kevin à 13 h 33) ; trois ouvertures du cache × 30 s = **90,4 s** avant
+  0 octet — le même que sur le NAS, créé par l'utilisateur à 13 h 33) ; trois ouvertures du cache × 30 s = **90,4 s** avant
   la première mesure (92,7 s à 10 ms). Cache local pour un partage, repli en 3 s ; inventaire producteur/consommateur
   (`moteur.inventorier`, `parcours.parcourir`) ; dossiers des lots d'après INDEX_LOTS.csv / la base d'état ; dates
   tirées de `scandir` ; 32 fils sur un partage ; échantillon mesuré d'abord, question non modale. **Après : inventaire
@@ -503,7 +503,7 @@ mesures : `docs/AUDIT2_2026-10.md` § 9.
 - **Aucun tag posé.**
 
 ## 2026-10-09 — version 0.1.10 : base d'état sur un partage réseau (le « à décider » de la 0.1.9)
-Le dossier de sortie de Kevin est sur le partage (`/mnt/nas/Astronomie/OHP_DU_ECU`, base `_traitement/etat.sqlite`
+Le dossier de sortie d'un utilisateur est sur le partage (`/mnt/partage/OHP_DU_ECU`, base `_traitement/etat.sqlite`
 partagée avec le NAS) : sous Linux, télécharger, *Tout télécharger* ou réorganiser vers lui échouait. Détail :
 `docs/AUDIT2_2026-10.md` § 10.
 - **Reproduit** (vrai Samba, cifs par défaut, banc `outils/audit2/samba/`) : `Etat()` → « database is locked » en
@@ -526,9 +526,9 @@ partagée avec le NAS) : sous Linux, télécharger, *Tout télécharger* ou réo
 - **macOS/Windows** (raisonné, § 10.4) : smbfs et UNC/lecteur réseau passent par la même base de travail ; Windows
   vérifié par la CI (`\\localhost\C$`).
 - Mesuré (vrai Samba) : ouverture 0,02 s (contre 60,1 s puis erreur), recopie 0,02–0,04 s (base de 1,3 Mo).
-  **Essai réel** : 3 images de (914) Palisana depuis `tap-ufe.obspm.fr` vers `/mnt/nas/OHP_DU_ECU_essai` (Samba de
+  **Essai réel** : 3 images de (914) Palisana depuis `tap-ufe.obspm.fr` vers `/mnt/partage/OHP_DU_ECU_essai` (Samba de
   test) : 3 converties, base du partage 3 `ok`, `integrity_check` ok, aucun temporaire ; relance : rien à refaire.
-  Rien écrit dans `/mnt/zpool2`.
+  Rien écrit dans `/srv/banque`.
 - Tests : `tests/test_base_partagee.py` (20 + vrai cifs si `COUPOLE_TEST_SMB` + UNC Windows). Manuels FR/EN :
   section « Dossier de sortie sur un partage réseau », dépannage (3 lignes), `nobrl` plus nécessaire ; aide de la
   Banque OHP ; CHANGELOG FR/EN ; `\texttt` cassé (tabulation) corrigé dans le manuel FR.
@@ -538,9 +538,9 @@ partagée avec le NAS) : sous Linux, télécharger, *Tout télécharger* ou réo
 - CI `tests.yml` du commit `09f8ae8` : **6/6** (Linux, Windows, macOS × 3.10, 3.12) ; sous Windows, `test_chemin_unc_reel` de la base de travail (`\\localhost\C$`) passe.
 - **Aucun tag posé.**
 
-## 2026-10-09 — version 0.1.11 : copie d'un ancien traitement, menus, dialogues, Qualité sur les poses de Kevin
-Retours de Kevin (Linux/KDE, 0.1.10, `/mnt/nas/Astronomie/OHP_DU_ECU` = copie produite par `ohp_xisf.py` avant Coupole).
-- **Rien à ouvrir sur des objets possédés** : la base de cette copie note `final` = « /workspace/Workspace/OHP_DU_ECU/… »
+## 2026-10-09 — version 0.1.11 : copie d'un ancien traitement, menus, dialogues, Qualité sur les poses d'un utilisateur
+Retours d'utilisateur (Linux/KDE, 0.1.10, `/mnt/partage/OHP_DU_ECU` = copie produite par `ohp_xisf.py` avant Coupole).
+- **Rien à ouvrir sur des objets possédés** : la base de cette copie note `final` = « /srv/ancien/OHP_DU_ECU/… »
   (conteneur d'alors) ; `possession` le rendait tel quel (chemin absolu étranger) → `chemin_image` inexistant,
   `dossier_objet` vide. Nouveau `modules/ohp/emplacements.py` : `info.chemin` relatif → `final` dans la sortie →
   `journal.csv` (url, puis fichier_source non ambigu ; cache par mtime/taille) → ancienne racine (`staging` avant
@@ -551,7 +551,7 @@ Retours de Kevin (Linux/KDE, 0.1.10, `/mnt/nas/Astronomie/OHP_DU_ECU` = copie pr
   (fichiers trouvés, puis journal). Pilote : `final` étranger rapporté avant le rangement (sinon `os.replace` d'un
   staging absent et `journal.csv` réécrit avec « ../.. ») ; `lots.ranger` note `chemin`, saute un staging absent ;
   `ecrire_journal` : `chemin`, sinon `final` dans la sortie, sinon la ligne précédente.
-- **Vraie copie (lecture seule, base et journal copiés dans un dossier de travail ; rien écrit dans /mnt/zpool2)** :
+- **Vraie copie (lecture seule, base et journal copiés dans un dossier de travail ; rien écrit dans /srv/banque)** :
   7 625 images résolues par le journal en 0,34 s ; 300 tirées au sort présentes sur le disque ; ancienne racine =
   journal 7 625/7 625 ; nom attendu = journal 100/100 (0,2 s) ; migration d'une copie de la base sur « partage »
   simulé : 7 625 en 0,78 s, relue ensuite sans journal (origine « base »).
@@ -559,7 +559,7 @@ Retours de Kevin (Linux/KDE, 0.1.10, `/mnt/nas/Astronomie/OHP_DU_ECU` = copie pr
   inchangée, la recopie vers le partage ne voyait « rien de neuf » (aussi `metadonnees.maj_etat` en 0.1.10) → DELETE
   avant d'écrire ; `_copier_base` reprend un `-wal` ; recopie refusée si `-wal` non vide, `-wal` vide et `-shm`
   périmés retirés après remplacement.
-- **Menus** : sur la capture de Kevin, l'info-bulle « Rien n'est encore téléchargé… » d'une entrée GRISÉE couvrait le
+- **Menus** : sur la capture d'un utilisateur, l'info-bulle « Rien n'est encore téléchargé… » d'une entrée GRISÉE couvrait le
   menu (cause principale : entrées désactivées, faute de chemin). `QMenu.setToolTipsVisible` retiré partout
   (`gui/ouvrir.action` : motif court dans le libellé, motif complet en `statusTip`), `ouvrir.montrer_menu` = `popup` +
   WA_DeleteOnClose (plus d'`exec` imbriqué) pour tous les menus contextuels (images, objets, lots, colonnes, Qualité).
@@ -572,9 +572,9 @@ Retours de Kevin (Linux/KDE, 0.1.10, `/mnt/nas/Astronomie/OHP_DU_ECU` = copie pr
   booléen `checked`. `tests/test_dialogues_fichiers.py` : les 13 appels de dialogue (garde-fou de comptage).
 - **Qualité, 70 poses N.I.N.A. « mesurées » sans valeur** : `xisf.lire` strict (« incomplete FITSKeyword », N.I.N.A.
   écrit `CD1_1` sans commentaire). `xisf.lire(strict=False)` par défaut (tolérant), `strict=True`/`xisf.verifier`
-  pour nos fichiers (formats.py, tests XSD). Vrais fichiers (copies dans `/workspace/.cache/qtest/`) : pose N.I.N.A.
-  ASI 6200MM 9576×6388 (strict : refus ; tolérant : lu), flat ASIAIR sans Metadata (copié de
-  `Observatoire FC76-DCU/…/Nuit_4/Flat/`, lecture seule), masterLight WBPP PixInsight 1.8.8 (strict ok). Mesure de la
+  pour nos fichiers (formats.py, tests XSD). Vrais fichiers (copies dans `<dossier de travail>/qtest/`) : pose N.I.N.A.
+  9576×6388 (strict : refus ; tolérant : lu), flat ASIAIR sans Metadata (copié de
+  `…/Nuit_4/Flat/`, lecture seule), masterLight WBPP PixInsight 1.8.8 (strict ok). Mesure de la
   pose N.I.N.A. : 4,2 s, pic RSS 1 170 Mo (float32, fond soustrait en place), 14 455 sources, 400 étoiles, FWHM
   2,08 px = 3,53″ à 1,695″/px (matrice CD), RSN 108. Estimation mémoire 18 o/px + 150 Mo → processus limités
   (`limiter_par_memoire`). Erreurs : colonne `etat`, `rapport.motif_erreur`, `bilan_texte`, pile dans coupole.log,
@@ -591,3 +591,54 @@ Retours de Kevin (Linux/KDE, 0.1.10, `/mnt/nas/Astronomie/OHP_DU_ECU` = copie pr
 - CI `tests.yml` : commit `0f261ca` 4/6 (Windows : test du dossier de départ qui supposait « / » comme racine) ;
   commit `b459b98` **6/6** (Linux, Windows, macOS × 3.10, 3.12).
 - **Aucun tag posé.**
+
+## 2026-10-09 — version 0.1.12 : lancements journalisés, PixInsight, dépôt sans données personnelles
+Retour d'utilisateur (Manjaro/KDE, 0.1.11) : « Ouvrir avec → PixInsight » ne faisait rien de visible et `coupole.log`
+n'en gardait aucune trace. Diagnostic sur le poste : `PixInsight.sh` (eval, guillemets seulement autour des arguments
+à espace), `.desktop` utilisateur sans `%F` ni MimeType, type MIME `application/x-kdeuser1`, instance ouverte qui
+« cède la main » (code 0) sans rien ouvrir ; `PixInsight.sh -n fichier` ouvre l'image.
+- **`core/lancement.py`** (nouveau) : `demarrer()` — liste d'arguments, détaché, stdout+stderr dans un fichier anonyme
+  (pas de tube : le programme survit à Coupole), journal (programme, arguments, pid ; code et sortie si arrêt dans les
+  3 s, `os.pread` pour ne pas déplacer la position partagée) ; `Lancement.verifier()` non bloquant, `attendre()`,
+  `message()` → clé de texte FR/EN ; `ouvrir_systeme()` (startfile / open / xdg-open) ; `application_par_defaut()`
+  (`xdg-mime query filetype|default`, .desktop dans XDG_DATA_HOME/DIRS, codes `%f %F %u %U`) ;
+  `environnement_enfant()` retire le `QT_QPA_PLATFORMTHEME` posé par Coupole (`COUPOLE_QPA_THEME_POSE`).
+- **`core/logiciels.py`** : `preparer_commande()` par logiciel et par système, sources citées en tête du module
+  (forum PixInsight, fils 15197 / 14614 / 15888 ; `open(1)` ; manifeste Flathub de Siril ; `CommandLineOptions.cs`
+  de N.I.N.A.). PixInsight Linux : script préféré au binaire, `/bin/sh` si le script n'est pas exécutable, lien
+  symbolique temporaire (`lien_temporaire`, dossier privé 0700, liens de plus de 2 jours retirés, jamais leurs cibles)
+  si `chemin_sur_pour_eval` refuse le chemin. `pixinsight_ouvert()` : `/proc/*/comm` (le cœur s'appelle
+  « PixInsight », le script « PixInsight.sh »), `pgrep -x`, `tasklist` — pas `-e`, qui lancerait le cœur à chaque
+  menu. Réglage `pixinsight_instance` (défaut `nouvelle`). Siril flatpak : `--file-forwarding @@ … @@`,
+  `flatpak_voit()` lit `flatpak info --show-permissions` (host sans /tmp, /run sauf /run/media…, home, chemins,
+  `!…`). N.I.N.A. : `SANS_FICHIER` (grisé avec la raison). `ouvrir_defaut()` : .desktop sans code de fichier →
+  logiciel reconnu lancé directement, sinon message. `montrer_dans_dossier()` journalisé (explorer.exe : code ignoré).
+- **Interface** : `gui/ouvrir.suivre()` (message immédiat puis état final par un QTimer de 250 ms),
+  `statut()`, `montrer_emplacement()` ; `dialogues.ouvrir_fichier` passe par le même chemin ; menu « PixInsight
+  (nouvelle fenêtre) » / « PixInsight (fenêtre ouverte, essai) » quand une instance tourne, celle du réglage d'abord ;
+  Préférences > « PixInsight déjà ouvert » ; aide F1 `aide_ouvrir_avec` (correction du .desktop).
+- **Tests** `tests/test_lancement.py` (26 cas) : faux PixInsight.sh qui reproduit l'`eval` + faux binaire qui note ses
+  arguments ; **témoin** (le script appelé directement abîme un chemin à `$`) ; 14 noms difficiles (espace, `$`,
+  `'`, `(`, accents, `` ` ``, `"`, `\`, `*`) dans un dossier lui-même difficile et dans un dossier sûr, `-n` ou non ;
+  instance ouverte simulée (« Yielded execution ») ; Siril/ASTAP/Aladin directs ; programme direct sous tous les
+  systèmes (CI Windows comprise) ; flatpak et permissions ; N.I.N.A. ; introuvable, code de retour + stderr ;
+  .desktop sans `%F` (PixInsight lancé, application inconnue refusée), avec `%F` (xdg-open) ; menu selon instance
+  et réglage ; barre d'état ; aucun `shell=True` ni `os.system` dans le code (analyse de l'AST).
+- **Dépôt public, aucune donnée personnelle** (demande du mainteneur) : prénoms, chemins d'infrastructure, noms de
+  machines, matériel personnel retirés des manuels (.tex et PDF), CHANGELOG (entrées passées comprises), PROGRESSION,
+  audits, code, commentaires, tests, données de test (`/srv/ancien/OHP_DU_ECU` dans la copie d'exemple), outils
+  (banc Samba : utilisateur `astro`) ; captures : `outils/captures.py` impose un dossier personnel neutre
+  (`/tmp/utilisateur`) et une machine générique (`machine_neutre()`), captures refaites : Préférences, À propos,
+  Ma machine, Spectres, Traitement (FR/EN) ; les autres vérifiées par OCR. `tests/test_confidentialite.py` : tous les
+  fichiers suivis par git (texte, `pdftotext` + `pdfinfo`, PNG tEXt/zTXt/iTXt, .gz décompressés, chaînes des
+  binaires), motifs et liste blanche explicites ; `poppler-utils` ajouté à la CI Linux. Historique git non réécrit
+  (décision du mainteneur). `COUPOLE_REFERENCE` sans valeur par défaut.
+- README : badges shields.io (Python 3.10+, GPL-3.0, Windows | Linux | macOS, dernière Release, statut de
+  `tests.yml`, FR | EN).
+- Manuels FR/EN : § « Ouvrir une image » (lancement de chaque logiciel, PixInsight déjà ouvert, double-clic et
+  .desktop sans `%F`), Préférences ; recompilés (42 p.), temporaires supprimés.
+- Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 509 réussis,
+  15 sautés, code 0 ; python:3.10-slim 509 / 15, code 0**.
+- Non vérifiable ici : PixInsight réel (logiciel commercial, absent du serveur de développement) — le comportement
+  du script et de `-n` vient de l'essai sur le poste de l'utilisateur ; macOS et Windows : commandes d'après les
+  sources citées, non essayées avec PixInsight.

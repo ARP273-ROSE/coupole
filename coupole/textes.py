@@ -40,6 +40,91 @@ TEXTES = {
                              'en': 'ASTAP only reads uncompressed XISF: choose the FITS format in Processing.'},
     'lg_raison_astap_gzip': {'fr': "ASTAP lit le .fits.fz Rice (entiers) mais pas GZIP (flottants) : choisir FITS.",
                              'en': 'ASTAP reads Rice .fits.fz (integers) but not GZIP (floats): choose FITS.'},
+    # ------------------------------------------------------------ lancements journalisés (0.1.12)
+    'lg_raison_nina_argument': {
+        'fr': "N.I.N.A. n'ouvre pas une image passée en argument (ses options : profil, séquence, débogage) : "
+              "ouvrir l'image depuis N.I.N.A.",
+        'en': 'N.I.N.A. does not open an image given as an argument (its options: profile, sequence, debug): open '
+              'the image from within N.I.N.A.'},
+    'lg_motif_argument': {'fr': "n'ouvre pas de fichier donné", 'en': 'does not open a given file'},
+    'lg_pixinsight_nouvelle': {'fr': 'PixInsight (nouvelle fenêtre)', 'en': 'PixInsight (new window)'},
+    'lg_pixinsight_nouvelle_aide': {
+        'fr': "PixInsight est déjà ouvert : lance une nouvelle instance (-n) qui ouvre l'image — fonctionne même si "
+              "la fenêtre ouverte est occupée par un script.",
+        'en': 'PixInsight is already open: starts a new instance (-n) that opens the image — works even if the open '
+              'window is busy with a script.'},
+    'lg_pixinsight_envoyer': {'fr': 'PixInsight (fenêtre ouverte, essai)', 'en': 'PixInsight (open window, try)'},
+    'lg_pixinsight_envoyer_aide': {
+        'fr': "Envoie l'image à la fenêtre PixInsight déjà ouverte. Si elle est occupée (script en cours), elle peut "
+              "ne rien ouvrir : choisir alors « nouvelle fenêtre ».",
+        'en': 'Sends the image to the PixInsight window already open. If it is busy (script running) it may open '
+              'nothing: then choose “new window”.'},
+    'lg_lancement_en_cours': {'fr': 'Ouverture dans {logiciel}…', 'en': 'Opening in {logiciel}…'},
+    'lg_err_code': {'fr': "{logiciel} s'est arrêté aussitôt (code {code}) : {detail} — détails dans coupole.log.",
+                    'en': '{logiciel} stopped at once (code {code}): {detail} — details in coupole.log.'},
+    'lg_err_introuvable': {'fr': 'Impossible de lancer {logiciel} : programme introuvable ({detail}).',
+                           'en': 'Cannot start {logiciel}: program not found ({detail}).'},
+    'lg_err_permission': {'fr': "Impossible de lancer {logiciel} : permission refusée ({detail}).",
+                          'en': 'Cannot start {logiciel}: permission denied ({detail}).'},
+    'lg_err_systeme': {'fr': 'Impossible de lancer {logiciel} : {detail}', 'en': 'Cannot start {logiciel}: {detail}'},
+    'lg_err_lien': {
+        'fr': "Chemin à caractères spéciaux que PixInsight.sh ne transmet pas, et lien temporaire impossible ({detail}) : "
+              "renommer le fichier ou son dossier sans $ ` ' \" \\ ( ) * ? [ ].",
+        'en': "Path with special characters that PixInsight.sh does not pass on, and no temporary link possible "
+              "({detail}): rename the file or its folder without $ ` ' \" \\ ( ) * ? [ ]."},
+    'lg_err_desktop_sans_fichier': {
+        'fr': "L'application associée à ce type de fichier ({desktop}) ne reçoit pas de fichier (ligne Exec= sans %F) : "
+              "elle s'ouvrirait vide. Utiliser « Ouvrir avec », ou corriger son .desktop (voir l'aide, F1).",
+        'en': 'The application associated with this file type ({desktop}) receives no file (Exec= line without %F): '
+              'it would open empty. Use “Open with”, or fix its .desktop (see help, F1).'},
+    'lg_err_aucun_moyen': {'fr': "Aucun moyen d'ouvrir {detail} sur ce système (ni xdg-open, ni le bureau).",
+                           'en': 'No way to open {detail} on this system (neither xdg-open nor the desktop).'},
+    'lg_note_pixinsight_lien': {
+        'fr': "{logiciel} : chemin à caractères spéciaux, ouvert par un lien temporaire (PixInsight.sh les "
+              "interpréterait). Pour enregistrer, « Enregistrer sous » dans le dossier d'origine.",
+        'en': '{logiciel}: path with special characters, opened through a temporary link (PixInsight.sh would '
+              'interpret them). To save, use “Save As” into the original folder.'},
+    'lg_note_pixinsight_cede': {
+        'fr': "PixInsight déjà ouvert : l'image a été confiée à la fenêtre ouverte. Si rien ne s'ouvre (fenêtre "
+              "occupée), choisir « PixInsight (nouvelle fenêtre) » ou le réglage des Préférences.",
+        'en': 'PixInsight already open: the image was handed to the open window. If nothing opens (window busy), '
+              'choose “PixInsight (new window)” or the Preferences setting.'},
+    'lg_note_flatpak_portail': {
+        'fr': "{logiciel} (flatpak) ne voit pas {dossier} : fichier transmis par le portail de documents. S'il ne "
+              "s'ouvre pas : flatpak override --user --filesystem={dossier} {ident}",
+        'en': '{logiciel} (flatpak) cannot see {dossier}: file passed through the document portal. If it does not '
+              'open: flatpak override --user --filesystem={dossier} {ident}'},
+    'lg_note_desktop_sans_fichier': {
+        'fr': "{logiciel} lancé directement : son .desktop ({desktop}) ne reçoit pas de fichier (ajouter %F à la "
+              "ligne Exec=, voir l'aide).",
+        'en': '{logiciel} started directly: its .desktop ({desktop}) receives no file (add %F to the Exec= line, '
+              'see help).'},
+    'reg_pixinsight': {'fr': 'PixInsight déjà ouvert', 'en': 'PixInsight already open'},
+    'reg_pixinsight_nouvelle': {'fr': 'Ouvrir une nouvelle fenêtre (-n)', 'en': 'Open a new window (-n)'},
+    'reg_pixinsight_envoyer': {'fr': 'Envoyer à la fenêtre ouverte (essai)', 'en': 'Send to the open window (try)'},
+    'reg_pixinsight_aide': {
+        'fr': "« Ouvrir avec PixInsight » quand PixInsight tourne déjà. Nouvelle fenêtre (conseillé) : une nouvelle "
+              "instance ouvre l'image à coup sûr. Fenêtre ouverte : PixInsight confie l'image à l'instance ouverte, "
+              "qui peut ne rien ouvrir si elle est occupée (script en cours). Le menu propose toujours les deux.",
+        'en': '“Open with PixInsight” when PixInsight is already running. New window (recommended): a new instance '
+              'surely opens the image. Open window: PixInsight hands the image to the running instance, which may '
+              'open nothing if it is busy (script running). The menu always offers both.'},
+    'aide_ouvrir_avec': {
+        'fr': "<p><b>Ouvrir, Ouvrir avec.</b> Chaque lancement est noté dans <tt>coupole.log</tt> (programme, "
+              "arguments, code de retour) et une erreur s'affiche dans la barre d'état. <i>PixInsight sous Linux</i> : "
+              "si un double-clic ouvre PixInsight <i>sans</i> l'image, son fichier "
+              "<tt>~/.local/share/applications/pixinsight.desktop</tt> n'a pas de <tt>%F</tt> ; Coupole lance alors "
+              "PixInsight directement. Pour corriger le bureau tout entier, y écrire :<br>"
+              "<tt>Exec=/opt/PixInsight/bin/PixInsight.sh %F</tt><br><tt>MimeType=image/x-xisf;image/fits;</tt><br>"
+              "puis <tt>update-desktop-database ~/.local/share/applications</tt> (Coupole ne modifie pas ce fichier). "
+              "PixInsight déjà ouvert : Préférences &gt; « PixInsight déjà ouvert » (nouvelle fenêtre par défaut).</p>",
+        'en': '<p><b>Open, Open with.</b> Each launch is recorded in <tt>coupole.log</tt> (program, arguments, exit '
+              'code) and an error shows in the status bar. <i>PixInsight on Linux</i>: if a double-click opens '
+              'PixInsight <i>without</i> the image, its file <tt>~/.local/share/applications/pixinsight.desktop</tt> '
+              'has no <tt>%F</tt>; Coupole then starts PixInsight directly. To fix the whole desktop, write in it:<br>'
+              '<tt>Exec=/opt/PixInsight/bin/PixInsight.sh %F</tt><br><tt>MimeType=image/x-xisf;image/fits;</tt><br>'
+              'then <tt>update-desktop-database ~/.local/share/applications</tt> (Coupole does not change this file). '
+              'PixInsight already open: Preferences &gt; “PixInsight already open” (new window by default).</p>'},
     'lg_raison_format': {'fr': 'Ce logiciel ne lit pas ce format.', 'en': 'This program does not read this format.'},
     'lg_raison_non_verifie': {'fr': "Lecture de ce format par ce logiciel non vérifiée : non proposé.",
                               'en': 'Reading of this format by this program not checked: not offered.'},
@@ -470,13 +555,13 @@ TEXTES = {
               "système : choisir le partage dans ses emplacements réseau. <i>Linux</i> : ouvrir d'abord le partage "
               "dans Dolphin ou Fichiers (smb://serveur/partage) ; il apparaît sous <tt>/run/user/&lt;uid&gt;/gvfs/"
               "smb-share:server=…,share=…</tt> (GNOME, ou KDE avec kio-fuse), ou monter le partage en cifs/nfs "
-              "(<tt>/mnt/nas</tt>). <i>macOS</i> : Finder &gt; Aller &gt; Se connecter au serveur (⌘K), "
+              "(<tt>/mnt/partage</tt>). <i>macOS</i> : Finder &gt; Aller &gt; Se connecter au serveur (⌘K), "
               "<tt>smb://serveur/partage</tt>, puis le choisir sous <tt>/Volumes</tt>. <i>Windows</i> : lecteur réseau "
               "(Z:) ou chemin UNC <tt>\\\\serveur\\partage</tt>, saisissable aussi dans le champ du dossier.</p>",
         'en': '<p><b>Folder on a NAS or a network share.</b> The “Browse” dialog is the system file manager: pick the '
               'share among its network places. <i>Linux</i>: first open the share in Dolphin or Files '
               '(smb://server/share); it shows up under <tt>/run/user/&lt;uid&gt;/gvfs/smb-share:server=…,share=…</tt> '
-              '(GNOME, or KDE with kio-fuse), or mount the share with cifs/nfs (<tt>/mnt/nas</tt>). <i>macOS</i>: '
+              '(GNOME, or KDE with kio-fuse), or mount the share with cifs/nfs (<tt>/mnt/partage</tt>). <i>macOS</i>: '
               'Finder &gt; Go &gt; Connect to Server (⌘K), <tt>smb://server/share</tt>, then pick it under '
               '<tt>/Volumes</tt>. <i>Windows</i>: network drive (Z:) or UNC path <tt>\\\\server\\share</tt>, '
               'which can also be typed into the folder field.</p>'},

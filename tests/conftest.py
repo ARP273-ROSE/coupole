@@ -12,9 +12,9 @@ os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
 os.environ['COUPOLE_HOME'] = tempfile.mkdtemp(prefix='coupole-tests-')
 os.environ['COUPOLE_SANS_RESEAU'] = '1'      # jamais de requête publique depuis les tests (serveur local seulement)
 
-# Traitement de référence (dépôt de l'auteur) : utilisé quand il est présent, sinon les tests concernés sont sautés.
-REFERENCE = Path(os.environ.get('COUPOLE_REFERENCE',
-                                '/workspace/GitHub/_docs/Observatoire-Paris/Banque-Images-OHP'))
+# Traitement de référence (scripts d'origine) : dossier donné par COUPOLE_REFERENCE ; sinon les tests concernés sont
+# sautés.
+REFERENCE = Path(os.environ.get('COUPOLE_REFERENCE') or os.devnull)
 
 
 @pytest.fixture(scope='session', autouse=True)

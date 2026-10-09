@@ -1,6 +1,6 @@
 """0.1.11 — chaque bouton qui ouvre un dialogue de fichier ou de dossier l'ouvre vraiment.
 
-Retour de Kevin (KDE, portail XDG depuis 0.1.8) : dans « Spectres et séries », « Ouvrir un fichier » ne faisait
+Retour d'utilisateur (KDE, portail XDG depuis 0.1.8) : dans « Spectres et séries », « Ouvrir un fichier » ne faisait
 rien.  Cause : le filtre « (*.fits *.fit …) » n'avait pas de nom ; Qt l'envoie au portail avec un nom vide, que
 xdg-desktop-portal refuse (« invalid filter: name is empty », src/file-chooser.c) — le dialogue ne s'ouvre pas.
 
@@ -130,7 +130,7 @@ def test_spectres_et_series(app_qt, faux):
     from coupole.modules.donnees.gui import Panneau
     p = _montrer(Panneau(), app_qt)
     try:
-        _bouton(p, 'don_ouvrir').click()                       # le vrai bouton, comme Kevin
+        _bouton(p, 'don_ouvrir').click()                       # le vrai bouton, comme l'utilisateur
         d = verifier_ouverture(faux)
         noms = [n for n, _ in fichiers.filtres_portail(d.filtre)]
         assert noms[0] == 'Spectres et séries' and 'Tous les fichiers' in noms

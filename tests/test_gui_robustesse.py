@@ -198,7 +198,7 @@ def _cellules_elidees(p):
 
 @pytest.mark.parametrize('largeur', [1366, 2000])
 def test_cosmologie_colonnes_au_contenu_et_dispositions(app_qt, largeur):
-    """Retour de Kevin (écran de 2 000 px) : côte à côte, la colonne « valeur » était tronquée et « ± 1σ »
+    """Retour d'utilisateur (écran de 2 000 px) : côte à côte, la colonne « valeur » était tronquée et « ± 1σ »
     s'étirait ; empilé, 7 lignes seulement et des courbes écrasées.  Valeurs jamais élidées, tableau à la largeur
     de son contenu (côte à côte) ou à toutes ses lignes (empilé), courbes ≥ 300 px ; choix du menu gardé."""
     from coupole.core import config

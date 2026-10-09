@@ -2,6 +2,13 @@
 
 # Coupole
 
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-green.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](https://github.com/ARP273-ROSE/coupole/releases/latest)
+[![Version](https://img.shields.io/github/v/release/ARP273-ROSE/coupole?label=version)](https://github.com/ARP273-ROSE/coupole/releases/latest)
+[![Tests](https://github.com/ARP273-ROSE/coupole/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/ARP273-ROSE/coupole/actions/workflows/tests.yml)
+[![Langue / Language](https://img.shields.io/badge/langue-FR%20%7C%20EN-informational.svg)](#english)
+
 **Français** · [English](#english)
 
 Boîte à outils **libre** (GPL-3.0) pour les étudiants du DU « Explorer et Comprendre l'Univers » (DU ECU) de

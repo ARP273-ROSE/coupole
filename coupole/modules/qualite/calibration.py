@@ -4,7 +4,7 @@ Trois niveaux, du moins cher au plus cher :
 
 1. **Dossier** (à l'inventaire, sans rien ouvrir) : un dossier du chemin, sous le dossier analysé, nommé
    (ou commençant par) Flat(s), Dark(s), Bias, Offset(s), DarkFlat(s), FlatDark(s), Calibration, Master(s) —
-   « FLAT FSQ », « Dark-Bias » —, ou cosmetized, calibrated, registered, debayered, aligned, _platesolve…
+   « FLAT L », « Dark-Bias » —, ou cosmetized, calibrated, registered, debayered, aligned, _platesolve…
    (casse et pluriels, français compris : Plats, Noirs, Biais) ;
 2. **Nom de fichier** (à l'inventaire) : préfixes et suffixes de N.I.N.A. (`FLAT_`, `DARK_`, `BIAS_`, `DARKFLAT_`),
    de l'ASIAIR (`Flat_`, `Dark_`, `Bias_`), des masters PixInsight/Siril (`masterDark_`, `masterFlat`,
@@ -22,7 +22,7 @@ import os
 import re
 
 # 1. dossiers (un composant entier du chemin)
-# (premier mot du nom : « Flats », « FLAT FSQ », « Dark-Bias », « master 2600mc » ; « Nuit_2_master » n'en est pas)
+# (premier mot du nom : « Flats », « FLAT L », « Dark-Bias », « master OSC » ; « Nuit_2_master » n'en est pas)
 RE_DOSSIER = re.compile(
     r'(?i)^(?:'
     r'(?:flats?|darks?|bias(?:es)?|offsets?|dark[ _-]?flats?|flat[ _-]?darks?|calibrations?|calib|masters?|'

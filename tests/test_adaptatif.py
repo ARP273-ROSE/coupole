@@ -121,7 +121,7 @@ def _pages_affichees(app_qt, f):
 
 @pytest.mark.parametrize('largeur', [1366, 2000])
 def test_entetes_de_tableaux_jamais_tronques(app_qt, fenetre_adaptative, largeur):
-    """Retour de Kevin (Qualité, 0.1.8) : « étoiles mesurées » affiché « toiles mesurée ».  Chaque section visible
+    """Retour d'utilisateur (Qualité, 0.1.8) : « étoiles mesurées » affiché « toiles mesurée ».  Chaque section visible
     de chaque tableau visible est au moins aussi large que son titre (police de l'en-tête, échelle comprise :
     lancé aussi à QT_SCALE_FACTOR = 1,5 et 2), et le titre entier est en info-bulle."""
     from PyQt6.QtCore import Qt
@@ -167,7 +167,7 @@ def test_entete_garde_la_largeur_du_titre(app_qt):
 
 
 def test_conteneurs_sans_info_bulle_sur_leurs_enfants(app_qt, fenetre_adaptative):
-    """Retour de Kevin : l'info-bulle des onglets de la Banque OHP restait affichée par-dessus le groupe
+    """Retour d'utilisateur : l'info-bulle des onglets de la Banque OHP restait affichée par-dessus le groupe
     « Solution astrométrique ».  Un QTabWidget, une zone défilante ou un groupe n'a pas d'info-bulle propre (elle
     s'afficherait au survol de n'importe lequel de ses enfants) : l'aide des onglets est sur chaque onglet."""
     from PyQt6.QtWidgets import QGroupBox, QScrollArea, QStackedWidget, QTabWidget

@@ -419,7 +419,7 @@ def test_interface_message_et_fusion(app_qt, monkeypatch):
     monkeypatch.setitem(config.reglages().valeurs, 'ohp_verifier_nouveautes', False)
     p = gui.Panneau()
     try:
-        p._evenements([{'type': 'base_locale', 'cle': 'base_locale_avis', 'valeurs': {'dest': '/mnt/nas/X', 'secondes': 30}}])
+        p._evenements([{'type': 'base_locale', 'cle': 'base_locale_avis', 'valeurs': {'dest': '/mnt/partage/X', 'secondes': 30}}])
         assert 'Dossier sur un partage réseau : base de travail locale, recopiée sur le partage toutes les 30 s' in \
             p.journal.toPlainText()
         appels = []
@@ -427,9 +427,9 @@ def test_interface_message_et_fusion(app_qt, monkeypatch):
         monkeypatch.setattr(gui.base_partagee, 'fusionner',
                             lambda chemin: appels.append(chemin) or
                             {'total': 7, 'de_la_locale': 2, 'conflits': 1, 'envoyee': True, 'copies': ['a', 'b']})
-        p.proposer_fusion('/mnt/nas/X/_traitement/etat.sqlite', '/cache/bases/x')
+        p.proposer_fusion('/mnt/partage/X/_traitement/etat.sqlite', '/cache/bases/x')
         assert attendre(app_qt, lambda: 'fusionnées' in p.journal.toPlainText())
-        assert appels == ['/mnt/nas/X/_traitement/etat.sqlite']
+        assert appels == ['/mnt/partage/X/_traitement/etat.sqlite']
     finally:
         p.arreter()
         p.close()

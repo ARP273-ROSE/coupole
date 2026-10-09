@@ -1,8 +1,8 @@
 """Où se trouve, dans le dossier de sortie COURANT, le fichier converti d'une image possédée.
 
 La base d'état note l'emplacement absolu (`info['final']`) sur la machine qui a traité : une copie faite par
-`ohp_xisf.py` dans un conteneur porte « /workspace/Workspace/OHP_DU_ECU/… », introuvable sur le poste qui la lit
-par « /mnt/nas/Astronomie/OHP_DU_ECU ».  Depuis 0.1.11, Coupole note aussi `info['chemin']`, relatif au dossier
+`ohp_xisf.py` dans un conteneur porte « /srv/ancien/OHP_DU_ECU/… », introuvable sur le poste qui la lit
+par « /mnt/partage/OHP_DU_ECU ».  Depuis 0.1.11, Coupole note aussi `info['chemin']`, relatif au dossier
 de sortie, et retrouve celui des copies plus anciennes, dans cet ordre :
 
 1. ``info['chemin']`` (relatif) ; ou ``info['final']`` s'il est dans le dossier de sortie courant ;

@@ -102,6 +102,10 @@ class DialogueReglages(QDialog):
                                          (tr('reg_dialogues_fichiers_qt'), 'qt')])
         self.dialogues_fichiers.setCurrentIndex(max(0, self.dialogues_fichiers.findData(r['dialogues_fichiers'])))
         f.addRow(tr('reg_dialogues_fichiers'), self.dialogues_fichiers)
+        self.pixinsight = liste('reg_pixinsight_aide', [(tr('reg_pixinsight_nouvelle'), 'nouvelle'),
+                                                        (tr('reg_pixinsight_envoyer'), 'envoyer')])
+        self.pixinsight.setCurrentIndex(max(0, self.pixinsight.findData(r['pixinsight_instance'])))
+        f.addRow(tr('reg_pixinsight'), self.pixinsight)
         h = QHBoxLayout()
         self.dest = champ('reg_dest_aide', r['dossier_sortie'] or str(config.dossier_sortie_defaut() / 'OHP_DU_ECU'))
         h.addWidget(self.dest, 1)
@@ -228,6 +232,7 @@ class DialogueReglages(QDialog):
         r['dossier_sortie'] = self.dest.text().strip()
         r['format_sortie'] = self.format.currentData()
         r['dialogues_fichiers'] = self.dialogues_fichiers.currentData()
+        r['pixinsight_instance'] = self.pixinsight.currentData()
         r['telechargements_max'] = self.dl.value()
         r['conversions_max'] = self.conv.value()
         r['debit_max_mo_s'] = self.debit.value()
@@ -486,7 +491,18 @@ def afficher_aide(parent, titre: str, texte: str):
 
 
 def ouvrir_fichier(chemin: str):
-    QDesktopServices.openUrl(QUrl.fromLocalFile(chemin))
+    """Manuel, JOURNAL.txt, LOT.txt, dossier : application du système, journalisé, erreur en barre d'état."""
+    from ..core import lancement
+    from . import ouvrir
+    l = lancement.ouvrir_systeme(chemin)
+    if l is None:
+        import logging
+        ok = QDesktopServices.openUrl(QUrl.fromLocalFile(chemin))
+        logging.getLogger('coupole.lancement').info('launch [QDesktopServices] %s -> %s', chemin, ok)
+        if not ok:
+            ouvrir.statut(tr('lg_err_aucun_moyen', detail=chemin), 15000)
+        return ok
+    return ouvrir.suivre(l)
 
 
 # ======================================================================== mise à jour

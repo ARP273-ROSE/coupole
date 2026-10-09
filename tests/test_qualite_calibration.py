@@ -1,4 +1,4 @@
-"""0.1.11 — Qualité des images sur les poses personnelles de Kevin.
+"""0.1.11 — Qualité des images sur les poses personnelles d'un utilisateur.
 
 1. Lecteur XISF tolérant : N.I.N.A. écrit des `<FITSKeyword>` sans `comment` (« CD1_1 ») et l'ASIAIR n'écrit pas de
    `<Metadata>` ; la lecture stricte (nos fichiers) les refusait → 70 poses « mesurées » sans une valeur.
@@ -6,7 +6,7 @@
 3. Poses de ciel seulement : flats, darks, bias, masters, sorties de WBPP exclus (dossier, nom, puis en-tête).
 
 Les XISF « à la N.I.N.A. » et « à l'ASIAIR » sont construits ici octet par octet, comme ces logiciels les écrivent
-(en-têtes relevés sur une vraie pose N.I.N.A. 3.2 de l'ASI 6200MM et un vrai flat de l'ASIAIR, 2026).
+(en-têtes relevés sur une vraie pose N.I.N.A. 3.2 d'une caméra CMOS de 61 Mpx et un vrai flat de l'ASIAIR, 2026).
 """
 import os
 import zlib
@@ -96,7 +96,7 @@ def test_lecture_tolerante_refuse_encore_l_illisible(tmp_path):
     (tmp_path / 't.xisf').write_bytes(brut[:-100])                       # tronqué : pixels absents
     with pytest.raises(xisf.ErreurXISF, match='outside the file'):
         xisf.lire(str(tmp_path / 't.xisf'))
-    (tmp_path / 's.xisf').write_bytes(b'SIMPLE  = T' + brut[11:])          # FITS déguisé (vu chez Kevin)
+    (tmp_path / 's.xisf').write_bytes(b'SIMPLE  = T' + brut[11:])          # FITS déguisé (vu chez l'utilisateur)
     with pytest.raises(xisf.ErreurXISF, match='signature'):
         xisf.lire(str(tmp_path / 's.xisf'))
 
@@ -144,12 +144,12 @@ def test_image_couleur(tmp_path):
     ('2026-10-03 NGC 7822/Nuit_1/Flats/FLAT_2026-10-03_0001.xisf', 'dossier:Flats'),
     ('2026-10-03 NGC 7822/Nuit_1/Darks/x.xisf', 'dossier:Darks'),
     ('N/Bias/x.fits', 'dossier:Bias'), ('N/Offsets/x.fits', 'dossier:Offsets'), ('N/DarkFlats/x.fits', 'dossier:DarkFlats'),
-    ('N/Plats/x.fits', 'dossier:Plats'), ('N/Noirs/x.fits', 'dossier:Noirs'), ('FLAT FSQ/x.fits', 'dossier:FLAT FSQ'),
-    ('Dark-Bias/master 2600mc/x.xisf', 'dossier:Dark-Bias'), ('WBPP/calibrated/a_c.xisf', 'dossier:calibrated'),
+    ('N/Plats/x.fits', 'dossier:Plats'), ('N/Noirs/x.fits', 'dossier:Noirs'), ('FLAT L/x.fits', 'dossier:FLAT L'),
+    ('Dark-Bias/master OSC/x.xisf', 'dossier:Dark-Bias'), ('WBPP/calibrated/a_c.xisf', 'dossier:calibrated'),
     ('WBPP/registered/a.xisf', 'dossier:registered'), ('WBPP/cosmetized/a.xisf', 'dossier:cosmetized'),
     ('WBPP/debayered/a.xisf', 'dossier:debayered'), ('S/_platesolve_tmp/a.fits', 'dossier:_platesolve_tmp'),
     ('S/Calibration/a.fits', 'dossier:Calibration'), ('S/master/a.xisf', 'dossier:master'),
-    ('Nuit_2_master/LIGHT_Markarian_0039.xisf', ''),                       # (dossier de Kevin : des lights)
+    ('Nuit_2_master/LIGHT_Markarian_0039.xisf', ''),                       # (dossier d'un utilisateur : des lights)
     ('L/FLAT_2026_0001.xisf', 'nom'), ('L/DARK_300s.xisf', 'nom'), ('L/BIAS_0001.fits', 'nom'),
     ('L/DARKFLAT_0001.fits', 'nom'), ('L/Flat_Unknown_2026-09-13_0023.xisf', 'nom'),
     ('L/masterDark_BIN-1_300s.xisf', 'nom'), ('L/masterFlat_FILTER-Ha.xisf', 'nom'),
@@ -179,7 +179,7 @@ def test_type_image_lu_dans_l_entete_xisf(tmp_path):
 
 
 def arborescence(racine):
-    """Dossier d'acquisition N.I.N.A. + sorties WBPP + ASIAIR, comme ceux de Kevin."""
+    """Dossier d'acquisition N.I.N.A. + sorties WBPP + ASIAIR, comme ceux d'un utilisateur."""
     nuit = racine / '2026-10-03 NGC 7822' / 'Nuit_1'
     poses = {}
     for sous, noms in {'Light': ['LIGHT_NGC 7822_%04d.xisf' % k for k in range(3)],
@@ -246,7 +246,7 @@ def test_avec_calibration_tout_est_mesure(tmp_path):
 
 @sans_sep
 def test_tout_en_erreur_jamais_silencieux(tmp_path, capsys):
-    """La situation de Kevin en 0.1.10 : toutes les poses illisibles → résumé, colonne état, code de sortie 1."""
+    """La situation d'un utilisateur en 0.1.10 : toutes les poses illisibles → résumé, colonne état, code de sortie 1."""
     from coupole.cli import main
     d = tmp_path / 'L'
     d.mkdir()
@@ -284,7 +284,7 @@ def test_mesure_d_une_pose_nina_synthetique(tmp_path):
 def test_memoire_par_image_et_processus(tmp_path):
     p = xisf_tiers(str(tmp_path / 'g.xisf'), np.zeros((64, 64), '<u2'), MOTS_NINA)
     assert moteur.memoire_par_image_mo(p) == 150
-    # pose de 61 Mpx (ASI 6200) : ≈ 1,2 Go par mesure ; 8 Go libres → 3 processus au plus (moitié de la mémoire)
+    # pose de 61 Mpx : ≈ 1,2 Go par mesure ; 8 Go libres → 3 processus au plus (moitié de la mémoire)
     from coupole.core.parallele import PART_MEMOIRE
     par = int(9576 * 6388 * 18 / 2**20) + 150
     assert moteur.limiter_par_memoire(7, par, dispo_mo=8000) == int(8000 * PART_MEMOIRE // par) == 3

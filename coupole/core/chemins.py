@@ -2,7 +2,7 @@
 
 Un dossier de sortie peut se trouver sur un NAS : ``\\\\serveur\\partage\\…`` (UNC, Windows),
 ``/run/user/1000/gvfs/smb-share:server=nas,share=astro/…`` (GNOME, KDE avec kio-fuse), un montage cifs ou nfs
-(``/mnt/nas``), ``/Volumes/astro`` (macOS). Tout ce qui manipule ces chemins passe par ici.
+(``/mnt/partage``), ``/Volumes/astro`` (macOS). Tout ce qui manipule ces chemins passe par ici.
 """
 from __future__ import annotations
 

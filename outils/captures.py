@@ -7,10 +7,17 @@ DESTINATION : un dossier de sortie (INDEX_LOTS.csv et quelques images par lot) p
 """
 import os
 import sys
+import tempfile
 import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+# dossier personnel neutre (0.1.12) : aucun chemin réel (nom d'utilisateur, partage) dans les champs capturés ;
+# le manuel montre « /tmp/utilisateur/Coupole/OHP_DU_ECU »
+DOSSIER_NEUTRE = os.path.join(tempfile.gettempdir(), 'utilisateur')
+os.makedirs(DOSSIER_NEUTRE, exist_ok=True)
+os.environ['HOME'] = DOSSIER_NEUTRE
 
 
 def attendre(app, condition, delai=30.0):
@@ -39,8 +46,24 @@ def spectre_exemple(dossier):
     return str(p)
 
 
+def machine_neutre():
+    """Le module Ma machine et la fenêtre À propos montrent une machine générique, pas celle qui fait les captures
+    (nom du noyau, modèle exact du processeur et de la carte graphique)."""
+    from coupole.core import machine
+    vraie = machine.detecter
+
+    def detecter(rafraichir=False):
+        m = vraie(rafraichir)
+        m.version_systeme = '6.12'
+        m.processeur = 'x86_64 CPU'
+        m.cartes = []
+        return m
+    machine.detecter = detecter
+
+
 def main():
     langue = sys.argv[1] if len(sys.argv) > 1 else 'fr'
+    machine_neutre()
     dossier = Path(sys.argv[2] if len(sys.argv) > 2 else 'captures')
     dossier.mkdir(parents=True, exist_ok=True)
     from PyQt6.QtWidgets import QApplication

@@ -80,7 +80,7 @@ def test_manuel_accessible(capsys, langue):
 
 
 def test_guide_astap_liens_et_extraction_sure():
-    """Retour de Kevin (Manjaro) : le lien D80 en .zip était mort (404) ; extraction du .deb sans toucher à /."""
+    """Retour d'utilisateur (Manjaro) : le lien D80 en .zip était mort (404) ; extraction du .deb sans toucher à /."""
     from coupole.core import astap
     from coupole import textes
     urls = {u for *_x, u in astap.urls_conseillees()}

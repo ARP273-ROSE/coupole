@@ -2,15 +2,51 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.1.12 — 9 octobre 2026
+
+**« Ouvrir avec → PixInsight » ouvre vraiment l'image, et plus aucun lancement n'est silencieux.** Retour
+d'utilisateur (Manjaro/KDE, 0.1.11) : rien ne se passait, et `coupole.log` ne disait rien.
+
+- **Journal de chaque lancement** : *Ouvrir*, *Ouvrir avec*, *Ouvrir l'emplacement*, dossier de la cible ou du lot,
+  manuel, `JOURNAL.txt`, `LOT.txt` — méthode, programme, arguments, numéro de processus dans `coupole.log` ; si le
+  programme s'arrête dans les 3 premières secondes, son code de retour et le début de ce qu'il a écrit (sortie et
+  erreurs capturées). Le résultat s'affiche dans la barre d'état (« Ouverture dans Siril… », programme introuvable,
+  arrêt immédiat avec son message). Toujours une liste d'arguments, jamais d'interpréteur de commandes (garde-fou :
+  test qui refuse tout `shell=True`).
+- **PixInsight (Linux)** : lancé par son script `PixInsight.sh` (le binaire seul ne démarre pas, d'après l'éditeur).
+  Ce script reconstruit ses arguments par un `eval` et n'entoure de guillemets que ceux qui contiennent une espace :
+  un chemin avec `$`, `` ` ``, `'`, `(`, `*`… serait interprété → il reçoit alors un lien symbolique temporaire au
+  nom sans caractère spécial. Windows : `PixInsight.exe` ; macOS : `open -a` (nouvelle instance : `open -n -a …
+  --args -n`).
+- **PixInsight déjà ouvert** : sans option, il confie l'image à l'instance ouverte et sort (« Yielded execution to
+  running application instance #1 ») ; occupée par un script, elle n'ouvre rien. Nouveau réglage *Préférences >
+  PixInsight déjà ouvert* : nouvelle fenêtre (`-n`, **par défaut**) ou envoyer à la fenêtre ouverte (essai). Quand
+  une instance tourne, le menu propose les deux ; si PixInsight cède la main, la barre d'état le dit.
+- **Double-clic** : si l'application associée a un `.desktop` sans `%F` (cas d'un `pixinsight.desktop` écrit à la
+  main : `xdg-open` lançait PixInsight sans l'image), Coupole le détecte (`xdg-mime`) et lance le logiciel
+  directement ; l'aide (F1) et le manuel expliquent comment corriger ce `.desktop` (Coupole n'y touche pas).
+- **Siril en flatpak** : `flatpak run --file-forwarding … @@ fichier @@` ; si le bac à sable ne voit pas le dossier
+  (réglage `flatpak override`), message avec la commande à taper. **N.I.N.A.** grisé dans *Ouvrir avec* : il
+  n'ouvre pas une image passée en argument (ses options, vérifiées dans son code : profil, séquence, débogage).
+  ASTAP et Aladin : programme direct, chemin tel quel.
+- Les programmes lancés n'héritent plus du thème Qt choisi par Coupole pour ses propres dialogues.
+- **Dépôt public : aucune donnée personnelle.** Manuels, historique, audits, code, tests et outils relus : noms,
+  chemins d'une infrastructure personnelle, machines et matériel remplacés par des formulations neutres (« retour
+  d'utilisateur », `/mnt/partage/OHP_DU_ECU`…) ; captures refaites avec un dossier personnel et une machine
+  génériques ; `tests/test_confidentialite.py` parcourt tous les fichiers du dépôt (texte, texte des PDF, PNG, .gz,
+  chaînes des binaires) et échoue sur ces motifs. Le dossier du traitement de référence des tests se donne par
+  `COUPOLE_REFERENCE`.
+- README : badges (Python, licence, systèmes, version, tests, langues).
+
 ## 0.1.11 — 9 octobre 2026
 
 **Une copie faite avant Coupole s'ouvre enfin, les menus se cliquent, « Ouvrir un fichier » de Spectres et séries
 s'ouvre sous KDE, et le module Qualité mesure vraiment les poses de N.I.N.A. et de l'ASIAIR — seulement les poses de
-ciel.** Retours de Kevin (Linux/KDE, 0.1.10, dossier de sortie `/mnt/nas/Astronomie/OHP_DU_ECU`).
+ciel.** Retours d'utilisateur (Linux/KDE, 0.1.10, dossier de sortie `/mnt/partage/OHP_DU_ECU`).
 
-- **Objets possédés (4/4, pastille verte) mais rien à ouvrir.** La copie de Kevin a été produite par l'ancien script
+- **Objets possédés (4/4, pastille verte) mais rien à ouvrir.** La copie d'un utilisateur a été produite par l'ancien script
   `ohp_xisf.py`, dans un conteneur : sa base d'état ne note que le chemin absolu d'alors
-  (« /workspace/Workspace/OHP_DU_ECU/… »), introuvable sur le poste. Coupole retrouve maintenant chaque fichier dans
+  (« /srv/ancien/OHP_DU_ECU/… »), introuvable sur le poste. Coupole retrouve maintenant chaque fichier dans
   le dossier de sortie courant, dans cet ordre : chemin relatif noté dans la base (`info.chemin`, nouveau), `final`
   s'il est dans le dossier, `_traitement/journal.csv` (adresse puis fichier d'origine ; lu une fois, en cache, relu
   s'il change), ancienne racine ou dossier de type, puis nom attendu dans le dossier du lot (calcul du rangement,
@@ -37,7 +73,7 @@ ciel.** Retours de Kevin (Linux/KDE, 0.1.10, dossier de sortie `/mnt/nas/Astrono
   aucune fenêtre ; corrigé : fenêtre « Ouvrir un fichier — Portal »). Tous les dialogues passent par un filtre
   normalisé (nom, motifs sans doublon), une fenêtre parente visible, un dossier de départ qui existe ; chaque
   ouverture, son résultat ou son exception sont notés dans `coupole.log`. Test de chacun des 13 boutons de dialogue.
-- **Qualité : lecteur XISF tolérant.** Les 70 poses N.I.N.A. de Kevin (ASI 6200MM, 61 Mpx, zlib+sh) étaient
+- **Qualité : lecteur XISF tolérant.** Les 70 poses N.I.N.A. d'un utilisateur (caméra de 61 Mpx, zlib+sh) étaient
   refusées (« incomplete FITSKeyword » : N.I.N.A. écrit `CD1_1` sans commentaire) et le résultat restait vide sans
   rien dire. La lecture des fichiers des autres logiciels accepte mots-clés sans commentaire ni valeur, `Metadata`
   absente (ASIAIR), propriétés inconnues, éléments en plus, images couleur ; seul ce qui empêche de lire les pixels
@@ -54,7 +90,7 @@ ciel.** Retours de Kevin (Linux/KDE, 0.1.10, dossier de sortie `/mnt/nas/Astrono
 
 ## 0.1.10 — 9 octobre 2026
 
-**Le traitement fonctionne vers un dossier sur un partage réseau.** Le dossier de sortie de Kevin est sur le NAS
+**Le traitement fonctionne vers un dossier sur un partage réseau.** Le dossier de sortie d'un utilisateur est sur le NAS
 (partage SMB monté par cifs sous Manjaro) : télécharger les nouveautés, *Tout télécharger* ou réorganiser vers ce
 dossier échouait.
 
@@ -80,7 +116,7 @@ dossier échouait.
 ## 0.1.9 — 9 octobre 2026
 
 **Le module Qualité démarre tout de suite sur un partage réseau, les logiciels d'astronomie ouvrent vraiment nos
-fichiers, et PixInsight trouve focale et pixel.** Retours de Kevin (Manjaro, 0.1.8, dossier sur un partage SMB).
+fichiers, et PixInsight trouve focale et pixel.** Retours d'utilisateur (Manjaro, 0.1.8, dossier sur un partage SMB).
 
 - **« Inventaire du dossier… » interminable sur un partage SMB : cause trouvée et mesurée.** Sur un vrai partage
   Samba monté par le client cifs du noyau, SQLite ne peut pas écrire à travers les verrous de plage SMB (« database

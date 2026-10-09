@@ -41,7 +41,7 @@ le QUALITE.csv de son lot est réécrit au plus toutes les 5 s : relancer ne ref
 **Cache** : ``<racine>/_traitement/qualite.sqlite`` sur un disque local ; **jamais sur un partage réseau** —
 SQLite y écrit à travers les verrous de plage SMB, que le client cifs de Linux transmet au serveur : « database is
 locked » au bout du délai d'attente (30 s par ouverture en 0.1.8, trois ouvertures avant la première mesure : 90 s
-d'« Inventaire du dossier… » sur le vrai partage de Kevin, fichier de 0 octet).  Sur un partage, le cache va dans
+d'« Inventaire du dossier… » sur le vrai partage d'un utilisateur, fichier de 0 octet).  Sur un partage, le cache va dans
 le dossier de cache de l'utilisateur (un fichier par dossier analysé) ; un ancien cache du partage est seulement lu.
 """
 from __future__ import annotations
@@ -256,7 +256,7 @@ def inventaire_base(racine, base: str) -> dict | None:
     """{dossier: [images triées]} des images converties (statut « ok ») de la base d'état de la sortie `base`,
     gardées sous `racine` ; None si la base est illisible ou ne donne rien sous `racine`.
 
-    Les chemins de la base sont ceux de la machine qui a traité (``/workspace/…``, ``C:\\…``) : ils sont
+    Les chemins de la base sont ceux de la machine qui a traité (``/srv/…``, ``C:\\…``) : ils sont
     rapportés à `base` d'après la racine d'alors (dossier qui contenait ``_traitement``, lue dans le chemin
     ``staging`` ; à défaut, le plus long suffixe commun aux chemins)."""
     from ...core.chemins import uri_sqlite_lecture_seule
@@ -764,7 +764,7 @@ class Mesureur:
                     envoyer_debut()
                 # 3) mesures
                 if prio and pool is None:
-                    # images de 61 Mpx (ASI 6200) : ≈ 1 Go par mesure → moins de processus que de cœurs
+                    # images de 61 Mpx : ≈ 1 Go par mesure → moins de processus que de cœurs
                     n_proc = limiter_par_memoire(n_proc, memoire_par_image_mo(prio[0][2]))
                     fenetre = 2 * n_proc
                     ctx = mp.get_context('spawn')

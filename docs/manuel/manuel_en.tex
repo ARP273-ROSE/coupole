@@ -133,7 +133,7 @@ Ctrl+Shift+A & ASTAP assistant\\ Ctrl+Shift+D & dark / light theme\\ Ctrl+R & OH
 
 \capture{img/reglages_en.png}{0.62}
 Preferences (Ctrl+,): interface language; language of folder names, object names and FITS comments;
-appearance (section~\ref{sec:apparence}); file dialogs (section~\ref{sec:dialogues}); output folder; format; parallelism; maximum rate; economy mode; update check; check of the bank for new images at startup and its maximum frequency (section~\ref{sec:nouveautes}). The \emph{Sources} tab lists the service
+appearance (section~\ref{sec:apparence}); file dialogs (section~\ref{sec:dialogues}); PixInsight already open (section~\ref{sec:ouvrir}); output folder; format; parallelism; maximum rate; economy mode; update check; check of the bank for new images at startup and its maximum frequency (section~\ref{sec:nouveautes}). The \emph{Sources} tab lists the service
 addresses (chapter~\ref{chap:evolutif}). An unreadable settings file is set aside (suffix \texttt{.corrompu-…}) and
 the defaults take over: the application always starts.
 
@@ -159,7 +159,7 @@ change with it.
 \item \emph{Linux}: first open the share in Dolphin or Files (\texttt{smb://server/share}); it shows up under
   \texttt{/run/user/<uid>/gvfs/smb-share:server=server,share=share} (GNOME; KDE with the \texttt{kio-fuse} package,
   without which an unmounted \texttt{smb://} share cannot be picked by an application), or mount the share with cifs
-  or nfs (\texttt{/mnt/nas}, advised for large volumes; default options, no need for \texttt{nobrl}: section~\ref{sec:partage});
+  or nfs (\texttt{/mnt/partage}, advised for large volumes; default options, no need for \texttt{nobrl}: section~\ref{sec:partage});
 \item \emph{macOS}: Finder > Go > Connect to Server (Cmd+K), \texttt{smb://server/share}, then pick the volume under
   \texttt{/Volumes};
 \item \emph{Windows}: network drive (\texttt{Z:}) or UNC path \texttt{\textbackslash\textbackslash
@@ -462,8 +462,51 @@ read this file according to the checked table of section~\ref{sec:compat}; the o
 status bar says so. A disabled entry carries its reason in its label (« Open with (nothing downloaded) ») and the
 full reason shows in the status bar on hover: no more tooltip over the menu (on KDE it grabbed the mouse).
 
+\paragraph{How each program is started (0.1.12).} Always the detected program, with a \emph{list} of arguments
+(never a shell); each launch is recorded in \texttt{coupole.log} (method, program, arguments, process id; if the
+program stops within the first 3~seconds: exit code and the beginning of its output) and its result shows in the
+status bar: « Opening in Siril… », or the error (program not found, immediate stop with its message). Never silent.
+\begin{itemize}
+  \item \textbf{PixInsight} — Linux: the \texttt{bin/PixInsight.sh} script (the publisher states that the binary
+  alone does not start on Linux). This script rebuilds its arguments through an \texttt{eval} that only quotes those
+  containing a space: a path with \texttt{\$}, \texttt{`}, \texttt{'}, \texttt{"}, \texttt{\textbackslash},
+  \texttt{(}, \texttt{*}… would be interpreted; Coupole then passes a \emph{temporary symbolic link} with a safe
+  name (to save: « Save As » into the original folder). Windows: \texttt{bin\textbackslash PixInsight.exe}. macOS:
+  \texttt{open -a PixInsight.app \emph{file}}, or \texttt{open -n -a PixInsight.app --args -n \emph{file}} for a new
+  instance.
+  \item \textbf{PixInsight already open.} Without options, PixInsight hands the file to the running instance
+  (« Yielded execution to running application instance \#1 », code~0); if that instance is busy (script running),
+  \emph{nothing opens}. Hence the setting \emph{Preferences > PixInsight already open}: « Open a new window (-n) »
+  (default, safe) or « Send to the open window (try) ». When an instance is running (process detected), the menu
+  offers both: « PixInsight (new window) » and « PixInsight (open window, try) », the setting's one first; if the
+  output says PixInsight yielded, the status bar says so.
+  \item \textbf{Siril}: \texttt{siril \emph{file}}; as a flatpak: \texttt{flatpak run --file-forwarding
+  org.free\_astro.siril @@ \emph{file} @@} (the document portal only forwards the file if the sandbox cannot see it).
+  The Flathub package sees the whole system (\texttt{--filesystem=host}) except \texttt{/tmp}, \texttt{/run}
+  (apart from \texttt{/run/media}), \texttt{/usr}…; if a \texttt{flatpak override} removes a folder, the status bar
+  says so and gives the command: \cmd{flatpak override --user --filesystem=/mnt/partage org.free\_astro.siril}.
+  \item \textbf{ASTAP, Aladin}: \texttt{\emph{program} \emph{file}}.
+  \item \textbf{N.I.N.A.} does not open an image given as an argument (its only options: profile, sequence, debug,
+  graphics acceleration): it stays greyed in \emph{Open with}, with the reason; open the image from within N.I.N.A.
+\end{itemize}
+
+\paragraph{Double-click opens PixInsight without the image (Linux).} \texttt{xdg-open} starts the application
+associated with the file type through its \texttt{.desktop} file. If its \texttt{Exec=} line has no \texttt{\%F}
+code (\texttt{\%f}, \texttt{\%u}, \texttt{\%U}), the application starts \emph{without} the file — the case of a
+hand-written \texttt{pixinsight.desktop}. Coupole detects it (\texttt{xdg-mime query filetype}, then
+\texttt{xdg-mime query default}, reading the \texttt{.desktop}) and then starts the program directly (status bar:
+« PixInsight started directly… »); another application in that case is not started, a message says why. To fix the
+whole desktop (Coupole does not change this file), in
+\texttt{\textasciitilde/.local/share/applications/pixinsight.desktop}:
+\begin{verbatim}
+Exec=/opt/PixInsight/bin/PixInsight.sh %F
+MimeType=image/x-xisf;image/fits;
+\end{verbatim}
+then \cmd{update-desktop-database \textasciitilde/.local/share/applications} and, if needed,
+\cmd{xdg-mime default pixinsight.desktop image/x-xisf}.
+
 \paragraph{Copy from an older processing run.} An output made before Coupole (script \texttt{ohp\_xisf.py}) or on
-another computer records the absolute path of the time in its state database (« /workspace/Workspace/OHP\_DU\_ECU/… »).
+another computer records the absolute path of the time in its state database (« /srv/ancien/OHP\_DU\_ECU/… »).
 Coupole finds each file in the current output folder, in this order: relative path recorded in the database,
 \texttt{\_traitement/journal.csv} (\texttt{destination} column), former root or type folder, then the expected name
 in the stack folder; paths found through the journal are recorded once and for all in the database (in the
@@ -653,7 +696,7 @@ The module needs the SEP library (Source Extractor in Python, LGPL, about 1 MB);
 Report per stack: \texttt{QUALITE.csv} and \texttt{QUALITE.txt}.
 
 \paragraph{Sky frames only.} By default only sky frames (lights) are measured. Left out without being opened:
-Flat(s), Dark(s), Bias, Offset(s), DarkFlat(s), Calibration, Master(s) folders (« FLAT FSQ », « Dark-Bias »
+Flat(s), Dark(s), Bias, Offset(s), DarkFlat(s), Calibration, Master(s) folders (« FLAT L », « Dark-Bias »
 included), cosmetized, calibrated, registered, debayered, \texttt{\_platesolve…} and their French names (Plats,
 Noirs, Biais); \texttt{FLAT\_}, \texttt{DARK\_}, \texttt{BIAS\_}, \texttt{DARKFLAT\_} files (N.I.N.A., ASIAIR),
 masters (\texttt{masterDark}, \texttt{masterFlat}, \texttt{masterLight}, \texttt{superbias}) and WBPP outputs
@@ -669,7 +712,7 @@ measured.
 is refused; our own files are still checked strictly. A file that cannot be measured shows in the table,
 \emph{status} column, with its reason (« error: XISF format not read (…) »); the summary counts the errors and
 \texttt{coupole.log} keeps the stack trace; the command line exits with code 1 when no image could be measured.
-N.I.N.A. frame from the ASI~6200MM (9,576 × 6,388, 61~Mpx): 4.2~s, 1,170~MB peak (float32 computation), FWHM 3.5″
+N.I.N.A. frame from a CMOS camera (9,576 × 6,388, 61~Mpx): 4.2~s, 1,170~MB peak (float32 computation), FWHM 3.5″
 at 1.695″/px; the number of processes is reduced from the image size (half of the free memory) and the number of
 fitted stars grows with the sensor (120 to 400).
 
@@ -683,7 +726,7 @@ reopening resumes. Above 200 images, Coupole offers a \textbf{sample} of
 5 images per stack (spread in time: first, last, middle…, adjustable in the tab and with \cmd{--sample N}; measured
 first, while you choose), enough to judge a stack, or \emph{Measure everything} with the duration estimated from the
 images already measured; progress shows the
-time left and the rate (images/min). On the author's NAS (Ryzen 5 8500G): 1.21 → 0.33~s per T120 image (vectorised
+time left and the rate (images/min). On a 6-core processor: 1.21 → 0.33~s per T120 image (vectorised
 Moffat model, analytic derivatives, 120 stars per image), i.e. the whole bank in about ten minutes on 5 processes.
 
 \paragraph{Listing as a stream.} Measuring starts with the first stack found, while the listing goes on (« Listing
@@ -835,7 +878,7 @@ and changing the theme only recomputes colours (see \texttt{docs/AUDIT2\_2026-10
 \begin{center}\small
 \begin{tabular}{@{}lr@{}}
 \toprule
-\textbf{Measurement (Ryzen 5 8500G, 6 cores, NVMe; Debian container)} & \textbf{Value}\\
+\textbf{Measurement (6-core processor, NVMe; Debian container)} & \textbf{Value}\\
 \midrule
 \texttt{coupole --version} & 0.1–0.2 s\\
 window shown (astropy, scipy, SEP not loaded) & 0.42 s (1.5 s before the audit)\\

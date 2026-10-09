@@ -93,7 +93,7 @@ def panneau(app_qt, monkeypatch):
 
 def _possession(p, app_qt, dest, statuts):
     """Possession simulée appliquée comme si elle revenait du fil de fond (dossier absolu, comme le panneau le lit :
-    sous Windows, « /mnt/nas » devient « D:\\mnt\\nas »)."""
+    sous Windows, « /mnt/partage » devient « D:\\mnt\\partage »)."""
     p.dest.setText(dest)
     poss = Possession(p._dest_courante(), statuts)
     p._possession_prete((poss, [], poss.compte_objets(p.inv.images), p.inv.images))
@@ -193,7 +193,7 @@ def test_message_quand_aucun_objet_n_est_choisi(panneau, app_qt):
 def test_tout_deja_telecharge(panneau, app_qt):
     """Toute la banque possédée + « À télécharger seulement » : les deux listes vides le disent, le résumé aussi."""
     p = panneau
-    dest = '/mnt/nas/Astronomie/OHP_DU_ECU'
+    dest = '/mnt/partage/OHP_DU_ECU'
     statuts = {ident(x): 'ok' for x in p.inv.images if not x['doublon']}
     for x in [x for x in p.inv.images if not x['doublon']][:5]:
         statuts[ident(x)] = 'doublon'
