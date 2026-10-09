@@ -2,6 +2,13 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.1.2 — 9 octobre 2026
+
+- **Paquet `.deb` : dépendance `ca-certificates` ajoutée.** L'interpréteur embarqué (OpenSSL statique) lit les autorités de
+  certification dans `/etc/ssl/certs` : sur un système minimal sans ce paquet, toute connexion HTTPS échouait en silence
+  (recherche de mise à jour, SIMBAD, JPL) — trouvé en essayant `coupole maj` dans un conteneur Ubuntu nu. L'essai du
+  paquet dans `release.yml` vérifie désormais une connexion HTTPS depuis l'interpréteur embarqué.
+
 ## 0.1.1 — 9 octobre 2026
 
 - **Paquet Debian/Ubuntu** (`coupole_0.1.1_amd64.deb`, `_arm64.deb`, et noms stables `coupole-linux-amd64.deb` /

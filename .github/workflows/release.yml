@@ -398,6 +398,8 @@ jobs:
             apt-get update -qq
             apt-get install -y -qq --no-install-recommends /src/coupole-linux-'"$ARCH"'.deb >/dev/null
             coupole --version
+            # HTTPS depuis l'interpreteur embarque (mise a jour, SIMBAD) : exige ca-certificates dans Depends
+            /opt/coupole/python/bin/python3 -c "import urllib.request; urllib.request.urlopen(\"https://api.github.com\", timeout=30); print(\"TLS OK\")"
             LANG=fr_FR.UTF-8 coupole --help | grep -q commandes
             LANG=en_US.UTF-8 coupole --help | grep -q commands
             coupole ohp inventaire --json | head -c 200 >/dev/null
