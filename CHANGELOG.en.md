@@ -2,6 +2,11 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.1.3 — 9 October 2026
+
+- Build: the v0.1.2 release run failed on an apostrophe that slipped into a comment of the `.deb` test
+  (`release.yml`); no change to the application. The 0.1.3 assets are those expected for 0.1.2.
+
 ## 0.1.2 — 9 October 2026
 
 - **`.deb` package: `ca-certificates` dependency added.** The bundled interpreter (static OpenSSL) reads the certificate
