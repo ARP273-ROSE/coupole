@@ -10,7 +10,8 @@ readme = "README.md"
 license = {text = "GPL-3.0-or-later"}
 authors = [{name = "ARP273-ROSE"}]
 requires-python = ">=3.10"
-keywords = ["astronomy", "FITS", "XISF", "PixInsight", "Siril", "OHP", "education", "TAP", "ObsCore"]
+keywords = ["astronomy", "FITS", "XISF", "PixInsight", "Siril", "OHP", "education", "TAP", "ObsCore", "MAST", "JWST",
+            "Hubble", "ESO", "PDS"]
 classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Programming Language :: Python :: 3",
@@ -34,8 +35,9 @@ dependencies = [
 [project.optional-dependencies]
 validation = ["lxml>=4.9", "xisf>=0.9"]
 qualite = ["sep>=1.4"]
+alignement = ["reproject>=0.13"]
 gpu = ["cupy-cuda12x"]
-test = ["pytest>=7", "lxml>=4.9", "xisf>=0.9", "psutil>=5.9", "pillow>=10", "sep>=1.4"]
+test = ["pytest>=7", "lxml>=4.9", "xisf>=0.9", "psutil>=5.9", "pillow>=10", "sep>=1.4", "reproject>=0.13"]
 
 [project.urls]
 Homepage = "https://github.com/ARP273-ROSE/coupole"

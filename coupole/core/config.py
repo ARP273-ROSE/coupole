@@ -87,6 +87,11 @@ DEFAUTS = {
     'ohp_garder_fits': False,
     'ohp_mode_astap': 'tous',          # tous | suspectes | jamais
     'ohp_verifier_qualite': False,
+    # module Archives (0.2.0)
+    'archives_dossier': '',            # vide : le dossier de sortie (Préférences), sinon ~/Coupole
+    'archives_seuil_go': 2.0,          # au-delà, confirmation avant de télécharger
+    'archives_debit_mo_s': 8.0,        # plafond de débit vers les archives (seau à jetons partagé)
+    'archives_format': 'xisf',         # image préparée : xisf | fits
 }
 
 _verrou = threading.Lock()

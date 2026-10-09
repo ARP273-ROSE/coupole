@@ -112,7 +112,7 @@ def test_toutes_les_ouvertures_sont_couvertes():
         if f.name == 'fichiers.py':
             continue
         n += len(re.findall(r'fichiers\.choisir_(?:dossier|fichier|enregistrement)\(', f.read_text(encoding='utf-8')))
-    assert n == 13
+    assert n == 15
 
 
 def _montrer(w, app):
@@ -166,6 +166,20 @@ def test_qualite(app_qt, faux):
         p.choisir()
         verifier_ouverture(faux)
     finally:
+        p.close()
+
+
+def test_archives(app_qt, faux):
+    from coupole.modules.archives.gui import Panneau
+    p = _montrer(Panneau(), app_qt)
+    try:
+        p.choisir_dossier()
+        verifier_ouverture(faux, 1)
+        p.ajouter_fichiers()
+        d = verifier_ouverture(faux, 2)
+        assert '*.xisf' in fichiers.filtres_portail(d.filtre)[0][1]
+    finally:
+        p.arreter()
         p.close()
 
 
