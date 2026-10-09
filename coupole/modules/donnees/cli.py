@@ -51,7 +51,7 @@ def colonnes(d, vitesse=False, f0_mhz=None):
     if vitesse and d.meta.get('axe') == 'freq':
         f0 = f0_mhz * 1e6 if f0_mhz else (d.meta.get('restfreq_hz') or donnees.HI_HZ)
         cols.append(donnees.vitesse_radio(donnees.en_hz(x, d.unite_x or 'Hz'), f0))
-        tete.append('v_radio [km/s] (f0=%.9g MHz)' % (f0 / 1e6))
+        tete.append('v_radio [km s^-1] (f0=%.9g MHz)' % (f0 / 1e6))
     return tete, cols
 
 

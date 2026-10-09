@@ -143,3 +143,23 @@ def test_aucune_fuite_de_langue():
             fuites.append(('fr', k, m[:3]))
     assert not fuites, fuites
 
+
+
+def test_unites_composees_non_ambigues():
+    """Retour de Kevin : « km/s/Mpc » est ambigu.  Aucune unité de la forme x/y/z (deux barres) dans les textes
+    FR/EN ; H₀ s'écrit km s⁻¹ Mpc⁻¹ ; sur une console cp1252, repli ASCII « km s^-1 Mpc^-1 »."""
+    import re
+    from coupole import cli
+    from coupole.core import i18n
+    unite = r'(?:km|m|s|Mpc|kpc|pc|Gpc|arcsec|″|px|ADU|Mo|MB|Go|GB|mag|Gyr|yr|sr|h|min|deg)'
+    motif = re.compile(r'(?<![\w/.])%s/%s/%s(?![\w/])' % (unite, unite, unite))
+    fautes = [(cle, L) for cle, v in i18n.toutes_les_cles().items() for L in ('fr', 'en')
+              if motif.search(v.get(L) or '')]
+    assert not fautes, fautes
+    from coupole.core.i18n import tr
+    assert 'km s⁻¹ Mpc⁻¹' in tr('cosmo_h0', 'fr') and 'km s⁻¹ Mpc⁻¹' in tr('cosmo_h0', 'en')
+    cli.console_tolerante()
+    assert tr('cosmo_err_h0', 'fr', mini=0, maxi=300).encode('cp1252', 'coupole_ascii').decode('cp1252') == \
+        'H0 doit rester entre 0 et 300 km s^-1 Mpc^-1.'
+    from coupole.modules.cosmo import formats
+    assert formats.unite_csv('kms_mpc') == 'km s^-1 Mpc^-1' and formats.unite_csv('kms') == 'km s^-1'

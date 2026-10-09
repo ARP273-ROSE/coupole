@@ -175,3 +175,78 @@ def test_cosmologie_sans_defilement_horizontal_a_1400(app_qt):
     assert p.splitter.orientation() == Qt.Orientation.Horizontal
     f.close()
     outils.attendre_taches()
+
+
+def _cellules_elidees(p):
+    """Cellules visibles du tableau de la Cosmologie dont le texte ne tient pas dans la colonne."""
+    from PyQt6.QtCore import Qt
+    v, m = p.v_res, p.m_res
+    fm = v.fontMetrics()
+    out = []
+    for r in range(m.rowCount()):
+        for c in range(m.columnCount()):
+            if v.isColumnHidden(c):
+                continue
+            t = str(m.data(m.index(r, c), Qt.ItemDataRole.DisplayRole) or '')
+            if t and v.columnWidth(c) < fm.horizontalAdvance(t) + 6:      # marges du style Fusion : 2 × 3 px
+                out.append((r, c, t, v.columnWidth(c), fm.horizontalAdvance(t)))
+    return out
+
+
+@pytest.mark.parametrize('largeur', [1366, 2000])
+def test_cosmologie_colonnes_au_contenu_et_dispositions(app_qt, largeur):
+    """Retour de Kevin (écran de 2 000 px) : côte à côte, la colonne « valeur » était tronquée et « ± 1σ »
+    s'étirait ; empilé, 7 lignes seulement et des courbes écrasées.  Valeurs jamais élidées, tableau à la largeur
+    de son contenu (côte à côte) ou à toutes ses lignes (empilé), courbes ≥ 300 px ; choix du menu gardé."""
+    from coupole.core import config
+    config.reglages()['maj_auto'] = False
+    config.reglages()['rapports_autorises'] = False
+    from coupole.gui.fenetre import FenetrePrincipale
+    from coupole.modules.cosmo import gui as G
+    from PyQt6.QtCore import Qt
+    f = FenetrePrincipale()
+    f.resize(largeur, 1000)
+    f.show()
+    p = f.ouvrir_module('cosmo')
+    p.shoes.setChecked(True)
+    t0 = time.monotonic()
+    while (p.resultat is None or 'shoes' not in p.resultat) and time.monotonic() - t0 < 60:
+        _tourner(app_qt, 0.05)
+    _tourner(app_qt, 0.3)
+    for mode in ('cote', 'empile', 'auto'):
+        f.act_disposition_cosmo[mode].trigger()
+        _tourner(app_qt, 0.3)
+        assert p.disposition_choisie == mode and p.l_disposition.currentData() == mode
+        assert not _cellules_elidees(p), (mode, _cellules_elidees(p)[:3])
+        if p.splitter.orientation() == Qt.Orientation.Horizontal:
+            if p.splitter.width() >= p.largeur_tableau() + 320:          # la place suffit : tableau au contenu
+                assert p.largeur_tableau() - 4 <= p.splitter.sizes()[0] <= p.largeur_tableau() + 40
+                assert p.v_res.horizontalScrollBar().maximum() == 0
+            assert p.splitter.sizes()[1] >= 300                            # le reste aux courbes
+        else:
+            assert p.trace.height() >= G.COURBES_MIN - 2
+            if p.disposition['disponible'] >= p.hauteur_tableau() + G.COURBES_MIN:
+                assert p.v_res.verticalScrollBar().maximum() == 0          # toutes les lignes visibles
+    assert p.splitter.orientation() == (Qt.Orientation.Horizontal if largeur >= 1550 else Qt.Orientation.Vertical)
+    f.close()
+    outils.attendre_taches()
+
+
+def test_cosmologie_hysteresis(app_qt):
+    from coupole.modules.cosmo import gui as G
+    from PyQt6.QtCore import Qt
+    H, V = Qt.Orientation.Horizontal, Qt.Orientation.Vertical
+
+    class Faux:
+        disposition_choisie = 'auto'
+        _orientation_auto = None
+        l = 0
+
+        def width(self):
+            return self.l
+    p = Faux()
+    suite = []
+    for l in (1600, 1500, 1460, 1440, 1500, 1540, 1560, 1300, 1520):
+        p.l = l
+        suite.append(G.Panneau.orientation_voulue(p))
+    assert suite == [H, H, H, V, V, V, H, V, V]

@@ -270,12 +270,38 @@ def _gui():
     return gui_main()
 
 
+_EXPOSANTS = str.maketrans('⁰¹²³⁴⁵⁶⁷⁸⁹', '0123456789')
+_ESPACES_FINES = {'\u202f': ' ', '\u2009': ' ', '\u00a0': ' ', **{chr(0x2080 + k): str(k) for k in range(10)}}
+
+
+def _repli_ascii(err):
+    """Gestionnaire d'erreur d'encodage : unités en notation ASCII lisible (« km s⁻¹ Mpc⁻¹ » → « km s^-1 Mpc^-1 »,
+    « arcsec⁻² » → « arcsec^-2 », « Gpc³ » → « Gpc^3 ») sur une console qui ne sait pas les afficher ; le reste
+    devient « ? » comme avec errors='replace'."""
+    texte, i, fin = err.object, err.start, err.end
+    c = texte[i]
+    if c in _ESPACES_FINES:                         # espaces fines, indices (H₀ → H0)
+        return _ESPACES_FINES[c], i + 1
+    if c == '⁻' or c in '⁰¹²³⁴⁵⁶⁷⁸⁹':
+        j = i + 1 if c == '⁻' else i
+        while j < len(texte) and texte[j] in '⁰¹²³⁴⁵⁶⁷⁸⁹':
+            j += 1
+        return '^' + ('-' if c == '⁻' else '') + texte[i:j].lstrip('⁻').translate(_EXPOSANTS), j
+    return '?' * (fin - i), fin
+
+
 def console_tolerante():
-    """Console qui ne sait pas tout afficher (Windows cp1252, LANG=C) : remplacer au lieu de planter."""
+    """Console qui ne sait pas tout afficher (Windows cp1252, LANG=C) : remplacer au lieu de planter, et écrire
+    les unités à exposants en ASCII (« km s^-1 Mpc^-1 »)."""
+    import codecs
+    try:
+        codecs.lookup_error('coupole_ascii')
+    except LookupError:
+        codecs.register_error('coupole_ascii', _repli_ascii)
     for flux in (sys.stdout, sys.stderr):
         try:
             if flux is not None and hasattr(flux, 'reconfigure') and (flux.encoding or '').lower() not in ('utf-8', 'utf8'):
-                flux.reconfigure(errors='replace')
+                flux.reconfigure(errors='coupole_ascii')
         except (AttributeError, ValueError, OSError):
             pass
 

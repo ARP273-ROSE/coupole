@@ -64,7 +64,7 @@ TEXTES = {
     'fiche_distance': {'fr': 'Distance mesurée', 'en': 'Measured distance'},
     'fiche_methode': {'fr': 'méthode :', 'en': 'method:'},
     'fiche_vitesse': {'fr': 'Vitesse radiale / redshift', 'en': 'Radial velocity / redshift'},
-    'fiche_vitesse_val': {'fr': 'v = {v} km/s, z = {z}', 'en': 'v = {v} km/s, z = {z}'},
+    'fiche_vitesse_val': {'fr': 'v = {v} km s⁻¹, z = {z}', 'en': 'v = {v} km s⁻¹, z = {z}'},
     'fiche_qualite': {'fr': 'qualité', 'en': 'quality'},
     'fiche_taille': {'fr': 'Taille angulaire', 'en': 'Angular size'},
     'fiche_taille_val': {'fr': "{x}′ × {y}′ (angle de position {a}°)", 'en': "{x}′ × {y}′ (position angle {a}°)"},

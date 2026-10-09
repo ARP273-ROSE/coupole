@@ -4,7 +4,7 @@ Ne sont proposées que les mesures qui retrouvent les valeurs injectées sur
 images synthétiques (tests/test_qualite.py ; précision dans le manuel) :
 
   fond         médiane robuste du fond (SEP, maillage 64 px), en ADU et ADU/s.
-               Pas de conversion en mag/arcsec² : la banque ne donne pas de point zéro fiable.
+               Pas de conversion en mag arcsec⁻² : la banque ne donne pas de point zéro fiable.
   bruit        écart-type robuste du fond (SEP, globalrms), ADU.
   rsn          rapport signal sur bruit médian des étoiles mesurées, SEULEMENT si le gain
                (EGAIN/GAIN, e-/ADU) est dans l'en-tête : sans gain, le bruit de photons de l'étoile est

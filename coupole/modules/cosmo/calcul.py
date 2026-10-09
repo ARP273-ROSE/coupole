@@ -23,9 +23,9 @@ import math
 
 import numpy as np
 
-H0_PLANCK = 67.66                # km/s/Mpc  (Planck 2018, TT,TE,EE+lowE+lensing+BAO)
+H0_PLANCK = 67.66                # km s⁻¹ Mpc⁻¹  (Planck 2018, TT,TE,EE+lowE+lensing+BAO)
 OM_PLANCK = 0.31110              # Ωm TOTAL (matière + neutrinos)
-H0_SHOES = 73.04                 # km/s/Mpc  (SH0ES, Riess et al. 2022)
+H0_SHOES = 73.04                 # km s⁻¹ Mpc⁻¹  (SH0ES, Riess et al. 2022)
 SIGMA_H0 = 0.42
 SIGMA_OM = 0.0056
 RHO_H0_OM = -0.9763              # corrélation H0–Ωm, déduite de ω_m = Ωm h² (voir le calculateur)

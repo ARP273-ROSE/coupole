@@ -181,6 +181,7 @@ class FenetrePrincipale(QMainWindow):
         sm.addSeparator()
         sm.addAction(action(self, 'act_apparence_basculer', self.basculer_apparence, QKeySequence('Ctrl+Shift+D')))
         self.synchroniser_apparence()
+        self._menu_disposition_cosmo(m)
         m = mb.addMenu(tr('menu_langue'))
         for code, nom in (('auto', tr('reg_langue_auto')), ('fr', 'Français'), ('en', 'English')):
             a = action(self, 'act_langue', lambda _=False, c=code: self.changer_langue(c), cle_aide='act_langue_aide')
@@ -211,6 +212,28 @@ class FenetrePrincipale(QMainWindow):
     def panneau_courant(self):
         i = self.pile.currentIndex()
         return self.panneaux[i] if 0 <= i < len(self.panneaux) else None
+
+    def _menu_disposition_cosmo(self, menu):
+        """Affichage > Disposition de la Cosmologie : automatique / côte à côte / empilée (même choix que la liste
+        du module, synchronisés)."""
+        p = self.panneau_module('cosmo')
+        if p is None or not hasattr(p, 'definir_disposition'):
+            return
+        from ..modules.cosmo.gui import DISPOSITIONS
+        sm = menu.addMenu(tr('menu_cosmo_disposition'))
+        aide(sm.menuAction(), 'cosmo_disposition_aide')
+        groupe = QActionGroup(self)
+        groupe.setExclusive(True)
+        self.act_disposition_cosmo = {}
+        for d in DISPOSITIONS:
+            a = action(self, 'cosmo_disposition_' + d, lambda _=False, x=d: p.definir_disposition(x),
+                       cle_aide='cosmo_disposition_aide')
+            a.setCheckable(True)
+            a.setChecked(p.disposition_choisie == d)
+            groupe.addAction(a)
+            sm.addAction(a)
+            self.act_disposition_cosmo[d] = a
+        p.disposition_changee.connect(lambda d: self.act_disposition_cosmo[d].setChecked(True))
 
     def panneau_module(self, ident: str):
         """Panneau du module `ident` (None s'il est absent ou défectueux)."""
