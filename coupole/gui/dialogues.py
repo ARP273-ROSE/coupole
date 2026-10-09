@@ -60,7 +60,7 @@ class DialogueConsentement(QDialog):
         h.addWidget(self.b_non)
         h.addWidget(self.b_oui)
         v.addLayout(h)
-        adaptatif.ajuster(self, 560, 360)
+        adaptatif.ajuster(self, 560, 360, cle='consentement')
         adaptatif.assouplir(self)
 
 
@@ -117,9 +117,17 @@ class DialogueReglages(QDialog):
         self.nouv_heures = nombre('reg_nouveautes_heures_aide', 1, 720, int(r['ohp_nouveautes_heures'] or 24))
         self.nouv_heures.setSuffix(' ' + tr('unite_heures'))
         f.addRow(tr('reg_nouveautes_heures'), self.nouv_heures)
+        # disposition gardée d'une fermeture à l'autre (interface.json) : on peut toujours revenir à l'origine
+        self.disposition_reinitialisee = False
+        h = QHBoxLayout()
+        h.addWidget(bouton('reg_disposition_reinit', self._reinitialiser_disposition))
+        h.addStretch(1)
+        f.addRow(tr('reg_disposition'), h)
         racine.addWidget(_boutons(self))
-        adaptatif.ajuster(self, 820, 520)
+        adaptatif.ajuster(self, 820, 520, cle='reglages')
         adaptatif.assouplir(self)
+        from . import memoire
+        memoire.onglets(self.onglets, 'dialogues.reglages_onglet')
 
     def _onglet_sources(self):
         from ..core import sources
@@ -195,6 +203,15 @@ class DialogueReglages(QDialog):
         if d:
             self.dest.setText(d)
 
+    def _reinitialiser_disposition(self):
+        """Fenêtre, colonnes, séparateurs, filtres, onglets et dossiers des dialogues reviennent à l'origine ;
+        les réglages de cette fenêtre (langue, thème, dossier de sortie…) ne changent pas."""
+        if QMessageBox.question(self, tr('reg_disposition'), tr('reg_disposition_question')) != \
+                QMessageBox.StandardButton.Yes:
+            return
+        self.disposition_reinitialisee = True
+        self.accept()
+
     def accept(self):
         r = config.reglages()
         ancienne = r['langue']
@@ -240,7 +257,7 @@ class DialogueASTAP(QDialog):
         self.guide = navigateur('', 'astapdlg_guide_aide')
         v.addWidget(self.guide, 1)
         v.addWidget(_boutons(self, ok=True, annuler=False))
-        adaptatif.ajuster(self, 780, 640)
+        adaptatif.ajuster(self, 780, 640, cle='astap')
         adaptatif.assouplir(self)
         self.actualiser()
 
@@ -268,14 +285,21 @@ class DialogueASTAP(QDialog):
         self.guide.setHtml(guide_astap_html())
 
     def choisir_exe(self):
-        f, _ = QFileDialog.getOpenFileName(self, tr('astapdlg_choisir_exe'))
+        from . import memoire
+        actuel = config.reglages()['astap_executable']
+        depart = os.path.dirname(actuel) if actuel and os.path.isabs(actuel) else memoire.dossier('astap_exe')
+        f, _ = QFileDialog.getOpenFileName(self, tr('astapdlg_choisir_exe'), depart)
         if f:
+            memoire.retenir('astap_exe', f, est_fichier=True)
             config.reglages()['astap_executable'] = f
             self.actualiser()
 
     def choisir_cat(self):
-        d = QFileDialog.getExistingDirectory(self, tr('astapdlg_choisir_cat'))
+        from . import memoire
+        d = QFileDialog.getExistingDirectory(self, tr('astapdlg_choisir_cat'),
+                                             config.reglages()['astap_catalogue'] or memoire.dossier('astap_cat'))
         if d:
+            memoire.retenir('astap_cat', d)
             config.reglages()['astap_catalogue'] = d
             self.actualiser()
 
@@ -334,7 +358,7 @@ class DialogueAPropos(QDialog):
         self.navig = navigateur(self._gabarit % html.escape(tr('astapdlg_recherche')), 'apropos_aide')
         v.addWidget(self.navig)
         v.addWidget(_boutons(self, ok=True, annuler=False))
-        adaptatif.ajuster(self, 640, 560)
+        adaptatif.ajuster(self, 640, 560, cle='apropos')
         adaptatif.assouplir(self)
         self._t = Tache(texte_configuration, parent=self)      # sondes : hors du fil graphique
         self._t.quand_fini(lambda txt: self.navig.setHtml(self._gabarit % html.escape(txt + self._qt)))
@@ -361,7 +385,7 @@ class DialogueSignaler(QDialog):
         self.b_env = bouton('signaler_envoyer', self.envoyer)
         h.addWidget(self.b_env)
         v.addLayout(h)
-        adaptatif.ajuster(self, 560, 420)
+        adaptatif.ajuster(self, 560, 420, cle='signaler')
         adaptatif.assouplir(self)
 
     def _rapport(self, diagnostic: str = ''):
@@ -397,9 +421,13 @@ class DialogueSignaler(QDialog):
 
     def fichier(self):
         from ..core import rapports
-        f, _ = QFileDialog.getSaveFileName(self, tr('signaler_fichier'), 'coupole-rapport.json', 'JSON (*.json)')
+        from . import memoire
+        f, _ = QFileDialog.getSaveFileName(self, tr('signaler_fichier'),
+                                           os.path.join(memoire.dossier('signaler'), 'coupole-rapport.json'),
+                                           'JSON (*.json)')
         if not f:
             return
+        memoire.retenir('signaler', f, est_fichier=True)
 
         def suite(diag):
             r = rapports.machine()
@@ -429,7 +457,7 @@ def afficher_raccourcis(parent):
     v = QVBoxLayout(d)
     v.addWidget(navigateur('<table>%s</table>' % lignes, 'racc_aide'))
     v.addWidget(_boutons(d, ok=True, annuler=False))
-    adaptatif.ajuster(d, 460, 300)
+    adaptatif.ajuster(d, 460, 300, cle='raccourcis')
     adaptatif.assouplir(d)
     d.exec()
 
@@ -440,7 +468,7 @@ def afficher_aide(parent, titre: str, texte: str):
     v = QVBoxLayout(d)
     v.addWidget(navigateur(texte, 'aide_ecran_aide'))
     v.addWidget(_boutons(d, ok=True, annuler=False))
-    adaptatif.ajuster(d, 640, 520)
+    adaptatif.ajuster(d, 640, 520, cle='aide')
     adaptatif.assouplir(d)
     d.exec()
 

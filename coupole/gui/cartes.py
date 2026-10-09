@@ -345,6 +345,7 @@ class CacheTuiles:
 
 class CarteMonde(QWidget):
     site_clique = pyqtSignal(object)
+    vue_changee = pyqtSignal()        # zoom ou centre changés (la vue est gardée d'une fermeture à l'autre)
     _rafraichir = pyqtSignal()
     BUDGET_TUILES_S = 0.03
 
@@ -379,6 +380,21 @@ class CarteMonde(QWidget):
         if z is not None:
             self.z = max(1, min(17, z))
         self.update()
+        self.vue_changee.emit()
+
+    def vue(self) -> dict:
+        return {'z': int(self.z), 'lon': round(float(self.centre[0]), 6), 'lat': round(float(self.centre[1]), 6)}
+
+    def definir_vue(self, v) -> bool:
+        """Rétablit une vue gardée ; rend False (et ne change rien) si elle n'est pas valable."""
+        try:
+            z, lon, lat = v['z'], float(v['lon']), float(v['lat'])
+        except (KeyError, TypeError, ValueError):
+            return False
+        if not isinstance(z, int) or isinstance(z, bool) or not (math.isfinite(lon) and math.isfinite(lat)):
+            return False
+        self.centrer(((lon + 180.0) % 360.0) - 180.0, max(-85.0, min(85.0, lat)), z)
+        return True
 
     def _origine(self):
         cx, cy = lonlat_vers_monde(self.centre[0], self.centre[1], self.z)
@@ -507,8 +523,11 @@ class CarteMonde(QWidget):
             QToolTip.hideText()
 
     def mouseReleaseEvent(self, ev):
+        if self._glisse is not None:
+            self.vue_changee.emit()
         self._glisse = None
 
     def wheelEvent(self, ev):
         self.z = max(1, min(17, self.z + (1 if ev.angleDelta().y() > 0 else -1)))
         self.update()
+        self.vue_changee.emit()

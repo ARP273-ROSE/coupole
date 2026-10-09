@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import (QDialog, QDoubleSpinBox, QFormLayout, QHBoxLayout, 
 
 from ...core import sites, temps
 from ...core.i18n import tr
+from ...gui import memoire
 from ...gui.cartes import CarteMonde
 from ...gui.outils import aide, bouton, case, champ
 from .cli import verifier_fuseau
@@ -44,7 +45,9 @@ class Panneau(QWidget):
         v.addWidget(sp, 1)
         self.info = QLabel('')
         v.addWidget(self.info)
+        self.sp = sp
         self.remplir()
+        self._memoriser()
         self.horloge = QTimer(self)
         self.horloge.timeout.connect(self._heures)
         self.horloge.start(30000)
@@ -57,11 +60,30 @@ class Panneau(QWidget):
                                      s.fuseau or '~', '', tr('sit_origine_' + s.origine))):
                 self.table.setItem(i, j, QTableWidgetItem(val))
         self._heures()
-        self.table.resizeColumnsToContents()
+        memoire.ajuster_colonnes(self.table)
         self.carte.definir([(s.lon, s.lat, '%s\n%.5f°, %.5f° E, %.0f m%s\n%s' % (
             s.nom, s.lat, s.lon, s.alt, (' — MPC ' + s.mpc) if s.mpc else '', s.fuseau), s) for s in self.sites])
         if self.sites:
             self.carte.centrer(self.sites[0].lon, self.sites[0].lat, 4)
+
+    def _memoriser(self):
+        """Site choisi, vue de la carte (zoom, centre), « carte en ligne », séparateur, colonnes."""
+        from ...core.etat_interface import etat
+        e, m, k = etat(), memoire.memoire(), 'modules.sites.'
+        memoire.case(self.en_ligne, k + 'carte_en_ligne')
+        memoire.separateur(self.sp, k + 'separateur')
+        memoire.entete(self.table, k + 'colonnes')
+        ident = e.lire(k + 'site', '', str)
+        for i, s in enumerate(self.sites):
+            if ident and s.id == ident:
+                self.table.selectRow(i)              # → _choisi → la carte se centre sur le site
+                break
+        vue = e.lire(k + 'carte', None, dict)
+        if vue:
+            self.carte.definir_vue(vue)              # puis la vue exacte de la dernière fois (zoom, centre)
+        m.suivre(k + 'site', lambda: getattr(getattr(self, '_site', None), 'id', None), self.table,
+                 self.table.itemSelectionChanged)
+        m.suivre(k + 'carte', self.carte.vue, self.carte, self.carte.vue_changee)
 
     def _heures(self):
         maintenant = D.datetime.now(D.timezone.utc)
@@ -143,6 +165,7 @@ class DialogueSite(QDialog):
         h.addWidget(bouton('dlg_annuler', self.reject))
         h.addWidget(bouton('dlg_ok', self.accept))
         f.addRow(h)
+        memoire.dialogue(self, 'site')              # taille gardée d'une ouverture à l'autre
 
     def accept(self):
         if not self.id.text().strip() or not verifier_fuseau(self.fuseau.text().strip()):

@@ -35,6 +35,14 @@ TEXTES = {
     'cli_epilogue': {'fr': "Aide d'une commande : coupole <commande> --help. Manuel : coupole manuel.",
                      'en': 'Help on a command: coupole <command> --help. Manual: coupole manual.'},
     'cli_aide_version': {'fr': 'affiche la version et quitte', 'en': 'show the version and exit'},
+    'cli_aide_reinit_interface': {'fr': "efface la disposition gardée (fenêtre, colonnes, filtres, dossiers des "
+                                        "dialogues) puis quitte ; les réglages ne changent pas",
+                                  'en': 'erase the saved layout (window, columns, filters, file-dialog folders) and exit; '
+                                        'settings do not change'},
+    'cli_reinit_interface_fait': {'fr': "Disposition effacée : l'interface reprendra son état d'origine ({chemin}).",
+                                  'en': 'Layout erased: the interface will start in its original state ({chemin}).'},
+    'cli_reinit_interface_rien': {'fr': "Aucune disposition enregistrée : l'interface est déjà dans son état d'origine.",
+                                  'en': 'No saved layout: the interface is already in its original state.'},
     'cli_aide_langue': {'fr': 'langue des messages (auto : celle du système)', 'en': 'message language (auto: system language)'},
     'cli_aide_verbeux': {'fr': 'journal détaillé', 'en': 'detailed log'},
     'cli_aide_json': {'fr': 'sortie JSON (pour les scripts)', 'en': 'JSON output (for scripts)'},
@@ -363,6 +371,35 @@ TEXTES = {
     'reg_nouveautes_heures': {'fr': 'Au plus une vérification toutes les', 'en': 'At most one check every'},
     'reg_nouveautes_heures_aide': {'fr': 'Fréquence maximale de la vérification automatique (heures).', 'en': 'Maximum frequency of the automatic check (hours).'},
     'unite_heures': {'fr': 'h', 'en': 'h'},
+    'reg_disposition': {'fr': 'Disposition', 'en': 'Layout'},
+    'reg_disposition_reinit': {'fr': 'Réinitialiser la disposition', 'en': 'Reset the layout'},
+    'reg_disposition_reinit_aide': {'fr': "Coupole retrouve à chaque lancement la fenêtre, les colonnes, les filtres, les "
+                                          "onglets et les dossiers des dialogues tels que vous les avez laissés. Ce bouton "
+                                          "remet la fenêtre, les colonnes, les séparateurs, les filtres, les onglets, les "
+                                          "fichiers récents et les dossiers des dialogues dans leur état d'origine. Les "
+                                          "réglages de cette fenêtre (langue, thème, dossier de sortie, format…) ne changent pas.",
+                                    'en': 'Each time it starts, Coupole restores the window, columns, filters, tabs and '
+                                          'file-dialog folders as you left them. This button puts the window, columns, '
+                                          'splitters, filters, tabs, recent files and file-dialog folders back to their '
+                                          'original state. The settings of this window (language, '
+                                          'theme, output folder, format…) do not change.'},
+    'reg_disposition_question': {'fr': "Revenir à la disposition d'origine (fenêtre, colonnes, filtres, onglets, fichiers "
+                                       "récents, dossiers des dialogues) ?",
+                                 'en': 'Go back to the original layout (window, columns, filters, tabs, recent files, '
+                                       'file-dialog folders)?'},
+    'fen_disposition_reinitialisee': {'fr': "Disposition d'origine rétablie.", 'en': 'Original layout restored.'},
+    'fen_disposition_plus_tard': {'fr': "Un traitement est en cours : la disposition d'origine sera rétablie au prochain "
+                                        "lancement (rien n'est plus enregistré d'ici là).",
+                                  'en': 'A processing is running: the original layout will come back at the next start '
+                                        '(nothing more is saved until then).'},
+    'aide_reglages_conserves': {'fr': "<p><b>Réglages conservés.</b> Taille et position de la fenêtre, colonnes (largeur, "
+                                      "ordre, tri), séparateurs, module et onglet affichés, filtres et recherche, chemins "
+                                      "saisis et dossiers des dialogues sont retrouvés au prochain lancement. Préférences "
+                                      "&gt; « Réinitialiser la disposition » revient à l'origine.</p>",
+                                'en': '<p><b>Saved settings.</b> Window size and position, columns (width, order, sort), '
+                                      'splitters, module and tab shown, filters and search, typed paths and file-dialog '
+                                      'folders come back at the next start. Preferences &gt; “Reset the layout” goes back '
+                                      'to the original.</p>'},
     'reg_maj_aide': {'fr': 'Une requête discrète à GitHub au démarrage ; rien ne s\'installe sans votre accord.',
                      'en': 'One discreet request to GitHub at startup; nothing installs without your consent.'},
 

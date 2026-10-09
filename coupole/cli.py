@@ -64,6 +64,8 @@ def construire_parseur(mods) -> argparse.ArgumentParser:
     p.add_argument('--version', action='version', version='Coupole %s' % __version__, help=tr('cli_aide_version'))
     p.add_argument('--lang', '--langue', choices=['auto', 'fr', 'en'], help=tr('cli_aide_langue'))
     p.add_argument('-v', '--verbeux', '--verbose', action='store_true', help=tr('cli_aide_verbeux'))
+    p.add_argument('--reinitialiser-interface', '--reset-interface', action='store_true',
+                   help=tr('cli_aide_reinit_interface'))
     sous = p.add_subparsers(dest='commande', metavar=tr('cli_commande'), title=tr('cli_commandes'))
 
     g = sous.add_parser('gui', help=tr('cli_gui'), description=tr('cli_gui'), formatter_class=Formateur)
@@ -287,6 +289,13 @@ def main(argv=None) -> int:
     logging.basicConfig(level=logging.INFO if a.verbeux else logging.WARNING, format='%(levelname)s %(message)s')
     if a.lang:
         i18n.choisir_langue(a.lang)
+    if a.reinitialiser_interface:
+        from .core import etat_interface
+        if etat_interface.effacer_fichier():
+            print(tr('cli_reinit_interface_fait', chemin=str(config.dossier_config() / etat_interface.NOM_FICHIER)))
+        else:
+            print(tr('cli_reinit_interface_rien'))
+        return 0
     if not getattr(a, 'fonction', None):
         p.print_help()
         return 0

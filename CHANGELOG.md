@@ -2,6 +2,41 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.1.6 — 9 octobre 2026
+
+**Réglages conservés d'une fermeture à l'autre** : tout ce qui se règle à l'écran et tous les chemins saisis sont
+retrouvés au lancement suivant (manuel, section « Réglages conservés »).
+
+- **Fenêtre** : taille, position, écran, état maximisé ; garde-fous : écran débranché ou position hors des écrans →
+  fenêtre recentrée, taille plus grande que l'écran → ramenée sur l'écran (compatible avec l'interface adaptative, à
+  100, 150 et 200 %). Taille de chaque dialogue (et onglet des Préférences).
+- **Disposition** : module affiché, onglet de la Banque OHP, séparateurs, largeur et ordre des colonnes, colonne et
+  sens du tri de chaque tableau (les colonnes continuent de s'ajuster au contenu tant qu'on n'a pas choisi leurs
+  largeurs).
+- **Banque OHP** : recherche, type, télescope, cases « nouveaux », « à vérifier », « à télécharger », « sans dates
+  douteuses », nuit, filtre, objets choisis (rétablis dès l'inventaire chargé), filtres des anomalies et de la carte
+  du ciel. Onglet Traitement : dossier de sortie gardé **dès qu'il est modifié** (et non plus seulement au lancement
+  d'un traitement), format, langue des noms, « garder les doublons », « garder les FITS », mode ASTAP, « vérifier la
+  qualité » ; un changement du dossier dans les Préférences est repris par l'onglet.
+- **Qualité des images** : dossier analysé, mode échantillon et N. **Spectres et séries** : dossier du dialogue
+  d'ouverture, menu **Récents** (10 fichiers, un fichier disparu est grisé), axe. **Cosmologie** : jeu de paramètres,
+  paramètres personnalisés (gardés même en repassant par Planck), Ωk, z, option SH0ES, et nouvelle **échelle des
+  courbes** (distances en logarithmique ou en linéaire). **Sites et heures** : site choisi, zoom et centre de la
+  carte, « carte en ligne ».
+- **Dialogues de fichiers** : chacun rouvre dans le dernier dossier utilisé (exports CSV, réorganisation, ASTAP,
+  signalement…).
+- Mécanisme unique (`core/etat_interface.py`, `gui/memoire.py`) : `interface.json` versionné à côté de
+  `reglages.json` ; écriture **différée et groupée** (au plus une toutes les 2 s, plus une à la fermeture), atomique,
+  seulement si quelque chose a changé — jamais une écriture par frappe ; lecture tolérante (clé absente, type faux,
+  valeur hors bornes → défaut ; fichier illisible mis de côté) ; existence des chemins vérifiée en fond (un partage
+  réseau absent ne bloque pas le démarrage). Rien de dangereux à rejouer n'est gardé : un traitement n'est jamais
+  relancé seul.
+- **Réinitialiser** : Préférences > « Réinitialiser la disposition » (immédiat, réglages intacts) et
+  `coupole --reinitialiser-interface` (`--reset-interface`).
+- Tests : `test_reglages_conserves.py` (+11) — deux fenêtres successives retrouvent chaque élément ; réglages
+  corrompus ou de mauvais types → défauts ; position hors écran, écran disparu, fenêtre maximisée ; aucune écriture
+  disque pendant la frappe (puis une seule, groupée) ; réinitialisation. Chaque test part d'une disposition vierge.
+
 ## 0.1.5 — 9 octobre 2026
 
 Les deux lenteurs laissées par le second audit (`docs/AUDIT2_2026-10.md`, § 8), mesurées à dix fois la banque

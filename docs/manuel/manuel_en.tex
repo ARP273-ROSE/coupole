@@ -96,7 +96,7 @@ python -m coupole             \# interface; coupole --help: command line
 Extras: \texttt{qualite} (SEP), \texttt{validation} (lxml, xisf: XSD validation and second reader), \texttt{gpu}
 (CuPy), \texttt{test} (pytest).
 
-\subsection{Updates, uninstallation, data}
+\subsection{Updates, uninstallation, data}\label{sec:donnees}
 At startup (can be disabled) the packages check the latest release on GitHub and offer to install it: only the
 code archive (\texttt{coupole-app-x.y.z.zip}, about 1 MB) is downloaded and unpacked by the application, the
 previous version being restored on failure. A pip/pipx installation shows the command to run. The \texttt{.deb}
@@ -145,6 +145,39 @@ through the \emph{View} > \emph{Appearance} menu (checkable \emph{Light} / \emph
 toggle) or in the Preferences: the same setting, applied at once and saved; both stay in sync. A user who had chosen
 the light theme keeps it: the saved setting takes precedence over the default. The screenshots of this manual are
 taken in the default theme.
+
+\subsection{Saved settings}\label{sec:conserves}
+Each time it starts, Coupole shows the screen as it was left. Kept:
+\begin{itemize}
+\item \textbf{window}: size, position, screen, maximised state; size of every dialog (Preferences and its tab, ASTAP
+  assistant, About, report, help, object correction, new site);
+\item \textbf{layout}: module shown, tab of the OHP bank, splitter positions, width and order of the columns, sort
+  column and direction of every table;
+\item \textbf{OHP bank}: search, type, telescope, \emph{New}, \emph{To check}, \emph{Missing only} and \emph{Without
+  doubtful dates} boxes, night and filter, chosen objects (restored as soon as the inventory is loaded), anomaly and
+  sky-map filters; Processing tab: output folder \emph{as soon as it is changed}, format, language of names,
+  \emph{Keep duplicates}, \emph{Keep FITS}, ASTAP mode, \emph{Check quality};
+\item \textbf{Image quality}: analysed folder, sample mode and number of images per batch;
+\item \textbf{Spectra and series}: folder of the open dialog and \emph{Recent} menu (last 10 files; a file that has
+  disappeared is greyed out); chosen axis;
+\item \textbf{Cosmology}: parameter set, custom parameters ($H_0$, $\Omega_m$, kept even when going back to Planck),
+  $\Omega_k$, current $z$, SH0ES option, scale of the curves (logarithmic or linear);
+\item \textbf{Sites and times}: chosen site, zoom and centre of the world map, \emph{Online map};
+\item \textbf{file dialogs}: each one opens again in the last folder used (CSV export, reorganisation, ASTAP,
+  report…).
+\end{itemize}
+The layout lives in \texttt{interface.json}, next to \texttt{reglages.json} (section~\ref{sec:donnees}); processing
+choices stay in \texttt{reglages.json}. Writing is \emph{deferred and grouped}: at most once every 2~s and once on
+closing, atomic (temporary file then replacement); typing in a field never writes to disk. Tolerant reading: a missing
+value, a wrong type or an out-of-range value leaves the default; an unreadable file is set aside
+(\texttt{.corrompu-…}). Safeguards: an unplugged screen or a position outside the screens centres the window again, a
+size larger than the screen is brought back onto it (as at 150 or 200~\%). A folder kept on a network share that is
+absent never blocks start-up: its existence is checked in the background, and the dialog opens in the default folder
+until it is confirmed. Nothing that would be dangerous to replay is kept: an interrupted processing never restarts on
+its own (it resumes when you run it again).
+
+To go back to the original: Preferences > \emph{Reset the layout} (immediate; language, theme, output folder and the
+other settings do not change), or \cmd{coupole --reinitialiser-interface} (\cmd{--reset-interface}).
 
 % =====================================================================
 \section{OHP image bank module}

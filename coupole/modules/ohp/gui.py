@@ -20,7 +20,7 @@ from ...core import config, i18n
 from ...core.i18n import tr
 from ...gui.adaptatif import Flux, coupable
 from ...gui.dialogues import DialogueASTAP, ouvrir_fichier
-from ...gui import pastilles
+from ...gui import memoire, pastilles
 from ...gui.modele import (DelegueProgression, ModeleParesseux, ModeleTableau, Progression, lignes_choisies,
                            vue_tableau)
 from ...gui.outils import (FileEvenements, Tache, aide, bouton, case, champ, decimal, enregistrer_arret, lancer_fil,
@@ -125,7 +125,67 @@ class Panneau(QWidget):
         sc = QShortcut(QKeySequence('Ctrl+R'), self)
         sc.activated.connect(lambda: self.charger(True))
         self._etat_astap = None
+        self._memoriser()
         self._charger_apres_premier_dessin()
+
+    # ================================================================ disposition gardée d'une fois à l'autre
+    def _memoriser(self):
+        """Filtres, recherche, colonnes, séparateur, onglet, objets choisis : rétablis maintenant (ou dès que les
+        listes qu'ils visent sont remplies), relus à chaque écriture différée (gui/memoire.py)."""
+        from ...core.etat_interface import etat
+        e, m, k = etat(), memoire.memoire(), 'modules.ohp.'
+        memoire.champ(self.recherche, k + 'recherche')
+        memoire.liste(self.f_cat, k + 'type')
+        memoire.liste(self.f_tel, k + 'telescope')
+        memoire.case(self.f_nouveaux, k + 'nouveaux')
+        memoire.case(self.f_verifier, k + 'a_verifier')
+        memoire.case(self.f_manquantes, k + 'a_telecharger')
+        memoire.case(self.f_dates, k + 'sans_dates_douteuses')
+        memoire.case(self.f_anom_nouv, k + 'anomalies_nouvelles')
+        memoire.liste(self.ciel_cat, k + 'ciel_type')
+        memoire.separateur(self.sp_catalogue, k + 'separateur')
+        memoire.entete(self.v_obj, k + 'colonnes_objets')
+        memoire.entete(self.v_img, k + 'colonnes_images')
+        memoire.entete(self.v_lots, k + 'colonnes_lots')
+        memoire.entete(self.v_anom, k + 'colonnes_anomalies')
+        memoire.onglets(self.onglets, k + 'onglet')
+        # listes remplies plus tard (nuits et filtres des objets choisis, genres d'anomalies), objets choisis
+        # (après le chargement de l'inventaire) : valeur « attendue », appliquée une fois, gardée en attendant
+        self._nuit_attendue = e.lire(k + 'nuit', None, str) or None
+        self._filtre_attendu = e.lire(k + 'filtre', None, str) or None
+        self._genre_attendu = e.lire(k + 'genre_anomalie', None, str) or None
+        objets = e.lire(k + 'objets', None, list)
+        self._objets_attendus = [o for o in objets if isinstance(o, str)][:200] if objets else None
+        m.suivre(k + 'nuit', lambda: self._nuit_attendue or self.f_nuit.currentData() or '', self.f_nuit,
+                 self.f_nuit.currentIndexChanged)
+        m.suivre(k + 'filtre', lambda: self._filtre_attendu or self.f_filtre.currentData() or '', self.f_filtre,
+                 self.f_filtre.currentIndexChanged)
+        m.suivre(k + 'genre_anomalie', lambda: self._genre_attendu or self.f_genre.currentData() or '',
+                 self.f_genre, self.f_genre.currentIndexChanged)
+        m.suivre(k + 'objets', lambda: self._objets_attendus if self._objets_attendus is not None
+                 else sorted(getattr(self, '_objets', set()))[:200], self.v_obj,
+                 self.v_obj.selectionModel().selectionChanged)
+
+    def _restaurer_selection(self):
+        """Objets choisis à la dernière fermeture : sélectionnés une fois, au premier remplissage du catalogue."""
+        voulus = self._objets_attendus
+        if not voulus or not self.m_obj.donnees:
+            return
+        self._objets_attendus = None
+        from PyQt6.QtCore import QItemSelection, QItemSelectionModel
+        voulus = set(voulus)
+        sel = QItemSelection()
+        premier = None
+        for r, o in enumerate(self.m_obj.donnees):
+            if o['objet'] in voulus:
+                idx = self.p_obj.mapFromSource(self.m_obj.index(r, 0))
+                if idx.isValid():                    # masqué par les filtres : on ne le force pas
+                    sel.select(idx, idx)
+                    premier = premier or idx
+        if premier is not None:
+            self.v_obj.selectionModel().select(sel, QItemSelectionModel.SelectionFlag.ClearAndSelect |
+                                               QItemSelectionModel.SelectionFlag.Rows)
+            self.v_obj.scrollTo(premier)
 
     # ================================================================ chargement initial
     def _charger_apres_premier_dessin(self):
@@ -309,6 +369,7 @@ class Panneau(QWidget):
         vd.addWidget(self.l_legende)
         sp.addWidget(droite)
         sp.setSizes([560, 620])
+        self.sp_catalogue = sp
         v.addWidget(sp, 1)
         self.l_estimation = QLabel(tr('ohp_aucune_selection'))
         self.l_estimation.setWordWrap(True)
@@ -484,8 +545,9 @@ class Panneau(QWidget):
             bulles.append(tr('ohp_bulle_objet', noms=', '.join(sorted(o['noms'])), doublons=o['doublons']))
         self.m_obj.remplir(lignes, donnees, bulles)
         self._appliquer_possession_objets()
-        self.v_obj.resizeColumnsToContents()
+        memoire.ajuster_colonnes(self.v_obj)
         self._filtrer_objets()
+        self._restaurer_selection()
 
     # ---------------------------------------------------------------- ce qu'on possède déjà
     def _dest_courante(self) -> str:
@@ -596,6 +658,14 @@ class Panneau(QWidget):
             for val in sorted(vals):
                 combo.addItem(val, val)
             combo.blockSignals(False)
+        if objs and (self._nuit_attendue or self._filtre_attendu):
+            for combo, attr in ((self.f_nuit, '_nuit_attendue'), (self.f_filtre, '_filtre_attendu')):
+                i = combo.findData(getattr(self, attr)) if getattr(self, attr) else -1
+                if i >= 0:
+                    combo.blockSignals(True)
+                    combo.setCurrentIndex(i)
+                    combo.blockSignals(False)
+                setattr(self, attr, None)            # appliquée une fois (ou absente de ces objets : oubliée)
         self._remplir_images()
         self._maj_fiche()
 
@@ -740,7 +810,7 @@ class Panneau(QWidget):
         vide_avant = self.m_img.rowCount() == 0
         self.m_img.remplir_objets(imgs)              # aucune ligne construite ici : seulement à l'affichage
         if vide_avant or not getattr(self, '_colonnes_images_ajustees', False):
-            self.v_img.resizeColumnsToContents()     # une fois : ensuite l'utilisateur garde ses largeurs
+            memoire.ajuster_colonnes(self.v_img)     # une fois : ensuite l'utilisateur garde ses largeurs
             self._colonnes_images_ajustees = bool(imgs)
         self.selection = imgs
         self._estimer()
@@ -817,23 +887,32 @@ class Panneau(QWidget):
         h = QHBoxLayout()
         self.dest = champ('ohp_dest_aide', r['dossier_sortie'] or str(config.dossier_sortie_defaut() / 'OHP_DU_ECU'))
         self.dest.editingFinished.connect(self._charger_possession)
+        # gardé dès qu'il est modifié (écriture différée et groupée : jamais une écriture par frappe)
+        self.dest.textEdited.connect(lambda t: memoire.reglage_differe('dossier_sortie', t.strip()))
         h.addWidget(self.dest, 1)
         h.addWidget(bouton('reg_parcourir', self._parcourir))
         f.addRow(tr('reg_dest'), h)
         self.format = liste('reg_format_aide', [(tr('fmt_xisf'), 'xisf'), (tr('fmt_fz'), 'fz'), (tr('fmt_fits'), 'fits')])
         self.format.setCurrentIndex(max(0, self.format.findData(r['format_sortie'])))
         self.format.currentIndexChanged.connect(self._estimer)
+        self.format.currentIndexChanged.connect(
+            lambda *_: memoire.reglage_differe('format_sortie', self.format.currentData()))
         f.addRow(tr('reg_format'), self.format)
         noms = r['langue_noms'] if r['langue_noms'] in ('fr', 'en') else i18n.langue()
         self.noms = liste('reg_noms_aide', [('Français', 'fr'), ('English', 'en')])
         self.noms.setCurrentIndex(max(0, self.noms.findData(noms)))
+        self.noms.currentIndexChanged.connect(
+            lambda *_: memoire.reglage_differe('langue_noms', self.noms.currentData()))
         f.addRow(tr('reg_noms'), self.noms)
-        self.garder_doublons = case('ohp_garder_doublons')
-        self.garder_fits = case('ohp_garder_fits')
+        self.garder_doublons = case('ohp_garder_doublons', r.lire('ohp_garder_doublons', bool))
+        self.garder_fits = case('ohp_garder_fits', r.lire('ohp_garder_fits', bool))
         f.addRow('', self.garder_doublons)
         f.addRow('', self.garder_fits)
-        self.qualite = case('ohp_qualite')
+        self.qualite = case('ohp_qualite', r.lire('ohp_verifier_qualite', bool))
         f.addRow('', self.qualite)
+        for cle, c in (('ohp_garder_doublons', self.garder_doublons), ('ohp_garder_fits', self.garder_fits),
+                       ('ohp_verifier_qualite', self.qualite)):
+            c.toggled.connect(lambda oui, k=cle: memoire.reglage_differe(k, bool(oui)))
         v.addWidget(g)
         g = QGroupBox(tr('ohp_groupe_astrometrie'))
         vg = QVBoxLayout(g)                        # texte au-dessus, réglages dessous : tient sur un écran étroit
@@ -845,6 +924,9 @@ class Panneau(QWidget):
         self.mode_astap = liste('ohp_mode_astap_aide', [(tr('ohp_astap_tous'), 'tous'),
                                                         (tr('ohp_astap_suspectes'), 'suspectes'),
                                                         (tr('ohp_astap_jamais'), 'jamais')])
+        self.mode_astap.setCurrentIndex(max(0, self.mode_astap.findData(r.lire('ohp_mode_astap', str))))
+        self.mode_astap.currentIndexChanged.connect(
+            lambda *_: memoire.reglage_differe('ohp_mode_astap', self.mode_astap.currentData()))
         hg.addWidget(self.mode_astap)
         hg.addWidget(bouton('ohp_assistant_astap', self._astap))
         v.addWidget(g)
@@ -900,6 +982,7 @@ class Panneau(QWidget):
         d = QFileDialog.getExistingDirectory(self, tr('reg_dest'), self.dest.text())
         if d:
             self.dest.setText(d)
+            memoire.reglage_differe('dossier_sortie', d)
             self._estimer()
             self._remplir_lots()
             self._charger_possession()
@@ -912,6 +995,7 @@ class Panneau(QWidget):
         """Détection d'ASTAP (sous-processus) et sondes de la machine : hors du fil graphique."""
         from ...core import astap, machine
         r = config.reglages()
+        self._suivre_preferences(r)
         pastilles.vider_cache()                    # le thème a pu changer : pastilles et légende aux bonnes couleurs
         self._maj_legende()
         if self.inv and self.m_obj.lignes:
@@ -925,6 +1009,25 @@ class Panneau(QWidget):
         self._t_astap = Tache(sonder, parent=self)
         self._t_astap.quand_fini(self._sondes_pretes)
         self._t_astap.start()
+
+    def _suivre_preferences(self, r):
+        """Les Préférences ont changé le dossier de sortie, le format ou la langue des noms : l'onglet suit.
+        Seulement ce qui a changé DANS les réglages depuis la dernière fois (un changement de thème ne touche à rien)."""
+        vus = getattr(self, '_prefs_vues', None)
+        actuels = (r['dossier_sortie'], r['format_sortie'], r['langue_noms'])
+        self._prefs_vues = actuels
+        if vus is None or vus == actuels or self.occupe():
+            return
+        d = actuels[0]
+        if d and d != vus[0] and d != self.dest.text().strip():
+            self.dest.setText(d)
+            self._remplir_lots()
+            self._charger_possession()
+            self._estimer()
+        for combo, val, avant in ((self.format, actuels[1], vus[1]), (self.noms, actuels[2], vus[2])):
+            i = combo.findData(val)
+            if val != avant and i >= 0 and i != combo.currentIndex():
+                combo.setCurrentIndex(i)
 
     def _sondes_pretes(self, resultat):
         self._machine, self._etat_astap = resultat
@@ -968,6 +1071,7 @@ class Panneau(QWidget):
         if os.path.basename(d) != 'OHP_DU_ECU' and not os.path.exists(os.path.join(d, '_traitement')):
             d = os.path.join(d, 'OHP_DU_ECU')
         self.dest.setText(d)
+        memoire.reglage_differe('dossier_sortie', d)
         return os.path.abspath(d)
 
     def tout_telecharger(self):
@@ -1001,9 +1105,11 @@ class Panneau(QWidget):
         """Range des fichiers déjà convertis (ailleurs, ancien rangement) dans l'arborescence des lots."""
         if self.occupe() or not self.inv:
             return
-        src = QFileDialog.getExistingDirectory(self, tr('ohp_reorganiser_titre'), self.dest.text())
+        src = QFileDialog.getExistingDirectory(self, tr('ohp_reorganiser_titre'),
+                                               memoire.dossier('ohp_reorganiser', self.dest.text()))
         if not src:
             return
+        memoire.retenir('ohp_reorganiser', src)
         dest = os.path.abspath(os.path.expanduser(self.dest.text().strip()))
         from .pilote import Traitement
         from ...core.parallele import Plan
@@ -1322,7 +1428,7 @@ class Panneau(QWidget):
             donnees.append(dossier)
             styles.append(style)
         self.m_lots.remplir(lignes, donnees, None, styles)
-        self.v_lots.resizeColumnsToContents()
+        memoire.ajuster_colonnes(self.v_lots)
         self.l_lots.setText(tr('ohp_lots_resume', n=len(lignes), dest=coupable(dest)) if lignes
                             else tr('ohp_lots_aucun', dest=coupable(dest)))
 
@@ -1382,6 +1488,9 @@ class Panneau(QWidget):
         self.f_genre.addItem(tr('ohp_tous_genres'), '')
         for g, n in res.items():
             self.f_genre.addItem('%s (%d)' % (tr('anom_' + g), n), g)
+        if self._genre_attendu:
+            self.f_genre.setCurrentIndex(max(0, self.f_genre.findData(self._genre_attendu)))
+            self._genre_attendu = None
         self.f_genre.blockSignals(False)
         self.l_anom.setText(tr('ohp_anomalies_intro') + ' ' + tr('ohp_anomalies_total', n=len(anoms)))
         self._filtrer_anomalies()
@@ -1392,12 +1501,15 @@ class Panneau(QWidget):
         self.m_anom.remplir([(a['genre'], tr('anom_action_' + a['action']), cibles.nom_affiche(a['objet']), a['nuit'],
                               a['fichier'], a['detail'], tr('anom_' + a['genre'])) for a in sel], sel,
                             [a['url'] for a in sel])
-        self.v_anom.resizeColumnsToContents()
+        memoire.ajuster_colonnes(self.v_anom)
 
     def _exporter_anomalies(self):
         from . import anomalies
-        f, _ = QFileDialog.getSaveFileName(self, tr('ohp_anom_csv'), 'anomalies.csv', 'CSV (*.csv)')
+        f, _ = QFileDialog.getSaveFileName(self, tr('ohp_anom_csv'),
+                                           os.path.join(memoire.dossier('ohp_anomalies'), 'anomalies.csv'),
+                                           'CSV (*.csv)')
         if f:
+            memoire.retenir('ohp_anomalies', f, est_fichier=True)
             anomalies.ecrire_csv(f, self._anoms)
             QMessageBox.information(self, tr('ohp_anom_csv'), tr('ecrit', chemin=f))
 
@@ -1515,6 +1627,7 @@ class DialogueCorrection(QDialog):
         h.addWidget(bouton('dlg_annuler', self.reject))
         h.addWidget(bouton('ohp_corr_enregistrer', self.accept))
         f.addRow(h)
+        memoire.dialogue(self, 'correction')        # taille gardée d'une ouverture à l'autre
 
     def _oublier(self):
         for n in self.objet['noms']:

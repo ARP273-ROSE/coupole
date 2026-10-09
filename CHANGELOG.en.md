@@ -2,6 +2,37 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.1.6 — 9 October 2026
+
+**Settings kept from one session to the next**: everything set on screen and every typed path comes back at the next
+start (manual, “Saved settings” section).
+
+- **Window**: size, position, screen, maximised state; safeguards: unplugged screen or position outside the screens →
+  window centred again, size larger than the screen → brought back onto it (compatible with the adaptive interface,
+  at 100, 150 and 200 %). Size of every dialog (and tab of the Preferences).
+- **Layout**: module shown, tab of the OHP bank, splitters, width and order of the columns, sort column and direction
+  of every table (columns keep fitting their contents until you choose their widths).
+- **OHP bank**: search, type, telescope, “new”, “to check”, “missing only”, “without doubtful dates” boxes, night,
+  filter, chosen objects (restored once the inventory is loaded), anomaly and sky-map filters. Processing tab: output
+  folder kept **as soon as it is changed** (no longer only when a processing starts), format, language of names,
+  “keep duplicates”, “keep FITS”, ASTAP mode, “check quality”; a folder changed in the Preferences is followed by the
+  tab.
+- **Image quality**: analysed folder, sample mode and N. **Spectra and series**: folder of the open dialog,
+  **Recent** menu (10 files, a missing file is greyed out), axis. **Cosmology**: parameter set, custom parameters
+  (kept even when going back to Planck), Ωk, z, SH0ES option, and a new **curve scale** (distances logarithmic or
+  linear). **Sites and times**: chosen site, zoom and centre of the map, “online map”.
+- **File dialogs**: each one opens again in the last folder used (CSV exports, reorganisation, ASTAP, report…).
+- A single mechanism (`core/etat_interface.py`, `gui/memoire.py`): versioned `interface.json` next to
+  `reglages.json`; **deferred, grouped** writing (at most once every 2 s, plus once on closing), atomic, only when
+  something changed — never one write per keystroke; tolerant reading (missing key, wrong type, out-of-range value →
+  default; unreadable file set aside); path existence checked in the background (an absent network share does not
+  block start-up). Nothing dangerous to replay is kept: a processing never restarts on its own.
+- **Reset**: Preferences > “Reset the layout” (immediate, settings untouched) and `coupole --reinitialiser-interface`
+  (`--reset-interface`).
+- Tests: `test_reglages_conserves.py` (+11) — two successive windows find every element again; corrupt or wrongly
+  typed settings → defaults; off-screen position, missing screen, maximised window; no disk write while typing (then a
+  single grouped one); reset. Every test starts from a blank layout.
+
 ## 0.1.5 — 9 October 2026
 
 The two slow spots left by the second audit (`docs/AUDIT2_2026-10.md`, § 8), measured at ten times the bank

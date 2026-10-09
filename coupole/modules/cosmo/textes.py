@@ -40,6 +40,13 @@ TEXTES = {
                      'en': 'H₀ = {h0} km/s/Mpc · Ωm = {om} (incl. Ων = {onu}) · ΩΛ = {ode} · Ωk = {ok} · Ωγ = {og} · '
                            'T₀ = {t} K · Neff = {neff} · Σmν = {mnu} eV'},
     'cosmo_shoes': {'fr': 'Comparer avec SH0ES (H₀ = 73,04)', 'en': 'Compare with SH0ES (H₀ = 73.04)'},
+    'cosmo_echelle': {'fr': 'Distances', 'en': 'Distances'},
+    'cosmo_echelle_aide': {'fr': 'Échelle verticale des courbes : logarithmique (toutes les distances lisibles, de z = 0,001 '
+                                 'à 1100) ou linéaire (proportions réelles).',
+                           'en': 'Vertical scale of the curves: logarithmic (every distance readable, from z = 0.001 '
+                                 'to 1100) or linear (true proportions).'},
+    'cosmo_echelle_log': {'fr': 'Échelle logarithmique', 'en': 'Logarithmic scale'},
+    'cosmo_echelle_lin': {'fr': 'Échelle linéaire', 'en': 'Linear scale'},
     'cosmo_shoes_aide': {'fr': 'Ajoute une colonne : mêmes grandeurs avec la mesure locale de SH0ES (Riess et al. '
                                '2022), en désaccord à ~5σ avec Planck (tension de Hubble). Planck 2018 seulement.',
                          'en': 'Adds a column: same quantities with the local SH0ES measurement (Riess et al. 2022), '
