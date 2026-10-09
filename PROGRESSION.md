@@ -251,3 +251,8 @@ Consigne : « fais au mieux » → appliquer ce qui apporte un gain réel sans r
   --cleanup-tag` des précédentes et suppression des artefacts) ; permissions `actions: write`. Après la 0.1.1 :
   suppression manuelle de v0.1.0 et de ses artefacts.
 - Manuels FR/EN recompilés (34 p. chacun), CHANGELOG FR/EN 0.1.1, README, CONTRIBUTING.
+- **v0.1.1 publiée** (run 37865797635, 8 jobs verts dont `nettoyer`) : 10 actifs, v0.1.0 et son tag supprimés par
+  le job, 0 artefact restant. Essai de `coupole maj` (version simulée 0.0.9) dans ubuntu:24.04 nu : « aucune version »
+  alors que la Release existe → **HTTPS impossible sans `ca-certificates`** (OpenSSL statique de CPython, autorités lues
+  dans /etc/ssl/certs). → **0.1.2** : `ca-certificates` dans Depends, contrôle TLS dans l'essai du paquet de
+  `release.yml`.

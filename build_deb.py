@@ -58,6 +58,8 @@ TAILLES_ICONES = (16, 24, 32, 48, 64, 128, 256, 512)
 # déclarent bien un Provides vers l'ancien nom, mais un nom explicite ne dépend pas de l'âge d'apt).
 DEPENDS = [
     'libc6 (>= 2.28)', 'libstdc++6', 'libgcc-s1',
+    'ca-certificates',                             # HTTPS (Releases GitHub, SIMBAD, JPL…) : OpenSSL est statique dans CPython
+                                                   # mais lit les autorités dans /etc/ssl/certs — absent d'un système nu
     'libglib2.0-0t64 | libglib2.0-0', 'libdbus-1-3',
     'libfontconfig1', 'libfreetype6', 'libpng16-16t64 | libpng16-16', 'libzstd1', 'zlib1g',
     'libgl1', 'libegl1', 'libopengl0',

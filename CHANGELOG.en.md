@@ -2,6 +2,13 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.1.2 — 9 October 2026
+
+- **`.deb` package: `ca-certificates` dependency added.** The bundled interpreter (static OpenSSL) reads the certificate
+  authorities from `/etc/ssl/certs`: on a minimal system without that package every HTTPS connection failed silently
+  (update check, SIMBAD, JPL) — found by trying `coupole maj` in a bare Ubuntu container. The package test in
+  `release.yml` now checks an HTTPS connection from the bundled interpreter.
+
 ## 0.1.1 — 9 October 2026
 
 - **Debian/Ubuntu package** (`coupole_0.1.1_amd64.deb`, `_arm64.deb`, and stable names `coupole-linux-amd64.deb` /
