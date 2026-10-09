@@ -1609,25 +1609,26 @@ class Panneau(QWidget):
         g = QGroupBox(tr('ohp_astro_titre'))
         grille = QGridLayout(g)
         self._astro_valeurs = {}
+        # deux colonnes de valeurs (instrument, focale, pixel, binning | échelle, champ, centre) : encadré compact
         for k, cle in enumerate(self.CHAMPS_ASTRO):
+            ligne, col = (k, 0) if k < 4 else (k - 4, 3)
             lab = aide(QLabel(tr('ohp_astro_' + cle)), 'ohp_astro_aide')
             val = aide(QLabel('—'), 'ohp_astro_aide')
             val.setWordWrap(True)
             val.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
             b = bouton('ohp_astro_copier', lambda _=False, c=cle: self._copier(self._astro_valeurs[c].text()))
-            grille.addWidget(lab, k, 0)
-            grille.addWidget(val, k, 1)
-            grille.addWidget(b, k, 2)
+            grille.addWidget(lab, ligne, col)
+            grille.addWidget(val, ligne, col + 1)
+            grille.addWidget(b, ligne, col + 2)
             self._astro_valeurs[cle] = val
         grille.setColumnStretch(1, 1)
-        h = Flux()
+        grille.setColumnStretch(4, 2)
         self.b_astro_tout = bouton('ohp_astro_tout', lambda: self._copier(self.texte_astrometrie()))
-        h.addWidget(self.b_astro_tout)
-        n = len(self.CHAMPS_ASTRO)
-        grille.addLayout(h, n, 0, 1, 3)
+        grille.addWidget(self.b_astro_tout, 3, 3, 1, 3)
+        n = 4
         self.l_astro_note = QLabel(tr('ohp_astro_note'))
         self.l_astro_note.setWordWrap(True)
-        grille.addWidget(self.l_astro_note, n + 1, 0, 1, 3)
+        grille.addWidget(self.l_astro_note, n, 0, 1, 6)
         self._astro_lot = None
         return g
 

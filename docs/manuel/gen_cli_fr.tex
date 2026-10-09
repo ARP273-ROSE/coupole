@@ -100,7 +100,7 @@ OBJET & objet(s) : « NGC 6888 », « Pluton », « 1998 AG6 », ou un nom de la
 --nuit,\allowbreak{} --night AAAA-MM-JJ & nuit (date du soir) ; répétable\\
 --sans-dates-douteuses,\allowbreak{} --no-doubtful-dates & écarte les poses à DATE-OBS partagée ou datées en plein jour\\
 --tout,\allowbreak{} --all & toute la banque (≈ 78 Go)\\
---format \{xisf,\allowbreak{}fz,\allowbreak{}fits\} & format de sortie : xisf (PixInsight, défaut), fz (FITS compressé sans perte), fits (float32)\\
+--format \{xisf,\allowbreak{}xisf16,\allowbreak{}fz,\allowbreak{}fits\} & format de sortie : xisf (PixInsight, défaut), xisf16 (XISF compatible N.I.N.A. et Siril : entiers 16 bits, zlib), fz (FITS compressé sans perte), fits (float32)\\
 --dest DOSSIER & dossier de destination (défaut : \textasciitilde{}/Coupole/OHP\_DU\_ECU ou celui des réglages)\\
 \bottomrule
 \end{tabularx}
@@ -117,7 +117,7 @@ OBJET & objet(s) : « NGC 6888 », « Pluton », « 1998 AG6 », ou un nom de la
 --sans-dates-douteuses,\allowbreak{} --no-doubtful-dates & écarte les poses à DATE-OBS partagée ou datées en plein jour\\
 --tout,\allowbreak{} --all & toute la banque (≈ 78 Go)\\
 --dest DOSSIER & dossier de destination (défaut : \textasciitilde{}/Coupole/OHP\_DU\_ECU ou celui des réglages)\\
---format \{xisf,\allowbreak{}fz,\allowbreak{}fits\} & format de sortie : xisf (PixInsight, défaut), fz (FITS compressé sans perte), fits (float32)\\
+--format \{xisf,\allowbreak{}xisf16,\allowbreak{}fz,\allowbreak{}fits\} & format de sortie : xisf (PixInsight, défaut), xisf16 (XISF compatible N.I.N.A. et Siril : entiers 16 bits, zlib), fz (FITS compressé sans perte), fits (float32)\\
 --noms,\allowbreak{} --names \{fr,\allowbreak{}en\} & langue des noms de dossiers, d'objets et des en-têtes (défaut : langue de l'interface)\\
 --astap \{auto,\allowbreak{}tous,\allowbreak{}suspectes,\allowbreak{}jamais,\allowbreak{}all,\allowbreak{}suspicious,\allowbreak{}never\} & vérification ASTAP : auto/tous (chaque image si ASTAP est là), suspectes, jamais\\
 --telechargements,\allowbreak{} --downloads N & téléchargements simultanés (défaut automatique ; 4 au plus)\\
@@ -135,7 +135,7 @@ OBJET & objet(s) : « NGC 6888 », « Pluton », « 1998 AG6 », ou un nom de la
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp tout (all)\newline\normalfont\small Toute la banque (≈ 8 000 images, ≈ 78 Go de FITS → ≈ 30 Go en XISF), avec estimation du volume et du temps avant confirmation ; relancer la même commande reprend là où elle s'était arrêtée.}\\
 \midrule
 --dest DOSSIER & dossier de destination (défaut : \textasciitilde{}/Coupole/OHP\_DU\_ECU ou celui des réglages)\\
---format \{xisf,\allowbreak{}fz,\allowbreak{}fits\} & format de sortie : xisf (PixInsight, défaut), fz (FITS compressé sans perte), fits (float32)\\
+--format \{xisf,\allowbreak{}xisf16,\allowbreak{}fz,\allowbreak{}fits\} & format de sortie : xisf (PixInsight, défaut), xisf16 (XISF compatible N.I.N.A. et Siril : entiers 16 bits, zlib), fz (FITS compressé sans perte), fits (float32)\\
 --noms,\allowbreak{} --names \{fr,\allowbreak{}en\} & langue des noms de dossiers, d'objets et des en-têtes (défaut : langue de l'interface)\\
 --astap \{auto,\allowbreak{}tous,\allowbreak{}suspectes,\allowbreak{}jamais,\allowbreak{}all,\allowbreak{}suspicious,\allowbreak{}never\} & vérification ASTAP : auto/tous (chaque image si ASTAP est là), suspectes, jamais\\
 --telechargements,\allowbreak{} --downloads N & téléchargements simultanés (défaut automatique ; 4 au plus)\\
@@ -154,7 +154,7 @@ OBJET & objet(s) : « NGC 6888 », « Pluton », « 1998 AG6 », ou un nom de la
 \midrule
 --telecharger,\allowbreak{} --download & télécharge et convertit les nouveautés listées\\
 --dest DOSSIER & dossier de destination (défaut : \textasciitilde{}/Coupole/OHP\_DU\_ECU ou celui des réglages)\\
---format \{xisf,\allowbreak{}fz,\allowbreak{}fits\} & format de sortie : xisf (PixInsight, défaut), fz (FITS compressé sans perte), fits (float32)\\
+--format \{xisf,\allowbreak{}xisf16,\allowbreak{}fz,\allowbreak{}fits\} & format de sortie : xisf (PixInsight, défaut), xisf16 (XISF compatible N.I.N.A. et Siril : entiers 16 bits, zlib), fz (FITS compressé sans perte), fits (float32)\\
 --noms,\allowbreak{} --names \{fr,\allowbreak{}en\} & langue des noms de dossiers, d'objets et des en-têtes (défaut : langue de l'interface)\\
 --astap \{auto,\allowbreak{}tous,\allowbreak{}suspectes,\allowbreak{}jamais,\allowbreak{}all,\allowbreak{}suspicious,\allowbreak{}never\} & vérification ASTAP : auto/tous (chaque image si ASTAP est là), suspectes, jamais\\
 --telechargements,\allowbreak{} --downloads N & téléchargements simultanés (défaut automatique ; 4 au plus)\\
@@ -235,6 +235,16 @@ NOM\_BASE & nom de cible tel qu'il figure dans la base\\
 \par\medskip
 \begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
 \toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp metadonnees (metadata)\newline\normalfont\small Pour chaque XISF/FITS du dossier : FOCALLEN accordé à l'échelle mesurée (ancienne valeur en HISTORY) et propriétés XISF Instrument:Sensor:XPixelSize, Instrument:Camera:XBinning, Instrument:Telescope:FocalLength… Les pixels ne sont pas touchés (relus et comparés), écriture atomique, journal dans \_traitement/metadonnees.csv. Sans --reecrire : simulation.}\\
+\midrule
+DOSSIER & dossier de sortie (ou un lot)\\
+--reecrire,\allowbreak{} --rewrite & écrit vraiment (sinon : dit seulement ce qui changerait)\\
+--noms,\allowbreak{} --names \{fr,\allowbreak{}en\} & langue des noms de dossiers, d'objets et des en-têtes (défaut : langue de l'interface)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole qualite\newline\normalfont\small Facultatif : fond, bruit, FWHM et ellipticité (carte 3×3), gradient du fond, saturation, traînées, échantillonnage}\\
 \midrule
 DOSSIER & dossier de lots (ou un fichier image)\\
@@ -273,7 +283,7 @@ FICHIER & fichier à lire\\
 Z & redshift(s) à calculer\\
 --objet,\allowbreak{} --object NOM & nom d'objet : redshift demandé à SIMBAD\\
 --modele,\allowbreak{} --model \{planck18,\allowbreak{}planck15,\allowbreak{}wmap9,\allowbreak{}simple,\allowbreak{}perso\} & jeu de paramètres (défaut : planck18)\\
---h0 H0 & H₀ en km/s/Mpc (modèle perso)\\
+--h0 H0 & H₀ en km s⁻¹ Mpc⁻¹ (modèle perso)\\
 --om OM & Ωm total (modèle perso)\\
 --ok OK & Ωk, courbure (planck18 ou perso)\\
 --shoes & ajoute la comparaison SH0ES (planck18)\\

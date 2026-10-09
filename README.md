@@ -71,6 +71,7 @@ Coupole peut signaler (sans jamais télécharger seul) les **nouveautés** de la
 | Format | Pour | Détail |
 |---|---|---|
 | **XISF** (défaut) | PixInsight | Float32 en ADU avec `bounds="-1000:65535"` (rien à régler à l'ouverture, même échelle pour toutes les poses), UInt16 pour les FITS IRIS entiers ; compression zstd+sh niveau 9 : 36 % du FITS d'origine pour le T120. |
+| **XISF compatible** (0.1.9) | N.I.N.A., Siril ≥ 1.4, PixInsight | Entiers 16 bits + piédestal de 1 000 ADU (`PEDESTAL`), zlib+sh comme N.I.N.A. : N.I.N.A. ramène tout flottant à [0, 1] (image blanche) et la 3.2 ne lit pas zstd ; Siril garde les flottants XISF hors de sa plage (vérifié sur le code et par essai réel : tableau « qui lit quoi » du manuel). |
 | **FITS compressé `.fits.fz`** | Siril, astropy, DS9 | Compression par tuiles du standard FITS, **sans perte** : GZIP_2 sans quantification pour les flottants (RICE_1 et HCOMPRESS quantifient : vérifié, écart d'un ADU), RICE_1 pour les entiers. |
 | **FITS float32** | tout logiciel | Non compressé ; dans PixInsight, régler la plage FITS sur 0–65535 (Truncate). |
 
@@ -183,6 +184,9 @@ Everything the interface does is available on the command line (`--json` for scr
 
 **XISF** (default, PixInsight): Float32 in ADU with `bounds="-1000:65535"` (nothing to set when opening, same scale
 for every exposure), UInt16 for integer IRIS FITS; zstd+sh level 9 compression (36 % of the original T120 FITS).
+**Compatible XISF** (0.1.9; N.I.N.A., Siril ≥ 1.4, PixInsight): 16-bit integers + 1,000 ADU pedestal (`PEDESTAL`),
+zlib+sh like N.I.N.A. — N.I.N.A. maps any float to [0, 1] (white image) and 3.2 cannot read zstd; Siril keeps XISF
+floats outside its range (checked in the code and by real tests: « who reads what » table in the manual).
 **`.fits.fz`** (Siril, astropy, DS9): FITS tile compression, **lossless** — GZIP_2 without quantization for floats
 (RICE_1 and HCOMPRESS quantize: checked, one-ADU error), RICE_1 for integers. **float32 FITS**: universal,
 uncompressed. Every file written is read back and compared pixel by pixel.

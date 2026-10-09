@@ -100,7 +100,7 @@ OBJECT & object(s): « NGC 6888 », « Pluto », « 1998 AG6 », or a database n
 --nuit,\allowbreak{} --night YYYY-MM-DD & night (evening date); repeatable\\
 --sans-dates-douteuses,\allowbreak{} --no-doubtful-dates & leave out exposures with a shared DATE-OBS or dated in daytime\\
 --tout,\allowbreak{} --all & the whole bank (≈ 78 GB)\\
---format \{xisf,\allowbreak{}fz,\allowbreak{}fits\} & output format: xisf (PixInsight, default), fz (lossless compressed FITS), fits (float32)\\
+--format \{xisf,\allowbreak{}xisf16,\allowbreak{}fz,\allowbreak{}fits\} & output format: xisf (PixInsight, default), xisf16 (XISF compatible with N.I.N.A. and Siril: 16-bit integers, zlib), fz (lossless compressed FITS), fits (float32)\\
 --dest FOLDER & destination folder (default: \textasciitilde{}/Coupole/OHP\_DU\_ECU or the one in the settings)\\
 \bottomrule
 \end{tabularx}
@@ -117,7 +117,7 @@ OBJECT & object(s): « NGC 6888 », « Pluto », « 1998 AG6 », or a database n
 --sans-dates-douteuses,\allowbreak{} --no-doubtful-dates & leave out exposures with a shared DATE-OBS or dated in daytime\\
 --tout,\allowbreak{} --all & the whole bank (≈ 78 GB)\\
 --dest FOLDER & destination folder (default: \textasciitilde{}/Coupole/OHP\_DU\_ECU or the one in the settings)\\
---format \{xisf,\allowbreak{}fz,\allowbreak{}fits\} & output format: xisf (PixInsight, default), fz (lossless compressed FITS), fits (float32)\\
+--format \{xisf,\allowbreak{}xisf16,\allowbreak{}fz,\allowbreak{}fits\} & output format: xisf (PixInsight, default), xisf16 (XISF compatible with N.I.N.A. and Siril: 16-bit integers, zlib), fz (lossless compressed FITS), fits (float32)\\
 --noms,\allowbreak{} --names \{fr,\allowbreak{}en\} & language of folder names, object names and headers (default: interface language)\\
 --astap \{auto,\allowbreak{}tous,\allowbreak{}suspectes,\allowbreak{}jamais,\allowbreak{}all,\allowbreak{}suspicious,\allowbreak{}never\} & ASTAP check: auto/all (every image when ASTAP is present), suspicious, never\\
 --telechargements,\allowbreak{} --downloads N & simultaneous downloads (automatic by default; at most 4)\\
@@ -135,7 +135,7 @@ OBJECT & object(s): « NGC 6888 », « Pluto », « 1998 AG6 », or a database n
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp tout (all)\newline\normalfont\small The whole bank (≈ 8,000 images, ≈ 78 GB of FITS → ≈ 30 GB as XISF), with a volume and time estimate before confirmation; running the same command again resumes where it stopped.}\\
 \midrule
 --dest FOLDER & destination folder (default: \textasciitilde{}/Coupole/OHP\_DU\_ECU or the one in the settings)\\
---format \{xisf,\allowbreak{}fz,\allowbreak{}fits\} & output format: xisf (PixInsight, default), fz (lossless compressed FITS), fits (float32)\\
+--format \{xisf,\allowbreak{}xisf16,\allowbreak{}fz,\allowbreak{}fits\} & output format: xisf (PixInsight, default), xisf16 (XISF compatible with N.I.N.A. and Siril: 16-bit integers, zlib), fz (lossless compressed FITS), fits (float32)\\
 --noms,\allowbreak{} --names \{fr,\allowbreak{}en\} & language of folder names, object names and headers (default: interface language)\\
 --astap \{auto,\allowbreak{}tous,\allowbreak{}suspectes,\allowbreak{}jamais,\allowbreak{}all,\allowbreak{}suspicious,\allowbreak{}never\} & ASTAP check: auto/all (every image when ASTAP is present), suspicious, never\\
 --telechargements,\allowbreak{} --downloads N & simultaneous downloads (automatic by default; at most 4)\\
@@ -154,7 +154,7 @@ OBJECT & object(s): « NGC 6888 », « Pluto », « 1998 AG6 », or a database n
 \midrule
 --telecharger,\allowbreak{} --download & download and convert the listed new images\\
 --dest FOLDER & destination folder (default: \textasciitilde{}/Coupole/OHP\_DU\_ECU or the one in the settings)\\
---format \{xisf,\allowbreak{}fz,\allowbreak{}fits\} & output format: xisf (PixInsight, default), fz (lossless compressed FITS), fits (float32)\\
+--format \{xisf,\allowbreak{}xisf16,\allowbreak{}fz,\allowbreak{}fits\} & output format: xisf (PixInsight, default), xisf16 (XISF compatible with N.I.N.A. and Siril: 16-bit integers, zlib), fz (lossless compressed FITS), fits (float32)\\
 --noms,\allowbreak{} --names \{fr,\allowbreak{}en\} & language of folder names, object names and headers (default: interface language)\\
 --astap \{auto,\allowbreak{}tous,\allowbreak{}suspectes,\allowbreak{}jamais,\allowbreak{}all,\allowbreak{}suspicious,\allowbreak{}never\} & ASTAP check: auto/all (every image when ASTAP is present), suspicious, never\\
 --telechargements,\allowbreak{} --downloads N & simultaneous downloads (automatic by default; at most 4)\\
@@ -235,6 +235,16 @@ DB\_NAME & target name as it appears in the database\\
 \par\medskip
 \begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
 \toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp metadonnees (metadata)\newline\normalfont\small For each XISF/FITS of the folder: FOCALLEN matched to the measured scale (old value in HISTORY) and the XISF properties Instrument:Sensor:XPixelSize, Instrument:Camera:XBinning, Instrument:Telescope:FocalLength… Pixels are not touched (read back and compared), atomic writing, log in \_traitement/metadonnees.csv. Without --rewrite: dry run.}\\
+\midrule
+FOLDER & output folder (or one stack)\\
+--reecrire,\allowbreak{} --rewrite & really write (otherwise: only say what would change)\\
+--noms,\allowbreak{} --names \{fr,\allowbreak{}en\} & language of folder names, object names and headers (default: interface language)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole qualite\newline\normalfont\small Optional: background, noise, FWHM and ellipticity (3×3 map), background gradient, saturation, trails, sampling}\\
 \midrule
 FOLDER & folder of stacks (or one image file)\\
@@ -273,7 +283,7 @@ FILE & file to read\\
 Z & redshift(s) to compute\\
 --objet,\allowbreak{} --object NAME & object name: redshift requested from SIMBAD\\
 --modele,\allowbreak{} --model \{planck18,\allowbreak{}planck15,\allowbreak{}wmap9,\allowbreak{}simple,\allowbreak{}perso\} & parameter set (default: planck18)\\
---h0 H0 & H₀ in km/s/Mpc (custom model)\\
+--h0 H0 & H₀ in km s⁻¹ Mpc⁻¹ (custom model)\\
 --om OM & total Ωm (custom model)\\
 --ok OK & Ωk, curvature (planck18 or perso)\\
 --shoes & add the SH0ES comparison (planck18)\\

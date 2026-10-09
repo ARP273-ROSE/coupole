@@ -378,6 +378,47 @@ object, filter, exposure; sorting by name = sorting in time. Names are safe unde
 bank's exposures for the same key (object, instrument, filter, and night for a moving object); a fixed object split
 into several fields counts its stacks together.
 
+\paragraph{Owned $\neq$ stackable together.} « 840 / 840 » in the \emph{owned} column says all the images of an
+object are there, not that they form one stack: the \emph{stacks} column of the object list and its tooltip give
+the breakdown (« 840 images sorted into 9 stacks: field 1 T120: B 200 · V 300 · R 300; … — stack each stack
+separately »), and right-clicking an object offers \emph{Show this object's stacks} (Stacks tab filtered,
+\emph{All stacks} button) and \emph{Open the target folder} (double-click: the same).
+
+\paragraph{For PixInsight / N.I.N.A.} Below the stack table, a box gives, for the selected stack, what to enter in
+PixInsight (ImageSolver, WBPP \emph{Astrometric solution} panel) or N.I.N.A.: instrument, \textbf{focal length} (the
+one giving the measured scale: $f = 206.265 \times \mathrm{XPIXSZ} / \mathrm{PIXSCALE}$, for instance 7,234.1~mm for
+the T120 instead of the original header's 7,200), \textbf{effective pixel} (binning included: T120 iKon-L in
+binning 2: 27~\textmu m), binning, \textbf{scale} (\si{\arcsecond}\,px$^{-1}$), field and centre, each with
+\emph{Copy}, plus \emph{Copy all} (also on a stack's right-click: \emph{Copy the astrometry parameters}). The values
+are read from the header of the stack's images, never hard-coded; the \emph{focal length}, \emph{pixel} and
+\emph{scale} columns can be hidden by right-clicking the header. \texttt{LOT.txt} gives the same values. If a
+program shows twice the scale, it applied the binning twice: enter the unbinned pixel (13.5~\textmu m) with binning
+2, or the effective pixel with binning 1.
+
+Checked in PixInsight's code (PJSR: \texttt{AstrometricMetadata.js}, \texttt{BPP-Solver.js}): ImageSolver reads the
+\texttt{Instrument:Telescope:FocalLength} (m) and \texttt{Instrument:Sensor:XPixelSize} (\textmu m) properties,
+otherwise \texttt{FOCALLEN} and \texttt{XPIXSZ}, without multiplying by \texttt{XBINNING}; WBPP solves the integrated
+\emph{master} with its metadata if they survive integration, otherwise with the values of its panel, which stay those
+of the last instrument used: enter focal length and pixel there (one WBPP settings file per instrument avoids typing
+them again). Coupole therefore writes \texttt{FOCALLEN} matched to the measured scale (old value in \texttt{HISTORY})
+and the \texttt{Instrument:Sensor:XPixelSize}/\texttt{YPixelSize}, \texttt{Instrument:Camera:XBinning}/\texttt{YBinning},
+\texttt{Instrument:Camera:Name}, \texttt{Instrument:Telescope:FocalLength} and \texttt{Aperture} (T120: 1.2~m)
+properties. For files already converted: \cmd{coupole ohp metadata FOLDER --rewrite} (without \texttt{--rewrite}:
+dry run) completes the headers \emph{without touching the pixels} (block copied byte for byte, read back and
+compared; atomic writing; log \texttt{\_traitement/metadonnees.csv}) and notes focal length and pixel in the state
+database; \cmd{coupole ohp sort} then rewrites the \texttt{LOT.txt} files. To check a master: open it,
+\emph{FITSHeader} or \emph{Image > Properties}, look for \texttt{XPIXSZ}, \texttt{FOCALLEN} and \texttt{Instrument:*}.
+
+\subsection{Opening an image}\label{sec:ouvrir}
+Double-click an owned image (image list, Quality table): the system's associated application. Right-click:
+\emph{Open}, \emph{Open with} and \emph{Open file location} (file selected: Explorer \texttt{/select}, Finder
+\texttt{open -R}, freedesktop file manager through D-Bus \texttt{FileManager1.ShowItems} — Dolphin, Nautilus… —,
+otherwise the folder). \emph{Open with} only offers the astronomy programs found on the computer (PixInsight, Siril,
+ASTAP, Aladin, N.I.N.A.: PATH, usual locations, flatpak, \texttt{/Applications}, Program Files) \emph{and} able to
+read this file according to the checked table of section~\ref{sec:compat}; the others are greyed with the reason
+(« ASTAP only reads uncompressed XISF: choose the FITS format in Processing »). An image not downloaded yet: the
+status bar says so.
+
 \subsection{Anomalies}
 \capture{img/anomalies_en.png}{1.0}
 \begin{center}\small
@@ -451,19 +492,36 @@ and that dense catalogues serve small fields. The bank's fields range from 10.7�
 \textbf{System} & \textbf{Program (links of the official page)}\\
 \midrule
 Windows x64 & \texttt{astap\_setup.exe} then \texttt{d80\_star\_database.exe} (same folder, \texttt{C:\textbackslash Program Files\textbackslash astap}); optional: \texttt{astap\_command-line\_version\_win64.zip}\\
-Windows ARM64 & \texttt{astap\_command-line\_version\_win11\_aarch64.zip} and \texttt{d80\_star\_database.zip}, in one folder\\
+Windows ARM64 & \texttt{astap\_command-line\_version\_win11\_aarch64.zip} in \texttt{C:\textbackslash astap}; catalogue: \texttt{d80\_star\_database.exe} (x86 installer, emulated) into that folder, or \texttt{d50\_star\_database.zip} (no zipped D80)\\
 macOS Apple Silicon & \texttt{astap\_M1.pkg}, \texttt{d80\_star\_database.pkg}; once: \texttt{codesign --force -s - /Applications/ASTAP.app/Contents/MacOS/astap}\\
 macOS Intel & \texttt{astap.pkg}, \texttt{d80\_star\_database.pkg}\\
 Linux Debian/Ubuntu & \texttt{astap\_amd64.deb} (or \texttt{astap\_aarch64.deb}), \texttt{d80\_star\_database.deb} (into \texttt{/opt/astap})\\
-Linux Fedora/openSUSE & \texttt{astap\_amd64.rpm}, catalogue \texttt{d80\_star\_database.zip} unzipped into \texttt{/opt/astap}\\
-Linux Arch & \texttt{astap\_amd64.pkg.tar.zst}, catalogue as zip\\
+Linux Fedora/openSUSE & \texttt{astap\_amd64.rpm}; D80 extracted from the \texttt{.deb} (below) or zipped D50 into \texttt{/opt/astap}\\
+Linux Arch/Manjaro & \texttt{astap\_amd64\_gtk3.pkg.tar.zst} (or GTK2); D80: AUR package \texttt{d80-star-db-astap} or extracted from the \texttt{.deb}; D50: \texttt{d50\_star\_database.pkg.tar.zst}\\
 Other Linux & \texttt{astap\_amd64.tar.gz} or \texttt{astap\_command-line\_version\_Linux\_amd64.zip}; no official AppImage\\
 \bottomrule
 \end{tabularx}
 \end{center}
 
+\paragraph{No zipped D80.} The « D80 (zipped) » link of the official page is dead (404, checked on 9/10/2026): D80
+only exists as \texttt{.exe}, \texttt{.pkg} and \texttt{.deb}. Outside Debian, extract it from the \texttt{.deb}
+without touching the permissions of \texttt{/} (command checked on the real package: 1,213,392,756 bytes, 1,476
+tiles):
+\begin{ccode}
+bsdtar -xf d80\_star\_database.deb data.tar.xz\\
+sudo mkdir -p /opt/astap\\
+sudo tar -xJf data.tar.xz -C /opt/astap --strip-components=3 --no-same-owner\\
+\hspace*{2em}--wildcards \textquotesingle./opt/astap/d80\_*\textquotesingle
+\end{ccode}
+(never \texttt{sudo tar -x … -C /}: the archive contains \texttt{./} and \texttt{./opt/}). \textbf{Arch/Manjaro}: the
+official package puts \texttt{astap} and \texttt{astap\_cli} in \texttt{/opt/astap} only (nothing on the PATH:
+Coupole finds them there); the GTK2 graphical \texttt{astap} needs \texttt{libgtk-x11-2.0}, missing from the official
+repositories (AUR only) and not declared; \texttt{astap\_cli} is self-contained (statically linked) and is all
+Coupole needs; for ASTAP's interface, the GTK3 package. A continuous-integration test checks every link, for every
+system.
+
 \begin{sloppypar}\noindent\textbf{Detection.} Order: chosen path (Preferences, \cmd{coupole astap --set}),
-\texttt{COUPOLE\_ASTAP} variable, PATH (\texttt{astap\_cli}, then \texttt{astap}), default locations (Windows
+\texttt{COUPOLE\_ASTAP} variable, \texttt{astap\_cli} everywhere (PATH then default locations), only then \texttt{astap}, default locations (Windows
 \texttt{Program Files\textbackslash astap}, \texttt{\%LOCALAPPDATA\%\textbackslash astap}; macOS
 \texttt{/Applications/ASTAP.app}, \texttt{/usr/local/opt/astap}; Linux \texttt{/opt/astap}, \texttt{/usr/bin},
 \texttt{/usr/local/bin}, \texttt{\textasciitilde/astap}). Catalogue: chosen folder, \texttt{COUPOLE\_ASTAP\_CATALOGUE},
@@ -478,6 +536,7 @@ declared complete with its 1,476 tiles; the version is read from \texttt{astap\_
 \textbf{Format} & \textbf{Content} & \textbf{Readers}\\
 \midrule
 XISF (default) & Float32 in ADU, \texttt{bounds="-1000:65535"}; UInt16 for integer IRIS FITS; zstd+sh level 9 compression; \texttt{Observation:*}, \texttt{Instrument:*} properties & PixInsight\\
+Compatible XISF & UInt16 + 1,000~ADU pedestal (\texttt{PEDESTAL}), zlib+sh (what N.I.N.A. writes) & PixInsight, Siril $\geq$ 1.4, N.I.N.A.\\
 FITS \texttt{.fits.fz} & lossless tile compression: GZIP\_2 without quantization (floats), RICE\_1 (integers) & Siril, astropy, DS9\\
 FITS & uncompressed float32 (or UInt16) & all\\
 \bottomrule
@@ -488,8 +547,51 @@ every exposure; the −1,000 lower bound keeps the negative values of short cali
 original FITS for the T120 (float64), 62~\% for IRIS. \textbf{Compressed FITS}: measured with astropy 8.0, RICE\_1
 and HCOMPRESS\_1 quantize floats (one-ADU error, even with \texttt{quantize\_level=0}); only GZIP\_1 and GZIP\_2
 without quantization restore floats bit for bit. \textbf{float32 FITS}: in PixInsight, set the FITS input range to
-0–65,535 with \emph{Truncate}. For every format the difference to the original FITS stays below half a float32 ULP
-(checked pixel by pixel).
+0–65,535 with \emph{Truncate}. For every format except the compatible XISF, the difference to the original FITS
+stays below half a float32 ULP (checked pixel by pixel).
+
+\paragraph{Compatible XISF (N.I.N.A., Siril).} UInt16 = ADU + 1,000 rounded, clipped to [0, 65,535]; the pedestal
+keeps the negative backgrounds of short calibrated exposures and is written in the header (\texttt{PEDESTAL},
+PixInsight's convention). Measured on 66 exposures of the bank (\texttt{outils/audit2/mesure\_perte\_uint16.py}):
+rounding $\le 0.5$~ADU, background mean changed by at most 0.014~ADU (background noise: 10 to 109~ADU); pixels
+clipped high: at most 0.012~\% (stars above 64,535~ADU); no pixel lost low any more. Without the pedestal, a 10-s
+T120 exposure with an over-subtracted background (−220~ADU) lost 99.75~\% of its pixels to 0 and 6.1~\% of the pixels
+of 1–2-s exposures fell to 0: hence the pedestal. Integer IRIS images stay lossless.
+
+\subsection*{Who reads what (checked)}\label{sec:compat}
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.25\linewidth}ccccX@{}}
+\toprule
+\textbf{File} & \textbf{PixInsight} & \textbf{Siril} & \textbf{N.I.N.A.} & \textbf{ASTAP} & \textbf{Note}\\
+\midrule
+XISF Float32 (default) & yes & no & no & no & Siril $\geq$ 1.4 reads it but outside its [0, 1] range; N.I.N.A.: white image\\
+Compatible XISF (UInt16, zlib) & yes & $\geq$ 1.4.0 & yes & no & ASTAP: uncompressed XISF only\\
+XISF UInt16 zstd (integer IRIS) & yes & $\geq$ 1.4.0 & no (3.2) & no & zstd read by N.I.N.A. since January 2026 (development)\\
+FITS Float32 & yes & yes & no & yes & N.I.N.A. assumes [0, 1]; Aladin, astropy: yes\\
+FITS UInt16 & yes & yes & yes & yes & \\
+\texttt{.fits.fz} Float32 (GZIP) & — & yes & — & no & ASTAP: Rice only\\
+\texttt{.fits.fz} UInt16 (Rice) & — & yes & — & $\geq$ 2026.07.16 & —: not checked\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Sources: \textbf{PixInsight}, PCL code (\texttt{XISF.cpp}: zlib, lz4, lz4hc, zstd codecs, with or without
+\texttt{+sh}; \texttt{XISFReader.cpp}: \texttt{bounds} mandatory for a float, clipped then mapped to [0, 1]); XISF
+1.0 specification revision 1 (September 2026, \url{https://pixinsight.com/doc/docs/XISF-1.0-spec/XISF-1.0-spec.html}),
+XSD schema identical to the one Coupole uses. \textbf{Siril}, real test of the official AppImages (siril-cli, pixels
+read back and compared): 1.2.0 and 1.2.6 do not read XISF (« file type not supported »), 1.4.0 and 1.4.4 read all
+our codecs bit for bit; but XISF floats stay in ADU there (statistics multiplied by 65,535), whereas float FITS are
+mapped to [0, 1]; Debian 13 and Ubuntu 24.04 packages (Siril 1.2.x): no XISF. \textbf{N.I.N.A.}, code
+(\texttt{Version-3.2} tag, 27/11/2025: \texttt{XISF.cs} l.~304–328: lz4, lz4hc, zlib, with or without \texttt{+sh};
+\texttt{Float32Converter.cs} l.~23: $(\text{ushort})(v \times 65535)$, \texttt{bounds} never read) and real decoding
+of one of our files. \textbf{ASTAP}, official page (« uncompressed » XISF, Rice \texttt{.fits.fz} since 2026.07.16,
+not GZIP). Test files for testers: \texttt{tests/donnees/} (synthetic image as default XISF, compatible XISF and
+FITS, under 300~KB each).
+
+\paragraph{Deviation from revision 1.} Coupole writes the centre of the astrometric solution in
+\texttt{Observation:Center:RA/Dec} (choice of the reference processing, older than the revision); revision 1 keeps
+these properties for the point the telescope was aimed at and standardizes the solution in the
+\texttt{AstrometricSolution:} namespace (not written: the solution stays in the WCS keywords, which PixInsight reads).
+Kept as is in 0.1.9 so as not to change files compared with the reference processing.
 
 % =====================================================================
 \section{Image quality (optional)}
@@ -504,12 +606,23 @@ announced, since reading then limits the speed), one image being read while the 
 stays free, \emph{Stop} is immediate. Each measured image is kept at once in the cache
 \texttt{\_traitement/qualite.sqlite} by (path, size, date) and shown; its stack's \texttt{QUALITE.csv} (atomic write)
 is rewritten at most every 5~s and at the end of the stack or on stop: starting again redoes nothing, closing then
-reopening resumes. The folder is walked only once (folders and dates read in parallel, cache read in one query):
-starting again on the whole, already measured bank over a share takes 2~s instead of 72~s. Above 200 images, Coupole offers a \textbf{sample} of
-5 images per stack (spread in time: first, last, middle…, adjustable in the tab and with \cmd{--sample N}), enough to
-judge a stack, or \emph{Measure everything} with the duration estimated from the first 3 images; progress shows the
+reopening resumes. Above 200 images, Coupole offers a \textbf{sample} of
+5 images per stack (spread in time: first, last, middle…, adjustable in the tab and with \cmd{--sample N}; measured
+first, while you choose), enough to judge a stack, or \emph{Measure everything} with the duration estimated from the
+images already measured; progress shows the
 time left and the rate (images/min). On the author's NAS (Ryzen 5 8500G): 1.21 → 0.33~s per T120 image (vectorised
 Moffat model, analytic derivatives, 120 stars per image), i.e. the whole bank in about ten minutes on 5 processes.
+
+\paragraph{Listing as a stream.} Measuring starts with the first stack found, while the listing goes on (« Listing
+the folder: 1,234 files found in 56 stacks… », \emph{Stop} immediate); the listing opens no file and reads size and
+date from each folder's listing (at most one \texttt{stat} per image). In a Coupole output, only the stack folders
+are read, from \texttt{INDEX\_LOTS.csv} or the state database; processing leftovers (\texttt{converties},
+\texttt{telechargements}) are never taken for stacks. On a share, 32 threads read the folders. The cache is
+\textbf{never} written on a network share: Linux's SMB client forwards SQLite's locks to the server, which refuses
+them (« database is locked » after 30~s, three times before the first measurement in 0.1.8: the 90~s of « Listing the
+folder… » seen on a real share); it goes to the user's cache folder (an old cache on the share is read). Measured on
+a real Samba share, 831 XISF of 09\_Galaxies: 0.1.8 92.7~s before the first measurement (10~ms latency); 0.1.9 full
+listing in 0.24–0.57~s (10~ms) and 0.57–1.05~s (20~ms), first result in 0.2–0.6~s.
 
 \begin{center}\small
 \begin{tabularx}{\linewidth}{@{}lXl@{}}
@@ -530,7 +643,7 @@ sampling & FWHM < 2 px, 2–5 px, > 5 px & —\\
 \end{center}
 On 14 IRIS images (12 nights, FWHM from 2.4 to 11.3 px), the measured FWHM and the one written by PinPoint in the
 header correlate (r = 0.974), median ratio 1.046 (0.85 to 1.16): the two estimators differ (PinPoint's method is
-not described). Not offered for lack of validation: mag/arcsec² (no zero point), dust-donut detection. A FWHM
+not described). Not offered for lack of validation: mag\,arcsec$^{-2}$ (no zero point), dust-donut detection. A FWHM
 growing towards an edge may come from the sensor, field curvature, collimation, but also from seeing, tracking or
 focus: the map alone cannot tell.
 
@@ -599,8 +712,18 @@ marks at 0.01 / 0.1 / 1 / 10 / 100 / 1000). While dragging, the vertical marker 
 follow live: values are then \emph{interpolated} on the curve grid (300 logarithmic points, typical deviation
 $< 0.5$~\%, $\sigma$ and SH0ES columns suspended) and the status line says so; on release the exact computation
 resumes. Arrows: fine step (1~\% of a decade); Page up/down: one decade. The $z$ field and the slider stay in sync
-both ways. The curves follow the window when it is resized, including when they sit under the table (window
-narrower than 1500 px): half of the visible height goes to them.
+both ways.
+
+\capture{img/module_cosmo_cote_en.png}{1.0}
+\paragraph{Layout.} Side by side, the table takes the width of its columns (to their content, never truncated) and
+the curves all the rest; stacked, the table shows its 18 rows when there is room, otherwise the room is shared while
+keeping at least 300~px for the curves. \emph{View > Cosmology layout} (or the module's \emph{Layout} list):
+automatic (side by side from 1,550~px wide, back to stacked below 1,450~px: no flipping while resizing), always side
+by side, or always stacked; the choice and the splitter position of each layout are kept.
+
+\paragraph{Units.} Negative-exponent notation: $H_0$ in km\,s$^{-1}$\,Mpc$^{-1}$, velocities in km\,s$^{-1}$; in
+CSV files, unambiguous ASCII (\texttt{km s\^{}-1 Mpc\^{}-1}), likewise on a console that cannot show exponents
+(Windows cp1252).
 
 \paragraph{Origin and checks.} The computation core is taken from the same author's « cosmologie-redshift »
 calculator (public repository \url{https://github.com/ARP273-ROSE/cosmologie-redshift}), with astropy.cosmology.
@@ -732,6 +855,8 @@ File dialog without the NAS, or generic & Linux: install \texttt{xdg-desktop-por
 System dialog does not open & Preferences > File dialogs: Qt.\\
 \texttt{\textasciitilde/.local/bin/coupole} not found & add \texttt{\textasciitilde/.local/bin} to the \texttt{PATH} (line given by the installer).\\
 \texttt{.part} or \texttt{.tmp} file in \texttt{\_traitement} & left by a cut: resuming reuses it (\texttt{.part}) or replaces it; nothing to do.\\
+WBPP does not find focal length and pixel & enter the values of the \emph{For PixInsight / N.I.N.A.} box (Stacks tab) in the \emph{Astrometric solution} panel; older files: \cmd{coupole ohp metadata FOLDER --rewrite}.\\
+White image in N.I.N.A. or Siril & compatible XISF format (Processing tab), section~\ref{sec:compat}.\\
 \bottomrule
 \end{tabularx}
 \end{center}
