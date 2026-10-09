@@ -69,6 +69,39 @@ TEXTES = {
     'qual_barre_aide': {'fr': 'Images mesurées.', 'en': 'Images measured.'},
     'qual_fini': {'fr': 'Terminé : {n} image(s) dans {lots} lot(s) ({deja} du cache) en {duree}.',
                   'en': 'Done: {n} image(s) in {lots} stack(s) ({deja} from the cache) in {duree}.'},
+    # ------------------------------------------------------------ 0.1.11 : poses de ciel seulement, erreurs visibles
+    'qual_col_etat': {'fr': 'état', 'en': 'status'},
+    'qual_etat_mesuree': {'fr': 'mesurée', 'en': 'measured'},
+    'qual_etat_erreur': {'fr': 'erreur : {motif}', 'en': 'error: {motif}'},
+    'qual_etat_exclu': {'fr': 'exclu (calibration : {motif})', 'en': 'excluded (calibration: {motif})'},
+    'qual_err_xisf': {'fr': 'format XISF non lu ({detail})', 'en': 'XISF format not read ({detail})'},
+    'qual_err_fits': {'fr': 'FITS non lu ({detail})', 'en': 'FITS not read ({detail})'},
+    'qual_err_lecture': {'fr': 'fichier illisible ({detail})', 'en': 'unreadable file ({detail})'},
+    'qual_err_memoire': {'fr': 'mémoire insuffisante', 'en': 'not enough memory'},
+    'qual_err_processus': {'fr': 'processus de mesure arrêté (mémoire ?)', 'en': 'measuring process stopped (memory?)'},
+    'qual_err_autre': {'fr': '{detail}', 'en': '{detail}'},
+    'qual_exclu_dossier': {'fr': 'dossier « {nom} »', 'en': 'folder « {nom} »'},
+    'qual_exclu_nom': {'fr': 'nom de fichier', 'en': 'file name'},
+    'qual_exclu_entete': {'fr': 'en-tête : {type}', 'en': 'header: {type}'},
+    'qual_bilan': {'fr': '{trouvees} image(s) trouvée(s), {mesurees} pose(s) de ciel mesurée(s), {erreurs} en erreur{motifs}, '
+                         '{exclus} fichier(s) de calibration exclu(s).',
+                   'en': '{trouvees} image(s) found, {mesurees} sky frame(s) measured, {erreurs} with an error{motifs}, '
+                         '{exclus} calibration file(s) excluded.'},
+    'qual_avec_calibration': {'fr': 'Inclure aussi les poses de calibration', 'en': 'Also include calibration frames'},
+    'qual_avec_calibration_aide': {'fr': "Décoché (défaut) : seules les poses de ciel (lights) sont mesurées. Les flats, darks, "
+                                         "bias/offsets, masters et sorties intermédiaires de WBPP (_c, _cc, _r…) sont exclus "
+                                         "d'après le nom du dossier (Flats, Darks…), le nom du fichier (FLAT_, masterDark…) "
+                                         "puis l'en-tête (IMAGETYP). Cocher pour tout mesurer.",
+                                   'en': 'Unticked (default): only sky frames (lights) are measured. Flats, darks, bias/offsets, '
+                                         'masters and WBPP intermediate outputs (_c, _cc, _r…) are excluded from the folder name '
+                                         '(Flats, Darks…), the file name (FLAT_, masterDark…) then the header (IMAGETYP). Tick '
+                                         'to measure everything.'},
+    'qual_voir_exclus': {'fr': 'Fichiers exclus…', 'en': 'Excluded files…'},
+    'qual_voir_exclus_aide': {'fr': 'Liste des fichiers de calibration et intermédiaires exclus de la mesure, avec le motif.',
+                              'en': 'List of the calibration and intermediate files left out of the measurement, with the reason.'},
+    'qual_exclus_titre': {'fr': '{n} fichier(s) exclu(s) de la mesure', 'en': '{n} file(s) left out of the measurement'},
+    'qual_aide_avec_calibration': {'fr': 'mesurer aussi flats, darks, bias, masters et fichiers intermédiaires (exclus par défaut)',
+                                   'en': 'also measure flats, darks, bias, masters and intermediate files (excluded by default)'},
     'qual_col_fichier': {'fr': 'fichier', 'en': 'file'},
     'qual_col_etoiles': {'fr': 'étoiles mesurées', 'en': 'stars measured'},
     'qual_col_fwhm_px': {'fr': 'FWHM (px)', 'en': 'FWHM (px)'},
@@ -126,7 +159,17 @@ TEXTES = {
                              "lit la liste des images dans _traitement/etat.sqlite au lieu de parcourir le dossier. "
                              "Au-delà de 200 images, Coupole propose un <b>échantillon</b> (5 images par lot, réparties dans "
                              "le temps, mesurées en premier) ou tout mesurer, avec la durée estimée sur les images déjà "
-                             "mesurées ; progression avec temps restant et débit.</p>",
+                             "mesurées ; progression avec temps restant et débit.</p>"
+                             "<h4>Poses de ciel seulement</h4><p>Par défaut, seules les poses de ciel (lights) sont mesurées : "
+                             "les dossiers Flat(s), Dark(s), Bias, Offset(s), Calibration, Master(s), cosmetized, registered… "
+                             "(« Plats », « Noirs » compris), les fichiers FLAT_, DARK_, BIAS_ (N.I.N.A., ASIAIR), les masters "
+                             "(masterDark, masterFlat, masterLight) et les sorties de WBPP (_c, _cc, _r) sont exclus sans être "
+                             "ouverts ; une pose dont l'en-tête (IMAGETYP, FRAME, Observation:Image:Type) dit flat, dark, bias "
+                             "ou master est exclue à la mesure. Le résumé donne le nombre d'exclus ; <b>Fichiers exclus…</b> "
+                             "en montre la liste. <b>Inclure aussi les poses de calibration</b> mesure tout.</p>"
+                             "<p>Un fichier non mesurable (format non lu, fichier abîmé, mémoire) apparaît dans le tableau, "
+                             "colonne <b>état</b>, avec le motif ; le résumé compte les erreurs et le journal (coupole.log) "
+                             "garde le détail.</p>",
                        'en': "<h3>Image quality (optional)</h3><p>Measurements made with SEP (Source Extractor in Python) and "
                              "numpy, validated on synthetic images with known parameters (FWHM better than 2 % for Gaussian and "
                              "Moffat profiles from 2.5 to 7 px, ellipticity ± 0.02, background 0.5 %, noise 5 %).</p>"
@@ -144,5 +187,14 @@ TEXTES = {
                              "images from _traitement/etat.sqlite instead of walking the folder. Above 200 images, Coupole "
                              "offers a <b>sample</b> (5 images per stack, spread in time, measured first) or measuring "
                              "everything, with the duration estimated on the images already measured; progress with time "
-                             "left and rate.</p>"},
+                             "left and rate.</p>"
+                             "<h4>Sky frames only</h4><p>By default only sky frames (lights) are measured: Flat(s), Dark(s), "
+                             "Bias, Offset(s), Calibration, Master(s), cosmetized, registered… folders, FLAT_, DARK_, BIAS_ "
+                             "files (N.I.N.A., ASIAIR), masters (masterDark, masterFlat, masterLight) and WBPP outputs (_c, "
+                             "_cc, _r) are left out without being opened; a frame whose header (IMAGETYP, FRAME, "
+                             "Observation:Image:Type) says flat, dark, bias or master is left out when measured. The summary "
+                             "gives the number left out; <b>Excluded files…</b> lists them. <b>Also include calibration "
+                             "frames</b> measures everything.</p><p>A file that cannot be measured (format not read, damaged "
+                             "file, memory) shows in the table, <b>status</b> column, with the reason; the summary counts the "
+                             "errors and the log (coupole.log) keeps the details.</p>"},
 }

@@ -123,30 +123,34 @@ def chemin_travail(chemin_partage) -> str:
 
 
 def _copier_base(src, dst):
-    """Copie de fichier (et du ``-journal`` éventuel, que SQLite rejouera localement) vers `dst` ; la copie est
-    ouverte une fois (annulation du journal), vérifiée, puis mise en place.  OSError / ValueError si illisible."""
+    """Copie de fichier (et du ``-journal`` ou du ``-wal`` éventuel, que SQLite rejouera localement) vers `dst` ;
+    la copie est ouverte une fois (annulation du journal, report du WAL d'une base d'``ohp_xisf.py``), passée en
+    journal DELETE, vérifiée, puis mise en place.  OSError / ValueError si illisible."""
     tmp = dst + '.arrivee'
-    for suffixe in ('', '-journal'):
+    for suffixe in ('', '-journal', '-wal', '-shm'):
         try:
             os.remove(tmp + suffixe)
         except OSError:
             pass
     try:
         shutil.copyfile(src, tmp)
-        j = src + '-journal'
-        if os.path.isfile(j) and os.path.getsize(j) > 0:
-            shutil.copyfile(j, tmp + '-journal')
+        for suffixe in ('-journal', '-wal'):
+            j = src + suffixe
+            if os.path.isfile(j) and os.path.getsize(j) > 0:
+                shutil.copyfile(j, tmp + suffixe)
         if os.path.getsize(tmp) > 0:
-            db = sqlite3.connect(tmp, timeout=5)        # rejoue (annule) un journal chaud
+            db = sqlite3.connect(tmp, timeout=5)        # rejoue (annule) un journal chaud, reporte le WAL
             try:
                 db.execute('SELECT count(*) FROM sqlite_master').fetchone()
+                if db.execute('PRAGMA journal_mode').fetchone()[0] != 'delete':
+                    db.execute('PRAGMA journal_mode=DELETE')
             finally:
                 db.close()
             if not integre(tmp):
                 raise ValueError('integrity_check: %s' % src)
         os.replace(tmp, dst)
     finally:
-        for suffixe in ('', '-journal'):
+        for suffixe in ('', '-journal', '-wal', '-shm'):
             try:
                 os.remove(tmp + suffixe)
             except OSError:
@@ -360,11 +364,11 @@ class BasePartagee:
                         self.divergence = True
                         self.rapporter('base_locale_divergence_en_cours', partage=self.partage)
                         return False
-                j = self.partage + '-journal'
-                if os.path.isfile(j) and os.path.getsize(j) > 0:   # écrivain direct en cours (ou planté) sur le partage
-                    self.erreur_envoi = 'journal'
-                    self.rapporter('base_locale_partage_occupe', partage=self.partage)
-                    return False
+                for j in (self.partage + '-journal', self.partage + '-wal'):
+                    if os.path.isfile(j) and os.path.getsize(j) > 0:   # écrivain direct en cours (ou planté)
+                        self.erreur_envoi = 'journal'
+                        self.rapporter('base_locale_partage_occupe', partage=self.partage)
+                        return False
                 version = int(s.get('version') or 0) + 1
                 db = sqlite3.connect(instantane)
                 try:
@@ -393,6 +397,12 @@ class BasePartagee:
                         if k == ESSAIS_REMPLACEMENT - 1:
                             raise
                         time.sleep(0.5 * (k + 1))
+                for suffixe in ('-wal', '-shm'):        # WAL vide et index d'une base WAL remplacée : périmés
+                    try:
+                        if os.path.getsize(self.partage + suffixe) == 0 or suffixe == '-shm':
+                            os.remove(self.partage + suffixe)
+                    except OSError:
+                        pass
                 self._noter(empreinte_locale, attendu, version)
                 self.erreur_envoi = None
                 return True

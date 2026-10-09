@@ -18,6 +18,7 @@ diamètre qui lui donne son nom ; autres télescopes : seulement si l'en-tête l
 """
 from __future__ import annotations
 
+import collections
 import csv
 import io
 import os
@@ -200,33 +201,51 @@ def _base_etat(dossier):
     return None
 
 
-def maj_etat(dossier, valeurs: dict) -> int:
+def maj_etat(dossier, valeurs: dict, chemins: dict | None = None, compte: dict | None = None) -> int:
     """Note focale, pixel et binning dans la base d'état de la sortie (par nom de fichier) : le prochain rangement
-    (`coupole ohp ranger`) les écrit dans LOT.txt.  Rend le nombre d'images mises à jour (0 sans base)."""
+    (`coupole ohp ranger`) les écrit dans LOT.txt.  `chemins` ({nom de fichier: chemin trouvé sur le disque}) :
+    l'emplacement relatif au dossier de sortie (`info['chemin']`, 0.1.11) est noté aussi — copie d'un ancien
+    traitement dont la base parle des chemins d'une autre machine ; `compte['chemins']` reçoit leur nombre.
+    Rend le nombre d'images mises à jour (0 sans base)."""
     import json
     import sqlite3
+    from .emplacements import dans_sortie, relatif_valide
     chemin = _base_etat(dossier)
-    if not chemin or not valeurs:
+    chemins = chemins or {}
+    if not chemin or not (valeurs or chemins):
         return 0
+    racine = os.path.dirname(os.path.dirname(chemin))
     n = 0
+    n_chemins = 0
     from ...core import base_partagee
     base = base_partagee.BasePartagee(chemin)          # partage réseau : base de travail locale, recopiée
     try:
         db = sqlite3.connect(base.ouvrir(), timeout=5)
         try:
+            # base d'ohp_xisf.py en WAL : écritures dans le -wal, base principale inchangée → la recopie vers
+            # le partage ne voyait rien de neuf ; et un -wal ne passe pas un partage SMB
+            db.execute('PRAGMA journal_mode=DELETE')
             maj = []
             for i, info in db.execute("SELECT id, info FROM images WHERE statut='ok'"):
                 try:
                     d = json.loads(info or '{}')
                 except ValueError:
                     continue
-                v = valeurs.get(os.path.basename((d.get('final') or '').replace('\\', '/')))
-                if not v:
-                    continue
-                nouveau = {'focale_mm': round(v['focale_mm'], 1) if v.get('focale_mm') else None,
-                           'pixel_um': v.get('pixel_um'), 'binning': list(v['binning']) if v.get('binning') else None}
-                if any(d.get(k) != val for k, val in nouveau.items()):
-                    d.update(nouveau)
+                nom = os.path.basename((d.get('final') or '').replace('\\', '/'))
+                change = False
+                v = valeurs.get(nom)
+                if v:
+                    nouveau = {'focale_mm': round(v['focale_mm'], 1) if v.get('focale_mm') else None,
+                               'pixel_um': v.get('pixel_um'), 'binning': list(v['binning']) if v.get('binning') else None}
+                    if any(d.get(k) != val for k, val in nouveau.items()):
+                        d.update(nouveau)
+                        change = True
+                rel = dans_sortie(chemins[nom], racine) if nom in chemins else ''
+                if rel and relatif_valide(d.get('chemin')) != rel:
+                    d['chemin'] = rel
+                    n_chemins += 1
+                    change = True
+                if change:
                     maj.append((json.dumps(d, ensure_ascii=False), i))
             if maj:
                 db.executemany('UPDATE images SET info=? WHERE id=?', maj)
@@ -237,6 +256,8 @@ def maj_etat(dossier, valeurs: dict) -> int:
             db.close()
     except (sqlite3.Error, OSError, base_partagee.Divergence):
         return 0
+    if compte is not None:
+        compte['chemins'] = n_chemins
     return n
 
 
@@ -247,8 +268,10 @@ def reecrire_dossier(dossier, langue='fr', simuler=False, rapporter=None, arret=
     from ...core.config import ecrire_atomique
     lots = parcours.lister(dossier, ('.xisf', '.fits', '.fit', '.fts', '.fits.fz'))
     fichiers = [f for v in lots.values() for f in v]
-    out = {'fichiers': len(fichiers), 'modifies': 0, 'inchanges': 0, 'erreurs': 0, 'base': 0}
+    out = {'fichiers': len(fichiers), 'modifies': 0, 'inchanges': 0, 'erreurs': 0, 'base': 0, 'chemins': 0}
     valeurs = {}
+    noms = collections.Counter(os.path.basename(f) for f in fichiers)
+    chemins = {os.path.basename(f): f for f in fichiers if noms[os.path.basename(f)] == 1}   # noms ambigus : non
     journal = io.StringIO()
     w = csv.writer(journal, delimiter=';')
     w.writerow(['fichier', 'changements', 'erreur'])
@@ -269,7 +292,13 @@ def reecrire_dossier(dossier, langue='fr', simuler=False, rapporter=None, arret=
         if rapporter:
             rapporter(k + 1, len(fichiers))
     if not simuler:
-        out['base'] = maj_etat(dossier, valeurs)
+        compte = {}
+        out['base'] = maj_etat(dossier, valeurs, chemins, compte)
+        out['chemins'] = compte.get('chemins', 0)
+        base = _base_etat(dossier)
+        if base:                                     # le reste (hors de ce dossier) : par _traitement/journal.csv
+            from . import emplacements
+            out['chemins'] += emplacements.migrer_dossier(os.path.dirname(os.path.dirname(base)))['migrees']
         try:
             os.makedirs(os.path.join(dossier, '_traitement'), exist_ok=True)
             ecrire_atomique(os.path.join(dossier, '_traitement', 'metadonnees.csv'), journal.getvalue(), 'utf-8-sig')

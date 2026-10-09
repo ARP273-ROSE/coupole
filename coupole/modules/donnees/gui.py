@@ -23,7 +23,7 @@ class Panneau(QWidget):
         self.ds = []
         v = QVBoxLayout(self)
         h = QHBoxLayout()
-        h.addWidget(bouton('don_ouvrir', self.ouvrir))
+        h.addWidget(bouton('don_ouvrir', lambda *_: self.ouvrir()))   # (pas le booléen « checked »)
         # fichiers récents (10 au plus, gardés d'une fermeture à l'autre) : menu reconstruit à chaque ouverture
         self.b_recents = bouton('don_recents')
         self.menu_recents = QMenu(self.b_recents)
@@ -95,11 +95,24 @@ class Panneau(QWidget):
         etat().ecrire('recents.donnees', [])
         self._maj_recents()
 
+    @staticmethod
+    def filtre_ouvrir() -> str:
+        """« Spectres et séries (*.fits *.fit …);;FITS (…);;CSV (…) » : un NOM par filtre (le portail XDG refuse un
+        filtre sans nom — en 0.1.10 « (*.fits …) » seul : le dialogue ne s'ouvrait pas sous KDE)."""
+        tous = []
+        for ext, _, _ in donnees._lecteurs:
+            for e in ext:
+                if '*' + e not in tous:
+                    tous.append('*' + e)
+        parties = ['%s (%s)' % (tr('don_filtre_tous'), ' '.join(tous))]
+        for nom, ext in donnees.formats():
+            parties.append('%s (%s)' % (nom, ' '.join('*' + e for e in ext.split())))
+        return ';;'.join(parties)
+
     def ouvrir(self, chemin=None):
         if not chemin:
-            filtres = ' '.join('*' + e for ext, _, _ in donnees._lecteurs for e in ext)
             chemin, _ = fichiers.choisir_fichier(self, tr('don_ouvrir'), memoire.dossier('donnees_ouvrir'),
-                                                 '(%s)' % filtres)
+                                                 self.filtre_ouvrir())
         if not chemin:
             return
         memoire.retenir('donnees_ouvrir', chemin, est_fichier=True)

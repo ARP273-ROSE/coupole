@@ -1,0 +1,5 @@
+﻿dossier;type;objet;lot;filtre;poses;pose_totale_s;nuits;centre_ra;centre_dec;angle_deg;alignement
+01_Asteroides/914_Palisana/nuit_2023-08-15_T120/R;01_Asteroides;(914) Palisana;nuit_2023-08-15_T120;R;10;200.0;2023-08-15;300.60114;23.6329;180.25;CometAlignment
+09_Galaxies/NGC_5866/champ_1_IRIS-2048/g_SDSS;09_Galaxies;NGC 5866;champ_1_IRIS-2048;g;1;40.0;2024-07-04;226.6394;55.75313;359.15;StarAlignment
+09_Galaxies/NGC_5866/champ_1_IRIS-2048/r_SDSS;09_Galaxies;NGC 5866;champ_1_IRIS-2048;r;2;160.0;2024-07-04;226.64415;55.76212;359.14;StarAlignment
+09_Galaxies/NGC_5866/champ_1_IRIS-2048/z_SDSS;09_Galaxies;NGC 5866;champ_1_IRIS-2048;z;1;40.0;2024-07-04;226.6396;55.75315;359.23;StarAlignment

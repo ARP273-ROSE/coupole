@@ -224,8 +224,39 @@ def forme(mxx, myy, mxy):
     return SIGMA_FWHM * math.sqrt(a * b), SIGMA_FWHM * a, SIGMA_FWHM * b, 1 - b / a, ang
 
 
+def _texte(v) -> str:
+    v = '' if v is None else str(v)
+    return v.strip().strip("'").strip()
+
+
+def entete(chemin) -> dict:
+    """En-tête seul (mots-clés FITS et, pour un XISF, ses propriétés), sans lire les pixels."""
+    p = str(chemin)
+    if p.lower().endswith('.xisf'):
+        from ...core import xisf
+        e = xisf.lire_entete(p)
+        ent = {k: _texte(v) for k, v, _c in e['mots_cles'] if k not in ('HISTORY', 'COMMENT')}
+        for k, v in e['proprietes'].items():
+            ent.setdefault('xisf:' + k, _texte(v))
+        nx, ny = e['geometrie']
+        ent.setdefault('NAXIS1', nx)
+        ent.setdefault('NAXIS2', ny)
+        return ent
+    import warnings
+    from astropy.io import fits
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        with fits.open(p, memmap=False, lazy_load_hdus=True) as hd:
+            for h in hd:
+                if h.header.get('NAXIS', 0) >= 2:
+                    return {k: h.header[k] for k in h.header if k not in ('HISTORY', 'COMMENT', '')}
+    return {}
+
+
 def lire_image(chemin):
-    """(données float64 natives, en-tête dict) depuis XISF, FITS ou FITS compressé."""
+    """(données float32, en-tête dict) depuis XISF (lecture tolérante : N.I.N.A., ASIAIR, PixInsight…), FITS ou
+    FITS compressé.  Float32 : une pose de 61 Mpx (ASI 6200) tient en 245 Mo au lieu de 490 Mo en float64 ; une
+    image couleur est ramenée à la moyenne de ses canaux."""
     p = str(chemin)
     if p.lower().endswith('.xisf'):
         from ...core import xisf
@@ -233,18 +264,37 @@ def lire_image(chemin):
         ent = {}
         for k, v, c in inf['mots_cles']:
             if k not in ('HISTORY', 'COMMENT'):
-                ent[k] = v.strip("'").strip() if v.startswith("'") else v
-        return np.asarray(a, dtype=np.float64), ent
+                ent[k] = _texte(v) if v.startswith("'") else v
+        for k, v in inf['proprietes'].items():
+            ent.setdefault('xisf:' + k, _texte(v))
+        return _plan(a), ent
     import warnings
     from astropy.io import fits
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         with fits.open(p, memmap=False) as hd:
             for h in hd:
-                if getattr(h, 'data', None) is not None and np.ndim(h.data) == 2:
-                    return np.asarray(h.data, dtype=np.float64), {k: h.header[k] for k in h.header
-                                                                  if k not in ('HISTORY', 'COMMENT', '')}
-    raise ValueError('no 2-D image in %s' % p)
+                if getattr(h, 'data', None) is not None and np.ndim(h.data) in (2, 3):
+                    return _plan(h.data), {k: h.header[k] for k in h.header
+                                           if k not in ('HISTORY', 'COMMENT', '')}
+    raise ValueError('no 2-D image')
+
+
+def _plan(a):
+    a = np.asarray(a)
+    if a.ndim == 3:                                    # couleur : moyenne des canaux (une étoile reste une étoile)
+        return a.mean(axis=0, dtype=np.float32)
+    return a.astype(np.float32, copy=False) if a.dtype != np.float32 or not a.dtype.isnative else a
+
+
+# type d'image : seules les poses de ciel sont mesurées (niveau 3 de l'exclusion, voir calibration.py)
+def type_image(ent) -> str:
+    """Valeur de IMAGETYP / FRAME / propriété XISF Observation:Image:Type, en minuscules ('' si absente)."""
+    for k in ('IMAGETYP', 'FRAME', 'FRAMETYP', 'xisf:Observation:Image:Type'):
+        v = _texte((ent or {}).get(k))
+        if v:
+            return v.lower()
+    return ''
 
 
 def _flottant(ent, *cles):
@@ -268,20 +318,39 @@ def echelle(ent):
     return abs(c1) * 3600 if c1 else None
 
 
-def analyser(data, ent=None, max_etoiles=120):
-    """Mesure une image ; renvoie un dictionnaire (valeurs None quand la mesure n'est pas possible)."""
+def etoiles_max(nx: int, ny: int) -> int:
+    """Étoiles ajustées au plus : 120 pour une image de la banque (≤ 16 Mpx), davantage pour un grand capteur
+    (61 Mpx : 400), pour que chaque neuvième de la carte 3 × 3 garde assez d'étoiles."""
+    return int(max(120, min(400, nx * ny // 150_000)))
+
+
+def analyser(data, ent=None, max_etoiles=None, en_place: bool = False):
+    """Mesure une image ; renvoie un dictionnaire (valeurs None quand la mesure n'est pas possible).
+
+    Calcul en float32 (fond soustrait en place dans une copie, ou dans `data` si `en_place`) : la mémoire de pointe d'une pose de 61 Mpx reste vers 3 fois la
+    taille de l'image en float32 ; les découpes autour de chaque étoile sont ajustées en float64."""
     import sep
     ent = ent or {}
-    a = np.ascontiguousarray(data, dtype=np.float64)
+    pret = isinstance(data, np.ndarray) and data.dtype == np.float32 and data.flags.c_contiguous and \
+        data.flags.writeable and data.dtype.isnative
+    # `en_place` : le tableau de l'appelant sert de travail (processus de mesure : il n'en a plus besoin)
+    a = data if (en_place and pret) else np.array(data, dtype=np.float32, order='C', copy=True)
     masque = ~np.isfinite(a)
     if masque.any():
-        a = np.where(masque, 0.0, a)
+        a[masque] = 0.0
+    else:
+        masque = None
     ny, nx = a.shape
+    if max_etoiles is None:
+        max_etoiles = etoiles_max(nx, ny)
     bkg = sep.Background(a, mask=masque, bw=64, bh=64, fw=3, fh=3)
-    fond_carte = bkg.back()
-    sub = a - fond_carte
+    fond_carte = bkg.back(dtype=np.float32)
     rms = float(bkg.globalrms)
-    r = {'nx': nx, 'ny': ny, 'fond_adu': float(bkg.globalback), 'bruit_adu': rms}
+    globalback = float(bkg.globalback)
+    del bkg
+    np.subtract(a, fond_carte, out=a)
+    sub = a
+    r = {'nx': nx, 'ny': ny, 'fond_adu': globalback, 'bruit_adu': rms}
     pose = _flottant(ent, 'EXPTIME', 'EXPOSURE')
     r['fond_adu_s'] = r['fond_adu'] / pose if pose else None
     sep.set_extract_pixstack(max(300000, nx * ny // 4))
@@ -320,7 +389,7 @@ def analyser(data, ent=None, max_etoiles=120):
             if np.sum(d < 2 * demi) > 1:
                 continue
             xi, yi = int(round(x)), int(round(y))
-            cut = sub[yi - demi:yi + demi + 1, xi - demi:xi + demi + 1]
+            cut = sub[yi - demi:yi + demi + 1, xi - demi:xi + demi + 1].astype(np.float64)
             try:
                 m = moments_adaptatifs(cut, x - xi + demi, y - yi + demi, s0=max(1.0, float(o['a'])))
                 if m is None:

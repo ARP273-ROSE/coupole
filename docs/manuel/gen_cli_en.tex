@@ -246,7 +246,7 @@ DB\_NAME & target name as it appears in the database\\
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp metadonnees (metadata)\newline\normalfont\small For each XISF/FITS of the folder: FOCALLEN matched to the measured scale (old value in HISTORY) and the XISF properties Instrument:Sensor:XPixelSize, Instrument:Camera:XBinning, Instrument:Telescope:FocalLength… Pixels are not touched (read back and compared), atomic writing, log in \_traitement/metadonnees.csv. Without --rewrite: dry run.}\\
 \midrule
 FOLDER & output folder (or one stack)\\
---reecrire,\allowbreak{} --rewrite & really write (otherwise: only say what would change)\\
+--reecrire,\allowbreak{} --rewrite & really write (otherwise: only say what would change); also records each file's location, relative to the output folder, in the state database (copy from an older processing run, another computer)\\
 --noms,\allowbreak{} --names \{fr,\allowbreak{}en\} & language of folder names, object names and headers (default: interface language)\\
 \bottomrule
 \end{tabularx}
@@ -260,6 +260,7 @@ FOLDER & folder of stacks (or one image file)\\
 --echantillon,\allowbreak{} --sample N & measure N images per stack (spread in time) instead of all\\
 --tout,\allowbreak{} --all & measure everything even above 200 images (otherwise: sample of 5 per stack, announced)\\
 --processus,\allowbreak{} --processes N & number of measuring processes (default: machine plan)\\
+--avec-calibration,\allowbreak{} --with-calibration & also measure flats, darks, bias, masters and intermediate files (excluded by default)\\
 \bottomrule
 \end{tabularx}
 \par\medskip

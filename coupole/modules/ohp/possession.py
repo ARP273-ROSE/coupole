@@ -51,6 +51,7 @@ class Possession:
         self.statuts: dict[str, str] = statuts or {}        # id → 'ok' | 'doublon' | 'echec'
         self.details: dict[str, dict] = details or {}       # id → {'date': …, 'chemin': …}
         self.existe = bool(self.statuts)
+        self.a_migrer: list = []                            # [(id, chemin relatif)] trouvés par journal.csv
 
     @classmethod
     def vide(cls) -> 'Possession':
@@ -64,7 +65,13 @@ class Possession:
     @classmethod
     def lire_avec_infos(cls, dest) -> tuple['Possession', list]:
         """(Possession, [(id, info)] des converties) en UNE lecture de la base : l'interface demandait les deux
-        et décodait deux fois les 7 625 JSON (et, sur un partage, ouvrait deux fois la base)."""
+        et décodait deux fois les 7 625 JSON (et, sur un partage, ouvrait deux fois la base).
+
+        Le chemin de chaque image convertie est rapporté au dossier de sortie courant (`emplacements.resoudre` :
+        `info['chemin']`, `final` s'il est dedans, `journal.csv`, dossier de type) ; dans les infos rendues,
+        `final` est remplacé (en mémoire seulement) par ce chemin local, pour la complétude des lots.
+        `a_migrer` : [(id, chemin relatif)] trouvés par le journal, à noter dans la base (`emplacements.migrer`)."""
+        from . import emplacements
         dest = str(dest or '')
         chemin = os.path.join(dest, '_traitement', 'etat.sqlite') if dest else ''
         if not chemin or not os.path.exists(chemin):
@@ -75,36 +82,53 @@ class Possession:
             # URI en lecture seule : on ne crée rien, on ne modifie rien, on ne gêne pas un pilote qui écrit.
             db = sqlite3.connect(_uri_lecture_seule(chemin), uri=True, timeout=5)
             try:
-                for i, statut, maj, info in db.execute('SELECT id, statut, maj, info FROM images'):
-                    if statut not in ('ok', 'doublon', 'echec'):
-                        continue
-                    statuts[i] = statut
-                    chemin_local = ''
-                    if info:
-                        try:
-                            d = json.loads(info)
-                            chemin_local = d.get('final') or ''
-                            if statut == 'ok':
-                                infos_ok.append((i, d))
-                        except ValueError:
-                            pass
-                    details[i] = {'date': (maj or '')[:19].replace('T', ' '), 'chemin': _relatif(chemin_local, dest)}
+                lignes = db.execute('SELECT id, statut, maj, info FROM images').fetchall()
             finally:
                 db.close()
         except Exception:                        # sqlite3.Error, OSError : rien de possédé plutôt qu'un plantage
             return cls(dest), []
-        return cls(dest, statuts, details), infos_ok
+        journal = None
+        a_migrer = []
+        for i, statut, maj, info in lignes:
+            if statut not in ('ok', 'doublon', 'echec'):
+                continue
+            statuts[i] = statut
+            rel, origine = '', ''
+            if info and statut == 'ok':
+                try:
+                    d = json.loads(info)
+                except ValueError:
+                    d = None
+                if isinstance(d, dict):
+                    rel, origine = emplacements.resoudre(dest, d, journal={'url': {}, 'source': {}})
+                    if origine not in ('base',):             # journal lu une seule fois, et seulement s'il sert
+                        if journal is None:
+                            journal = emplacements.lire_journal(dest)
+                        rel, origine = emplacements.resoudre(dest, d, journal)
+                    if origine == 'journal':
+                        a_migrer.append((i, rel))
+                    d = dict(d, _id=i)
+                    if rel:
+                        d['final'] = emplacements.absolu(dest, rel)
+                    infos_ok.append((i, d))
+            details[i] = {'date': (maj or '')[:19].replace('T', ' '), 'chemin': rel.replace('/', os.sep),
+                          'origine': origine}
+        poss = cls(dest, statuts, details)
+        poss.a_migrer = a_migrer
+        return poss, infos_ok
 
     # ---------------------------------------------------------------- par image
     def statut(self, x: dict) -> str:
         return self.statuts.get(ident(x), 'absente')
 
     def detail(self, x: dict) -> dict:
-        """{'statut', 'date', 'chemin'} ; le chemin local est relatif à la destination quand il est dedans."""
+        """{'statut', 'date', 'chemin', 'origine'} ; le chemin est relatif au dossier de sortie courant ('' si
+        introuvable) ; origine : 'base', 'journal' (journal.csv), 'rebase' (dossier de type) ou ''."""
         i = ident(x)
         d = self.details.get(i, {})
         # chemin déjà rendu relatif à la lecture (fil de fond) : rien à recalculer à chaque affichage
-        return {'statut': self.statuts.get(i, 'absente'), 'date': d.get('date', ''), 'chemin': d.get('chemin') or ''}
+        return {'statut': self.statuts.get(i, 'absente'), 'date': d.get('date', ''), 'chemin': d.get('chemin') or '',
+                'origine': d.get('origine', '')}
 
     def possedee(self, x: dict) -> bool:
         """Plus rien à télécharger pour cette image (convertie, ou écartée comme doublon de pixels)."""

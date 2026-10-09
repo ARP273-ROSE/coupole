@@ -1,4 +1,4 @@
-"""XISF 1.0 : écrivain minimal et lecteur indépendant (contrôle strict).
+"""XISF 1.0 : écrivain minimal et lecteur indépendant (contrôle strict de nos fichiers, lecture tolérante des autres).
 
 Repris de ``_outils/xisf_ecrire.py`` et ``_outils/xisf_lire.py`` (traitement de
 la banque OHP du 7-8 octobre 2026, 7 625 fichiers validés par le schéma XSD
@@ -233,91 +233,142 @@ def valider_xsd(xml: bytes, xsd) -> None:
         raise ErreurXISF('XSD: %s' % schema.error_log.last_error)
 
 
-def lire(chemin, xsd=None):
-    """Lit et contrôle un XISF monolithique à une image.  Renvoie (tableau, infos)."""
+def lire(chemin, xsd=None, strict: bool = False):
+    """Lit un XISF monolithique ; renvoie (tableau, infos).
+
+    `strict=True` : contrôle complet de la spécification (fichiers écrits par Coupole, tests, vérification) —
+    déclaration XML, Metadata et ses propriétés obligatoires, une seule image, mots-clés complets et bien nommés,
+    identifiants de propriétés, espace inutilisé nul, bounds des flottants.
+
+    Par défaut, lecture TOLÉRANTE des fichiers des autres logiciels (N.I.N.A., ASIAIR, PixInsight, Siril…) : on ne
+    refuse que ce qui empêche vraiment de lire les pixels (signature, géométrie, format d'échantillon, bloc hors du
+    fichier, compression inconnue, taille décompressée, somme de contrôle fausse).  `<FITSKeyword>` sans
+    `comment` ni `value` (N.I.N.A. : « CD1_1 »), Metadata absente (ASIAIR), propriétés inconnues ou en double,
+    attributs et éléments en plus (ColorFilterArray, Resolution, Thumbnail…), checksum absent, `bounds` sur des
+    entiers, plusieurs images (la première est lue) : acceptés.  Image couleur (n canaux) : tableau (n, ny, nx)."""
     with open(chemin, 'rb') as f:
         debut = f.read(16)
-        _verifier(debut[:8] == b'XISF0100', 'signature missing')
+        _verifier(debut[:8] == b'XISF0100', 'signature missing (not a monolithic XISF file)')
         lg = int.from_bytes(debut[8:12], 'little')
-        _verifier(debut[12:16] == b'\0\0\0\0', 'reserved field not zero')
-        _verifier(lg <= ENTETE_MAX, 'header too large: %d bytes' % lg)
+        if strict:
+            _verifier(debut[12:16] == b'\0\0\0\0', 'reserved field not zero')
+        _verifier(0 < lg <= ENTETE_MAX, 'header too large: %d bytes' % lg)
         taille_fichier = os.fstat(f.fileno()).st_size
         _verifier(taille_fichier <= 16 + lg + PIXELS_MAX * 8 + ALIGNEMENT, 'file too large')
         f.seek(0)
         tout = f.read(16 + lg + ALIGNEMENT)                # en-tête et bourrage ; le bloc de pixels est lu à part
     xml = tout[16:16 + lg]
-    _verifier(xml.startswith(b'<?xml version="1.0" encoding="UTF-8"?>'), 'XML declaration missing')
+    if strict:
+        _verifier(xml.startswith(b'<?xml version="1.0" encoding="UTF-8"?>'), 'XML declaration missing')
     try:
-        xml.decode('utf-8')
-        racine = ET.fromstring(xml)
+        if strict:
+            xml.decode('utf-8')
+        racine = ET.fromstring(xml.rstrip(b'\0 \t\r\n'))
     except (UnicodeDecodeError, ET.ParseError) as e:        # en-tête abîmé (fichier partiel, octets altérés)
         raise ErreurXISF('invalid XML header: %s' % e)
     _verifier(racine.tag == NS + 'xisf', 'root %s' % racine.tag)
-    _verifier(racine.get('version') == '1.0', 'root version')
+    if strict:
+        _verifier(racine.get('version') == '1.0', 'root version')
     if xsd is not None:
         valider_xsd(xml, xsd)
     meta = racine.find(NS + 'Metadata')
-    _verifier(meta is not None, 'Metadata missing')
-    ids = {p.get('id') for p in meta.findall(NS + 'Property')}
-    _verifier({'XISF:CreationTime', 'XISF:CreatorApplication'} <= ids, 'mandatory Metadata properties missing')
+    if strict:
+        _verifier(meta is not None, 'Metadata missing')
+        ids = {p.get('id') for p in meta.findall(NS + 'Property')}
+        _verifier({'XISF:CreationTime', 'XISF:CreatorApplication'} <= ids, 'mandatory Metadata properties missing')
     images = racine.findall(NS + 'Image')
-    _verifier(len(images) == 1, '%d images' % len(images))
+    _verifier(len(images) == 1 if strict else len(images) >= 1, '%d images' % len(images))
     im = images[0]
     try:
         geo = [int(v) for v in (im.get('geometry') or '').split(':')]
     except ValueError:
         raise ErreurXISF('geometry %s' % im.get('geometry'))
-    _verifier(len(geo) == 3 and geo[2] == 1 and min(geo) > 0, 'geometry %s' % im.get('geometry'))
-    _verifier(geo[0] * geo[1] <= PIXELS_MAX, 'image too large: %dx%d' % (geo[0], geo[1]))
+    if strict:
+        _verifier(len(geo) == 3 and geo[2] == 1 and min(geo) > 0, 'geometry %s' % im.get('geometry'))
+    else:
+        _verifier(len(geo) == 3 and min(geo) > 0, 'geometry %s (only 2-D images with channels)' % im.get('geometry'))
+    _verifier(geo[0] * geo[1] * geo[2] <= PIXELS_MAX, 'image too large: %dx%d' % (geo[0], geo[1]))
     fmt = im.get('sampleFormat')
     _verifier(fmt in TYPES, 'sampleFormat %s' % fmt)
     bounds = im.get('bounds')
-    if fmt.startswith('Float'):
+    if strict and fmt.startswith('Float'):
         _verifier(bounds is not None, 'bounds missing for a floating point image')
     if bounds is not None:
-        lo, hi = (float(v) for v in bounds.split(':'))
-        _verifier(lo < hi, 'inconsistent bounds')
-    _verifier(im.get('colorSpace', 'Gray') == 'Gray', 'colorSpace')
-    _verifier(im.get('pixelStorage', 'Planar') == 'Planar', 'pixelStorage')
-    m = re.match(r'^attachment:(\d+):(\d+)$', im.get('location', ''))
-    _verifier(m is not None, 'location %s' % im.get('location'))
+        try:
+            lo, hi = (float(v) for v in bounds.split(':'))
+        except ValueError:
+            if strict:
+                raise ErreurXISF('bounds %s' % bounds)
+            bounds = None
+        else:
+            if strict:
+                _verifier(lo < hi, 'inconsistent bounds')
+            elif not lo < hi:
+                bounds = None
+    if strict:
+        _verifier(im.get('colorSpace', 'Gray') == 'Gray', 'colorSpace')
+        _verifier(im.get('pixelStorage', 'Planar') == 'Planar', 'pixelStorage')
+    m = re.match(r'^attachment:(\d+):(\d+)$', (im.get('location') or '').strip())
+    _verifier(m is not None, 'location %s (only attached blocks are read)' % im.get('location'))
     pos, taille = int(m.group(1)), int(m.group(2))
-    _verifier(pos >= 16 + lg and pos + taille <= taille_fichier, 'block outside the file')
-    _verifier(not tout[16 + lg:pos].strip(b'\0'), 'unused space not zero')
+    _verifier(pos >= 16 + lg and pos + taille <= taille_fichier, 'block outside the file (truncated file?)')
+    if strict:
+        _verifier(not tout[16 + lg:pos].strip(b'\0'), 'unused space not zero')
     with open(chemin, 'rb') as f:
         f.seek(pos)
         bloc = f.read(taille)
-    _verifier(len(bloc) == taille, 'block outside the file')
+    _verifier(len(bloc) == taille, 'block outside the file (truncated file?)')
     cs = im.get('checksum')
     if cs:
-        algo, dig = cs.split(':')
+        algo, _, dig = cs.partition(':')
         h = {'sha1': hashlib.sha1, 'sha-1': hashlib.sha1, 'sha256': hashlib.sha256, 'sha-256': hashlib.sha256,
-             'sha512': hashlib.sha512, 'sha-512': hashlib.sha512}[algo]
-        _verifier(h(bloc).hexdigest() == dig, 'wrong checksum: altered block')
+             'sha512': hashlib.sha512, 'sha-512': hashlib.sha512}.get(algo.lower())
+        if h is None:
+            _verifier(not strict, 'checksum algorithm %s' % algo)
+        else:
+            _verifier(h(bloc).hexdigest() == dig.lower(), 'wrong checksum: altered block')
     brut = _decompresser(bloc, im.get('compression')) if im.get('compression') else bloc
     dt = np.dtype(TYPES[fmt])
     if im.get('byteOrder') == 'big':
         dt = dt.newbyteorder('>')
-    nx, ny = geo[0], geo[1]
-    _verifier(len(brut) == nx * ny * dt.itemsize, 'pixel data size')
-    data = (brut.view(dt) if isinstance(brut, np.ndarray) else np.frombuffer(brut, dt)).reshape(ny, nx)
+    nx, ny, nc = geo
+    _verifier(len(brut) == nx * ny * nc * dt.itemsize, 'pixel data size')
+    plat = brut.view(dt) if isinstance(brut, np.ndarray) else np.frombuffer(brut, dt)
+    if nc == 1:
+        data = plat.reshape(ny, nx)
+    elif im.get('pixelStorage', 'Planar') == 'Normal':       # entrelacé : canaux par pixel
+        data = np.moveaxis(plat.reshape(ny, nx, nc), -1, 0)
+    else:
+        data = plat.reshape(nc, ny, nx)
     mots = []
     for k in im.findall(NS + 'FITSKeyword'):
         nom = k.get('name')
-        _verifier(nom is not None and k.get('value') is not None and k.get('comment') is not None,
-                  'incomplete FITSKeyword')
-        _verifier(RE_MOTCLE.match(nom) is not None, 'invalid FITS keyword name: %r' % nom)
-        if nom in ('HISTORY', 'COMMENT'):
-            _verifier(k.get('value') == '', '%s with a value' % nom)
-        mots.append((nom, k.get('value'), k.get('comment')))
+        if strict:
+            _verifier(nom is not None and k.get('value') is not None and k.get('comment') is not None,
+                      'incomplete FITSKeyword')
+            _verifier(RE_MOTCLE.match(nom) is not None, 'invalid FITS keyword name: %r' % nom)
+            if nom in ('HISTORY', 'COMMENT'):
+                _verifier(k.get('value') == '', '%s with a value' % nom)
+        elif not nom:
+            continue
+        mots.append((nom, k.get('value') or '', k.get('comment') or ''))
     props = {}
     for p in im.findall(NS + 'Property'):
-        _verifier(RE_ID.match(p.get('id', '')) is not None, 'invalid property id %r' % p.get('id'))
-        _verifier(p.get('id') not in props, 'duplicate property %s' % p.get('id'))
-        props[p.get('id')] = p.get('value') if p.get('value') is not None else (p.text or '')
+        pid = p.get('id', '')
+        if strict:
+            _verifier(RE_ID.match(pid) is not None, 'invalid property id %r' % pid)
+            _verifier(pid not in props, 'duplicate property %s' % pid)
+        elif not pid or pid in props:
+            continue
+        props[pid] = p.get('value') if p.get('value') is not None else (p.text or '')
     return data, {'format': fmt, 'bounds': bounds, 'compression': im.get('compression'), 'mots_cles': mots,
                   'proprietes': props, 'taille_bloc': taille, 'position': pos, 'image_type': im.get('imageType'),
-                  'xml': xml}
+                  'canaux': nc, 'xml': xml}
+
+
+def verifier(chemin, xsd=None):
+    """Contrôle strict d'un XISF (nos fichiers) : `lire(chemin, xsd, strict=True)`."""
+    return lire(chemin, xsd=xsd, strict=True)
 
 
 # ======================================================================== en-tête seul (sans les pixels)
@@ -332,7 +383,7 @@ def lire_entete(chemin) -> dict:
         _verifier(lg <= ENTETE_MAX, 'header too large: %d bytes' % lg)
         xml = f.read(lg)
     try:
-        racine = ET.fromstring(xml)
+        racine = ET.fromstring(xml.rstrip(b'\0 \t\r\n'))
     except ET.ParseError as e:
         raise ErreurXISF('invalid XML header: %s' % e)
     im = racine.find(NS + 'Image')
@@ -342,7 +393,8 @@ def lire_entete(chemin) -> dict:
     for p in im.findall(NS + 'Property'):
         props[p.get('id')] = p.get('value') if p.get('value') is not None else (p.text or '')
         types[p.get('id')] = p.get('type')
-    return {'mots_cles': [(k.get('name'), k.get('value'), k.get('comment')) for k in im.findall(NS + 'FITSKeyword')],
+    return {'mots_cles': [(k.get('name'), k.get('value') or '', k.get('comment') or '')
+                          for k in im.findall(NS + 'FITSKeyword') if k.get('name')],
             'proprietes': props, 'types': types, 'geometrie': (geo[0], geo[1]), 'format': im.get('sampleFormat'),
             'compression': im.get('compression')}
 

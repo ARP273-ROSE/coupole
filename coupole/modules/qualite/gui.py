@@ -41,6 +41,11 @@ class Panneau(QWidget):
         self.n_echantillon.setSuffix(' ' + tr('qual_n_suffixe'))
         h.addWidget(self.echantillon)
         h.addWidget(self.n_echantillon)
+        self.avec_calibration = case('qual_avec_calibration')        # décochée : poses de ciel seulement
+        h.addWidget(self.avec_calibration)
+        self.b_exclus = bouton('qual_voir_exclus', self.voir_exclus)
+        self.b_exclus.setEnabled(False)
+        h.addWidget(self.b_exclus)
         v.addLayout(h)
         if not mesures.disponible():
             l = QLabel(tr('qual_absent'))
@@ -86,6 +91,7 @@ class Panneau(QWidget):
                                  else None, self.l_dossier)
         memoire.case(self.echantillon, k + 'echantillon')
         memoire.nombre(self.n_echantillon, k + 'echantillon_n')
+        memoire.case(self.avec_calibration, k + 'avec_calibration')
         memoire.separateur(self.sp, k + 'separateur')
         memoire.entete(self.vue, k + 'colonnes')
 
@@ -140,7 +146,8 @@ class Panneau(QWidget):
         arret = self._arret
         plan = None                                  # plan machine calculé dans le fil de mesure (sondes hors du fil graphique)
         m = moteur.Mesureur(racine, plan, ech, rapporter=evts, arret=arret, langue=langue(), demander=demander,
-                            n_echantillon=n_lot)
+                            n_echantillon=n_lot, avec_calibration=self.avec_calibration.isChecked())
+        self.b_exclus.setEnabled(False)
         self._mesureur = m
 
         def travail():
@@ -194,7 +201,9 @@ class Panneau(QWidget):
         out = []
         for c in rapport.COLONNES:
             v = l.get(c)
-            if c == 'echantillonnage' and v:
+            if c == 'etat':
+                out.append(rapport.etat_ligne(l))
+            elif c == 'echantillonnage' and v:
                 out.append(tr('qual_ech_' + v))
             elif isinstance(v, (int, float)) and not isinstance(v, bool):
                 out.append(Nombre(v))
@@ -239,14 +248,37 @@ class Panneau(QWidget):
                 self.bilan = ev
                 self.barre.setMaximum(max(1, ev['n']))
                 self.barre.setValue(ev['n'])
+                bilan = rapport.bilan_texte(ev)        # trouvées, mesurées, en erreur (motifs), exclues : rien de muet
                 self.resume.appendPlainText('\n' + tr('qual_fini', n=ev['n'], lots=ev['lots'], deja=ev['deja'],
                                                       duree=duree_lisible(ev['duree'])) +
-                                            (' ' + tr('interrompu_reprise') if ev['annule'] else ''))
+                                            (' ' + tr('interrompu_reprise') if ev['annule'] else '') + '\n' + bilan)
                 self.l_progression.setText(tr('qual_fini', n=ev['n'], lots=ev['lots'], deja=ev['deja'],
-                                              duree=duree_lisible(ev['duree'])))
+                                              duree=duree_lisible(ev['duree'])) + ' ' + bilan)
+                self.b_exclus.setEnabled(bool(ev.get('liste_exclus')))
                 self._terminer()
         if nouvelles:                                  # ajout incrémental : le modèle n'est pas reconstruit
             self.modele.ajouter(nouvelles, [ev['ligne'] for ev in evs if ev['type'] == 'image'])
+
+    def voir_exclus(self):
+        """Liste consultable des fichiers exclus de la mesure (calibration, intermédiaires), avec le motif."""
+        from . import calibration
+        liste = (self.bilan or {}).get('liste_exclus') or []
+        if not liste:
+            return
+        racine = texte_reel(self.l_dossier.text())
+        lignes = []
+        for f, motif in sorted(liste):
+            try:
+                rel = os.path.relpath(f, racine)
+            except ValueError:
+                rel = f
+            lignes.append('%s — %s' % (rel, calibration.texte_motif(motif)))
+        b = QMessageBox(QMessageBox.Icon.Information, tr('qual_voir_exclus'),
+                        tr('qual_exclus_titre', n=len(liste)), parent=self)
+        b.setDetailedText('\n'.join(lignes))
+        b.open()
+        self._boite_exclus = b
+        return b
 
     def _image_choisie(self, pos=None):
         from ...gui.modele import lignes_choisies
@@ -273,7 +305,7 @@ class Panneau(QWidget):
         from ...gui import ouvrir
         m = QMenu(self)
         ouvrir.remplir_menu(m, l['chemin'])
-        m.exec(self.vue.viewport().mapToGlobal(pos))
+        ouvrir.montrer_menu(m, self.vue.viewport().mapToGlobal(pos))
 
     def _terminer(self):
         if self._question is not None:

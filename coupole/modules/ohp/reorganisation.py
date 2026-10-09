@@ -34,11 +34,15 @@ def lire_entete_xisf(chemin) -> tuple[list, dict]:
         if lg > xisf.ENTETE_MAX:
             raise xisf.ErreurXISF('header too large')
         xml = f.read(lg)
-    racine = ET.fromstring(xml)
+    try:
+        racine = ET.fromstring(xml.rstrip(b'\0 \t\r\n'))     # (lecture tolérante : bourrage, autres logiciels)
+    except ET.ParseError as e:
+        raise xisf.ErreurXISF('invalid XML header: %s' % e)
     im = racine.find(xisf.NS + 'Image')
     if im is None:
         raise xisf.ErreurXISF('no image')
-    mots = [(k.get('name'), k.get('value', ''), k.get('comment', '')) for k in im.findall(xisf.NS + 'FITSKeyword')]
+    mots = [(k.get('name'), k.get('value') or '', k.get('comment') or '') for k in im.findall(xisf.NS + 'FITSKeyword')
+            if k.get('name')]
     props = {p.get('id'): (p.get('value') if p.get('value') is not None else (p.text or ''))
              for p in im.findall(xisf.NS + 'Property')}
     geo = [int(v) for v in (im.get('geometry') or '0:0:1').split(':')]

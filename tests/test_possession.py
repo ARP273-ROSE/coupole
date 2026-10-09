@@ -66,7 +66,7 @@ def test_statuts_comptes_et_manquantes(tmp_path, palisana, inventaire):
     d = p.detail(utiles[0])
     assert d['statut'] == 'ok' and d['date'] and d['chemin'] and not os.path.isabs(d['chemin'])   # chemin relatif à dest
     assert os.path.join(str(tmp_path), d['chemin']) == finals[ident(utiles[0])]
-    assert p.detail(utiles[9]) == {'statut': 'absente', 'date': '', 'chemin': ''}
+    assert p.detail(utiles[9]) == {'statut': 'absente', 'date': '', 'chemin': '', 'origine': ''}
     # manquantes : échec (à retenter) et absentes, jamais les doublons (de la base ou de pixels)
     manq = p.manquantes(imgs)
     assert len(manq) == 5 and utiles[5] in manq and utiles[4] not in manq and not any(x['doublon'] for x in manq)

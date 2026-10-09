@@ -246,7 +246,7 @@ NOM\_BASE & nom de cible tel qu'il figure dans la base\\
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole ohp metadonnees (metadata)\newline\normalfont\small Pour chaque XISF/FITS du dossier : FOCALLEN accordé à l'échelle mesurée (ancienne valeur en HISTORY) et propriétés XISF Instrument:Sensor:XPixelSize, Instrument:Camera:XBinning, Instrument:Telescope:FocalLength… Les pixels ne sont pas touchés (relus et comparés), écriture atomique, journal dans \_traitement/metadonnees.csv. Sans --reecrire : simulation.}\\
 \midrule
 DOSSIER & dossier de sortie (ou un lot)\\
---reecrire,\allowbreak{} --rewrite & écrit vraiment (sinon : dit seulement ce qui changerait)\\
+--reecrire,\allowbreak{} --rewrite & écrit vraiment (sinon : dit seulement ce qui changerait) ; note aussi dans la base d'état l'emplacement de chaque fichier, relatif au dossier de sortie (copie d'un ancien traitement, autre machine)\\
 --noms,\allowbreak{} --names \{fr,\allowbreak{}en\} & langue des noms de dossiers, d'objets et des en-têtes (défaut : langue de l'interface)\\
 \bottomrule
 \end{tabularx}
@@ -260,6 +260,7 @@ DOSSIER & dossier de lots (ou un fichier image)\\
 --echantillon,\allowbreak{} --sample N & mesure N images par lot (réparties dans le temps) au lieu de toutes\\
 --tout,\allowbreak{} --all & tout mesurer même au-delà de 200 images (sinon : échantillon de 5 par lot, annoncé)\\
 --processus,\allowbreak{} --processes N & nombre de processus de mesure (défaut : plan machine)\\
+--avec-calibration,\allowbreak{} --with-calibration & mesurer aussi flats, darks, bias, masters et fichiers intermédiaires (exclus par défaut)\\
 \bottomrule
 \end{tabularx}
 \par\medskip

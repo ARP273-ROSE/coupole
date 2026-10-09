@@ -2,6 +2,7 @@
 
 TEXTES = {
     'don_ouvrir': {'fr': 'Ouvrir un fichier…', 'en': 'Open a file…'},
+    'don_filtre_tous': {'fr': 'Spectres et séries', 'en': 'Spectra and series'},
     'don_ouvrir_aide': {'fr': 'FITS (image 1D avec axe WCS, cube radio 1×1×N, table binaire) ou CSV/texte en colonnes.',
                         'en': 'FITS (1D image with WCS axis, 1×1×N radio cube, binary table) or CSV/text in columns.'},
     'don_liste_aide': {'fr': 'Contenu du fichier : une ligne par extension utile.', 'en': 'File contents: one line per useful extension.'},
