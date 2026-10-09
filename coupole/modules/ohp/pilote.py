@@ -3,7 +3,9 @@
 * État dans ``<destination>/_traitement/etat.sqlite`` (journal DELETE, jamais
   WAL : la destination peut être un partage réseau) : un traitement interrompu
   (coupure, annulation, plantage) reprend là où il s'était arrêté ; une image
-  convertie n'est jamais refaite.
+  convertie n'est jamais refaite.  Sur un partage réseau (où SQLite ne peut pas
+  écrire sous Linux), base de travail locale recopiée sur le partage toutes les
+  30 s, en fin de session et à l'arrêt (``core/base_partagee.py``).
 * Chaîne en pipeline (producteur / consommateur, file bornée) : les
   téléchargements (fils) et les conversions (processus séparés : zstd, numpy et
   ASTAP tournent hors du GIL) se recouvrent ; pas plus de
@@ -33,7 +35,7 @@ import time
 import traceback
 
 from ... import __version__
-from ...core import reseau
+from ...core import base_partagee, reseau
 from ...core.i18n import bilingue, tr
 from ...core.parallele import Plan
 from . import formats, lots
@@ -57,12 +59,18 @@ class Etat:
     les images concernées sont simplement refaites à la reprise.  `delai=0` : validation à chaque écriture.
     """
 
-    def __init__(self, chemin, delai: float = 0.0):
+    def __init__(self, chemin, delai: float = 0.0, reseau: bool | None = None, rapporter=None,
+                 intervalle: float = base_partagee.INTERVALLE_S):
         os.makedirs(os.path.dirname(chemin), exist_ok=True)
         self.delai = float(delai)
         self._derniere = time.monotonic()
         self._en_attente = False
-        self.db = sqlite3.connect(chemin, check_same_thread=False, timeout=60)
+        self.chemin = chemin
+        # partage réseau (ou base verrouillée) : base de travail locale, recopiée sur le partage (core/base_partagee)
+        self.base = base_partagee.BasePartagee(chemin, reseau=reseau, intervalle=intervalle, rapporter=rapporter)
+        travail = self.base.ouvrir()                  # Divergence : rien n'est ouvert ni écrasé
+        self.locale = self.base.mode == 'local'
+        self.db = sqlite3.connect(travail, check_same_thread=False, timeout=60)
         self.db.execute('PRAGMA journal_mode=DELETE')
         self.db.execute('CREATE TABLE IF NOT EXISTS images (id TEXT PRIMARY KEY, url TEXT, statut TEXT, '
                         'essais INTEGER DEFAULT 0, info TEXT, maj TEXT)')
@@ -70,6 +78,17 @@ class Etat:
         self.db.execute('CREATE TABLE IF NOT EXISTS meta (cle TEXT PRIMARY KEY, valeur TEXT)')
         self.db.commit()
         self.verrou = threading.Lock()
+
+    def synchroniser_si_du(self):
+        """Base de travail locale : recopie sur le partage toutes les `intervalle` s (transfert dans un fil)."""
+        return self.locale and self.base.envoyer_si_du(self.db, verrou=self.verrou)
+
+    def synchroniser(self) -> bool:
+        """Recopie immédiate (fin de session) ; True si le partage est à jour."""
+        if not self.locale:
+            return True
+        self.valider()
+        return self.base.fermer(self.db, verrou=self.verrou)
 
     def lire(self, i):
         with self.verrou:
@@ -160,7 +179,14 @@ class Etat:
             try:
                 if self._en_attente:
                     self.db.commit()
-            finally:
+                    self._en_attente = False
+            except sqlite3.Error:
+                pass
+        try:
+            if self.locale:                           # dernière recopie (fin, arrêt, annulation)
+                self.base.fermer(self.db, verrou=self.verrou)
+        finally:
+            with self.verrou:
                 self.db.close()
 
 
@@ -255,8 +281,8 @@ class Traitement:
         self.rapporter = rapporter or (lambda ev: None)
         self.arret = arret or threading.Event()
         self.pause = pause or threading.Event()
-        self.etat = Etat(os.path.join(self.trav, 'etat.sqlite'), DELAI_VALIDATION)
         self.journal = Journal(self.trav, DELAI_VALIDATION)
+        self.etat = Etat(os.path.join(self.trav, 'etat.sqlite'), DELAI_VALIDATION, rapporter=self._avis_base)
         self._verifier_coherence()
         self.limiteur = reseau.LimiteurDebit(self.options.get('debit_octets_s', 8e6))
         self._med = self._medo = None
@@ -264,6 +290,12 @@ class Traitement:
         self._octets = 0
         self._octets_t = 0.0
         self._octets_verrou = threading.Lock()
+
+    def _avis_base(self, cle, **valeurs):
+        """Messages de la base de travail locale (partage réseau) : JOURNAL.txt et interface."""
+        self.journal.ecrire(cle, **valeurs)
+        self.journal.vider()
+        self.rapporter({'type': 'base_locale', 'cle': cle, 'valeurs': valeurs})
 
     def _verifier_inscriptible(self):
         """Un dossier de sortie non inscriptible se détecte avant de télécharger quoi que ce soit."""
@@ -393,6 +425,7 @@ class Traitement:
         try:
             while (file_ or en_dl or en_conv or prets) and not self.arret.is_set():
                 self.etat.valider_si_du()
+                self.etat.synchroniser_si_du()
                 self.journal.vider_si_du()
                 if self.pause.is_set():
                     if not en_pause:
@@ -485,6 +518,7 @@ class Traitement:
         self.journal.vider()
         index = self.ranger()
         self.etat.valider()
+        self.etat.synchroniser()                         # base de travail locale : le partage est à jour
         bilan = self.etat.bilan()
         bilan.update(compte=compte, lots=len(index), annule=annule, duree=round(time.time() - t0, 1),
                      echecs=echecs[:50], images=total)

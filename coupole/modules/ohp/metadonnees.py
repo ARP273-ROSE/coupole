@@ -209,8 +209,10 @@ def maj_etat(dossier, valeurs: dict) -> int:
     if not chemin or not valeurs:
         return 0
     n = 0
+    from ...core import base_partagee
+    base = base_partagee.BasePartagee(chemin)          # partage réseau : base de travail locale, recopiée
     try:
-        db = sqlite3.connect(chemin, timeout=5)
+        db = sqlite3.connect(base.ouvrir(), timeout=5)
         try:
             maj = []
             for i, info in db.execute("SELECT id, info FROM images WHERE statut='ok'"):
@@ -230,9 +232,10 @@ def maj_etat(dossier, valeurs: dict) -> int:
                 db.executemany('UPDATE images SET info=? WHERE id=?', maj)
                 db.commit()
             n = len(maj)
+            base.fermer(db)
         finally:
             db.close()
-    except sqlite3.Error:
+    except (sqlite3.Error, OSError, base_partagee.Divergence):
         return 0
     return n
 

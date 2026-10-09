@@ -24,9 +24,11 @@ POSSEDES = ('ok', 'doublon')                 # ce qui n'est plus à télécharge
 
 
 def _uri_lecture_seule(chemin: str) -> str:
-    """URI SQLite en lecture seule (chemins avec espaces, accents ou « ? », UNC et gvfs compris)."""
+    """URI SQLite en lecture seule (chemins avec espaces, accents ou « ? », UNC et gvfs compris) de la base à lire :
+    la base de travail locale si elle est à jour (dossier sur un partage, voir core/base_partagee), sinon celle-ci."""
+    from ...core.base_partagee import chemin_lecture
     from ...core.chemins import uri_sqlite_lecture_seule
-    return uri_sqlite_lecture_seule(chemin)
+    return uri_sqlite_lecture_seule(chemin_lecture(chemin))
 
 
 def _relatif(chemin: str, dest: str) -> str:

@@ -44,6 +44,38 @@ def montages_reseau(texte: str | None = None) -> list[str]:
     return [point for point, typ, _src in lire_montages(texte) if typ.lower() in TYPES_RESEAU]
 
 
+def est_reseau(chemin) -> bool:
+    """Le dossier est-il sur un partage (lettre réseau ou UNC sous Windows, cifs/smb/nfs/sshfs ailleurs) ?
+
+    Jamais d'exception : en cas de doute, False."""
+    try:
+        p = os.path.abspath(os.path.expanduser(str(chemin)))
+        if os.name == 'nt':
+            if p.startswith('\\\\'):
+                return True
+            import ctypes
+            racine = os.path.splitdrive(p)[0] + '\\'
+            return ctypes.windll.kernel32.GetDriveTypeW(racine) == 4          # DRIVE_REMOTE
+        if os.path.exists('/proc/mounts'):
+            montages = [(point, typ) for point, typ, _src in lire_montages()]
+        else:                                                               # macOS, BSD : sortie de `mount`
+            montages = []
+            import subprocess
+            out = subprocess.run(['mount'], capture_output=True, text=True, timeout=5).stdout
+            for ligne in out.splitlines():
+                if ' on ' in ligne and ' (' in ligne:
+                    point = ligne.split(' on ', 1)[1].split(' (', 1)[0]
+                    typ = ligne.split(' (', 1)[1].split(',', 1)[0].strip(')')
+                    montages.append((point, typ))
+        meilleur = ''
+        for point, typ in montages:
+            if (p == point or p.startswith(point.rstrip('/') + '/')) and len(point) >= len(meilleur):
+                meilleur, meilleur_type = point, typ
+        return bool(meilleur) and meilleur_type.lower() in TYPES_RESEAU
+    except Exception:
+        return False
+
+
 def est_unc(chemin: str) -> bool:
     """``\\\\serveur\\partage`` ou ``//serveur/partage`` (hors préfixe de chemin long ``\\\\?\\``)."""
     c = str(chemin).replace('/', '\\')
