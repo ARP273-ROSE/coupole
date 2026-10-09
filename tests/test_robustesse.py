@@ -258,7 +258,9 @@ def test_vigie_detecte_un_gel(monkeypatch):
     v.battre()
     v.demarrer()
     try:
-        time.sleep(1.0)                                   # le « fil graphique » ne bat plus : gel simulé
+        t0 = time.monotonic()                             # le « fil graphique » ne bat plus : gel simulé
+        while not envoyes and time.monotonic() - t0 < 15:  # attente scrutée : un serveur de CI chargé peut tarder
+            time.sleep(0.05)
         assert [g for g, _ in envoyes] == ['gel'] and envoyes[0][1]['phase'] == 'debut'
         assert 'GUI' in envoyes[0][1]['piles']            # la pile du fil surveillé est jointe
         v.battre()
