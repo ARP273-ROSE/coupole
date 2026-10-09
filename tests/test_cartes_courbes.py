@@ -166,7 +166,9 @@ def test_les_courbes_suivent_la_fenetre(app_qt, fenetre):
     app_qt.processEvents()
     attendre(app_qt, lambda: p.trace.width() > l1 + 200, 5)
     assert p.trace.width() > l1 + 200
-    assert p.splitter.orientation() == Qt.Orientation.Horizontal
+    from coupole.modules.cosmo.gui import LARGEUR_COTE_A_COTE
+    if p.width() >= LARGEUR_COTE_A_COTE:                      # l'écran virtuel de certains serveurs de CI est plus étroit
+        assert p.splitter.orientation() == Qt.Orientation.Horizontal
     assert compteur.n > n1                                    # un nouveau paint a eu lieu
     # sous 1500 px, les courbes grandissent avec la hauteur de la fenêtre au lieu de rester figées à leur minimum
     fenetre.resize(1200, 600)
