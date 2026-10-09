@@ -159,7 +159,7 @@ change with it.
 \item \emph{Linux}: first open the share in Dolphin or Files (\texttt{smb://server/share}); it shows up under
   \texttt{/run/user/<uid>/gvfs/smb-share:server=server,share=share} (GNOME; KDE with the \texttt{kio-fuse} package,
   without which an unmounted \texttt{smb://} share cannot be picked by an application), or mount the share with cifs
-  or nfs (\texttt{/mnt/nas}, advised for large volumes: reliable file locks);
+  or nfs (\texttt{/mnt/nas}, advised for large volumes; default options, no need for \texttt{nobrl}: section~\ref{sec:partage});
 \item \emph{macOS}: Finder > Go > Connect to Server (Cmd+K), \texttt{smb://server/share}, then pick the volume under
   \texttt{/Volumes};
 \item \emph{Windows}: network drive (\texttt{Z:}) or UNC path \texttt{\textbackslash\textbackslash
@@ -286,6 +286,7 @@ On a network share (NAS over SMB), where every access is a round trip, the state
 and \texttt{JOURNAL.txt} is written in batches (a power cut only redoes the last second); the final sorting rewrites
 only the \texttt{LOT.txt} files that changed and no longer walks the whole tree: running a processing again for one
 image no longer costs a minute of sorting.
+The state database, however, is never written directly on a share: section~\ref{sec:partage}.
 
 \subsection{Download everything, log, reorganise}\label{sec:tout}
 \emph{Download everything…} takes the whole bank (about 8,000 images, 78 GB of FITS, 30 GB as XISF). On first use
@@ -307,6 +308,47 @@ card « converted from … »), attached to the inventory and \textbf{moved} (ne
 foreign file gets a suffix and a log line; nothing is ever overwritten. Headers are read by several processes,
 progress is shown (« 1,200 / 7,625 headers read ») and \emph{Stop} interrupts the reading (whatever is already
 recognised is sorted). Command line: \cmd{coupole ohp reorganise FOLDER --dest DEST}.
+
+\subsection{Output folder on a network share}\label{sec:partage}
+\textbf{Why.} The state database (\texttt{\_traitement/etat.sqlite}) is an SQLite database, which locks its file on
+every write. On Linux, an SMB share mounted by \texttt{cifs} with default options passes these locks on to the
+server as SMB byte-range locks, and writing fails: « database is locked » after one minute, 0-byte database (checked
+on a real Samba server; true of every version up to 0.1.9: downloading new images, \emph{Download everything} or
+reorganising into a NAS folder failed). Read-only access and file copies do work.
+
+\textbf{What Coupole does (0.1.10).} When the output folder is recognised as a share (cifs, smb3, nfs, sshfs, gvfs,
+kio-fuse on Linux; smbfs, afpfs, nfs on macOS; UNC path or network drive on Windows) or when SQLite cannot write
+there within 3~s (unrecognised share, another program), it works on a \textbf{local working database} in the user's
+cache folder (\texttt{bases/<key>/etat.sqlite}, one per output folder, the key derived from the path), and says so
+in the log and the status bar: « Folder on a network share: local working database, copied back to the share every
+30~s ».
+\begin{itemize}[nosep]
+\item \emph{At the start}: the database on the share is copied (plain file copy) into the working database.
+\item \emph{During processing}, every 30~s, \emph{at the end}, on \emph{stop} and \emph{cancel}: the working database
+  is copied back to the share --- consistent snapshot, \texttt{PRAGMA integrity\_check}, copy into a temporary file
+  in the same folder, read back and SHA-256 compared, then replaced in one go (\texttt{os.replace}). No lock is ever
+  taken on the share: no orphan lock is possible after a crash, and a reader (another computer, the NAS) always sees
+  a complete database.
+\item \emph{At the next start}: if the database on the share is newer (processed elsewhere), it is copied in; if the
+  working database holds writes that were not copied back (crash, power cut), they are copied at once.
+\item \emph{Two writers} (two computers, or the NAS, processed into the same folder meanwhile): nothing is
+  overwritten. Coupole says so clearly and offers a \textbf{merge}: for each image the most advanced status is kept
+  (converted > duplicate left out > failed > in progress), the most recent on a tie; pixel fingerprints are pooled.
+  Both original databases are kept next to the working database (\texttt{etat.sqlite.local-<date>},
+  \texttt{etat.sqlite.partage-<date>}). Command line: \cmd{coupole ohp merge --dest FOLDER}.
+\end{itemize}
+Ownership, new images and anomalies read the working database when it is up to date (faster than reading page by
+page over the network), otherwise the database on the share, read-only. \texttt{JOURNAL.txt}, the CSV files and the
+\texttt{LOT.txt} files are still written directly on the share (text files, replaced in one go). The Quality
+module's cache is only a cache: it stays in the user's cache folder, without copy back (section~\ref{sec:qualite}).
+
+\textbf{Per system.} \emph{Linux}: default cifs fails (cause above); mounting with \texttt{nobrl} is no longer
+needed. \emph{macOS}: the smbfs client handles locks differently (depending on how SQLite was built); this could not
+be checked here, so Coupole does not rely on it and uses the same working database. \emph{Windows}: SQLite can in
+principle write on a share (native SMB locks), but several writers risk damaging the database; same working
+database, checked in continuous integration on \texttt{\textbackslash\textbackslash localhost\textbackslash C\$}. If
+the database on the share is open in another program when it is replaced, Coupole retries, then waits for the next
+pass.
 
 \subsection{New images in the bank}\label{sec:nouveautes}
 At startup (at most once a day, adjustable, can be disabled in Preferences), when the Internet is available and a
@@ -594,7 +636,7 @@ these properties for the point the telescope was aimed at and standardizes the s
 Kept as is in 0.1.9 so as not to change files compared with the reference processing.
 
 % =====================================================================
-\section{Image quality (optional)}
+\section{Image quality (optional)}\label{sec:qualite}
 \capture{img/module_qualite_en.png}{1.0}
 The module needs the SEP library (Source Extractor in Python, LGPL, about 1 MB); it never runs automatically
 (\emph{Measure} button, \emph{Check image quality} box of the processing, or \cmd{coupole qualite FOLDER --write}).
@@ -857,6 +899,9 @@ System dialog does not open & Preferences > File dialogs: Qt.\\
 \texttt{.part} or \texttt{.tmp} file in \texttt{\_traitement} & left by a cut: resuming reuses it (\texttt{.part}) or replaces it; nothing to do.\\
 WBPP does not find focal length and pixel & enter the values of the \emph{For PixInsight / N.I.N.A.} box (Stacks tab) in the \emph{Astrometric solution} panel; older files: \cmd{coupole ohp metadata FOLDER --rewrite}.\\
 White image in N.I.N.A. or Siril & compatible XISF format (Processing tab), section~\ref{sec:compat}.\\
+« database is locked » towards a NAS (0.1.9 and earlier) & update: the local working database solves it (section~\ref{sec:partage}).\\
+« Two versions of the state database » & two computers (or the NAS) processed into the same folder: accept the merge, or \cmd{coupole ohp merge --dest FOLDER}; both original databases are kept.\\
+« Could not copy the state database to the share » & share unplugged or database open elsewhere: nothing is lost, retried on the next pass and at the next start.\\
 \bottomrule
 \end{tabularx}
 \end{center}

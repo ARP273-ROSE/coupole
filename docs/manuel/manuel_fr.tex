@@ -164,7 +164,7 @@ de repli) suivent la langue de l'interface et changent avec elle.
 \item \emph{Linux} : ouvrir d'abord le partage dans Dolphin ou Fichiers (\texttt{smb://serveur/partage}) ; il apparaît
   sous \texttt{/run/user/<uid>/gvfs/smb-share:server=serveur,share=partage} (GNOME ; KDE avec le paquet
   \texttt{kio-fuse}, sans lequel un partage \texttt{smb://} non monté ne peut pas être choisi par une application),
-  ou monter le partage en cifs ou nfs (\texttt{/mnt/nas}, conseillé pour de gros volumes : verrous de fichiers fiables) ;
+  ou monter le partage en cifs ou nfs (\texttt{/mnt/nas}, conseillé pour de gros volumes ; options par défaut, \texttt{nobrl} inutile : section~\ref{sec:partage}) ;
 \item \emph{macOS} : Finder > Aller > Se connecter au serveur (Cmd+K), \texttt{smb://serveur/partage}, puis choisir le
   volume sous \texttt{/Volumes} ;
 \item \emph{Windows} : lecteur réseau (\texttt{Z:}) ou chemin UNC \texttt{\textbackslash\textbackslash
@@ -290,9 +290,10 @@ sous Linux et macOS, par un \emph{job object} sous Windows). À la fin, un
 rapport résume images, durée, converties, doublons, échecs (avec leur raison), volume écrit et lots.
 
 Sur un partage réseau (NAS par SMB), où chaque accès est un aller-retour, l'état est validé au plus une fois par
-seconde et 	exttt{JOURNAL.txt} écrit par paquets (une coupure ne fait refaire que la dernière seconde) ; le rangement
-final ne réécrit que les 	exttt{LOT.txt} qui ont changé et ne parcourt plus toute l'arborescence : relancer un
+seconde et \texttt{JOURNAL.txt} écrit par paquets (une coupure ne fait refaire que la dernière seconde) ; le rangement
+final ne réécrit que les \texttt{LOT.txt} qui ont changé et ne parcourt plus toute l'arborescence : relancer un
 traitement pour une image ne coûte plus une minute de rangement.
+La base d'état, elle, n'est jamais écrite directement sur un partage : section~\ref{sec:partage}.
 
 \subsection{Tout télécharger, journal, réorganiser}\label{sec:tout}
 \emph{Tout télécharger…} prend la banque entière (environ 8~000 images, 78 Go de FITS, 30 Go en XISF). Au premier
@@ -315,6 +316,50 @@ trouvent ailleurs ou selon un ancien rangement : chaque fichier est reconnu par 
 jamais écrasé. Les en-têtes sont lus par plusieurs processus, la progression s'affiche (« 1 200 / 7 625 en-têtes
 lus ») et \emph{Arrêter} interrompt la lecture (ce qui est déjà reconnu est rangé). Ligne de commande :
 \cmd{coupole ohp reorganiser DOSSIER --dest DEST}.
+
+\subsection{Dossier de sortie sur un partage réseau}\label{sec:partage}
+\textbf{Pourquoi.} La base d'état (\texttt{\_traitement/etat.sqlite}) est une base SQLite, qui pose des verrous sur
+son fichier à chaque écriture. Sous Linux, un partage SMB monté par \texttt{cifs} avec les options par défaut
+transmet ces verrous au serveur comme verrous de plage SMB, et l'écriture échoue : « database is locked » au bout
+d'une minute, base de 0 octet (vérifié sur un vrai serveur Samba ; c'était le cas de toute version jusqu'à 0.1.9 :
+télécharger les nouveautés, \emph{Tout télécharger} ou réorganiser vers un dossier du NAS échouait). La lecture
+seule et la copie de fichiers, elles, fonctionnent.
+
+\textbf{Ce que fait Coupole (0.1.10).} Quand le dossier de sortie est reconnu comme un partage (cifs, smb3, nfs,
+sshfs, gvfs, kio-fuse sous Linux ; smbfs, afpfs, nfs sous macOS ; chemin UNC ou lecteur réseau sous Windows) ou
+quand SQLite n'arrive pas à y écrire en 3~s (partage non reconnu, autre programme), il travaille sur une
+\textbf{base de travail locale}, dans le dossier de cache de l'utilisateur (\texttt{bases/<clé>/etat.sqlite},
+une par dossier de sortie, la clé étant tirée du chemin), et le dit dans le journal et la barre d'état :
+« Dossier sur un partage réseau : base de travail locale, recopiée sur le partage toutes les 30~s ».
+\begin{itemize}[nosep]
+\item \emph{Au début} : la base du partage est copiée (simple copie de fichier) dans la base de travail.
+\item \emph{Pendant le traitement}, toutes les 30~s, \emph{à la fin}, à l'\emph{arrêt} et à l'\emph{annulation} :
+  la base de travail est recopiée sur le partage --- instantané cohérent, \texttt{PRAGMA integrity\_check},
+  copie dans un fichier temporaire du même dossier, relecture et comparaison de l'empreinte SHA-256, puis
+  remplacement d'un coup (\texttt{os.replace}). Aucun verrou n'est jamais posé sur le partage : pas de verrou
+  orphelin possible après un plantage, et un lecteur (autre ordinateur, NAS) voit toujours une base complète.
+\item \emph{Au démarrage suivant} : si la base du partage est plus récente (traitée ailleurs), elle est recopiée ; si
+  la base de travail a des écritures qui n'ont pas été recopiées (plantage, coupure), elles le sont aussitôt.
+\item \emph{Deux écrivains} (deux ordinateurs, ou le NAS, ont traité vers le même dossier pendant ce temps) : rien
+  n'est écrasé. Coupole le dit clairement et propose une \textbf{fusion} : pour chaque image, le statut le plus
+  avancé est gardé (convertie > doublon écarté > échec > en cours), à égalité le plus récent ; empreintes de
+  pixels réunies. Les deux bases d'origine sont gardées à côté de la base de travail
+  (\texttt{etat.sqlite.local-<date>}, \texttt{etat.sqlite.partage-<date>}). Ligne de commande :
+  \cmd{coupole ohp fusionner --dest DOSSIER}.
+\end{itemize}
+La possession, les nouveautés et les anomalies lisent la base de travail quand elle est à jour (plus rapide qu'une
+lecture page par page sur le réseau), sinon la base du partage, en lecture seule. \texttt{JOURNAL.txt}, les CSV et
+les \texttt{LOT.txt} restent écrits directement sur le partage (fichiers texte, remplacés d'un coup). Le cache du
+module Qualité n'est qu'un cache : il reste dans le dossier de cache de l'utilisateur, sans recopie
+(section~\ref{sec:qualite}).
+
+\textbf{Selon le système.} \emph{Linux} : cifs par défaut échoue (cause ci-dessus) ; monter avec \texttt{nobrl}
+n'est plus nécessaire. \emph{macOS} : le client smbfs gère ses verrous autrement (selon la façon dont SQLite a été
+compilé) ; ce n'a pas pu être vérifié ici, Coupole n'en dépend donc pas et utilise la même base de travail.
+\emph{Windows} : SQLite sait en principe écrire sur un partage (verrous SMB natifs), mais plusieurs écrivains y
+risquent d'abîmer la base ; même base de travail, vérifiée en intégration continue sur
+\texttt{\textbackslash\textbackslash localhost\textbackslash C\$}. Si la base du partage est ouverte par un autre
+programme au moment du remplacement, Coupole réessaie puis attend le passage suivant.
 
 \subsection{Nouveautés de la banque}\label{sec:nouveautes}
 À l'ouverture (au plus une fois par jour, réglable, désactivable dans les Préférences), si Internet est disponible et
@@ -603,7 +648,7 @@ solution reste dans les mots-clés WCS, que PixInsight lit). Gardé tel quel en 
 par rapport au traitement de référence.
 
 % =====================================================================
-\section{Qualité des images (facultatif)}
+\section{Qualité des images (facultatif)}\label{sec:qualite}
 \capture{img/module_qualite_fr.png}{1.0}
 Le module demande la bibliothèque SEP (Source Extractor en Python, LGPL, environ 1 Mo) ; il n'est jamais lancé
 automatiquement (bouton \emph{Mesurer}, case \emph{Vérifier la qualité des images} du traitement, ou
@@ -874,6 +919,9 @@ Dialogue du système qui ne s'ouvre pas & Préférences > Boîtes de dialogue de
 Fichier \texttt{.part} ou \texttt{.tmp} dans \texttt{\_traitement} & reste d'une coupure : la reprise le réutilise (\texttt{.part}) ou le remplace ; rien à faire.\\
 WBPP ne trouve pas focale et pixel & saisir les valeurs de l'encadré \emph{Pour PixInsight / N.I.N.A.} (onglet Lots) dans le panneau \emph{Astrometric solution} ; fichiers anciens : \cmd{coupole ohp metadonnees DOSSIER --reecrire}.\\
 Image blanche dans N.I.N.A. ou Siril & format XISF compatible (onglet Traitement), section~\ref{sec:compat}.\\
+« database is locked » vers un NAS (0.1.9 et avant) & mettre à jour : la base de travail locale règle le problème (section~\ref{sec:partage}).\\
+« Deux versions de la base d'état » & deux ordinateurs (ou le NAS) ont traité vers le même dossier : accepter la fusion, ou \cmd{coupole ohp fusionner --dest DOSSIER} ; les deux bases d'origine sont gardées.\\
+« Recopie de la base d'état sur le partage impossible » & partage débranché ou base ouverte ailleurs : rien n'est perdu, nouvel essai au passage suivant et au prochain lancement.\\
 \bottomrule
 \end{tabularx}
 \end{center}

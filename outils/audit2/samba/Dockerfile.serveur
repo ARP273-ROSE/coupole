@@ -1,0 +1,6 @@
+# Serveur Samba de test : posix locking = False, comme le partage « Astronomie » du NAS ; utilisateur kevin (uid 3000).
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends samba && rm -rf /var/lib/apt/lists/*
+RUN useradd -M -u 3000 kevin && (echo secret; echo secret) | smbpasswd -a -s kevin && mkdir -p /partage && chown 3000 /partage
+RUN printf '[global]\n  server min protocol = SMB2\n  map to guest = never\n  posix locking = False\n  log level = 0\n[Astronomie]\n  path = /partage\n  read only = no\n  valid users = kevin\n  force user = kevin\n' > /etc/samba/smb.conf
+CMD ["smbd", "--foreground", "--no-process-group", "--debug-stdout"]

@@ -4,6 +4,7 @@ from __future__ import annotations
 import csv
 import json
 import os
+import sqlite3
 import sys
 import threading
 import time
@@ -121,6 +122,11 @@ def enregistrer(p):
     s.add_argument('--dest', required=True, metavar=tr('cli_meta_dossier'), help=tr('ohp_aide_dest'))
     s.add_argument('--json', action='store_true', help=tr('cli_aide_json'))
     s.set_defaults(fonction=cmd_bilan)
+
+    s = sous.add_parser('fusionner', aliases=['merge'], help=tr('ohp_cli_fusionner'), description=tr('ohp_cli_fusionner'),
+                        formatter_class=fmt)
+    s.add_argument('--dest', required=True, metavar=tr('cli_meta_dossier'), help=tr('ohp_aide_dest'))
+    s.set_defaults(fonction=cmd_fusionner)
 
     s = sous.add_parser('metadonnees', aliases=['metadata'], help=tr('ohp_cli_metadonnees'),
                         description=tr('ohp_cli_metadonnees_desc'))
@@ -453,7 +459,12 @@ def cmd_reorganiser(a):
     from ...core.parallele import Plan
     inv = _inventaire()
     r = config.reglages()
-    t = Traitement(_dest(a), inv, Plan(1, 1, True, ''), {'format': r['format_sortie'], 'langue': i18n.langue()})
+    from ...core.base_partagee import Divergence
+    try:
+        t = Traitement(_dest(a), inv, Plan(1, 1, True, ''), {'format': r['format_sortie'], 'langue': i18n.langue()},
+                       rapporter=_avis_base)
+    except Divergence as e:
+        return _divergence(e, _dest(a))
     import time
     etat = {'t': time.monotonic()}
 
@@ -528,11 +539,16 @@ def _traiter(a, inv, sel, confirmer_gros=True):
             print(tr('ohp_ligne_echec', source=ev['source'], erreur=ev['erreur']), flush=True)
         elif t == 'avis':
             print(tr(ev['cle'], valeur=ev['valeur']))
+        elif t == 'base_locale':
+            _avis_base(ev)
+    from ...core.base_partagee import Divergence
     try:
         tr_ = Traitement(dest, inv, plan, {'format': fmt, 'langue': langue, 'astap': etat, 'mode_astap': mode,
                                            'debit_octets_s': debit, 'garder_fits': a.garder_fits,
                                            'garder_doublons': a.garder_doublons},
                          rapporter=rapporter, arret=arret)
+    except Divergence as e:                           # deux écrivains : rien n'est écrasé
+        return _divergence(e, dest)
     except OSError as e:                              # dossier non inscriptible, disque retiré
         print(str(e), file=sys.stderr)
         return 3
@@ -570,7 +586,11 @@ def cmd_ranger(a):
     from .pilote import Traitement
     inv = _inventaire()
     from ...core.parallele import Plan
-    t = Traitement(_dest(a), inv, Plan(1, 1, True, ''), {'format': 'xisf', 'langue': 'fr'})
+    from ...core.base_partagee import Divergence
+    try:
+        t = Traitement(_dest(a), inv, Plan(1, 1, True, ''), {'format': 'xisf', 'langue': 'fr'}, rapporter=_avis_base)
+    except Divergence as e:
+        return _divergence(e, _dest(a))
     try:
         idx = t.ranger()
     finally:
@@ -579,13 +599,45 @@ def cmd_ranger(a):
     return 0
 
 
+def _divergence(e, dest) -> int:
+    print(tr('ohp_divergence_cli', partage=e.partage, dest=dest), file=sys.stderr)
+    return 5
+
+
+def _avis_base(ev):
+    if ev.get('type') == 'base_locale':
+        print(tr(ev['cle'], **ev['valeurs']), flush=True)
+
+
+def cmd_fusionner(a):
+    """Fusion des deux versions de la base d'état (partage / base de travail locale) après une divergence."""
+    from ...core import base_partagee
+    dest = _dest(a)
+    chemin = os.path.join(dest, '_traitement', 'etat.sqlite')
+    if not base_partagee.divergence_en_attente(chemin):
+        print(tr('ohp_fusion_rien', dest=dest))
+        return 0
+    try:
+        r = base_partagee.fusionner(chemin)
+    except (OSError, ValueError, sqlite3.Error) as e:
+        print(tr('ohp_fusion_echec', erreur=e), file=sys.stderr)
+        return 1
+    print(tr('ohp_fusion_faite', total=r.get('total', 0), locale=r['de_la_locale'], conflits=r['conflits'],
+             envoyee='✓' if r.get('envoyee') else '✗', dossier=os.path.dirname(r['copies'][0])))
+    return 0 if r.get('envoyee') else 1
+
+
 def cmd_bilan(a):
     from .pilote import Etat
     chemin = os.path.join(_dest(a), '_traitement', 'etat.sqlite')
     if not os.path.exists(chemin):
         print(tr('ohp_pas_de_traitement', dest=_dest(a)))
         return 1
-    e = Etat(chemin)
+    from ...core.base_partagee import Divergence
+    try:
+        e = Etat(chemin)
+    except Divergence as ex:
+        return _divergence(ex, _dest(a))
     b = e.bilan()
     e.fermer()
     if a.json:

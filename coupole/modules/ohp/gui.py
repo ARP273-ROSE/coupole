@@ -16,7 +16,7 @@ from PyQt6.QtGui import QKeySequence, QShortcut
 from PyQt6.QtWidgets import (QDialog, QFormLayout, QFrame, QGridLayout, QGroupBox, QHBoxLayout, QLabel,
                              QMessageBox, QPlainTextEdit, QProgressBar, QSplitter, QTabWidget, QVBoxLayout, QWidget)
 
-from ...core import config, i18n
+from ...core import base_partagee, config, i18n
 from ...core.i18n import tr
 from ...gui.adaptatif import Flux, coupable
 from ...gui.dialogues import DialogueASTAP, ouvrir_fichier
@@ -1316,7 +1316,11 @@ class Panneau(QWidget):
         evts = FileEvenements(self, self._progression_reorg)
 
         def travail():
-            t = Traitement(dest, inv, Plan(1, 1, True, ''), {'format': fmt, 'langue': L}, arret=arret)
+            try:
+                t = Traitement(dest, inv, Plan(1, 1, True, ''), {'format': fmt, 'langue': L}, arret=arret,
+                               rapporter=lambda ev: ev['type'] == 'base_locale' and evts(ev))
+            except base_partagee.Divergence as e:
+                return {'divergence': (e.partage, os.path.dirname(e.locale))}
             try:
                 return t.reorganiser(src, progression=lambda fait, total: evts((fait, total)))
             finally:
@@ -1326,6 +1330,9 @@ class Panneau(QWidget):
             evts.arreter()
             self.b_lancer.setEnabled(True)
             self.b_arreter.setEnabled(False)
+            if 'divergence' in r:
+                self.proposer_fusion(*r['divergence'])
+                return
             self._remplir_lots()
             self._charger_possession()
             self._log(tr('ohp_reorganise_fait', n=r['ranges'], lots=r['lots'], ignores=len(r['ignores'])))
@@ -1343,6 +1350,15 @@ class Panneau(QWidget):
         self._t_reorg.start()
 
     def _progression_reorg(self, evs):
+        for ev in evs:
+            if isinstance(ev, dict):                       # messages de la base de travail locale (partage)
+                texte = tr(ev['cle'], **ev['valeurs'])
+                self._log(texte)
+                if ev['cle'] == 'base_locale_avis':
+                    self._statut(texte)
+        evs = [ev for ev in evs if not isinstance(ev, dict)]
+        if not evs:
+            return
         fait, total = evs[-1]
         self.barre.setMaximum(max(1, total))
         self.barre.setValue(fait)
@@ -1416,6 +1432,8 @@ class Panneau(QWidget):
             try:
                 t = Traitement(dest, inv, plan, opts, rapporter=evts, arret=arret, pause=pause)
                 t.lancer(sel)
+            except base_partagee.Divergence as e:    # deux écrivains : rien n'est écrasé, fusion proposée
+                evts({'type': 'divergence', 'partage': e.partage, 'dossier': os.path.dirname(e.locale)})
             except OSError as e:                     # dossier non inscriptible, disque plein, dossier retiré
                 evts({'type': 'erreur', 'erreur': str(e)})
             except Exception as e:
@@ -1432,6 +1450,25 @@ class Panneau(QWidget):
         self.b_pause.setEnabled(True)
         self.b_arreter.setEnabled(True)
         self._fil = lancer_fil(travail)
+
+    def proposer_fusion(self, partage, dossier):
+        """Base d'état du partage et base de travail locale modifiées chacune de leur côté : rien n'a été écrasé ;
+        fusion à la demande (le statut le plus avancé gagne), en fond, puis relecture de la possession."""
+        texte = tr('ohp_divergence_question', partage=partage, dossier=dossier)
+        self._log(texte.replace('\n\n', ' '))
+        if QMessageBox.question(self, tr('ohp_divergence_titre'), texte) != QMessageBox.StandardButton.Yes:
+            return
+
+        def fini(r):
+            self._log(tr('ohp_fusion_faite', total=r.get('total', 0), locale=r['de_la_locale'], conflits=r['conflits'],
+                         envoyee='✓' if r.get('envoyee') else '✗', dossier=dossier))
+            self._log(tr('ohp_fusion_relancer'))
+            self._statut(tr('ohp_fusion_relancer'))
+            self._charger_possession()
+        self._t_fusion = Tache(base_partagee.fusionner, partage, parent=self)
+        self._t_fusion.quand_fini(fini)
+        self._t_fusion.quand_erreur(lambda e: self._log(tr('ohp_fusion_echec', erreur=e)))
+        self._t_fusion.start()
 
     def _verifier_qualite(self):
         """Contrôle de qualité demandé explicitement (case cochée) : lots du dossier de sortie, en fond."""
@@ -1523,6 +1560,13 @@ class Panneau(QWidget):
                              nominale=ev['nominale']))
             elif t == 'erreur':
                 self._log(tr('ohp_erreur_traitement', erreur=ev['erreur']))
+            elif t == 'base_locale':
+                texte = tr(ev['cle'], **ev['valeurs'])
+                self._log(texte)
+                if ev['cle'] in ('base_locale_avis', 'base_locale_divergence_en_cours', 'base_locale_envoi_echec'):
+                    self._statut(texte)
+            elif t == 'divergence':
+                QTimer.singleShot(0, lambda e=ev: self.proposer_fusion(e['partage'], e['dossier']))
             elif t == 'fin':
                 b = ev['bilan']
                 of, ox = b['octets_fits'], b['octets_sortie']

@@ -501,3 +501,38 @@ mesures : `docs/AUDIT2_2026-10.md` § 9.
   Cosmologie côte à côte et empilée, Traitement avec « qui lit quoi »).
 - CI `tests.yml` du commit `c193ab5` : **6/6** (Linux, Windows, macOS × 3.10, 3.12), étape « Liens du guide ASTAP » comprise. Premiers passages rouges : tests sous Windows (police large : colonnes au contenu plus larges que la vue → défilement admis ; hauteur du tableau empilé qui oubliait l’ascenseur horizontal : corrigé dans le code) et SourceForge en 403 pour les machines de CI (repli sur le flux RSS du dossier).
 - **Aucun tag posé.**
+
+## 2026-10-09 — version 0.1.10 : base d'état sur un partage réseau (le « à décider » de la 0.1.9)
+Le dossier de sortie de Kevin est sur le partage (`/mnt/nas/Astronomie/OHP_DU_ECU`, base `_traitement/etat.sqlite`
+partagée avec le NAS) : sous Linux, télécharger, *Tout télécharger* ou réorganiser vers lui échouait. Détail :
+`docs/AUDIT2_2026-10.md` § 10.
+- **Reproduit** (vrai Samba, cifs par défaut, banc `outils/audit2/samba/`) : `Etat()` → « database is locked » en
+  60,1 s, `etat.sqlite` de 0 octet ; lecture seule (possession, nouveautés, anomalies) : fonctionne.
+- **Décision** : pas de VFS `unix-dotfile` (verrou orphelin) ; **base de travail locale** (`core/base_partagee.py`) :
+  `<cache>/bases/<clé du chemin>/etat.sqlite` + `.sync.json` ; partage détecté (`est_reseau`, déplacée dans
+  `core/chemins.py`) ou essai d'écriture en échec (3 s, fichier de 0 octet retiré) ; recopie atomique (instantané
+  par l'API de sauvegarde, `integrity_check`, temporaire sur le partage relu et comparé SHA-256, `os.replace`) toutes
+  les 30 s (fil), en fin de session, à l'arrêt/annulation ; compteur `meta.version_partage`.
+- **Démarrage** : partage plus récent → repris (réuni si une recopie a été remplacée par un autre écrivain) ;
+  écritures non recopiées (plantage) → recopiées ; les deux → `Divergence`, rien d'écrasé, **fusion** (ok > doublon
+  > echec > en_cours, puis le plus récent ; essais max ; empreintes réunies ; deux bases d'origine gardées) :
+  question dans l'interface, `coupole ohp fusionner` en ligne de commande (code 5 sinon). Divergence pendant la
+  session : plus de recopie, message, fusion au lancement suivant. `-journal` présent sur le partage : recopie
+  remise.
+- Lecteurs (possession, nouveautés, anomalies, inventaire Qualité) : base de travail si à jour. `metadonnees.maj_etat`
+  passe par la même base. Qualité (`qualite.sqlite`) : cache local depuis 0.1.9, sans recopie ; JOURNAL.txt, CSV,
+  LOT.txt écrits directement. Messages journal + barre d'état (« Dossier sur un partage réseau : base de travail
+  locale, recopiée sur le partage toutes les 30 s »).
+- **macOS/Windows** (raisonné, § 10.4) : smbfs et UNC/lecteur réseau passent par la même base de travail ; Windows
+  vérifié par la CI (`\\localhost\C$`).
+- Mesuré (vrai Samba) : ouverture 0,02 s (contre 60,1 s puis erreur), recopie 0,02–0,04 s (base de 1,3 Mo).
+  **Essai réel** : 3 images de (914) Palisana depuis `tap-ufe.obspm.fr` vers `/mnt/nas/OHP_DU_ECU_essai` (Samba de
+  test) : 3 converties, base du partage 3 `ok`, `integrity_check` ok, aucun temporaire ; relance : rien à refaire.
+  Rien écrit dans `/mnt/zpool2`.
+- Tests : `tests/test_base_partagee.py` (20 + vrai cifs si `COUPOLE_TEST_SMB` + UNC Windows). Manuels FR/EN :
+  section « Dossier de sortie sur un partage réseau », dépannage (3 lignes), `nobrl` plus nécessaire ; aide de la
+  Banque OHP ; CHANGELOG FR/EN ; `\texttt` cassé (tabulation) corrigé dans le manuel FR.
+- Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 389 réussis,
+  15 sautés, code 0 ; python:3.10-slim 389 / 15, code 0**. Banc Samba (`outils/audit2/samba/essai.sh`, conteneurs
+  retirés ensuite) : tests avec `COUPOLE_TEST_SMB` réussis, essai réel refait (3 converties, base du partage intègre).
+- **Aucun tag posé.**

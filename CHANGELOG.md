@@ -2,6 +2,31 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.1.10 — 9 octobre 2026
+
+**Le traitement fonctionne vers un dossier sur un partage réseau.** Le dossier de sortie de Kevin est sur le NAS
+(partage SMB monté par cifs sous Manjaro) : télécharger les nouveautés, *Tout télécharger* ou réorganiser vers ce
+dossier échouait.
+
+- **Cause (reproduite sur un vrai serveur Samba, montage cifs par défaut)** : SQLite ne peut pas écrire à travers les
+  verrous de plage SMB — « database is locked » au bout de 60 s, base d'état de 0 octet. La lecture seule
+  (possession, nouveautés, anomalies) et la copie de fichiers fonctionnaient.
+- **Base de travail locale** : sur un partage (cifs, nfs, sshfs, gvfs, kio-fuse ; smbfs sous macOS ; UNC ou lecteur
+  réseau sous Windows), ou si SQLite n'arrive pas à écrire en 3 s, la base d'état est tenue dans le dossier de cache
+  de l'utilisateur (une par dossier de sortie) et **recopiée sur le partage toutes les 30 s**, en fin de session, à
+  l'arrêt et à l'annulation : instantané cohérent, `PRAGMA integrity_check`, copie dans un fichier temporaire du
+  partage relue et comparée (SHA-256), puis remplacement d'un coup. Aucun verrou n'est posé sur le partage : pas de
+  verrou orphelin possible, et le NAS ou un autre ordinateur voient toujours une base complète. Journal et barre
+  d'état : « Dossier sur un partage réseau : base de travail locale, recopiée sur le partage toutes les 30 s ».
+- **Au démarrage** : base du partage plus récente (traitée ailleurs) → reprise ; écritures non recopiées après un
+  plantage → recopiées. **Deux écrivains** (deux ordinateurs, ou le NAS) : rien n'est écrasé, Coupole prévient et
+  propose une **fusion** (le statut le plus avancé gagne : convertie > doublon > échec), les deux bases d'origine
+  sont gardées ; ligne de commande `coupole ohp fusionner --dest DOSSIER`.
+- Possession, nouveautés et anomalies lisent la base de travail quand elle est à jour (pas de lecture page par page
+  sur le réseau). `coupole ohp metadonnees --reecrire` met aussi à jour la base d'état sur un partage.
+- Manuels : section « Dossier de sortie sur un partage réseau » (Linux, macOS, Windows), dépannage ; aide de la
+  Banque OHP. Audit : `docs/AUDIT2_2026-10.md` § 10 ; banc Samba reproductible `outils/audit2/samba/`.
+
 ## 0.1.9 — 9 octobre 2026
 
 **Le module Qualité démarre tout de suite sur un partage réseau, les logiciels d'astronomie ouvrent vraiment nos

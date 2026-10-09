@@ -2,6 +2,30 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.1.10 — 9 October 2026
+
+**Processing works towards a folder on a network share.** Kevin's output folder is on the NAS (SMB share mounted
+by cifs on Manjaro): downloading new images, *Download everything* or reorganising into that folder failed.
+
+- **Cause (reproduced on a real Samba server, default cifs mount)**: SQLite cannot write through SMB byte-range
+  locks — « database is locked » after 60 s, 0-byte state database. Read-only access (ownership, new images,
+  anomalies) and file copies worked.
+- **Local working database**: on a share (cifs, nfs, sshfs, gvfs, kio-fuse; smbfs on macOS; UNC or network drive on
+  Windows), or when SQLite cannot write within 3 s, the state database is kept in the user's cache folder (one per
+  output folder) and **copied back to the share every 30 s**, at the end of the session, on stop and on cancel:
+  consistent snapshot, `PRAGMA integrity_check`, copy into a temporary file on the share read back and compared
+  (SHA-256), then replaced in one go. No lock is ever taken on the share: no orphan lock is possible, and the NAS or
+  another computer always see a complete database. Log and status bar: « Folder on a network share: local working
+  database, copied back to the share every 30 s ».
+- **At startup**: a newer database on the share (processed elsewhere) is taken over; writes not copied back after a
+  crash are copied. **Two writers** (two computers, or the NAS): nothing is overwritten, Coupole warns and offers a
+  **merge** (most advanced status wins: converted > duplicate > failed), both original databases are kept; command
+  line `coupole ohp merge --dest FOLDER`.
+- Ownership, new images and anomalies read the working database when it is up to date (no page-by-page reading over
+  the network). `coupole ohp metadata --rewrite` also updates the state database on a share.
+- Manuals: section « Output folder on a network share » (Linux, macOS, Windows), troubleshooting; OHP Bank help.
+  Audit: `docs/AUDIT2_2026-10.md` § 10; reproducible Samba bench `outils/audit2/samba/`.
+
 ## 0.1.9 — 9 October 2026
 
 **The Quality module starts at once on a network share, astronomy programs really open our files, and PixInsight

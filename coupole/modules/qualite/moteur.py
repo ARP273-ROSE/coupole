@@ -75,37 +75,7 @@ ATTENTE_VERROU_S = 3.0            # ouverture du cache : au-delà, base verrouil
 
 
 # ============================================================================ dossier réseau
-def est_reseau(chemin) -> bool:
-    """Le dossier est-il sur un partage (lettre réseau ou UNC sous Windows, cifs/smb/nfs/sshfs ailleurs) ?
-
-    Jamais d'exception : en cas de doute, False."""
-    try:
-        p = os.path.abspath(os.path.expanduser(str(chemin)))
-        if os.name == 'nt':
-            if p.startswith('\\\\'):
-                return True
-            import ctypes
-            racine = os.path.splitdrive(p)[0] + '\\'
-            return ctypes.windll.kernel32.GetDriveTypeW(racine) == 4          # DRIVE_REMOTE
-        from ...core.chemins import TYPES_RESEAU, lire_montages
-        if os.path.exists('/proc/mounts'):
-            montages = [(point, typ) for point, typ, _src in lire_montages()]
-        else:                                                               # macOS, BSD : sortie de `mount`
-            montages = []
-            import subprocess
-            out = subprocess.run(['mount'], capture_output=True, text=True, timeout=5).stdout
-            for ligne in out.splitlines():
-                if ' on ' in ligne and ' (' in ligne:
-                    point = ligne.split(' on ', 1)[1].split(' (', 1)[0]
-                    typ = ligne.split(' (', 1)[1].split(',', 1)[0].strip(')')
-                    montages.append((point, typ))
-        meilleur = ''
-        for point, typ in montages:
-            if (p == point or p.startswith(point.rstrip('/') + '/')) and len(point) >= len(meilleur):
-                meilleur, meilleur_type = point, typ
-        return bool(meilleur) and meilleur_type.lower() in TYPES_RESEAU
-    except Exception:
-        return False
+from ...core.chemins import est_reseau  # noqa: E402,F401  (déplacée dans core en 0.1.10 ; nom gardé ici)
 
 
 # ============================================================================ cache des mesures
@@ -290,7 +260,11 @@ def inventaire_base(racine, base: str) -> dict | None:
     finals, ancienne = [], collections.Counter()
     copie = None
     try:
-        if est_reseau(base):
+        from ...core.base_partagee import chemin_lecture
+        travail = chemin_lecture(chemin)                    # base de travail locale à jour (partage) : lue telle quelle
+        if travail != chemin:
+            chemin = travail
+        elif est_reseau(base):
             # SQLite lit page par page (4 Ko, un aller-retour chacune sur un partage) : copie locale d'un bloc
             import shutil
             import tempfile
