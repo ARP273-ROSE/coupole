@@ -28,7 +28,7 @@ def _carte_avec_cache_simule(dpr):
     im = QImage(256, 256, QImage.Format.Format_RGB32)
     im.fill(Qt.GlobalColor.gray)
 
-    def tuile(z, x, y):
+    def tuile(z, x, y, synchrone=True):
         cles.append((z, x, y))
         return im
     carte.cache.tuile = tuile

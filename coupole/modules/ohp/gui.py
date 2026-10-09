@@ -11,7 +11,7 @@ import os
 import threading
 import time
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QKeySequence, QShortcut
 from PyQt6.QtWidgets import (QDialog, QFileDialog, QFormLayout, QFrame, QGridLayout, QGroupBox, QHBoxLayout, QLabel,
                              QMessageBox, QPlainTextEdit, QProgressBar, QSplitter, QTabWidget, QVBoxLayout, QWidget)
@@ -21,11 +21,12 @@ from ...core.i18n import tr
 from ...gui.adaptatif import Flux, coupable
 from ...gui.dialogues import DialogueASTAP, ouvrir_fichier
 from ...gui import pastilles
-from ...gui.modele import DelegueProgression, ModeleTableau, Progression, lignes_choisies, vue_tableau
+from ...gui.modele import (DelegueProgression, ModeleParesseux, ModeleTableau, Progression, lignes_choisies,
+                           vue_tableau)
 from ...gui.outils import (FileEvenements, Tache, aide, bouton, case, champ, decimal, enregistrer_arret, lancer_fil,
                            liste, nombre)
 from . import cibles
-from .possession import Possession, lire_infos_ok
+from .possession import Possession
 
 
 def _taille(o: float) -> str:
@@ -176,10 +177,15 @@ class Panneau(QWidget):
                                     tr('ohp_col_possede'), tr('ohp_col_volume'), tr('ohp_col_nuits'),
                                     tr('ohp_col_telescopes'), tr('ohp_col_filtres'), tr('ohp_col_etat')])
         self.COL_POSSEDE = 4
-        self.v_obj, self.p_obj = vue_tableau(self.m_obj, 'ohp_table_objets_aide')
+        self.v_obj, self.p_obj = vue_tableau(self.m_obj, 'ohp_table_objets_aide', filtrable=True)
         self.v_obj.setItemDelegateForColumn(self.COL_POSSEDE, DelegueProgression(self.v_obj, lambda: pastilles.couleur_statut('ok')))
         self.v_obj.horizontalHeader().setToolTip(tr('ohp_legende_aide'))
-        self.v_obj.selectionModel().selectionChanged.connect(self._objets_choisis)
+        # sélection à la souris (glisser, Maj+clic) : une rafale de signaux → un seul remplissage, 40 ms après
+        self._minuteur_choix = QTimer(self)
+        self._minuteur_choix.setSingleShot(True)
+        self._minuteur_choix.setInterval(40)
+        self._minuteur_choix.timeout.connect(self._objets_choisis)
+        self.v_obj.selectionModel().selectionChanged.connect(lambda *_: self._minuteur_choix.start())
         sp.addWidget(self.v_obj)
         droite = QWidget()
         vd = QVBoxLayout(droite)
@@ -195,9 +201,10 @@ class Panneau(QWidget):
         hf.addWidget(self.f_filtre)
         hf.addWidget(self.f_dates)
         vd.addLayout(hf)
-        self.m_img = ModeleTableau([tr('ohp_col_possede'), tr('ohp_col_date'), tr('ohp_col_heure_site'), tr('ohp_col_nuit'),
-                                    tr('ohp_col_tel'), tr('ohp_col_filtre'),
-                                    tr('ohp_col_pose'), tr('ohp_col_drapeaux'), tr('ohp_col_noms')])
+        self.m_img = ModeleParesseux([tr('ohp_col_possede'), tr('ohp_col_date'), tr('ohp_col_heure_site'),
+                                      tr('ohp_col_nuit'), tr('ohp_col_tel'), tr('ohp_col_filtre'),
+                                      tr('ohp_col_pose'), tr('ohp_col_drapeaux'), tr('ohp_col_noms')],
+                                     self._ligne_image, self._style_image, self._bulle_image, self._cle_image)
         self.v_img, self.p_img = vue_tableau(self.m_img, 'ohp_table_images_aide')
         self.v_img.horizontalHeader().setToolTip(tr('ohp_legende_aide'))
         vd.addWidget(self.v_img)
@@ -223,13 +230,43 @@ class Panneau(QWidget):
     def charger(self, rafraichir):
         if self.occupe():
             return
-        from .inventaire import Inventaire
         self.b_rafraichir.setEnabled(False)
         self.l_inventaire.setText(tr('ohp_interrogation_tap') if rafraichir else tr('ohp_chargement'))
-        self._t_inv = Tache(Inventaire.charger, rafraichir, parent=self)
+        self._t_inv = Tache(self.charger_et_preparer, rafraichir, parent=self)
         self._t_inv.quand_fini(self._inventaire_pret)
         self._t_inv.quand_erreur(self._inventaire_erreur)
         self._t_inv.start()
+
+    @staticmethod
+    def charger_et_preparer(rafraichir):
+        """Dans le fil de fond : inventaire, catalogue des objets et chaîne de recherche de chaque objet (le fil
+        graphique n'a plus qu'à afficher)."""
+        from .inventaire import Inventaire
+        inv = Inventaire.charger(rafraichir)
+        Panneau.preparer_objets(inv)
+        return inv
+
+    @staticmethod
+    def preparer_objets(inv):
+        for o in inv.objets():
+            if '_recherche' not in o:
+                o['_recherche'] = '\x00'.join([o['objet'].lower(), cibles.nom_affiche(o['objet']).lower()] +
+                                               [n.lower() for n in o['noms']])
+        if getattr(inv, '_index_memo', (None,))[0] is not inv.images:
+            # images triées une fois (date, adresse) et rangées par objet : choisir des objets ou filtrer ne trie
+            # ni ne parcourt plus tout l'inventaire à chaque geste
+            triees = sorted(inv.images, key=lambda x: (x['t_min'], x['access_url']))
+            par_objet, valeurs = {}, {}
+            for x in triees:
+                par_objet.setdefault(x['objet'], []).append(x)
+                v = valeurs.setdefault(x['objet'], (set(), set()))
+                v[0].add(str(x['nuit']))
+                v[1].add(str(x['filter_name']))
+            inv._index_memo = (inv.images, triees, par_objet, valeurs)
+        if not hasattr(inv, '_resume_memo'):
+            inv._resume_memo = {'doublons': sum(1 for x in inv.images if x['doublon']),
+                                'octets': sum(x['access_estsize'] * 1024 for x in inv.images),
+                                'nuits': len({str(x['nuit']) for x in inv.images})}
 
     def _inventaire_erreur(self, e):
         self.b_rafraichir.setEnabled(True)
@@ -240,10 +277,11 @@ class Panneau(QWidget):
         self.b_rafraichir.setEnabled(True)
         m = inv.meta
         n = inv.nouveautes or {}
-        texte = tr('ohp_inventaire_resume', n=len(inv.images), objets=len(inv.objets()),
-                   doublons=sum(1 for x in inv.images if x['doublon']),
-                   taille=_taille(sum(x['access_estsize'] * 1024 for x in inv.images)),
-                   nuits=len({str(x['nuit']) for x in inv.images}), date=m.get('date', '?')[:16],
+        self.preparer_objets(inv)                    # déjà fait en fond (sans effet), sauf inventaire passé à la main
+        r = inv._resume_memo
+        self._comptes = None
+        texte = tr('ohp_inventaire_resume', n=len(inv.images), objets=len(inv.objets()), doublons=r['doublons'],
+                   taille=_taille(r['octets']), nuits=r['nuits'], date=m.get('date', '?')[:16],
                    source=m.get('source', '?')).replace('\n', ' — ')
         if n and not n.get('premiere') and (n.get('images') or n.get('noms')):
             texte += ' — ' + tr('ohp_nouveautes', images=len(n['images']), noms=len(n['noms']),
@@ -288,22 +326,39 @@ class Panneau(QWidget):
         dest = self._dest_courante()
         if not dest:
             return
-        self._t_poss = Tache(lambda d=dest: (Possession.lire(d), lire_infos_ok(d)), parent=self)
+        images = self.inv.images if self.inv else []
+
+        def lire(d=dest, imgs=images):
+            poss, infos = Possession.lire_avec_infos(d)
+            return poss, infos, poss.compte_objets(imgs), imgs   # comptes par objet : en fond aussi
+        self._t_poss = Tache(lire, parent=self)
         self._t_poss.quand_fini(self._possession_prete)
         self._t_poss.start()
 
     def _possession_prete(self, resultat):
-        self.possession, self._infos_ok = resultat
+        self.possession, self._infos_ok = resultat[:2]
+        if len(resultat) > 3 and self.inv is not None and resultat[3] is self.inv.images:
+            self._comptes = resultat[2]              # comptes calculés en fond pour CET inventaire
+        else:
+            self._comptes = None
         self._appliquer_possession_objets()
         self._filtrer_objets()
-        self._remplir_images()
+        if self.f_manquantes.isChecked():
+            self._remplir_images()                   # la liste elle-même dépend de la possession
+        else:
+            self._restyler_images()
+            self._estimer()
         self._remplir_lots()
 
     def _appliquer_possession_objets(self):
         """Colonne « possédé » (n / total, mini-barre) et pastille de chaque objet, sans perdre la sélection."""
         if not self.inv or not self.m_obj.lignes:
             return
-        comptes = self.possession.compte_objets(self.inv.images)
+        comptes = getattr(self, '_comptes', None)
+        if comptes is None:
+            if self.possession.existe:
+                self._charger_possession()           # comptes recalculés en fond, appliqués au retour
+            return                                   # en attendant : barres à zéro (« 0 / n »)
         lignes, styles = [], []
         for ligne, o in zip(self.m_obj.lignes, self.m_obj.donnees):
             c = comptes.get(o['objet'], {'possedees': 0, 'doublons': 0, 'echecs': 0, 'absentes': 0, 'total': o['images']})
@@ -315,8 +370,7 @@ class Panneau(QWidget):
                        echecs=c['echecs'], absentes=c['absentes'], total=c['total'])
             styles.append({'icones': {self.COL_POSSEDE: pastilles.pastille(etat)} if etat != 'aucun' else {},
                            'bulles': {self.COL_POSSEDE: bulle}})
-        self.m_obj.lignes = lignes
-        self.m_obj.restyler(styles)
+        self.m_obj.remplacer_lignes(lignes, styles)
 
     def _maj_legende(self):
         if not hasattr(self, 'l_legende'):
@@ -331,31 +385,39 @@ class Panneau(QWidget):
     def _filtrer_objets(self):
         q = self.recherche.text().strip().lower()
         cat, tel = self.f_cat.currentData(), self.f_tel.currentData()
-        for r, o in enumerate(self.m_obj.donnees):
+        nouveaux, verifier, manquantes = (self.f_nouveaux.isChecked(), self.f_verifier.isChecked(),
+                                          self.f_manquantes.isChecked())
+        visibles = set()
+        for ligne, o in zip(self.m_obj.lignes, self.m_obj.donnees):
             ok = (not cat or o['cat'] == cat) and (not tel or tel in o['tel']) and \
-                 (not self.f_nouveaux.isChecked() or o['nouveau']) and \
-                 (not self.f_verifier.isChecked() or o['a_verifier'])
-            if ok and self.f_manquantes.isChecked():
-                prog = self.m_obj.lignes[r][self.COL_POSSEDE]
+                 (not nouveaux or o['nouveau']) and (not verifier or o['a_verifier'])
+            if ok and manquantes:
+                prog = ligne[self.COL_POSSEDE]
                 ok = not (isinstance(prog, Progression) and prog.total > 0 and prog.n >= prog.total)
             if ok and q:
-                ok = q in o['objet'].lower() or q in cibles.nom_affiche(o['objet']).lower() or \
-                     any(q in n.lower() for n in o['noms'])
-            src = self.m_obj.index(r, 0)
-            row = self.p_obj.mapFromSource(src).row()
-            if row >= 0:
-                self.v_obj.setRowHidden(row, not ok)
+                ok = q in (o.get('_recherche') or o['objet'].lower())
+            if ok:
+                visibles.add(id(o))
+        # un seul passage du filtre du proxy (et non un setRowHidden par ligne) ; suit les re-tris
+        self.p_obj.definir_visibles(None if len(visibles) == len(self.m_obj.donnees) else visibles)
 
     def _objets_choisis(self, *_):
         objs = {o['objet'] for o in lignes_choisies(self.v_obj, self.p_obj, self.m_obj)}
         self._objets = objs
-        imgs = [x for x in (self.inv.images if self.inv else []) if x['objet'] in objs]
-        for combo, cle, tous in ((self.f_nuit, 'nuit', 'ohp_toutes_nuits'), (self.f_filtre, 'filter_name',
+        nuits, filtres = set(), set()
+        if self.inv:
+            valeurs = self._index_inventaire()[3]
+            for o in objs:
+                v = valeurs.get(o)
+                if v:
+                    nuits |= v[0]
+                    filtres |= v[1]
+        for combo, vals, tous in ((self.f_nuit, nuits, 'ohp_toutes_nuits'), (self.f_filtre, filtres,
                                                                             'ohp_tous_filtres')):
             combo.blockSignals(True)
             combo.clear()
             combo.addItem(tr(tous), '')
-            for val in sorted({str(x[cle]) for x in imgs}):
+            for val in sorted(vals):
                 combo.addItem(val, val)
             combo.blockSignals(False)
         self._remplir_images()
@@ -374,78 +436,154 @@ class Panneau(QWidget):
             return                                  # déjà affichée : pas de nouvelle requête
         self.fiche.demander(o['objet'], o['cat'], o.get('sbdb'), sorted(o.get('noms') or ()))
 
+    def _index_inventaire(self):
+        if getattr(self.inv, '_index_memo', (None,))[0] is not self.inv.images:
+            self.preparer_objets(self.inv)
+        return self.inv._index_memo
+
     def _images_filtrees(self):
+        """Images des objets choisis, dans l'ordre (date, adresse), après les filtres de la vue."""
         objs = getattr(self, '_objets', set())
         nuit, filtre = self.f_nuit.currentData(), self.f_filtre.currentData()
+        dates, manquantes = self.f_dates.isChecked(), self.f_manquantes.isChecked()
         out = []
-        for x in (self.inv.images if self.inv else []):
+        if not self.inv or not objs:
+            return out
+        _, triees, par_objet, _ = self._index_inventaire()
+        if len(objs) * 4 < len(par_objet):           # peu d'objets : leurs listes (déjà triées), fusionnées
+            import heapq
+            source = heapq.merge(*(par_objet.get(o, []) for o in objs), key=lambda x: (x['t_min'], x['access_url']))
+        else:                                        # beaucoup : l'inventaire trié, filtré
+            source = triees
+        for x in source:
             if x['objet'] not in objs:
                 continue
             if nuit and str(x['nuit']) != nuit:
                 continue
             if filtre and x['filter_name'] != filtre:
                 continue
-            if self.f_dates.isChecked() and (x['date_partagee'] or x['diurne']) and not x['doublon']:
+            if dates and (x['date_partagee'] or x['diurne']) and not x['doublon']:
                 continue
-            if self.f_manquantes.isChecked() and self.possession.possedee(x):
+            if manquantes and self.possession.possedee(x):
                 continue
             out.append(x)
         return out
 
+    def _sites_par_id(self):
+        d = getattr(self, '_sites_cache', None)
+        if d is None:
+            from ...core import sites as sites_mod
+            d = self._sites_cache = {s_.id: s_ for s_ in sites_mod.sites()}
+        return d
+
+    def _ligne_image(self, x):
+        """Cellules d'une ligne d'image, calculées seulement quand la vue l'affiche (modèle paresseux)."""
+        from ...core import temps
+        dr = []
+        if x['doublon']:
+            dr.append(tr('ohp_drapeau_doublon'))
+        if x['date_partagee']:
+            dr.append(tr('ohp_drapeau_date'))
+        if x['diurne']:
+            dr.append(tr('ohp_drapeau_diurne'))
+        if x['nouveau']:
+            dr.append(tr('ohp_etat_nouveau', date=x['vu_le']))
+        u = temps.mjd_vers_utc(x['t_min'])
+        s_ = self._sites_par_id().get(x.get('site'))
+        loc = temps.heure_locale(u, s_).strftime('%H:%M:%S (UTC%z)') if s_ else ''
+        return (tr('ohp_statut_possession_' + self.possession.statut(x)), u.strftime('%Y-%m-%d %H:%M:%S'), loc,
+                str(x['nuit']), x['tel'], x['filter_name'], x['t_exptime'], ', '.join(dr), x['target_name'])
+
+    def _bulle_image(self, x):
+        from ...core import temps
+        u = temps.mjd_vers_utc(x['t_min'])
+        return temps.formater(u, self._sites_par_id().get(x.get('site'))) + '\n' + x['access_url']
+
+    def _style_image(self, x):
+        """Style d'une ligne d'image ; l'info-bulle de possession est composée au survol seulement."""
+        st = self.possession.statut(x)
+        communs = self.__dict__.setdefault('_styles_communs', {})
+        c = communs.get(st)
+        if c is None:
+            c = communs[st] = ({0: pastilles.pastille(st)},
+                               pastilles.couleur_statut(st) if st != 'absente' else None)
+        return {'icones': c[0], 'couleur': c[1], 'bulles': {0: lambda x=x: self._bulle_possession(x)}}
+
+    def _bulle_possession(self, x):
+        d = self.possession.detail(x)
+        return tr('ohp_bulle_possession', statut=tr('ohp_statut_possession_' + d['statut']),
+                  date=d['date'] or '—', chemin=d['chemin'] or '—')
+
+    def _cle_image(self, col):
+        """Clés de tri rapides (sans calculer les cellules) pour les colonnes courantes de la table des images."""
+        from ...gui.modele import cle_de_tri
+        if col == 0:
+            cles = {st: cle_de_tri(tr('ohp_statut_possession_' + st)) for st in ('ok', 'doublon', 'echec', 'absente')}
+            return lambda x: cles[self.possession.statut(x)]
+        if col in (1, 3):
+            return lambda x: (0, x['t_min'], 0)
+        champ = {4: 'tel', 5: 'filter_name', 6: 't_exptime', 8: 'target_name'}.get(col)
+        if champ:
+            return lambda x: cle_de_tri(x[champ])
+        return None
+
+    def _restyler_images(self, lignes=True):
+        """Thème ou possession changés : colonne « possédé » et styles recalculés à l'affichage ; ni
+        reconstruction, ni perte de la sélection."""
+        self.__dict__.pop('_styles_communs', None)
+        self.m_img.invalider(lignes=lignes)
+
     def _remplir_images(self, *_):
-        from ...core.astro import utc
-        from ...core import sites as sites_mod, temps
-        imgs = sorted(self._images_filtrees(), key=lambda x: (x['t_min'], x['access_url']))
-        sites_par_id = {s.id: s for s in sites_mod.sites()}
-        lignes, bulles, styles = [], [], []
-        for x in imgs:
-            st = self.possession.statut(x)
-            d = self.possession.detail(x)
-            styles.append({'icones': {0: pastilles.pastille(st)},
-                           'couleur': pastilles.couleur_statut(st) if st != 'absente' else None,
-                           'bulles': {0: tr('ohp_bulle_possession', statut=tr('ohp_statut_possession_' + st),
-                                            date=d['date'] or '—', chemin=d['chemin'] or '—')}})
-            dr = []
-            if x['doublon']:
-                dr.append(tr('ohp_drapeau_doublon'))
-            if x['date_partagee']:
-                dr.append(tr('ohp_drapeau_date'))
-            if x['diurne']:
-                dr.append(tr('ohp_drapeau_diurne'))
-            if x['nouveau']:
-                dr.append(tr('ohp_etat_nouveau', date=x['vu_le']))
-            u = temps.mjd_vers_utc(x['t_min'])
-            s_ = sites_par_id.get(x.get('site'))
-            loc = temps.heure_locale(u, s_).strftime('%H:%M:%S (UTC%z)') if s_ else ''
-            lignes.append((tr('ohp_statut_possession_' + st), u.strftime('%Y-%m-%d %H:%M:%S'), loc, str(x['nuit']),
-                           x['tel'], x['filter_name'], x['t_exptime'], ', '.join(dr), x['target_name']))
-            bulles.append(temps.formater(u, s_) + '\n' + x['access_url'])
-        self.m_img.remplir(lignes, imgs, bulles, styles)
-        self.v_img.resizeColumnsToContents()
+        imgs = self._images_filtrees()               # déjà dans l'ordre (date, adresse)
+        vide_avant = self.m_img.rowCount() == 0
+        self.m_img.remplir_objets(imgs)              # aucune ligne construite ici : seulement à l'affichage
+        if vide_avant or not getattr(self, '_colonnes_images_ajustees', False):
+            self.v_img.resizeColumnsToContents()     # une fois : ensuite l'utilisateur garde ses largeurs
+            self._colonnes_images_ajustees = bool(imgs)
         self.selection = imgs
         self._estimer()
 
-    def _estimer(self):
-        from ...core.machine import disque_libre_go
-        from .selection import estimer
+    def _estimer(self, *_):
+        """Volume, place libre (un appel système sur la destination, peut-être un partage réseau) et images
+        manquantes : calculés hors du fil graphique (80 000 images : ~0,3 s), affichés au retour.  Lancé 120 ms
+        après le dernier geste : le fil de calcul ne dispute pas le GIL à l'interface pendant qu'elle se remplit."""
+        if not hasattr(self, '_minuteur_estimation'):
+            self._minuteur_estimation = QTimer(self)
+            self._minuteur_estimation.setSingleShot(True)
+            self._minuteur_estimation.setInterval(120)
+            self._minuteur_estimation.timeout.connect(self._estimer_maintenant)
+        self._gen_estimation = getattr(self, '_gen_estimation', 0) + 1      # un résultat en route est périmé
+        self._minuteur_estimation.start()
+
+    def _estimer_maintenant(self):
         if not self.selection:
             self.l_estimation.setText(tr('ohp_aucune_selection'))
             return
         fmt = self.format.currentData() if hasattr(self, 'format') else 'xisf'
         dest = self.dest.text() if hasattr(self, 'dest') else ''
-        manquantes = self.possession.manquantes(self.selection)
-        utiles = [x for x in self.selection if not x['doublon']]
+        sel, poss = list(self.selection), self.possession
+        gen = self._gen_estimation
+        self._t_est = Tache(self.texte_estimation, sel, poss, fmt, dest, parent=self)
+        self._t_est.quand_fini(lambda t, g=gen: g == self._gen_estimation and self.l_estimation.setText(t))
+        self._t_est.start()
+
+    @staticmethod
+    def texte_estimation(selection, possession, fmt, dest) -> str:
+        from ...core.machine import disque_libre_go
+        from .selection import estimer
+        manquantes = possession.manquantes(selection)
+        utiles = [x for x in selection if not x['doublon']]
         if len(manquantes) < len(utiles):            # une partie est déjà là : on n'estime que ce qui manque
             e = estimer(manquantes, fmt)
             texte = tr('ohp_estimation_manquantes', manquantes=len(manquantes), total=len(utiles),
                        possedees=len(utiles) - len(manquantes), fits=_taille(e['octets_fits']),
                        sortie=_taille(e['octets_sortie']), format=fmt.upper())
         else:
-            e = estimer(self.selection, fmt)
+            e = estimer(selection, fmt)
             texte = tr('ohp_estimation', images=e['images'], objets=e['objets'], nuits=e['nuits'],
                        doublons=e['doublons'], fits=_taille(e['octets_fits']),
                        sortie=_taille(e['octets_sortie']), format=fmt.upper())
-        self.l_estimation.setText(texte + '  ' + tr('ohp_libre', libre=_taille(disque_libre_go(dest or '.') * 1e9)))
+        return texte + '  ' + tr('ohp_libre', libre=_taille(disque_libre_go(dest or '.') * 1e9))
 
     def vers_traitement(self):
         if not self.selection:
@@ -576,8 +714,8 @@ class Panneau(QWidget):
         self._maj_legende()
         if self.inv and self.m_obj.lignes:
             self._appliquer_possession_objets()
-            self._remplir_images()
-            self._remplir_lots()
+            self._restyler_images(lignes=False)      # couleurs seulement : ni reconstruction ni relecture
+            self._restyler_lots()
         self.l_astap.setText(tr('astapdlg_recherche'))
 
         def sonder():
@@ -670,21 +808,41 @@ class Panneau(QWidget):
         inv = self.inv
         fmt, L = self.format.currentData(), self.noms.currentData()
 
+        arret = self.arret = enregistrer_arret(threading.Event())
+        evts = FileEvenements(self, self._progression_reorg)
+
         def travail():
-            t = Traitement(dest, inv, Plan(1, 1, True, ''), {'format': fmt, 'langue': L})
+            t = Traitement(dest, inv, Plan(1, 1, True, ''), {'format': fmt, 'langue': L}, arret=arret)
             try:
-                return t.reorganiser(src)
+                return t.reorganiser(src, progression=lambda fait, total: evts((fait, total)))
             finally:
                 t.fermer()
+
+        def fini(r):
+            evts.arreter()
+            self.b_lancer.setEnabled(True)
+            self.b_arreter.setEnabled(False)
+            self._remplir_lots()
+            self._charger_possession()
+            self._log(tr('ohp_reorganise_fait', n=r['ranges'], lots=r['lots'], ignores=len(r['ignores'])))
+
+        def erreur(e):
+            evts.arreter()
+            self.b_lancer.setEnabled(True)
+            self.b_arreter.setEnabled(False)
+            QMessageBox.warning(self, tr('ohp_reorganiser'), e)
         self.b_lancer.setEnabled(False)
+        self.b_arreter.setEnabled(True)               # arrêt immédiat : ce qui est rattaché est rangé
         self._t_reorg = Tache(travail, parent=self)
-        self._t_reorg.quand_fini(lambda r: (self.b_lancer.setEnabled(True), self._remplir_lots(),
-                                            self._charger_possession(),
-                                            self._log(tr('ohp_reorganise_fait', n=r['ranges'], lots=r['lots'],
-                                                         ignores=len(r['ignores'])))))
-        self._t_reorg.quand_erreur(lambda e: (self.b_lancer.setEnabled(True),
-                                              QMessageBox.warning(self, tr('ohp_reorganiser'), e)))
+        self._t_reorg.quand_fini(fini)
+        self._t_reorg.quand_erreur(erreur)
         self._t_reorg.start()
+
+    def _progression_reorg(self, evs):
+        fait, total = evs[-1]
+        self.barre.setMaximum(max(1, total))
+        self.barre.setValue(fait)
+        self.l_stats.setText(tr('ohp_reorganise_progression', fait=fait, total=total))
 
     def basculer_pause(self):
         if self.pause is None:
@@ -795,11 +953,14 @@ class Panneau(QWidget):
             elif ev['type'] == 'fin':
                 q(tr('qual_fini', n=ev['n'], lots=ev['lots'], deja=ev['deja'], duree=duree_lisible(ev['duree'])))
 
+        plan_machine = self._plan()[1]
+
         def travail():
             # échantillon par lot au-delà de 200 images : le contrôle après traitement doit rester court
-            total = sum(len(v) for v in rapport.fichiers(dest).values())
-            ech = moteur.ECHANTILLON_DEFAUT if total > moteur.SEUIL_GROS_DOSSIER else None
-            moteur.Mesureur(dest, self._plan()[1], ech, rapporter=rapporter, arret=arret, langue=L).lancer()
+            plan_dossier = moteur.planifier(dest, None)          # un seul parcours, repris par le moteur
+            ech = moteur.ECHANTILLON_DEFAUT if plan_dossier['total_dossier'] > moteur.SEUIL_GROS_DOSSIER else None
+            moteur.Mesureur(dest, plan_machine, ech, rapporter=rapporter, arret=arret, langue=L,
+                            plan_dossier=plan_dossier).lancer()
         lancer_fil(travail)
 
     def arreter_traitement(self):
@@ -907,31 +1068,62 @@ class Panneau(QWidget):
         v.addWidget(self.v_lots, 1)
         return w
 
-    def _remplir_lots(self):
-        chemin = os.path.join(self.dest.text(), 'INDEX_LOTS.csv')
-        lignes, donnees, styles = [], [], []
-        completude = self.possession.lots(self.inv.images, self._infos_ok) if self.inv else {}
-        if os.path.exists(chemin):
+    @staticmethod
+    def lire_lots(dest, images, possession, infos_ok):
+        """INDEX_LOTS.csv lu et complétude calculée HORS du fil graphique (la destination peut être un partage
+        réseau : chaque accès y coûte un aller-retour).  Rend [(ligne, dossier, complétude ou None)]."""
+        chemin = os.path.join(dest, 'INDEX_LOTS.csv')
+        out = []
+        completude = possession.lots(images, infos_ok) if images else {}
+        try:
             with open(chemin, encoding='utf-8-sig') as f:
                 for i, r in enumerate(csv.reader(f, delimiter=';')):
                     if i == 0 or len(r) < 12:
                         continue
-                    dossier = os.path.join(self.dest.text(), *r[0].split('/'))
-                    c = completude.get(os.path.normcase(os.path.abspath(dossier)))
-                    if c and c['base']:
-                        etat = tr('ohp_lot_complet' if c['complet'] else 'ohp_lot_incomplet',
-                                  converties=c['converties'], base=c['base'])
-                        styles.append({'icones': {self.COL_LOT_COMPLET: pastilles.pastille('complet' if c['complet'] else 'partiel')},
-                                       'bulles': {self.COL_LOT_COMPLET: tr('ohp_lot_complet_aide')}})
-                    else:
-                        etat = ''
-                        styles.append({})
-                    lignes.append((r[0], r[2], r[4], int(r[5]), etat, float(r[6]), r[7], r[11]))
-                    donnees.append(dossier)
+                    dossier = os.path.join(dest, *r[0].split('/'))
+                    try:
+                        ligne = (r[0], r[2], r[4], int(r[5]), '', float(r[6]), r[7], r[11])
+                    except ValueError:
+                        continue
+                    out.append((ligne, dossier, completude.get(os.path.normcase(os.path.abspath(dossier)))))
+        except OSError:
+            pass
+        return out
+
+    def _remplir_lots(self):
+        dest = self.dest.text()
+        images = self.inv.images if self.inv else None
+        self._t_lots = Tache(self.lire_lots, dest, images, self.possession, self._infos_ok, parent=self)
+        self._t_lots.quand_fini(lambda r, d=dest: self._lots_prets(d, r))
+        self._t_lots.start()
+
+    def _style_lot(self, c):
+        if c and c['base']:
+            etat = tr('ohp_lot_complet' if c['complet'] else 'ohp_lot_incomplet',
+                      converties=c['converties'], base=c['base'])
+            return etat, {'icones': {self.COL_LOT_COMPLET: pastilles.pastille('complet' if c['complet'] else 'partiel')},
+                          'bulles': {self.COL_LOT_COMPLET: tr('ohp_lot_complet_aide')}}
+        return '', {}
+
+    def _lots_prets(self, dest, resultat):
+        if dest != self.dest.text():
+            return                                   # la destination a changé entre-temps : un autre calcul suit
+        self._lots_lus = resultat
+        lignes, donnees, styles = [], [], []
+        for ligne, dossier, c in resultat:
+            etat, style = self._style_lot(c)
+            lignes.append(ligne[:self.COL_LOT_COMPLET] + (etat,) + ligne[self.COL_LOT_COMPLET + 1:])
+            donnees.append(dossier)
+            styles.append(style)
         self.m_lots.remplir(lignes, donnees, None, styles)
         self.v_lots.resizeColumnsToContents()
-        self.l_lots.setText(tr('ohp_lots_resume', n=len(lignes), dest=coupable(self.dest.text())) if lignes
-                            else tr('ohp_lots_aucun', dest=coupable(self.dest.text())))
+        self.l_lots.setText(tr('ohp_lots_resume', n=len(lignes), dest=coupable(dest)) if lignes
+                            else tr('ohp_lots_aucun', dest=coupable(dest)))
+
+    def _restyler_lots(self):
+        par_dossier = {d: c for _, d, c in getattr(self, '_lots_lus', [])}
+        styles = [self._style_lot(par_dossier.get(d))[1] for d in self.m_lots.donnees]
+        self.m_lots.restyler(styles)
 
     def _ouvrir_lot(self):
         ch = lignes_choisies(self.v_lots, self.p_lots, self.m_lots)
@@ -1031,14 +1223,21 @@ class Panneau(QWidget):
         return w
 
     def _remplir_ciel(self, *_):
+        """Points de la carte (un par objet fixe, un par objet mobile et par nuit, à la médiane des poses) :
+        regroupement et médianes hors du fil graphique."""
         if not self.inv:
             return
+        cat = self.ciel_cat.currentData()
+        self._t_ciel = Tache(self.points_ciel, self.inv.images, cat, parent=self)
+        self._t_ciel.quand_fini(self._ciel_pret)
+        self._t_ciel.start()
+
+    @staticmethod
+    def points_ciel(images, cat):
         import math
         import numpy as np
-        from PyQt6.QtGui import QColor
-        cat = self.ciel_cat.currentData()
         groupes = {}
-        for x in self.inv.images:
+        for x in images:
             if x['doublon'] or (cat and x['cat'] != cat):
                 continue
             cle = x['objet'] if x['cat'] in cibles.FIXES else (x['objet'], str(x['nuit']))
@@ -1050,14 +1249,28 @@ class Panneau(QWidget):
             x0 = xs[0]
             r = 2.5 + 1.2 * math.sqrt(len(xs)) if x0['cat'] in cibles.FIXES else 2.5
             nom = cibles.nom_affiche(x0['objet']) + ('' if x0['cat'] in cibles.FIXES else ' — ' + str(x0['nuit']))
-            pts.append((ra, de, min(r, 14), QColor(self.COULEURS.get(x0['cat'], '#95A5A6')),
+            pts.append((ra, de, min(r, 14), x0['cat'],
                         tr('ohp_ciel_bulle', nom=nom, n=len(xs), cat=tr('ohp_cat_' + x0['cat'])), x0['objet']))
-        self.ciel.definir(pts)
+        return pts
+
+    def _ciel_pret(self, pts):
+        from PyQt6.QtGui import QColor
+        couleurs = {}
+        for c in {p[3] for p in pts}:
+            couleurs[c] = QColor(self.COULEURS.get(c, '#95A5A6'))
+        self.ciel.definir([(ra, de, r, couleurs[c], b, o) for ra, de, r, c, b, o in pts])
 
     def _ciel_clic(self, objet):
         for r, o in enumerate(self.m_obj.donnees):
             if o['objet'] == objet:
                 idx = self.p_obj.mapFromSource(self.m_obj.index(r, 0))
+                if not idx.isValid():                # objet masqué par les filtres du catalogue : on les lève
+                    for c in (self.f_nouveaux, self.f_verifier, self.f_manquantes):
+                        c.setChecked(False)
+                    self.f_cat.setCurrentIndex(0)
+                    self.f_tel.setCurrentIndex(0)
+                    self.recherche.setText('')
+                    idx = self.p_obj.mapFromSource(self.m_obj.index(r, 0))
                 self.v_obj.selectRow(idx.row())
                 self.v_obj.scrollTo(idx)
                 self.onglets.setCurrentIndex(0)

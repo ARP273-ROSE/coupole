@@ -46,6 +46,8 @@ class Trace(QWidget):
         ordre = np.argsort(x[ok])
         self.x, self.y = x[ok][ordre], y[ok][ordre]
         self.titre_x, self.titre_y = titre_x, titre_y
+        self._chemin = None
+        self._fond = None
         self.update()
 
     def _cadre(self):
@@ -60,7 +62,44 @@ class Trace(QWidget):
         return x0, x1 if x1 > x0 else x0 + 1, y0 - m, y1 + m
 
     def paintEvent(self, ev):
+        """Axes et courbe dessinés une fois dans une image gardée (tant que données, taille, échelle d'écran et
+        couleurs ne changent pas) ; le survol ne redessine que le curseur par-dessus, au lieu de toute la courbe
+        à chaque mouvement de souris."""
+        from PyQt6.QtGui import QPixmap
+        dpr = float(self.devicePixelRatioF())
+        cle = (self.width(), self.height(), dpr, id(self.x), 0 if self.x is None else len(self.x),
+               self.palette().base().color().rgba(), self.palette().text().color().rgba(), self.titre_x, self.titre_y)
+        if getattr(self, '_fond', None) is None or self._cle_fond != cle:
+            pm = QPixmap(max(1, int(self.width() * dpr)), max(1, int(self.height() * dpr)))
+            pm.setDevicePixelRatio(dpr)
+            q = QPainter(pm)
+            self._dessiner_fond(q)
+            q.end()
+            self._fond, self._cle_fond = pm, cle
         p = QPainter(self)
+        p.drawPixmap(0, 0, self._fond)
+        if self._curseur is not None and self.x is not None and len(self.x) >= 2:
+            p.setRenderHint(QPainter.RenderHint.Antialiasing)
+            r = self._cadre()
+            x0, x1, _, _ = self._limites()
+            n = len(self.x)
+            cx = self._curseur
+            v = x0 + (cx - r.left()) / r.width() * (x1 - x0)
+            i = int(np.clip(np.searchsorted(self.x, v), 0, n - 1))
+            X = r.left() + (self.x[i] - x0) / (x1 - x0) * r.width()
+            p.setClipRect(r)
+            p.setPen(QPen(QColor('#B5382B'), 1, Qt.PenStyle.DashLine))
+            p.drawLine(QPointF(X, r.top()), QPointF(X, r.bottom()))
+            p.setClipping(False)
+            f = QFont(self.font())
+            f.setPointSizeF(max(7.0, f.pointSizeF() * 0.85))
+            p.setFont(f)
+            p.setPen(self.palette().text().color())
+            p.drawText(QRectF(r.left() + 6, r.top() + 4, r.width() - 12, 18), Qt.AlignmentFlag.AlignRight,
+                       self.format_lecture.format(x=self.x[i], y=self.y[i]))
+        p.end()
+
+    def _dessiner_fond(self, p):
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         pal = self.palette()
         p.fillRect(self.rect(), pal.base())
@@ -68,7 +107,6 @@ class Trace(QWidget):
         p.setPen(QPen(pal.text().color(), 1))
         p.drawRect(r)
         if self.x is None or len(self.x) < 2:
-            p.end()
             return
         x0, x1, y0, y1 = self._limites()
 
@@ -99,42 +137,39 @@ class Trace(QWidget):
         p.rotate(-90)
         p.drawText(QRectF(-r.height() / 2, -10, r.height(), 18), Qt.AlignmentFlag.AlignHCenter, self.titre_y)
         p.restore()
-        # courbe : au plus 2 points par pixel (min/max par colonne) pour rester rapide sur 10^6 points
-        chemin = QPainterPath()
+        # courbe : au plus 2 points par pixel (min/max par colonne, en numpy) pour rester rapide sur 10^6 points ;
+        # le chemin est gardé tant que ni les données ni la taille ne changent (le survol ne redessine que le
+        # curseur au lieu de recalculer la courbe à chaque mouvement de souris)
         n = len(self.x)
-        larg = int(r.width())
-        if n > 4 * larg:
-            idx = np.linspace(0, n, larg + 1).astype(int)
-            premier = True
-            for i in range(larg):
-                seg = self.y[idx[i]:idx[i + 1]]
-                if not len(seg):
-                    continue
-                X = r.left() + i
-                for v in (seg.min(), seg.max()):
-                    if premier:
-                        chemin.moveTo(X, py(v))
-                        premier = False
-                    else:
-                        chemin.lineTo(X, py(v))
-        else:
-            chemin.moveTo(px(self.x[0]), py(self.y[0]))
-            for a, b in zip(self.x[1:], self.y[1:]):
-                chemin.lineTo(px(a), py(b))
+        cle = (r.width(), r.height(), id(self.x), n)
+        chemin = getattr(self, '_chemin', None)
+        if chemin is None or self._cle_chemin != cle:
+            chemin = self._chemin_courbe(r, n, px, py)
+            self._chemin, self._cle_chemin = chemin, cle
         p.setClipRect(r)
         p.setPen(QPen(QColor('#1C6DB4'), 1.4))
         p.drawPath(chemin)
-        if self._curseur is not None:
-            cx = self._curseur
-            v = x0 + (cx - r.left()) / r.width() * (x1 - x0)
-            i = int(np.clip(np.searchsorted(self.x, v), 0, n - 1))
-            p.setPen(QPen(QColor('#B5382B'), 1, Qt.PenStyle.DashLine))
-            p.drawLine(QPointF(px(self.x[i]), r.top()), QPointF(px(self.x[i]), r.bottom()))
-            p.setClipping(False)
-            p.setPen(pal.text().color())
-            p.drawText(QRectF(r.left() + 6, r.top() + 4, r.width() - 12, 18), Qt.AlignmentFlag.AlignRight,
-                       self.format_lecture.format(x=self.x[i], y=self.y[i]))
-        p.end()
+
+    def _chemin_courbe(self, r, n, px, py):
+        chemin = QPainterPath()
+        larg = int(r.width())
+        if n > 4 * larg:
+            idx = np.linspace(0, n, larg + 1).astype(int)
+            debut = idx[:-1]
+            plein = idx[1:] > debut
+            debut = debut[plein]
+            mins = np.minimum.reduceat(self.y, debut)
+            maxs = np.maximum.reduceat(self.y, debut)
+            X = (r.left() + np.flatnonzero(plein)).astype(float)
+            xs = np.repeat(X, 2)
+            ys = py(np.column_stack([mins, maxs]).ravel())
+        else:
+            xs, ys = px(self.x), py(self.y)
+        xs, ys = xs.tolist(), ys.tolist()
+        chemin.moveTo(xs[0], ys[0])
+        for a, b in zip(xs[1:], ys[1:]):
+            chemin.lineTo(a, b)
+        return chemin
 
     def mouseMoveEvent(self, ev):
         r = self._cadre()

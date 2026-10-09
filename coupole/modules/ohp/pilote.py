@@ -20,6 +20,7 @@
 """
 from __future__ import annotations
 
+import collections
 import concurrent.futures as F
 import datetime as D
 import json
@@ -43,13 +44,24 @@ VERSION_MODULE = '1.1.0'
 JOURNAL_MAX = 5 * 2**20            # octets : au-delà, JOURNAL.txt tourne (JOURNAL-1.txt, JOURNAL-2.txt)
 JOURNAL_COPIES = 2
 CADENCE_OCTETS = 0.1               # secondes entre deux événements « octets » (10 Hz)
+DELAI_VALIDATION = 1.0             # secondes : la base d'état et JOURNAL.txt sont écrits au plus une fois par seconde
 
 
 class Etat:
-    """Base SQLite d'état (même schéma que le traitement de référence)."""
+    """Base SQLite d'état (même schéma que le traitement de référence).
 
-    def __init__(self, chemin):
+    Validations groupées : une écriture n'est validée (`commit`) que si la précédente validation date de plus de
+    `delai` secondes ; `valider()` force, `fermer()` valide.  En journal DELETE, chaque `commit` crée, écrit,
+    synchronise puis efface un fichier de journal : 77 ms par validation sur un partage réseau (2 ms par
+    aller-retour), soit 3 validations par image auparavant.  Une coupure perd au plus `delai` secondes d'état :
+    les images concernées sont simplement refaites à la reprise.  `delai=0` : validation à chaque écriture.
+    """
+
+    def __init__(self, chemin, delai: float = 0.0):
         os.makedirs(os.path.dirname(chemin), exist_ok=True)
+        self.delai = float(delai)
+        self._derniere = time.monotonic()
+        self._en_attente = False
         self.db = sqlite3.connect(chemin, check_same_thread=False, timeout=60)
         self.db.execute('PRAGMA journal_mode=DELETE')
         self.db.execute('CREATE TABLE IF NOT EXISTS images (id TEXT PRIMARY KEY, url TEXT, statut TEXT, '
@@ -64,6 +76,28 @@ class Etat:
             r = self.db.execute('SELECT statut, essais, info FROM images WHERE id=?', (i,)).fetchone()
         return (r[0], r[1], json.loads(r[2]) if r[2] else {}) if r else (None, 0, {})
 
+    def _peut_etre_valider(self):
+        """(sous le verrou) valide si le délai est écoulé, sinon garde l'écriture en attente."""
+        self._en_attente = True
+        t = time.monotonic()
+        if self.delai <= 0 or t - self._derniere >= self.delai:
+            self.db.commit()
+            self._derniere = t
+            self._en_attente = False
+
+    def valider_si_du(self):
+        """Valide l'écriture en attente si elle a dépassé le délai (appelé à chaque tour du pilote : rien ne reste
+        non validé pendant une pause ou une longue conversion)."""
+        if self._en_attente and time.monotonic() - self._derniere >= self.delai:
+            self.valider()
+
+    def valider(self):
+        with self.verrou:
+            if self._en_attente:
+                self.db.commit()
+                self._derniere = time.monotonic()
+                self._en_attente = False
+
     def ecrire(self, i, url, statut, info, essais=None):
         with self.verrou:
             if essais is None:
@@ -71,7 +105,7 @@ class Etat:
             self.db.execute('INSERT OR REPLACE INTO images VALUES (?,?,?,?,?,?)',
                             (i, url, statut, essais, json.dumps(info, ensure_ascii=False, default=str),
                              D.datetime.now().isoformat(timespec='seconds')))
-            self.db.commit()
+            self._peut_etre_valider()
 
     def empreinte(self, sha, i):
         """Renvoie l'id déjà associé à ces pixels, ou None (et enregistre `i`)."""
@@ -79,7 +113,7 @@ class Etat:
             r = self.db.execute('SELECT id FROM empreintes WHERE sha=?', (sha,)).fetchone()
             if r is None:
                 self.db.execute('INSERT INTO empreintes VALUES (?,?)', (sha, i))
-                self.db.commit()
+                self._peut_etre_valider()
                 return None
             return r[0] if r[0] != i else None
 
@@ -101,6 +135,11 @@ class Etat:
         with self.verrou:
             return dict(self.db.execute('SELECT id, statut FROM images').fetchall())
 
+    def statuts_essais(self) -> dict:
+        """{id: (statut, essais)} en une requête (reprise : plus de lecture par image)."""
+        with self.verrou:
+            return {i: (st, e or 0) for i, st, e in self.db.execute('SELECT id, statut, essais FROM images')}
+
     def ok(self):
         with self.verrou:
             rows = self.db.execute("SELECT id, info FROM images WHERE statut='ok'").fetchall()
@@ -118,16 +157,23 @@ class Etat:
 
     def fermer(self):
         with self.verrou:
-            self.db.close()
+            try:
+                if self._en_attente:
+                    self.db.commit()
+            finally:
+                self.db.close()
 
 
 # ============================================================================ journal lisible
 class Journal:
     """``_traitement/JOURNAL.txt`` : une ligne horodatée (UTC) et bilingue par événement ; rotation."""
 
-    def __init__(self, dossier):
+    def __init__(self, dossier, delai: float = 0.0):
         self.chemin = os.path.join(dossier, 'JOURNAL.txt')
         self.verrou = threading.Lock()
+        self.delai = float(delai)             # > 0 : lignes regroupées, écrites au plus une fois par `delai` s
+        self._tampon: list[str] = []
+        self._derniere = time.monotonic()
 
     def _tourner(self):
         try:
@@ -145,12 +191,30 @@ class Journal:
         ligne = '%s | %s\n' % (D.datetime.now(D.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC'),
                                bilingue(cle, ' / ', **valeurs))
         with self.verrou:
-            self._tourner()
-            try:
-                with open(self.chemin, 'a', encoding='utf-8') as f:
-                    f.write(ligne)
-            except OSError:
-                pass
+            self._tampon.append(ligne)
+            if self.delai <= 0 or time.monotonic() - self._derniere >= self.delai:
+                self._vider()
+
+    def vider(self):
+        with self.verrou:
+            self._vider()
+
+    def vider_si_du(self):
+        if self._tampon and time.monotonic() - self._derniere >= self.delai:
+            self.vider()
+
+    def _vider(self):
+        """(sous le verrou) une ouverture du fichier pour toutes les lignes en attente (et non une par ligne)."""
+        self._derniere = time.monotonic()
+        if not self._tampon:
+            return
+        lignes, self._tampon = ''.join(self._tampon), []
+        self._tourner()
+        try:
+            with open(self.chemin, 'a', encoding='utf-8') as f:
+                f.write(lignes)
+        except OSError:
+            pass
 
 
 def _initialiser_processus():
@@ -191,11 +255,12 @@ class Traitement:
         self.rapporter = rapporter or (lambda ev: None)
         self.arret = arret or threading.Event()
         self.pause = pause or threading.Event()
-        self.etat = Etat(os.path.join(self.trav, 'etat.sqlite'))
-        self.journal = Journal(self.trav)
+        self.etat = Etat(os.path.join(self.trav, 'etat.sqlite'), DELAI_VALIDATION)
+        self.journal = Journal(self.trav, DELAI_VALIDATION)
         self._verifier_coherence()
         self.limiteur = reseau.LimiteurDebit(self.options.get('debit_octets_s', 8e6))
         self._med = self._medo = None
+        self._essais = {}
         self._octets = 0
         self._octets_t = 0.0
         self._octets_verrou = threading.Lock()
@@ -269,13 +334,13 @@ class Traitement:
         """(images à traiter, images utiles de la sélection) d'après l'état : ce qui est fait n'est pas refait."""
         garder = bool(self.options.get('garder_doublons'))
         xs = sorted([x for x in selection if garder or not x['doublon']], key=lambda x: (x['t_min'], x['access_url']))
-        statuts = self.etat.statuts()
+        connus = self.etat.statuts_essais()            # une requête pour toute la sélection
+        self._essais = {i: e for i, (_, e) in connus.items()}
         out = []
         for x in xs:
-            st = statuts.get(ident(x))
+            st, essais = connus.get(ident(x), (None, 0))
             if st in ('ok', 'doublon'):
                 continue
-            _, essais, _ = self.etat.lire(ident(x)) if st is not None else (None, 0, {})
             if essais < 5:
                 out.append(x)
         return out, xs
@@ -284,14 +349,17 @@ class Traitement:
         """Traite `selection` (lignes enrichies de l'inventaire, doublons compris)."""
         med, medo = self.attentes()
         garder = bool(self.options.get('garder_doublons'))
+        connus = self.etat.statuts() if not garder else {}       # une requête, et non une par doublon
         for x in selection:
             if x['doublon'] and not garder:
                 i = ident(x)
-                if self.etat.lire(i)[0] is None:
+                if connus.get(i) is None:
+                    connus[i] = 'doublon'
                     self.etat.ecrire(i, x['access_url'], 'doublon',
                                      dict(info_de_base(x), doublon_de='inventaire'), 0)
                     self.journal.ecrire('jrn_doublon_inventaire', source=x['access_url'].rsplit('/', 1)[1],
                                         raison=x.get('raison_doublon') or 'meme_fichier')
+        self.etat.valider()
         a_faire, xs = self.a_faire(selection)
         total = len(a_faire)
         reprise = len(xs) - total
@@ -314,7 +382,7 @@ class Traitement:
             options_proc['astap'] = {k: getattr(astap, k) for k in ('executable', 'version', 'est_cli',
                                                                      'catalogue_dossier', 'catalogue',
                                                                      'catalogue_fichiers', 'catalogue_complet')}
-        file_ = list(a_faire)
+        file_ = collections.deque(a_faire)
         en_dl: dict = {}
         en_conv: dict = {}
         prets: list = []
@@ -324,6 +392,8 @@ class Traitement:
         en_pause = False
         try:
             while (file_ or en_dl or en_conv or prets) and not self.arret.is_set():
+                self.etat.valider_si_du()
+                self.journal.vider_si_du()
                 if self.pause.is_set():
                     if not en_pause:
                         en_pause = True
@@ -336,10 +406,11 @@ class Traitement:
                 # alimenter les téléchargements sans dépasser la fenêtre disque (pas pendant une pause)
                 while file_ and not en_pause and len(en_dl) < self.plan.telechargements and \
                         len(en_dl) + len(prets) + len(en_conv) < fenetre:
-                    x = file_.pop(0)
+                    x = file_.popleft()
                     i = ident(x)
-                    _, essais, _ = self.etat.lire(i)
-                    self.etat.ecrire(i, x['access_url'], 'en_cours', info_de_base(x), essais + 1)
+                    essais = self._essais.get(i, 0) + 1       # (lus une fois dans a_faire)
+                    self._essais[i] = essais
+                    self.etat.ecrire(i, x['access_url'], 'en_cours', info_de_base(x), essais)
                     en_dl[pool_dl.submit(self._telecharger, x)] = x
                 # alimenter les conversions
                 while prets and not en_pause and len(en_conv) < self.plan.conversions:
@@ -410,13 +481,17 @@ class Traitement:
             # les retrouve (taille complète) sans les retélécharger
             for fic in [v[1] for v in en_conv.values()]:
                 self._supprimer(fic + '.tmp')
+        self.etat.valider()                              # l'état de chaque image est sur le disque avant le rangement
+        self.journal.vider()
         index = self.ranger()
+        self.etat.valider()
         bilan = self.etat.bilan()
         bilan.update(compte=compte, lots=len(index), annule=annule, duree=round(time.time() - t0, 1),
                      echecs=echecs[:50], images=total)
         self.journal.ecrire('jrn_session_fin', ok=compte['ok'], doublons=compte['doublon'], echecs=compte['echec'],
                             duree=int(bilan['duree']), sortie='%.2f' % (bilan['octets_sortie'] / 1e9), lots=len(index),
                             etat='interrompu / interrupted' if annule else 'terminé / finished')
+        self.journal.vider()
         self.rapporter({'type': 'fin', 'bilan': bilan})
         return bilan
 
@@ -521,7 +596,7 @@ class Traitement:
         return index
 
     # ---------------------------------------------------------------- réorganiser des fichiers déjà convertis
-    def reorganiser(self, dossier_source) -> dict:
+    def reorganiser(self, dossier_source, progression=None) -> dict:
         """Range dans l'arborescence des lots des fichiers convertis par Coupole qui se trouvent ailleurs (ou
         selon un ancien rangement) : déplacement, jamais de copie ni d'écrasement, une ligne de journal par fichier.
 
@@ -530,11 +605,13 @@ class Traitement:
         {'ranges': n, 'ignores': [(chemin, raison)], 'lots': n}.
         """
         from . import reorganisation
-        trouves, ignores = reorganisation.inventorier(dossier_source, self.inventaire, self.racine)
+        trouves, ignores = reorganisation.inventorier(dossier_source, self.inventaire, self.racine,
+                                                      progression=progression, arret=self.arret)
         n = 0
+        statuts = self.etat.statuts()                 # une requête ; les infos ne sont relues que pour les « ok »
         for chemin, x, info in trouves:
             i = ident(x)
-            st, _, ancienne = self.etat.lire(i)
+            st, _, ancienne = self.etat.lire(i) if statuts.get(i) == 'ok' else (statuts.get(i), 0, {})
             deja = ancienne.get('final') and os.path.exists(ancienne['final']) and \
                 os.path.abspath(ancienne['final']) != os.path.abspath(chemin) and \
                 os.path.getsize(ancienne['final']) == ancienne.get('octets_sortie', -1)
@@ -554,10 +631,12 @@ class Traitement:
             if raison != 'deja_rangee':
                 self.journal.ecrire('jrn_reorg_ignore', fichier=chemin, raison=bilingue('reorg_' + raison))
         index = self.ranger() if n else []
-        reorganisation.nettoyer_dossiers_vides(dossier_source, self.racine)
+        reorganisation.nettoyer_dossiers_vides(dossier_source, self.racine,
+                                               {os.path.dirname(c) for c, _, _ in trouves})
         return {'ranges': n, 'ignores': ignores, 'lots': len(index)}
 
     def fermer(self):
+        self.journal.vider()
         self.etat.fermer()
 
 

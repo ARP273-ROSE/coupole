@@ -11,6 +11,7 @@ l'ordre de 10 fois la taille de l'image en float32 (voir PROGRESSION.md).
 from __future__ import annotations
 
 import datetime as D
+import functools
 import hashlib
 import math
 import os
@@ -59,7 +60,14 @@ def sur(s: str) -> str:
 
 
 def ident(x) -> str:
-    return hashlib.sha1(x['access_url'].encode()).hexdigest()[:16]
+    return _ident_url(x['access_url'])
+
+
+@functools.lru_cache(maxsize=1 << 18)
+def _ident_url(url: str) -> str:
+    """Identifiant stable d'une image (SHA-1 de son adresse) ; mémorisé : l'interface le redemande pour chaque
+    ligne à chaque remplissage (statut possédé, détails), 80 000 lignes comprises."""
+    return hashlib.sha1(url.encode()).hexdigest()[:16]
 
 
 def info_de_base(x) -> dict:

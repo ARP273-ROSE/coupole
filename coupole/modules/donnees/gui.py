@@ -136,12 +136,18 @@ class Panneau(QWidget):
         if not f:
             return
         tete, cols = cli.colonnes(d, self.axe.currentData() == 'vitesse', self.f0.value())
-        with open(f, 'w', newline='', encoding='utf-8') as fh:
-            w = csv.writer(fh)
-            w.writerow(tete)
-            for ligne in zip(*cols):
-                w.writerow(['%.10g' % v for v in ligne])
-        QMessageBox.information(self, tr('don_exporter'), tr('ecrit', chemin=f))
+
+        def ecrire():                                 # hors du fil graphique : 10^6 lignes = plusieurs secondes
+            with open(f, 'w', newline='', encoding='utf-8') as fh:
+                w = csv.writer(fh)
+                w.writerow(tete)
+                for ligne in zip(*cols):
+                    w.writerow(['%.10g' % v for v in ligne])
+            return f
+        self._t_export = Tache(ecrire, parent=self)
+        self._t_export.quand_fini(lambda c: QMessageBox.information(self, tr('don_exporter'), tr('ecrit', chemin=c)))
+        self._t_export.quand_erreur(lambda e: QMessageBox.warning(self, tr('don_exporter'), e))
+        self._t_export.start()
 
     def aide_html(self):
         return tr('don_aide_html')

@@ -24,8 +24,9 @@ def cmd(a):
         return 3
     from .gui_sans_qt import duree_lisible
     ech = a.echantillon
+    plan_dossier = moteur.planifier(a.dossier, ech)        # un seul parcours du dossier, repris par le moteur
     if ech is None and not a.tout:
-        total = sum(len(v) for v in rapport.fichiers(a.dossier).values())
+        total = plan_dossier['total_dossier']
         if total > moteur.SEUIL_GROS_DOSSIER:
             ech = moteur.ECHANTILLON_DEFAUT
             print(tr('qual_cli_echantillon_auto', total=total, n=ech))
@@ -57,7 +58,7 @@ def cmd(a):
                 print(tr('interrompu_reprise'))
     arret = threading.Event()
     m = moteur.Mesureur(racine, None, ech, rapporter=rapporter, arret=arret, ecrire_rapports=a.ecrire,
-                        processus_max=a.processus, langue=langue())
+                        processus_max=a.processus, langue=langue(), plan_dossier=plan_dossier)
     try:
         b = m.lancer()
     except KeyboardInterrupt:

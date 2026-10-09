@@ -18,7 +18,7 @@ import warnings
 
 import numpy as np
 
-from ...core.astro import cap, ecart_angle, mediane_angle, sep_deg
+from ...core.astro import cap, ecart_angle, mediane_angle, sep_deg, sep_deg_matrice
 from .cibles import FIXES
 
 TOL_ECHELLE = 0.02
@@ -91,11 +91,13 @@ def attentes(d):
     medo = {}
     for k, v in pos.items():
         v2 = v[::len(v) // 400 + 1] if len(v) > 400 else v
-        best, bn = v2[0], -1
-        for a in v2:
-            n = sum(1 for b in v2 if sep_deg(a[0], a[1], b[0], b[1]) < max(a[2], 0.2))
-            if n > bn:
-                best, bn = a, n
+        # médoïde : le point qui a le plus de voisins à moins de max(champ, 0,2°) ; matrice des séparations en
+        # numpy (400 × 400) au lieu de 160 000 appels Python par objet (0,6 s pour la banque, dans un fil qui
+        # retenait le GIL et ralentissait l'interface)
+        arr = np.asarray(v2, dtype=float)
+        voisins = (sep_deg_matrice(arr[:, 0], arr[:, 1], arr[:, 0], arr[:, 1]) <
+                   np.maximum(arr[:, 2], 0.2)[:, None]).sum(axis=1)
+        best = v2[int(np.argmax(voisins))]          # premier maximum, comme la boucle d'origine
         medo[k] = (best[0], best[1], len(v))
     return med, medo
 

@@ -425,8 +425,18 @@ def cmd_reorganiser(a):
     inv = _inventaire()
     r = config.reglages()
     t = Traitement(_dest(a), inv, Plan(1, 1, True, ''), {'format': r['format_sortie'], 'langue': i18n.langue()})
+    import time
+    etat = {'t': time.monotonic()}
+
+    def progression(fait, total):                     # une ligne toutes les 5 s sur un gros dossier
+        if time.monotonic() - etat['t'] >= 5 or fait == total and total > 200:
+            etat['t'] = time.monotonic()
+            print(tr('ohp_reorganise_progression', fait=fait, total=total), flush=True)
     try:
-        res = t.reorganiser(a.source)
+        res = t.reorganiser(a.source, progression=progression)
+    except KeyboardInterrupt:
+        t.arret.set()
+        return 130
     finally:
         t.fermer()
     print(tr('ohp_reorganise_fait', n=res['ranges'], lots=res['lots'], ignores=len(res['ignores'])))

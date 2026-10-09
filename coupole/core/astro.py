@@ -69,6 +69,23 @@ def sep_deg(ra1, de1, ra2, de2) -> float:
     return math.degrees(2 * math.asin(min(1, math.sqrt(a))))
 
 
+def sep_deg_matrice(ra1, de1, ra2, de2):
+    """`sep_deg` de chaque point (ra1, de1) à chaque point (ra2, de2) : matrice len(1) × len(2), en numpy (même
+    formule que `sep_deg`), au lieu de n² appels Python."""
+    ra1, de1 = np.asarray(ra1, dtype=float)[:, None], np.asarray(de1, dtype=float)[:, None]
+    ra2, de2 = np.asarray(ra2, dtype=float)[None, :], np.asarray(de2, dtype=float)[None, :]
+    a = np.sin(np.radians(de1 - de2) / 2) ** 2 + np.cos(np.radians(de1)) * np.cos(np.radians(de2)) * \
+        np.sin(np.radians(ra1 - ra2) / 2) ** 2
+    return np.degrees(2 * np.arcsin(np.minimum(1.0, np.sqrt(a))))
+
+
+def ecart_angle_np(a, b):
+    """`ecart_angle` en numpy (diffusion)."""
+    d = np.abs(np.remainder(np.asarray(a, dtype=float) - np.asarray(b, dtype=float), 360.0))
+    d = np.minimum(d, 360.0 - d)
+    return np.minimum(d, np.abs(180.0 - d))
+
+
 def cap(ra1, de1, ra2, de2) -> float:
     """Angle de position (E depuis N) du point 2 vu du point 1, en degrés [0, 360)."""
     r = math.radians

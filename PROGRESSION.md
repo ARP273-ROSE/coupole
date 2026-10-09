@@ -270,3 +270,37 @@ Consigne : « fais au mieux » → appliquer ce qui apporte un gain réel sans r
 - Essais locaux du `.deb` 0.1.2 (avec `ca-certificates`) dans ubuntu:24.04 nu : installation, `coupole --version`,
   HTTPS OK (SIMBAD 200), désinstallation propre. Captures et profils : `/mnt/apps_pool/_transfert/coupole_deb_test/`
   (`gui_ubuntu_22_04.png`, `gui_ubuntu_24_04.png`) et `/mnt/apps_pool/_transfert/coupole_carte_dpr/`.
+
+## 2026-10-09 — version 0.1.4 : second audit, usage réel à pleine échelle (rapport : `docs/AUDIT2_2026-10.md`)
+Demande de Kevin : le premier audit avait raté le module Qualité (image par image sur la banque entière) ; trouver
+**tous** les défauts de ce genre. Méthode : chaque fonction qui peut durer chronométrée sur la banque réelle
+(`/mnt/zpool2/Astronomie/OHP_DU_ECU`, 7 625 XISF, lecture seule ; `_traitement` et index copiés dans
+`/mnt/apps_pool/_transfert/coupole_audit2/`), sur un **partage réseau simulé** (FUSE, 2 ms par opération,
+`outils/audit2/partage_simule.py`, conteneur avec `/dev/fuse`), et pour l'interface à **10 × la banque** (79 890
+lignes) ; avant/après avec le code de 0.1.3 (`git archive 794092c`) dans le même conteneur.
+- **33 constats, tous corrigés** (13 🔴, 13 🟠, 7 🟡). Les 5 plus coûteux :
+  1. rangement final (à chaque session, même pour une image) sur partage : **60,7 s → 1,5 s** (un `stat` par
+     fichier, parcours complet, 682 LOT.txt réécrits ; désormais seulement ce qui a changé) ;
+  2. Qualité, relancer sur la banque déjà mesurée par un partage : **72 s → 2 s** (2–3 parcours, un `stat` + une
+     requête par image et par passe ; QUALITE.csv réécrit après chaque image = O(n²)) ;
+  3. tri / re-remplissage des tables : `lessThan` Python n·log n — 80 000 images **4,2 s → 0,16 s**, re-remplir trié
+     **6,9 s → 0,3 s** ; table des images paresseuse ; en-tête Qt qui parcourait toutes les lignes à chaque dessin
+     après « tout sélectionner » (0,77 s → 0,02 s, trouvé avec gdb, rendu identique au pixel) ;
+  4. Réorganiser : O(n²) (61 M comparaisons) + séquentiel, sans progression ni arrêt : **243 s → 57 s** (borné par les
+     disques), progression et Arrêter ajoutés ;
+  5. base d'état : 3 validations SQLite par image (77 ms chacune sur partage) → groupées (1 s) ; chaîne de 48 images
+     vers le partage **20,3 → 4,9 s** ; doublons de début de session 12,5 → 0,06 s.
+- Autres : thème (1 s → 0,02 s ; 7,4 s à ×10), lots / estimation / possession / ciel en fond, carte du ciel (survol
+  14 → 0,1 ms), tuiles (budget 30 ms, LRU), tracé (survol 30 → 1 ms), médoïdes et groupement des champs en numpy
+  (résultats identiques), nouveautés en lecture seule, **bug** de tri textuel de la table Qualité.
+- Tests : `tests/test_echelle.py` (21 tests : budgets tolérants à 80 000 lignes, compteurs exacts d'écritures, de
+  validations, de lectures) ; tests d'interface adaptés (anti-rebond, calculs en fond). Validation locale (copie du
+  dépôt sans `build/` ni `dist/`, `pip install ".[test]"`, offscreen) : **python:3.12-slim 278 réussis, 11 sautés,
+  code 0 ; python:3.10-slim 278 réussis, 11 sautés, code 0** ; `test_adaptatif` + `test_gui_robustesse` +
+  `test_echelle` à `QT_SCALE_FACTOR=1.5` et `2` : 36 réussis, code 0 (sous 3.12 et 3.10). CI GitHub non utilisée
+  (minutes du dépôt privé épuisées).
+- Manuels FR/EN : traitement sur partage, réorganiser (progression, Arrêter), Qualité (cache, CSV toutes les 5 s),
+  tableau des mesures du second audit ; recompilés. Aide : info-bulles Arrêter / Réorganiser.
+- Reste proposé (§ 5 du rapport) : gel de 0,8 s au chargement à ×10 (0,17 s à l'échelle réelle), tri sur colonnes
+  sans clé rapide à ×10, Windows non vérifiable ici (§ 6).
+- **Aucun tag posé** (CI de publication bloquée par la facturation GitHub du dépôt privé : à décider par Kevin).

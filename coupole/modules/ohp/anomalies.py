@@ -73,11 +73,15 @@ def depuis_traitement(chemin_etat) -> list[dict]:
     if not os.path.exists(chemin_etat):
         return []
     import sqlite3
-    db = sqlite3.connect(chemin_etat)
-    try:
-        rows = db.execute("SELECT url, info FROM images WHERE statut='doublon'").fetchall()
-    finally:
-        db.close()
+    from pathlib import Path
+    try:                                       # lecture seule (ne gêne pas un traitement qui écrit) ; jamais d'exception
+        db = sqlite3.connect(Path(chemin_etat).resolve().as_uri() + '?mode=ro', uri=True, timeout=5)
+        try:
+            rows = db.execute("SELECT url, info FROM images WHERE statut='doublon'").fetchall()
+        finally:
+            db.close()
+    except sqlite3.Error:
+        return []
     out = []
     for url, info in rows:
         x = json.loads(info) if info else {}

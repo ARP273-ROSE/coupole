@@ -2,6 +2,38 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.1.4 — 9 octobre 2026
+
+Second audit de performance, en usage réel et à pleine échelle (`docs/AUDIT2_2026-10.md`) : chaque fonction qui peut
+durer chronométrée sur la banque entière (7 625 XISF), sur un partage réseau simulé (2 ms par accès) et, pour
+l'interface, à dix fois la banque (80 000 lignes). 33 constats, tous corrigés ; aucun résultat de calcul changé.
+
+- **Grandes listes fluides** : tri par une clé par ligne dans le modèle (et non par comparaisons Python deux à deux :
+  4 s → 0,1–0,2 s pour 80 000 images, 0,3–0,5 s → 0,05 s sur la banque) ; table des images **paresseuse** (cellules
+  calculées pour les lignes affichées seulement) : « tout sélectionner » 2,5 s → 0,06–0,37 s à 80 000 images, 0,48 →
+  0,04 s sur la banque ; l'en-tête des tableaux ne parcourt plus toutes les lignes à chaque dessin après « tout
+  sélectionner » (0,77 s → 0,02 s, rendu identique) ; changer de thème ne recalcule que les couleurs (1 s → 0,02 s ;
+  7,4 s à 80 000 lignes) ; filtre du catalogue en une passe ; anti-rebond de la sélection.
+- **Rien de lent dans le fil graphique** : index des lots, estimation (place libre comprise), possession et comptes par
+  objet, points de la carte du ciel calculés en fond ; carte du ciel : survol 14 ms → 0,1 ms ; carte du monde :
+  décodage des tuiles borné à 30 ms par dessin, cache LRU ; tracé des spectres : survol 30 ms → 1 ms ; export CSV en
+  fond ; médoïdes et groupement des champs en numpy (0,63 et 0,67 s → 0,07 et 0,09 s, résultats identiques).
+- **Partage réseau (NAS)** : base d'état validée au plus une fois par seconde (au lieu de 3 fois par image : 7,7 s →
+  0,07 s pour 100 écritures), JOURNAL.txt écrit par paquets, doublons notés en une passe (12,5 s → 0,06 s) ; rangement
+  final sans rien à déplacer **60,7 s → 1,5 s** (LOT.txt et INDEX_LOTS.csv réécrits seulement s'ils ont changé, plus
+  de `stat` par fichier ni de parcours complet) ; 48 images vers une destination sur le partage : 20,3 → 4,9 s.
+- **Réorganiser** : plus de parcours de l'inventaire pour chaque fichier (61 millions de comparaisons), en-têtes lus
+  par plusieurs processus, **progression affichée et Arrêter** (interface et ligne de commande) ; banque entière :
+  243 → 57 s (borné par la lecture des disques).
+- **Qualité** : un seul parcours du dossier (en parallèle), tailles et dates lues en parallèle, cache lu en une
+  requête, plan du dialogue repris par le moteur : relancer sur la banque déjà mesurée par un partage **72 s → 2 s** ;
+  QUALITE.csv réécrit au plus toutes les 5 s et en fin de lot (et non après chaque image : O(n²) octets par lot) ; cache
+  validé par paquets. **Correctif** : la table triait FWHM, fond, RSN… comme du texte.
+- **Correctifs** : la vérification des nouveautés ouvrait la base de la destination en écriture ; la lecture des
+  doublons de pixels pour le rapport d'anomalies pouvait lever une exception.
+- Tests : +21 (`tests/test_echelle.py`, budgets de temps tolérants et compteurs exacts : écritures, validations,
+  lectures par image) ; outils de mesure dans `outils/audit2/`.
+
 ## 0.1.3 — 9 octobre 2026
 
 - Construction : le run de release v0.1.2 a échoué sur une apostrophe glissée dans un commentaire de l'essai du `.deb`

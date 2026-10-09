@@ -350,8 +350,10 @@ TEXTES = {
     'ohp_lancer_aide': {'fr': "Télécharge, vérifie, corrige, convertit et range la sélection. Reprenable à tout moment.",
                         'en': 'Download, check, fix, convert and sort the selection. Resumable at any time.'},
     'ohp_arreter': {'fr': 'Arrêter', 'en': 'Stop'},
-    'ohp_arreter_aide': {'fr': "Arrête proprement : les images en cours se terminent, la reprise repart de là.",
-                         'en': 'Stop cleanly: images in progress finish, resuming starts from there.'},
+    'ohp_arreter_aide': {'fr': "Arrête proprement : les images en cours se terminent, la reprise repart de là. "
+                                 "Pendant une réorganisation : arrête la lecture des en-têtes (ce qui est reconnu est rangé).",
+                         'en': 'Stop cleanly: images in progress finish, resuming starts from there. During a '
+                               'reorganisation: stops reading headers (whatever is recognised is sorted).'},
     'ohp_barre_aide': {'fr': 'Images traitées sur le total.', 'en': 'Images processed out of the total.'},
     'ohp_journal_aide': {'fr': 'Journal du traitement (le détail complet est dans _traitement/journal.csv).',
                          'en': 'Processing log (full details in _traitement/journal.csv).'},
@@ -480,9 +482,13 @@ TEXTES = {
     'ohp_journal_absent': {'fr': 'Aucun journal dans {dest} pour le moment.', 'en': 'No log in {dest} yet.'},
     'ohp_reorganiser': {'fr': 'Réorganiser des fichiers…', 'en': 'Reorganise files…'},
     'ohp_reorganiser_aide': {'fr': "Range dans l'arborescence des lots des images déjà converties par Coupole qui se trouvent ailleurs ou "
-                                   "selon un ancien rangement : déplacement (jamais de copie), jamais d'écrasement, journal.",
+                                   "selon un ancien rangement : déplacement (jamais de copie), jamais d'écrasement, journal ; "
+                                   "en-têtes lus en parallèle, progression affichée, « Arrêter » l'interrompt.",
                              'en': 'Sort images already converted by Coupole that live elsewhere or in an older layout into the stack '
-                                   'tree: move (never copy), never overwrite, logged.'},
+                                   'tree: move (never copy), never overwrite, logged; headers read in parallel, progress shown, '
+                                   '“Stop” interrupts it.'},
+    'ohp_reorganise_progression': {'fr': 'Réorganisation : {fait} / {total} en-têtes lus…',
+                                   'en': 'Reorganising: {fait} / {total} headers read…'},
     'ohp_reorganiser_titre': {'fr': 'Dossier contenant les fichiers à ranger', 'en': 'Folder holding the files to sort'},
     'ohp_reorganise_fait': {'fr': '{n} fichier(s) rangé(s) dans {lots} lot(s), {ignores} ignoré(s) (détail dans JOURNAL.txt).',
                             'en': '{n} file(s) sorted into {lots} stack(s), {ignores} ignored (details in JOURNAL.txt).'},
