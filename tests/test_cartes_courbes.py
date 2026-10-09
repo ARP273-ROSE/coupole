@@ -187,5 +187,8 @@ def test_les_courbes_suivent_la_fenetre(app_qt, fenetre):
     assert p.trace.height() >= d['courbes_min'] - 2, (d, p.trace.height())
     if d['disponible'] >= 700:                                # assez de place visible (écran virtuel du serveur de CI)
         # 0.1.9 : partage équilibré quand toutes les lignes ne tiennent pas, courbes d'au moins 300 px
-        assert d['courbes_min'] >= 300 and p.trace.height() > h_bas + 30, (d_bas, d, h_bas, p.trace.height())
+        assert d['courbes_min'] >= 300, d
+        # les courbes grandissent, sauf si le tableau a d'abord pris toutes ses lignes (police large)
+        assert p.trace.height() > h_bas + 30 or p.v_res.verticalScrollBar().maximum() == 0, \
+            (d_bas, d, h_bas, p.trace.height())
     p.trace.removeEventFilter(compteur)

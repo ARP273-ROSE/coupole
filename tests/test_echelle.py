@@ -160,8 +160,8 @@ def test_tout_selectionner_80000_lignes_et_entete(app_qt):
         t.setSortingEnabled(True)
         t.sortByColumn(1, Qt.SortOrder.AscendingOrder)
         for c in range(4):                       # sections plus larges que leur titre : EnTete ne les élargit pas
-            t.horizontalHeader().resizeSection(c, 140)
-        t.resize(600, 200)
+            t.horizontalHeader().resizeSection(c, 240)
+        t.resize(1000, 200)
         t.show()
         app_qt.processEvents()
         images.append(t.horizontalHeader().grab().toImage())
