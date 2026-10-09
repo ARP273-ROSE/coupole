@@ -69,7 +69,7 @@ Windows 10/11 64-bit & Coupole-Setup-x.y.z.exe & Double-click. SmartScreen warni
 macOS Apple Silicon & Coupole-x.y.z-macos-arm64.dmg & Drag Coupole into Applications. First launch: right click, « Open ».\\
 macOS Intel & Coupole-x.y.z-macos-x86\_64.dmg & Same.\\
 Ubuntu / Debian x86\_64, ARM64 & coupole\_x.y.z\_amd64.deb & \texttt{sudo apt install ./coupole\_x.y.z\_amd64.deb} (\texttt{\_arm64.deb} on ARM): apt installs the Qt system libraries; \texttt{coupole} command, menu entry. Ubuntu 22.04 or newer, Debian 12 or newer. Uninstall: \texttt{sudo apt remove coupole}.\\
-Other Linux x86\_64 / ARM64 & Coupole-x.y.z-linux-*.tar.gz & Unpack, run \texttt{installer.sh} (copied into \texttt{\textasciitilde/.local/share/coupole}, menu entry).\\
+Other Linux x86\_64 / ARM64 & Coupole-x.y.z-linux-*.tar.gz & Unpack, run \texttt{installer.sh} (copied into \texttt{\textasciitilde/.local/share/coupole}, menu entry, \texttt{coupole} command through a link \texttt{\textasciitilde/.local/bin/coupole}; if that folder is not in the \texttt{PATH}, the installer says so and gives the line to add). The \texttt{Coupole.sh} launcher follows symbolic links (links to links included).\\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -133,9 +133,42 @@ Ctrl+Shift+A & ASTAP assistant\\ Ctrl+Shift+D & dark / light theme\\ Ctrl+R & OH
 
 \capture{img/reglages_en.png}{0.62}
 Preferences (Ctrl+,): interface language; language of folder names, object names and FITS comments;
-appearance (section~\ref{sec:apparence}); output folder; format; parallelism; maximum rate; economy mode; update check; check of the bank for new images at startup and its maximum frequency (section~\ref{sec:nouveautes}). The \emph{Sources} tab lists the service
+appearance (section~\ref{sec:apparence}); file dialogs (section~\ref{sec:dialogues}); output folder; format; parallelism; maximum rate; economy mode; update check; check of the bank for new images at startup and its maximum frequency (section~\ref{sec:nouveautes}). The \emph{Sources} tab lists the service
 addresses (chapter~\ref{chap:evolutif}). An unreadable settings file is set aside (suffix \texttt{.corrompu-…}) and
 the defaults take over: the application always starts.
+
+\subsection{Choosing a file or a folder, folder on a NAS}\label{sec:dialogues}
+The \emph{Browse} buttons open the system file manager, with its places, bookmarks and network shares: Explorer on
+Windows, Finder (NSOpenPanel) on macOS, and on Linux the desktop's own through the \textbf{XDG portal}
+(\texttt{xdg-desktop-portal}): Dolphin on KDE Plasma, Files (Nautilus) on GNOME. The standalone package bundles its own
+Qt library, which cannot load the desktop plugin installed on the system: up to 0.1.7 it fell back to Qt's generic
+dialog, in English and without the system places. At startup, unless the user already set
+\texttt{QT\_QPA\_PLATFORMTHEME}, Coupole checks (waiting at most one second) whether the portal is installed or
+running with a backend able to choose files, and uses it; otherwise, on a GTK desktop (GNOME, Cinnamon, Xfce,
+MATE…), the GTK dialog; otherwise Qt's dialog, \textbf{in the interface language}, its sidebar completed with the home
+folders, \texttt{/media}, \texttt{/mnt}, \texttt{/run/media/\$USER}, the shares opened in the file manager
+(\texttt{/run/user/<uid>/gvfs/…}) and the cifs, nfs and sshfs mounts found in \texttt{/proc/mounts}.
+
+Preferences > \emph{File dialogs}: \emph{System} (default) or \emph{Qt}, the latter only if the system dialog does not
+open or misbehaves (broken portal). On Linux, switching back to \emph{System} takes effect at next start. All texts
+provided by Qt (standard buttons, context menus of text fields, fallback dialog) follow the interface language and
+change with it.
+
+\paragraph{Output folder on a NAS.}
+\begin{itemize}[nosep]
+\item \emph{Linux}: first open the share in Dolphin or Files (\texttt{smb://server/share}); it shows up under
+  \texttt{/run/user/<uid>/gvfs/smb-share:server=server,share=share} (GNOME; KDE with the \texttt{kio-fuse} package,
+  without which an unmounted \texttt{smb://} share cannot be picked by an application), or mount the share with cifs
+  or nfs (\texttt{/mnt/nas}, advised for large volumes: reliable file locks);
+\item \emph{macOS}: Finder > Go > Connect to Server (Cmd+K), \texttt{smb://server/share}, then pick the volume under
+  \texttt{/Volumes};
+\item \emph{Windows}: network drive (\texttt{Z:}) or UNC path \texttt{\textbackslash\textbackslash
+  server\textbackslash share}, which can also be typed into the folder field.
+\end{itemize}
+These paths are accepted everywhere: state database read read-only (SQLite URI of a UNC path written with an empty
+authority), free space, write test, Windows long paths (\texttt{\textbackslash\textbackslash?\textbackslash
+UNC\textbackslash…}), wrapped display; a share is recognised as such (UNC, network drive, cifs, nfs, sshfs, gvfs,
+kio-fuse) and the Quality module limits its parallel reads there.
 
 \subsection{Appearance}\label{sec:apparence}
 Coupole has its own theme, independent of the computer's (a system in dark mode no longer mixes its colours with the
@@ -203,11 +236,21 @@ the background when opening, after each run and whenever the folder changes, nev
 apart with a marker and a soft text colour (readable in both themes, contrast $\geq 4.5$): \textbf{owned} (converted
 and sorted, green check), \textbf{duplicate left out} (same pixels as an image already converted, grey dot),
 \textbf{failed} (to retry, orange triangle) and \textbf{to download} (normal text, arrow); the marker's tooltip gives
-the status, the date and the local path of the file. In the object table, the \emph{owned} column (« 120 / 300 »,
-mini progress bar, sortable) and its marker (full disc: everything owned; half disc: partly; empty circle: nothing)
-sum up each object. The \emph{To download only} box hides fully owned objects and, in the list, the images already
-processed; the estimate then counts only what is missing (« 180 missing images out of 300: 1.5 GB »). A compact
-legend under the list explains the markers. Command line: \cmd{coupole ohp inventory --missing [--dest FOLDER]
+the status, the date and the local path of the file. The \textbf{object list} shows the same state, in the same
+colours: each row starts with a marker (green check: everything owned, left-out duplicates included; green half disc:
+partly; orange triangle: at least one failure; arrow: nothing downloaded), the object name takes the same colour, and
+the tooltip details it (« 12 owned / 12 · 0 to download · 0 failed · 3 duplicate(s) left out »). The \emph{owned}
+column (« 120 / 300 », mini bar) comes right after the name (a column order chosen by hand is kept); sorting it
+orders objects by state (failed, nothing, partly, complete). The legend, below both lists, applies to both. The
+inventory summary line adds the overall ownership (« 7,989 images (144 duplicates), 166 objects, 60 nights,
+78.03 GB — owned: 7,625 (+ 220 duplicates left out), failed: 0, to download: 0 »). The \emph{To download only} box
+hides fully owned objects and, in the list, the images already processed; an emptied list explains itself in its
+centre (« Everything is already downloaded in … »), as does the image list while no object is selected (« Pick one
+or more objects… »; at first start, the first object is selected). The estimate counts only what is missing
+(« 180 missing images out of 300: 1.5 GB »). Changing the output folder (Preferences, field or \emph{Browse} in the
+Processing tab) re-reads its ownership in the background at once: markers, column and summary follow, and the status
+bar says so (« Ownership recomputed: 7,625 images found in … »).
+Command line: \cmd{coupole ohp inventory --missing [--dest FOLDER]
 [--json]}, and \texttt{possedee}, \texttt{statut\_local}, \texttt{fichier\_local} columns in the CSV of \cmd{coupole
 ohp list}.
 
@@ -685,6 +728,9 @@ Unknown target name & Catalogue tab, « To check » box, \emph{Correct the class
 Quality unavailable & \texttt{pip install sep} (included in the packages).\\
 Settings back to defaults & the \texttt{reglages.json} file was unreadable: it is kept alongside with the suffix \texttt{.corrompu-…}.\\
 Output folder not writable & clear message at start; choose another folder (Preferences or the Folder field).\\
+File dialog without the NAS, or generic & Linux: install \texttt{xdg-desktop-portal} and the desktop backend (\texttt{-kde}, \texttt{-gnome} or \texttt{-gtk}), restart; KDE: \texttt{kio-fuse}; otherwise type the path of the mounted share into the field (section~\ref{sec:dialogues}).\\
+System dialog does not open & Preferences > File dialogs: Qt.\\
+\texttt{\textasciitilde/.local/bin/coupole} not found & add \texttt{\textasciitilde/.local/bin} to the \texttt{PATH} (line given by the installer).\\
 \texttt{.part} or \texttt{.tmp} file in \texttt{\_traitement} & left by a cut: resuming reuses it (\texttt{.part}) or replaces it; nothing to do.\\
 \bottomrule
 \end{tabularx}

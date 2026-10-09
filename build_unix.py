@@ -158,16 +158,77 @@ def step_app():
     log(f'application copiee ({sum(1 for _ in app.rglob("*"))} entrees)')
 
 
+# Dossier réel du lanceur, liens symboliques suivis (~/.local/bin/coupole -> .../Coupole.sh, et lien de lien) :
+# `dirname "$0"` seul donnait le dossier du LIEN (« .../.local/bin/python/bin/python3 : aucun fichier », 0.1.7).
+# Sans `readlink -f`, absent de macOS avant 12.3 : `readlink` simple, en boucle, chemins relatifs résolus.
+SUIVRE_LIENS = (
+    'CIBLE="$0"\n'
+    'while [ -L "$CIBLE" ]; do\n'
+    '    LIEN=$(readlink "$CIBLE")\n'
+    '    case "$LIEN" in\n'
+    '        /*) CIBLE="$LIEN" ;;\n'
+    '        *) CIBLE="$(dirname "$CIBLE")/$LIEN" ;;\n'
+    '    esac\n'
+    'done\n')
+
+
+def texte_lanceur(relatif: str = '.') -> str:
+    """Le lanceur shell ; `relatif` : chemin de python/ et app/ depuis le dossier du lanceur."""
+    ici = '$(cd "$(dirname "$CIBLE")" && pwd)' if relatif == '.' else \
+        '$(cd "$(dirname "$CIBLE")/%s" && pwd)' % relatif
+    return ('#!/bin/sh\n'
+            '# Lanceur : tout est relatif au dossier du paquet, rien n\'est\n'
+            '# installe dans le systeme.\n'
+            + SUIVRE_LIENS +
+            f'ICI={ici}\n'
+            f'exec "$ICI/python/bin/python3" "$ICI/app/{POINT_ENTREE}" "$@"\n')
+
+
+def texte_installeur() -> str:
+    """installer.sh du paquet Linux : copie dans ~/.local/share/<tech>, entrée de menu, lien ~/.local/bin/<tech>."""
+    return f'''#!/bin/sh
+# Installation du paquet autonome dans votre dossier personnel : ni sudo, ni gestionnaire de paquets.
+# Installs the standalone package in your home folder: no sudo, no package manager.
+set -e
+ICI=$(cd "$(dirname "$0")" && pwd)
+NOM_APP={NOM}
+TECH={NOM_TECHNIQUE}
+case "${{LC_ALL:-${{LC_MESSAGES:-${{LANG:-}}}}}}" in
+  fr*) FR=1 ;;
+  *) FR=0 ;;
+esac
+dire() {{ if [ "$FR" = 1 ]; then printf '%s\\n' "$1"; else printf '%s\\n' "$2"; fi; }}
+CIBLE="${{XDG_DATA_HOME:-$HOME/.local/share}}/$TECH"
+dire "Installation dans $CIBLE" "Installing into $CIBLE"
+mkdir -p "$CIBLE"
+# Les donnees de l'utilisateur ne sont jamais ecrasees.
+rm -rf "$CIBLE/python" "$CIBLE/app"
+cp -R "$ICI/python" "$ICI/app" "$ICI/$NOM_APP.sh" "$CIBLE/"
+chmod +x "$CIBLE/$NOM_APP.sh"
+APPS="${{XDG_DATA_HOME:-$HOME/.local/share}}/applications"
+mkdir -p "$APPS"
+sed -e "s|__ICI__|$CIBLE|" -e "s|__ICONE__|Icon=$CIBLE/app/coupole/ressources/coupole_256.png\\n|" \\
+    "$ICI/$TECH.desktop" > "$APPS/$TECH.desktop"
+# commande « coupole » dans le terminal : lien vers le lanceur (qui suit les liens jusqu'au paquet)
+BIN="$HOME/.local/bin"
+mkdir -p "$BIN"
+ln -sf "$CIBLE/$NOM_APP.sh" "$BIN/$TECH"
+dire "Termine. Lancez « $NOM_APP » depuis votre menu, ou : $TECH" "Done. Start « $NOM_APP » from your menu, or: $TECH"
+case ":$PATH:" in
+  *":$BIN:"*) ;;
+  *) dire "Attention : $BIN n'est pas dans votre PATH. Ajoutez a ~/.profile (ou ~/.bashrc) la ligne
+  export PATH=\\"\\$HOME/.local/bin:\\$PATH\\"
+puis rouvrez le terminal ; en attendant : $BIN/$TECH" "Note: $BIN is not in your PATH. Add to ~/.profile (or ~/.bashrc) the line
+  export PATH=\\"\\$HOME/.local/bin:\\$PATH\\"
+then reopen the terminal; meanwhile: $BIN/$TECH" ;;
+esac
+'''
+
+
 def step_lanceur():
     """Un script shell, et sous macOS le bundle .app qui va autour."""
     sh = PKG / f'{NOM}.sh'
-    sh.write_text(
-        '#!/bin/sh\n'
-        '# Lanceur : tout est relatif au dossier du paquet, rien n\'est\n'
-        '# installe dans le systeme.\n'
-        'ICI=$(cd "$(dirname "$0")" && pwd)\n'
-        f'exec "$ICI/python/bin/python3" "$ICI/app/{POINT_ENTREE}" "$@"\n',
-        encoding='utf-8')
+    sh.write_text(texte_lanceur(), encoding='utf-8')
     sh.chmod(sh.stat().st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
     log(f'lanceur : {sh.name}')
 
@@ -199,11 +260,7 @@ def step_lanceur():
             '  <key>CFBundleIconFile</key><string>coupole.icns</string>\n'
             '</dict></plist>\n', encoding='utf-8')
         lanceur = macos / NOM
-        lanceur.write_text(
-            '#!/bin/sh\n'
-            'ICI=$(cd "$(dirname "$0")/../Resources" && pwd)\n'
-            f'exec "$ICI/python/bin/python3" "$ICI/app/{POINT_ENTREE}" "$@"\n',
-            encoding='utf-8')
+        lanceur.write_text(texte_lanceur('../Resources'), encoding='utf-8')
         lanceur.chmod(0o755)
         for entree in ('python', 'app'):
             shutil.move(str(PKG / entree), str(resources / entree))
@@ -226,6 +283,9 @@ def step_lanceur():
             'Terminal=false\n'
             'Categories=Science;Astronomy;Education;\n',
             encoding='utf-8')
+        installeur = PKG / 'installer.sh'
+        installeur.write_text(texte_installeur(), encoding='utf-8')
+        installeur.chmod(0o755)
 
 
 def racine_paquet() -> Path:
@@ -329,6 +389,32 @@ def step_elaguer():
     log(f'elagage : {avant/1e6:.0f} Mo -> {apres/1e6:.0f} Mo')
 
 
+# Ce que le Qt du paquet doit garder (0.1.8) : sans le greffon du portail XDG, le dialogue de fichiers retombait sur
+# celui de Qt, sans les emplacements du système (partages réseau) ; sans qtbase_fr.qm, ce dialogue et les boutons
+# standard restaient en anglais.
+QT_ATTENDUS = {
+    'linux': ('plugins/platforms/libqxcb.so', 'plugins/platformthemes/libqxdgdesktopportal.so',
+              'plugins/platformthemes/libqgtk3.so', 'translations/qtbase_fr.qm', 'translations/qt_fr.qm'),
+    'macos': ('plugins/platforms/libqcocoa.dylib', 'translations/qtbase_fr.qm', 'translations/qt_fr.qm'),
+}
+
+
+def controler_qt(base: Path, systeme: str | None = None) -> list[str]:
+    """Fichiers Qt attendus absents du paquet (liste vide : tout y est)."""
+    systeme = systeme or plateforme()
+    dossiers = [q / 'Qt6' for q in base.rglob('PyQt6') if q.is_dir() and q.parent.name == 'site-packages']
+    if not dossiers:
+        return ['PyQt6/Qt6']
+    return [rel for rel in QT_ATTENDUS[systeme] if not any((d / rel).exists() for d in dossiers)]
+
+
+def step_controler_qt():
+    manque = controler_qt(racine_paquet())
+    if manque:
+        raise RuntimeError('Qt incomplet dans le paquet : ' + ', '.join(manque))
+    log('Qt : greffons de dialogues natifs et traductions presents')
+
+
 def step_verifier(version):
     """L'application doit au moins s'importer avec l'interpreteur embarque."""
     base = racine_paquet()
@@ -402,6 +488,7 @@ def main():
     step_app()
     step_lanceur()
     step_elaguer()
+    step_controler_qt()
     step_verifier(version)
     step_archive(version)
     step_paquet_complet(version)

@@ -3,13 +3,13 @@ from __future__ import annotations
 
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QAction, QActionGroup, QIcon, QKeySequence
-from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QMainWindow, QMessageBox,
+from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QMainWindow, QMessageBox,
                              QStackedWidget, QWidget)
 
 from .. import __version__
 from ..core import config, i18n, modules
 from ..core.i18n import tr
-from . import adaptatif, dialogues, memoire, theme
+from . import adaptatif, dialogues, memoire, plateforme, theme
 from .outils import action, aide
 from .ressources import icone_application
 
@@ -233,7 +233,7 @@ class FenetrePrincipale(QMainWindow):
             return
         titre = p.module.nom_local() if hasattr(p, 'module') else 'Coupole'
         texte = p.aide_html() if hasattr(p, 'aide_html') else tr('aide_generale')
-        dialogues.afficher_aide(self, titre, texte + tr('aide_reglages_conserves'))
+        dialogues.afficher_aide(self, titre, texte + tr('aide_dossier_reseau') + tr('aide_reglages_conserves'))
 
     def manuel(self):
         from ..cli import chemin_manuel
@@ -249,6 +249,7 @@ class FenetrePrincipale(QMainWindow):
         if ok and getattr(d, 'disposition_reinitialisee', False):
             if getattr(d, 'langue_changee', False):
                 i18n.choisir_langue(config.reglages()['langue'])
+                plateforme.installer_traductions(QApplication.instance(), i18n.langue())
             self.reinitialiser_disposition()
             return
         if ok and getattr(d, 'langue_changee', False):
@@ -299,6 +300,7 @@ class FenetrePrincipale(QMainWindow):
             return
         config.reglages()['langue'] = code
         i18n.choisir_langue(code)
+        plateforme.installer_traductions(QApplication.instance(), i18n.langue())   # textes fournis par Qt
         idx = self.pile.currentIndex()
         self.construire()
         self.barre.setCurrentRow(max(0, idx))

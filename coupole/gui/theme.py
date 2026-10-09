@@ -23,14 +23,14 @@ THEMES = {
         'selection': ACCENT, 'texte_selection': '#FFFFFF', 'bulle': '#FBF7EC', 'texte_bulle': '#2E333B',
         'lien': ACCENT, 'entete': '#EDEEE9', 'survol': '#E3EAF1',
         # statuts de possession (Banque OHP) : contraste ≥ 4,5 sur base, alterne et fenêtre (tests/test_interface.py)
-        'statut_ok': '#1F7A3A', 'statut_ecarte': '#5F6873', 'statut_echec': '#A1500A',
+        'statut_ok': '#1F7A3A', 'statut_ecarte': '#5F6873', 'statut_echec': '#A1500A', 'statut_partiel': '#2E7866',
     },
     'sombre': {
         'fenetre': '#262A31', 'base': '#1F2329', 'alterne': '#2A2E35', 'texte': '#D9DDE2',
         'texte_doux': '#A3ABB6', 'desactive': '#69717C', 'bouton': '#30353E', 'bordure': '#3B414B',
         'selection': '#3E6C99', 'texte_selection': '#FFFFFF', 'bulle': '#30353E', 'texte_bulle': '#D9DDE2',
         'lien': '#8DB4DA', 'entete': '#2C3139', 'survol': '#343C48',
-        'statut_ok': '#7CC47F', 'statut_ecarte': '#A3ABB6', 'statut_echec': '#F2A65A',
+        'statut_ok': '#7CC47F', 'statut_ecarte': '#A3ABB6', 'statut_echec': '#F2A65A', 'statut_partiel': '#9FD5B5',
     },
 }
 

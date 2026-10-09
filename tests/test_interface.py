@@ -156,7 +156,7 @@ def test_theme_independant_du_systeme_et_lisible(app_qt):
                                 (R.AlternateBase, R.Text)):
                 assert _contraste(p.color(fond), p.color(texte)) >= 4.5, (nom, fond, texte)
             # couleurs de statut (possédée, doublon écarté, échec) lisibles sur tous les fonds des tableaux
-            for statut in ('statut_ok', 'statut_ecarte', 'statut_echec'):
+            for statut in ('statut_ok', 'statut_ecarte', 'statut_echec', 'statut_partiel', 'texte_doux'):
                 for fond in ('base', 'alterne', 'fenetre'):
                     assert _contraste(QColor(theme.THEMES[nom][statut]), QColor(theme.THEMES[nom][fond])) >= 4.5, \
                         (nom, statut, fond)
@@ -235,12 +235,19 @@ def test_possession_pastilles_filtre_et_estimation(app_qt, fenetre, tmp_path, in
                 ohp.v_obj.selectRow(ohp.p_obj.mapFromSource(ohp.m_obj.index(r, 0)).row())
         attendre(app_qt, lambda: len(ohp.selection) == 16 and 'manquante' in ohp.l_estimation.text()
                  and str(ohp.m_obj.lignes[rang][ohp.COL_POSSEDE]) == '5 / 10', 10)
-        # objets : colonne « possédé » = (4 converties + 1 doublon) / 10, pastille « partiel »
+        # objets : colonne « possédé » = (4 converties + 1 doublon) / 10 ; un échec → état « echec » : pastille
+        # (triangle orange) en tête de ligne, nom de la même couleur (0.1.8)
         prog = ohp.m_obj.lignes[rang][ohp.COL_POSSEDE]
         assert isinstance(prog, Progression) and (prog.n, prog.total) == (5, 10) and str(prog) == '5 / 10'
-        idx = ohp.m_obj.index(rang, ohp.COL_POSSEDE)
+        assert prog.etat == 'echec'
+        tete = ohp.v_obj.horizontalHeader().logicalIndex(0)
+        idx = ohp.m_obj.index(rang, tete)
         assert ohp.m_obj.data(idx, Qt.ItemDataRole.DecorationRole) is not None
-        assert '4 / 10' in ohp.m_obj.data(idx, Qt.ItemDataRole.ToolTipRole)
+        bulle = ohp.m_obj.data(idx, Qt.ItemDataRole.ToolTipRole)
+        assert '5 possédées / 10' in bulle and '4 à télécharger' in bulle and '1 échec' in bulle, bulle
+        assert '5 possédées / 10' in ohp.m_obj.data(ohp.m_obj.index(rang, ohp.COL_POSSEDE), Qt.ItemDataRole.ToolTipRole)
+        assert ohp.m_obj.data(ohp.m_obj.index(rang, ohp.COL_OBJET), Qt.ItemDataRole.ForegroundRole) == \
+            pastilles.couleur_statut('echec')
         # images : 16 lignes, statuts et couleurs par ligne, info-bulle avec le fichier local
         assert len(ohp.selection) == 16 and ohp.m_img.rowCount() == 16
         statuts = [ohp.m_img.lignes[r][0] for r in range(16)]

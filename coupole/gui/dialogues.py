@@ -8,13 +8,13 @@ import platform
 
 from PyQt6.QtCore import Qt, QUrl
 from PyQt6.QtGui import QDesktopServices
-from PyQt6.QtWidgets import (QDialog, QDialogButtonBox, QFileDialog, QFormLayout, QGridLayout, QHBoxLayout, QLabel,
+from PyQt6.QtWidgets import (QDialog, QDialogButtonBox, QFormLayout, QGridLayout, QHBoxLayout, QLabel,
                              QMessageBox, QPlainTextEdit, QTabWidget, QTextBrowser, QVBoxLayout, QWidget)
 
 from .. import __version__
 from ..core import config, i18n
 from ..core.i18n import tr
-from . import adaptatif
+from . import adaptatif, fichiers
 from .outils import Tache, aide, bouton, case, champ, decimal, liste, nombre
 
 
@@ -94,6 +94,11 @@ class DialogueReglages(QDialog):
                                                       (tr('reg_apparence_sombre'), 'sombre')])
         self.apparence.setCurrentIndex(max(0, self.apparence.findData(r['apparence'])))
         f.addRow(tr('reg_apparence'), self.apparence)
+        self.dialogues_fichiers = liste('reg_dialogues_fichiers_aide',
+                                        [(tr('reg_dialogues_fichiers_systeme'), 'systeme'),
+                                         (tr('reg_dialogues_fichiers_qt'), 'qt')])
+        self.dialogues_fichiers.setCurrentIndex(max(0, self.dialogues_fichiers.findData(r['dialogues_fichiers'])))
+        f.addRow(tr('reg_dialogues_fichiers'), self.dialogues_fichiers)
         h = QHBoxLayout()
         self.dest = champ('reg_dest_aide', r['dossier_sortie'] or str(config.dossier_sortie_defaut() / 'OHP_DU_ECU'))
         h.addWidget(self.dest, 1)
@@ -199,7 +204,7 @@ class DialogueReglages(QDialog):
         t.start()
 
     def _parcourir(self):
-        d = QFileDialog.getExistingDirectory(self, tr('reg_dest'), self.dest.text())
+        d = fichiers.choisir_dossier(self, tr('reg_dest'), self.dest.text())
         if d:
             self.dest.setText(d)
 
@@ -219,6 +224,7 @@ class DialogueReglages(QDialog):
         r['langue_noms'] = self.noms.currentData()
         r['dossier_sortie'] = self.dest.text().strip()
         r['format_sortie'] = self.format.currentData()
+        r['dialogues_fichiers'] = self.dialogues_fichiers.currentData()
         r['telechargements_max'] = self.dl.value()
         r['conversions_max'] = self.conv.value()
         r['debit_max_mo_s'] = self.debit.value()
@@ -288,7 +294,7 @@ class DialogueASTAP(QDialog):
         from . import memoire
         actuel = config.reglages()['astap_executable']
         depart = os.path.dirname(actuel) if actuel and os.path.isabs(actuel) else memoire.dossier('astap_exe')
-        f, _ = QFileDialog.getOpenFileName(self, tr('astapdlg_choisir_exe'), depart)
+        f, _ = fichiers.choisir_fichier(self, tr('astapdlg_choisir_exe'), depart)
         if f:
             memoire.retenir('astap_exe', f, est_fichier=True)
             config.reglages()['astap_executable'] = f
@@ -296,8 +302,8 @@ class DialogueASTAP(QDialog):
 
     def choisir_cat(self):
         from . import memoire
-        d = QFileDialog.getExistingDirectory(self, tr('astapdlg_choisir_cat'),
-                                             config.reglages()['astap_catalogue'] or memoire.dossier('astap_cat'))
+        d = fichiers.choisir_dossier(self, tr('astapdlg_choisir_cat'),
+                                     config.reglages()['astap_catalogue'] or memoire.dossier('astap_cat'))
         if d:
             memoire.retenir('astap_cat', d)
             config.reglages()['astap_catalogue'] = d
@@ -422,9 +428,9 @@ class DialogueSignaler(QDialog):
     def fichier(self):
         from ..core import rapports
         from . import memoire
-        f, _ = QFileDialog.getSaveFileName(self, tr('signaler_fichier'),
-                                           os.path.join(memoire.dossier('signaler'), 'coupole-rapport.json'),
-                                           'JSON (*.json)')
+        f, _ = fichiers.choisir_enregistrement(self, tr('signaler_fichier'),
+                                               os.path.join(memoire.dossier('signaler'), 'coupole-rapport.json'),
+                                               'JSON (*.json)')
         if not f:
             return
         memoire.retenir('signaler', f, est_fichier=True)

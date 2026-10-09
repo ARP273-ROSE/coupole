@@ -81,9 +81,8 @@ def propre(app_qt):
 def test_fermer_rouvrir_retrouve_chaque_element(app_qt, propre, tmp_path, monkeypatch):
     from PyQt6.QtCore import Qt
     from PyQt6.QtTest import QTest
-    from PyQt6.QtWidgets import QFileDialog
     from coupole.core import config, etat_interface
-    from coupole.gui import dialogues, memoire
+    from coupole.gui import dialogues, fichiers as dlg_fichiers, memoire
 
     f = _ouvrir(app_qt)
     ohp = f.panneau_module('ohp')
@@ -133,7 +132,7 @@ def test_fermer_rouvrir_retrouve_chaque_element(app_qt, propre, tmp_path, monkey
     qual = f.panneau_module('qualite')
     analyse = tmp_path / 'analyse'
     analyse.mkdir()
-    monkeypatch.setattr(QFileDialog, 'getExistingDirectory', staticmethod(lambda *a, **k: str(analyse)))
+    monkeypatch.setattr(dlg_fichiers, 'choisir_dossier', lambda *a, **k: str(analyse))
     qual.choisir()
     qual.echantillon.setChecked(True)
     qual.n_echantillon.setValue(7)
@@ -146,7 +145,7 @@ def test_fermer_rouvrir_retrouve_chaque_element(app_qt, propre, tmp_path, monkey
         c = dossier_csv / ('serie%02d.csv' % i)
         c.write_text('t,flux\n1,2\n2,3\n3,5\n', encoding='utf-8')
         fichiers.append(str(c))
-    monkeypatch.setattr(QFileDialog, 'getOpenFileName', staticmethod(lambda *a, **k: (fichiers[0], '')))
+    monkeypatch.setattr(dlg_fichiers, 'choisir_fichier', lambda *a, **k: (fichiers[0], ''))
     don.ouvrir()
     assert attendre(app_qt, lambda: don.ds)
     for c in fichiers[1:]:

@@ -345,6 +345,34 @@ TEXTES = {
     'reg_dest': {'fr': 'Dossier de sortie', 'en': 'Output folder'},
     'reg_dest_aide': {'fr': 'Où ranger les images converties et les lots.', 'en': 'Where to store converted images and stacks.'},
     'reg_parcourir': {'fr': 'Parcourir…', 'en': 'Browse…'},
+    'reg_dialogues_fichiers': {'fr': 'Boîtes de dialogue de fichiers', 'en': 'File dialogs'},
+    'reg_dialogues_fichiers_systeme': {'fr': 'Système (explorateur du bureau)', 'en': 'System (desktop file manager)'},
+    'reg_dialogues_fichiers_qt': {'fr': 'Qt (dialogue intégré)', 'en': 'Qt (built-in dialog)'},
+    'reg_dialogues_fichiers_aide': {
+        'fr': "Système (conseillé) : l'explorateur de votre bureau, avec ses emplacements, favoris et partages réseau "
+              "(Explorateur Windows, Finder, Dolphin ou Fichiers sous Linux, par le portail XDG). Qt : le dialogue "
+              "intégré à Coupole, en français, avec dossiers personnels, disques et partages montés dans la barre "
+              "latérale ; à choisir seulement si le dialogue du système ne s'ouvre pas ou fonctionne mal. Sous Linux, "
+              "repasser à « Système » prend effet au prochain lancement.",
+        'en': 'System (recommended): your desktop\'s file manager, with its places, bookmarks and network shares '
+              '(Windows Explorer, Finder, Dolphin or Files on Linux, through the XDG portal). Qt: the dialog built '
+              'into Coupole, with home folders, drives and mounted shares in the sidebar; pick it only if the system '
+              'dialog does not open or misbehaves. On Linux, switching back to “System” takes effect at next start.'},
+    'aide_dossier_reseau': {
+        'fr': "<p><b>Dossier sur un NAS ou un partage réseau.</b> Le dialogue « Parcourir » est l'explorateur du "
+              "système : choisir le partage dans ses emplacements réseau. <i>Linux</i> : ouvrir d'abord le partage "
+              "dans Dolphin ou Fichiers (smb://serveur/partage) ; il apparaît sous <tt>/run/user/&lt;uid&gt;/gvfs/"
+              "smb-share:server=…,share=…</tt> (GNOME, ou KDE avec kio-fuse), ou monter le partage en cifs/nfs "
+              "(<tt>/mnt/nas</tt>). <i>macOS</i> : Finder &gt; Aller &gt; Se connecter au serveur (⌘K), "
+              "<tt>smb://serveur/partage</tt>, puis le choisir sous <tt>/Volumes</tt>. <i>Windows</i> : lecteur réseau "
+              "(Z:) ou chemin UNC <tt>\\\\serveur\\partage</tt>, saisissable aussi dans le champ du dossier.</p>",
+        'en': '<p><b>Folder on a NAS or a network share.</b> The “Browse” dialog is the system file manager: pick the '
+              'share among its network places. <i>Linux</i>: first open the share in Dolphin or Files '
+              '(smb://server/share); it shows up under <tt>/run/user/&lt;uid&gt;/gvfs/smb-share:server=…,share=…</tt> '
+              '(GNOME, or KDE with kio-fuse), or mount the share with cifs/nfs (<tt>/mnt/nas</tt>). <i>macOS</i>: '
+              'Finder &gt; Go &gt; Connect to Server (⌘K), <tt>smb://server/share</tt>, then pick it under '
+              '<tt>/Volumes</tt>. <i>Windows</i>: network drive (Z:) or UNC path <tt>\\\\server\\share</tt>, '
+              'which can also be typed into the folder field.</p>'},
     'reg_parcourir_aide': {'fr': 'Choisir le dossier.', 'en': 'Choose the folder.'},
     'reg_format': {'fr': 'Format de sortie', 'en': 'Output format'},
     'reg_format_aide': {'fr': 'XISF pour PixInsight (défaut) ; .fits.fz pour Siril et astropy ; FITS float32 si un logiciel ne lit rien d\'autre.',

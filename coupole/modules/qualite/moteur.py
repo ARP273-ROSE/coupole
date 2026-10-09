@@ -52,16 +52,11 @@ def est_reseau(chemin) -> bool:
             import ctypes
             racine = os.path.splitdrive(p)[0] + '\\'
             return ctypes.windll.kernel32.GetDriveTypeW(racine) == 4          # DRIVE_REMOTE
-        types_reseau = ('cifs', 'smb3', 'smbfs', 'nfs', 'nfs4', 'fuse.sshfs', 'sshfs', 'afpfs', 'webdav', 'davfs',
-                        'fuse.rclone', '9p')
-        montages = []
+        from ...core.chemins import TYPES_RESEAU, lire_montages
         if os.path.exists('/proc/mounts'):
-            with open('/proc/mounts', encoding='utf-8', errors='replace') as f:
-                for ligne in f:
-                    morceaux = ligne.split()
-                    if len(morceaux) >= 3:
-                        montages.append((morceaux[1].replace('\\040', ' '), morceaux[2]))
+            montages = [(point, typ) for point, typ, _src in lire_montages()]
         else:                                                               # macOS, BSD : sortie de `mount`
+            montages = []
             import subprocess
             out = subprocess.run(['mount'], capture_output=True, text=True, timeout=5).stdout
             for ligne in out.splitlines():
@@ -73,7 +68,7 @@ def est_reseau(chemin) -> bool:
         for point, typ in montages:
             if (p == point or p.startswith(point.rstrip('/') + '/')) and len(point) >= len(meilleur):
                 meilleur, meilleur_type = point, typ
-        return bool(meilleur) and meilleur_type.lower() in types_reseau
+        return bool(meilleur) and meilleur_type.lower() in TYPES_RESEAU
     except Exception:
         return False
 

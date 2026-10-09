@@ -71,7 +71,7 @@ Windows 10/11 64 bits & Coupole-Setup-x.y.z.exe & Double-clic. Avertissement Sma
 macOS Apple Silicon & Coupole-x.y.z-macos-arm64.dmg & Glisser Coupole dans Applications. Premier lancement : clic droit, « Ouvrir ».\\
 macOS Intel & Coupole-x.y.z-macos-x86\_64.dmg & Idem.\\
 Ubuntu / Debian x86\_64, ARM64 & coupole\_x.y.z\_amd64.deb & \texttt{sudo apt install ./coupole\_x.y.z\_amd64.deb} (\texttt{\_arm64.deb} sur ARM) : apt installe les bibliothèques système de Qt ; commande \texttt{coupole}, entrée de menu. Ubuntu 22.04 ou plus récent, Debian 12 ou plus récent. Désinstaller : \texttt{sudo apt remove coupole}.\\
-Autre Linux x86\_64 / ARM64 & Coupole-x.y.z-linux-*.tar.gz & Décompresser, lancer \texttt{installer.sh} (copie dans \texttt{\textasciitilde/.local/share/coupole}, entrée de menu).\\
+Autre Linux x86\_64 / ARM64 & Coupole-x.y.z-linux-*.tar.gz & Décompresser, lancer \texttt{installer.sh} (copie dans \texttt{\textasciitilde/.local/share/coupole}, entrée de menu, commande \texttt{coupole} par un lien \texttt{\textasciitilde/.local/bin/coupole} ; si ce dossier n'est pas dans le \texttt{PATH}, l'installeur le dit et donne la ligne à ajouter). Le lanceur \texttt{Coupole.sh} suit les liens symboliques (lien de lien compris).\\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -137,9 +137,43 @@ Ctrl+Maj+A & assistant ASTAP\\ Ctrl+Maj+D & thème sombre / clair\\ Ctrl+R & Ban
 
 \capture{img/reglages_fr.png}{0.62}
 Préférences (Ctrl+,) : langue de l'interface ; langue des noms de dossiers, d'objets et des commentaires FITS ;
-apparence (section~\ref{sec:apparence}) ; dossier de sortie ; format ; parallélisme ; débit maximal ; mode économe ; recherche de mise à jour ; vérification des nouveautés de la banque au démarrage et sa fréquence maximale (section~\ref{sec:nouveautes}). L'onglet
+apparence (section~\ref{sec:apparence}) ; boîtes de dialogue de fichiers (section~\ref{sec:dialogues}) ; dossier de sortie ; format ; parallélisme ; débit maximal ; mode économe ; recherche de mise à jour ; vérification des nouveautés de la banque au démarrage et sa fréquence maximale (section~\ref{sec:nouveautes}). L'onglet
 \emph{Sources} donne les adresses des services (chapitre~\ref{chap:evolutif}). Un fichier de réglages illisible est
 mis de côté (suffixe \texttt{.corrompu-…}) et les valeurs par défaut reprennent : l'application démarre toujours.
+
+\subsection{Choisir un fichier ou un dossier, dossier sur un NAS}\label{sec:dialogues}
+Les boutons \emph{Parcourir} ouvrent l'explorateur de fichiers du système, avec ses emplacements, favoris et partages
+réseau : Explorateur sous Windows, Finder (NSOpenPanel) sous macOS, et sous Linux celui du bureau par le
+\textbf{portail XDG} (\texttt{xdg-desktop-portal}) : Dolphin sous KDE Plasma, Fichiers (Nautilus) sous GNOME. Le paquet
+autonome embarque sa propre bibliothèque Qt, qui ne peut pas charger le greffon du bureau installé sur le système :
+jusqu'à la 0.1.7, il retombait sur le dialogue générique de Qt, en anglais et sans les emplacements du système. Au
+démarrage, si l'utilisateur n'a pas déjà posé \texttt{QT\_QPA\_PLATFORMTHEME}, Coupole regarde (sans attendre plus
+d'une seconde) si le portail est installé ou en service avec un moteur qui sait choisir des fichiers, et le prend ;
+sinon, sous un bureau GTK (GNOME, Cinnamon, Xfce, MATE…), le dialogue GTK ; sinon, le dialogue de Qt, \textbf{en
+français} et complété dans sa barre latérale par les dossiers personnels, \texttt{/media}, \texttt{/mnt},
+\texttt{/run/media/\$USER}, les partages ouverts dans le gestionnaire de fichiers (\texttt{/run/user/<uid>/gvfs/…}) et
+les montages cifs, nfs et sshfs trouvés dans \texttt{/proc/mounts}.
+
+Préférences > \emph{Boîtes de dialogue de fichiers} : \emph{Système} (défaut) ou \emph{Qt}, le second seulement si le
+dialogue du système ne s'ouvre pas ou fonctionne mal (portail défaillant). Sous Linux, revenir à \emph{Système} prend
+effet au prochain lancement. Tous les textes fournis par Qt (boutons standard, menus contextuels des champs, dialogue
+de repli) suivent la langue de l'interface et changent avec elle.
+
+\paragraph{Dossier de sortie sur un NAS.}
+\begin{itemize}[nosep]
+\item \emph{Linux} : ouvrir d'abord le partage dans Dolphin ou Fichiers (\texttt{smb://serveur/partage}) ; il apparaît
+  sous \texttt{/run/user/<uid>/gvfs/smb-share:server=serveur,share=partage} (GNOME ; KDE avec le paquet
+  \texttt{kio-fuse}, sans lequel un partage \texttt{smb://} non monté ne peut pas être choisi par une application),
+  ou monter le partage en cifs ou nfs (\texttt{/mnt/nas}, conseillé pour de gros volumes : verrous de fichiers fiables) ;
+\item \emph{macOS} : Finder > Aller > Se connecter au serveur (Cmd+K), \texttt{smb://serveur/partage}, puis choisir le
+  volume sous \texttt{/Volumes} ;
+\item \emph{Windows} : lecteur réseau (\texttt{Z:}) ou chemin UNC \texttt{\textbackslash\textbackslash
+  serveur\textbackslash partage}, qu'on peut aussi taper dans le champ du dossier.
+\end{itemize}
+Ces chemins sont acceptés partout : base d'état lue en lecture seule (URI SQLite d'un chemin UNC écrite avec une
+autorité vide), place libre, test d'écriture, chemins longs Windows (\texttt{\textbackslash\textbackslash?\textbackslash
+UNC\textbackslash…}), affichage coupé à la ligne ; un partage est reconnu comme tel (UNC, lecteur réseau, cifs, nfs,
+sshfs, gvfs, kio-fuse) et le module Qualité y limite ses lectures parallèles.
 
 \subsection{Apparence}\label{sec:apparence}
 Coupole a son propre thème, indépendant de celui de l'ordinateur (un système en mode sombre ne mélange plus ses
@@ -208,12 +242,22 @@ l'ouverture, après chaque traitement et à chaque changement de dossier, jamais
 distingue par une pastille et une couleur de texte douce (lisible dans les deux thèmes, contraste $\geq 4{,}5$) :
 \textbf{possédée} (convertie et rangée, coche verte), \textbf{doublon écarté} (mêmes pixels qu'une image déjà
 convertie, rond gris), \textbf{échec} (à retenter, triangle orange) et \textbf{à télécharger} (texte normal,
-flèche) ; l'info-bulle de la pastille donne le statut, la date et le chemin local du fichier. Dans le tableau des
-objets, la colonne \emph{possédé} (« 120 / 300 », mini-barre de progression, triable) et sa pastille (disque plein :
-tout possédé ; demi-disque : en partie ; cercle vide : rien) résument chaque objet. La case \emph{À télécharger
-seulement} cache les objets entièrement possédés et, dans la liste, les images déjà traitées ; l'estimation ne
-compte alors que ce qui manque (« 180 images manquantes sur 300 : 1,5 Go »). Une légende compacte sous la liste
-explique les pastilles. Ligne de commande : \cmd{coupole ohp inventaire --manquantes [--dest DOSSIER] [--json]}, et
+flèche) ; l'info-bulle de la pastille donne le statut, la date et le chemin local du fichier. La \textbf{liste des
+objets} montre le même état, aux mêmes couleurs : chaque ligne commence par une pastille (coche verte : tout possédé,
+doublons écartés compris ; demi-disque vert : en partie ; triangle orange : au moins un échec ; flèche : rien de
+téléchargé), le nom de l'objet prend la même couleur, et l'info-bulle détaille (« 12 possédées / 12 · 0 à télécharger
+· 0 échec(s) · 3 doublon(s) écarté(s) »). La colonne \emph{possédé} (« 120 / 300 », mini-barre) suit directement le
+nom (un ordre de colonnes choisi à la main est respecté) ; la trier range les objets par état (échec, rien, en
+partie, complet). La légende, sous les deux listes, vaut pour les deux. La ligne de résumé de l'inventaire ajoute la
+possession globale (« 7 989 images (144 doublons), 166 objets, 60 nuits, 78,03 Go — possédées : 7 625 (+ 220
+doublons écartés), échecs : 0, à télécharger : 0 »). La case \emph{À télécharger seulement} cache les objets
+entièrement possédés et, dans la liste, les images déjà traitées ; une liste vidée l'explique au centre (« Tout est
+déjà téléchargé dans … »), comme la liste des images tant qu'aucun objet n'est choisi (« Choisissez un ou plusieurs
+objets… » ; au premier lancement, le premier objet est choisi d'office). L'estimation ne compte que ce qui manque
+(« 180 images manquantes sur 300 : 1,5 Go »). Changer de dossier de sortie (Préférences, champ ou \emph{Parcourir}
+de l'onglet Traitement) relit aussitôt sa possession en fond : pastilles, colonne et résumé suivent, et la barre
+d'état l'annonce (« Possession recalculée : 7 625 images trouvées dans … »).
+Ligne de commande : \cmd{coupole ohp inventaire --manquantes [--dest DOSSIER] [--json]}, et
 colonnes \texttt{possedee}, \texttt{statut\_local}, \texttt{fichier\_local} dans le CSV de \cmd{coupole ohp images}.
 
 \subsection{Traitement}
@@ -700,6 +744,9 @@ Nom de cible inconnu & onglet Catalogue, case « À vérifier », \emph{Corriger
 Qualité indisponible & \texttt{pip install sep} (inclus dans les paquets).\\
 Réglages revenus par défaut & le fichier \texttt{reglages.json} était illisible : il est gardé à côté avec le suffixe \texttt{.corrompu-…}.\\
 Dossier de sortie non inscriptible & message clair au lancement ; choisir un autre dossier (Préférences ou champ Dossier).\\
+Dialogue de fichiers sans le NAS, ou générique & Linux : installer \texttt{xdg-desktop-portal} et le moteur du bureau (\texttt{-kde}, \texttt{-gnome} ou \texttt{-gtk}), relancer ; KDE : \texttt{kio-fuse} ; sinon taper le chemin du partage monté dans le champ (section~\ref{sec:dialogues}).\\
+Dialogue du système qui ne s'ouvre pas & Préférences > Boîtes de dialogue de fichiers : Qt.\\
+\texttt{\textasciitilde/.local/bin/coupole} introuvable & ajouter \texttt{\textasciitilde/.local/bin} au \texttt{PATH} (ligne donnée par l'installeur).\\
 Fichier \texttt{.part} ou \texttt{.tmp} dans \texttt{\_traitement} & reste d'une coupure : la reprise le réutilise (\texttt{.part}) ou le remplace ; rien à faire.\\
 \bottomrule
 \end{tabularx}

@@ -4,13 +4,13 @@ from __future__ import annotations
 import csv
 import os
 
-from PyQt6.QtWidgets import (QDoubleSpinBox, QFileDialog, QFormLayout, QHBoxLayout, QLabel, QListWidget, QMenu,
+from PyQt6.QtWidgets import (QDoubleSpinBox, QFormLayout, QHBoxLayout, QLabel, QListWidget, QMenu,
                              QMessageBox, QSplitter, QVBoxLayout, QWidget)
 from PyQt6.QtCore import Qt
 
 from ...core import donnees
 from ...core.i18n import tr
-from ...gui import memoire
+from ...gui import fichiers, memoire
 from ...gui.adaptatif import coupable
 from ...gui.outils import Tache, aide, bouton, liste
 from ...gui.trace import Trace
@@ -98,8 +98,8 @@ class Panneau(QWidget):
     def ouvrir(self, chemin=None):
         if not chemin:
             filtres = ' '.join('*' + e for ext, _, _ in donnees._lecteurs for e in ext)
-            chemin, _ = QFileDialog.getOpenFileName(self, tr('don_ouvrir'), memoire.dossier('donnees_ouvrir'),
-                                                    '(%s)' % filtres)
+            chemin, _ = fichiers.choisir_fichier(self, tr('don_ouvrir'), memoire.dossier('donnees_ouvrir'),
+                                                 '(%s)' % filtres)
         if not chemin:
             return
         memoire.retenir('donnees_ouvrir', chemin, est_fichier=True)
@@ -174,9 +174,9 @@ class Panneau(QWidget):
         d = self._courant()
         if d is None or d.x is None:
             return
-        f, _ = QFileDialog.getSaveFileName(self, tr('don_exporter'),
-                                           os.path.join(memoire.dossier('donnees_exporter'), 'donnees.csv'),
-                                           'CSV (*.csv)')
+        f, _ = fichiers.choisir_enregistrement(self, tr('don_exporter'),
+                                               os.path.join(memoire.dossier('donnees_exporter'), 'donnees.csv'),
+                                               'CSV (*.csv)')
         if not f:
             return
         memoire.retenir('donnees_exporter', f, est_fichier=True)

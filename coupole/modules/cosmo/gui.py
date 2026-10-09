@@ -6,11 +6,11 @@ import os
 
 from PyQt6.QtCore import QEvent, QLocale, Qt
 from PyQt6.QtGui import QPainter
-from PyQt6.QtWidgets import (QDoubleSpinBox, QFileDialog, QGroupBox, QHBoxLayout, QLabel, QMessageBox, QScrollArea,
+from PyQt6.QtWidgets import (QDoubleSpinBox, QGroupBox, QHBoxLayout, QLabel, QMessageBox, QScrollArea,
                              QSlider, QSplitter, QStyle, QStyleOptionSlider, QVBoxLayout, QWidget)
 
 from ...core.i18n import langue, tr
-from ...gui import memoire
+from ...gui import fichiers, memoire
 from ...gui.adaptatif import Flux
 from ...gui.modele import ModeleTableau, vue_tableau
 from ...gui.outils import Tache, aide, bouton, case, champ, liste
@@ -556,9 +556,9 @@ class Panneau(QWidget):
         if not self.resultat:
             QMessageBox.information(self, tr('cosmo_csv_table'), tr('cosmo_rien_a_exporter'))
             return
-        f, _ = QFileDialog.getSaveFileName(self, tr('cosmo_csv_table'),
-                                           os.path.join(memoire.dossier('cosmo_exporter'),
-                                                        'cosmologie_z%g.csv' % self.resultat['z']), 'CSV (*.csv)')
+        f, _ = fichiers.choisir_enregistrement(self, tr('cosmo_csv_table'),
+                                               os.path.join(memoire.dossier('cosmo_exporter'),
+                                                            'cosmologie_z%g.csv' % self.resultat['z']), 'CSV (*.csv)')
         if f:
             memoire.retenir('cosmo_exporter', f, est_fichier=True)
             formats.ecrire_csv_resultats(f, [self.resultat])
@@ -568,9 +568,9 @@ class Panneau(QWidget):
         if not self.courbes:
             QMessageBox.information(self, tr('cosmo_csv_courbes'), tr('cosmo_rien_a_exporter'))
             return
-        f, _ = QFileDialog.getSaveFileName(self, tr('cosmo_csv_courbes'),
-                                           os.path.join(memoire.dossier('cosmo_exporter'), 'cosmologie_courbes.csv'),
-                                           'CSV (*.csv)')
+        f, _ = fichiers.choisir_enregistrement(self, tr('cosmo_csv_courbes'),
+                                               os.path.join(memoire.dossier('cosmo_exporter'),
+                                                            'cosmologie_courbes.csv'), 'CSV (*.csv)')
         if f:
             memoire.retenir('cosmo_exporter', f, est_fichier=True)
             formats.ecrire_csv_courbes(f, self.courbes)

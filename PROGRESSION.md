@@ -412,3 +412,48 @@ Le plantage « isolé » de la 0.1.6 n'était pas isolé : **reproduit 8 fois**,
   `test_fil_graphique` à `QT_SCALE_FACTOR=1.5` et `2` : 57 réussis, code 0 (3.12 et 3.10). CI `tests.yml` du
   commit `95145bd` : **6/6** (Linux, Windows, macOS × 3.10, 3.12).
 - **Aucun tag posé** (publication v0.1.6 en cours, non touchée).
+
+## 2026-10-09 — 0.1.8 : explorateur du système, possession visible, lanceur par lien
+Retours d'usage de Kevin (Manjaro, KDE Plasma, paquet autonome 0.1.7, dossier de sortie `/mnt/nas/Astronomie/OHP_DU_ECU`).
+- **Dialogue de fichiers générique, en anglais, sans le NAS** : cause = le Qt du paquet ne peut pas charger le greffon
+  `kde` de plasma-integration (compilé pour le Qt du système) ; Qt prend alors son thème KDE intégré, sans dialogue
+  natif ; le portail n'est choisi d'office que dans Flatpak/Snap. `gui/plateforme.py` : avant `QApplication`, si
+  `QT_QPA_PLATFORMTHEME` n'est pas posé, sonde sans Qt (fichier de service D-Bus ou unité systemd du portail, fichiers
+  `*.portal` avec `FileChooser`, sinon `NameHasOwner` par `dbus-send`/`gdbus` borné à 1 s) → `xdgdesktopportal` ;
+  sinon bureau GTK + `libqgtk3` + GTK 3 → `gtk3` ; sinon dialogue Qt traduit, barre latérale complétée
+  (`core/chemins.emplacements_systeme` : gvfs et ses partages, cifs/nfs/sshfs de `/proc/mounts`, `/run/media/$USER`,
+  `/media`, `/mnt`). Tous les choix de fichiers par `gui/fichiers.py` (parent transmis, `DontUseNativeDialog`
+  seulement si Préférences > « Boîtes de dialogue de fichiers » = Qt). Windows/macOS : rien à choisir, natifs.
+- **Essai réel** (conteneur ubuntu:24.04, Xvfb, `dbus-run-session`, `xdg-desktop-portal` 1.18) : décision
+  `portail` ; `dbus-monitor` voit `org.freedesktop.portal.FileChooser.OpenFile` avec la fenêtre parente
+  `x11:…`, le titre, l'option `directory` et des filtres en français ; `xwininfo` montre « Dossier de sortie — Portal »
+  dans **xdg-desktop-portal-kde** (XDG_CURRENT_DESKTOP=KDE) et « Dossier de sortie » dans xdg-desktop-portal-gtk
+  (GNOME) ; `QT_QPA_PLATFORMTHEME=gtk3` : dialogue GTK dans le processus ; préférence Qt : dialogue Qt.
+- **Traductions de Qt** : `qtbase_fr.qm` par `QTranslator` (dossier `QLibraryInfo.TranslationsPath`), rechargé au
+  changement de langue. Constat dans le dialogue de repli : Qt 6 ne traduit pas « &Look in: » ni « Files of &type: »
+  (absents du catalogue) → `QTranslator` complémentaire (retour `None` = chaîne nulle ; une chaîne vide masquait
+  TOUTES les autres traductions). Paquets : `controler_qt` dans `build_unix.py` (greffons portail/GTK, `qtbase_fr`,
+  `qt_fr`) et `build_package.py` (`qwindows.dll`, traductions) — la construction échoue s'il en manque ; `.deb`
+  vérifié dans le conteneur nu de `release.yml` ; le paquet Windows charge les traductions à l'essai.
+- **Chemins réseau** : URI SQLite d'un UNC (`file://serveur/…` refusée par SQLite → `file:////serveur/…`),
+  `chemin_os` UNC long (`\\?\UNC\…`, l'ancien préfixe donnait `\\?\\\serveur…`), gvfs/kio-fuse reconnus comme
+  partages. Test UNC réel sous Windows (`\\localhost\C$\…`, sauté si inaccessible).
+- **Possession visible** (Banque OHP) : pastille d'état agrégé (`Possession.etat_agrege` : echec > complet > partiel >
+  absente) sur la première colonne affichée, nom coloré (`statut_partiel` ajouté : contraste ≥ 4,5 vérifié avec
+  `texte_doux`), info-bulle ; colonne « possédé » déplacée après « objet » (ordre logique inchangé →
+  largeurs/tri gardés ; `memoire.entete(version=2)` migre l'ordre d'origine non modifié), largeurs auto de type/nom
+  bornées pour qu'elle reste visible, tri par état (`ProgressionEtat`) ; légende sous les deux listes avec « en
+  partie » ; résumé de possession ; messages centrés dans les tables vides (`VueTableau.message_vide`, dessiné
+  dans la zone) ; premier objet choisi au premier lancement ; changement de dossier → relecture, résultat périmé
+  ignoré, message dans la barre d'état.
+- **Lanceur** : `Coupole.sh` suit les liens (boucle `readlink`, sans `-f`) ; `installer.sh` généré par
+  `build_unix.py` (plus dans `release.yml`), pose `~/.local/bin/coupole`, signale le PATH ; `maj.reparer_lanceur()`
+  réécrit au démarrage le lanceur d'un paquet ≤ 0.1.7 (la mise à jour ne touche que `app/`). `install.sh` posait déjà
+  ses liens (venv) : inchangé. `release.yml` : essai par lien et lien de lien (Linux, .app macOS), installeur dans un
+  HOME vide.
+- Tests : `test_dialogues_systeme.py` (27, dont 1 Windows), `test_catalogue_possession.py` (16) ; tests existants
+  adaptés (pastille en tête de ligne, `fichiers.choisir_*` simulés au lieu de `QFileDialog.get*`).
+- Validation locale : **python:3.12-slim 345 réussis, 12 sautés, code 0 ; python:3.10-slim 345 / 12, code 0**.
+  Manuels FR/EN (38 p.) recompilés (section « Choisir un fichier ou un dossier, dossier sur un NAS », possession,
+  dépannage, installeur), captures Catalogue et Préférences refaites.
+- **Aucun tag posé** (publication par Kevin).

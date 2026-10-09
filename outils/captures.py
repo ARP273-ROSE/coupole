@@ -57,6 +57,27 @@ def main():
     f.show()
     ohp = f.panneaux[0]
     attendre(app, lambda: ohp.inv is not None)
+    attendre(app, lambda: not getattr(ohp, '_etapes', None) and getattr(ohp, '_comptes', None) is not None)
+    # possession d'exemple (illustration des pastilles du manuel) : un tiers des objets complets, un tiers en
+    # partie, quelques échecs, le reste à télécharger
+    from coupole.modules.ohp.conversion import ident
+    from coupole.modules.ohp.possession import Possession
+    par_objet = {}
+    for x in ohp.inv.images:
+        if not x['doublon']:
+            par_objet.setdefault(x['objet'], []).append(x)
+    statuts = {}
+    for k, (o, l) in enumerate(sorted(par_objet.items())):
+        if o == 'NGC 6888' or k % 3 == 1:
+            statuts.update({ident(x): 'ok' for x in l[:max(1, len(l) // 2)]})
+        elif k % 3 == 0:
+            statuts.update({ident(x): 'ok' for x in l})
+            if len(l) > 2:
+                statuts[ident(l[-1])] = 'doublon'
+        if k % 11 == 4:
+            statuts[ident(l[0])] = 'echec'
+    poss = Possession(ohp._dest_courante(), statuts)
+    ohp._possession_prete((poss, [], poss.compte_objets(ohp.inv.images), ohp.inv.images))
     # sélection : NGC 6888 (exemple du manuel)
     for r, o in enumerate(ohp.m_obj.donnees):
         if o['objet'] == 'NGC 6888':

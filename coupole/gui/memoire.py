@@ -216,16 +216,23 @@ def _bouton_gauche_enfonce() -> bool:
     return bool(QApplication.mouseButtons() & Qt.MouseButton.LeftButton)
 
 
-def entete(vue, cle: str):
+def entete(vue, cle: str, version: int = 1):
     """QTableView : largeur et ordre des colonnes, colonne et sens du tri.
 
     Les largeurs ne sont gardées qu'une fois choisies par l'utilisateur (glisser une séparation) ; tant qu'il ne
-    l'a pas fait, les colonnes continuent de s'ajuster au contenu (voir `ajuster_colonnes`)."""
+    l'a pas fait, les colonnes continuent de s'ajuster au contenu (voir `ajuster_colonnes`).
+
+    `version` : à augmenter quand l'ordre par défaut des colonnes change (posé sur la vue AVANT l'appel). Un ordre
+    gardé par une version antérieure qui est l'ordre d'origine (0, 1, 2…, jamais modifié à la main) cède alors la
+    place au nouvel ordre par défaut ; un ordre choisi par l'utilisateur est toujours respecté."""
     h = vue.horizontalHeader()
     n = h.count()
     d = etat().lire(cle, None, dict)
     if d and d.get('n') == n:
         ordre = d.get('ordre')
+        ancienne = not isinstance(d.get('version'), int) or d.get('version') < version
+        if ancienne and ordre == list(range(n)):
+            ordre = None                            # ordre d'origine d'une version antérieure : nouveau défaut
         if isinstance(ordre, list) and sorted(ordre) == list(range(n)) and \
                 all(isinstance(x, int) and not isinstance(x, bool) for x in ordre):
             for visuel, logique in enumerate(ordre):
@@ -256,6 +263,8 @@ def entete(vue, cle: str):
         hh = vue.horizontalHeader()
         m = hh.count()
         out = {'n': m, 'ordre': [hh.logicalIndex(i) for i in range(m)]}
+        if version > 1:
+            out['version'] = version
         if vue.isSortingEnabled():
             out['tri'] = [hh.sortIndicatorSection() if hh.sortIndicatorSection() < m else -1,
                           1 if hh.sortIndicatorOrder() == Qt.SortOrder.DescendingOrder else 0]

@@ -16,6 +16,7 @@ import os
 
 import numpy as np
 
+from ...core.chemins import chemin_os
 from ...core.astro import ecart_angle_np, mediane_angle, sep_deg, sep_deg_matrice, sexa, utc
 from ...core.i18n import tr
 from .astrometrie import TOL_ANGLE, TOL_ECHELLE
@@ -108,13 +109,6 @@ def plan_des_lots(tout, L):
                 lots[(dossier_categorie(cat, L), sur(nom_affiche(obj, L)), '%s_%d_%s' % (champ_, k, lab),
                       info['filtre_dossier'])].append((i, info))
     return lots
-
-
-def chemin_os(p: str) -> str:
-    """Chemin tel que le système le veut : sous Windows, au-delà de ~250 caractères, préfixe « \\\\?\\ » (chemins longs)."""
-    if os.name == 'nt' and len(p) > 250 and not p.startswith('\\\\?\\'):
-        return '\\\\?\\' + os.path.abspath(p)
-    return p
 
 
 class _Listages:

@@ -110,6 +110,50 @@ def type_installation() -> str:
     return 'paquet'
 
 
+# Lanceur du paquet Linux autonome, identique à celui qu'écrit build_unix.py (vérifié par les tests) : il suit les
+# liens symboliques (~/.local/bin/coupole -> Coupole.sh). La mise à jour automatique ne remplace que app/ : le
+# lanceur d'un paquet 0.1.7 ou antérieur est donc réécrit par l'application elle-même (`reparer_lanceur`).
+LANCEUR_LINUX = ('#!/bin/sh\n'
+                 '# Lanceur : tout est relatif au dossier du paquet, rien n\'est\n'
+                 '# installe dans le systeme.\n'
+                 'CIBLE="$0"\n'
+                 'while [ -L "$CIBLE" ]; do\n'
+                 '    LIEN=$(readlink "$CIBLE")\n'
+                 '    case "$LIEN" in\n'
+                 '        /*) CIBLE="$LIEN" ;;\n'
+                 '        *) CIBLE="$(dirname "$CIBLE")/$LIEN" ;;\n'
+                 '    esac\n'
+                 'done\n'
+                 'ICI=$(cd "$(dirname "$CIBLE")" && pwd)\n'
+                 'exec "$ICI/python/bin/python3" "$ICI/app/lancer.py" "$@"\n')
+
+
+def reparer_lanceur(racine: Path | None = None) -> bool:
+    """Réécrit `Coupole.sh` d'un paquet Linux autonome antérieur à la 0.1.8 (qui ne suivait pas les liens
+    symboliques). Rend True s'il a été réécrit. Jamais d'exception ; ne touche à rien d'autre."""
+    try:
+        if racine is None:
+            if not sys.platform.startswith('linux') or type_installation() != 'paquet':
+                return False
+            racine = dossier_app().parent
+        lanceur = Path(racine) / 'Coupole.sh'
+        if not lanceur.is_file() or lanceur.is_symlink():
+            return False
+        actuel = lanceur.read_text(encoding='utf-8', errors='replace')
+        if actuel == LANCEUR_LINUX or not actuel.startswith('#!/bin/sh') or 'dirname "$0"' not in actuel or \
+                'while [ -L' in actuel or 'app/lancer.py' not in actuel:
+            return False
+        tmp = lanceur.with_name('.Coupole.sh.tmp')
+        tmp.write_text(LANCEUR_LINUX, encoding='utf-8')
+        tmp.chmod(lanceur.stat().st_mode | 0o111)
+        os.replace(tmp, lanceur)
+        log.info('launcher rewritten to follow symbolic links: %s', lanceur)
+        return True
+    except Exception as e:
+        log.warning('launcher not rewritten: %s', e)
+        return False
+
+
 def peut_appliquer() -> bool:
     """L'application peut-elle installer elle-même l'archive applicative ?"""
     return type_installation() == 'paquet'

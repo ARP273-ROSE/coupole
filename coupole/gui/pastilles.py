@@ -16,7 +16,7 @@ _cache: dict = {}
 
 def couleur_statut(nom: str) -> QColor:
     """La couleur de texte associée à un statut (None → couleur normale du texte)."""
-    return theme.couleur({'ok': 'statut_ok', 'complet': 'statut_ok', 'partiel': 'statut_ok',
+    return theme.couleur({'ok': 'statut_ok', 'complet': 'statut_ok', 'partiel': 'statut_partiel',
                           'ecarte': 'statut_ecarte', 'doublon': 'statut_ecarte', 'aucun': 'statut_ecarte',
                           'echec': 'statut_echec'}.get(nom, 'texte_doux'))
 
