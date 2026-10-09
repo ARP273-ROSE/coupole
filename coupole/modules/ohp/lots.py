@@ -208,10 +208,13 @@ def ranger(racine, tout, L, maj_info, ext='.xisf', conflits=None):
                 info['staging'] = os.path.join(staging_dir, i + os.path.splitext(actuel)[1])
             os.replace(chemin_os(actuel), chemin_os(info['staging']))
             info['final'] = None
+            info.pop('chemin', None)
     crees = set()
     for cle, i, info, cible in plan:
         actuel = info.get('final') or info['staging']
         if actuel != cible:
+            if not os.path.exists(chemin_os(info['staging'])):
+                continue                              # fichier introuvable ici (copie d'une autre machine) : laissé
             d = os.path.dirname(cible)
             if d not in crees:
                 os.makedirs(chemin_os(d), exist_ok=True)
@@ -219,6 +222,7 @@ def ranger(racine, tout, L, maj_info, ext='.xisf', conflits=None):
             quittes.add(os.path.dirname(actuel))
             os.replace(chemin_os(info['staging']), chemin_os(cible))
             info['final'] = cible
+            info['chemin'] = os.path.relpath(cible, racine).replace(os.sep, '/')
             maj_info(i, info)
     par_lot = C.defaultdict(list)                     # (une passe : plus de filtrage du plan entier par lot)
     for c, i, info, _ in plan:
@@ -369,15 +373,19 @@ def ecrire_journal(chemin, racine, lignes):
     """lignes : [(id, url, statut, info)] → journal.csv (mêmes colonnes que le traitement de référence)."""
     import io
     from ...core.config import ecrire_atomique
+    from .emplacements import lire_journal
+    precedent = lire_journal(os.path.dirname(os.path.dirname(os.path.abspath(chemin))))['url'] \
+        if os.path.basename(os.path.dirname(os.path.abspath(chemin))) == '_traitement' else {}
     buf = io.StringIO()
     w = csv.writer(buf, delimiter=';')
     w.writerow(COLONNES_JOURNAL)
     for i, url, st, info in lignes:
         x = json.loads(info) if isinstance(info, str) else (info or {})
-        try:
-            dest = os.path.relpath(x['final'], racine) if x.get('final') else ''
-        except ValueError:                          # autre lecteur Windows : chemin absolu
-            dest = x.get('final', '')
+        from .emplacements import dans_sortie, relatif_valide
+        # chemin relatif noté (0.1.11), sinon `final` s'il est dans la sortie ; jamais de « ../.. » vers le chemin
+        # d'une autre machine (copie d'un ancien traitement) : la ligne garde alors celle du journal précédent
+        dest = relatif_valide(x.get('chemin')) or (dans_sortie(x['final'], racine) if x.get('final') else '') \
+            or precedent.get(url, '')
         w.writerow([x.get('source', ''), dest,
                     x.get('octets_fits', ''), x.get('octets_sortie', x.get('octets_xisf', '')), x.get('ratio', ''),
                     x.get('ecart_max', ''), st, x.get('wcs', ''), ' | '.join(x.get('doutes', [])),

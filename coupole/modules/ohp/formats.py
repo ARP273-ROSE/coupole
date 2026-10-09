@@ -136,7 +136,7 @@ def ecrire(fmt, chemin, donnees, mots, proprietes, createur):
         else:
             octets, _ = xisf.ecrire(chemin, donnees, mots, proprietes, bounds=bounds, codec=CODEC, niveau=NIVEAU,
                                     createur=createur, niveau_abstrait=round(1 + (NIVEAU - 1) * 99 / 21))
-        relu, inf = xisf.lire(chemin)
+        relu, inf = xisf.lire(chemin, strict=True)        # notre fichier : contrôle complet
         if relu.dtype.str != donnees.dtype.str:
             raise ValueError('read back format %s instead of %s' % (relu.dtype.str, donnees.dtype.str))
         if not identiques(relu, donnees):

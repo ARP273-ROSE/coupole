@@ -24,7 +24,7 @@ def test_aller_retour(tmp_path, dtype, bounds):
     p = tmp_path / 'a.xisf'
     octets, bloc = xisf.ecrire(p, a, MOTS, [('Observation:Object:Name', 'String', 'NGC 6888')], bounds=bounds)
     assert octets == os.path.getsize(p) and octets % 4096 == bloc % 4096 or True
-    b, inf = xisf.lire(p, xsd=xsd())
+    b, inf = xisf.lire(p, xsd=xsd(), strict=True)
     assert b.dtype == a.dtype and np.array_equal(a, b)
     assert inf['mots_cles'] == MOTS                     # ordre des HISTORY conservé
     assert inf['bounds'] == ('-1000.0:65535.0' if bounds else None)
@@ -174,7 +174,7 @@ def test_metadonnees_fits_sans_toucher_aux_pixels(tmp_path):
         assert hd[0].header['FOCALLEN'] == 7234.1 and np.array_equal(hd[0].data, a)
         assert any('7200' in str(c) for c in hd[0].header['HISTORY'])
     r = metadonnees.reecrire_dossier(tmp_path)
-    assert r == {'fichiers': 1, 'modifies': 0, 'inchanges': 1, 'erreurs': 0, 'base': 0}
+    assert r == {'fichiers': 1, 'modifies': 0, 'inchanges': 1, 'erreurs': 0, 'base': 0, 'chemins': 0}
     assert (tmp_path / '_traitement' / 'metadonnees.csv').exists()
 
 

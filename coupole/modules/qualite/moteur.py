@@ -13,7 +13,8 @@ Sans Qt.  L'interface et la ligne de commande lui passent une fonction `rapporte
   {'type': 'image', 'lot', 'ligne', 'deja'}               une image mesurée (ou relue du cache)
   {'type': 'progression', 'fait', 'total', 'eta_s', 'debit', 'inventaire_fini'}   agrégée, au plus 10 fois par s
   {'type': 'lot', 'lot', 'lignes'}                        un lot terminé (QUALITE.csv et QUALITE.txt écrits)
-  {'type': 'fin', 'n', 'lots', 'duree', 'annule', 'echecs', 'absentes'}
+  {'type': 'fin', 'n', 'lots', 'duree', 'annule', 'echecs', 'absentes', 'exclus', 'liste_exclus', 'erreurs_motifs',
+   'mesurees_ok'}                                       poses de calibration exclues et motifs d'erreur (0.1.11)
 
 **Inventaire en flux** (0.1.9) : la mesure commence dès le premier lot trouvé, pendant que l'inventaire continue
 (producteur dans un fil, consommateur ici).  L'inventaire ne lit aucun fichier (aucune ouverture : la mesure s'en
@@ -50,6 +51,7 @@ import concurrent.futures as F
 import csv
 import io
 import json
+import logging
 import multiprocessing as mp
 import os
 import queue
@@ -76,6 +78,8 @@ ATTENTE_VERROU_S = 3.0            # ouverture du cache : au-delà, base verrouil
 
 # ============================================================================ dossier réseau
 from ...core.chemins import est_reseau  # noqa: E402,F401  (déplacée dans core en 0.1.10 ; nom gardé ici)
+
+log = logging.getLogger(__name__)
 
 
 # ============================================================================ cache des mesures
@@ -283,7 +287,7 @@ def inventaire_base(racine, base: str) -> dict | None:
                 f = d.get('final')
                 if not f:
                     continue
-                finals.append(f)
+                finals.append((f, d.get('chemin')))
                 st = d.get('staging') or ''
                 parts = _decouper(st)
                 if '_traitement' in parts:
@@ -303,9 +307,12 @@ def inventaire_base(racine, base: str) -> dict | None:
     r0 = list(ancienne.most_common(1)[0][0]) if ancienne else None
     nom_base = os.path.basename(base)
     lots: dict[str, list] = {}
-    for f in finals:
+    from ..ohp.emplacements import absolu, relatif_valide
+    for f, rel in finals:
         parts = _decouper(f)
-        if r0 is not None and parts[:len(r0)] == r0:
+        if relatif_valide(rel):                                     # chemin relatif noté (0.1.11) : il fait foi
+            local = absolu(base, relatif_valide(rel))
+        elif r0 is not None and parts[:len(r0)] == r0:
             local = os.path.join(base, *parts[len(r0):])
         elif _sous(os.path.abspath(f), base):
             local = os.path.abspath(f)
@@ -410,23 +417,60 @@ def echantillon(images: list, n: int) -> list:
 
 
 # ============================================================================ une image (processus)
-def mesurer_une(chemin: str) -> dict:
-    """Dans un processus de mesure : lecture (zstd), SEP, ajustements.  Ne lève jamais : une image illisible rend
-    une ligne avec `erreur`."""
-    from . import mesures
+def mesurer_une(chemin: str, avec_calibration: bool = False) -> dict:
+    """Dans un processus de mesure : en-tête (pose de calibration ? niveau 3 de `calibration`), lecture (zstd,
+    zlib…), SEP, ajustements.  Ne lève jamais : une image illisible rend une ligne avec `erreur` (motif court) et
+    `trace` (la pile, pour le journal)."""
+    from . import calibration, mesures
     t0 = time.perf_counter()
     try:
+        if not avec_calibration:
+            ent = mesures.entete(chemin)
+            motif = calibration.motif_entete(mesures.type_image(ent))
+            if motif:
+                return {'fichier': os.path.basename(chemin), 'chemin': chemin, 'exclu': 'entete:' + motif,
+                        'duree': round(time.perf_counter() - t0, 3)}
         a, ent = mesures.lire_image(chemin)
         t1 = time.perf_counter()
-        r = mesures.analyser(a, ent)
+        r = mesures.analyser(a, ent, en_place=True)
         del a
         r['t_lecture'] = round(t1 - t0, 3)
     except Exception as e:                       # fichier abîmé, format inconnu : on le dit, on continue
-        r = {'erreur': '%s: %s' % (type(e).__name__, str(e)[:200])}
+        import traceback
+        r = {'erreur': '%s: %s' % (type(e).__name__, str(e)[:200]), 'trace': traceback.format_exc()[-2000:]}
     r['fichier'] = os.path.basename(chemin)
     r['chemin'] = chemin
     r['duree'] = round(time.perf_counter() - t0, 3)
     return r
+
+
+def memoire_par_image_mo(chemin: str) -> int:
+    """Mémoire de pointe d'une mesure, d'après la géométrie lue dans l'en-tête (sans les pixels) : environ
+    18 octets par pixel (bloc compressé, décompression, float32, fond, masque, SEP) + 150 Mo de base (mesuré : pose
+    N.I.N.A. de 61 Mpx, 1 170 Mo de pointe) ; 0 si inconnu."""
+    try:
+        from . import mesures
+        ent = mesures.entete(chemin)
+        nx, ny = int(ent.get('NAXIS1') or 0), int(ent.get('NAXIS2') or 0)
+        return int(nx * ny * 18 / 2**20) + 150 if nx and ny else 0
+    except Exception:
+        return 0
+
+
+def limiter_par_memoire(n: int, par_image_mo: int, dispo_mo: int | None = None) -> int:
+    """Processus de mesure que la mémoire disponible permet pour des images de cette taille (au moins 1)."""
+    if par_image_mo <= 0:
+        return n
+    if dispo_mo is None:
+        try:
+            from ...core import machine
+            dispo_mo = machine.memoire_disponible_mo()
+        except Exception:
+            dispo_mo = 0
+    if not dispo_mo:
+        return n
+    from ...core.parallele import PART_MEMOIRE
+    return max(1, min(n, int(dispo_mo * PART_MEMOIRE // par_image_mo)))
 
 
 def _initialiser_processus():
@@ -475,8 +519,10 @@ class Mesureur:
     def __init__(self, racine, plan: Plan | None = None, echantillon_par_lot: int | None = None, rapporter=None,
                  arret: threading.Event | None = None, ecrire_rapports: bool = True, processus_max: int | None = None,
                  langue: str | None = None, demander: bool = False, auto: bool = False,
-                 n_echantillon: int = ECHANTILLON_DEFAUT):
+                 n_echantillon: int = ECHANTILLON_DEFAUT, avec_calibration: bool = False):
         self.racine = os.path.abspath(os.path.expanduser(str(racine)))
+        self.avec_calibration = bool(avec_calibration)
+        self.exclus: list[tuple[str, str]] = []     # (fichier, motif) : poses de calibration et intermédiaires
         self.plan = plan
         self.echantillon = echantillon_par_lot or None
         self.rapporter = rapporter or (lambda ev: None)
@@ -565,7 +611,10 @@ class Mesureur:
         prio = collections.deque()                   # (dossier, indice, chemin, taille, mtime) à mesurer d'abord
         differe = collections.deque()                # hors échantillon, en attente de la décision
         en_cours = {}
-        st = {'fait': 0, 'deja': 0, 'mesurees': 0, 'echecs': 0, 'absentes': 0, 'trouves': 0, 'duree_mesures': 0.0}
+        st = {'fait': 0, 'deja': 0, 'mesurees': 0, 'echecs': 0, 'absentes': 0, 'trouves': 0, 'duree_mesures': 0.0,
+              'exclus': 0}
+        erreurs = collections.Counter()              # motif court → nombre (résumé « 70 en erreur (…) »)
+        self.exclus = []
         inventaire_fini = False
         question_posee = debut_envoye = False
         annule = False
@@ -593,6 +642,14 @@ class Mesureur:
                 self.rapporter({'type': 'lot', 'lot': d, 'lignes': lignes_de(d)})
 
         def accueillir(d, fs, dates):
+            if not self.avec_calibration:            # niveaux 1 et 2 : dossiers et noms, sans rien ouvrir
+                from . import calibration
+                fs, exclus = calibration.trier(fs, self.racine)
+                if exclus:
+                    self.exclus.extend(exclus)
+                    st['exclus'] += len(exclus)
+                if not fs:
+                    return
             lots[d] = fs
             resultats[d] = {}
             ech = echantillon(list(range(len(fs))), n_ech)
@@ -707,12 +764,15 @@ class Mesureur:
                     envoyer_debut()
                 # 3) mesures
                 if prio and pool is None:
+                    # images de 61 Mpx (ASI 6200) : ≈ 1 Go par mesure → moins de processus que de cœurs
+                    n_proc = limiter_par_memoire(n_proc, memoire_par_image_mo(prio[0][2]))
+                    fenetre = 2 * n_proc
                     ctx = mp.get_context('spawn')
                     pool = F.ProcessPoolExecutor(n_proc, mp_context=ctx, initializer=_initialiser_processus)
                     t_mesure = time.monotonic()
                 while prio and len(en_cours) < fenetre:
                     d, i, f, taille, mtime = prio.popleft()
-                    en_cours[pool.submit(mesurer_une, f)] = (d, i, f, taille, mtime)
+                    en_cours[pool.submit(mesurer_une, f, self.avec_calibration)] = (d, i, f, taille, mtime)
                 if en_cours:
                     finis, _ = F.wait(list(en_cours), timeout=0.1, return_when=F.FIRST_COMPLETED)
                     for fut in finis:
@@ -723,6 +783,11 @@ class Mesureur:
                             r = {'fichier': os.path.basename(f), 'chemin': f, 'erreur': '%s: %s' % (type(e).__name__, e)}
                         if 'erreur' in r:
                             st['echecs'] += 1
+                            erreurs[rapport.motif_erreur(r['erreur'], self.langue)] += 1
+                            log.error('quality: %s not measured: %s\n%s', f, r['erreur'], r.pop('trace', ''))
+                        elif r.get('exclu'):
+                            st['exclus'] += 1                 # niveau 3 : l'en-tête dit « flat », « dark »…
+                            self.exclus.append((f, r['exclu']))
                         else:
                             self.cache.ecrire(f, taille, mtime, r)
                         st['mesurees'] += 1
@@ -762,6 +827,9 @@ class Mesureur:
                  'echecs': st['echecs'], 'absentes': st['absentes'], 'duree': time.monotonic() - t0, 'annule': annule,
                  'processus': n_proc, 'reseau': reseau, 'source': self.source, 'total_dossier': st['trouves'],
                  'echantillon': n_ech if decision == 'echantillon' else 0, 'erreur_inventaire': erreur_inventaire,
-                 'lignes': {d: lignes_de(d) for d in lots}}
+                 'lignes': {d: lignes_de(d) for d in lots}, 'exclus': st['exclus'], 'liste_exclus': list(self.exclus),
+                 'erreurs_motifs': erreurs.most_common(),
+                 'mesurees_ok': sum(1 for d in lots for l in resultats[d].values()
+                                    if not l.get('erreur') and not l.get('exclu'))}
         self.rapporter(bilan)
         return bilan

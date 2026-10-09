@@ -124,7 +124,7 @@ def test_aucun_dialogue_statique_ni_dialogue_qt_force():
         if f.name != 'fichiers.py':
             assert 'DontUseNativeDialog' not in texte, f
     texte = (RACINE / 'coupole' / 'gui' / 'fichiers.py').read_text(encoding='utf-8')
-    assert 'QFileDialog(parent' in texte
+    assert 'fen = _parent_visible(parent)' in texte and 'QFileDialog(fen,' in texte
 
 
 @pytest.fixture
@@ -148,6 +148,7 @@ def test_dialogue_dossier_natif_ou_qt_selon_le_reglage(app_qt, dialogue_simule, 
     from coupole.gui import fichiers
     monkeypatch.setitem(config.reglages().valeurs, 'dialogues_fichiers', reglage)
     parent = QWidget()
+    parent.show()                             # fenêtre visible : c'est elle qui porte le dialogue
     assert fichiers.choisir_dossier(parent, 'Dossier de sortie', str(tmp_path)) == str(tmp_path).replace(os.sep, '/')
     d = dialogue_simule[-1]
     assert d.parent() is parent and d.windowTitle() == 'Dossier de sortie'

@@ -621,6 +621,24 @@ class Traitement:
 
         def maj(i, info):
             self.etat.ecrire(i, info['url'], 'ok', info)
+        # copie venue d'une autre machine (ohp_xisf.py, autre point de montage) : `final` y est le chemin d'alors ;
+        # rapporté au dossier courant (chemin relatif, journal.csv, dossier de type) avant de ranger, sinon le
+        # rangement chercherait à déplacer un fichier « absent » et réécrirait journal.csv avec des « ../.. »
+        from . import emplacements
+        journal = None
+        for i, info in tout:
+            final = info.get('final') or ''
+            if not final or emplacements.dans_sortie(final, self.racine):
+                continue                              # (sans `final` : le fichier attend dans `staging`)
+            if journal is None:
+                journal = emplacements.lire_journal(self.racine)
+            rel, _ = emplacements.resoudre(self.racine, info, journal)
+            local = emplacements.absolu(self.racine, rel) if rel else ''
+            if local and os.path.exists(local) and local != final:
+                info['final'], info['chemin'] = local, rel
+                if not os.path.exists(info.get('staging') or ''):
+                    info['staging'] = os.path.join(self.staging, i + os.path.splitext(local)[1])
+                maj(i, info)
         conflits = []
         index = lots.ranger(self.racine, tout, self.options['langue'], maj,
                             formats.EXTENSIONS[self.options['format']], conflits=conflits)

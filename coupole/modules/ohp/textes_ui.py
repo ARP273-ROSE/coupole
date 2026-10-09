@@ -47,15 +47,19 @@ TEXTES = {
                                        'Instrument:Telescope:FocalLength… Pixels are not touched (read back and compared), atomic '
                                        'writing, log in _traitement/metadonnees.csv. Without --rewrite: dry run.'},
     'ohp_aide_metadonnees_dossier': {'fr': 'dossier de sortie (ou un lot)', 'en': 'output folder (or one stack)'},
-    'ohp_aide_metadonnees_reecrire': {'fr': 'écrit vraiment (sinon : dit seulement ce qui changerait)',
-                                      'en': 'really write (otherwise: only say what would change)'},
+    'ohp_aide_metadonnees_reecrire': {'fr': "écrit vraiment (sinon : dit seulement ce qui changerait) ; note aussi "
+                                            "dans la base d'état l'emplacement de chaque fichier, relatif au dossier "
+                                            "de sortie (copie d'un ancien traitement, autre machine)",
+                                      'en': 'really write (otherwise: only say what would change); also records each '
+                                            "file's location, relative to the output folder, in the state database "
+                                            '(copy from an older processing run, another computer)'},
     'ohp_metadonnees_absent': {'fr': 'Dossier introuvable : {dossier}', 'en': 'Folder not found: {dossier}'},
     'ohp_metadonnees_bilan': {'fr': '{fichiers} fichier(s) : {modifies} complété(s), {inchanges} déjà à jour, {erreurs} erreur(s) '
                                     '(journal : _traitement/metadonnees.csv) ; {base} image(s) notée(s) dans la base d\'état : '
-                                    '« coupole ohp ranger » récrit alors les LOT.txt avec focale et pixel.',
+                                    '« coupole ohp ranger » récrit alors les LOT.txt avec focale et pixel ; emplacements notés : {chemins}.',
                               'en': '{fichiers} file(s): {modifies} completed, {inchanges} already up to date, {erreurs} error(s) '
                                     '(log: _traitement/metadonnees.csv); {base} image(s) noted in the state database: '
-                                    '« coupole ohp sort » then rewrites the LOT.txt files with focal length and pixel.'},
+                                    '« coupole ohp sort » then rewrites the LOT.txt files with focal length and pixel; locations recorded: {chemins}.'},
     'ohp_metadonnees_simulation': {'fr': 'Simulation : {fichiers} fichier(s), {modifies} à compléter, {inchanges} déjà à jour, '
                                          '{erreurs} erreur(s){base}. Ajouter --reecrire pour écrire.',
                                    'en': 'Dry run: {fichiers} file(s), {modifies} to complete, {inchanges} already up to date, '
@@ -350,6 +354,16 @@ TEXTES = {
     'ohp_lots_tous_aide': {'fr': 'Retire le filtre sur un objet.', 'en': 'Removes the filter on an object.'},
     'ohp_lots_filtre': {'fr': 'Lots de {objet} : {n}', 'en': 'Stacks of {objet}: {n}'},
     'ohp_lot_ouvrir_dossier': {'fr': 'Ouvrir le dossier du lot', 'en': 'Open the stack folder'},
+    'ohp_objet_pas_de_lot': {'fr': "Aucun lot pour cet objet dans INDEX_LOTS.csv du dossier de sortie.",
+                             'en': 'No stack for this object in the output folder\'s INDEX_LOTS.csv.'},
+    'ohp_motif_pas_de_lot': {'fr': 'aucun lot', 'en': 'no stack'},
+    'ohp_lot_absent': {'fr': "Ce dossier de lot n'existe pas (ou plus) dans le dossier de sortie.",
+                       'en': 'This stack folder does not exist (any more) in the output folder.'},
+    'ohp_motif_dossier_absent': {'fr': 'dossier absent', 'en': 'folder missing'},
+    'ohp_chemins_migres': {'fr': "Emplacements de {n} images retrouvés dans _traitement/journal.csv (copie d'un "
+                                 "ancien traitement) et notés dans la base d'état.",
+                           'en': 'Locations of {n} images found in _traitement/journal.csv (copy from an older '
+                                 'processing run) and recorded in the state database.'},
     'ohp_col_etat': {'fr': 'état', 'en': 'status'},
     # ------------------------------------------------------------ ce qu'on possède déjà
     'ohp_col_possede': {'fr': 'possédé', 'en': 'owned'},

@@ -1,4 +1,4 @@
-"""coupole qualite DOSSIER [--ecrire] [--echantillon N | --tout] [--processus N]"""
+"""coupole qualite DOSSIER [--ecrire] [--echantillon N | --tout] [--processus N] [--avec-calibration]"""
 from __future__ import annotations
 
 import os
@@ -15,6 +15,7 @@ def enregistrer(p):
     p.add_argument('--echantillon', '--sample', type=int, default=None, metavar='N', help=tr('qual_aide_echantillon'))
     p.add_argument('--tout', '--all', action='store_true', help=tr('qual_aide_tout'))
     p.add_argument('--processus', '--processes', type=int, default=None, metavar='N', help=tr('qual_aide_processus'))
+    p.add_argument('--avec-calibration', '--with-calibration', action='store_true', help=tr('qual_aide_avec_calibration'))
     p.set_defaults(fonction=cmd)
 
 
@@ -52,14 +53,21 @@ def cmd(a):
                 print('  ' + l)
         elif t == 'fin':
             print(tr('qual_fini', n=ev['n'], lots=ev['lots'], deja=ev['deja'], duree=duree_lisible(ev['duree'])))
+            print(rapport.bilan_texte(ev))
+            from .calibration import texte_motif
+            for f, motif in sorted(ev.get('liste_exclus') or [])[:50]:
+                print('  - %s — %s' % (os.path.relpath(f, racine) if os.path.isdir(racine) else f, texte_motif(motif)))
+            if len(ev.get('liste_exclus') or []) > 50:
+                print('  …')
             if ev['annule']:
                 print(tr('interrompu_reprise'))
     arret = threading.Event()
     m = moteur.Mesureur(racine, None, ech, rapporter=rapporter, arret=arret, ecrire_rapports=a.ecrire,
-                        processus_max=a.processus, langue=langue(), auto=auto)
+                        processus_max=a.processus, langue=langue(), auto=auto,
+                        avec_calibration=getattr(a, 'avec_calibration', False))
     try:
         b = m.lancer()
     except KeyboardInterrupt:
         arret.set()
         return 130
-    return 1 if b['annule'] else 0
+    return 1 if b['annule'] or (b['echecs'] and not b['mesurees_ok']) else 0     # tout en erreur : jamais « 0 »

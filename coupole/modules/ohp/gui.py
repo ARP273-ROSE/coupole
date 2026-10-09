@@ -26,6 +26,7 @@ from ...gui.modele import (DelegueProgression, ModeleParesseux, ModeleTableau, N
 from ...gui.outils import (FileEvenements, Tache, aide, bouton, case, champ, decimal, enregistrer_arret, est_detruit,
                            lancer_fil, liste, nombre)
 from . import cibles
+from .conversion import ident
 from .possession import Possession
 
 
@@ -687,12 +688,30 @@ class Panneau(QWidget):
         self._appliquer_possession_objets()
         self._filtrer_objets()
         self._maj_resume()
+        self._migrer_chemins(poss)
         if self.f_manquantes.isChecked():
             self._remplir_images()                   # la liste elle-même dépend de la possession
         else:
             self._restyler_images()
             self._estimer()
         self._remplir_lots()
+
+    def _migrer_chemins(self, poss):
+        """Copie d'un ancien traitement (`ohp_xisf.py`, autre machine) : les chemins trouvés par journal.csv sont
+        notés dans la base d'état, une fois par dossier et par session, en fond, groupés (base de travail locale
+        recopiée sur un partage).  Jamais pendant un traitement (un seul écrivain) ; un échec ne change rien : la
+        résolution par le journal continue de servir."""
+        faites = self.__dict__.setdefault('_migrations_faites', set())
+        if not poss.a_migrer or not poss.dest or poss.dest in faites:
+            return
+        b = getattr(self, 'b_lancer', None)
+        if b is not None and not b.isEnabled():
+            return                                   # traitement en cours : retenté à la relecture de fin
+        faites.add(poss.dest)
+        from . import emplacements
+        self._t_migration = Tache(emplacements.migrer, poss.dest, list(poss.a_migrer), parent=self)
+        self._t_migration.quand_fini(lambda n: n and self._statut(tr('ohp_chemins_migres', n=_entier(n))))
+        self._t_migration.start()
 
     def _appliquer_possession_objets(self):
         """Colonne « possédé » (n / total, mini-barre) et pastille de chaque objet, sans perdre la sélection."""
@@ -1769,7 +1788,8 @@ class Panneau(QWidget):
             a.setCheckable(True)
             a.setChecked(not h.isSectionHidden(c))
             a.toggled.connect(lambda oui, cc=c: self.v_lots.setColumnHidden(cc, not oui))
-        m.exec(h.mapToGlobal(pos))
+        from ...gui import ouvrir
+        ouvrir.montrer_menu(m, h.mapToGlobal(pos))
 
     # ---------------------------------------------------------------- ouvrir (double-clic, menus contextuels)
     def _statut(self, texte):
@@ -1777,15 +1797,38 @@ class Panneau(QWidget):
         if hasattr(fen, 'statusBar'):
             fen.statusBar().showMessage(texte, 8000)
 
-    def chemin_image(self, x) -> str:
-        """Fichier local d'une image possédée (convertie), ou '' : le chemin noté par le traitement, rapporté au
-        dossier de sortie courant."""
+    def chemin_image(self, x, verifier: bool = False) -> str:
+        """Fichier local d'une image possédée (convertie), ou '' : le chemin résolu à la lecture de la base
+        (`info['chemin']`, `final` dans la sortie, `_traitement/journal.csv`, dossier de type), rapporté au dossier
+        de sortie courant ; sans chemin (ou, si `verifier`, fichier absent) : le nom attendu dans le dossier de
+        son lot (un `listdir`, à la demande seulement)."""
         if not self.possession.possedee(x):
             return ''
         rel = self.possession.detail(x).get('chemin') or ''
-        if not rel:
-            return ''
-        return rel if os.path.isabs(rel) else os.path.join(self._dest_courante(), rel)
+        p = os.path.join(self._dest_courante(), rel) if rel else ''
+        if p and (not verifier or os.path.exists(p)):
+            return p
+        trouve = self._chercher_par_nom(x)
+        return trouve or p
+
+    def _chercher_par_nom(self, x) -> str:
+        """Dernier recours : le fichier attendu (nom du rangement) dans le dossier de son lot ; mémorisé."""
+        from . import emplacements
+        dest = self._dest_courante()
+        i = ident(x)
+        memo = getattr(self, '_noms_trouves', None)
+        if memo is None or memo[0] is not self._infos_ok:
+            par_objet = {}
+            for j, info in self._infos_ok or ():
+                par_objet.setdefault(info.get('objet'), []).append((j, info))
+            memo = self._noms_trouves = (self._infos_ok, par_objet, {})
+        _, par_objet, trouves = memo
+        if (dest, i) not in trouves:
+            infos = par_objet.get(x['objet'], [])
+            info = next((d for j, d in infos if j == i), None)
+            rel = emplacements.chercher_par_nom(dest, info, infos) if info else ''
+            trouves[(dest, i)] = emplacements.absolu(dest, rel) if rel else ''
+        return trouves[(dest, i)]
 
     def _image_sous(self, pos=None):
         if pos is not None:
@@ -1801,7 +1844,7 @@ class Panneau(QWidget):
         x = self._image_sous()
         if x is None:
             return
-        p = self.chemin_image(x)
+        p = self.chemin_image(x, verifier=True)
         if p and os.path.exists(p):
             from ...gui import ouvrir
             ouvrir.ouvrir_defaut(p)
@@ -1815,17 +1858,20 @@ class Panneau(QWidget):
         from PyQt6.QtWidgets import QMenu
         from ...gui import ouvrir
         m = QMenu(self)
-        p = self.chemin_image(x)
+        p = self.chemin_image(x, verifier=True)
         ouvrir.remplir_menu(m, p, existe=bool(p) and os.path.exists(p))
-        m.exec(self.v_img.viewport().mapToGlobal(pos))
+        ouvrir.montrer_menu(m, self.v_img.viewport().mapToGlobal(pos))
 
     def dossier_objet(self, o) -> str:
-        """Dossier de la cible dans la sortie (« <sortie>/07_Nebuleuses/NGC_6888 »), d'après une image possédée ;
-        '' si rien n'est encore téléchargé."""
+        """Dossier de la cible dans la sortie (« <sortie>/07_Nebuleuses/NGC_6888 »), d'après le chemin résolu
+        d'une image possédée ; à défaut le dossier attendu « <sortie>/<type>/<objet> » (nommage du rangement)
+        s'il existe ; '' si rien n'est encore téléchargé."""
         if not self.inv or not o:
             return ''
+        from . import emplacements
         par_objet = getattr(self.inv, '_index_memo', (None, None, {}))[2] or {}
         dest = self._dest_courante()
+        candidat = ''
         for x in par_objet.get(o['objet'], ()):
             p = self.chemin_image(x)
             if p:
@@ -1834,8 +1880,11 @@ class Panneau(QWidget):
                 except ValueError:
                     continue
                 if len(rel) >= 3 and rel[0] != '..':
-                    return os.path.join(dest, rel[0], rel[1])
-        return ''
+                    candidat = os.path.join(dest, rel[0], rel[1])
+                    break
+        if candidat and os.path.isdir(candidat):
+            return candidat
+        return emplacements.dossier_attendu(dest, o.get('cat') or 'autre', o['objet']) or candidat
 
     def _objet_sous(self, pos=None):
         if pos is not None:
@@ -1861,19 +1910,17 @@ class Panneau(QWidget):
             return
         from PyQt6.QtWidgets import QMenu
         from ...core import logiciels
+        from ...gui import ouvrir
         m = QMenu(self)
-        m.setToolTipsVisible(True)
         d = self.dossier_objet(o)
-        a = m.addAction(tr('ohp_objet_dossier'))
-        a.setEnabled(bool(d) and os.path.isdir(d))
-        a.setToolTip(tr('ohp_objet_dossier_aide') if a.isEnabled() else tr('ohp_objet_rien'))
+        a = ouvrir.action(m, tr('ohp_objet_dossier'), bool(d) and os.path.isdir(d), tr('ohp_objet_dossier_aide'),
+                          tr('ohp_objet_rien'), tr('lg_motif_rien'))
         a.triggered.connect(lambda: logiciels.montrer_dans_dossier(d))
         lots = getattr(self, '_lots_par_objet', {}) or {}
-        b = m.addAction(tr('ohp_objet_lots'))
-        b.setEnabled(bool(lots.get(o['objet']) or lots.get(cibles.nom_affiche(o['objet']))))
-        b.setToolTip(tr('ohp_objet_lots_aide'))
+        b = ouvrir.action(m, tr('ohp_objet_lots'), bool(lots.get(o['objet']) or lots.get(cibles.nom_affiche(o['objet']))),
+                          tr('ohp_objet_lots_aide'), tr('ohp_objet_pas_de_lot'), tr('ohp_motif_pas_de_lot'))
         b.triggered.connect(lambda: self.voir_lots_objet(o))
-        m.exec(self.v_obj.viewport().mapToGlobal(pos))
+        ouvrir.montrer_menu(m, self.v_obj.viewport().mapToGlobal(pos))
 
     def voir_lots_objet(self, o):
         """Onglet Lots filtré sur un objet (None : tous les lots)."""
@@ -1902,16 +1949,16 @@ class Panneau(QWidget):
         dossier = self.m_lots.donnees[r] if 0 <= r < len(self.m_lots.donnees) else ''
         from PyQt6.QtWidgets import QMenu
         from ...core import logiciels
+        from ...gui import ouvrir
         m = QMenu(self)
-        a = m.addAction(tr('ohp_lot_ouvrir_dossier'))
-        a.setEnabled(bool(dossier) and os.path.isdir(dossier))
+        a = ouvrir.action(m, tr('ohp_lot_ouvrir_dossier'), bool(dossier) and os.path.isdir(dossier), '',
+                          tr('ohp_lot_absent'), tr('ohp_motif_dossier_absent'))
         a.triggered.connect(lambda: logiciels.montrer_dans_dossier(dossier))
-        c = m.addAction(tr('ohp_astro_copier_lot'))
-        c.setEnabled(bool(self.texte_astrometrie(dossier)))
+        c = ouvrir.action(m, tr('ohp_astro_copier_lot'), bool(self.texte_astrometrie(dossier)))
         c.triggered.connect(lambda: self._copier(self.texte_astrometrie(dossier)))
         b = m.addAction(tr('ohp_lots_ouvrir'))
         b.triggered.connect(self._ouvrir_lot)
-        m.exec(self.v_lots.viewport().mapToGlobal(pos))
+        ouvrir.montrer_menu(m, self.v_lots.viewport().mapToGlobal(pos))
 
     @staticmethod
     def lire_lots(dest, images, possession, infos_ok):

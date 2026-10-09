@@ -11,7 +11,7 @@ from ...core.i18n import tr
 from . import mesures
 
 EXTENSIONS = ('.xisf', '.fits', '.fit', '.fts', '.fits.fz')
-COLONNES = ['fichier', 'etoiles', 'fwhm_px', 'fwhm_arcsec', 'ellipticite', 'fond_adu', 'fond_adu_s', 'bruit_adu',
+COLONNES = ['fichier', 'etat', 'etoiles', 'fwhm_px', 'fwhm_arcsec', 'ellipticite', 'fond_adu', 'fond_adu_s', 'bruit_adu',
             'rsn', 'gradient_pct', 'residu_pct', 'satures', 'trainees', 'echantillonnage']
 
 
@@ -46,6 +46,42 @@ def analyser_lot(images, progression=None, arret=None):
     return lignes
 
 
+def motif_erreur(erreur: str, L: str | None = None) -> str:
+    """Motif court et lisible (FR/EN) d'une erreur de mesure « Type: message »."""
+    genre, _, detail = (erreur or '').partition(': ')
+    detail = detail or genre
+    if genre == 'ErreurXISF':
+        return tr('qual_err_xisf', L, detail=detail[:80])
+    if genre in ('MemoryError',):
+        return tr('qual_err_memoire', L)
+    if genre in ('BrokenProcessPool', 'BrokenProcessPoolError', 'TerminatedWorkerError'):
+        return tr('qual_err_processus', L)
+    if genre in ('OSError', 'FileNotFoundError', 'PermissionError', 'IsADirectoryError') or erreur.startswith('unreadable'):
+        return tr('qual_err_lecture', L, detail=detail[:80])
+    if genre in ('VerifyError', 'ValueError', 'TypeError') and 'FITS' in detail.upper():
+        return tr('qual_err_fits', L, detail=detail[:80])
+    return tr('qual_err_autre', L, detail=(erreur or '')[:100])
+
+
+def etat_ligne(l: dict, L: str | None = None) -> str:
+    """Colonne « état » : mesurée, erreur (motif), exclu (calibration : motif)."""
+    if l.get('erreur'):
+        return tr('qual_etat_erreur', L, motif=motif_erreur(l['erreur'], L))
+    if l.get('exclu'):
+        from .calibration import texte_motif
+        return tr('qual_etat_exclu', L, motif=texte_motif(l['exclu'], L))
+    return tr('qual_etat_mesuree', L)
+
+
+def bilan_texte(ev: dict, L: str | None = None) -> str:
+    """« 70 image(s) trouvée(s), 0 pose(s) de ciel mesurée(s), 70 en erreur (format XISF non lu : …), 12 fichier(s)
+    de calibration exclu(s). »"""
+    motifs = ev.get('erreurs_motifs') or []
+    m = (' (' + ' ; '.join('%s × %d' % (k, n) if len(motifs) > 1 else k for k, n in motifs[:3]) + ')') if motifs else ''
+    return tr('qual_bilan', L, trouvees=ev.get('total_dossier', ev.get('n', 0)), mesurees=ev.get('mesurees_ok', 0),
+              erreurs=ev.get('echecs', 0), motifs=m, exclus=ev.get('exclus', 0))
+
+
 def _fmt(v, f='%.3g'):
     return '' if v is None else (f % v if isinstance(v, float) else str(v))
 
@@ -54,6 +90,9 @@ def resume(lignes, L) -> list[str]:
     ok = [l for l in lignes if l.get('fwhm_px')]
     t = lambda k, **kw: tr('qual_' + k, L, **kw)  # noqa: E731
     out = [t('resume_titre', n=len(lignes), mesurees=len(ok))]
+    for l in lignes:                                   # jamais d'échec silencieux : chaque erreur, avec son motif
+        if l.get('erreur'):
+            out.append('  %s : %s' % (l.get('fichier', ''), motif_erreur(l['erreur'], L)))
     if not ok:
         return out + [t('resume_aucune')]
     fw = np.array([l['fwhm_px'] for l in ok])
@@ -97,7 +136,7 @@ def ecrire(dossier, lignes, txt: bool = True):
     w = csv.writer(buf, delimiter=';')
     w.writerow(['%s (%s)' % (tr('qual_col_' + c, 'fr'), tr('qual_col_' + c, 'en')) for c in COLONNES])
     for l in lignes:
-        w.writerow([_fmt(l.get(c), '%.4g') for c in COLONNES])
+        w.writerow([etat_ligne(l) if c == 'etat' else _fmt(l.get(c), '%.4g') for c in COLONNES])
     ecrire_atomique(os.path.join(dossier, 'QUALITE.csv'), buf.getvalue(), 'utf-8-sig')
     if txt:
         ecrire_atomique(os.path.join(dossier, 'QUALITE.txt'),

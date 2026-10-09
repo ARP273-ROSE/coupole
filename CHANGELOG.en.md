@@ -2,6 +2,55 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.1.11 — 9 October 2026
+
+**A copy made before Coupole finally opens, context menus can be clicked, Spectra and series' « Open a file » opens on
+KDE, and the Quality module really measures N.I.N.A. and ASIAIR frames — sky frames only.** Feedback from Kevin
+(Linux/KDE, 0.1.10, output folder `/mnt/nas/Astronomie/OHP_DU_ECU`).
+
+- **Owned objects (4/4, green dot) but nothing to open.** Kevin's copy was made by the older `ohp_xisf.py` script, in
+  a container: its state database only records the absolute path of the time (« /workspace/Workspace/OHP_DU_ECU/… »),
+  not found on the computer. Coupole now finds each file in the current output folder, in this order: relative path
+  recorded in the database (`info.chemin`, new), `final` if inside the folder, `_traitement/journal.csv` (address, then
+  original file; read once, cached, read again if it changes), former root or type folder, then the expected name in
+  the stack folder (same computation as sorting, « _2 » included). Never another computer's absolute path. Checked
+  on the real copy (read only): **7,625 images found in 0.34 s**, 300 random ones all present; former root and
+  expected name give the same paths as the journal (7,625/7,625, 100/100).
+- **Migration**: paths found through the journal are recorded in the state database, in the background, once, in one
+  batch (0.8 s for 7,625 images), through the local working database copied back when the folder is on a share; never
+  during processing; a failure changes nothing (the journal still serves). `coupole ohp metadata --rewrite` records
+  the locations too (from the files found, then the journal).
+- **Target folder**: without any path, the expected folder `<output>/<type>/<object>` when it exists. Double-click,
+  *Open*, *Open with*, *Open file location*, *Open the target folder*, *Show stacks*, stack box and completeness
+  checked on a reduced reproduction of the real copy (20 real rows of the database and journal), also on a simulated
+  share.
+- **Processing again into such a copy** no longer breaks anything: sorting maps `final` to the current folder (it would
+  have tried to move « missing » files and rewritten `journal.csv` with « ../.. »); an `ohp_xisf.py` database in WAL
+  mode is switched to DELETE journalling before writing (otherwise the copy back to the share saw nothing new), and a
+  non-empty `-wal` on the share blocks the copy like a `-journal`.
+- **Context menus clickable on KDE**: no more tooltips in menus (a greyed entry's tooltip opened over the menu and
+  grabbed the mouse); the reason is in the label (« Open with (nothing downloaded) ») and in the status bar on hover;
+  menus opened with `popup` (no nested loop), deleted when closed.
+- **Spectra and series, « Open a file » did nothing on KDE**: the « (*.fits *.fit …) » filter had no name; the XDG
+  portal refuses it (« invalid filter: name is empty », reproduced with a real xdg-desktop-portal-kde: no window;
+  fixed: « Open a file — Portal » window). Every dialog goes through a normalised filter (name, patterns without
+  duplicates), a visible parent window, a start folder that exists; each opening, its result or exception is logged in
+  `coupole.log`. Each of the 13 dialog buttons is tested.
+- **Quality: tolerant XISF reader.** Kevin's 70 N.I.N.A. frames (ASI 6200MM, 61 Mpx, zlib+sh) were refused
+  (« incomplete FITSKeyword »: N.I.N.A. writes `CD1_1` without a comment) and the result stayed empty without a word.
+  Reading other programs' files accepts keywords without comment or value, missing `Metadata` (ASIAIR), unknown
+  properties, extra elements, colour images; only what prevents reading the pixels is refused. Our own files are still
+  checked strictly (`xisf.verifier`). Real frame: 4.2 s, 1,170 MB peak (float32 computation), FWHM 2.08 px = 3.5″ at
+  1.695″/px, 400 stars; processes limited from the image size.
+- **Never a silent failure**: *status* column (measured, error with a readable reason, excluded), summary « N image(s)
+  found, M sky frame(s) measured, K with an error (XISF format not read: …), X calibration file(s) excluded », stack
+  trace in `coupole.log`, exit code 1 on the command line when nothing could be measured.
+- **Quality: sky frames only.** Excluded while listing, without opening the files, by folder (Flat(s), Dark(s), Bias,
+  Offset(s), Calibration, Master(s), cosmetized, registered, Plats, Noirs…) and name (`FLAT_`, `DARK_`, `BIAS_`,
+  masters, WBPP outputs `_c`, `_cc`, `_r`…, same family as astrosolver's expression), then when measuring by the header
+  (`IMAGETYP`, `FRAME`, `Observation:Image:Type`). *Also include calibration frames* box, `--with-calibration` option,
+  *Excluded files…* list.
+
 ## 0.1.10 — 9 October 2026
 
 **Processing works towards a folder on a network share.** Kevin's output folder is on the NAS (SMB share mounted

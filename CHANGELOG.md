@@ -2,6 +2,56 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.1.11 — 9 octobre 2026
+
+**Une copie faite avant Coupole s'ouvre enfin, les menus se cliquent, « Ouvrir un fichier » de Spectres et séries
+s'ouvre sous KDE, et le module Qualité mesure vraiment les poses de N.I.N.A. et de l'ASIAIR — seulement les poses de
+ciel.** Retours de Kevin (Linux/KDE, 0.1.10, dossier de sortie `/mnt/nas/Astronomie/OHP_DU_ECU`).
+
+- **Objets possédés (4/4, pastille verte) mais rien à ouvrir.** La copie de Kevin a été produite par l'ancien script
+  `ohp_xisf.py`, dans un conteneur : sa base d'état ne note que le chemin absolu d'alors
+  (« /workspace/Workspace/OHP_DU_ECU/… »), introuvable sur le poste. Coupole retrouve maintenant chaque fichier dans
+  le dossier de sortie courant, dans cet ordre : chemin relatif noté dans la base (`info.chemin`, nouveau), `final`
+  s'il est dans le dossier, `_traitement/journal.csv` (adresse puis fichier d'origine ; lu une fois, en cache, relu
+  s'il change), ancienne racine ou dossier de type, puis nom attendu dans le dossier du lot (calcul du rangement,
+  « _2 » compris). Jamais le chemin absolu d'une autre machine. Vérifié sur la vraie copie (lecture seule) :
+  **7 625 images retrouvées en 0,34 s**, 300 tirées au sort toutes présentes ; ancienne racine et nom attendu donnent
+  les mêmes chemins que le journal (7 625/7 625, 100/100).
+- **Migration** : les chemins trouvés par le journal sont notés dans la base d'état, en fond, une fois, groupés
+  (0,8 s pour 7 625 images), par la base de travail locale recopiée si le dossier est sur un partage ; jamais pendant
+  un traitement ; un échec ne change rien (le journal continue de servir). `coupole ohp metadonnees --reecrire` note
+  aussi les emplacements (d'après les fichiers trouvés, puis le journal).
+- **Dossier de la cible** : à défaut de chemin, le dossier attendu `<sortie>/<type>/<objet>` s'il existe. Double-clic,
+  *Ouvrir*, *Ouvrir avec*, *Ouvrir l'emplacement*, *Ouvrir le dossier de la cible*, *Voir les lots*, encadré et
+  complétude des lots vérifiés sur une reproduction réduite de la vraie copie (20 lignes réelles de la base et du
+  journal), aussi sous un partage simulé.
+- **Relancer un traitement vers une telle copie** ne casse plus rien : le rangement rapporte `final` au dossier courant
+  (il aurait cherché à déplacer des fichiers « absents » et réécrit `journal.csv` avec des « ../.. ») ; une base
+  d'`ohp_xisf.py` en mode WAL est passée en journal DELETE avant d'être écrite (sinon la recopie vers le partage ne
+  voyait rien de neuf), un `-wal` non vide sur le partage bloque la recopie comme un `-journal`.
+- **Menus contextuels cliquables sous KDE** : plus d'info-bulle dans les menus (celle d'une entrée grisée s'ouvrait
+  par-dessus le menu et en captait la souris) ; le motif est dans le libellé (« Ouvrir avec (rien de téléchargé) »)
+  et en barre d'état au survol ; menus ouverts par `popup` (plus de boucle imbriquée), détruits à la fermeture.
+- **Spectres et séries, « Ouvrir un fichier » ne faisait rien sous KDE** : le filtre « (*.fits *.fit …) » n'avait pas
+  de nom ; le portail XDG le refuse (« invalid filter: name is empty », reproduit avec xdg-desktop-portal-kde réel :
+  aucune fenêtre ; corrigé : fenêtre « Ouvrir un fichier — Portal »). Tous les dialogues passent par un filtre
+  normalisé (nom, motifs sans doublon), une fenêtre parente visible, un dossier de départ qui existe ; chaque
+  ouverture, son résultat ou son exception sont notés dans `coupole.log`. Test de chacun des 13 boutons de dialogue.
+- **Qualité : lecteur XISF tolérant.** Les 70 poses N.I.N.A. de Kevin (ASI 6200MM, 61 Mpx, zlib+sh) étaient
+  refusées (« incomplete FITSKeyword » : N.I.N.A. écrit `CD1_1` sans commentaire) et le résultat restait vide sans
+  rien dire. La lecture des fichiers des autres logiciels accepte mots-clés sans commentaire ni valeur, `Metadata`
+  absente (ASIAIR), propriétés inconnues, éléments en plus, images couleur ; seul ce qui empêche de lire les pixels
+  est refusé. Nos fichiers restent contrôlés strictement (`xisf.verifier`). Pose réelle : 4,2 s, 1 170 Mo de pointe
+  (calcul en float32), FWHM 2,08 px = 3,5″ à 1,695″/px, 400 étoiles ; processus limités d'après la taille des images.
+- **Jamais d'échec silencieux** : colonne *état* (mesurée, erreur avec motif lisible, exclu), résumé « N image(s)
+  trouvée(s), M pose(s) de ciel mesurée(s), K en erreur (format XISF non lu : …), X fichier(s) de calibration
+  exclu(s) », pile dans `coupole.log`, code de sortie 1 en ligne de commande si rien n'a pu être mesuré.
+- **Qualité : poses de ciel seulement.** Exclusion à l'inventaire, sans ouvrir les fichiers, par le dossier (Flat(s),
+  Dark(s), Bias, Offset(s), Calibration, Master(s), cosmetized, registered, Plats, Noirs…) et le nom (`FLAT_`, `DARK_`,
+  `BIAS_`, masters, sorties WBPP `_c`, `_cc`, `_r`…, même famille que l'expression d'astrosolver), puis à la mesure
+  par l'en-tête (`IMAGETYP`, `FRAME`, `Observation:Image:Type`). Case *Inclure aussi les poses de calibration*,
+  option `--avec-calibration`, liste *Fichiers exclus…*.
+
 ## 0.1.10 — 9 octobre 2026
 
 **Le traitement fonctionne vers un dossier sur un partage réseau.** Le dossier de sortie de Kevin est sur le NAS

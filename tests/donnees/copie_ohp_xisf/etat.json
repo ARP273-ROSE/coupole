@@ -1,0 +1,162 @@
+[
+[
+"d79623ecaa9b309e",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/t120/palisana_R_20000_02ea85061f8f81670db5c3b13d97a082_aux.fits",
+"doublon",
+0,
+"{\"source\": \"palisana_R_20000_02ea85061f8f81670db5c3b13d97a082_aux.fits\", \"doublon_de\": \"inventaire (cibles.py)\", \"objet\": \"(914) Palisana\"}",
+"2026-10-07T18:43:34"
+],
+[
+"91cdfdd03e8fd630",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/t120/palisana_R_20000_1dacdcc442fd313956e88f461529083a_aux.fits",
+"doublon",
+0,
+"{\"source\": \"palisana_R_20000_1dacdcc442fd313956e88f461529083a_aux.fits\", \"doublon_de\": \"inventaire (cibles.py)\", \"objet\": \"(914) Palisana\"}",
+"2026-10-07T18:43:34"
+],
+[
+"da051b8e622df41f",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/t120/palisana_R_20000_2bceef4b27fd71c667e95d387c2c115f_aux.fits",
+"doublon",
+0,
+"{\"source\": \"palisana_R_20000_2bceef4b27fd71c667e95d387c2c115f_aux.fits\", \"doublon_de\": \"inventaire (cibles.py)\", \"objet\": \"(914) Palisana\"}",
+"2026-10-07T18:43:34"
+],
+[
+"36dedfaf192db4ca",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/t152/palisana_R_20000_02ea85061f8f81670db5c3b13d97a082_aux.fits",
+"doublon",
+0,
+"{\"source\": \"palisana_R_20000_02ea85061f8f81670db5c3b13d97a082_aux.fits\", \"doublon_de\": \"inventaire (cibles.py)\", \"objet\": \"(914) Palisana\"}",
+"2026-10-07T18:43:34"
+],
+[
+"122163e06bf8f88c",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/t152/palisana_R_20000_1dacdcc442fd313956e88f461529083a_aux.fits",
+"doublon",
+0,
+"{\"source\": \"palisana_R_20000_1dacdcc442fd313956e88f461529083a_aux.fits\", \"doublon_de\": \"inventaire (cibles.py)\", \"objet\": \"(914) Palisana\"}",
+"2026-10-07T18:43:34"
+],
+[
+"0c2e7000a3c2e0d6",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/t152/palisana_R_20000_2bceef4b27fd71c667e95d387c2c115f_aux.fits",
+"doublon",
+0,
+"{\"source\": \"palisana_R_20000_2bceef4b27fd71c667e95d387c2c115f_aux.fits\", \"doublon_de\": \"inventaire (cibles.py)\", \"objet\": \"(914) Palisana\"}",
+"2026-10-07T18:43:34"
+],
+[
+"5887fd407208ce2c",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/iris/2024/20240704/padc/M_102-S001-R001-C001-SDSS_r.fits",
+"ok",
+1,
+"{\"source\": \"M_102-S001-R001-C001-SDSS_r.fits\", \"url\": \"http://tap-ufe.obspm.fr/getproduct/ufe/data/iris/2024/20240704/padc/M_102-S001-R001-C001-SDSS_r.fits\", \"objet\": \"NGC 5866\", \"cat\": \"gal\", \"tel\": \"IRIS\", \"nuit\": \"2024-07-04\", \"filtre_base\": \"SDSS r\", \"pose\": 120.0, \"mjd\": 60495.86403125012, \"date_partagee\": false, \"nom_base\": \"M102\", \"octets_fits\": 16790400, \"t_telechargement\": 4.1, \"bitpix\": -32, \"nx\": 2048, \"ny\": 2048, \"sha_pixels\": \"cc8f2a2845cdaf868d981496569c400de991971c\", \"non_finis\": 0, \"min\": 0.0, \"max\": 65900.6171875, \"negatifs\": 0, \"hors_bornes\": 4, \"ecart_base_arcsec\": 0.5, \"doutes\": [], \"astap\": \"0.1 s\", \"astap_echelle\": 0.6825, \"ecart_astap_arcsec\": 0.48, \"ecart_astap_echelle\": -0.00046, \"ecart_astap_angle\": 0.131, \"wcs\": \"confirmee\", \"ra\": 226.6482747196691, \"dec\": 55.77096645946305, \"echelle\": 0.6827643410098165, \"angle\": 359.11628631814466, \"parite\": -1, \"echelle_nominale\": 0.6833480284178752, \"filtre\": \"r\", \"filtre_dossier\": \"r_SDSS\", \"filtre_sys\": \"SDSS\", \"date\": \"ok\", \"debut\": \"2024-07-04T20:45:12.300\", \"pose_ctrl\": \"ok\", \"ecart_max\": 0.0, \"modifs\": [\"+FILTORIG\", \"+FILTSYS\", \"+OBJCTDEC\", \"+OBJCTRA\", \"+ORIENTAT\", \"+PIXSCALE\", \"+SITEELEV\", \"+SITELAT\", \"+SITELONG\", \"+XISFCONV\", \"CTYPE1\", \"CTYPE2\", \"DEC\", \"FILTER\", \"LATITUDE\", \"LONGITUD\", \"OBJECT\", \"RA\"], \"octets_xisf\": 10809855, \"ratio\": 0.6438, \"staging\": \"/workspace/Workspace/OHP_DU_ECU/_traitement/converties/5887fd407208ce2c.xisf\", \"t_total\": 4.9, \"final\": \"/workspace/Workspace/OHP_DU_ECU/09_Galaxies/NGC_5866/champ_1_IRIS-2048/r_SDSS/20240704-204512_NGC_5866_r_SDSS_120s.xisf\"}",
+"2026-10-07T18:44:08"
+],
+[
+"778cd899ddc2db6f",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_c7839208c7967cc371c0ac145c7074de_aux.fits",
+"ok",
+1,
+"{\"source\": \"palisana_R_20000_c7839208c7967cc371c0ac145c7074de_aux.fits\", \"url\": \"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_c7839208c7967cc371c0ac145c7074de_aux.fits\", \"objet\": \"(914) Palisana\", \"cat\": \"ast\", \"tel\": \"T120\", \"nuit\": \"2023-08-15\", \"filtre_base\": \"Johnson R\", \"pose\": 20.0, \"mjd\": 60171.922598263714, \"date_partagee\": true, \"nom_base\": \"914 Palisana A919 NC\", \"octets_fits\": 8398080, \"t_telechargement\": 0.8, \"bitpix\": -64, \"nx\": 1024, \"ny\": 1024, \"sha_pixels\": \"0425cdc050f1db97a8cce54205aab7bbadea3f0d\", \"non_finis\": 0, \"min\": 275.46237349344324, \"max\": 65856.82385979121, \"negatifs\": 0, \"hors_bornes\": 7, \"ecart_base_arcsec\": 0.5, \"doutes\": [], \"astap\": \"0.1 s\", \"astap_echelle\": 0.7695, \"ecart_astap_arcsec\": 0.09, \"ecart_astap_echelle\": -0.00106, \"ecart_astap_angle\": 0.023, \"wcs\": \"confirmee\", \"ra\": 300.6010930625194, \"dec\": 23.632933747872936, \"echelle\": 0.7703197431237279, \"angle\": 180.22662090516664, \"parite\": -1, \"echelle_nominale\": 0.7734930225, \"filtre\": \"R\", \"filtre_dossier\": \"R\", \"filtre_sys\": \"Johnson\", \"date\": \"ok\", \"debut\": \"2023-08-15T22:08:42.490\", \"pose_ctrl\": \"ok\", \"ecart_max\": 0.00354729121318087, \"modifs\": [\"+DATEDOUT\", \"+DEC\", \"+FILTSYS\", \"+OBJCTDEC\", \"+OBJCTRA\", \"+ORIENTAT\", \"+PIXSCALE\", \"+RA\", \"+SITEELEV\", \"+SITELAT\", \"+SITELONG\", \"+XISFCONV\", \"LATITUDE\", \"LONGITUD\", \"OBJECT\"], \"octets_xisf\": 2972724, \"ratio\": 0.354, \"staging\": \"/workspace/Workspace/OHP_DU_ECU/_traitement/converties/778cd899ddc2db6f.xisf\", \"t_total\": 0.9, \"final\": \"/workspace/Workspace/OHP_DU_ECU/01_Asteroides/914_Palisana/nuit_2023-08-15_T120/R/20230815-220842_914_Palisana_R_20s.xisf\"}",
+"2026-10-07T22:03:32"
+],
+[
+"8f77c6767375c701",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000.fits",
+"ok",
+1,
+"{\"source\": \"palisana_R_20000.fits\", \"url\": \"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000.fits\", \"objet\": \"(914) Palisana\", \"cat\": \"ast\", \"tel\": \"T120\", \"nuit\": \"2023-08-15\", \"filtre_base\": \"Johnson R\", \"pose\": 20.0, \"mjd\": 60171.922598263714, \"date_partagee\": true, \"nom_base\": \"914 Palisana A919 NC\", \"octets_fits\": 8398080, \"t_telechargement\": 0.5, \"bitpix\": -64, \"nx\": 1024, \"ny\": 1024, \"sha_pixels\": \"ef19f50a6ad27cdbcb70dd28e4bc189dac1d3798\", \"non_finis\": 0, \"min\": 318.11154751017904, \"max\": 65843.20457690953, \"negatifs\": 0, \"hors_bornes\": 7, \"ecart_base_arcsec\": 0.5, \"doutes\": [], \"astap\": \"ASTAP sans solution (2 s) 0d,1d,1d,1d,2d,2d,2d,2d,3d,3d,No solution found!  :( ; -s 50 : ASTAP sans solution (1 s) 0d,1d,1d,1d,2d,2d,2d,2d,3d,3d,No solution found!  :( ; diagonale : ASTAP sans solution (1 s) 0d,1d,1d,2d,2d,3d,3d,No solution found!  :(\", \"wcs\": \"validee\", \"ra\": 300.6010727547851, \"dec\": 23.632939381060208, \"echelle\": 0.7702626060968347, \"angle\": 180.24118914947758, \"parite\": -1, \"echelle_nominale\": 0.7734930225, \"filtre\": \"R\", \"filtre_dossier\": \"R\", \"filtre_sys\": \"Johnson\", \"date\": \"ok\", \"debut\": \"2023-08-15T22:08:42.490\", \"pose_ctrl\": \"ok\", \"ecart_max\": 0.0034391815861454234, \"modifs\": [\"+DATEDOUT\", \"+DEC\", \"+FILTSYS\", \"+OBJCTDEC\", \"+OBJCTRA\", \"+ORIENTAT\", \"+PIXSCALE\", \"+RA\", \"+SITEELEV\", \"+SITELAT\", \"+SITELONG\", \"+XISFCONV\", \"LATITUDE\", \"LONGITUD\", \"OBJECT\"], \"octets_xisf\": 2898681, \"ratio\": 0.3452, \"staging\": \"/workspace/Workspace/OHP_DU_ECU/_traitement/converties/8f77c6767375c701.xisf\", \"t_total\": 4.3, \"final\": \"/workspace/Workspace/OHP_DU_ECU/01_Asteroides/914_Palisana/nuit_2023-08-15_T120/R/20230815-220842_914_Palisana_R_20s_2.xisf\"}",
+"2026-10-07T22:03:32"
+],
+[
+"44db23478a564f6b",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_02ea85061f8f81670db5c3b13d97a082_aux.fits",
+"ok",
+1,
+"{\"source\": \"palisana_R_20000_02ea85061f8f81670db5c3b13d97a082_aux.fits\", \"url\": \"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_02ea85061f8f81670db5c3b13d97a082_aux.fits\", \"objet\": \"(914) Palisana\", \"cat\": \"ast\", \"tel\": \"T120\", \"nuit\": \"2023-08-15\", \"filtre_base\": \"Johnson R\", \"pose\": 20.0, \"mjd\": 60171.92286377307, \"date_partagee\": false, \"nom_base\": \"914 Palisana A919 NC\", \"octets_fits\": 8398080, \"t_telechargement\": 1.6, \"bitpix\": -64, \"nx\": 1024, \"ny\": 1024, \"sha_pixels\": \"5f97da05156818e2250b78123b95c22e9e1eac59\", \"non_finis\": 0, \"min\": 269.3777241405737, \"max\": 65866.14307512963, \"negatifs\": 0, \"hors_bornes\": 9, \"ecart_base_arcsec\": 0.5, \"doutes\": [], \"astap\": \"0.1 s\", \"astap_echelle\": 0.7698, \"ecart_astap_arcsec\": 0.18, \"ecart_astap_echelle\": -0.00104, \"ecart_astap_angle\": 0.029, \"wcs\": \"confirmee\", \"ra\": 300.60107148426044, \"dec\": 23.632840901350637, \"echelle\": 0.7706030696333815, \"angle\": 180.25229764270222, \"parite\": -1, \"echelle_nominale\": 0.7734930225, \"filtre\": \"R\", \"filtre_dossier\": \"R\", \"filtre_sys\": \"Johnson\", \"date\": \"ok\", \"debut\": \"2023-08-15T22:09:05.430\", \"pose_ctrl\": \"ok\", \"ecart_max\": 0.0034193183382740244, \"modifs\": [\"+DEC\", \"+FILTSYS\", \"+OBJCTDEC\", \"+OBJCTRA\", \"+ORIENTAT\", \"+PIXSCALE\", \"+RA\", \"+SITEELEV\", \"+SITELAT\", \"+SITELONG\", \"+XISFCONV\", \"LATITUDE\", \"LONGITUD\", \"OBJECT\"], \"octets_xisf\": 2973277, \"ratio\": 0.354, \"staging\": \"/workspace/Workspace/OHP_DU_ECU/_traitement/converties/44db23478a564f6b.xisf\", \"t_total\": 1.8, \"final\": \"/workspace/Workspace/OHP_DU_ECU/01_Asteroides/914_Palisana/nuit_2023-08-15_T120/R/20230815-220905_914_Palisana_R_20s.xisf\"}",
+"2026-10-07T22:03:32"
+],
+[
+"345b5a9b896f7cd2",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_1928b2138e746dbe2c073b536fdd6d39_aux.fits",
+"ok",
+1,
+"{\"source\": \"palisana_R_20000_1928b2138e746dbe2c073b536fdd6d39_aux.fits\", \"url\": \"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_1928b2138e746dbe2c073b536fdd6d39_aux.fits\", \"objet\": \"(914) Palisana\", \"cat\": \"ast\", \"tel\": \"T120\", \"nuit\": \"2023-08-15\", \"filtre_base\": \"Johnson R\", \"pose\": 20.0, \"mjd\": 60171.92312580999, \"date_partagee\": false, \"nom_base\": \"914 Palisana A919 NC\", \"octets_fits\": 8398080, \"t_telechargement\": 4.6, \"bitpix\": -64, \"nx\": 1024, \"ny\": 1024, \"sha_pixels\": \"2a483f8a1de942665c623cd6e1f5709d5ba6bddc\", \"non_finis\": 0, \"min\": 271.1793980231169, \"max\": 65860.96573327496, \"negatifs\": 0, \"hors_bornes\": 6, \"ecart_base_arcsec\": 0.5, \"doutes\": [], \"astap\": \"0.3 s\", \"astap_echelle\": 0.7696, \"ecart_astap_arcsec\": 0.18, \"ecart_astap_echelle\": -0.00078, \"ecart_astap_angle\": 0.003, \"wcs\": \"confirmee\", \"ra\": 300.60117826721284, \"dec\": 23.632871799618055, \"echelle\": 0.7702059545154917, \"angle\": 180.2452772548273, \"parite\": -1, \"echelle_nominale\": 0.7734930225, \"filtre\": \"R\", \"filtre_dossier\": \"R\", \"filtre_sys\": \"Johnson\", \"date\": \"ok\", \"debut\": \"2023-08-15T22:09:28.070\", \"pose_ctrl\": \"ok\", \"ecart_max\": 0.003221351944375783, \"modifs\": [\"+DEC\", \"+FILTSYS\", \"+OBJCTDEC\", \"+OBJCTRA\", \"+ORIENTAT\", \"+PIXSCALE\", \"+RA\", \"+SITEELEV\", \"+SITELAT\", \"+SITELONG\", \"+XISFCONV\", \"LATITUDE\", \"LONGITUD\", \"OBJECT\"], \"octets_xisf\": 2974514, \"ratio\": 0.3542, \"staging\": \"/workspace/Workspace/OHP_DU_ECU/_traitement/converties/345b5a9b896f7cd2.xisf\", \"t_total\": 5.0, \"final\": \"/workspace/Workspace/OHP_DU_ECU/01_Asteroides/914_Palisana/nuit_2023-08-15_T120/R/20230815-220928_914_Palisana_R_20s.xisf\"}",
+"2026-10-07T22:03:32"
+],
+[
+"6c5f92f8e0285da5",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_2bceef4b27fd71c667e95d387c2c115f_aux.fits",
+"ok",
+1,
+"{\"source\": \"palisana_R_20000_2bceef4b27fd71c667e95d387c2c115f_aux.fits\", \"url\": \"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_2bceef4b27fd71c667e95d387c2c115f_aux.fits\", \"objet\": \"(914) Palisana\", \"cat\": \"ast\", \"tel\": \"T120\", \"nuit\": \"2023-08-15\", \"filtre_base\": \"Johnson R\", \"pose\": 20.0, \"mjd\": 60171.923859259114, \"date_partagee\": false, \"nom_base\": \"914 Palisana A919 NC\", \"octets_fits\": 8398080, \"t_telechargement\": 2.1, \"bitpix\": -64, \"nx\": 1024, \"ny\": 1024, \"sha_pixels\": \"89f41155bd3591d640b128cb4e5c36cbdd5715df\", \"non_finis\": 0, \"min\": 265.1940769381124, \"max\": 65840.11964252296, \"negatifs\": 0, \"hors_bornes\": 8, \"ecart_base_arcsec\": 0.5, \"doutes\": [], \"astap\": \"0.1 s\", \"astap_echelle\": 0.7681, \"ecart_astap_arcsec\": 0.06, \"ecart_astap_echelle\": -0.00269, \"ecart_astap_angle\": 0.281, \"wcs\": \"confirmee\", \"ra\": 300.60117649388974, \"dec\": 23.632929009163977, \"echelle\": 0.7701420244675479, \"angle\": 180.24062556564465, \"parite\": -1, \"echelle_nominale\": 0.7734930225, \"filtre\": \"R\", \"filtre_dossier\": \"R\", \"filtre_sys\": \"Johnson\", \"date\": \"ok\", \"debut\": \"2023-08-15T22:10:31.440\", \"pose_ctrl\": \"ok\", \"ecart_max\": 0.003221351944375783, \"modifs\": [\"+DEC\", \"+FILTSYS\", \"+OBJCTDEC\", \"+OBJCTRA\", \"+ORIENTAT\", \"+PIXSCALE\", \"+RA\", \"+SITEELEV\", \"+SITELAT\", \"+SITELONG\", \"+XISFCONV\", \"LATITUDE\", \"LONGITUD\", \"OBJECT\"], \"octets_xisf\": 2975251, \"ratio\": 0.3543, \"staging\": \"/workspace/Workspace/OHP_DU_ECU/_traitement/converties/6c5f92f8e0285da5.xisf\", \"t_total\": 2.2, \"final\": \"/workspace/Workspace/OHP_DU_ECU/01_Asteroides/914_Palisana/nuit_2023-08-15_T120/R/20230815-221031_914_Palisana_R_20s.xisf\"}",
+"2026-10-07T22:03:32"
+],
+[
+"7477bf6459033037",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_4c5394e3af833d34be92d29e9920f831_aux.fits",
+"ok",
+1,
+"{\"source\": \"palisana_R_20000_4c5394e3af833d34be92d29e9920f831_aux.fits\", \"url\": \"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_4c5394e3af833d34be92d29e9920f831_aux.fits\", \"objet\": \"(914) Palisana\", \"cat\": \"ast\", \"tel\": \"T120\", \"nuit\": \"2023-08-15\", \"filtre_base\": \"Johnson R\", \"pose\": 20.0, \"mjd\": 60171.9241210646, \"date_partagee\": false, \"nom_base\": \"914 Palisana A919 NC\", \"octets_fits\": 8398080, \"t_telechargement\": 0.5, \"bitpix\": -64, \"nx\": 1024, \"ny\": 1024, \"sha_pixels\": \"eb544eafbafef9f8fa2427695047b8830ff7290c\", \"non_finis\": 0, \"min\": 267.1588580188461, \"max\": 65854.75292304935, \"negatifs\": 0, \"hors_bornes\": 5, \"ecart_base_arcsec\": 0.5, \"doutes\": [], \"astap\": \"ASTAP sans solution (2 s) 0d,1d,1d,1d,2d,2d,2d,2d,3d,3d,No solution found!  :( ; -s 50 : 0.0 s\", \"astap_echelle\": 0.7692, \"ecart_astap_arcsec\": 0.13, \"ecart_astap_echelle\": -0.00151, \"ecart_astap_angle\": 0.022, \"wcs\": \"confirmee\", \"ra\": 300.6011873531064, \"dec\": 23.6330144345049, \"echelle\": 0.7703449425847368, \"angle\": 180.24702510072905, \"parite\": -1, \"echelle_nominale\": 0.7734930225, \"filtre\": \"R\", \"filtre_dossier\": \"R\", \"filtre_sys\": \"Johnson\", \"date\": \"ok\", \"debut\": \"2023-08-15T22:10:54.060\", \"pose_ctrl\": \"ok\", \"ecart_max\": 0.0037112248392077163, \"modifs\": [\"+DEC\", \"+FILTSYS\", \"+OBJCTDEC\", \"+OBJCTRA\", \"+ORIENTAT\", \"+PIXSCALE\", \"+RA\", \"+SITEELEV\", \"+SITELAT\", \"+SITELONG\", \"+XISFCONV\", \"LATITUDE\", \"LONGITUD\", \"OBJECT\"], \"octets_xisf\": 2972869, \"ratio\": 0.354, \"staging\": \"/workspace/Workspace/OHP_DU_ECU/_traitement/converties/7477bf6459033037.xisf\", \"t_total\": 2.9, \"final\": \"/workspace/Workspace/OHP_DU_ECU/01_Asteroides/914_Palisana/nuit_2023-08-15_T120/R/20230815-221054_914_Palisana_R_20s.xisf\"}",
+"2026-10-07T22:03:32"
+],
+[
+"3cd45fd9f218c52a",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_1dacdcc442fd313956e88f461529083a_aux.fits",
+"ok",
+1,
+"{\"source\": \"palisana_R_20000_1dacdcc442fd313956e88f461529083a_aux.fits\", \"url\": \"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_1dacdcc442fd313956e88f461529083a_aux.fits\", \"objet\": \"(914) Palisana\", \"cat\": \"ast\", \"tel\": \"T120\", \"nuit\": \"2023-08-15\", \"filtre_base\": \"Johnson R\", \"pose\": 20.0, \"mjd\": 60171.92438333342, \"date_partagee\": false, \"nom_base\": \"914 Palisana A919 NC\", \"octets_fits\": 8398080, \"t_telechargement\": 0.5, \"bitpix\": -64, \"nx\": 1024, \"ny\": 1024, \"sha_pixels\": \"1994acf234f357f26c71b9f63cf6c5ff9456d2d5\", \"non_finis\": 0, \"min\": 273.58684866918225, \"max\": 66032.41120871846, \"negatifs\": 0, \"hors_bornes\": 8, \"ecart_base_arcsec\": 0.5, \"doutes\": [], \"astap\": \"ASTAP sans solution (2 s) 0d,1d,1d,1d,2d,2d,2d,2d,3d,3d,No solution found!  :( ; -s 50 : ASTAP sans solution (1 s) 0d,1d,1d,1d,2d,2d,2d,2d,3d,3d,No solution found!  :( ; diagonale : 0.1 s\", \"astap_echelle\": 0.7697, \"ecart_astap_arcsec\": 0.23, \"ecart_astap_echelle\": -0.00043, \"ecart_astap_angle\": 0.033, \"wcs\": \"confirmee\", \"ra\": 300.60105293344265, \"dec\": 23.6328876089394, \"echelle\": 0.7700613491141088, \"angle\": 180.25135179268352, \"parite\": -1, \"echelle_nominale\": 0.7734930225, \"filtre\": \"R\", \"filtre_dossier\": \"R\", \"filtre_sys\": \"Johnson\", \"date\": \"ok\", \"debut\": \"2023-08-15T22:11:16.720\", \"pose_ctrl\": \"ok\", \"ecart_max\": 0.003221351944375783, \"modifs\": [\"+DEC\", \"+FILTSYS\", \"+OBJCTDEC\", \"+OBJCTRA\", \"+ORIENTAT\", \"+PIXSCALE\", \"+RA\", \"+SITEELEV\", \"+SITELAT\", \"+SITELONG\", \"+XISFCONV\", \"LATITUDE\", \"LONGITUD\", \"OBJECT\"], \"octets_xisf\": 2973488, \"ratio\": 0.3541, \"staging\": \"/workspace/Workspace/OHP_DU_ECU/_traitement/converties/3cd45fd9f218c52a.xisf\", \"t_total\": 3.4, \"final\": \"/workspace/Workspace/OHP_DU_ECU/01_Asteroides/914_Palisana/nuit_2023-08-15_T120/R/20230815-221116_914_Palisana_R_20s.xisf\"}",
+"2026-10-07T22:03:32"
+],
+[
+"561256e47755c3a2",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_3d08573094ac0b4e9bb02ea135e6ba6c_aux.fits",
+"ok",
+1,
+"{\"source\": \"palisana_R_20000_3d08573094ac0b4e9bb02ea135e6ba6c_aux.fits\", \"url\": \"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_3d08573094ac0b4e9bb02ea135e6ba6c_aux.fits\", \"objet\": \"(914) Palisana\", \"cat\": \"ast\", \"tel\": \"T120\", \"nuit\": \"2023-08-15\", \"filtre_base\": \"Johnson R\", \"pose\": 20.0, \"mjd\": 60171.925968403, \"date_partagee\": false, \"nom_base\": \"914 Palisana A919 NC\", \"octets_fits\": 8398080, \"t_telechargement\": 4.3, \"bitpix\": -64, \"nx\": 1024, \"ny\": 1024, \"sha_pixels\": \"70c0162d07d4ca5782a616665bd29d09c9bf2d81\", \"non_finis\": 0, \"min\": 275.05239937577716, \"max\": 65859.93026490402, \"negatifs\": 0, \"hors_bornes\": 6, \"ecart_base_arcsec\": 0.5, \"doutes\": [], \"astap\": \"ASTAP sans solution (2 s) 0d,1d,1d,1d,2d,2d,2d,2d,3d,3d,No solution found!  :( ; -s 50 : ASTAP sans solution (1 s) 0d,1d,1d,1d,2d,2d,2d,2d,3d,3d,No solution found!  :( ; diagonale : ASTAP sans solution (1 s) 0d,1d,1d,2d,2d,3d,3d,No solution found!  :(\", \"wcs\": \"validee\", \"ra\": 300.60125017029196, \"dec\": 23.632971289537352, \"echelle\": 0.7702981739340193, \"angle\": 180.25572132032357, \"parite\": -1, \"echelle_nominale\": 0.7734930225, \"filtre\": \"R\", \"filtre_dossier\": \"R\", \"filtre_sys\": \"Johnson\", \"date\": \"ok\", \"debut\": \"2023-08-15T22:13:33.670\", \"pose_ctrl\": \"ok\", \"ecart_max\": 0.0028105736564612016, \"modifs\": [\"+DEC\", \"+FILTSYS\", \"+OBJCTDEC\", \"+OBJCTRA\", \"+ORIENTAT\", \"+PIXSCALE\", \"+RA\", \"+SITEELEV\", \"+SITELAT\", \"+SITELONG\", \"+XISFCONV\", \"LATITUDE\", \"LONGITUD\", \"OBJECT\"], \"octets_xisf\": 2975449, \"ratio\": 0.3543, \"staging\": \"/workspace/Workspace/OHP_DU_ECU/_traitement/converties/561256e47755c3a2.xisf\", \"t_total\": 8.3, \"final\": \"/workspace/Workspace/OHP_DU_ECU/01_Asteroides/914_Palisana/nuit_2023-08-15_T120/R/20230815-221333_914_Palisana_R_20s.xisf\"}",
+"2026-10-07T22:03:32"
+],
+[
+"ef3475ca10bb7112",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_52af85bbc6d8984c8359662200030e8b_aux.fits",
+"ok",
+1,
+"{\"source\": \"palisana_R_20000_52af85bbc6d8984c8359662200030e8b_aux.fits\", \"url\": \"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_52af85bbc6d8984c8359662200030e8b_aux.fits\", \"objet\": \"(914) Palisana\", \"cat\": \"ast\", \"tel\": \"T120\", \"nuit\": \"2023-08-15\", \"filtre_base\": \"Johnson R\", \"pose\": 20.0, \"mjd\": 60171.92623020848, \"date_partagee\": false, \"nom_base\": \"914 Palisana A919 NC\", \"octets_fits\": 8398080, \"t_telechargement\": 3.2, \"bitpix\": -64, \"nx\": 1024, \"ny\": 1024, \"sha_pixels\": \"ab5e61a6205b46c3fb01caaf7a150accfece5177\", \"non_finis\": 0, \"min\": 273.246406828799, \"max\": 66049.02261369534, \"negatifs\": 0, \"hors_bornes\": 10, \"ecart_base_arcsec\": 0.5, \"doutes\": [], \"astap\": \"ASTAP sans solution (2 s) 0d,1d,1d,1d,2d,2d,2d,2d,3d,3d,No solution found!  :( ; -s 50 : ASTAP sans solution (1 s) 0d,1d,1d,1d,2d,2d,2d,2d,3d,3d,No solution found!  :( ; diagonale : 0.3 s\", \"astap_echelle\": 0.7696, \"ecart_astap_arcsec\": 0.11, \"ecart_astap_echelle\": -0.00095, \"ecart_astap_angle\": 0.003, \"wcs\": \"confirmee\", \"ra\": 300.6009992299944, \"dec\": 23.63280605720926, \"echelle\": 0.7703596663110266, \"angle\": 180.24957577190233, \"parite\": -1, \"echelle_nominale\": 0.7734930225, \"filtre\": \"R\", \"filtre_dossier\": \"R\", \"filtre_sys\": \"Johnson\", \"date\": \"ok\", \"debut\": \"2023-08-15T22:13:56.290\", \"pose_ctrl\": \"ok\", \"ecart_max\": 0.0034391815861454234, \"modifs\": [\"+DEC\", \"+FILTSYS\", \"+OBJCTDEC\", \"+OBJCTRA\", \"+ORIENTAT\", \"+PIXSCALE\", \"+RA\", \"+SITEELEV\", \"+SITELAT\", \"+SITELONG\", \"+XISFCONV\", \"LATITUDE\", \"LONGITUD\", \"OBJECT\"], \"octets_xisf\": 2973444, \"ratio\": 0.3541, \"staging\": \"/workspace/Workspace/OHP_DU_ECU/_traitement/converties/ef3475ca10bb7112.xisf\", \"t_total\": 6.2, \"final\": \"/workspace/Workspace/OHP_DU_ECU/01_Asteroides/914_Palisana/nuit_2023-08-15_T120/R/20230815-221356_914_Palisana_R_20s.xisf\"}",
+"2026-10-07T22:03:32"
+],
+[
+"8876c929e93a7c6d",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_e5158c19eacd39ddc387f4fdf85e1693_aux.fits",
+"ok",
+1,
+"{\"source\": \"palisana_R_20000_e5158c19eacd39ddc387f4fdf85e1693_aux.fits\", \"url\": \"http://tap-ufe.obspm.fr/getproduct/ufe/data/OHPT120/2023/2023-08-15-DU-ECU/padc/palisana_R_20000_e5158c19eacd39ddc387f4fdf85e1693_aux.fits\", \"objet\": \"(914) Palisana\", \"cat\": \"ast\", \"tel\": \"T120\", \"nuit\": \"2023-08-15\", \"filtre_base\": \"Johnson R\", \"pose\": 20.0, \"mjd\": 60171.926492476836, \"date_partagee\": false, \"nom_base\": \"914 Palisana A919 NC\", \"octets_fits\": 8398080, \"t_telechargement\": 1.3, \"bitpix\": -64, \"nx\": 1024, \"ny\": 1024, \"sha_pixels\": \"cc1aed49f27619fbfa929089eb4e1cac1eeaae98\", \"non_finis\": 0, \"min\": 269.0861110408908, \"max\": 65865.1076067587, \"negatifs\": 0, \"hors_bornes\": 8, \"ecart_base_arcsec\": 0.5, \"doutes\": [], \"astap\": \"0.1 s\", \"astap_echelle\": 0.7698, \"ecart_astap_arcsec\": 0.13, \"ecart_astap_echelle\": -0.00078, \"ecart_astap_angle\": 0.008, \"wcs\": \"confirmee\", \"ra\": 300.6012818903487, \"dec\": 23.632794165360842, \"echelle\": 0.7703713306936842, \"angle\": 180.2337383606516, \"parite\": -1, \"echelle_nominale\": 0.7734930225, \"filtre\": \"R\", \"filtre_dossier\": \"R\", \"filtre_sys\": \"Johnson\", \"date\": \"ok\", \"debut\": \"2023-08-15T22:14:18.950\", \"pose_ctrl\": \"ok\", \"ecart_max\": 0.0037754340592073277, \"modifs\": [\"+DEC\", \"+FILTSYS\", \"+OBJCTDEC\", \"+OBJCTRA\", \"+ORIENTAT\", \"+PIXSCALE\", \"+RA\", \"+SITEELEV\", \"+SITELAT\", \"+SITELONG\", \"+XISFCONV\", \"LATITUDE\", \"LONGITUD\", \"OBJECT\"], \"octets_xisf\": 2972689, \"ratio\": 0.354, \"staging\": \"/workspace/Workspace/OHP_DU_ECU/_traitement/converties/8876c929e93a7c6d.xisf\", \"t_total\": 1.5, \"final\": \"/workspace/Workspace/OHP_DU_ECU/01_Asteroides/914_Palisana/nuit_2023-08-15_T120/R/20230815-221418_914_Palisana_R_20s.xisf\"}",
+"2026-10-07T22:03:32"
+],
+[
+"5fd6b2011324d34f",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/iris/2024/20240704/padc/NGC_5866-S001-R001-C001-SDSS_g.fits",
+"ok",
+1,
+"{\"source\": \"NGC_5866-S001-R001-C001-SDSS_g.fits\", \"url\": \"http://tap-ufe.obspm.fr/getproduct/ufe/data/iris/2024/20240704/padc/NGC_5866-S001-R001-C001-SDSS_g.fits\", \"objet\": \"NGC 5866\", \"cat\": \"gal\", \"tel\": \"IRIS\", \"nuit\": \"2024-07-04\", \"filtre_base\": \"SDSS g\", \"pose\": 40.0, \"mjd\": 60495.955951713026, \"date_partagee\": false, \"nom_base\": \"NGC 5866\", \"octets_fits\": 16790400, \"t_telechargement\": 6.0, \"bitpix\": -32, \"nx\": 2048, \"ny\": 2048, \"sha_pixels\": \"7f30f60a7b02390967c3d92ee99139c75b29f85c\", \"non_finis\": 0, \"min\": 0.0, \"max\": 66076.734375, \"negatifs\": 0, \"hors_bornes\": 25, \"ecart_base_arcsec\": 0.5, \"doutes\": [], \"astap\": \"0.1 s\", \"astap_echelle\": 0.6825, \"ecart_astap_arcsec\": 0.57, \"ecart_astap_echelle\": 0.0002, \"ecart_astap_angle\": 0.03, \"wcs\": \"confirmee\", \"ra\": 226.63939709398286, \"dec\": 55.753128149137, \"echelle\": 0.6823726214449976, \"angle\": 359.1528918967085, \"parite\": -1, \"echelle_nominale\": 0.6833815694406951, \"filtre\": \"g\", \"filtre_dossier\": \"g_SDSS\", \"filtre_sys\": \"SDSS\", \"date\": \"ok\", \"debut\": \"2024-07-04T22:56:54.228\", \"pose_ctrl\": \"ok\", \"ecart_max\": 0.0, \"modifs\": [\"+FILTORIG\", \"+FILTSYS\", \"+OBJCTDEC\", \"+OBJCTRA\", \"+ORIENTAT\", \"+PIXSCALE\", \"+SITEELEV\", \"+SITELAT\", \"+SITELONG\", \"+XISFCONV\", \"CTYPE1\", \"CTYPE2\", \"DEC\", \"FILTER\", \"LATITUDE\", \"LONGITUD\", \"RA\"], \"octets_xisf\": 11566891, \"ratio\": 0.6889, \"staging\": \"/workspace/Workspace/OHP_DU_ECU/_traitement/converties/5fd6b2011324d34f.xisf\", \"t_total\": 6.6, \"final\": \"/workspace/Workspace/OHP_DU_ECU/09_Galaxies/NGC_5866/champ_1_IRIS-2048/g_SDSS/20240704-225654_NGC_5866_g_SDSS_40s.xisf\"}",
+"2026-10-07T22:03:37"
+],
+[
+"e4689c02cc07ad76",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/iris/2024/20240704/padc/NGC_5866-S001-R001-C001-SDSS_r.fits",
+"ok",
+1,
+"{\"source\": \"NGC_5866-S001-R001-C001-SDSS_r.fits\", \"url\": \"http://tap-ufe.obspm.fr/getproduct/ufe/data/iris/2024/20240704/padc/NGC_5866-S001-R001-C001-SDSS_r.fits\", \"objet\": \"NGC 5866\", \"cat\": \"gal\", \"tel\": \"IRIS\", \"nuit\": \"2024-07-04\", \"filtre_base\": \"SDSS r\", \"pose\": 40.0, \"mjd\": 60495.95519548608, \"date_partagee\": false, \"nom_base\": \"NGC 5866\", \"octets_fits\": 16790400, \"t_telechargement\": 6.4, \"bitpix\": -32, \"nx\": 2048, \"ny\": 2048, \"sha_pixels\": \"c5fef3ab46da89d623c6e84299924f662045d51c\", \"non_finis\": 0, \"min\": 0.0, \"max\": 64963.62890625, \"negatifs\": 0, \"hors_bornes\": 0, \"ecart_base_arcsec\": 0.5, \"doutes\": [], \"astap\": \"0.1 s\", \"astap_echelle\": 0.6826, \"ecart_astap_arcsec\": 1.09, \"ecart_astap_echelle\": 0.00064, \"ecart_astap_angle\": 0.02, \"wcs\": \"confirmee\", \"ra\": 226.6400256632958, \"dec\": 55.753263607969835, \"echelle\": 0.6821318682656039, \"angle\": 359.1579324619031, \"parite\": -1, \"echelle_nominale\": 0.6826109580075013, \"filtre\": \"r\", \"filtre_dossier\": \"r_SDSS\", \"filtre_sys\": \"SDSS\", \"date\": \"ok\", \"debut\": \"2024-07-04T22:55:48.890\", \"pose_ctrl\": \"ok\", \"ecart_max\": 0.0, \"modifs\": [\"+FILTORIG\", \"+FILTSYS\", \"+OBJCTDEC\", \"+OBJCTRA\", \"+ORIENTAT\", \"+PIXSCALE\", \"+SITEELEV\", \"+SITELAT\", \"+SITELONG\", \"+XISFCONV\", \"CTYPE1\", \"CTYPE2\", \"DEC\", \"FILTER\", \"LATITUDE\", \"LONGITUD\", \"RA\"], \"octets_xisf\": 11313195, \"ratio\": 0.6738, \"staging\": \"/workspace/Workspace/OHP_DU_ECU/_traitement/converties/e4689c02cc07ad76.xisf\", \"t_total\": 6.9, \"final\": \"/workspace/Workspace/OHP_DU_ECU/09_Galaxies/NGC_5866/champ_1_IRIS-2048/r_SDSS/20240704-225548_NGC_5866_r_SDSS_40s.xisf\"}",
+"2026-10-07T22:03:37"
+],
+[
+"d4235aaee1c45191",
+"http://tap-ufe.obspm.fr/getproduct/ufe/data/iris/2024/20240704/padc/NGC_5866-S001-R001-C001-SDSS_z.fits",
+"ok",
+1,
+"{\"source\": \"NGC_5866-S001-R001-C001-SDSS_z.fits\", \"url\": \"http://tap-ufe.obspm.fr/getproduct/ufe/data/iris/2024/20240704/padc/NGC_5866-S001-R001-C001-SDSS_z.fits\", \"objet\": \"NGC 5866\", \"cat\": \"gal\", \"tel\": \"IRIS\", \"nuit\": \"2024-07-04\", \"filtre_base\": \"SDSS z\", \"pose\": 40.0, \"mjd\": 60495.957261458505, \"date_partagee\": false, \"nom_base\": \"NGC 5866\", \"octets_fits\": 16787520, \"t_telechargement\": 3.7, \"bitpix\": -32, \"nx\": 2048, \"ny\": 2048, \"sha_pixels\": \"e29abb382232e498352d07b0a48fccca60e12af7\", \"non_finis\": 0, \"min\": 0.0, \"max\": 64707.03515625, \"negatifs\": 0, \"hors_bornes\": 0, \"ecart_base_arcsec\": 0.5, \"doutes\": [], \"astap\": \"0.1 s\", \"astap_echelle\": 0.6825, \"ecart_astap_arcsec\": 0.53, \"ecart_astap_echelle\": -0.00018, \"ecart_astap_angle\": 0.041, \"wcs\": \"confirmee\", \"ra\": 226.63959707367007, \"dec\": 55.753147344918915, \"echelle\": 0.6826228000048413, \"angle\": 359.22715995856765, \"parite\": -1, \"echelle_nominale\": 0.6835493239561087, \"filtre\": \"z\", \"filtre_dossier\": \"z_SDSS\", \"filtre_sys\": \"SDSS\", \"date\": \"ok\", \"debut\": \"2024-07-04T22:58:47.390\", \"pose_ctrl\": \"ok\", \"ecart_max\": 0.0, \"modifs\": [\"+FILTORIG\", \"+FILTSYS\", \"+OBJCTDEC\", \"+OBJCTRA\", \"+ORIENTAT\", \"+PIXSCALE\", \"+SITEELEV\", \"+SITELAT\", \"+SITELONG\", \"+XISFCONV\", \"CTYPE1\", \"CTYPE2\", \"DEC\", \"FILTER\", \"LATITUDE\", \"LONGITUD\", \"RA\"], \"octets_xisf\": 8361434, \"ratio\": 0.4981, \"staging\": \"/workspace/Workspace/OHP_DU_ECU/_traitement/converties/d4235aaee1c45191.xisf\", \"t_total\": 4.3, \"final\": \"/workspace/Workspace/OHP_DU_ECU/09_Galaxies/NGC_5866/champ_1_IRIS-2048/z_SDSS/20240704-225847_NGC_5866_z_SDSS_40s.xisf\"}",
+"2026-10-07T22:03:37"
+]
+]

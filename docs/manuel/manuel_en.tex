@@ -459,7 +459,17 @@ otherwise the folder). \emph{Open with} only offers the astronomy programs found
 ASTAP, Aladin, N.I.N.A.: PATH, usual locations, flatpak, \texttt{/Applications}, Program Files) \emph{and} able to
 read this file according to the checked table of section~\ref{sec:compat}; the others are greyed with the reason
 (« ASTAP only reads uncompressed XISF: choose the FITS format in Processing »). An image not downloaded yet: the
-status bar says so.
+status bar says so. A disabled entry carries its reason in its label (« Open with (nothing downloaded) ») and the
+full reason shows in the status bar on hover: no more tooltip over the menu (on KDE it grabbed the mouse).
+
+\paragraph{Copy from an older processing run.} An output made before Coupole (script \texttt{ohp\_xisf.py}) or on
+another computer records the absolute path of the time in its state database (« /workspace/Workspace/OHP\_DU\_ECU/… »).
+Coupole finds each file in the current output folder, in this order: relative path recorded in the database,
+\texttt{\_traitement/journal.csv} (\texttt{destination} column), former root or type folder, then the expected name
+in the stack folder; paths found through the journal are recorded once and for all in the database (in the
+background, at first load; through the local working database on a share). Open, \emph{Open with}, file location,
+target folder and stacks therefore work on a copy of the whole bank (7,625 images found in 0.34~s, recorded in the
+database in 0.8~s). \cmd{coupole ohp metadata FOLDER --rewrite} records these locations too.
 
 \subsection{Anomalies}
 \capture{img/anomalies_en.png}{1.0}
@@ -641,6 +651,27 @@ Kept as is in 0.1.9 so as not to change files compared with the reference proces
 The module needs the SEP library (Source Extractor in Python, LGPL, about 1 MB); it never runs automatically
 (\emph{Measure} button, \emph{Check image quality} box of the processing, or \cmd{coupole qualite FOLDER --write}).
 Report per stack: \texttt{QUALITE.csv} and \texttt{QUALITE.txt}.
+
+\paragraph{Sky frames only.} By default only sky frames (lights) are measured. Left out without being opened:
+Flat(s), Dark(s), Bias, Offset(s), DarkFlat(s), Calibration, Master(s) folders (« FLAT FSQ », « Dark-Bias »
+included), cosmetized, calibrated, registered, debayered, \texttt{\_platesolve…} and their French names (Plats,
+Noirs, Biais); \texttt{FLAT\_}, \texttt{DARK\_}, \texttt{BIAS\_}, \texttt{DARKFLAT\_} files (N.I.N.A., ASIAIR),
+masters (\texttt{masterDark}, \texttt{masterFlat}, \texttt{masterLight}, \texttt{superbias}) and WBPP outputs
+(\texttt{\_c}, \texttt{\_cc}, \texttt{\_r}…). As a last resort, a frame whose header (\texttt{IMAGETYP},
+\texttt{FRAME} or the XISF property \texttt{Observation:Image:Type}) says flat, dark, bias, offset or master is left
+out when measured; Light, Light Frame, Science or Object are measured. The summary says « 70 image(s) found, 66 sky
+frame(s) measured, 0 with an error, 4 calibration file(s) excluded »; \emph{Excluded files…} lists them with the
+reason. \emph{Also include calibration frames} box (command line: \cmd{--with-calibration}): everything is
+measured.
+
+\paragraph{Other programs' files, errors.} XISF files from N.I.N.A. (keywords without a comment), the ASIAIR (no
+\texttt{Metadata}), PixInsight and Siril are read by a tolerant reader: only what really prevents reading the pixels
+is refused; our own files are still checked strictly. A file that cannot be measured shows in the table,
+\emph{status} column, with its reason (« error: XISF format not read (…) »); the summary counts the errors and
+\texttt{coupole.log} keeps the stack trace; the command line exits with code 1 when no image could be measured.
+N.I.N.A. frame from the ASI~6200MM (9,576 × 6,388, 61~Mpx): 4.2~s, 1,170~MB peak (float32 computation), FWHM 3.5″
+at 1.695″/px; the number of processes is reduced from the image size (half of the free memory) and the number of
+fitted stars grows with the sensor (120 to 400).
 
 \paragraph{Speed, resume, sample.} Measurements run in separate processes (count given by the machine plan: cores,
 memory, economy mode and the Preferences limit; at most 3 when the folder is on a network share, detected and
@@ -894,7 +925,9 @@ Quality unavailable & \texttt{pip install sep} (included in the packages).\\
 Settings back to defaults & the \texttt{reglages.json} file was unreadable: it is kept alongside with the suffix \texttt{.corrompu-…}.\\
 Output folder not writable & clear message at start; choose another folder (Preferences or the Folder field).\\
 File dialog without the NAS, or generic & Linux: install \texttt{xdg-desktop-portal} and the desktop backend (\texttt{-kde}, \texttt{-gnome} or \texttt{-gtk}), restart; KDE: \texttt{kio-fuse}; otherwise type the path of the mounted share into the field (section~\ref{sec:dialogues}).\\
-System dialog does not open & Preferences > File dialogs: Qt.\\
+System dialog does not open & 0.1.10 and earlier, Spectra and series on KDE: update (nameless filter refused by the portal); otherwise Preferences > File dialogs: Qt; each opening is logged in \texttt{coupole.log}.\\
+Owned images but nothing to open (copy from an older run) & update (0.1.11): locations are found through \texttt{journal.csv} (section~\ref{sec:ouvrir}).\\
+Quality: empty columns on your own frames & update (0.1.11): tolerant XISF reader; the \emph{status} column gives the reason.\\
 \texttt{\textasciitilde/.local/bin/coupole} not found & add \texttt{\textasciitilde/.local/bin} to the \texttt{PATH} (line given by the installer).\\
 \texttt{.part} or \texttt{.tmp} file in \texttt{\_traitement} & left by a cut: resuming reuses it (\texttt{.part}) or replaces it; nothing to do.\\
 WBPP does not find focal length and pixel & enter the values of the \emph{For PixInsight / N.I.N.A.} box (Stacks tab) in the \emph{Astrometric solution} panel; older files: \cmd{coupole ohp metadata FOLDER --rewrite}.\\

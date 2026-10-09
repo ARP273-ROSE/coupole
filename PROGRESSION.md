@@ -537,3 +537,55 @@ partagée avec le NAS) : sous Linux, télécharger, *Tout télécharger* ou réo
   retirés ensuite) : tests avec `COUPOLE_TEST_SMB` réussis, essai réel refait (3 converties, base du partage intègre).
 - CI `tests.yml` du commit `09f8ae8` : **6/6** (Linux, Windows, macOS × 3.10, 3.12) ; sous Windows, `test_chemin_unc_reel` de la base de travail (`\\localhost\C$`) passe.
 - **Aucun tag posé.**
+
+## 2026-10-09 — version 0.1.11 : copie d'un ancien traitement, menus, dialogues, Qualité sur les poses de Kevin
+Retours de Kevin (Linux/KDE, 0.1.10, `/mnt/nas/Astronomie/OHP_DU_ECU` = copie produite par `ohp_xisf.py` avant Coupole).
+- **Rien à ouvrir sur des objets possédés** : la base de cette copie note `final` = « /workspace/Workspace/OHP_DU_ECU/… »
+  (conteneur d'alors) ; `possession` le rendait tel quel (chemin absolu étranger) → `chemin_image` inexistant,
+  `dossier_objet` vide. Nouveau `modules/ohp/emplacements.py` : `info.chemin` relatif → `final` dans la sortie →
+  `journal.csv` (url, puis fichier_source non ambigu ; cache par mtime/taille) → ancienne racine (`staging` avant
+  `_traitement`) ou dossier de type → nom attendu dans le dossier du lot (numérotation « _2 » du rangement, à la
+  demande). `Possession.lire_avec_infos` résout en fond (infos : `final` local en mémoire pour la complétude des lots),
+  `a_migrer` → `emplacements.migrer` en fond (BasePartagee, PRAGMA journal_mode=DELETE, jamais pendant un traitement).
+  `dossier_objet` : repli `dossier_attendu(<sortie>/<type>/<objet>)`. `metadonnees --reecrire` note les chemins
+  (fichiers trouvés, puis journal). Pilote : `final` étranger rapporté avant le rangement (sinon `os.replace` d'un
+  staging absent et `journal.csv` réécrit avec « ../.. ») ; `lots.ranger` note `chemin`, saute un staging absent ;
+  `ecrire_journal` : `chemin`, sinon `final` dans la sortie, sinon la ligne précédente.
+- **Vraie copie (lecture seule, base et journal copiés dans un dossier de travail ; rien écrit dans /mnt/zpool2)** :
+  7 625 images résolues par le journal en 0,34 s ; 300 tirées au sort présentes sur le disque ; ancienne racine =
+  journal 7 625/7 625 ; nom attendu = journal 100/100 (0,2 s) ; migration d'une copie de la base sur « partage »
+  simulé : 7 625 en 0,78 s, relue ensuite sans journal (origine « base »).
+- **Défauts trouvés en passant** : la base d'`ohp_xisf.py` est en WAL → écritures dans le `-wal`, base principale
+  inchangée, la recopie vers le partage ne voyait « rien de neuf » (aussi `metadonnees.maj_etat` en 0.1.10) → DELETE
+  avant d'écrire ; `_copier_base` reprend un `-wal` ; recopie refusée si `-wal` non vide, `-wal` vide et `-shm`
+  périmés retirés après remplacement.
+- **Menus** : sur la capture de Kevin, l'info-bulle « Rien n'est encore téléchargé… » d'une entrée GRISÉE couvrait le
+  menu (cause principale : entrées désactivées, faute de chemin). `QMenu.setToolTipsVisible` retiré partout
+  (`gui/ouvrir.action` : motif court dans le libellé, motif complet en `statusTip`), `ouvrir.montrer_menu` = `popup` +
+  WA_DeleteOnClose (plus d'`exec` imbriqué) pour tous les menus contextuels (images, objets, lots, colonnes, Qualité).
+- **Spectres et séries, « Ouvrir un fichier » sans effet** : filtre « (*.fits …) » sans nom → xdg-desktop-portal
+  « invalid filter: name is empty ». **Reproduit en vrai** (ubuntu:24.04, Xvfb, dbus-run-session, xdg-desktop-portal
+  1.18 + xdg-desktop-portal-kde, XDG_CURRENT_DESKTOP=KDE, `dbus-monitor`) : ancien filtre → `InvalidArgument`, aucune
+  fenêtre ; nouveau → fenêtre « Ouvrir un fichier (nouveau filtre) — Portal » de xdg-desktop-portal-kde.
+  `gui/fichiers` : `normaliser_filtre` (nom, motifs dédoublonnés, « Tous les fichiers (*) » à l'ouverture),
+  `_parent_visible`, `_depart_existant`, journal de chaque ouverture/résultat/exception. Bouton « Ouvrir » sans le
+  booléen `checked`. `tests/test_dialogues_fichiers.py` : les 13 appels de dialogue (garde-fou de comptage).
+- **Qualité, 70 poses N.I.N.A. « mesurées » sans valeur** : `xisf.lire` strict (« incomplete FITSKeyword », N.I.N.A.
+  écrit `CD1_1` sans commentaire). `xisf.lire(strict=False)` par défaut (tolérant), `strict=True`/`xisf.verifier`
+  pour nos fichiers (formats.py, tests XSD). Vrais fichiers (copies dans `/workspace/.cache/qtest/`) : pose N.I.N.A.
+  ASI 6200MM 9576×6388 (strict : refus ; tolérant : lu), flat ASIAIR sans Metadata (copié de
+  `Observatoire FC76-DCU/…/Nuit_4/Flat/`, lecture seule), masterLight WBPP PixInsight 1.8.8 (strict ok). Mesure de la
+  pose N.I.N.A. : 4,2 s, pic RSS 1 170 Mo (float32, fond soustrait en place), 14 455 sources, 400 étoiles, FWHM
+  2,08 px = 3,53″ à 1,695″/px (matrice CD), RSN 108. Estimation mémoire 18 o/px + 150 Mo → processus limités
+  (`limiter_par_memoire`). Erreurs : colonne `etat`, `rapport.motif_erreur`, `bilan_texte`, pile dans coupole.log,
+  code 1 en CLI si rien n'est mesuré. Reorganisation/Ouvrir avec/metadonnees vérifiés sur ces formats.
+- **Qualité, poses de ciel seulement** : `modules/qualite/calibration.py` (dossiers, noms — famille de
+  `_DEFAULT_EXCLUDE_RE` d'astrosolver —, en-tête à la mesure) ; case, `--avec-calibration`, liste *Fichiers exclus…*.
+  Le flat ASIAIR réel est exclu par son en-tête (`entete:flat`), le masterLight par le sien (`entete:master light`).
+- Tests : `test_copie_ancienne.py` (20 lignes réelles de base + journal + INDEX_LOTS, XISF factices ; toutes les
+  actions de l'interface sur la copie, local et partage simulé, popup + déclenchement des slots), 
+  `test_dialogues_fichiers.py`, `test_qualite_calibration.py` (XISF « à la N.I.N.A. » et « à l'ASIAIR » construits
+  octet par octet, arborescence N.I.N.A. + WBPP + ASIAIR). Manuels FR/EN (42 p.) complétés et recompilés.
+- Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 480 réussis,
+  15 sautés, code 0 ; python:3.10-slim 480 / 15, code 0**.
+- **Aucun tag posé.**

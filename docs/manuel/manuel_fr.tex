@@ -473,7 +473,19 @@ logiciels d'astronomie trouvés sur la machine (PixInsight, Siril, ASTAP, Aladin
 usuels, flatpak, \texttt{/Applications}, Program Files) \emph{et} capables de lire ce fichier d'après la table
 vérifiée de la section~\ref{sec:compat} ; les autres apparaissent grisés avec la raison (« ASTAP ne lit que le XISF
 non compressé : choisir le format FITS dans le Traitement »). Une image pas encore téléchargée : la barre d'état le
-dit.
+dit. Une entrée désactivée porte son motif dans son libellé (« Ouvrir avec (rien de téléchargé) ») et le motif
+complet s'affiche dans la barre d'état au survol : plus d'info-bulle par-dessus le menu (sous KDE, elle en captait
+la souris).
+
+\paragraph{Copie d'un ancien traitement.} Une sortie produite avant Coupole (script \texttt{ohp\_xisf.py}) ou sur
+une autre machine note dans sa base d'état le chemin absolu d'alors (« /workspace/Workspace/OHP\_DU\_ECU/… »).
+Coupole retrouve chaque fichier dans le dossier de sortie courant, dans cet ordre : chemin relatif noté dans la base,
+\texttt{\_traitement/journal.csv} (colonne \texttt{destination}), ancienne racine ou dossier de type, puis le nom
+attendu dans le dossier du lot ; les chemins trouvés par le journal sont notés une fois pour toutes dans la base
+(en fond, au premier chargement ; par la base de travail locale sur un partage). Ouvrir, \emph{Ouvrir avec},
+l'emplacement, le dossier de la cible et les lots fonctionnent donc sur la copie de la banque entière (7~625 images
+retrouvées en 0,34~s, notées dans la base en 0,8~s). \cmd{coupole ohp metadonnees DOSSIER --reecrire} note aussi
+ces emplacements.
 
 \subsection{Anomalies}
 \capture{img/anomalies_fr.png}{1.0}
@@ -653,6 +665,27 @@ par rapport au traitement de référence.
 Le module demande la bibliothèque SEP (Source Extractor en Python, LGPL, environ 1 Mo) ; il n'est jamais lancé
 automatiquement (bouton \emph{Mesurer}, case \emph{Vérifier la qualité des images} du traitement, ou
 \cmd{coupole qualite DOSSIER --ecrire}). Rapport par lot : \texttt{QUALITE.csv} et \texttt{QUALITE.txt}.
+
+\paragraph{Poses de ciel seulement.} Par défaut, seules les poses de ciel (lights) sont mesurées. Sont exclus sans
+être ouverts : les dossiers Flat(s), Dark(s), Bias, Offset(s), DarkFlat(s), Calibration, Master(s) (« FLAT FSQ »,
+« Dark-Bias » compris), cosmetized, calibrated, registered, debayered, \texttt{\_platesolve…} et leurs noms
+français (Plats, Noirs, Biais) ; les fichiers \texttt{FLAT\_}, \texttt{DARK\_}, \texttt{BIAS\_},
+\texttt{DARKFLAT\_} (N.I.N.A., ASIAIR), les masters (\texttt{masterDark}, \texttt{masterFlat},
+\texttt{masterLight}, \texttt{superbias}) et les sorties de WBPP (\texttt{\_c}, \texttt{\_cc}, \texttt{\_r}…).
+En dernier recours, une pose dont l'en-tête (\texttt{IMAGETYP}, \texttt{FRAME} ou la propriété XISF
+\texttt{Observation:Image:Type}) dit flat, dark, bias, offset ou master est exclue à la mesure ; Light, Light Frame,
+Science ou Object sont mesurées. Le résumé dit « 70 image(s) trouvée(s), 66 pose(s) de ciel mesurée(s), 0 en erreur,
+4 fichier(s) de calibration exclu(s) » ; \emph{Fichiers exclus…} en donne la liste avec le motif. Case
+\emph{Inclure aussi les poses de calibration} (ligne de commande : \cmd{--avec-calibration}) : tout est mesuré.
+
+\paragraph{Fichiers des autres logiciels, erreurs.} Les XISF de N.I.N.A. (mots-clés sans commentaire), de l'ASIAIR
+(sans \texttt{Metadata}), de PixInsight et de Siril sont lus par un lecteur tolérant : seul ce qui empêche
+vraiment de lire les pixels est refusé ; nos propres fichiers restent contrôlés strictement. Un fichier non mesurable
+apparaît dans le tableau, colonne \emph{état}, avec son motif (« erreur : format XISF non lu (…) ») ; le résumé
+compte les erreurs et \texttt{coupole.log} garde la pile ; la ligne de commande sort avec le code 1 si aucune image
+n'a pu être mesurée. Pose N.I.N.A. de l'ASI~6200MM (9~576 × 6~388, 61~Mpx) : 4,2~s, 1~170~Mo de pointe (calcul en
+float32), FWHM 3,5″ à 1,695″/px ; le nombre de processus est réduit d'après la taille des images (moitié de la
+mémoire libre) et le nombre d'étoiles ajustées croît avec le capteur (120 à 400).
 
 \paragraph{Vitesse, reprise, échantillon.} Les mesures tournent dans des processus séparés (nombre donné par le plan
 machine : cœurs, mémoire, mode économe et bridage des Préférences ; au plus 3 quand le dossier est sur un partage
@@ -914,7 +947,9 @@ Qualité indisponible & \texttt{pip install sep} (inclus dans les paquets).\\
 Réglages revenus par défaut & le fichier \texttt{reglages.json} était illisible : il est gardé à côté avec le suffixe \texttt{.corrompu-…}.\\
 Dossier de sortie non inscriptible & message clair au lancement ; choisir un autre dossier (Préférences ou champ Dossier).\\
 Dialogue de fichiers sans le NAS, ou générique & Linux : installer \texttt{xdg-desktop-portal} et le moteur du bureau (\texttt{-kde}, \texttt{-gnome} ou \texttt{-gtk}), relancer ; KDE : \texttt{kio-fuse} ; sinon taper le chemin du partage monté dans le champ (section~\ref{sec:dialogues}).\\
-Dialogue du système qui ne s'ouvre pas & Préférences > Boîtes de dialogue de fichiers : Qt.\\
+Dialogue du système qui ne s'ouvre pas & 0.1.10 et avant, Spectres et séries sous KDE : mettre à jour (filtre sans nom refusé par le portail) ; sinon Préférences > Boîtes de dialogue de fichiers : Qt ; chaque ouverture est notée dans \texttt{coupole.log}.\\
+Images possédées mais rien à ouvrir (copie d'un ancien traitement) & mettre à jour (0.1.11) : les emplacements sont retrouvés par \texttt{journal.csv} (section~\ref{sec:ouvrir}).\\
+Qualité : colonnes vides sur ses propres poses & mettre à jour (0.1.11) : lecteur XISF tolérant ; la colonne \emph{état} donne le motif.\\
 \texttt{\textasciitilde/.local/bin/coupole} introuvable & ajouter \texttt{\textasciitilde/.local/bin} au \texttt{PATH} (ligne donnée par l'installeur).\\
 Fichier \texttt{.part} ou \texttt{.tmp} dans \texttt{\_traitement} & reste d'une coupure : la reprise le réutilise (\texttt{.part}) ou le remplace ; rien à faire.\\
 WBPP ne trouve pas focale et pixel & saisir les valeurs de l'encadré \emph{Pour PixInsight / N.I.N.A.} (onglet Lots) dans le panneau \emph{Astrometric solution} ; fichiers anciens : \cmd{coupole ohp metadonnees DOSSIER --reecrire}.\\
