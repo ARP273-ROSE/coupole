@@ -699,4 +699,6 @@ passées, comme la Banque OHP ; méthode tirée des pratiques publiées (fils et
   CONTRIBUTING (ajouter une archive), `pyproject` (extra `alignement` = reproject, ajouté à `test`).
 - Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 548 réussis,
   17 sautés, code 0 (reproject 0.21.0) ; python:3.10-slim 548 / 17, code 0 (reproject 0.14.1)**.
+- CI `tests.yml` : commit `9d21622` **6/6** du premier coup (Linux, Windows, macOS × 3.10, 3.12), garde-fou de
+  confidentialité compris.
 - **Aucun tag posé.**
