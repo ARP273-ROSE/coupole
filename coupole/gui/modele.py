@@ -68,6 +68,32 @@ def cle_de_tri(v):
     return (1, 0.0, v if isinstance(v, str) else str(v))
 
 
+def permutation_triee(cles: list, decroissant: bool = False) -> list[int]:
+    """Indices qui trient `cles` — exactement l'ordre de ``sorted(range(n), key=cles.__getitem__,
+    reverse=decroissant)`` (tri stable : à clé égale, l'ordre courant est gardé, y compris en décroissant).
+
+    Clés entières (rangs précalculés : heure du site, drapeaux, possession) ou réelles sans NaN (date) :
+    `numpy.argsort` stable, quelques millisecondes pour 80 000 lignes ; autres clés : le tri de Python."""
+    n = len(cles)
+    if n > 1000:
+        import numpy as np
+        a = None
+        if all(type(c) is int for c in cles):
+            try:
+                a = np.fromiter(cles, dtype=np.int64, count=n)
+            except OverflowError:                      # entier hors de 64 bits : tri de Python
+                a = None
+            if a is not None and a.min() == np.iinfo(np.int64).min:
+                a = None                               # (son opposé déborderait)
+        elif all(type(c) is float for c in cles):
+            a = np.fromiter(cles, dtype=np.float64, count=n)
+            if np.isnan(a).any():                      # NaN : l'ordre de Python n'est pas celui de numpy
+                a = None
+        if a is not None:
+            return np.argsort(-a if decroissant else a, kind='stable').tolist()
+    return sorted(range(n), key=cles.__getitem__, reverse=decroissant)
+
+
 class ModeleTableau(QAbstractTableModel):
     """lignes : liste de tuples de valeurs affichables ; donnees : objet associé à chaque ligne.
 
@@ -246,6 +272,17 @@ class ModeleParesseux(ModeleTableau):
         self._f_ligne, self._f_style, self._f_bulle, self._f_cle = ligne, style, bulle, cle
         self._c_lignes: dict = {}
         self._c_styles: dict = {}
+        self._version = 0                 # change à chaque remplissage ou invalidation des cellules
+        self._version_triee = -1          # version déjà triée selon self._tri
+
+    def sort(self, colonne, ordre=Qt.SortOrder.AscendingOrder):
+        """Comme `ModeleTableau.sort`, sans refaire un tri déjà fait : `QTableView.sortByColumn` demande deux fois
+        le même tri (indicateur de l'en-tête, puis appel direct) — 80 000 clés recalculées pour rien."""
+        tri = None if colonne is None or colonne < 0 else (int(colonne), ordre)
+        if tri == self._tri and self._version_triee == self._version:
+            return
+        super().sort(colonne, ordre)
+        self._version_triee = self._version
 
     # -- vue « liste de lignes » pour le code qui lit modele.lignes (rare : export, tests)
     class _Lignes:
@@ -308,7 +345,7 @@ class ModeleParesseux(ModeleTableau):
             cles = [cle(x) for x in self.donnees]
         else:
             cles = [cle_de_tri(self._ligne(r)[col]) for r in range(n)]
-        return sorted(range(n), key=cles.__getitem__, reverse=(ordre == Qt.SortOrder.DescendingOrder))
+        return permutation_triee(cles, ordre == Qt.SortOrder.DescendingOrder)
 
     def _reordonner(self, perm):
         self.donnees = [self.donnees[i] for i in perm]
@@ -328,6 +365,8 @@ class ModeleParesseux(ModeleTableau):
             self._c_styles.clear()
         if self._tri is not None and len(self.donnees) > 1:
             self._reordonner(self._permutation())
+        self._version += 1
+        self._version_triee = self._version
         self.endResetModel()
 
     def invalider(self, lignes=True, styles=True):
@@ -335,12 +374,15 @@ class ModeleParesseux(ModeleTableau):
         re-trié si nécessaire ; sélection et défilement conservés."""
         if lignes:
             self._c_lignes.clear()
+            self._version += 1
         if styles:
             self._c_styles.clear()
         if self.donnees:
             self.dataChanged.emit(self.index(0, 0), self.index(len(self.donnees) - 1, len(self.entetes) - 1))
         if self._tri is not None and lignes:
             self._trier_en_place()
+        if lignes:
+            self._version_triee = self._version
 
     def remplir(self, lignes, donnees=None, infobulles=None, styles=None):
         raise TypeError('ModeleParesseux : remplir_objets(donnees)')

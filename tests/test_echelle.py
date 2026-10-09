@@ -203,6 +203,22 @@ def inventaire_x10():
     return inv
 
 
+def _fermer(panneau):
+    """Panneau détruit (et non seulement fermé) : sinon il réagit encore aux gestes des tests suivants (un champ
+    qui perd le focus relit la possession et recalcule 80 000 lignes dans le fil graphique d'un autre test)."""
+    from PyQt6 import sip
+    panneau.close()
+    sip.delete(panneau)
+
+
+def _attendre(app_qt, cond, delai=60):
+    fin = time.time() + delai
+    while not cond() and time.time() < fin:
+        app_qt.processEvents()
+        time.sleep(0.005)
+    return cond()
+
+
 def test_catalogue_a_dix_fois_la_banque(app_qt, inventaire_x10, monkeypatch):
     """Tout sélectionner, trier, filtrer, changer de thème : chaque geste reste court dans le fil graphique."""
     from PyQt6.QtCore import Qt
@@ -244,7 +260,145 @@ def test_catalogue_a_dix_fois_la_banque(app_qt, inventaire_x10, monkeypatch):
     p.recherche.setText('')
     _, dt = chrono(p.reglages_changes)                      # thème : couleurs seulement
     assert dt < 1.0, dt
-    p.close()
+    _fermer(p)
+
+
+def test_chargement_a_dix_fois_la_banque_sans_gel(app_qt, inventaire_x10, monkeypatch):
+    """0.1.5 : chargement réel (fil de fond → fil graphique) de 80 000 lignes, mesuré par un minuteur de 10 ms :
+    aucun silence > 100 ms (budget ×3 pour l'intégration continue).  0.1.4 : 0,5–0,8 s (calculs de fond
+    simultanés au premier dessin des tables, qui reprenait le GIL à chaque rappel Python)."""
+    from PyQt6.QtCore import QTimer
+    from coupole.core import config
+    from coupole.gui import outils
+    from coupole.modules.ohp import inventaire as INV
+    from coupole.modules.ohp.gui import Panneau
+    inv = inventaire_x10
+    for attribut in ('_index_memo', '_cles_memo', '_anom_memo', '_resume_memo'):
+        inv.__dict__.pop(attribut, None)                    # tout recalculer, comme au premier lancement
+    monkeypatch.setitem(config.reglages().valeurs, 'ohp_verifier_nouveautes', False)
+    monkeypatch.setattr(INV.Inventaire, 'charger', classmethod(lambda cls, rafraichir=False: inv))
+    lancees = []
+    init = outils.Tache.__init__
+
+    def compter(self, fonction, *a, **k):
+        lancees.append(getattr(fonction, '__name__', '?'))
+        init(self, fonction, *a, **k)
+    monkeypatch.setattr(outils.Tache, '__init__', compter)
+    p = Panneau()
+    p.resize(1400, 900)
+    p.show()
+    ecarts, dernier = [], [time.perf_counter()]
+
+    def battement():
+        t = time.perf_counter()
+        ecarts.append(t - dernier[0])
+        dernier[0] = t
+    tm = QTimer()
+    tm.timeout.connect(battement)
+    tm.start(10)
+    assert _attendre(app_qt, lambda: p.inv is inv and len(p.ciel.points) > 0 and p.m_anom.rowCount() > 0
+                     and not getattr(p, '_etapes', None) and not any(t.isRunning() for t in list(outils._actives)), 120)
+    fin = time.time() + 0.3
+    while time.time() < fin:
+        app_qt.processEvents()
+        time.sleep(0.005)
+    tm.stop()
+    assert p.m_obj.rowCount() == len(inv.objets())
+    assert max(ecarts) < 0.3, max(ecarts)
+    # carte du ciel, anomalies et possession calculées par le fil de chargement, pas par des fils concurrents
+    apres = lancees[lancees.index('charger_et_preparer') + 1:]
+    assert not {'points_ciel', 'anomalies_de', 'lire'} & set(apres), apres
+    _fermer(p)
+
+
+def test_tri_heure_du_site_et_drapeaux_80000_lignes(app_qt, inventaire_x10, monkeypatch):
+    """0.1.5 : clés entières précalculées au chargement (heure du site, drapeaux), tri numpy : < 150 ms à 80 000
+    lignes (budget ×3) ; 0.1.4 : toutes les cellules de la colonne calculées (~0,5–0,7 s)."""
+    from PyQt6.QtCore import Qt
+    from coupole.core import config
+    from coupole.gui import outils
+    from coupole.modules.ohp.gui import Panneau
+    from coupole.modules.ohp.possession import Possession
+    monkeypatch.setitem(config.reglages().valeurs, 'ohp_verifier_nouveautes', False)
+    p = Panneau()
+    p.resize(1400, 900)
+    p.show()
+    assert _attendre(app_qt, lambda: p.inv is not None, 30)
+    monkeypatch.setattr(outils.Tache, 'start', lambda self: None)
+    inv = inventaire_x10
+    Panneau.preparer_objets(inv)
+    p.possession = Possession.vide()
+    p._inventaire_pret(inv)
+    p.v_obj.selectAll()
+    p._minuteur_choix.stop()
+    p._objets_choisis()
+    app_qt.processEvents()
+    assert p.m_img.rowCount() == len(inv.images)
+    calculees = len(p.m_img._c_lignes)
+    for col in (2, 7, 2, 7, 0, 4, 5, 6, 8):
+        for ordre in (Qt.SortOrder.AscendingOrder, Qt.SortOrder.DescendingOrder):
+            _, dt = chrono(p.v_img.sortByColumn, col, ordre)
+            assert dt < 0.45, (col, ordre, dt)
+    assert len(p.m_img._c_lignes) - calculees < 2000           # aucune colonne calculée en entier pour trier
+    _fermer(p)
+
+
+def test_cles_de_tri_des_images_donnent_l_ordre_des_cellules(app_qt, inventaire, monkeypatch):
+    """Chaque clé rapide de la table des images rend EXACTEMENT l'ordre (stable) de la valeur affichée triée par
+    `cle_de_tri`, sur la banque réelle (dates, heures du site, drapeaux, possession…), croissant et décroissant."""
+    from PyQt6.QtCore import Qt
+    from coupole.core import config
+    from coupole.gui import outils
+    from coupole.gui.modele import cle_de_tri
+    from coupole.modules.ohp.gui import Panneau
+    from coupole.modules.ohp.possession import Possession
+    monkeypatch.setitem(config.reglages().valeurs, 'ohp_verifier_nouveautes', False)
+    p = Panneau()
+    assert _attendre(app_qt, lambda: p.inv is not None, 30)
+    monkeypatch.setattr(outils.Tache, 'start', lambda self: None)
+    imgs = [dict(x) for x in inventaire.images]
+    for k, x in enumerate(imgs):                     # variété : drapeaux « nouveau », image sans site connu
+        if k % 7 == 0:
+            x['nouveau'], x['vu_le'] = True, '2026-0%d-01' % (1 + k % 3)
+        if k % 11 == 0:
+            x['site'] = 'inconnu'
+    inv = type(inventaire).__new__(type(inventaire))
+    inv.__dict__.update({a: v for a, v in inventaire.__dict__.items() if not a.endswith('_memo')})
+    inv.images = imgs
+    Panneau.preparer_objets(inv)
+    statuts = {}
+    for k, x in enumerate(imgs[:3000]):
+        statuts[x['access_url']] = ('ok', 'doublon', 'echec')[k % 3]
+    poss = Possession.vide()
+    monkeypatch.setattr(Possession, 'statut', lambda self, x: statuts.get(x['access_url'], 'absente'))
+    p.possession = poss
+    p._inventaire_pret(inv)
+    p.v_obj.selectAll()
+    p._minuteur_choix.stop()
+    p._objets_choisis()
+    m = p.m_img
+    assert m.rowCount() == len(imgs)
+    for col in (0, 2, 4, 5, 6, 7, 8, 2, 7):
+        for ordre in (Qt.SortOrder.AscendingOrder, Qt.SortOrder.DescendingOrder):
+            avant = list(m.donnees)
+            p.v_img.sortByColumn(col, ordre)
+            attendu = sorted(avant, key=lambda x: cle_de_tri(p._ligne_image(x)[col]),
+                             reverse=ordre == Qt.SortOrder.DescendingOrder)
+            assert [id(x) for x in m.donnees] == [id(x) for x in attendu], (col, ordre)
+    p.v_img.sortByColumn(1, Qt.SortOrder.AscendingOrder)
+    assert [x['t_min'] for x in m.donnees] == sorted(x['t_min'] for x in imgs)
+    _fermer(p)
+
+
+def test_permutation_triee_identique_a_sorted():
+    from coupole.gui.modele import permutation_triee
+    rng = random.Random(3)
+    for cles in ([rng.randint(0, 50) for _ in range(5000)], [rng.choice([0.5, -0.0, 0.0, 2.25, float('inf')])
+                                                               for _ in range(5000)],
+                 [rng.randint(0, 9) for _ in range(500)], [(rng.randint(0, 3), 'a') for _ in range(3000)],
+                 [rng.random() for _ in range(3000)] + [float('nan')], [2 ** 70, 1] * 1000):
+        for dec in (False, True):
+            assert permutation_triee(cles, dec) == sorted(range(len(cles)), key=cles.__getitem__, reverse=dec)
 
 
 

@@ -2,6 +2,26 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.1.5 — 9 octobre 2026
+
+Les deux lenteurs laissées par le second audit (`docs/AUDIT2_2026-10.md`, § 8), mesurées à dix fois la banque
+(80 000 lignes) ; aucun résultat affiché ne change (ordres de tri identiques à la 0.1.4 sur la banque réelle et à
+×10, cellules, anomalies, carte du ciel, lots identiques).
+
+- **Chargement sans gel** : plus long silence du fil graphique pendant le chargement **0,55–0,8 s → 55–66 ms** à
+  80 000 lignes (0,16 s → 40 ms sur la banque). Ce n'était plus un calcul du fil graphique mais la concurrence
+  pour le GIL : carte du ciel, anomalies et possession tournaient dans trois fils en même temps que le premier dessin
+  des tables, et chaque rappel de Qt vers Python attendait le GIL. Ils sont désormais calculés en série par le fil
+  de chargement, avant la remise de l'inventaire ; l'affichage se fait ensuite par étapes courtes ; le chargement
+  part 0,2 s après le premier dessin de la fenêtre (catalogue prêt ~0,2 s plus tard qu'avant).
+- **Tri par l'heure du site et par les drapeaux** : clés entières calculées une fois au chargement (en fond), tri
+  numpy : **0,66–0,78 s → 50–60 ms** à 80 000 lignes ; toutes les colonnes de la table des images ont maintenant une
+  clé rapide (40–80 ms à 80 000 lignes) et le double tri demandé par `QTableView.sortByColumn` n'est plus refait.
+- « Tout sélectionner » sans filtre ne parcourt plus l'inventaire (liste déjà triée reprise telle quelle).
+- Tests : `test_echelle.py` (+4) — chargement réel à 80 000 lignes sans silence > 100 ms (budget ×3), tri des
+  colonnes heure du site / drapeaux < 150 ms (×3), chaque clé rapide égale à l'ordre des cellules sur la banque
+  réelle, tri numpy identique à `sorted`.
+
 ## 0.1.4 — 9 octobre 2026
 
 Second audit de performance, en usage réel et à pleine échelle (`docs/AUDIT2_2026-10.md`) : chaque fonction qui peut
