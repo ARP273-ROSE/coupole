@@ -2,6 +2,60 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.2.0 — 9 octobre 2026
+
+**Nouveau module « Archives des observatoires » : les images publiques des grands observatoires et des sondes,
+actuelles et passées, comme la Banque OHP.**
+
+- **Archives couvertes.** Étape 1 : **MAST** (Hubble, JWST, GALEX) par le service TAP officiel (vue
+  `dbo.obspointing` : filtres, date de publication, investigateur, adresse du produit et de la vignette), **ESO**
+  (TAP ObsCore, produits réduits « Phase 3 »), **IRSA** (Spitzer SEIP, AllWISE, 2MASS, par SIA 2 qui donne
+  l'adresse directe et la taille). Étape 2 : **NOIRLab** (piles et images rééchantillonnées), **Keck/KOA**
+  (poses brutes de NIRC2, OSIRIS, MOSFIRE), **SDSS** (images calibrées u g r i z) ; **Gemini** signalé (compte
+  exigé même pour les données publiques), **SMOKA** signalé (formulaire web seulement). Étape 3 : **Voyager ISS** et
+  **Cassini ISS** par OPUS (nœud Anneaux et Lunes du PDS), **JunoCam** par l'Atlas du PDS Imaging Node. Adresses
+  dans `sources.json` (version 3), modifiables.
+- **Recherche** par nom (SIMBAD puis Sesame) ou coordonnées (degrés ou sexagésimales) et rayon, ou par corps du
+  Système solaire (noms français acceptés : Saturne, Encelade…) ; filtres mission, instrument, filtre, dates ; par
+  défaut **produits finaux seulement** (JWST `_i2d`, Hubble `_drz`/`_drc`, Phase 3, SEIP, Atlas) et **données
+  publiques seulement** ; une observation est gardée si son centre est dans le cercle ou si son empreinte contient
+  la cible ; les plus proches d'abord ; réponse tronquée signalée ; archives interrogées en parallèle, une panne
+  n'arrête pas les autres.
+- **Volume avant téléchargement** : tailles annoncées ou mesurées (requête d'un octet, échantillon par instrument
+  au-delà de 60 fichiers), confirmation au-delà de 2 Go (réglage `archives_seuil_go`) ; débit plafonné (8 Mo/s),
+  deux fichiers à la fois, reprise d'un fichier interrompu ; un serveur qui refuse les requêtes partielles (ESO)
+  est repris depuis le début (`core/reseau.telecharger`).
+- **Préparation** : extension scientifique (SCI) des FITS à extensions, un fichier par détecteur pour les poses à
+  plusieurs détecteurs de l'ESO, WCS (SIP comprise), unité `BUNIT` et constantes photométriques, dates, programme,
+  investigateur ; NaN remplacés par 0 avec un **masque** ; **crédit** de l'archive dans l'en-tête (`CREDIT`) et
+  conditions d'usage dans la fiche ; XISF Float32 (bornes = minimum et maximum des données) ou FITS Float32 ;
+  entiers avec BZERO lus sans projection mémoire.
+- **Formats planétaires** (lecteur maison, sans dépendance) : PDS3 (label attaché ou détaché, pointeurs en
+  enregistrements ou en octets, préfixes de ligne, mise à l'échelle), VICAR, PDS4 ; lignes retournées pour que
+  l'image s'affiche comme dans l'archive. Label PDS3 de Cassini qui place l'image une ligne trop tôt : données lues
+  d'après l'en-tête VICAR.
+- **Rangement** `<sortie>/Archives/<mission>/<cible>/<instrument>/<filtre>/`, base d'état et journal bilingue dans
+  `Archives/_etat` (même logique de partage réseau que la Banque OHP), **possession** (pastilles), `coupole
+  archives bilan`.
+- **Alignement** par l'astrométrie : grille d'une image ou grille optimale, rééchantillonnage bilinéaire,
+  adaptatif ou exact (bibliothèque **reproject**, facultative : `pip install ".[alignement]"`) ou bilinéaire par
+  scipy sans elle ; unités par pixel corrigées du rapport des surfaces de pixel ; recadrage sur le plus grand
+  rectangle commun ; **composition couleur** dans l'ordre des longueurs d'onde (3 filtres : bleu, vert, rouge ;
+  davantage : palette chromatique), aperçu PNG, `composition.txt` avec l'expression PixelMath.
+- **Interface** : nouveau module dans la barre latérale (onglets Recherche et Alignement, vignette et fiche de
+  l'observation, lien vers la page de l'archive, menu « Ouvrir avec »), info-bulles, aide F1, français et anglais ;
+  **ligne de commande** `coupole archives liste | chercher | estimer | telecharger | preparer | aligner | bilan`.
+- **Méthode et sources** : `docs/archives_methode.md` (pratiques publiées pour retraiter les données de JWST et
+  Hubble, documentations des archives, de Siril et de reproject, mesures sur les services réels).
+- **Essais réels** (fichiers effacés ensuite) : JWST MIRI `i2d` F770W et F1130W des Piliers de la Création (153 Mo
+  chacun), Hubble WFC3/IR `drz` F110W et F160W, ESO APEX/LABOCA et HAWK-I (4 détecteurs), Spitzer MIPS, AllWISE
+  W1–W4, 2MASS J, NOIRLab, SDSS g r i de M 51 (composition couleur), Keck NIRC2, Voyager 1 (Io, `GEOMED`), Cassini
+  (Encelade, `CALIB`), JunoCam (RDR) ; alignements MIRI seul, MIRI + WFC3/IR, SDSS gri.
+- **Tests** : `tests/test_archives.py` (réponses simulées de chaque archive, géométrie, coordonnées, extraction,
+  PDS3/VICAR/PDS4, alignement d'étoiles synthétiques avec et sans reproject, conservation du flux, téléchargement
+  sur serveur local avec coupure, reprise et serveur sans requêtes partielles, 50 000 observations : filtres, tri,
+  possession, tableau de l'interface) ; essai réseau `tests/test_archives_reseau.py` (`COUPOLE_TEST_RESEAU=1`).
+
 ## 0.1.12 — 9 octobre 2026
 
 **« Ouvrir avec → PixInsight » ouvre vraiment l'image, et plus aucun lancement n'est silencieux.** Retour

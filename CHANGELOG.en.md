@@ -2,6 +2,54 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.2.0 — 9 October 2026
+
+**New « Observatory archives » module: public images from major observatories and space probes, current and past,
+like the OHP bank.**
+
+- **Archives covered.** Stage 1: **MAST** (Hubble, JWST, GALEX) through the official TAP service (`dbo.obspointing`
+  view: filters, release date, investigator, product and thumbnail address), **ESO** (TAP ObsCore, reduced « Phase
+  3 » products), **IRSA** (Spitzer SEIP, AllWISE, 2MASS, through SIA 2 which gives the direct address and size).
+  Stage 2: **NOIRLab** (stacks and resampled images), **Keck/KOA** (raw NIRC2, OSIRIS, MOSFIRE frames), **SDSS**
+  (calibrated u g r i z images); **Gemini** reported (account required even for public data), **SMOKA** reported
+  (web form only). Stage 3: **Voyager ISS** and **Cassini ISS** through OPUS (PDS Ring-Moon Systems Node),
+  **JunoCam** through the PDS Imaging Node Atlas. Addresses in `sources.json` (version 3), editable.
+- **Search** by name (SIMBAD then Sesame) or coordinates (degrees or sexagesimal) and radius, or by Solar System
+  body (French names accepted); mission, instrument, filter and date filters; by default **final products only**
+  (JWST `_i2d`, Hubble `_drz`/`_drc`, Phase 3, SEIP, Atlas) and **public data only**; an observation is kept if its
+  centre lies in the circle or its footprint contains the target; closest first; truncated answers reported;
+  archives queried in parallel, one failure never stops the others.
+- **Volume before downloading**: announced or measured sizes (one-byte request, sample per instrument beyond 60
+  files), confirmation beyond 2 GB (`archives_seuil_go` setting); capped rate (8 MB/s), two files at a time, an
+  interrupted file resumes; a server refusing partial requests (ESO) restarts from the beginning
+  (`core/reseau.telecharger`).
+- **Preparation**: science (SCI) extension of multi-extension FITS, one file per detector for ESO multi-detector
+  exposures, WCS (SIP included), `BUNIT` unit and photometric constants, dates, programme, investigator; NaN set to
+  0 with a **mask**; archive **credit** in the header (`CREDIT`) and usage terms in the record; XISF Float32 (bounds
+  = data minimum and maximum) or FITS Float32; integers with BZERO read without memory mapping.
+- **Planetary formats** (home-made reader, no dependency): PDS3 (attached or detached label, record or byte
+  pointers, line prefixes, scaling), VICAR, PDS4; rows flipped so the image shows as in the archive. Cassini PDS3
+  label placing the image one line too early: data read from the VICAR header.
+- **Filing** `<output>/Archives/<mission>/<target>/<instrument>/<filter>/`, state database and bilingual log in
+  `Archives/_etat` (same network-share logic as the OHP bank), **ownership** badges, `coupole archives status`.
+- **Alignment** by astrometry: grid of one image or optimal grid, bilinear, adaptive or exact resampling (optional
+  **reproject** library: `pip install ".[alignement]"`) or bilinear by scipy without it; per-pixel units corrected
+  for the pixel-area ratio; crop to the largest common rectangle; **colour composition** in wavelength order (3
+  filters: blue, green, red; more: chromatic palette), PNG preview, `composition.txt` with the PixelMath expression.
+- **Interface**: new module in the sidebar (Search and Alignment tabs, thumbnail and observation record, link to the
+  archive page, « Open with » menu), tooltips, F1 help, French and English; **command line** `coupole archives list
+  | search | estimate | download | prepare | align | status`.
+- **Method and sources**: `docs/archives_methode.md` (published practices for reprocessing JWST and Hubble data,
+  archive, Siril and reproject documentation, measurements on the real services).
+- **Real tests** (files deleted afterwards): JWST MIRI `i2d` F770W and F1130W of the Pillars of Creation (153 MB
+  each), Hubble WFC3/IR `drz` F110W and F160W, ESO APEX/LABOCA and HAWK-I (4 detectors), Spitzer MIPS, AllWISE
+  W1–W4, 2MASS J, NOIRLab, SDSS g r i of M 51 (colour composite), Keck NIRC2, Voyager 1 (Io, `GEOMED`), Cassini
+  (Enceladus, `CALIB`), JunoCam (RDR); alignments MIRI only, MIRI + WFC3/IR, SDSS gri.
+- **Tests**: `tests/test_archives.py` (simulated answers of every archive, geometry, coordinates, extraction,
+  PDS3/VICAR/PDS4, alignment of synthetic stars with and without reproject, flux conservation, download from a
+  local server with interruption, resume and a server without partial requests, 50,000 observations: filters, sort,
+  ownership, interface table); network test `tests/test_archives_reseau.py` (`COUPOLE_TEST_RESEAU=1`).
+
 ## 0.1.12 — 9 October 2026
 
 **« Open with → PixInsight » really opens the image, and no launch is silent any more.** User feedback (Manjaro/KDE,

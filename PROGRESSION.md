@@ -646,3 +646,57 @@ n'en gardait aucune trace. Diagnostic sur le poste : `PixInsight.sh` (eval, guil
 - Non vérifiable ici : PixInsight réel (logiciel commercial, absent du serveur de développement) — le comportement
   du script et de `-n` vient de l'essai sur le poste de l'utilisateur ; macOS et Windows : commandes d'après les
   sources citées, non essayées avec PixInsight.
+
+## 2026-10-09 — version 0.2.0 : module « Archives des observatoires »
+Demande : lister, rechercher, télécharger et préparer les images publiques des grands observatoires, actuelles et
+passées, comme la Banque OHP ; méthode tirée des pratiques publiées (fils et tutoriels JWST/Hubble), sources citées.
+- **Méthode et sources** : `docs/archives_methode.md`. Le fil Cloudy Nights « Working with JWST data from STScI /
+  MAST » n'a pas pu être lu (403 aux lectures automatiques, aucun instantané sur web.archive.org) ; synthèse faite
+  à partir de Galactic Hunter, Astronomy, Sky at Night Magazine, d'un tutoriel JWST, de l'aide du Hubble Legacy
+  Archive et du HST Data Handbook, des documentations de Siril et de reproject, de Rector et al. 2007.
+- **Services vérifiés sur place** (9 octobre 2026) : MAST TAP `ivoa.obscore` sans filtre ni date de publication →
+  vue `dbo.obspointing` ; `CONTAINS(POINT, CIRCLE)` → 504 après 60 s, boîte `s_ra`/`s_dec` + `ORDER BY` distance
+  → 1–2 s ; API Mashup `Mast.Caom.Cone` 74 s sur M 42 (écartée). ESO `tap_obs` : Phase 3 seulement,
+  `INTERSECTS` 0,4–5 s, `access_estsize` en ko, fichier sans requêtes partielles (416). IRSA : TAP → DataLink (une
+  requête par image) ; SIA 2 donne l'adresse et la taille → retenu. NOIRLab `adv_search` ; KOA TAP (poses brutes
+  seulement) ; SkyServer DR18 ; **Gemini : « Login Required » (compte exigé)** ; **SMOKA : formulaire web** ; OPUS
+  (`data.json`, `files/<id>.json`) ; PDS Imaging Atlas (Solr) pour JunoCam.
+- **Module** `coupole/modules/archives/` : `services/` (base : requête, observation, VOTable/CSV, géométrie,
+  politesse ; mast, eso, irsa, sol (noirlab, koa, sdss, gemini, smoka), planetes (opus, pds)), `recherche.py`
+  (résolution du nom, archives en parallèle, filtres communs, tri, réponse tronquée signalée), `telechargement.py`
+  (estimation, seuil, pilote, état `Archives/_etat/etat.sqlite` avec `BasePartagee`, journal bilingue,
+  possession), `extraction.py` (SCI, détecteurs multiples, WCS, BUNIT, NaN + masque, crédit, XISF/FITS),
+  `pds.py` (PDS3, VICAR, PDS4 maison), `alignement.py` (reproject facultatif ou scipy, unités par pixel, plus
+  grand rectangle commun, ordre chromatique, PNG, PixelMath), `gui.py`, `cli.py`, `textes.py`.
+- **Cœur** : `reseau.telecharger` recommence sans en-tête Range quand le serveur répond 416 dès l'octet 0 (ESO) ;
+  `sources.json` version 3 (26 adresses d'archives, domaines ajoutés à la liste blanche) ; réglages
+  `archives_dossier`, `archives_seuil_go`, `archives_debit_mo_s`, `archives_format`.
+- **Défauts trouvés et corrigés pendant les essais réels** : label PDS3 des `CALIB` de Cassini qui place l'image
+  une ligne trop tôt (valeurs de 1e38 : données lues d'après l'en-tête VICAR) ; poses brutes Keck avec BZERO
+  (projection mémoire refusée → relecture sans) ; recadrage commun réduit à une bande par les colonnes mortes des
+  mosaïques MIRI (rectangle calculé sur des blocs couverts à 90 %) ; identifiants PixelMath invalides (« - ») ;
+  limite de lignes de MAST appliquée avant le tri (tri par distance côté serveur) ; mots-clés XISF relus avec un
+  « / » final (lecture des valeurs réécrite) ; `reproject_exact` imprécis sous 0,05″ (méthode adaptative à la
+  place).
+- **Essais réels** (dossier temporaire du conteneur, effacé) : JWST MIRI `i2d` F770W + F1130W des Piliers (2 × 153
+  Mo), WFC3/IR `drz` F160W + F110W (36,7 et 12,6 Mo) → 355,8 Mo en 12 s ; ESO APEX/LABOCA (14 Mo) et HAWK-I J (69 Mo,
+  4 détecteurs) ; Spitzer MIPS 24 µm, AllWISE W1–W4 (274 Mo, IRSA à ~1 Mo/s), 2MASS J ; NOIRLab (0,3 Mo) ; SDSS g r i
+  de M 51 (composition couleur réussie) ; Keck NIRC2 (4,2 Mo) ; Voyager 1 Io `GEOMED` (2 Mo), Cassini Encelade
+  `CALIB` (4,2 Mo), JunoCam RDR (16,9 Mo). Alignements : MIRI seul (grille optimale, 2 346 × 2 548, 33 s en
+  « exacte »), MIRI + WFC3/IR (grille de F160W), SDSS gri (2 044 × 1 476). Contrôle d'alignement sur les étoiles
+  détectées (sommaire) : écart médian ≈ 1 px WFC3/IR entre F110W et F160W, ≈ 2,6 px (0,34″) avec MIRI : documenté
+  (précision = celle des astrométries des archives).
+- **Tests** : `tests/test_archives.py` (36), `tests/test_archives_reseau.py` (2, `COUPOLE_TEST_RESEAU=1` : réussi),
+  `test_dialogues_fichiers.py` (dialogues du module). Budgets : 50 000 observations filtrées et triées < 2 s,
+  possession de 50 000 lignes < 2 s, tableau de l'interface rempli et trié sur chaque colonne < 2 s.
+  Mise à l'échelle 1,5 et 2 (`QT_SCALE_FACTOR`) : test_adaptatif, test_interface, test_archives,
+  test_gui_robustesse, test_echelle verts fichier par fichier. Constat ancien (présent avant 0.2.0, vérifié sur
+  `HEAD`) : `test_interface.py::test_fiche_en_ligne_vers_cosmologie` échoue si `test_adaptatif.py` tourne juste
+  avant dans le même processus (ordre de la suite complète : vert).
+- Manuels FR/EN : nouveau chapitre « Archives des observatoires » (tableau des archives, chercher, télécharger et
+  préparer, formats planétaires, aligner et colorer, ligne de commande, crédits), tableaux des commandes
+  régénérés, captures refaites (FR/EN), 50 et 49 pages. README (module, exemples, crédits), CHANGELOG FR puis EN,
+  CONTRIBUTING (ajouter une archive), `pyproject` (extra `alignement` = reproject, ajouté à `test`).
+- Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 548 réussis,
+  17 sautés, code 0 (reproject 0.21.0) ; python:3.10-slim 548 / 17, code 0 (reproject 0.14.1)**.
+- **Aucun tag posé.**

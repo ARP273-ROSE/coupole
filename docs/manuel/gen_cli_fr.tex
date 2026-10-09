@@ -253,6 +253,117 @@ DOSSIER & dossier de sortie (ou un lot)\\
 \par\medskip
 \begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
 \toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives liste (list)\newline\normalfont\small liste les archives connues (étape, missions, état)}\\
+\midrule
+--json & sortie JSON (pour les scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives chercher (search)\newline\normalfont\small Cherche dans MAST, l'ESO et IRSA (par défaut) les produits finaux publics autour d'un objet ; --archive opus ou pds avec --corps pour les sondes planétaires.}\\
+\midrule
+OBJET & objet (nom ou coordonnées)\\
+--rayon,\allowbreak{} --radius ARCMIN & rayon de recherche en minutes d'arc (défaut : 3)\\
+--archive A & archive à interroger (répétable) : mast, eso, irsa, noirlab, koa, sdss, goa, smoka, opus, pds\\
+--mission M & mission (répétable) : JWST, HST, GALEX, ESO, Spitzer, WISE, 2MASS, NOIRLab, Keck, SDSS, Voyager, Cassini, Juno\\
+--instrument I & instrument (morceau du nom, répétable)\\
+--filtre,\allowbreak{} --filter F & filtre (nom exact, répétable)\\
+--debut,\allowbreak{} --from AAAA-MM-JJ & observations à partir de cette date\\
+--fin,\allowbreak{} --to AAAA-MM-JJ & observations jusqu'à cette date\\
+--tous-niveaux,\allowbreak{} --all-levels & aussi les poses calibrées une à une et les données brutes\\
+--non-publiques,\allowbreak{} --proprietary & aussi les données encore réservées (pour information : non téléchargeables)\\
+--corps,\allowbreak{} --body CORPS & corps du Système solaire (Voyager, Cassini, Juno)\\
+--limite,\allowbreak{} --limit N & nombre maximal de lignes par archive (défaut : 2000)\\
+--id ID & garder seulement cet identifiant (répétable)\\
+--json & sortie JSON (pour les scripts)\\
+--csv FICHIER & écrit aussi les résultats dans ce fichier CSV\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives estimer (estimate)\newline\normalfont\small Comme « chercher », puis additionne les tailles (annoncées ou mesurées) sans rien télécharger.}\\
+\midrule
+OBJET & objet (nom ou coordonnées)\\
+--rayon,\allowbreak{} --radius ARCMIN & rayon de recherche en minutes d'arc (défaut : 3)\\
+--archive A & archive à interroger (répétable) : mast, eso, irsa, noirlab, koa, sdss, goa, smoka, opus, pds\\
+--mission M & mission (répétable) : JWST, HST, GALEX, ESO, Spitzer, WISE, 2MASS, NOIRLab, Keck, SDSS, Voyager, Cassini, Juno\\
+--instrument I & instrument (morceau du nom, répétable)\\
+--filtre,\allowbreak{} --filter F & filtre (nom exact, répétable)\\
+--debut,\allowbreak{} --from AAAA-MM-JJ & observations à partir de cette date\\
+--fin,\allowbreak{} --to AAAA-MM-JJ & observations jusqu'à cette date\\
+--tous-niveaux,\allowbreak{} --all-levels & aussi les poses calibrées une à une et les données brutes\\
+--non-publiques,\allowbreak{} --proprietary & aussi les données encore réservées (pour information : non téléchargeables)\\
+--corps,\allowbreak{} --body CORPS & corps du Système solaire (Voyager, Cassini, Juno)\\
+--limite,\allowbreak{} --limit N & nombre maximal de lignes par archive (défaut : 2000)\\
+--id ID & garder seulement cet identifiant (répétable)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives telecharger (download)\newline\normalfont\small Comme « chercher », puis télécharge (confirmation au-delà du seuil : --oui), extrait l'image scientifique et la range dans <dest>/Archives.}\\
+\midrule
+OBJET & objet (nom ou coordonnées)\\
+--rayon,\allowbreak{} --radius ARCMIN & rayon de recherche en minutes d'arc (défaut : 3)\\
+--archive A & archive à interroger (répétable) : mast, eso, irsa, noirlab, koa, sdss, goa, smoka, opus, pds\\
+--mission M & mission (répétable) : JWST, HST, GALEX, ESO, Spitzer, WISE, 2MASS, NOIRLab, Keck, SDSS, Voyager, Cassini, Juno\\
+--instrument I & instrument (morceau du nom, répétable)\\
+--filtre,\allowbreak{} --filter F & filtre (nom exact, répétable)\\
+--debut,\allowbreak{} --from AAAA-MM-JJ & observations à partir de cette date\\
+--fin,\allowbreak{} --to AAAA-MM-JJ & observations jusqu'à cette date\\
+--tous-niveaux,\allowbreak{} --all-levels & aussi les poses calibrées une à une et les données brutes\\
+--non-publiques,\allowbreak{} --proprietary & aussi les données encore réservées (pour information : non téléchargeables)\\
+--corps,\allowbreak{} --body CORPS & corps du Système solaire (Voyager, Cassini, Juno)\\
+--limite,\allowbreak{} --limit N & nombre maximal de lignes par archive (défaut : 2000)\\
+--id ID & garder seulement cet identifiant (répétable)\\
+--dest DOSSIER & dossier de sortie (défaut : celui des Préférences)\\
+--format \{xisf,\allowbreak{}fits\} & format des images préparées (défaut : xisf)\\
+--sans-original,\allowbreak{} --no-original & efface le fichier d'origine une fois l'image préparée\\
+--debit,\allowbreak{} --rate MO/S & plafond de débit en Mo/s (défaut : réglage, 8)\\
+--paralleles,\allowbreak{} --parallel N & téléchargements simultanés (défaut : 2, au plus 6)\\
+--max N & au plus N fichiers (les plus proches)\\
+--oui,\allowbreak{} --yes & confirme un téléchargement au-delà du seuil\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives preparer (prepare)\newline\normalfont\small Extrait l'image scientifique d'un FITS à extensions, ou convertit un produit planétaire, en XISF ou FITS Float32 à côté du fichier.}\\
+\midrule
+FICHIER & fichiers à préparer\\
+--format \{xisf,\allowbreak{}fits\} & format des images préparées (défaut : xisf)\\
+--etiquette,\allowbreak{} --label FICHIER & label PDS3 détaché (.LBL) ou PDS4 (.xml)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives aligner (align)\newline\normalfont\small Rééchantillonne les images (WCS) sur la grille de l'une d'elles ou une grille optimale ; écrit les fichiers alignés, le masque commun, l'aperçu couleur et composition.txt.}\\
+\midrule
+FICHIER & images préparées (FITS ou XISF avec WCS)\\
+--dest DOSSIER & dossier des fichiers alignés\\
+--reference N & indice de l'image de référence (défaut : 0, la première)\\
+--optimale,\allowbreak{} --optimal & grille optimale couvrant toutes les images\\
+--methode,\allowbreak{} --method \{bilineaire,\allowbreak{}adaptative,\allowbreak{}exacte,\allowbreak{}proche\} & rééchantillonnage : bilineaire, adaptative, exacte (reproject), proche\\
+--echelle,\allowbreak{} --scale X & facteur de taille des pixels de sortie (défaut : 1)\\
+--sans-recadrage,\allowbreak{} --no-crop & ne recadre pas sur la zone commune\\
+--format \{xisf,\allowbreak{}fits\} & format des images préparées (défaut : xisf)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives bilan (status)\newline\normalfont\small ce qui est déjà téléchargé et préparé}\\
+\midrule
+--dest DOSSIER & dossier de sortie (défaut : celui des Préférences)\\
+--json & sortie JSON (pour les scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole qualite\newline\normalfont\small Facultatif : fond, bruit, FWHM et ellipticité (carte 3×3), gradient du fond, saturation, traînées, échantillonnage}\\
 \midrule
 DOSSIER & dossier de lots (ou un fichier image)\\

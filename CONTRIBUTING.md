@@ -121,6 +121,7 @@ def enregistrer(p):                          # p : sous-parseur argparse « coup
 | `coupole.core.donnees` | lecture générique (images, spectres, séries, tables) |
 | `coupole.core.astap` | détection et lancement d'ASTAP |
 | `coupole.core.rapports` | rapports d'incident (avec consentement) |
+| `coupole.modules.archives.services` | ajouter une archive : une classe `Archive` (`chercher(requete)` rend des observations), une ligne dans `services/__init__.py`, ses adresses dans `sources.json` (voir `docs/archives_methode.md`) |
 
 ## Ajouter un format de données
 
