@@ -2,6 +2,28 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.1.7 — 9 October 2026
+
+**Fix for an intermittent crash** (the application stopped abruptly, about one time in five in the most exposed
+test series, apparently never at the same place).
+
+- **Cause**: Python's garbage collector, which frees objects linked by circular references, ran in whichever thread
+  happened to be allocating memory — often a worker thread (inventory loading, probes, map tiles). A closed window
+  held only by such circular references was then destroyed **by that worker thread**, while the interface thread
+  was still serving the timers of its widgets: a timer of the OHP bank panel read a field that had already been
+  destroyed (“wrapped C/C++ object of type QLineEdit has been deleted”), and PyQt6 then stops the process.
+- **Fix**: automatic collection is replaced by a collection at a fixed rate (every 100 ms) in the interface thread
+  (`coupole/gui/fil_graphique.py`); every Qt object is now destroyed in that thread. Full collections are bounded (at
+  most one every 10 s and 2 % of the time) so that the interface never freezes.
+- Closed OHP bank panel: its pending display steps and timers are stopped. Deferred saving of the settings: an
+  unexpected error is logged, never fatal.
+- **Permanent guard in the tests**: a test fails if a display method is called outside the interface thread, if Qt
+  reports an object handled from another thread, or if the garbage collector runs outside the interface thread
+  (`COUPOLE_GARDE_FIL=1` also enables it in the application).
+- Tests: `test_fil_graphique.py` (+6), which reproduce the exact order of the crash (closed window, then a worker
+  thread allocating) and fail on 0.1.6. Budget of the loading test at ten times the bank raised to 1.2 s on
+  continuous integration (×3 the slowest measurement seen: 0.39 s on macOS); 0.3 s locally.
+
 ## 0.1.6 — 9 October 2026
 
 **Settings kept from one session to the next**: everything set on screen and every typed path comes back at the next

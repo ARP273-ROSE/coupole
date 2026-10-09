@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import sys
 import time
 
@@ -41,7 +42,11 @@ def main() -> int:
             app._mutex_installeur = ctypes.windll.kernel32.CreateMutexW(None, False, 'CoupoleEnCours')
         except Exception:
             pass
-    from . import theme
+    from . import fil_graphique, theme
+    # objets Qt détruits dans le fil graphique seulement (ramasse-miettes cyclique de Python, 0.1.7)
+    fil_graphique.installer_ramasse_miettes(app)
+    if os.environ.get('COUPOLE_GARDE_FIL'):
+        fil_graphique.installer_garde()
     theme.appliquer(app)
     from .dialogues import demander_consentement_si_besoin, verifier_maj
     from .fenetre import FenetrePrincipale

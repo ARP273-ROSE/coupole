@@ -306,7 +306,12 @@ def test_chargement_a_dix_fois_la_banque_sans_gel(app_qt, inventaire_x10, monkey
         time.sleep(0.005)
     tm.stop()
     assert p.m_obj.rowCount() == len(inv.objets())
-    assert max(ecarts) < 0.3, max(ecarts)
+    # Plus long silence du fil graphique : 0,06 s en local ; 0,39 s mesuré une fois sur un serveur macOS 3.10 de
+    # l'intégration continue (machines partagées).  Budget comme les autres tests d'échelle : ×3 la mesure CI la
+    # plus lente observée, soit 1,2 s sur la CI (variable CI posée par GitHub Actions).  En local le budget reste
+    # 0,3 s : c'est lui qui repère la régression de la 0.1.4 (0,5–0,8 s), qu'un budget de 1,2 s laisserait passer.
+    budget = 1.2 if os.environ.get('CI') else 0.3
+    assert max(ecarts) < budget, (max(ecarts), budget)
     # carte du ciel, anomalies et possession calculées par le fil de chargement, pas par des fils concurrents
     apres = lancees[lancees.index('charger_et_preparer') + 1:]
     assert not {'points_ciel', 'anomalies_de', 'lire'} & set(apres), apres
