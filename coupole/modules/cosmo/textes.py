@@ -1,6 +1,17 @@
 """Textes du module « Cosmologie » (FR/EN).  Explications reprises du calculateur cosmologie-redshift."""
 
 TEXTES = {
+    'cosmo_disposition': {'fr': 'Disposition', 'en': 'Layout'},
+    'cosmo_disposition_aide': {'fr': "Tableau et courbes : automatique (côte à côte à partir de 1 550 px de large, "
+                                     "l'un sous l'autre sous 1 450 px), toujours côte à côte, ou toujours empilés. "
+                                     "Gardé d'une fois à l'autre, avec la position du séparateur de chaque disposition.",
+                               'en': 'Table and curves: automatic (side by side from 1,550 px wide, stacked below 1,450 '
+                                     'px), always side by side, or always stacked. Kept from one session to the next, '
+                                     'with the splitter position of each layout.'},
+    'cosmo_disposition_auto': {'fr': 'automatique', 'en': 'automatic'},
+    'cosmo_disposition_cote': {'fr': 'côte à côte', 'en': 'side by side'},
+    'cosmo_disposition_empile': {'fr': 'empilée', 'en': 'stacked'},
+    'menu_cosmo_disposition': {'fr': 'Disposition de la Cosmologie', 'en': 'Cosmology layout'},
     # ------------------------------------------------------------ modèles et réglages
     'cosmo_modele': {'fr': 'Paramètres cosmologiques', 'en': 'Cosmological parameters'},
     'cosmo_modele_aide': {'fr': "Jeu de paramètres du modèle ΛCDM. Planck 2018 est la référence actuelle ; les autres "
@@ -13,7 +24,7 @@ TEXTES = {
     'cosmo_mod_simple': {'fr': 'ΛCDM de manuel (H₀ = 70, Ωm = 0,3, sans rayonnement)',
                          'en': 'Textbook ΛCDM (H₀ = 70, Ωm = 0.3, no radiation)'},
     'cosmo_mod_perso': {'fr': 'Personnalisé (rayonnement de Planck 2018)', 'en': 'Custom (Planck 2018 radiation)'},
-    'cosmo_h0': {'fr': 'H₀ (km/s/Mpc)', 'en': 'H₀ (km/s/Mpc)'},
+    'cosmo_h0': {'fr': 'H₀ (km s⁻¹ Mpc⁻¹)', 'en': 'H₀ (km s⁻¹ Mpc⁻¹)'},
     'cosmo_h0_aide': {'fr': 'Constante de Hubble actuelle. Planck 2018 : 67,66 ; SH0ES (céphéides et supernovæ) : '
                             '73,04. Modèle « Personnalisé » seulement.',
                       'en': 'Present-day Hubble constant. Planck 2018: 67.66; SH0ES (Cepheids and supernovae): 73.04. '
@@ -35,9 +46,9 @@ TEXTES = {
                      'en': 'Accepted ranges: H₀ from {h0a} to {h0b}; Ωm from {oma} to {omb}; Ωk from {oka} to {okb} '
                            '(Planck 2018: from {okpa} to {okpb}, already 25 times its uncertainty). An out-of-range '
                            'value is refused with an explanation, never silently corrected.'},
-    'cosmo_params': {'fr': 'H₀ = {h0} km/s/Mpc · Ωm = {om} (dont Ων = {onu}) · ΩΛ = {ode} · Ωk = {ok} · Ωγ = {og} · '
+    'cosmo_params': {'fr': 'H₀ = {h0} km s⁻¹ Mpc⁻¹ · Ωm = {om} (dont Ων = {onu}) · ΩΛ = {ode} · Ωk = {ok} · Ωγ = {og} · '
                            'T₀ = {t} K · Neff = {neff} · Σmν = {mnu} eV',
-                     'en': 'H₀ = {h0} km/s/Mpc · Ωm = {om} (incl. Ων = {onu}) · ΩΛ = {ode} · Ωk = {ok} · Ωγ = {og} · '
+                     'en': 'H₀ = {h0} km s⁻¹ Mpc⁻¹ · Ωm = {om} (incl. Ων = {onu}) · ΩΛ = {ode} · Ωk = {ok} · Ωγ = {og} · '
                            'T₀ = {t} K · Neff = {neff} · Σmν = {mnu} eV'},
     'cosmo_shoes': {'fr': 'Comparer avec SH0ES (H₀ = 73,04)', 'en': 'Compare with SH0ES (H₀ = 73.04)'},
     'cosmo_echelle': {'fr': 'Distances', 'en': 'Distances'},
@@ -241,8 +252,8 @@ TEXTES = {
     'cosmo_u_gyr': {'fr': "milliards d'années", 'en': 'billion years'},
     'cosmo_u_myr': {'fr': "millions d'années", 'en': 'million years'},
     'cosmo_u_kyr': {'fr': 'mille ans', 'en': 'thousand years'},
-    'cosmo_u_kms': {'fr': 'km/s', 'en': 'km/s'},
-    'cosmo_u_kms_mpc': {'fr': 'km/s/Mpc', 'en': 'km/s/Mpc'},
+    'cosmo_u_kms': {'fr': 'km s⁻¹', 'en': 'km s⁻¹'},
+    'cosmo_u_kms_mpc': {'fr': 'km s⁻¹ Mpc⁻¹', 'en': 'km s⁻¹ Mpc⁻¹'},
     'cosmo_u_mag': {'fr': 'mag', 'en': 'mag'},
     'cosmo_u_kpc_arcsec': {'fr': 'kpc par seconde d\'arc', 'en': 'kpc per arcsecond'},
     'cosmo_u_pc_arcsec': {'fr': 'pc par seconde d\'arc', 'en': 'pc per arcsecond'},
@@ -252,10 +263,10 @@ TEXTES = {
     'cosmo_u_kal': {'fr': 'k al', 'en': 'kly'},
     'cosmo_u_c': {'fr': 'c', 'en': 'c'},
     # avertissements et erreurs
-    'cosmo_av_proche': {'fr': "z < 0,03 : à cette distance, la vitesse propre de l'objet (quelques centaines de km/s "
+    'cosmo_av_proche': {'fr': "z < 0,03 : à cette distance, la vitesse propre de l'objet (quelques centaines de km s⁻¹ "
                               "dans son groupe ou son amas) pèse autant que l'expansion : la distance tirée de z est "
                               "indicative ; préférez une mesure directe (céphéides, TRGB…).",
-                        'en': "z < 0.03: at this distance the object's peculiar velocity (a few hundred km/s within "
+                        'en': "z < 0.03: at this distance the object's peculiar velocity (a few hundred km s⁻¹ within "
                               'its group or cluster) weighs as much as the expansion: the distance from z is only '
                               'indicative; prefer a direct measurement (Cepheids, TRGB…).'},
     'cosmo_av_opaque': {'fr': "z > 1089,8 : avant la recombinaison, l'univers est opaque ; aucun objet n'est "
@@ -274,8 +285,8 @@ TEXTES = {
     'cosmo_err_modele': {'fr': 'Modèle inconnu : {modele}.', 'en': 'Unknown model: {modele}.'},
     'cosmo_err_ok': {'fr': 'Ωk doit rester entre {mini} et {maxi} pour ce modèle.',
                      'en': 'Ωk must stay between {mini} and {maxi} for this model.'},
-    'cosmo_err_h0': {'fr': 'H₀ doit rester entre {mini} et {maxi} km/s/Mpc.',
-                     'en': 'H₀ must stay between {mini} and {maxi} km/s/Mpc.'},
+    'cosmo_err_h0': {'fr': 'H₀ doit rester entre {mini} et {maxi} km s⁻¹ Mpc⁻¹.',
+                     'en': 'H₀ must stay between {mini} and {maxi} km s⁻¹ Mpc⁻¹.'},
     'cosmo_err_om': {'fr': 'Ωm doit rester entre {mini} et {maxi}.', 'en': 'Ωm must stay between {mini} and {maxi}.'},
     'cosmo_err_parametres': {'fr': 'Paramètres refusés par astropy : {erreur}', 'en': 'Parameters refused by astropy: '
                                                                                      '{erreur}'},
@@ -372,7 +383,7 @@ TEXTES = {
     'cosmo_cli_objet': {'fr': 'nom d\'objet : redshift demandé à SIMBAD', 'en': 'object name: redshift requested from '
                                                                              'SIMBAD'},
     'cosmo_cli_modele': {'fr': 'jeu de paramètres (défaut : planck18)', 'en': 'parameter set (default: planck18)'},
-    'cosmo_cli_h0': {'fr': 'H₀ en km/s/Mpc (modèle perso)', 'en': 'H₀ in km/s/Mpc (custom model)'},
+    'cosmo_cli_h0': {'fr': 'H₀ en km s⁻¹ Mpc⁻¹ (modèle perso)', 'en': 'H₀ in km s⁻¹ Mpc⁻¹ (custom model)'},
     'cosmo_cli_om': {'fr': 'Ωm total (modèle perso)', 'en': 'total Ωm (custom model)'},
     'cosmo_cli_ok': {'fr': 'Ωk, courbure (planck18 ou perso)', 'en': 'Ωk, curvature (planck18 or perso)'},
     'cosmo_cli_shoes': {'fr': 'ajoute la comparaison SH0ES (planck18)', 'en': 'add the SH0ES comparison (planck18)'},

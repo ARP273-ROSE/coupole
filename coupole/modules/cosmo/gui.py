@@ -4,7 +4,7 @@ from __future__ import annotations
 import math
 import os
 
-from PyQt6.QtCore import QEvent, QLocale, Qt
+from PyQt6.QtCore import QEvent, QLocale, Qt, pyqtSignal
 from PyQt6.QtGui import QPainter
 from PyQt6.QtWidgets import (QDoubleSpinBox, QGroupBox, QHBoxLayout, QLabel, QMessageBox, QScrollArea,
                              QSlider, QSplitter, QStyle, QStyleOptionSlider, QVBoxLayout, QWidget)
@@ -33,7 +33,13 @@ def _calcul_complet(z, modele, H0, Om, Ok, shoes, avec_courbes):
     return d, c
 
 
-LARGEUR_COTE_A_COTE = 1500      # pixels logiques : en dessous, les courbes passent sous le tableau
+# Disposition automatique, avec hystérésis (pas de bascule incessante pendant qu'on redimensionne) : côte à côte à
+# partir de 1550 px de large, retour à l'empilement sous 1450 px ; au premier affichage, seuil de 1500 px.
+LARGEUR_COTE_A_COTE = 1500
+LARGEUR_VERS_COTE = 1550
+LARGEUR_VERS_EMPILE = 1450
+DISPOSITIONS = ('auto', 'cote', 'empile')
+COURBES_MIN = 300               # hauteur lisible des courbes sous le tableau (pixels logiques)
 
 # Curseur de redshift : échelle logarithmique de 0,001 à 1100, 1000 pas par décade (flèches : 10 pas, soit 2,3 % en z).
 CURSEUR_LOG_MIN = -3.0
@@ -94,8 +100,13 @@ def _paire(cle_libelle, widget):
 
 
 class Panneau(QWidget):
+    disposition_changee = pyqtSignal(str)            # 'auto' | 'cote' | 'empile' (menu Affichage synchronisé)
+
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.disposition_choisie = 'auto'
+        self._tailles = {}                           # orientation → tailles du séparateur choisies à la main
+        self._orientation_auto = None
         self.resultat = None
         self.courbes = None
         self._cle_courbes = None
@@ -186,8 +197,13 @@ class Panneau(QWidget):
         sp.setStretchFactor(0, 3)
         sp.setStretchFactor(1, 2)
         self.splitter = sp
+        sp.splitterMoved.connect(self._separateur_deplace)
         v.addWidget(sp, 1)
         f = Flux()
+        self.l_disposition = liste('cosmo_disposition_aide', [(tr('cosmo_disposition_' + d), d) for d in DISPOSITIONS])
+        self.l_disposition.currentIndexChanged.connect(
+            lambda _i: self.definir_disposition(self.l_disposition.currentData()))
+        f.addWidget(_paire('cosmo_disposition', self.l_disposition))
         f.addWidget(bouton('cosmo_csv_table', self.exporter_tableau))
         f.addWidget(bouton('cosmo_csv_courbes', self.exporter_courbes))
         self.l_credits = QLabel(tr('cosmo_credits'))
@@ -234,6 +250,20 @@ class Panneau(QWidget):
                 pass
         m.suivre(k + 'perso', lambda: list(self._perso), self.h0)
         m.suivre(k + 'z', self.z.text, self.z, self.z.editingFinished)
+        d = e.lire_texte(k + 'disposition', 'auto')
+        self.disposition_choisie = d if d in DISPOSITIONS else 'auto'
+        self.l_disposition.blockSignals(True)
+        self.l_disposition.setCurrentIndex(max(0, self.l_disposition.findData(self.disposition_choisie)))
+        self.l_disposition.blockSignals(False)
+        tailles = e.lire(k + 'separateurs', None, dict) or {}
+        for o in ('cote', 'empile'):
+            t = tailles.get(o)
+            if isinstance(t, list) and len(t) == 2 and all(isinstance(x, int) and not isinstance(x, bool)
+                                                           and 0 < x < 100000 for x in t):
+                self._tailles[o] = t
+        m.suivre(k + 'disposition', lambda: self.disposition_choisie, self.l_disposition,
+                 self.l_disposition.currentIndexChanged)
+        m.suivre(k + 'separateurs', lambda: dict(self._tailles) or None, self.splitter, self.splitter.splitterMoved)
 
     def _retenir_perso(self, *_):
         if self.modele.currentData() == 'perso':
@@ -274,53 +304,124 @@ class Panneau(QWidget):
         zone = self._zone_defilante()
         return zone.viewport().height() if zone is not None else self.height()
 
-    def _disposer(self):
-        """Tableau et courbes côte à côte sur un grand écran, l'un sous l'autre sinon : le tableau garde toutes
-        ses colonnes visibles (jamais de défilement horizontal pour la colonne SH0ES).
+    def definir_disposition(self, mode: str):
+        """Menu Affichage ou liste du module : automatique, côte à côte, empilée (gardée d'une fois à l'autre)."""
+        if mode not in DISPOSITIONS:
+            return
+        changee = mode != self.disposition_choisie
+        self.disposition_choisie = mode
+        if self.l_disposition.currentData() != mode:
+            self.l_disposition.blockSignals(True)
+            self.l_disposition.setCurrentIndex(self.l_disposition.findData(mode))
+            self.l_disposition.blockSignals(False)
+        self._orientation_auto = None
+        self._disposer()
+        if changee:
+            memoire.memoire().signaler()
+            self.disposition_changee.emit(mode)
 
-        Les courbes suivent la fenêtre : leur hauteur minimale est une part de la zone visible, et le tableau ne
-        réclame que la place qui reste (il défile si besoin) — sinon le panneau, plus haut que la zone défilante,
-        gardait sa hauteur de consigne et les courbes restaient figées à leur minimum quand on agrandissait."""
-        voulu = Qt.Orientation.Horizontal if self.width() >= LARGEUR_COTE_A_COTE else Qt.Orientation.Vertical
-        if self.splitter.orientation() != voulu:
+    def orientation_voulue(self):
+        """Orientation du séparateur selon le choix ; en automatique, seuils avec hystérésis."""
+        H, V = Qt.Orientation.Horizontal, Qt.Orientation.Vertical
+        if self.disposition_choisie == 'cote':
+            return H
+        if self.disposition_choisie == 'empile':
+            return V
+        l = self.width()
+        actuelle = self._orientation_auto
+        if actuelle is None:
+            actuelle = H if l >= LARGEUR_COTE_A_COTE else V
+        elif actuelle == H and l < LARGEUR_VERS_EMPILE:
+            actuelle = V
+        elif actuelle == V and l >= LARGEUR_VERS_COTE:
+            actuelle = H
+        self._orientation_auto = actuelle
+        return actuelle
+
+    @staticmethod
+    def _nom(orientation) -> str:
+        return 'cote' if orientation == Qt.Orientation.Horizontal else 'empile'
+
+    def _separateur_deplace(self, *_):
+        """Position choisie à la main, gardée pour CETTE disposition (côte à côte et empilée ont chacune la leur)."""
+        if self.splitter.sizes() and all(x > 0 for x in self.splitter.sizes()):
+            self._tailles[self._nom(self.splitter.orientation())] = list(self.splitter.sizes())
+
+    def largeur_tableau(self) -> int:
+        """Largeur qu'il faut au tableau pour montrer toutes ses colonnes (au contenu) sans ascenseur horizontal."""
+        v = self.v_res
+        cols = sum(v.columnWidth(c) for c in range(self.m_res.columnCount()) if not v.isColumnHidden(c))
+        return cols + 2 * v.frameWidth() + (v.verticalScrollBar().sizeHint().width()
+                                             if v.verticalScrollBar().isVisible() else 0) + 4
+
+    def hauteur_tableau(self) -> int:
+        """Hauteur qu'il faut au tableau pour montrer toutes ses lignes."""
+        v = self.v_res
+        n = self.m_res.rowCount()
+        return v.horizontalHeader().height() + sum(v.rowHeight(r) for r in range(n)) + 2 * v.frameWidth() + 4
+
+    def _disposer(self):
+        """Tableau et courbes côte à côte sur un grand écran, l'un sous l'autre sinon (ou selon le choix du menu
+        Affichage / de la liste « Disposition »).
+
+        Côte à côte : le tableau prend la largeur de ses colonnes (au contenu, jamais tronquées), les courbes tout
+        le reste.  Empilé : le tableau montre toutes ses lignes si la place le permet, sinon la place est partagée
+        en gardant au moins COURBES_MIN pixels aux courbes ; ses colonnes s'élargissent en proportion pour remplir
+        la largeur.  Une position du séparateur choisie à la main est gardée pour chaque disposition."""
+        voulu = self.orientation_voulue()
+        nom = self._nom(voulu)
+        nouvelle = self.splitter.orientation() != voulu
+        if nouvelle:
             self.splitter.setOrientation(voulu)
-            self.splitter.setSizes([3, 2] if voulu == Qt.Orientation.Horizontal else [11, 7])   # tableau d'abord
+        self._ajuster_colonnes(voulu)
         visible = self._hauteur_visible()
         reste = max(0, self.height() - self.splitter.height())      # tout ce qui n'est pas le tableau et les courbes
         disponible = max(200, visible - reste - 8)
-        if voulu == Qt.Orientation.Vertical and self.m_res.rowCount():
-            courbes_min = max(220, int(disponible * 0.55))          # plus de la moitié de la place visible aux courbes
-            h = self.v_res.horizontalHeader().height() + self.v_res.rowHeight(0) * self.m_res.rowCount() + 6
-            self.v_res.setMinimumHeight(max(140, min(h, disponible - courbes_min)))
+        if voulu == Qt.Orientation.Vertical:
+            h = self.hauteur_tableau() if self.m_res.rowCount() else 160
+            if h + COURBES_MIN <= disponible:
+                table = h                                           # toutes les lignes, le reste aux courbes
+            else:
+                table = max(140, min(h, disponible - COURBES_MIN))  # partage, courbes lisibles
+            courbes_min = max(COURBES_MIN, disponible - table) if h + COURBES_MIN <= disponible else COURBES_MIN
+            self.v_res.setMinimumHeight(table)
+            self.v_res.setMinimumWidth(0)
             self.trace.setMinimumHeight(courbes_min)
+            if nouvelle or self._tailles.get(nom) is None:
+                self.splitter.setSizes(self._tailles.get(nom) or [table, max(courbes_min, disponible - table)])
         else:
             courbes_min = max(200, min(disponible, 320))
             self.v_res.setMinimumHeight(0)
             self.trace.setMinimumHeight(courbes_min)
+            if self.m_res.rowCount():
+                largeur = self.largeur_tableau()
+                if nouvelle or self._tailles.get(nom) is None:
+                    total = self.splitter.width() - self.splitter.handleWidth()
+                    defaut = [largeur, total - largeur] if total >= largeur + 300 else [max(200, total - 300), 300]
+                    self.splitter.setSizes(self._tailles.get(nom) or defaut)
         # pour les tests et le diagnostic : ce que la disposition a vu et décidé
         self.disposition = {'visible': visible, 'reste': reste, 'disponible': disponible, 'courbes_min': courbes_min,
-                            'orientation': voulu}
-        self._ajuster_colonnes()
+                            'orientation': voulu, 'choix': self.disposition_choisie}
 
-    def _ajuster_colonnes(self):
-        """Colonnes au contenu, puis la dernière visible s'étire ; si le total dépasse la vue, la colonne
-        « valeur » (la plus longue) est réduite d'abord : tout reste visible sans ascenseur horizontal."""
+    def _ajuster_colonnes(self, orientation=None):
+        """Colonnes au contenu, jamais tronquées, aucune n'est étirée artificiellement ; empilé (le tableau a toute
+        la largeur), l'espace en trop est réparti en proportion de chaque colonne."""
         v = self.v_res
         if self.m_res.rowCount() == 0:
             return
-        v.resizeColumnsToContents()
         en_tete = v.horizontalHeader()
-        visibles = [c for c in range(self.m_res.columnCount()) if not v.isColumnHidden(c)]
-        dispo = v.viewport().width() - 4
-        total = sum(v.columnWidth(c) for c in visibles)
-        if total > dispo and dispo > 200:
-            trop = total - dispo
-            for c in (1, 3, 2):                            # valeur, SH0ES, sigma : on réduit dans cet ordre
-                if c in visibles and trop > 0:
-                    mini = max(90, v.columnWidth(c) - trop)
-                    trop -= v.columnWidth(c) - mini
-                    v.setColumnWidth(c, mini)
-        en_tete.setStretchLastSection(True)
+        en_tete.setStretchLastSection(False)
+        v.resizeColumnsToContents()
+        if orientation == Qt.Orientation.Vertical:
+            visibles = [c for c in range(self.m_res.columnCount()) if not v.isColumnHidden(c)]
+            dispo = v.viewport().width() - 2
+            total = sum(v.columnWidth(c) for c in visibles)
+            if visibles and total < dispo:
+                k = dispo / total
+                for c in visibles[:-1]:
+                    v.setColumnWidth(c, int(v.columnWidth(c) * k))
+                v.setColumnWidth(visibles[-1], max(v.columnWidth(visibles[-1]),
+                                                   dispo - sum(v.columnWidth(c) for c in visibles[:-1])))
 
     # ------------------------------------------------------------ outils
     @staticmethod

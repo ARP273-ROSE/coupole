@@ -104,15 +104,15 @@ TEXTES = {
                                        "ou de la mise au point. Cette carte ne suffit pas à trancher.",
                                  'en': 'A FWHM growing towards an edge or corner may come from sensor tilt, field curvature or '
                                        'collimation; it may also come from seeing, tracking or focus. This map alone cannot tell.'},
-    'qual_resume_prudence': {'fr': "Mesures indicatives : fond en ADU (pas de point zéro photométrique, donc pas de mag/arcsec²) ; "
+    'qual_resume_prudence': {'fr': "Mesures indicatives : fond en ADU (pas de point zéro photométrique, donc pas de mag arcsec⁻²) ; "
                                    "RSN donné seulement quand le gain est dans l'en-tête.",
-                             'en': 'Indicative measurements: background in ADU (no photometric zero point, hence no mag/arcsec²); '
+                             'en': 'Indicative measurements: background in ADU (no photometric zero point, hence no mag arcsec⁻²); '
                                    'SNR given only when the gain is in the header.'},
     'qual_aide_html': {'fr': "<h3>Qualité des images (facultatif)</h3><p>Mesures faites avec SEP (Source Extractor en Python) et "
                              "numpy, validées sur images synthétiques à paramètres connus (FWHM à mieux que 2 % pour des profils "
                              "gaussiens et de Moffat de 2,5 à 7 px, ellipticité à ± 0,02, fond à 0,5 %, bruit à 5 %).</p>"
                              "<p>Fond, bruit, FWHM et ellipticité (médianes et carte 3 × 3), gradient du fond et résidu "
-                             "(vignetage, flat), étoiles saturées, traînées, échantillonnage. Pas de mag/arcsec² (pas de point "
+                             "(vignetage, flat), étoiles saturées, traînées, échantillonnage. Pas de mag arcsec⁻² (pas de point "
                              "zéro), pas de RSN sans gain, pas de détection de « donuts » (méthode non validée).</p>"
                              "<p>Rapport par lot : QUALITE.csv et QUALITE.txt. Jamais lancé automatiquement.</p>"
                              "<h4>Vitesse, reprise, échantillon</h4><p>Les mesures tournent dans des processus parallèles "
@@ -131,7 +131,7 @@ TEXTES = {
                              "numpy, validated on synthetic images with known parameters (FWHM better than 2 % for Gaussian and "
                              "Moffat profiles from 2.5 to 7 px, ellipticity ± 0.02, background 0.5 %, noise 5 %).</p>"
                              "<p>Background, noise, FWHM and ellipticity (medians and 3 × 3 map), background gradient and "
-                             "residual (vignetting, flat), saturated stars, trails, sampling. No mag/arcsec² (no zero point), no "
+                             "residual (vignetting, flat), saturated stars, trails, sampling. No mag arcsec⁻² (no zero point), no "
                              "SNR without gain, no dust-donut detection (method not validated).</p><p>Report per stack: "
                              "QUALITE.csv and QUALITE.txt. Never run automatically.</p>"
                              "<h4>Speed, resume, sample</h4><p>Measurements run in parallel processes (machine plan, economy "

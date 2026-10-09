@@ -96,8 +96,9 @@ def incertitude(cle: str, v: float, s: float) -> str:
 
 
 def unite_csv(unite: str) -> str:
-    return {'': '', 'mpc': 'Mpc', 'gyr': 'Gyr', 'kms': 'km/s', 'kms_mpc': 'km/s/Mpc', 'mag': 'mag',
-            'kpc_arcsec': 'kpc/arcsec', 'gpc3': 'Gpc3'}.get(unite, unite)
+    """Unité en ASCII lisible et non ambiguë pour un tableur (exposants négatifs écrits ^-1)."""
+    return {'': '', 'mpc': 'Mpc', 'gyr': 'Gyr', 'kms': 'km s^-1', 'kms_mpc': 'km s^-1 Mpc^-1', 'mag': 'mag',
+            'kpc_arcsec': 'kpc arcsec^-1', 'gpc3': 'Gpc^3'}.get(unite, unite)
 
 
 def ecrire_csv_resultats(chemin, resultats: list[dict]):

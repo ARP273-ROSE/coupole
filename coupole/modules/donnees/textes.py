@@ -10,7 +10,7 @@ TEXTES = {
                      'en': 'For a frequency spectrum: frequency, or radio velocity v = c (1 − f/f0).'},
     'don_axe_brut': {'fr': 'Axe du fichier', 'en': 'File axis'},
     'don_axe_mhz': {'fr': 'Fréquence (MHz)', 'en': 'Frequency (MHz)'},
-    'don_axe_vitesse': {'fr': 'Vitesse radio (km/s)', 'en': 'Radio velocity (km/s)'},
+    'don_axe_vitesse': {'fr': 'Vitesse radio (km s⁻¹)', 'en': 'Radio velocity (km s⁻¹)'},
     'don_f0': {'fr': 'Fréquence de repos f0 (MHz)', 'en': 'Rest frequency f0 (MHz)'},
     'don_f0_aide': {'fr': "Lue dans RESTFRQ si présente ; sinon raie H I à 1 420,405 751 768 MHz.",
                     'en': 'Read from RESTFRQ when present; otherwise the H I line at 1,420.405751768 MHz.'},
