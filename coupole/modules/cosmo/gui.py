@@ -358,7 +358,9 @@ class Panneau(QWidget):
         """Hauteur qu'il faut au tableau pour montrer toutes ses lignes."""
         v = self.v_res
         n = self.m_res.rowCount()
-        return v.horizontalHeader().height() + sum(v.rowHeight(r) for r in range(n)) + 2 * v.frameWidth() + 4
+        cols = sum(v.columnWidth(c) for c in range(self.m_res.columnCount()) if not v.isColumnHidden(c))
+        ascenseur = v.horizontalScrollBar().sizeHint().height() if cols > v.viewport().width() + 2 else 0
+        return v.horizontalHeader().height() + sum(v.rowHeight(r) for r in range(n)) + 2 * v.frameWidth() + 4 + ascenseur
 
     def _disposer(self):
         """Tableau et courbes côte à côte sur un grand écran, l'un sous l'autre sinon (ou selon le choix du menu
