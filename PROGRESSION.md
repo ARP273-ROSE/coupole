@@ -752,3 +752,40 @@ passées, comme la Banque OHP ; méthode tirée des pratiques publiées (fils et
   UNC, l'URI de la 0.2.0 est refusée par SQLite) et la possession complète (WAL et DELETE, UNC et lettre, premier
   lancement, base de travail ancienne).
 - **Aucun tag posé** (publication et vérification du paquet par le mainteneur).
+
+## 2026-10-12 — version 0.2.2 (en cours) : rendre les Archives compréhensibles
+Objectif : un astrophotographe amateur doit comprendre ce qu'il télécharge par rapport à ce qu'il prend avec son
+télescope.  Retour d'utilisateur sous Windows (0.2.1), téléchargements réels relus en lecture seule (copie
+temporaire, jamais modifiés en place).
+### Diagnostic
+- **M 16** : produit HAP « skycell » MVM `hst_skycell-p1033x08y12_acs_wfc_f775w_all_drc` de 19 806 × 15 741 px
+  (≈ 2,49 Go chez MAST) dont seules les colonnes 19 044–19 805 et les lignes 5 427–10 643 contiennent des données
+  (ACS/WFC F775W, 2 000 s, programme 10533, 2006-04-12) : image « noire sauf un bout à droite ».  La cellule du
+  ciel est rognée au plus petit rectangle qui contient *toutes* les poses de la cellule, tous filtres confondus
+  (documentation DrizzlePac, « Multi-visit Mosaic Processing ») : le F775W n'en occupe qu'un coin.
+- Le « FITS de 300 Mo » est le masque NaN pleine taille non compressé (`…_masque.fits`, 311 771 520 octets).
+- **Arp 273** (programme 12326) : 17 fichiers pour 3 filtres.  Pour chaque filtre WFC3/UVIS : `drz` du pipeline
+  standard par visite (`ibkx21020`, `ibkx22020`), `drc` HAP d'une visite (`hst_12326_21_…`, `hst_12326_22_…`),
+  `drc` HAP multi-visites (`hst_skycell-p2092x10y17_…_all`, 9 600 s = les deux visites), plus deux images de
+  détection `…_total_…` (somme de tous les filtres, pas un filtre).  Vérifié dans `dbo.obspointing` :
+  `provenance_name` = CALWF3 / HAP-SVM / HAP-MVM et `t_exptime` = 4 800 s par visite, 9 600 s pour la MVM.
+- **Aperçus absents** : MAST donne en `jpegurl` un JPEG pleine résolution (3,7 à 4,2 Mo pour Arp 273 et M 16) ;
+  la vignette était lue jusqu'à 3 Mo seulement → JPEG tronqué (« premature end of data segment »), et une image de
+  300 Mpx dépasse de toute façon la limite d'allocation de Qt (256 Mo).
+- **« jupiter », « saturne »** : l'interface résolvait le nom par SIMBAD dès qu'une archive « céleste » était
+  cochée (MAST, ESO, IRSA par défaut) → `LookupError` → recherche entière abandonnée, OPUS et PDS jamais
+  interrogés ; MAST n'était interrogé que par position (inutile pour un corps mobile).  Vérifié : MAST répond par
+  `target_name LIKE 'JUPITER%' AND mtflag = 1` en 1 s.
+- **Catalogue sans critère** : `GROUP BY target_name` mesuré — HST entier : 504 après 65 s ; HST limité aux
+  produits HAP-MVM : 12 à 17 s ; JWST (`_i2d`) : 34 s ; ESO : 1,7 s ; OPUS `meta/mults/target.json` et facettes
+  Solr du PDS : < 1 s.
+### Plan (cases cochées au fil de l'eau)
+- [ ] Recadrage sur la zone utile (WCS mise à jour), tailles avant/après ; masque facultatif (uint8 compressé)
+- [ ] Un produit logique par filtre (MVM / SVM / pipeline / détection), variantes en option, nature et temps total
+- [ ] Recherche tolérante (corps du Système solaire FR/EN, alias SIMBAD), suggestions pendant la frappe
+- [ ] Noms lisibles et réorganisation des téléchargements existants
+- [ ] Taille affichée d'emblée, total de la sélection ; progression (débit, ETA, deux phases), état final
+- [ ] Aperçus (vignette réduite, générée après téléchargement, raison sinon)
+- [ ] Catalogue des cibles par archive (cache daté), programmes célèbres, guide Hubble Ultra Deep Field
+- [ ] Topo instruments et filtres (onglet, info-bulles, manuel)
+- [ ] Aide F1, manuels FR/EN, CHANGELOG, VERSION 0.2.2, validation 3.12 / 3.10, CI
