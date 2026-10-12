@@ -100,8 +100,10 @@ HLSP_HUDF = (
 )
 # Préréglage « couleur du HUDF en trois filtres » : le plus léger qui donne une image couleur (3 × 110 Mo)
 PRESET_HUDF = ('F435W', 'F775W', 'F160W')
-LAMBDA_HUDF = {'F435W': 432.9, 'F606W': 592.2, 'F775W': 769.3, 'F814W': 805.7, 'F850LP': 905.5, 'F105W': 1055.2,
-               'F125W': 1248.6, 'F140W': 1392.3, 'F160W': 1536.9}
+def _lambda(filtre, instrument):
+    from .instruments import info_filtre
+    f = info_filtre(filtre, instrument)
+    return f['lambda'] if f else None
 
 
 def observations_hlsp(filtres=None) -> list[dict]:
@@ -116,7 +118,7 @@ def observations_hlsp(filtres=None) -> list[dict]:
         expo = XDF.get(filtre, (None, None))
         out.append(observation(
             id='hlsp:' + chemin.rsplit('/', 1)[-1].rsplit('.', 1)[0], archive='mast', mission='HST',
-            instrument=instr, filtre=filtre, lambda_nm=LAMBDA_HUDF.get(filtre), debut='', publique='', public=True,
+            instrument=instr, filtre=filtre, lambda_nm=_lambda(filtre, instr), debut='', publique='', public=True,
             calib=4, final=True, cible='HUDF', ra=53.1625, dec=-27.7914, url=lien('archives.hlsp', chemin=chemin),
             fichier=chemin.rsplit('/', 1)[-1], taille=taille, page=lien('archives.hlsp.page', projet=projet),
             programme=projet.upper(), titre='Hubble Ultra Deep Field — HLSP %s' % projet.upper(),
