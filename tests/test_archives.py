@@ -1130,3 +1130,12 @@ def test_cli_catalogue_instruments_hudf_reorganiser(monkeypatch, capsys, tmp_pat
     assert cli.main(['archives', 'hudf']) == 0
     assert 'hlsp_xdf_hst_wfc3ir-60mas_hudf_f160w_v1_sci.fits  *' in capsys.readouterr().out
     assert cli.main(['archives', 'reorganiser', '--dest', str(tmp_path), '--simuler']) == 0
+
+
+def test_limite_partagee_entre_voyager_et_cassini():
+    """Cause réelle de « saturne : rien pour Cassini » : OPUS rend Voyager puis Cassini, et la limite coupait la fin."""
+    obs = [B.observation(id='opus:v%d' % k, mission='Voyager') for k in range(6)] + \
+          [B.observation(id='opus:c%d' % k, mission='Cassini') for k in range(6)]
+    t = R.tronquer_equitable(obs, 5)
+    assert len(t) == 5 and {o['mission'] for o in t} == {'Voyager', 'Cassini'}
+    assert R.tronquer_equitable(obs[:3], 5) == obs[:3]

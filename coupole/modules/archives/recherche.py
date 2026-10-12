@@ -153,7 +153,7 @@ def chercher(q: Requete, archives: tuple | None = None, arret: threading.Event |
             remettre_compte()
             obs = a.chercher(q)
             res.tronque = lignes_recues() > q.limite or len(obs) > q.limite
-            obs = filtrer(obs[:q.limite] if len(obs) > q.limite else obs, q)
+            obs = filtrer(tronquer_equitable(obs, q.limite), q)
             progs = {str(p).strip() for p in (q.extra.get('programmes') or ()) if str(p).strip()}
             if progs:                                       # programme célèbre choisi dans le catalogue
                 obs = [o for o in obs if str(o.get('programme') or '').strip() in progs]
@@ -171,6 +171,30 @@ def chercher(q: Requete, archives: tuple | None = None, arret: threading.Event |
     with F.ThreadPoolExecutor(max_workers=max(1, min(paralleles, len(ids) or 1))) as ex:
         resultats = list(ex.map(une, ids))
     return resultats
+
+
+def tronquer_equitable(obs: list[dict], n: int) -> list[dict]:
+    """Au plus `n` observations, réparties entre les missions d'une même archive (OPUS rend Voyager puis Cassini :
+    couper la liste à `n` supprimait toutes les images de Cassini — « saturne » ne trouvait rien pour Cassini)."""
+    if len(obs) <= n:
+        return obs
+    par_mission: dict[str, list] = {}
+    for o in obs:
+        par_mission.setdefault(o.get('mission', ''), []).append(o)
+    if len(par_mission) == 1:
+        return obs[:n]
+    out, listes, k = [], list(par_mission.values()), 0
+    while len(out) < n:
+        ajoute = False
+        for l in listes:
+            if k < len(l) and len(out) < n:
+                out.append(l[k])
+                ajoute = True
+        if not ajoute:
+            break
+        k += 1
+    garde = {id(o) for o in out}
+    return [o for o in obs if id(o) in garde]
 
 
 def toutes(resultats: list[Resultat]) -> list[dict]:

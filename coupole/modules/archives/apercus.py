@@ -38,9 +38,10 @@ def _cle(url: str) -> str:
 
 
 def telecharger_brut(url: str) -> str:
-    """Fichier officiel complet en cache (``.img``) ; '' si indisponible."""
+    """Fichier officiel complet en cache (``.brut``) ; '' si indisponible."""
     from ...core import reseau
-    p = dossier_cache() / (_cle(url) + '.img')
+    # « .brut » et non « .img » : les « .img » de la 0.2.1 sont souvent tronqués à 3 Mo (ignorés, jamais relus)
+    p = dossier_cache() / (_cle(url) + '.brut')
     if p.exists() and p.stat().st_size > 0:
         return str(p)
     try:

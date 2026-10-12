@@ -407,6 +407,10 @@ def _preparer_planetaire(source, dest_sans_ext, o, fmt, etiquette, nommer=None):
                 break
     if meta.get('_unite'):
         h['BUNIT'] = _texte_fits(meta['_unite'])[:68]
+    if (o or {}).get('exposition'):
+        # durée annoncée par l'archive, en secondes (le label Cassini donne EXPOSURE_DURATION en millisecondes
+        # sans unité : 10000 pour une pose de 10 s)
+        h['EXPTIME'] = (float(o['exposition']), '[s] exposure time (from the archive)')
     h2 = entete_prepare(None, h, o, os.path.basename(str(source)), 0, nan, '')
     for k in h:
         if k not in h2:

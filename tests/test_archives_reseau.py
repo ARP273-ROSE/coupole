@@ -44,3 +44,30 @@ def test_petits_telechargements_reels(tmp_path):
     for o in obs:
         d, h = lire_prepare(os.path.join(T.dossier_archives(tmp_path), p[o['id']]['prepare']))
         assert d.ndim == 2 and np.isfinite(d).any() and h['CREDIT']
+
+
+def test_corps_produits_logiques_et_telechargements_reels_022(tmp_path):
+    """0.2.2 : « jupiter » (HST), « saturne » (Cassini), Arp 273 (un produit par filtre), HUDF09 F160W (40 Mo)."""
+    from coupole.modules.archives import celebres as C
+    from coupole.modules.archives import recherche as R
+    from coupole.modules.archives import telechargement as T
+    q = R.requete('jupiter', 3.0, limite=100)
+    assert q.ra is None and q.cible == 'Jupiter'
+    hst = [o for o in R.toutes(R.chercher(q, ('mast',))) if o['mission'] == 'HST']
+    assert hst
+    sat = R.toutes(R.chercher(R.requete('saturne', 3.0, limite=30), ('opus',)))
+    assert {'Voyager', 'Cassini'} <= {o['mission'] for o in sat}
+    arp = R.toutes(R.chercher(R.requete('arp273', 3.0, limite=100), ('mast',)))
+    retenus = [o for o in arp if not o['variante']]
+    assert {o['filtre'] for o in retenus} == {'F390W', 'F475X', 'F600LP'} and len(retenus) == 3
+    assert all(o['produit'] == 'mvm' for o in retenus)
+    petit = min((o for o in hst if not o['variante']), key=lambda o: o.get('exposition') or 1e9)
+    cas = [o for o in sat if o['mission'] == 'Cassini'][:1]
+    hudf = [o for o in C.observations_hlsp() if o['programme'] == 'HUDF09']
+    T.estimer([petit])
+    assert petit['taille'] < 60e6
+    b = T.Telechargement(tmp_path, [petit] + cas + hudf, cible='', debit_octets_s=8e6).executer()
+    assert b.get('ok') == 3, b
+    noms = sorted(os.path.basename(d['prepare']) for d in T.possession(tmp_path).values())
+    assert any(n.startswith('HUDF_WFC3-IR_F160W_') and '_HLSP_' in n for n in noms), noms
+    assert all(not n.endswith('_masque.fits') for n in noms)
