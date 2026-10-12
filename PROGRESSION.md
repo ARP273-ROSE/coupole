@@ -802,7 +802,11 @@ temporaire, jamais modifiés en place).
   aperçus, téléchargement en deux phases, réorganisation, catalogue, HUDF, instruments et filtres ; 55 et 54 pages),
   captures FR/EN (`COUPOLE_CAPTURES=archives` dans `outils/captures.py`), tableaux des commandes régénérés, README,
   CHANGELOG FR puis EN, VERSION 0.2.2
-- [ ] Validation 3.12 / 3.10, CI
+- [x] Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 604 réussis,
+  22 sautés, code 0 (reproject 0.21.0) ; python:3.10-slim 604 / 22, code 0 (reproject 0.14.1)**.
+- [x] CI `tests.yml` : commit `5d827ac` **6/6** (Linux, Windows, macOS × 3.10, 3.12), garde-fou de confidentialité compris.
+- Téléchargements d'essai et copie temporaire des vrais téléchargements effacés ; dossier d'origine jamais modifié.
+- **Aucun tag posé.**
 ### Défauts trouvés en route
 - **« saturne » : rien pour Cassini** (cause distincte de SIMBAD) : OPUS rend Voyager puis Cassini, et la limite de
   lignes coupait la fin de la liste → `recherche.tronquer_equitable` (limite partagée entre missions).
