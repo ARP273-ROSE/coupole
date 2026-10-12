@@ -154,6 +154,9 @@ def chercher(q: Requete, archives: tuple | None = None, arret: threading.Event |
             obs = a.chercher(q)
             res.tronque = lignes_recues() > q.limite or len(obs) > q.limite
             obs = filtrer(obs[:q.limite] if len(obs) > q.limite else obs, q)
+            progs = {str(p).strip() for p in (q.extra.get('programmes') or ()) if str(p).strip()}
+            if progs:                                       # programme célèbre choisi dans le catalogue
+                obs = [o for o in obs if str(o.get('programme') or '').strip() in progs]
             res.observations = obs
         except CompteRequis as e:
             res.compte_requis, res.erreur = True, str(e)

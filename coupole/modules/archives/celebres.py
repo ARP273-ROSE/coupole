@@ -93,6 +93,7 @@ HLSP_HUDF = (
     ('xdf', 'xdf/hlsp_xdf_hst_wfc3ir-60mas_hudf_f105w_v1_sci.fits', 'WFC3/IR', 'F105W', 110255040, 'xdf60'),
     ('xdf', 'xdf/hlsp_xdf_hst_acswfc-60mas_hudf_f850lp_v1_sci.fits', 'ACS/WFC', 'F850LP', 110255040, 'xdf60'),
     ('xdf', 'xdf/hlsp_xdf_hst_acswfc-60mas_hudf_f775w_v1_sci.fits', 'ACS/WFC', 'F775W', 110255040, 'xdf60'),
+    ('xdf', 'xdf/hlsp_xdf_hst_acswfc-60mas_hudf_f814w_v1_sci.fits', 'ACS/WFC', 'F814W', 110255040, 'xdf60'),
     ('xdf', 'xdf/hlsp_xdf_hst_acswfc-60mas_hudf_f606w_v1_sci.fits', 'ACS/WFC', 'F606W', 110255040, 'xdf60'),
     ('xdf', 'xdf/hlsp_xdf_hst_acswfc-60mas_hudf_f435w_v1_sci.fits', 'ACS/WFC', 'F435W', 110255040, 'xdf60'),
     ('hudf09', 'hudf09/hlsp_hudf09_hst_wfc3ir_hudf09-1_f160w_v1_sci.fits', 'WFC3/IR', 'F160W', 40207680, 'hudf09'),

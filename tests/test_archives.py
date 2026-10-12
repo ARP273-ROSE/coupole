@@ -918,3 +918,215 @@ def test_reorganiser_des_telechargements_de_la_021(tmp_path):
     journal = open(os.path.join(racine, '_etat', 'JOURNAL.txt'), encoding='utf-8').read()
     assert 'arp273_WFC3-UVIS_F390W_2010-12-17_MVM_2.xisf' in journal
     assert RG.reorganiser(tmp_path)['deplaces'] == 0                      # une seconde fois : rien à faire
+
+
+# ============================================================================================ catalogue, aperçus, topo (0.2.2)
+def test_catalogue_requetes_agregees_et_cache(monkeypatch, tmp_path):
+    from coupole.core import config
+    from coupole.modules.archives import catalogue as K
+    monkeypatch.setattr(config, 'dossier_cache', lambda: tmp_path)
+    vues = reponses_simulees(monkeypatch, [
+        ('GROUP BY target_name', ('target_name,type,n,ra,dec,t\n'
+                                  'NGC-6752,STELLAR CLUSTER;GLOBULAR CLUSTER,107,287.7,-59.9,1297332\n'
+                                  'JUPITER,Solar System; Planet,42,60.0,5.5,966\n'
+                                  'GD-153,CALIBRATION;PHOTOMETRIC,74,194.2,22.0,10\n'
+                                  'M-16,ISM;HII REGION,12,274.7,-13.8,4000\n').encode()),
+        ('meta/mults/target.json', json.dumps({'mults': {'Saturn': 5, 'Dark': 3, 'Titan': 2}}).encode()),
+        ('facet.field', json.dumps({'facet_counts': {'facet_fields': {'TARGET_NAME': ['jupiter', 9, 'space', 4, 'io', 2]}}}).encode())])
+    monkeypatch.setattr(K, 'lire_url', B.lire_url)
+    monkeypatch.setattr(K, 'lire_json', lambda url, **k: json.loads(B.lire_url(url)))
+    d = K.charger('hst')
+    assert not d['cache'] and [l['cible'] for l in d['lignes']] == ['NGC-6752', 'JUPITER', 'M-16']     # étalonnage écarté
+    assert [l['categorie'] for l in d['lignes']] == ['amas_stellaire', 'systeme_solaire', 'nebuleuse']
+    assert d['lignes'][1]['recherche'] == 'Jupiter' and d['lignes'][0]['recherche'] == '287.70000 -59.90000'
+    assert "provenance_name='HAP-MVM'" in vues[0]
+    n = len(vues)
+    assert K.charger('hst')['cache'] and len(vues) == n                                 # cache frais : aucune requête
+    assert [l['cible'] for l in K.charger('cassini')['lignes']] == ['Saturn', 'Titan']
+    assert [l['cible'] for l in K.charger('juno')['lignes']] == ['Jupiter', 'Io']
+    lignes = [{'cible': 'C%d' % k, 'categorie': 'galaxie' if k % 2 else 'etoile'} for k in range(250)]
+    assert K.nombre_pages(lignes) == 3 and len(K.page(lignes, 2)) == 50
+    assert len(K.filtrer(lignes, 'c1', 'galaxie')) == 56
+    monkeypatch.setattr(K, '_tap', lambda *a: (_ for _ in ()).throw(OSError('504')))
+    d = K.charger('hst', rafraichir=True)                                  # service en panne : cache périmé rendu
+    assert d['cache'] and d['erreur'] and len(d['lignes']) == 3
+
+
+def test_apercus_fond_blanc_et_vignette_generee(app_qt, tmp_path, monkeypatch):
+    from PyQt6.QtGui import QColor, QImage
+    from coupole.core import config
+    from coupole.modules.archives import apercus as A
+    monkeypatch.setattr(config, 'dossier_cache', lambda: tmp_path)
+    img = QImage(2000, 1600, QImage.Format.Format_RGB32)
+    img.fill(QColor('white'))                                               # MAST : pixels sans donnée en blanc
+    for x in range(1920, 1990):
+        for y in range(500, 1100, 3):
+            img.setPixelColor(x, y, QColor(20, 20, 20))
+    src = str(tmp_path / 'm16.jpg')
+    assert img.save(src, 'JPG', 95)
+    assert A.reduire(src, str(tmp_path / 'v.png'))
+    v = QImage(str(tmp_path / 'v.png'))
+    assert v.height() == 400 and v.width() < 80                             # recadrée sur la bande utile
+    d = np.random.default_rng(4).normal(10, 1, (300, 200)).astype(np.float32)
+    r = EX.preparer(fits_multi(str(tmp_path / 'a.fits'), d), str(tmp_path / 'a_sci'), None, 'xisf')
+    p = A.vignette_generee(r['chemin'])
+    assert p and QImage(p).width() > 0
+    assert A.vignette({'archive': 'irsa', 'apercu': ''}) == ('', 'arc_apercu_sans_irsa')
+    assert A.vignette({'archive': 'irsa', 'apercu': ''}, r['chemin'])[1] == 'arc_apercu_genere'
+
+
+def test_topo_instruments_et_filtres():
+    from coupole.modules.archives import instruments as I
+    assert I.info_filtre('F775W;CLEAR2L', 'ACS/WFC')['lambda'] == 776.4
+    assert I.info_filtre('CLEAR;F444W', 'NIRCAM/IMAGE')['lambda'] == 4402
+    assert I.equivalent_amateur(656.1, 1.8) == 'Hα' and I.equivalent_amateur(501.0, 6.5) == 'OIII'
+    assert I.equivalent_amateur(676.6, 11.8, 'SII') == 'SII' and I.equivalent_amateur(588.9, 218.9) == 'L'
+    assert I.equivalent_amateur(1536.9, 268) == 'IR' and I.equivalent_amateur(271, 40) == 'UV'
+    b = I.bulle_filtre('F656N', 'WFC3/UVIS', 'fr')
+    assert '656 nm' in b and 'Hα' in b
+    assert 'Amateur equivalent' in I.bulle_filtre('F160W', 'WFC3/IR', 'en')
+    h = I.html_topo('fr')
+    for mot in ('NIRCAM', 'MIRI', 'HAWKI', 'FORS2', 'MUSE', 'VIRCAM', 'OMEGACAM', 'IRAC', 'MIPS', 'WISE', '2MASS',
+                'SDSS', 'NIRC2', 'VOYAGER ISS', 'CASSINI ISS', 'JUNOCAM', 'WFPC2', 'hst-docs.stsci.edu'):
+        assert mot in h
+    assert I.bulle_filtre('XYZ') == ''
+
+
+def test_hudf_preset_et_programmes_celebres():
+    from coupole.modules.archives import celebres as C
+    obs = C.observations_hlsp(C.PRESET_HUDF)
+    assert [o['filtre'] for o in obs] == ['F160W', 'F775W', 'F435W'] and sum(o['taille'] for o in obs) == 3 * 110255040
+    assert all(o['url'].startswith('https://archive.stsci.edu/hlsps/xdf/') for o in obs)
+    assert C.HUDF_POSES['ACS/WFC']['F435W'] == 134880 and C.HUDF_POSES['ACS/WFC']['F775W'] == 347110
+    assert {p[4] for p in C.PROGRAMMES} >= {'9978, 10086', '11563', '12498', '13926', '2739', '10475', '2731'}
+    assert C.alias('Piliers de la creation') == 'M 16' and C.alias('stephans quintet') == 'HCG 92'
+
+
+def test_programmes_filtres_dans_la_recherche(monkeypatch):
+    reponses_simulees(monkeypatch, [('dbo.obspointing', votable(CHAMPS_MAST, [
+        ligne_mast('HST', 'j8m81', 'j8m81_drz.fits'), ligne_mast('HST', 'icn1', 'icn1_drz.fits')]))])
+    q = B.Requete(ra=274.7, dec=-13.8, archives=('mast',), extra={'programmes': ('999',)})
+    assert R.chercher(q)[0].observations == []
+    q.extra['programmes'] = ('2739',)
+    assert len(R.chercher(q)[0].observations) == 2
+
+
+def _attendre(app_qt, condition, delai=20):
+    import time
+    fin = time.time() + delai
+    while not condition() and time.time() < fin:
+        app_qt.processEvents()
+        time.sleep(0.01)
+    return condition()
+
+
+def test_panneau_variantes_corps_progression_etat_final(app_qt, tmp_path, monkeypatch):
+    from coupole.core.i18n import tr
+    from coupole.modules.archives import gui as G
+    from coupole.modules.archives import produits as P
+    monkeypatch.setattr(G.T, 'sortie_par_defaut', lambda: str(tmp_path))
+    p = G.Panneau()
+    p.show()
+    obs = P.regrouper(_arp273())
+    for o in obs:
+        o['taille'] = 1000
+    p._resultats((B.Requete(nom='Arp 273'), [B.Resultat('mast', obs)], obs))
+    assert len(p.modele.donnees) == 3 and tr('arc_variantes_cachees', n=14) in p.l_etat.text()
+    p.c_variantes.setChecked(True)
+    assert len(p.modele.donnees) == 17
+    p.c_variantes.setChecked(False)
+    ligne = p._ligne(p.modele.donnees[0])
+    assert tr('arc_nature_mosaique') in ligne[G.COLONNES.index('nature')]
+    assert 's' in ligne[G.COLONNES.index('exposition')]
+    assert 'nm' in p._bulle_filtre(p.modele.donnees[0])
+    p.vue.selectAll()
+    app_qt.processEvents()
+    assert '3' in p.l_selection.text()
+    h = p.html_fiche(p.modele.donnees[0])
+    assert tr('arc_badge_final') in h and tr('arc_r_mvm')[:20] in h and 'MJy/sr' in h
+    # corps du Système solaire : aucune résolution SIMBAD, MAST + OPUS + PDS interrogés par nom
+    vues = reponses_simulees(monkeypatch, [
+        ('dbo.obspointing', votable(CHAMPS_MAST, [])), ('data.json', json.dumps({'page': []}).encode()),
+        ('pds_archives', json.dumps({'response': {'docs': []}}).encode())])
+    monkeypatch.setattr(R, 'resoudre', lambda *a, **k: (_ for _ in ()).throw(AssertionError('SIMBAD interrogé')))
+    p.e_nom.setText('saturne')
+    p.chercher()
+    assert _attendre(app_qt, lambda: p.b_chercher.isEnabled())
+    assert any("target_name LIKE 'SATURN%'" in v for v in vues) and any('target=Saturn' in v for v in vues)
+    # progression en deux phases puis état final explicite
+    p._a_telecharger, p._faits, p._telecharges, p._ids_dl, p._erreurs = 2, 0, 0, set(), 0
+    p._tailles, p._total_octets, p._recus, p._debits, p._octets_session = {'a': 600, 'b': 400}, 1000, {}, [], 0
+    p._evenements([{'genre': 'octets', 'octets': 500, 'recus': {'a': 500}}])
+    assert 300 <= p.barre.value() <= 400 and tr('arc_progres_fichiers', telecharges=0, prepares=0, n=2) in p.l_progres.text()
+    p._evenements([{'genre': 'telecharge', 'id': 'a'}, {'genre': 'fini', 'id': 'a', 'chemin': '/x/a.xisf',
+                                                       'forme': [10, 10], 'forme_origine': [100, 100]}])
+    assert '100 × 100' in p.l_etat.text()
+    p._evenements([{'genre': 'fin', 'bilan': {'ok': 1, 'deja': 0, 'echec': 1, 'octets': 2_000_000_000,
+                                               'octets_gardes': 5_000_000, 'secondes': 75}}])
+    assert p.barre.value() == 1000 and tr('arc_phase_termine') in p.barre.format()
+    assert p.l_etat.text().startswith(tr('arc_termine', n=1, telecharge='2.00 Go', garde='5.0 Mo', erreurs=1,
+                                         s='1 min 15 s')[:10])
+    p.arreter()
+    p.close()
+
+
+def test_onglets_catalogue_hudf_instruments(app_qt, tmp_path, monkeypatch):
+    from coupole.modules.archives import catalogue as K
+    from coupole.modules.archives import gui as G
+    monkeypatch.setattr(G.T, 'sortie_par_defaut', lambda: str(tmp_path))
+    lignes = [{'cible': 'T%03d' % k, 'n': 300 - k, 'ra': 10.0, 'dec': 20.0, 'exposition': 100.0, 'type': '',
+               'categorie': 'galaxie' if k % 2 else 'etoile', 'recherche': '10.00000 +20.00000', 'archive': 'mast',
+               'mission': 'HST'} for k in range(230)]
+    monkeypatch.setattr(K, 'charger', lambda cle, rafraichir=False: {'lignes': lignes, 'date': '2026-10-12T00:00:00',
+                                                                      'cache': True, 'erreur': ''})
+    p = G.Panneau()
+    p.show()
+    lances = []
+    monkeypatch.setattr(p, 'chercher', lambda: lances.append((p.e_nom.text(), p._programmes)))
+    c = p.catalogue
+    c.c_archive.setCurrentIndex(c.c_archive.findData('hst'))
+    assert _attendre(app_qt, lambda: len(c.modele.donnees) == 100)
+    c.aller(1)
+    c.aller(1)
+    assert len(c.modele.donnees) == 30 and not c.b_suiv.isEnabled()
+    c.c_categorie.setCurrentIndex(c.c_categorie.findData('galaxie'))
+    assert len(c.filtrees) == 115
+    c.c_archive.setCurrentIndex(c.c_archive.findData('celebres'))
+    c.vue.selectRow(0)
+    c.chercher()
+    assert lances[-1] == ('53.1625 -27.7914', ('9978', '10086'))
+    c.c_archive.setCurrentIndex(c.c_archive.findData('sans:irsa'))
+    from coupole.core.i18n import tr
+    assert c.l_info.text() == tr('arc_cat_sans_irsa')
+    h = p.hudf
+    assert len(h.coches()) == 3 and '330.8' in h.l_total.text().replace(',', '.')
+    envoyes = []
+    monkeypatch.setattr(p, 'telecharger', lambda obs=None, cible=None: envoyes.append((len(obs), cible)))
+    h.telecharger()
+    assert envoyes == [(3, 'HUDF')]
+    assert 'NIRCAM' in p.instruments.texte.toPlainText()
+    p.arreter()
+    p.close()
+
+
+def test_bouton_reorganiser(app_qt, tmp_path, monkeypatch):
+    from coupole.modules.archives import gui as G
+    monkeypatch.setattr(G.T, 'sortie_par_defaut', lambda: str(tmp_path))
+    p = G.Panneau()
+    p.reorganiser()
+    from coupole.core.i18n import tr
+    assert p.l_etat.text() == tr('arc_reorg_rien')
+    p.arreter()
+    p.close()
+
+
+def test_cli_catalogue_instruments_hudf_reorganiser(monkeypatch, capsys, tmp_path):
+    from coupole import cli
+    assert cli.main(['archives', 'catalogue']) == 0
+    assert '9978, 10086' in capsys.readouterr().out
+    assert cli.main(['archives', 'instruments', 'F656N', '--instrument', 'WFC3/UVIS']) == 0
+    assert '656' in capsys.readouterr().out
+    assert cli.main(['archives', 'instruments', 'ZZZ']) == 1
+    assert cli.main(['archives', 'hudf']) == 0
+    assert 'hlsp_xdf_hst_wfc3ir-60mas_hudf_f160w_v1_sci.fits  *' in capsys.readouterr().out
+    assert cli.main(['archives', 'reorganiser', '--dest', str(tmp_path), '--simuler']) == 0

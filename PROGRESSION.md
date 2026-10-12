@@ -785,14 +785,17 @@ temporaire, jamais modifiés en place).
   exacts redeviennent « sans donnée » pour l'alignement ; original non gardé par défaut, rien d'autre ne reste)
 - [x] Un produit logique par filtre (MVM / SVM / pipeline / détection), variantes en option, nature et temps total
   (`produits.py` ; colonnes `t_exptime`, `provenance_name`, `target_classification` ajoutées à la requête MAST)
-- [ ] Recherche tolérante (corps du Système solaire FR/EN, alias SIMBAD), suggestions pendant la frappe
-  (fait côté moteur : `corps.py`, `celebres.py`, `recherche.interpreter/variantes_nom/suggestions` ; reste l'interface)
-- [ ] Noms lisibles et réorganisation des téléchargements existants (moteur fait : `rangement.py`)
+- [x] Recherche tolérante (corps du Système solaire FR/EN, alias SIMBAD), suggestions pendant la frappe
+  (`corps.py`, `celebres.py`, `recherche.interpreter/variantes_nom/suggestions`, `QCompleter`)
+- [x] Noms lisibles et réorganisation des téléchargements existants (`rangement.py`, bouton et `coupole archives reorganiser`)
   Essai sur une copie des vrais téléchargements (18 fichiers, base écrite sous Windows) : 18 déplacés, 11 recadrés
   (M 16 : 19 806 × 15 741 → 762 × 5 217 px), 16 masques pleine taille supprimés, 1 641 → 910 Mo, 23 s ; les
   15 variantes et images de détection d'Arp 273 rangées dans `arp273/_variantes/`, les 3 MVM restent.
-- [ ] Taille affichée d'emblée, total de la sélection ; progression (débit, ETA, deux phases), état final
-- [ ] Aperçus (vignette réduite, générée après téléchargement, raison sinon)
-- [ ] Catalogue des cibles par archive (cache daté), programmes célèbres, guide Hubble Ultra Deep Field
-- [ ] Topo instruments et filtres (onglet, info-bulles, manuel)
+- [x] Taille affichée d'emblée, total de la sélection ; progression (débit, ETA, deux phases), état final
+- [x] Aperçus (vignette réduite, générée après téléchargement, raison sinon)
+- [x] Catalogue des cibles par archive (cache daté), programmes célèbres, guide Hubble Ultra Deep Field
+- [x] Topo instruments et filtres (onglet, info-bulles ; manuel : à faire avec la doc)
+- [x] Interface : onglets Catalogue, Hubble Ultra Deep Field, Instruments et filtres ; colonnes nature et pose totale ;
+  CLI `catalogue`, `reorganiser`, `instruments`, `hudf`, `--variantes`, `--programme`, `--garder-original`, `--masque`
+  (tests simulés : 66 dans `test_archives.py`)
 - [ ] Aide F1, manuels FR/EN, CHANGELOG, VERSION 0.2.2, validation 3.12 / 3.10, CI
