@@ -28,14 +28,6 @@ FILTRE_COL = {'Voyager': 'VGISSfilter', 'Cassini': 'COISSfilter'}
 CREDITS = {'Voyager': 'NASA/JPL-Caltech (PDS Ring-Moon Systems Node)',
            'Cassini': 'NASA/JPL-Caltech/Space Science Institute (PDS Ring-Moon Systems Node)',
            'Juno': 'NASA/JPL-Caltech/SwRI/MSSS (PDS Imaging Node)'}
-# corps en français → nom anglais attendu par les archives
-CORPS = {'mercure': 'Mercury', 'venus': 'Venus', 'vénus': 'Venus', 'terre': 'Earth', 'lune': 'Moon', 'mars': 'Mars',
-         'jupiter': 'Jupiter', 'saturne': 'Saturn', 'uranus': 'Uranus', 'neptune': 'Neptune', 'pluton': 'Pluto',
-         'io': 'Io', 'europe': 'Europa', 'ganymède': 'Ganymede', 'ganymede': 'Ganymede', 'callisto': 'Callisto',
-         'titan': 'Titan', 'encelade': 'Enceladus', 'mimas': 'Mimas', 'téthys': 'Tethys', 'tethys': 'Tethys',
-         'dioné': 'Dione', 'dione': 'Dione', 'rhéa': 'Rhea', 'rhea': 'Rhea', 'japet': 'Iapetus', 'hypérion': 'Hyperion',
-         'phœbé': 'Phoebe', 'phoebe': 'Phoebe', 'miranda': 'Miranda', 'ariel': 'Ariel', 'umbriel': 'Umbriel',
-         'titania': 'Titania', 'obéron': 'Oberon', 'oberon': 'Oberon', 'triton': 'Triton', 'anneaux': 'Rings'}
 # longueur d'onde centrale approximative (nm) des filtres courants (documentation des instruments)
 LAMBDA = {'VIOLET': 416, 'BLUE': 479, 'GREEN': 566, 'ORANGE': 591, 'UV': 346, 'CLEAR': 497, 'CH4_U': 541,
           'CH4_JS': 619, 'SODIUM': 589, 'RED': 649, 'BL1': 451, 'GRN': 568, 'RED,': 650, 'IR1': 752, 'IR2': 862,
@@ -44,8 +36,19 @@ LAMBDA = {'VIOLET': 416, 'BLUE': 479, 'GREEN': 566, 'ORANGE': 591, 'UV': 346, 'C
 
 
 def corps(nom: str) -> str:
+    """Nom anglais attendu par OPUS (« saturne » → « Saturn ») ; un nom inconnu est passé tel quel."""
+    from ..corps import nom_opus, reconnaitre
+    c = reconnaitre(nom)
+    if c is not None:
+        return nom_opus(c)
     n = (nom or '').strip()
-    return CORPS.get(n.lower(), n[:1].upper() + n[1:] if n else '')
+    return n[:1].upper() + n[1:] if n else ''
+
+
+def corps_pds(nom: str) -> str:
+    from ..corps import nom_pds, reconnaitre
+    c = reconnaitre(nom)
+    return nom_pds(c) if c is not None else (nom or '').strip().lower()
 
 
 def lambda_filtre(filtre: str):
@@ -119,7 +122,7 @@ class Opus(Archive):
             lambda_nm=lambda_filtre(filtre), debut=iso_normal(debut), publique='', public=True, calib=3, final=True,
             cible=cible or planete, url=url, fichier=fichier, format='pds3', etiquette=etiquette, apercu=apercu,
             page=lien('archives.opus.page', id=opusid), programme=volume, credit=CREDITS[mission],
-            conditions=self.conditions, obs_id=opusid)
+            conditions=self.conditions, obs_id=opusid, exposition=nombre(l[7]) if len(l) > 7 else None, poses=1)
 
     def adresse_fichier(self, o: dict) -> str:
         """Adresse exacte par ``files/<opusid>.json`` (le chemin déduit sert de repli)."""
@@ -154,7 +157,7 @@ class PdsAtlas(Archive):
     def url(self, q: Requete) -> str:
         fq = ['ATLAS_MISSION_NAME:juno', 'ATLAS_INSTRUMENT_NAME:jnc']
         if q.cible:
-            fq.append('TARGET_NAME:"%s"' % corps(q.cible).upper().replace('"', ''))
+            fq.append('TARGET_NAME:"%s"' % corps_pds(q.cible).replace('"', ''))
         if q.finaux:
             fq.append('ATLAS_PRODUCT_TYPE:rdr')
         if q.date_min or q.date_max:

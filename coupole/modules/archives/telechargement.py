@@ -1,7 +1,8 @@
 """Téléchargement poli, préparation et rangement des fichiers d'archive ; état, journal, possession.
 
-* Rangement : ``<sortie>/Archives/<mission>/<cible>/<instrument>/<filtre>/`` ; le fichier d'origine (gardé par
-  défaut) et l'image préparée ``<nom>_sci.xisf`` (ou ``.fits``), son masque éventuel.
+* Rangement par champ (0.2.2, ``rangement.py``) : ``<sortie>/Archives/<champ>/<cible>_<instrument>_<filtre>_<date>_
+  <type>_<n>x<pose>s.xisf`` (image préparée, recadrée sur sa zone utile) ; le fichier d'origine seulement sur option
+  (``<champ>/_originaux/``), le masque des pixels sans donnée seulement sur option (compressé).
 * État : ``<sortie>/Archives/_etat/etat.sqlite`` — même schéma et même logique de partage réseau que la Banque OHP
   (``core/base_partagee.py`` : sur un partage, base de travail locale recopiée atomiquement) ; un téléchargement
   interrompu reprend (fichier ``.part`` et requête partielle quand le serveur l'accepte) ; un fichier déjà préparé
@@ -59,8 +60,9 @@ def nom_cible(o: dict, cible: str = '') -> str:
 
 
 def dossier_de(sortie, o: dict, cible: str = '') -> str:
-    return os.path.join(dossier_archives(sortie), sur(o['mission'] or o['archive']), nom_cible(o, cible),
-                        sur(o['instrument'] or 'instrument'), sur(o['filtre'] or 'sans_filtre'))
+    """Dossier du champ (classement par champ, comme la Banque OHP)."""
+    from .rangement import nom_champ
+    return os.path.join(dossier_archives(sortie), nom_champ(o, cible))
 
 
 def base_preparee(fichier: str) -> str:
@@ -143,8 +145,9 @@ class Telechargement:
     {'genre': 'debut'|'octets'|'fini'|'erreur'|'deja'|'fin', …}.  `arret` annule ; `pause` suspend."""
 
     def __init__(self, sortie, observations: list[dict], cible: str = '', fmt: str = 'xisf',
-                 garder_original: bool = True, debit_octets_s: float = 8e6, paralleles: int = 2,
-                 rapporter=None, arret: threading.Event | None = None, pause: threading.Event | None = None):
+                 garder_original: bool = False, debit_octets_s: float = 8e6, paralleles: int = 2,
+                 rapporter=None, arret: threading.Event | None = None, pause: threading.Event | None = None,
+                 masque: bool = False, recadrer: bool = True):
         self.sortie = os.path.abspath(os.path.expanduser(str(sortie)))
         self.racine = dossier_archives(self.sortie)
         self.trav = os.path.join(self.racine, '_etat')
@@ -153,6 +156,10 @@ class Telechargement:
         self.cible = cible
         self.fmt = fmt if fmt in ('xisf', 'fits') else 'xisf'
         self.garder = bool(garder_original)
+        self.masque = bool(masque)
+        self.recadrer = bool(recadrer)
+        self._recus: dict[str, int] = {}
+        self._gardes = 0
         self.paralleles = max(1, min(6, int(paralleles or 2)))
         self.rapporter = rapporter or (lambda ev: None)
         self.arret = arret or threading.Event()
@@ -172,18 +179,25 @@ class Telechargement:
         except Exception:
             pass
 
-    def _progres(self, n):
+    def _progres(self, n, ident=''):
         with self._verrou:
             self._octets += n
+            if ident:
+                self._recus[ident] = self._recus.get(ident, 0) + n
             t = time.monotonic()
             if t - self._dernier_evt < 0.1:
                 return
             self._dernier_evt = t
             total = self._octets
-        self._evt(genre='octets', octets=total)
+            recus = dict(self._recus)
+        self._evt(genre='octets', octets=total, recus=recus)
 
     # ------------------------------------------------------------------ une observation
     def traiter(self, o: dict) -> str:
+        from .extraction import Inexploitable as _Inex
+        from .produits import classer
+        from .rangement import ORIGINAUX, libre, nom_lisible
+        classer(o)
         statut, _, info = self.etat.lire(o['id'])
         dossier = dossier_de(self.sortie, o, self.cible)
         if statut == 'ok' and info.get('prepare') and os.path.exists(os.path.join(self.racine, info['prepare'])):
@@ -193,48 +207,81 @@ class Telechargement:
             time.sleep(0.2)
         if self.arret.is_set():
             raise reseau.Annule()
-        os.makedirs(dossier, exist_ok=True)
-        self._evt(genre='debut', id=o['id'], fichier=o['fichier'])
+        originaux = os.path.join(dossier, ORIGINAUX)
+        os.makedirs(originaux, exist_ok=True)
+        self._evt(genre='debut', id=o['id'], fichier=o['fichier'], taille=o.get('taille'))
         a = ARCHIVES[o['archive']]
         url = a.adresse_fichier(o)
-        fichier = os.path.join(dossier, sur_fichier(o['fichier']))
+        fichier = os.path.join(originaux, sur_fichier(o['fichier']))
         exact = o.get('taille') if (o.get('taille') and not o.get('taille_estimee') and o['archive'] in ('mast',)) else None
         reseau.telecharger(url, fichier, taille_attendue=exact, limiteur=self.limiteur, arret=self.arret,
-                           progression=self._progres)
+                           progression=lambda n, i=o['id']: self._progres(n, i))
         etiquette = ''
         if o.get('etiquette'):
-            etiquette = os.path.join(dossier, sur_fichier(o['etiquette'].rsplit('/', 1)[-1]))
+            etiquette = os.path.join(originaux, sur_fichier(o['etiquette'].rsplit('/', 1)[-1]))
             reseau.telecharger(o['etiquette'], etiquette, limiteur=self.limiteur, arret=self.arret)
+        octets_origine = os.path.getsize(fichier)
+        self._evt(genre='telecharge', id=o['id'], octets=octets_origine)
+
+        def nommer(entete):
+            return libre(os.path.join(dossier, nom_lisible(o, self.cible, entete)), '.' + self.fmt,
+                         appartient=lambda c: False)
         try:
             r = preparer(fichier, os.path.join(dossier, base_preparee(o['fichier'])), o, self.fmt,
-                         etiquette or None)
-        except Inexploitable as e:
-            info = {'fichier': os.path.relpath(fichier, self.racine), 'raison': str(e)}
+                         etiquette or None, masque=self.masque, recadrer=self.recadrer, nommer=nommer)
+        except _Inex as e:
+            if not self.garder:
+                self._effacer_originaux(fichier, etiquette, originaux)
+            info = {'fichier': os.path.relpath(fichier, self.racine) if self.garder else '', 'raison': str(e)}
             self.etat.ecrire(o['id'], url, 'echec', info)
             self.journal.ecrire('arc_j_inexploitable', id=o['id'], raison=str(e))
             self._evt(genre='erreur', id=o['id'], erreur=str(e))
             return 'echec'
+        except Exception:
+            if not self.garder:                  # fichier illisible : rien ne reste derrière (il sera retéléchargé)
+                self._effacer_originaux(fichier, etiquette, originaux)
+            raise
         if not self.garder:
-            for f in (fichier, etiquette):
-                try:
-                    if f:
-                        os.remove(f)
-                except OSError:
-                    pass
+            self._effacer_originaux(fichier, etiquette, originaux)
+        gardes = r['octets'] + sum(os.path.getsize(m) for m in r.get('masques', []) if os.path.exists(m))
+        if self.garder:
+            gardes += octets_origine
+        with self._verrou:
+            self._gardes += gardes
         info = {'fichier': os.path.relpath(fichier, self.racine) if self.garder else '',
                 'prepare': os.path.relpath(r['chemin'], self.racine),
                 'masque': os.path.relpath(r['masque'], self.racine) if r['masque'] else '',
                 'autres': [os.path.relpath(c, self.racine) for c in r.get('chemins', [])[1:]],
-                'octets': os.path.getsize(fichier) if self.garder and os.path.exists(fichier) else 0,
-                'octets_prepare': r['octets'], 'forme': list(r['forme']), 'nan': r['nan'], 'wcs': r['wcs'],
-                'bunit': r['bunit'], 'extension': r['extension'], 'archive': o['archive'], 'mission': o['mission'],
-                'instrument': o['instrument'], 'filtre': o['filtre'], 'lambda_nm': o['lambda_nm'],
-                'cible': self.cible or o['cible'], 'debut': o['debut'], 'credit': o['credit'], 'page': o['page'],
-                'date': D.datetime.now(D.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}
+                'octets': octets_origine, 'octets_prepare': r['octets'], 'forme': list(r['forme']),
+                'forme_origine': list(r.get('forme_origine') or r['forme']), 'recadrage': r.get('recadrage'),
+                'nan': r['nan'], 'wcs': r['wcs'], 'bunit': r['bunit'], 'extension': r['extension'],
+                'archive': o['archive'], 'mission': o['mission'], 'instrument': o['instrument'], 'filtre': o['filtre'],
+                'lambda_nm': o['lambda_nm'], 'cible': self.cible or o['cible'], 'debut': o['debut'],
+                'credit': o['credit'], 'page': o['page'], 'poses': r.get('poses'), 'exposition': r.get('exposition'),
+                'produit': o.get('produit', ''), 'nature': o.get('nature', ''), 'variante': bool(o.get('variante')),
+                'obs_id': o.get('obs_id', ''), 'date': D.datetime.now(D.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}
         self.etat.ecrire(o['id'], url, 'ok', info)
         self.journal.ecrire('arc_j_ok', id=o['id'], chemin=info['prepare'])
-        self._evt(genre='fini', id=o['id'], chemin=r['chemin'])
+        if r.get('recadrage'):
+            self.journal.ecrire('arc_j_recadre', chemin=info['prepare'],
+                                avant='%d×%d' % (info['forme_origine'][1], info['forme_origine'][0]),
+                                apres='%d×%d' % (r['forme'][1], r['forme'][0]))
+        self._evt(genre='fini', id=o['id'], chemin=r['chemin'], octets_origine=octets_origine, octets_garde=gardes,
+                  forme=list(r['forme']), forme_origine=info['forme_origine'])
         return 'ok'
+
+    @staticmethod
+    def _effacer_originaux(fichier, etiquette, originaux):
+        for f in (fichier, etiquette):
+            try:
+                if f:
+                    os.remove(f)
+            except OSError:
+                pass
+        try:
+            os.rmdir(originaux)
+        except OSError:
+            pass
 
     # ------------------------------------------------------------------ boucle
     def executer(self) -> dict:
@@ -269,6 +316,8 @@ class Telechargement:
             self.journal.vider()
         res = dict(self.bilan)
         res['octets'] = self._octets
+        res['octets_gardes'] = self._gardes
+        res['dossier'] = self.racine
         res['secondes'] = time.monotonic() - t0
         self._evt(genre='fin', bilan=res)
         return res
@@ -285,6 +334,11 @@ def sur_fichier(nom: str) -> str:
 
 # ================================================================================================ possession
 STATUTS = ('ok', 'echec', 'absente')
+
+
+def chemin_relatif(p: str) -> str:
+    """Chemin relatif noté dans la base d'état, avec le séparateur du système (« HST\\M16\\x » ↔ « HST/M16/x »)."""
+    return p.replace('\\', '/').replace('/', os.sep) if p else p
 
 
 def possession(sortie) -> dict[str, dict]:
@@ -310,6 +364,11 @@ def possession(sortie) -> dict[str, dict]:
             d = json.loads(info) if info else {}
         except ValueError:
             d = {}
+        for k in ('prepare', 'fichier', 'masque'):          # base écrite sous Windows, relue ailleurs (et l'inverse)
+            if isinstance(d.get(k), str):
+                d[k] = chemin_relatif(d[k])
+        if isinstance(d.get('autres'), list):
+            d['autres'] = [chemin_relatif(x) for x in d['autres'] if isinstance(x, str)]
         if st == 'ok' and d.get('prepare') and not os.path.exists(os.path.join(racine, d['prepare'])):
             st = 'absente'                                     # fichier déplacé ou effacé à la main
         d['statut'] = st

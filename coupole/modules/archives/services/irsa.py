@@ -80,7 +80,8 @@ class Irsa(Archive):
             page=lien('archives.irsa.page', ra='%.5f' % ra, dec='%+.5f' % dec) if ra is not None and dec is not None else '',
             programme=l.get('proposal_id', ''), pi=l.get('proposal_pi', ''),
             titre=l.get('proposal_title', '') or l.get('obs_title', ''), credit=CREDITS.get(mission, self.credit),
-            conditions=self.conditions, obs_id=l.get('obs_id', ''), sous_type=sous)
+            conditions=self.conditions, obs_id=l.get('obs_id', ''), sous_type=sous,
+            exposition=nombre(l.get('t_exptime')))
 
 
 def _mjd_iso(v):

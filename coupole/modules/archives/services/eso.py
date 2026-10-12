@@ -17,7 +17,7 @@ from ....core import sources
 
 COLONNES = ('obs_collection', 'instrument_name', 'obs_id', 'dp_id', 'calib_level', 'dataproduct_subtype', 'filter',
             'em_min', 'em_max', 's_ra', 's_dec', 't_min', 'obs_release_date', 'target_name', 'proposal_id',
-            'access_estsize', 'obs_title', 'obs_creator_name', 'facility_name')
+            'access_estsize', 'obs_title', 'obs_creator_name', 'facility_name', 't_exptime')
 
 
 class Eso(Archive):
@@ -64,7 +64,8 @@ class Eso(Archive):
             filtre=l.get('filter', ''), lambda_nm=lam, debut=mjd_vers_iso(l.get('t_min')), publique=publique,
             public=deja_public(publique), calib=calib, final=(calib or 0) >= 2, cible=l.get('target_name', ''),
             ra=nombre(l.get('s_ra')), dec=nombre(l.get('s_dec')), url=lien('archives.eso.fichier', id=dp),
-            fichier=dp.replace(':', '_') + '.fits', taille=int(kb * 1000) if kb else None, apercu='',
+            fichier=dp.replace(':', '_') + '.fits', taille=int(kb * 1000) if kb else None,
+            apercu=lien('archives.eso.vignette', id=dp), exposition=nombre(l.get('t_exptime')),
             page=lien('archives.eso.page', id=dp), programme=programme, pi=l.get('obs_creator_name', ''),
             titre=l.get('obs_title', ''), credit='ESO' + ((' (%s)' % programme) if programme else ''),
             conditions=self.conditions, obs_id=l.get('obs_id', ''), sous_type=l.get('dataproduct_subtype', ''))

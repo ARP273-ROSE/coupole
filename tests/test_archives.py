@@ -295,26 +295,78 @@ def fits_multi(chemin, donnees, bunit='MJy/sr', sci=True, n_detecteurs=0, gz=Fal
 
 def test_extraction_sci_wcs_nan_masque_credit(tmp_path):
     d = np.random.default_rng(1).normal(100, 5, (150, 200)).astype(np.float32)
-    d[:10, :] = np.nan
+    d[:10, :] = np.nan                     # bord sans donnée : recadré
+    d[50:52, 60:70] = np.nan               # trou intérieur : reste (0 + NANCOUNT)
     src = fits_multi(str(tmp_path / 'jw_i2d.fits'), d)
     o = B.observation(id='mast:jw', archive='mast', mission='JWST', credit='NASA/ESA/CSA, STScI', cible='M 16',
                       lambda_nm=4440.0, page='https://mast.stsci.edu/x')
     for fmt in ('xisf', 'fits'):
-        r = EX.preparer(src, str(tmp_path / fmt / 'jw_i2d_sci'), o, fmt)
-        assert r['extension'] == 1 and r['nan'] == 2000 and r['wcs'] and r['bunit'] == 'MJy/sr'
-        assert os.path.exists(r['masque'])
-        lu, h = EX.lire_prepare(r['chemin'])
-        assert np.isnan(lu[:10]).all() and np.allclose(lu[10:], d[10:])        # NaN rétablis par le masque
-        assert h['CREDIT'] == 'NASA/ESA/CSA, STScI' and h['TELESCOP'] == 'JWST' and h['FILTER'] == 'F444W'
-        assert h['BUNIT'] == 'MJy/sr' and h['PHOTMJSR'] == 0.25 and h['ARCHID'] == 'mast:jw' and h['LAMBDA'] == 4440.0
-        assert abs(h['CRVAL1'] - 83.82) < 1e-12 and h['NANCOUNT'] == 2000
-        assert EX.wcs_celeste(h)
+        for avec_masque in (False, True):
+            dest = tmp_path / fmt / ('m' if avec_masque else 's') / 'jw_i2d_sci'
+            r = EX.preparer(src, str(dest), o, fmt, masque=avec_masque)
+            assert r['extension'] == 1 and r['nan'] == 20 and r['wcs'] and r['bunit'] == 'MJy/sr'
+            assert r['forme'] == (140, 200) and r['forme_origine'] == (150, 200) and r['recadrage'] == [10, 149, 0, 199]
+            assert bool(r['masque']) == avec_masque and (not avec_masque or os.path.exists(r['masque']))
+            lu, h = EX.lire_prepare(r['chemin'])
+            assert np.isnan(lu[40:42, 60:70]).all() and np.isfinite(lu).sum() == 140 * 200 - 20
+            assert np.allclose(lu[:40], d[10:50])
+            assert h['CREDIT'] == 'NASA/ESA/CSA, STScI' and h['TELESCOP'] == 'JWST' and h['FILTER'] == 'F444W'
+            assert h['BUNIT'] == 'MJy/sr' and h['PHOTMJSR'] == 0.25 and h['ARCHID'] == 'mast:jw' and h['LAMBDA'] == 4440.0
+            assert abs(h['CRVAL1'] - 83.82) < 1e-12 and h['NANCOUNT'] == 20 and h['CROPY0'] == 11 and h['ORIGNAX2'] == 150
+            assert EX.wcs_celeste(h)
+    # la WCS recadrée désigne le même point du ciel que l'originale
+    from astropy.io import fits
+    from astropy.wcs import WCS
+    with fits.open(src) as hd:
+        w0 = WCS(hd[1].header)
+    _, h = EX.lire_prepare(str(tmp_path / 'fits' / 's' / 'jw_i2d_sci.fits'))
+    w1 = WCS(h)
+    assert np.allclose(w0.pixel_to_world_values(37, 64), w1.pixel_to_world_values(37, 54), atol=1e-10)
     from coupole.core import xisf
-    _, info = xisf.lire(str(tmp_path / 'xisf' / 'jw_i2d_sci.xisf'), strict=True)
-    lo, hi = EX.bornes(np.where(np.isfinite(d), d, 0))
+    _, info = xisf.lire(str(tmp_path / 'xisf' / 's' / 'jw_i2d_sci.xisf'), strict=True)
+    lo, hi = EX.bornes(np.where(np.isfinite(d[10:]), d[10:], 0))
     b = info['bounds']
     b = tuple(float(x) for x in b.split(':')) if isinstance(b, str) else tuple(b)
     assert b == (lo, hi)
+    # sans recadrage (option) : taille d'origine
+    r = EX.preparer(src, str(tmp_path / 'brut' / 'x'), o, 'fits', recadrer=False)
+    assert r['forme'] == (150, 200) and r['recadrage'] is None and r['nan'] == 2020
+
+
+def test_recadrage_skycell_et_masque_compresse(tmp_path):
+    """Cas réel ramené à l'échelle : cellule de 1980 × 1574 dont seul un coin à droite a des données (MVM M 16)."""
+    d = np.full((1574, 1980), np.nan, dtype=np.float32)
+    d[543:1065, 1904:1980] = np.random.default_rng(2).normal(0.05, 0.01, (522, 76))
+    src = fits_multi(str(tmp_path / 'hst_skycell-p1033x08y12_acs_wfc_f775w_all_drc.fits'), d)
+    r = EX.preparer(src, str(tmp_path / 'sky_sci'), None, 'xisf', masque=True)
+    assert r['forme'] == (522, 76) and r['nan'] == 0 and not r['masque']        # plus aucun pixel sans donnée
+    assert os.path.getsize(r['chemin']) < 200_000
+    d[700, 1950] = np.nan
+    src = fits_multi(str(tmp_path / 'b.fits'), d)
+    r = EX.preparer(src, str(tmp_path / 'b_sci'), None, 'fits', masque=True)
+    assert r['nan'] == 1 and os.path.getsize(r['masque']) < 30_000
+    m = EX.lire_masque(r['masque'])
+    assert m.shape == (522, 76) and (~m).sum() == 1
+    # zone_utile lit par blocs et ignore les zéros exacts
+    z = np.zeros((3000, 40), np.float32)
+    z[2500:2600, 5:7] = 1
+    assert EX.zone_utile(z, bloc=512) == (2500, 2599, 5, 6) and EX.zone_utile(np.zeros((5, 5))) is None
+
+
+def test_nombre_de_poses_et_exposition():
+    from astropy.io import fits
+    h = fits.Header()
+    h['D001DATA'] = 'a_flt.fits[sci,1]'
+    h['D002DATA'] = 'a_flt.fits[sci,2]'
+    h['D003DATA'] = 'b_flt.fits[sci,1]'
+    assert EX.nombre_poses(h) == 2
+    h['NCOMBINE'] = 4
+    assert EX.nombre_poses(h) == 4
+    h['NUMEXP'] = 8
+    assert EX.nombre_poses(h) == 8
+    h['EXPTIME'] = 650.0
+    h['TEXPTIME'] = 5200.0
+    assert EX.exposition_totale(h) == 5200.0
 
 
 def test_extraction_detecteurs_cube_entier_gz(tmp_path):
@@ -560,10 +612,15 @@ def test_telechargement_reprise_etat_possession(serveur, tmp_path):
     assert p['mast:a_i2d.fits']['statut'] == 'ok' and p['mast:mauvais.fits']['statut'] == 'echec'
     racine = T.dossier_archives(tmp_path / 'sortie')
     prep = os.path.join(racine, p['mast:a_i2d.fits']['prepare'])
-    assert prep.endswith(os.path.join('JWST', 'M_16', 'NIRCAM_IMAGE', 'F444W', 'a_i2d_sci.xisf')) and os.path.exists(prep)
-    assert os.path.exists(os.path.join(racine, 'JWST', 'M_16', 'NIRCAM_IMAGE', 'F444W', 'a_i2d.fits'))
+    assert prep == os.path.join(racine, 'M16', 'M16_NIRCAM_F444W_2022-07-01_i2d.xisf') and os.path.exists(prep)
+    assert not os.path.exists(os.path.join(racine, 'M16', '_originaux'))          # original non gardé par défaut
+    assert sorted(os.listdir(os.path.join(racine, 'M16'))) == ['M16_NIRCAM_F200W_2022-07-01_i2d.xisf',
+                                                                'M16_NIRCAM_F444W_2022-07-01_i2d.xisf']
     journal = open(os.path.join(racine, '_etat', 'JOURNAL.txt'), encoding='utf-8').read()
-    assert 'a_i2d_sci.xisf' in journal and ' / ' in journal
+    assert 'M16_NIRCAM_F444W_2022-07-01_i2d.xisf' in journal and ' / ' in journal
+    assert b['octets_gardes'] == sum(os.path.getsize(os.path.join(racine, 'M16', f)) for f in os.listdir(os.path.join(racine, 'M16')))
+    genres = [e['genre'] for e in evts]
+    assert genres.index('telecharge') < genres.index('fini') and 'octets' in genres
     n = len(serveur.requetes)
     b2 = T.Telechargement(tmp_path / 'sortie', obs[:2], cible='M 16').executer()       # déjà là : aucune requête
     assert b2['deja'] == 2 and len(serveur.requetes) == n
@@ -574,8 +631,13 @@ def test_telechargement_reprise_etat_possession(serveur, tmp_path):
 def test_telechargement_sans_original_et_annulation(serveur, tmp_path):
     obs = [obs_locale(serveur, '/b_drz.fits', mission='HST')]
     T.Telechargement(tmp_path / 's', obs, garder_original=False, fmt='fits').executer()
-    d = os.path.join(T.dossier_archives(tmp_path / 's'), 'HST', 'M_16', 'NIRCAM_IMAGE', 'F200W')
-    assert sorted(os.listdir(d)) == ['b_drz_sci.fits', 'b_drz_sci_masque.fits']
+    d = os.path.join(T.dossier_archives(tmp_path / 's'), 'M16')
+    assert sorted(os.listdir(d)) == ['M16_NIRCAM_F200W_2022-07-01_drz.fits']    # rien d'autre que le produit préparé
+    T.Telechargement(tmp_path / 'g', obs, garder_original=True, masque=True, fmt='fits').executer()
+    d = os.path.join(T.dossier_archives(tmp_path / 'g'), 'M16')
+    assert sorted(os.listdir(d)) == ['M16_NIRCAM_F200W_2022-07-01_drz.fits', 'M16_NIRCAM_F200W_2022-07-01_drz_masque.fits',
+                                     '_originaux']
+    assert os.listdir(os.path.join(d, '_originaux')) == ['b_drz.fits']
     arret = threading.Event()
     arret.set()
     b = T.Telechargement(tmp_path / 's2', [obs_locale(serveur, '/a_i2d.fits')], arret=arret).executer()
@@ -715,3 +777,144 @@ def test_cli_liste_et_chercher(monkeypatch, capsys):
     sortie = json.loads(capsys.readouterr().out)
     assert [o['obs_id'] for o in sortie] == ['jw1']
     assert cli.main(['--lang', 'fr', 'archives', 'chercher', '274.7 -13.8', '--archive', 'inconnue']) == 2
+
+
+# ============================================================================================ produits logiques (0.2.2)
+def _arp273():
+    """Les 17 produits réellement rendus par MAST pour Arp 273 (programme 12326), d'après dbo.obspointing."""
+    lignes = []
+    for f, t in (('F600LP', 2600.0), ('F390W', 4800.0), ('F475X', 3200.0)):
+        k = {'F600LP': 1, 'F390W': 2, 'F475X': 3}[f]
+        for v in (21, 22):
+            lignes.append(('ibkx%d0%d0' % (v, k), f, t, 'CALWF3', 'drz'))
+            lignes.append(('hst_12326_%d_wfc3_uvis_%s_ibkx%d' % (v, f.lower(), v), f, t, 'HAP-SVM', 'drc'))
+        lignes.append(('hst_skycell-p2092x10y17_wfc3_uvis_%s_all' % f.lower(), f, 2 * t, 'HAP-MVM', 'drc'))
+    for v in (21, 22):
+        lignes.append(('hst_12326_%d_wfc3_uvis_total_ibkx%d' % (v, v), 'detection', 10600.0, 'HAP-SVM', 'drc'))
+    obs = []
+    for ident, f, t, prov, suf in lignes:
+        obs.append(B.observation(id='mast:' + ident, archive='mast', mission='HST', instrument='WFC3/UVIS', filtre=f,
+                                 obs_id=ident, exposition=t, provenance=prov, final=True, calib=3,
+                                 url='https://x/%s_%s.fits' % (ident, suf)))
+    return obs
+
+
+def test_un_produit_logique_par_filtre_arp273():
+    from coupole.modules.archives import produits as P
+    obs = P.regrouper(_arp273())
+    assert len(obs) == 17
+    retenus = P.visibles(obs)
+    assert sorted(o['obs_id'] for o in retenus) == sorted('hst_skycell-p2092x10y17_wfc3_uvis_%s_all' % f
+                                                         for f in ('f600lp', 'f390w', 'f475x'))
+    assert all(o['raison'] == 'arc_r_mvm' and o['nature'] == 'mosaique' for o in retenus)
+    det = [o for o in obs if o['filtre'] == 'detection']
+    assert len(det) == 2 and all(o['variante'] and o['raison'] == 'arc_r_detection' for o in det)
+    svm = [o for o in obs if o['produit'] == 'svm']
+    assert len(svm) == 6 and all(o['raison'] == 'arc_r_svm_dans_mvm' for o in svm)
+    assert {o['produit'] for o in obs if o['obs_id'].startswith('ibkx')} == {'pipeline'}
+    # sans les MVM (pas encore produites) : une SVM par visite et par filtre, le drz du pipeline en variante
+    sans = P.regrouper([o for o in _arp273() if o['produit'] != 'mvm' and 'skycell' not in o['obs_id']])
+    retenus = P.visibles(sans)
+    assert len(retenus) == 6 and all(o['produit'] == 'svm' for o in retenus)
+    assert all(o['raison'] == 'arc_r_pipeline_meme_visite' for o in sans if o['obs_id'].startswith('ibkx'))
+    assert len(P.visibles(sans, variantes=True)) == 14
+
+
+def test_natures_et_poses_unitaires():
+    from coupole.modules.archives import produits as P
+    poses = [B.observation(id='mast:ifmk41i%sq' % c, archive='mast', mission='HST', instrument='WFC3/UVIS',
+                           filtre='F275W', obs_id='ifmk41i%sq' % c, exposition=30.0) for c in 'bc']
+    P.regrouper(poses)
+    assert all(o['nature'] == 'pose' and not o['variante'] for o in poses)       # Saturne : chaque pose compte
+    jw = [B.observation(id='mast:%s' % i, archive='mast', mission='JWST', instrument='NIRCAM/IMAGE', filtre='F444W',
+                        obs_id=i, exposition=t) for i, t in (('jw02739-o001_t001_nircam_clear-f444w', 3000.0),
+                                                             ('jw02739-c1001_t001_nircam_clear-f444w', 6000.0))]
+    P.regrouper(jw)
+    assert [o['variante'] for o in jw] == [True, False] and jw[1]['nature'] == 'mosaique'
+    assert P.nature_generale({'archive': 'sdss'}) == 'pose' and P.nature_generale({'archive': 'irsa', 'mission': 'WISE'}) == 'mosaique'
+    assert P.resume_exposition(5200, 8) == '8 × 650 s = 5 200 s (1 h 27 min)'
+    assert P.resume_exposition(30) == '30 s' and P.resume_exposition(None) == ''
+
+
+# ============================================================================================ recherche tolérante (0.2.2)
+@pytest.mark.parametrize('texte,genre,attendu', [
+    ('jupiter', 'corps', 'Jupiter'), ('JUPITER', 'corps', 'Jupiter'), ('saturne', 'corps', 'Saturn'),
+    ('Saturn', 'corps', 'Saturn'), ('encelade', 'corps', 'Enceladus'), ('Phœbé', 'corps', 'Phoebe'),
+    ('ganymede', 'corps', 'Ganymede'), ('Japet', 'corps', 'Iapetus'), ('m16', 'nom', 'M 16'),
+    ('ngc6611', 'nom', 'NGC 6611'), ('arp273', 'nom', 'Arp 273'), ('Piliers de la Création', 'nom', 'M 16'),
+    ('sh2-155', 'nom', 'Sh 2-155'), ('HUDF', 'coordonnees', 53.1625), ('83.82 -5.39', 'coordonnees', 83.82)])
+def test_interpreter_le_texte_tape(texte, genre, attendu):
+    i = R.interpreter(texte)
+    assert i['genre'] == genre
+    if genre == 'corps':
+        assert i['corps']['en'] == attendu
+    elif genre == 'nom':
+        assert i['noms'][0] == attendu
+    else:
+        assert abs(i['ra'] - attendu) < 1e-6
+
+
+def test_corps_par_nom_de_cible_mast_opus_pds(monkeypatch):
+    vues = reponses_simulees(monkeypatch, [
+        ('dbo.obspointing', votable(CHAMPS_MAST, [ligne_mast('HST', 'ifmk41icq', 'ifmk41icq_drz.fits', filtre='F275W')])),
+        ('data.json', json.dumps({'page': []}).encode()),
+        ('pds_archives', json.dumps({'response': {'docs': []}}).encode())])
+    q = R.requete('saturne', 3.0)
+    assert q.ra is None and q.cible == 'Saturn'
+    assert set(R.archives_pour(q, ('mast', 'eso', 'irsa'))) == {'mast', 'opus', 'pds'}
+    res = {r.archive: r for r in R.chercher(q, R.archives_pour(q, ('eso',)))}
+    assert len(res['mast'].observations) == 1 and not res['mast'].erreur
+    adql = [v for v in vues if 'obspointing' in v][0]
+    assert "target_name LIKE 'SATURN%'" in adql and 'mtflag = 1' in adql and 's_ra' not in adql.split('WHERE')[1]
+    assert any('target=Saturn' in v for v in vues if 'data.json' in v)
+    from coupole.modules.archives import corps as C
+    assert C.condition_mast(C.reconnaitre('io')).count("'IO") == 3            # IO, IO-…, IO+… (pas IONOSPHERE)
+    assert R.suggestions('sat') == ['Saturne', 'Saturn Rings'] and R.suggestions('pil')[0] == 'Piliers de la Création'
+
+
+def test_reorganiser_des_telechargements_de_la_021(tmp_path):
+    """Arborescence et base d'état écrites par la 0.2.1 sous Windows (séparateurs « \\ », masques pleine taille,
+    images pleine taille) : renommées, rangées par champ, recadrées, masques supprimés, variantes à part, rien
+    d'écrasé, base et journal à jour."""
+    from coupole.modules.ohp.pilote import Etat
+    from coupole.modules.archives import rangement as RG
+    racine = T.dossier_archives(tmp_path)
+    etat = Etat(os.path.join(racine, '_etat', 'etat.sqlite'))
+    d = np.full((300, 400), np.nan, np.float32)
+    d[100:150, 350:400] = 5.0
+    for ident, filtre, sous in (('hst_skycell-p2092x10y17_wfc3_uvis_f390w_all', 'F390W', 'F390W'),
+                                ('hst_12326_21_wfc3_uvis_f390w_ibkx21', 'F390W', 'F390W'),
+                                ('hst_12326_21_wfc3_uvis_total_ibkx21', 'detection', 'detection')):
+        src = fits_multi(str(tmp_path / (ident + '.fits')), d)
+        rel = os.path.join('HST', 'arp_273', 'WFC3_UVIS', sous, ident + '_drc_sci')
+        r = EX.preparer(src, os.path.join(racine, rel), {'id': 'mast:' + ident}, 'xisf', masque=True, recadrer=False)
+        assert r['forme'] == (300, 400) and os.path.exists(r['masque'])
+        win = lambda p: os.path.relpath(p, racine).replace(os.sep, '\\')
+        etat.ecrire('mast:' + ident, 'https://x', 'ok', {'prepare': win(r['chemin']), 'masque': win(r['masque']),
+                                                         'mission': 'HST', 'instrument': 'WFC3/UVIS', 'filtre': filtre,
+                                                         'cible': 'arp 273', 'debut': '2010-12-17T06:39:15',
+                                                         'archive': 'mast'})
+    etat.fermer()
+    occupe = os.path.join(racine, 'arp273', 'arp273_WFC3-UVIS_F390W_2010-12-17_MVM.xisf')
+    os.makedirs(os.path.dirname(occupe))
+    open(occupe, 'w').write('déjà là')                                      # un nom déjà pris n'est jamais écrasé
+    simule = RG.reorganiser(tmp_path, simuler=True)
+    assert simule['deplaces'] == 0 and os.path.exists(os.path.join(racine, 'HST'))
+    b = RG.reorganiser(tmp_path)
+    assert b['deplaces'] == 3 and b['recadres'] == 3 and b['masques'] == 3 and not b['erreurs']
+    assert open(occupe).read() == 'déjà là'
+    attendus = {'arp273/arp273_WFC3-UVIS_F390W_2010-12-17_MVM_2.xisf',
+                'arp273/_variantes/arp273_WFC3-UVIS_F390W_2010-12-17_SVM-v21.xisf',
+                'arp273/_variantes/arp273_WFC3-UVIS_detection_2010-12-17_detection-v21.xisf'}
+    trouves = {os.path.relpath(os.path.join(a, f), racine).replace(os.sep, '/') for a, _, fs in os.walk(racine)
+               for f in fs if f.endswith('.xisf')}
+    assert trouves == attendus | {'arp273/arp273_WFC3-UVIS_F390W_2010-12-17_MVM.xisf'}
+    assert not os.path.exists(os.path.join(racine, 'HST'))                 # dossiers vidés retirés
+    p = T.possession(tmp_path)
+    mvm = p['mast:hst_skycell-p2092x10y17_wfc3_uvis_f390w_all']
+    assert mvm['statut'] == 'ok' and mvm['prepare'].replace(os.sep, '/') == 'arp273/arp273_WFC3-UVIS_F390W_2010-12-17_MVM_2.xisf'
+    lu, h = EX.lire_prepare(os.path.join(racine, mvm['prepare']))
+    assert lu.shape == (50, 50) and np.all(lu == 5.0) and h['CROPX0'] == 351 and 'MASKFILE' not in h
+    journal = open(os.path.join(racine, '_etat', 'JOURNAL.txt'), encoding='utf-8').read()
+    assert 'arp273_WFC3-UVIS_F390W_2010-12-17_MVM_2.xisf' in journal
+    assert RG.reorganiser(tmp_path)['deplaces'] == 0                      # une seconde fois : rien à faire

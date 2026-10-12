@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "version": 3,
+  "version": 4,
   "date": "2026-10-09",
   "_note": "Adresses des services utilisés par Coupole. Valeurs par défaut livrées avec l'application ; une version plus récente peut être publiée dans le dépôt (coupole/donnees/sources.json) et récupérée au démarrage ; l'utilisateur peut forcer chaque valeur dans les Préférences.",
   "valeurs": {
@@ -26,6 +26,9 @@
     "archives.eso.tap": "https://archive.eso.org/tap_obs",
     "archives.eso.fichier": "https://dataportal.eso.org/dataPortal/file/{id}",
     "archives.eso.page": "https://archive.eso.org/dataset/{id}",
+    "archives.eso.vignette": "https://archive.eso.org/previews/v1/files/{id}/thumbnail",
+    "archives.hlsp": "https://archive.stsci.edu/hlsps/{chemin}",
+    "archives.hlsp.page": "https://archive.stsci.edu/prepds/{projet}/",
     "archives.irsa.sia": "https://irsa.ipac.caltech.edu/SIA",
     "archives.irsa.tap": "https://irsa.ipac.caltech.edu/TAP",
     "archives.irsa.collections": "spitzer_seip,wise_allwise,twomass_allsky",

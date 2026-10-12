@@ -33,7 +33,8 @@ CREDITS = {'JWST': 'NASA/ESA/CSA, STScI', 'HST': 'NASA/ESA, STScI', 'HLA': 'NASA
 SUFFIXES_FINAUX = ('_i2d.fits', '_drz.fits', '_drc.fits', '-int.fits.gz')
 COLONNES = ('obs_collection', 'instrument_name', 'obs_id', 'obsid', 'calib_level', 'dataproduct_type', 'filters',
             's_ra', 's_dec', 't_min', 't_obs_release', 'target_name', 'proposal_id', 'proposal_pi', 'obs_title',
-            'jpegurl', 'dataurl', 'datarights', 'em_min', 'em_max', 's_region')
+            'jpegurl', 'dataurl', 'datarights', 'em_min', 'em_max', 's_region', 't_exptime', 'provenance_name',
+            'target_classification')
 
 
 def final(collection: str, fichier: str, calib) -> bool:
@@ -68,6 +69,7 @@ class Mast(Archive):
     credit = 'NASA, STScI (MAST)'
     conditions = 'arc_cond_mast'
     etape = 1
+    par_corps = True              # cherche aussi un corps du Système solaire par nom de cible (cible mobile)
 
     def requete_adql(self, q: Requete, collections) -> str:
         cond = ['obs_collection IN (%s)' % ','.join(adql_texte(c) for c in collections),
@@ -85,7 +87,15 @@ class Mast(Archive):
             cond.append('t_min >= %.5f' % _mjd(q.date_min))
         if q.date_max:
             cond.append('t_min <= %.5f' % (_mjd(q.date_max) + 1))
-        ordre = ''
+        if q.ra is None and q.cible:                     # corps du Système solaire : par nom de cible, jamais par position
+            from ..corps import condition_mast, reconnaitre
+            c = reconnaitre(q.cible)
+            if c is not None:
+                cond.append(condition_mast(c))
+            else:
+                cond.append('target_name LIKE %s' % adql_texte(q.cible.upper().replace('%', '') + '%'))
+            cond.append('mtflag = 1')
+        ordre = ' ORDER BY t_min DESC' if q.ra is None else ''
         if q.ra is not None and q.dec is not None:      # les plus proches d'abord : la limite garde les bonnes lignes
             c2 = math.cos(math.radians(q.dec)) ** 2
             ordre = ' ORDER BY (s_ra - (%.6f)) * (s_ra - (%.6f)) * %.6f + (s_dec - (%.6f)) * (s_dec - (%.6f))' % (
@@ -95,7 +105,7 @@ class Mast(Archive):
 
     def chercher(self, q: Requete) -> list[dict]:
         collections = [c for c in q.missions if c in COLLECTIONS] if q.missions else list(PAR_DEFAUT)
-        if not collections:
+        if not collections or (q.ra is None and not q.cible):
             return []
         lignes = tap(sources.valeur('archives.mast.tap'), self.requete_adql(q, collections), service='mast')
         out = []
@@ -138,7 +148,9 @@ class Mast(Archive):
             dec=nombre(l.get('s_dec')), url=adresse, fichier=fichier, apercu=apercu,
             page=lien('archives.mast.page', obs_id=l.get('obs_id', '')), programme=l.get('proposal_id', ''),
             pi=l.get('proposal_pi', ''), titre=l.get('obs_title', ''), credit=CREDITS.get(col, self.credit),
-            conditions=self.conditions, obs_id=l.get('obs_id', ''), _region=l.get('s_region', ''))
+            conditions=self.conditions, obs_id=l.get('obs_id', ''), _region=l.get('s_region', ''),
+            exposition=nombre(l.get('t_exptime')), provenance=(l.get('provenance_name') or '').strip(),
+            type_objet=(l.get('target_classification') or '').strip())
 
 
 def _mjd(date_iso: str) -> float:

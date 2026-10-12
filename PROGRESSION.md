@@ -780,10 +780,17 @@ temporaire, jamais modifiés en place).
   produits HAP-MVM : 12 à 17 s ; JWST (`_i2d`) : 34 s ; ESO : 1,7 s ; OPUS `meta/mults/target.json` et facettes
   Solr du PDS : < 1 s.
 ### Plan (cases cochées au fil de l'eau)
-- [ ] Recadrage sur la zone utile (WCS mise à jour), tailles avant/après ; masque facultatif (uint8 compressé)
-- [ ] Un produit logique par filtre (MVM / SVM / pipeline / détection), variantes en option, nature et temps total
+- [x] Recadrage sur la zone utile (WCS mise à jour), tailles avant/après ; masque facultatif (uint8 compressé)
+  (`extraction.zone_utile` lit par blocs de 512 lignes ; `CROPX0/CROPY0/ORIGNAX1/ORIGNAX2` ; sans masque, les 0
+  exacts redeviennent « sans donnée » pour l'alignement ; original non gardé par défaut, rien d'autre ne reste)
+- [x] Un produit logique par filtre (MVM / SVM / pipeline / détection), variantes en option, nature et temps total
+  (`produits.py` ; colonnes `t_exptime`, `provenance_name`, `target_classification` ajoutées à la requête MAST)
 - [ ] Recherche tolérante (corps du Système solaire FR/EN, alias SIMBAD), suggestions pendant la frappe
-- [ ] Noms lisibles et réorganisation des téléchargements existants
+  (fait côté moteur : `corps.py`, `celebres.py`, `recherche.interpreter/variantes_nom/suggestions` ; reste l'interface)
+- [ ] Noms lisibles et réorganisation des téléchargements existants (moteur fait : `rangement.py`)
+  Essai sur une copie des vrais téléchargements (18 fichiers, base écrite sous Windows) : 18 déplacés, 11 recadrés
+  (M 16 : 19 806 × 15 741 → 762 × 5 217 px), 16 masques pleine taille supprimés, 1 641 → 910 Mo, 23 s ; les
+  15 variantes et images de détection d'Arp 273 rangées dans `arp273/_variantes/`, les 3 MVM restent.
 - [ ] Taille affichée d'emblée, total de la sélection ; progression (débit, ETA, deux phases), état final
 - [ ] Aperçus (vignette réduite, générée après téléchargement, raison sinon)
 - [ ] Catalogue des cibles par archive (cache daté), programmes célèbres, guide Hubble Ultra Deep Field

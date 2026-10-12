@@ -5,6 +5,80 @@ _NOMS = {'mast': 'MAST (Hubble, JWST, GALEX)', 'eso': 'ESO', 'irsa': 'IRSA (Spit
          'opus': 'Voyager, Cassini (OPUS)', 'pds': 'Juno (PDS)'}
 
 TEXTES = {
+
+    # ---------------------------------------------------------------- 0.2.2 : réorganisation (journal)
+    'arc_j_reorg_debut': {'fr': 'réorganisation : {n} fichiers', 'en': 'reorganisation: {n} files'},
+    'arc_j_deplace': {'fr': 'déplacé : {de} → {vers}', 'en': 'moved: {de} → {vers}'},
+    'arc_j_recadre': {'fr': 'recadré sur la zone utile : {chemin} ({avant} → {apres} px)',
+                      'en': 'cropped to the useful area: {chemin} ({avant} → {apres} px)'},
+    'arc_j_masque_supprime': {'fr': 'masque supprimé : {chemin}', 'en': 'mask deleted: {chemin}'},
+    'arc_j_reorg_erreur': {'fr': 'réorganisation impossible pour {chemin} : {raison}',
+                           'en': 'could not reorganise {chemin}: {raison}'},
+    'arc_j_reorg_fin': {'fr': 'réorganisation terminée : {deplaces} déplacés, {recadres} recadrés, {masques} masques '
+                              'supprimés ; {avant} Mo → {apres} Mo',
+                        'en': 'reorganisation finished: {deplaces} moved, {recadres} cropped, {masques} masks deleted; '
+                              '{avant} MB → {apres} MB'},
+    # ---------------------------------------------------------------- 0.2.2 : nature des produits
+    'arc_nature_pose': {'fr': 'pose unitaire', 'en': 'single exposure'},
+    'arc_nature_combine': {'fr': 'produit combiné', 'en': 'combined product'},
+    'arc_nature_mosaique': {'fr': 'mosaïque', 'en': 'mosaic'},
+    'arc_nature_detection': {'fr': 'image de détection', 'en': 'detection image'},
+    'arc_nature_combine_n': {'fr': 'produit combiné ({n} poses)', 'en': 'combined product ({n} exposures)'},
+    'arc_nature_mosaique_n': {'fr': 'mosaïque ({n} poses)', 'en': 'mosaic ({n} exposures)'},
+    'arc_produit_mvm': {'fr': 'Hubble, mosaïque multi-visites (HAP MVM)', 'en': 'Hubble multi-visit mosaic (HAP MVM)'},
+    'arc_produit_svm': {'fr': "Hubble, mosaïque d'une visite (HAP SVM)", 'en': 'Hubble single-visit mosaic (HAP SVM)'},
+    'arc_produit_pipeline': {'fr': 'Hubble, pipeline standard (association drz/drc)',
+                             'en': 'Hubble standard pipeline (drz/drc association)'},
+    'arc_produit_pose': {'fr': 'Hubble, une pose drizzlée', 'en': 'Hubble, one drizzled exposure'},
+    'arc_produit_detection': {'fr': 'Hubble, image de détection (somme des filtres)',
+                              'en': 'Hubble detection image (sum of the filters)'},
+    'arc_produit_jwst_mosaique': {'fr': 'JWST, mosaïque de plusieurs observations (i2d)',
+                                  'en': 'JWST mosaic of several observations (i2d)'},
+    'arc_produit_jwst_obs': {'fr': "JWST, image combinée d'une observation (i2d)",
+                             'en': 'JWST combined image of one observation (i2d)'},
+    'arc_produit_hlsp': {'fr': 'produit de haut niveau (HLSP) déjà empilé par une équipe',
+                         'en': 'high-level science product (HLSP) already stacked by a team'},
+    'arc_r_mvm': {'fr': 'Retenu : la mosaïque multi-visites contient toutes les poses publiques de ce filtre (temps '
+                        'total le plus long), corrigées de la CTE, alignées sur Gaia, sur une grille commune à tous '
+                        'les filtres de la cellule (couleur directe).',
+                  'en': 'Chosen: the multi-visit mosaic holds every public exposure in this filter (longest total '
+                        'time), CTE-corrected, aligned to Gaia, on a grid shared by all filters of the cell (direct '
+                        'colour).'},
+    'arc_r_svm': {'fr': "Retenu : mosaïque de la visite, alignée sur Gaia, tous les filtres de la visite sur la même "
+                        "grille (pas de mosaïque multi-visites disponible).",
+                  'en': 'Chosen: visit mosaic, aligned to Gaia, all filters of the visit on the same grid (no '
+                        'multi-visit mosaic available).'},
+    'arc_r_pipeline': {'fr': 'Retenu : produit du pipeline standard (aucun produit HAP pour ces poses, par exemple '
+                             'WFPC2).',
+                       'en': 'Chosen: standard pipeline product (no HAP product for these exposures, e.g. WFPC2).'},
+    'arc_r_pose_seule': {'fr': 'Une pose unitaire : rien ne la combine (cible mobile ou pose isolée).',
+                         'en': 'A single exposure: nothing combines it (moving target or isolated exposure).'},
+    'arc_r_autre_cellule': {'fr': 'Variante : autre cellule du ciel pour le même filtre (champ à cheval sur deux '
+                                  'cellules).',
+                            'en': 'Variant: another sky cell for the same filter (field across two cells).'},
+    'arc_r_svm_dans_mvm': {'fr': "Variante : mêmes poses que la mosaïque multi-visites, mais d'une seule visite.",
+                           'en': 'Variant: same exposures as the multi-visit mosaic, but from one visit only.'},
+    'arc_r_pipeline_dans_mvm': {'fr': 'Variante : mêmes poses que la mosaïque multi-visites, traitées par le pipeline '
+                                      "standard (une visite, sans la grille commune).",
+                                'en': 'Variant: same exposures as the multi-visit mosaic, processed by the standard '
+                                      'pipeline (one visit, without the common grid).'},
+    'arc_r_pose_dans_mvm': {'fr': 'Variante : une seule des poses de la mosaïque multi-visites.',
+                            'en': 'Variant: just one of the exposures of the multi-visit mosaic.'},
+    'arc_r_pipeline_meme_visite': {'fr': 'Variante : mêmes poses que la mosaïque de la visite (SVM), pipeline '
+                                         'standard.',
+                                   'en': 'Variant: same exposures as the visit mosaic (SVM), standard pipeline.'},
+    'arc_r_pose_dans_assoc': {'fr': 'Variante : une seule pose de ce produit combiné.',
+                              'en': 'Variant: a single exposure of this combined product.'},
+    'arc_r_detection': {'fr': "Écartée : image de détection (somme de tous les filtres, pour les catalogues), pas un "
+                              "filtre.",
+                        'en': 'Left out: detection image (sum of all filters, for catalogues), not a filter.'},
+    'arc_r_jwst_mosaique': {'fr': 'Retenu : mosaïque JWST de plusieurs observations (temps total le plus long).',
+                            'en': 'Chosen: JWST mosaic of several observations (longest total time).'},
+    'arc_r_jwst_obs': {'fr': "Retenu : observation JWST au temps de pose le plus long pour ce filtre.",
+                       'en': 'Chosen: JWST observation with the longest exposure in this filter.'},
+    'arc_r_jwst_autre': {'fr': 'Variante : autre observation JWST du même filtre (même champ ou champ voisin).',
+                         'en': 'Variant: another JWST observation in the same filter (same or nearby field).'},
+    'arc_r_variante': {'fr': 'Variante du même produit.', 'en': 'Variant of the same product.'},
     **{'arc_nom_' + k: {'fr': v, 'en': v} for k, v in _NOMS.items()},
     'arc_info_mast': {'fr': "MAST (STScI) : produits finaux de Hubble (images « drizzlées » _drz, _drc), de JWST "
                             "(_i2d) et de GALEX.  Service TAP officiel de MAST.",

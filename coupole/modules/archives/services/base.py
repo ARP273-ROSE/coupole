@@ -15,6 +15,9 @@ Une *observation* est un dictionnaire (léger : 50 000 lignes tiennent en mémoi
     taille      octets annoncés par l'archive (None : inconnu, mesuré avant téléchargement)
     apercu      adresse d'une vignette ('' sinon) ; page : page de l'archive
     programme, pi, titre, credit (crédit à afficher), conditions (clé de texte des conditions d'usage)
+    exposition  temps de pose total en secondes (None : inconnu) ; poses : nombre de poses combinées (None : inconnu)
+    produit, nature, visite, variante, groupe, raison : voir ``produits.py`` (nature : pose | combine | mosaique |
+                detection) ; provenance : chaîne de traitement annoncée (CALWF3, HAP-SVM, HAP-MVM…)
 
 Aucune requête n'est faite à l'import ; chaque archive est une classe `Archive` (voir `catalogue.py`).
 """
@@ -348,7 +351,8 @@ def observation(**valeurs) -> dict:
          'publique': '', 'public': True, 'calib': None, 'final': False, 'cible': '', 'ra': None, 'dec': None,
          'distance': None, 'url': '', 'fichier': '', 'format': 'fits', 'etiquette': '', 'taille': None, 'apercu': '',
          'page': '', 'programme': '', 'pi': '', 'titre': '', 'credit': '', 'conditions': '', 'obs_id': '',
-         'type': 'image'}
+         'type': 'image', 'exposition': None, 'poses': None, 'produit': '', 'nature': '', 'visite': '',
+         'variante': False, 'groupe': '', 'raison': '', 'provenance': '', 'type_objet': '', 'sous_type': ''}
     o.update(valeurs)
     if not o['fichier'] and o['url']:
         o['fichier'] = nom_fichier(o['url'])
@@ -396,6 +400,7 @@ class Archive:
     conditions = ''
     compte = False
     celeste = True
+    par_corps = False             # une archive céleste qui sait aussi chercher un corps du Système solaire par son nom
     etape = 1
 
     def chercher(self, q: Requete) -> list[dict]:          # pragma: no cover - abstrait

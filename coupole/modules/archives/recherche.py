@@ -41,18 +41,91 @@ def lire_coordonnees(texte: str) -> tuple[float, float] | None:
     return None
 
 
-def resoudre(nom: str, delai: float = 10.0) -> dict:
-    """{'ra', 'dec', 'nom', 'service'} ; lève LookupError (introuvable) ou reseau.ServiceInjoignable."""
-    c = lire_coordonnees(nom)
+RE_CATALOGUE = re.compile(r'^\s*(m|ngc|ic|arp|ugc|pgc|sh\s*2-?|abell|hcg|caldwell|c|barnard|b|lbn|ldn|vdb|mrk|'
+                          r'markarian|messier)\s*-?\s*(\d+[a-z]?)\s*$', re.I)
+CATALOGUES = {'m': 'M', 'messier': 'M', 'ngc': 'NGC', 'ic': 'IC', 'arp': 'Arp', 'ugc': 'UGC', 'pgc': 'PGC',
+              'abell': 'Abell', 'hcg': 'HCG', 'caldwell': 'Caldwell', 'c': 'Caldwell', 'barnard': 'Barnard',
+              'b': 'Barnard', 'lbn': 'LBN', 'ldn': 'LDN', 'vdb': 'VdB', 'mrk': 'Mrk', 'markarian': 'Mrk'}
+
+
+def variantes_nom(nom: str) -> list[str]:
+    """Écritures à essayer auprès de SIMBAD/Sesame : nom usuel (« Piliers de la Création » → « M 16 »), numéro
+    de catalogue détaché et dans la casse attendue (« m16 », « ngc6611 », « sh2-155 », « arp273 »)."""
+    from .celebres import alias
+    out = []
+    a = alias(nom)
+    if a:
+        out.append(a)
+    m = RE_CATALOGUE.match(nom or '')
+    if m:
+        cat = re.sub(r'\s+', '', m.group(1).lower())
+        if cat.startswith('sh2'):
+            out.append('Sh 2-%s' % m.group(2))
+        else:
+            out.append('%s %s' % (CATALOGUES.get(cat, m.group(1)), m.group(2).upper()))
+    propre = ' '.join((nom or '').split())
+    if propre:
+        out.append(propre)
+    return list(dict.fromkeys(out))
+
+
+def interpreter(texte: str) -> dict:
+    """Ce que l'on a tapé : {'genre': 'vide'|'coordonnees'|'corps'|'nom', 'ra', 'dec', 'corps', 'noms'}.
+    Un corps du Système solaire (« jupiter », « Saturne », « Encelade ») se cherche par nom de cible."""
+    from .corps import reconnaitre
+    t = (texte or '').strip()
+    if not t:
+        return {'genre': 'vide'}
+    c = lire_coordonnees(t)
     if c:
-        return {'ra': c[0], 'dec': c[1], 'nom': '', 'service': 'coordonnees'}
-    r = enligne.fiche_objet(nom, cat='ciel', delai=delai, en_ligne=True)
-    f = r.get('fiche') or {}
-    if r.get('etat') == 'hors_ligne':
-        raise reseau.ServiceInjoignable(r.get('erreur') or 'offline')
-    if f.get('ra') is None or f.get('dec') is None:
+        return {'genre': 'coordonnees', 'ra': c[0], 'dec': c[1]}
+    corps = reconnaitre(t)
+    if corps is not None:
+        return {'genre': 'corps', 'corps': corps}
+    noms = variantes_nom(t)
+    c = lire_coordonnees(noms[0]) if noms else None
+    if c:
+        return {'genre': 'coordonnees', 'ra': c[0], 'dec': c[1], 'alias': noms[0]}
+    return {'genre': 'nom', 'noms': noms}
+
+
+def resoudre(nom: str, delai: float = 10.0) -> dict:
+    """{'ra', 'dec', 'nom', 'service'} ; lève LookupError (introuvable) ou reseau.ServiceInjoignable.  Essaie le nom
+    usuel, le numéro de catalogue réécrit, puis le nom tel quel (SIMBAD, puis Sesame qui interroge aussi NED et
+    VizieR)."""
+    i = interpreter(nom)
+    if i['genre'] == 'coordonnees':
+        return {'ra': i['ra'], 'dec': i['dec'], 'nom': '', 'service': 'coordonnees'}
+    if i['genre'] == 'corps':
         raise LookupError(nom)
-    return {'ra': float(f['ra']), 'dec': float(f['dec']), 'nom': f.get('nom') or nom, 'service': f.get('service', '')}
+    noms = i.get('noms') or [nom]
+    derniere = None
+    for n in noms:
+        r = enligne.fiche_objet(n, cat='ciel', delai=delai, en_ligne=True)
+        f = r.get('fiche') or {}
+        if r.get('etat') == 'hors_ligne':
+            derniere = reseau.ServiceInjoignable(r.get('erreur') or 'offline')
+            continue
+        if f.get('ra') is not None and f.get('dec') is not None:
+            return {'ra': float(f['ra']), 'dec': float(f['dec']), 'nom': f.get('nom') or n,
+                    'service': f.get('service', '')}
+    if derniere is not None:
+        raise derniere
+    raise LookupError(nom)
+
+
+def suggestions(debut: str, langue: str = 'fr', n: int = 10) -> list[str]:
+    """Propositions pendant la frappe : corps du Système solaire, noms usuels et programmes célèbres."""
+    from .celebres import noms_usuels
+    from .corps import normaliser, suggestions as s_corps
+    d = normaliser(debut)
+    if len(d) < 2:
+        return []
+    out = s_corps(debut, langue, n)
+    for nom in noms_usuels():
+        if normaliser(nom).startswith(d) and nom not in out:
+            out.append(nom)
+    return out[:n]
 
 
 def chercher(q: Requete, archives: tuple | None = None, arret: threading.Event | None = None,
@@ -71,7 +144,7 @@ def chercher(q: Requete, archives: tuple | None = None, arret: threading.Event |
         res = Resultat(archive=ident, observations=[])
         if arret is not None and arret.is_set():
             return res
-        if a.celeste and q.ra is None:
+        if a.celeste and q.ra is None and not (a.par_corps and q.cible):
             return res
         if not a.celeste and not q.cible:
             return res
@@ -108,13 +181,28 @@ def toutes(resultats: list[Resultat]) -> list[dict]:
                 out.append(o)
     out.sort(key=lambda o: (o['distance'] if o['distance'] is not None else math.inf, o['mission'],
                             o['lambda_nm'] if o['lambda_nm'] is not None else math.inf, o['debut']))
-    return out
+    from .produits import regrouper
+    return regrouper(out)
 
 
 def requete(nom: str = '', rayon_arcmin: float = 3.0, **kw) -> Requete:
-    """Requête depuis un nom ou des coordonnées (résolus ici, en ligne : à appeler hors du fil graphique)."""
+    """Requête depuis un nom, un corps du Système solaire ou des coordonnées (résolus ici, en ligne : à appeler
+    hors du fil graphique).  Un corps donne `cible` (recherche par nom de cible), le reste des coordonnées."""
     q = Requete(nom=nom, rayon=rayon_arcmin / 60.0, **kw)
     if nom and not q.cible:
+        i = interpreter(nom)
+        if i['genre'] == 'corps':
+            q.cible = i['corps']['en']
+            return q
         r = resoudre(nom)
         q.ra, q.dec = r['ra'], r['dec']
     return q
+
+
+def archives_pour(q: Requete, cochees: tuple) -> tuple:
+    """Archives à interroger : pour un corps du Système solaire, celles qui cherchent par nom de cible (MAST,
+    Voyager/Cassini, Juno), même non cochées ; sinon les archives célestes cochées."""
+    from .services import ARCHIVES
+    if q.ra is None and q.cible:
+        return tuple(a for a in ARCHIVES if not ARCHIVES[a].celeste or ARCHIVES[a].par_corps)
+    return tuple(a for a in cochees if ARCHIVES[a].celeste)
