@@ -284,6 +284,8 @@ OBJET & objet (nom ou coordonnées)\\
 --corps,\allowbreak{} --body CORPS & corps du Système solaire (Voyager, Cassini, Juno)\\
 --limite,\allowbreak{} --limit N & nombre maximal de lignes par archive (défaut : 2000)\\
 --id ID & garder seulement cet identifiant (répétable)\\
+--variantes,\allowbreak{} --variants & montrer aussi les variantes (autres produits des mêmes poses) et les images de détection ; par défaut, un produit par filtre\\
+--programme,\allowbreak{} --program N & ne garder que les produits de ce programme (répétable), par exemple 9978\\
 --json & sortie JSON (pour les scripts)\\
 --csv FICHIER & écrit aussi les résultats dans ce fichier CSV\\
 \bottomrule
@@ -306,6 +308,8 @@ OBJET & objet (nom ou coordonnées)\\
 --corps,\allowbreak{} --body CORPS & corps du Système solaire (Voyager, Cassini, Juno)\\
 --limite,\allowbreak{} --limit N & nombre maximal de lignes par archive (défaut : 2000)\\
 --id ID & garder seulement cet identifiant (répétable)\\
+--variantes,\allowbreak{} --variants & montrer aussi les variantes (autres produits des mêmes poses) et les images de détection ; par défaut, un produit par filtre\\
+--programme,\allowbreak{} --program N & ne garder que les produits de ce programme (répétable), par exemple 9978\\
 \bottomrule
 \end{tabularx}
 \par\medskip
@@ -326,9 +330,13 @@ OBJET & objet (nom ou coordonnées)\\
 --corps,\allowbreak{} --body CORPS & corps du Système solaire (Voyager, Cassini, Juno)\\
 --limite,\allowbreak{} --limit N & nombre maximal de lignes par archive (défaut : 2000)\\
 --id ID & garder seulement cet identifiant (répétable)\\
+--variantes,\allowbreak{} --variants & montrer aussi les variantes (autres produits des mêmes poses) et les images de détection ; par défaut, un produit par filtre\\
+--programme,\allowbreak{} --program N & ne garder que les produits de ce programme (répétable), par exemple 9978\\
 --dest DOSSIER & dossier de sortie (défaut : celui des Préférences)\\
 --format \{xisf,\allowbreak{}fits\} & format des images préparées (défaut : xisf)\\
---sans-original,\allowbreak{} --no-original & efface le fichier d'origine une fois l'image préparée\\
+--sans-original,\allowbreak{} --no-original & (comportement par défaut depuis 0.2.2) n'efface que le fichier d'origine une fois l'image préparée\\
+--garder-original,\allowbreak{} --keep-original & garder aussi le fichier d'origine (dans <champ>/\_originaux) ; par défaut, seul le produit préparé reste\\
+--masque,\allowbreak{} --mask & écrire aussi le masque des pixels sans donnée (compressé, après recadrage)\\
 --debit,\allowbreak{} --rate MO/S & plafond de débit en Mo/s (défaut : réglage, 8)\\
 --paralleles,\allowbreak{} --parallel N & téléchargements simultanés (défaut : 2, au plus 6)\\
 --max N & au plus N fichiers (les plus proches)\\
@@ -358,6 +366,51 @@ FICHIER & images préparées (FITS ou XISF avec WCS)\\
 --echelle,\allowbreak{} --scale X & facteur de taille des pixels de sortie (défaut : 1)\\
 --sans-recadrage,\allowbreak{} --no-crop & ne recadre pas sur la zone commune\\
 --format \{xisf,\allowbreak{}fits\} & format des images préparées (défaut : xisf)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives catalogue (catalog)\newline\normalfont\small Liste les cibles d'une archive, les plus observées d'abord (requête agrégée, cache de 30 jours), ou les programmes célèbres.  Listes : celebres, hst, jwst, eso, voyager, cassini, juno.}\\
+\midrule
+liste \{celebres,\allowbreak{}famous,\allowbreak{}hst,\allowbreak{}jwst,\allowbreak{}eso,\allowbreak{}voyager,\allowbreak{}cassini,\allowbreak{}juno\} & liste à afficher (celebres par défaut)\\
+--type T & type d'objet : galaxie, amas\_galaxies, amas\_stellaire, nebuleuse, etoile, systeme\_solaire, champ, autre\\
+--filtre,\allowbreak{} --filter OBJET & ne garder que les cibles dont le nom contient ce texte\\
+--page N & page à afficher (100 cibles par page)\\
+--actualiser,\allowbreak{} --refresh & relire la liste en ligne (ignorer le cache)\\
+--json & sortie JSON (pour les scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives reorganiser (reorganise)\newline\normalfont\small Renomme les fichiers déjà téléchargés (<cible>\_<instrument>\_<filtre>\_<date>\_<type>\_<n>x<pose>s), les range par champ, les recadre sur leur zone utile, supprime les masques pleine taille et met variantes et images de détection dans « \_variantes ».  Jamais d'écrasement ; journal dans \_etat/JOURNAL.txt.}\\
+\midrule
+--dest DOSSIER & dossier de sortie (défaut : celui des Préférences)\\
+--simuler,\allowbreak{} --dry-run & montrer ce qui serait fait, sans rien changer\\
+--garder-masques,\allowbreak{} --keep-masks & récrire les masques (compressés) au lieu de les supprimer\\
+--sans-recadrage,\allowbreak{} --no-crop & ne pas recadrer les images\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives instruments\newline\normalfont\small topo des instruments et des filtres (ou la fiche d’un filtre)}\\
+\midrule
+FILTRE & nom d'un filtre (F656N, F444W, Ks…) : longueur d'onde, largeur, usage, équivalent amateur\\
+--instrument I & instrument (morceau du nom, répétable)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives hudf\newline\normalfont\small Liste les produits de haut niveau du HUDF (XDF, HUDF09, HUDF12) ; --telecharger récupère le préréglage « couleur en 3 filtres » (XDF F435W, F775W, F160W, 3 × 110 Mo) ou les filtres donnés par --filtre.}\\
+\midrule
+--telecharger,\allowbreak{} --download & télécharger et préparer (sinon : liste seulement)\\
+--filtre,\allowbreak{} --filter F & filtre XDF à télécharger (répétable)\\
+--dest DOSSIER & dossier de sortie (défaut : celui des Préférences)\\
+--format \{xisf,\allowbreak{}fits\} & format des images préparées (défaut : xisf)\\
+--oui,\allowbreak{} --yes & confirme un téléchargement au-delà du seuil\\
 \bottomrule
 \end{tabularx}
 \par\medskip

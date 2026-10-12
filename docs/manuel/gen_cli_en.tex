@@ -284,6 +284,8 @@ OBJECT & object (name or coordinates)\\
 --corps,\allowbreak{} --body BODY & Solar System body (Voyager, Cassini, Juno)\\
 --limite,\allowbreak{} --limit N & maximum number of rows per archive (default: 2000)\\
 --id ID & keep only this identifier (repeatable)\\
+--variantes,\allowbreak{} --variants & also show variants (other products of the same exposures) and detection images; by default, one product per filter\\
+--programme,\allowbreak{} --program N & keep only the products of this programme (repeatable), e.g. 9978\\
 --json & JSON output (for scripts)\\
 --csv FILE & also write the results to this CSV file\\
 \bottomrule
@@ -306,6 +308,8 @@ OBJECT & object (name or coordinates)\\
 --corps,\allowbreak{} --body BODY & Solar System body (Voyager, Cassini, Juno)\\
 --limite,\allowbreak{} --limit N & maximum number of rows per archive (default: 2000)\\
 --id ID & keep only this identifier (repeatable)\\
+--variantes,\allowbreak{} --variants & also show variants (other products of the same exposures) and detection images; by default, one product per filter\\
+--programme,\allowbreak{} --program N & keep only the products of this programme (repeatable), e.g. 9978\\
 \bottomrule
 \end{tabularx}
 \par\medskip
@@ -326,9 +330,13 @@ OBJECT & object (name or coordinates)\\
 --corps,\allowbreak{} --body BODY & Solar System body (Voyager, Cassini, Juno)\\
 --limite,\allowbreak{} --limit N & maximum number of rows per archive (default: 2000)\\
 --id ID & keep only this identifier (repeatable)\\
+--variantes,\allowbreak{} --variants & also show variants (other products of the same exposures) and detection images; by default, one product per filter\\
+--programme,\allowbreak{} --program N & keep only the products of this programme (repeatable), e.g. 9978\\
 --dest FOLDER & output folder (default: the one of the Preferences)\\
 --format \{xisf,\allowbreak{}fits\} & format of the prepared images (default: xisf)\\
---sans-original,\allowbreak{} --no-original & delete the original file once the image is prepared\\
+--sans-original,\allowbreak{} --no-original & (default since 0.2.2) delete the original file once the image is prepared\\
+--garder-original,\allowbreak{} --keep-original & also keep the original file (in <field>/\_originaux); by default only the prepared product remains\\
+--masque,\allowbreak{} --mask & also write the mask of pixels without data (compressed, after cropping)\\
 --debit,\allowbreak{} --rate MB/S & rate cap in MB/s (default: setting, 8)\\
 --paralleles,\allowbreak{} --parallel N & simultaneous downloads (default: 2, at most 6)\\
 --max N & at most N files (the closest)\\
@@ -358,6 +366,51 @@ FILE & prepared images (FITS or XISF with WCS)\\
 --echelle,\allowbreak{} --scale X & output pixel size factor (default: 1)\\
 --sans-recadrage,\allowbreak{} --no-crop & do not crop to the common area\\
 --format \{xisf,\allowbreak{}fits\} & format of the prepared images (default: xisf)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives catalogue (catalog)\newline\normalfont\small Lists an archive's targets, most observed first (aggregate query, 30-day cache), or the famous programmes.  Lists: celebres, hst, jwst, eso, voyager, cassini, juno.}\\
+\midrule
+liste \{celebres,\allowbreak{}famous,\allowbreak{}hst,\allowbreak{}jwst,\allowbreak{}eso,\allowbreak{}voyager,\allowbreak{}cassini,\allowbreak{}juno\} & list to show (celebres by default)\\
+--type T & object type: galaxie, amas\_galaxies, amas\_stellaire, nebuleuse, etoile, systeme\_solaire, champ, autre\\
+--filtre,\allowbreak{} --filter OBJECT & keep only targets whose name contains this text\\
+--page N & page to show (100 targets per page)\\
+--actualiser,\allowbreak{} --refresh & read the list online again (ignore the cache)\\
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives reorganiser (reorganise)\newline\normalfont\small Renames the files already downloaded (<target>\_<instrument>\_<filter>\_<date>\_<type>\_<n>x<exp>s), files them by field, crops them to their useful area, deletes full-size masks and moves variants and detection images to "\_variantes".  Never overwrites; log in \_etat/JOURNAL.txt.}\\
+\midrule
+--dest FOLDER & output folder (default: the one of the Preferences)\\
+--simuler,\allowbreak{} --dry-run & show what would be done, changing nothing\\
+--garder-masques,\allowbreak{} --keep-masks & rewrite the masks (compressed) instead of deleting them\\
+--sans-recadrage,\allowbreak{} --no-crop & do not crop the images\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives instruments\newline\normalfont\small guide to instruments and filters (or one filter)}\\
+\midrule
+FILTER & filter name (F656N, F444W, Ks…): wavelength, width, use, amateur equivalent\\
+--instrument I & instrument (part of the name, repeatable)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives hudf\newline\normalfont\small Lists the HUDF high-level products (XDF, HUDF09, HUDF12); --download fetches the "3-filter colour" preset (XDF F435W, F775W, F160W, 3 × 110 MB) or the filters given by --filter.}\\
+\midrule
+--telecharger,\allowbreak{} --download & download and prepare (otherwise: list only)\\
+--filtre,\allowbreak{} --filter F & XDF filter to download (repeatable)\\
+--dest FOLDER & output folder (default: the one of the Preferences)\\
+--format \{xisf,\allowbreak{}fits\} & format of the prepared images (default: xisf)\\
+--oui,\allowbreak{} --yes & confirm a download beyond the threshold\\
 \bottomrule
 \end{tabularx}
 \par\medskip

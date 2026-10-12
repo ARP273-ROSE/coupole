@@ -630,47 +630,162 @@ PDS Imaging Atlas & 3 & JunoCam (RDR, \emph{framelet} strips)\\
 \end{tabularx}
 \end{center}
 
-\subsection{Searching}
-A name (resolved by SIMBAD then Sesame), coordinates in degrees (\texttt{83.82 -5.39}) or sexagesimal
-(\texttt{05:35:17 -05:23:28}), a radius (3~arcminutes by default) and the archives to query (MAST, ESO and IRSA by
-default). For Voyager, Cassini and Juno: a Solar System body (Jupiter, Saturn, Io, Enceladus…) with their archives
-ticked. Filters: instrument (part of the name: \texttt{NIRCAM}, \texttt{ACS}), filter (exact name: \texttt{F444W}),
-observation dates. Two boxes ticked by default: \emph{Final products only} (JWST \texttt{\_i2d}, Hubble
-\texttt{\_drz}/\texttt{\_drc}, Phase 3, SEIP, Atlas) and \emph{Public data only} (release date in the past). An
-observation is kept if its centre lies in the circle or its footprint contains the position; closest first. The
-archives answer in parallel; one that is unreachable, requires an account or has no interface is reported in the
-status bar without stopping the others. An answer truncated by the limit (2,000 rows per archive on the command line,
-20,000 in the interface) is reported: refine the search.
+\subsection{What you download, compared with your telescope}
+With your telescope you take single exposures (lights), calibrate them (bias, dark, flat), then align and stack
+them into a \emph{master}. Archives deliver the same steps, already done:
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Nature (column)} & \textbf{Amateur equivalent}\\
+\midrule
+single exposure · calibrated & one of your calibrated lights (Cassini, Voyager, JunoCam, SDSS, Keck); blue \emph{Calibrated exposure} badge\\
+combined product · final product & your stacked master: exposures aligned, cosmic rays rejected, distortion corrected (Hubble \texttt{drz}/\texttt{drc}, JWST \texttt{i2d}, ESO Phase 3); green \emph{Final product} badge\\
+mosaic & several visits or fields merged on a common grid (Hubble MVM, JWST \texttt{c…}, Spitzer SEIP, WISE)\\
+detection image & sum of all filters of a visit, made for catalogues: not a filter, left out by default\\
+\bottomrule
+\end{tabularx}
+\end{center}
+The \emph{total exposure} column gives the sum of the exposures and their number when known (``8 × 650 s = 5,200 s
+(1~h~27~min)''): compare with your nights. The calibration level in the record is spelt out (2 = calibrated frame by
+frame, 3 = combined final product, 4 = product of a science team).
 
-\paragraph{Record.} Clicking a row shows the thumbnail provided by the archive (cached) and the record: mission,
-instrument, filter, wavelength, observation and release dates, target, programme, principal investigator, title,
-calibration level, file, size, \textbf{credit} and \textbf{usage terms}, link to the archive page. Badges: green =
-already downloaded and prepared, orange = failure, arrow = to download; greyed row: not yet public.
+\paragraph{Units.} Hubble gives electrons per second, JWST MJy/sr: not ADU. Values are tiny (0.01 to 10), so the
+image looks black until stretched (PixInsight STF, Siril autostretch). Nothing is lost: Coupole keeps the physical
+values and the photometric constants.
+
+\paragraph{Hubble: drz, drc, SVM, MVM and ``skycell''.} For the same exposures, MAST publishes up to four products
+(checked on Arp~273, programme 12326: 17 files for 3 filters):
+\begin{itemize}
+\item \texttt{ipppssoot\_drz}: standard pipeline, an association of exposures of one visit and one filter;
+  \texttt{\_drc}: the same from exposures corrected for charge transfer efficiency (CTE, ACS/WFC and WFC3/UVIS) ---
+  \emph{HST Data Handbook}, ``Types of ACS files'';
+\item \texttt{hst\_<prog>\_<visit>\_…\_drc}: \textbf{single-visit mosaic} (SVM); all filters of the visit aligned to
+  each other and to Gaia, on the same grid; \texttt{…\_total\_…} is the detection image;
+\item \texttt{hst\_skycell-pPPPPxXXyYY\_…\_all\_drc}: \textbf{multi-visit mosaic} (MVM): every public exposure in the
+  filter within a \emph{sky cell}, a fixed grid 0.2° wide at 0.04″ per pixel, filled only where Hubble observed. The
+  cell is trimmed to the smallest rectangle holding \emph{all} exposures of the cell, every filter included
+  (DrizzlePac, ``Multi-visit Mosaic Processing''): one filter may fill only a corner. Real example: M~16, ACS F775W,
+  19,806 × 15,741 pixels (2.49~GB at MAST) for a data strip of 762 × 5,217 pixels.
+\end{itemize}
+\textbf{One logical product per filter}: Coupole picks the MVM when it exists (all exposures, longest total time, CTE
+corrected, grid shared by all filters of the cell: direct colour --- MAST, ``Multi-Visit Mosaics from Hubble Now
+Available'', 2022); otherwise, per visit, the SVM; otherwise the standard pipeline product (WFPC2 for instance). For
+JWST: the mosaic of several observations (\texttt{c…}), else the observation with the longest exposure. The other
+products of the same exposures become \emph{variants}, hidden by default (\emph{Show variants} box); the record says
+why each product is chosen or set aside. Documented MVM limits: residual shift of a few pixels between visits, moving
+objects doubled, no WFPC2.
+
+\subsection{Searching}
+\capture{img/archives_produits_en.png}{1.0}
+The \emph{Object} field accepts:
+\begin{itemize}
+\item a name or catalogue number, resolved by SIMBAD then Sesame (which also queries NED and VizieR); common spellings
+  are rewritten (``m16'' → M~16, ``ngc6611'', ``arp273'', ``sh2-155'') and usual French and English names recognised
+  (``Pillars of Creation'', ``Carina Nebula'', ``Stephan's Quintet'', ``HUDF'');
+\item a \textbf{Solar System body}, in French or English, case and accents ignored (jupiter, Saturne, Enceladus,
+  Iapetus, Phoebe…). SIMBAD does not know the planets and a planet moves: the body is searched \textbf{by target
+  name} in MAST (Hubble, JWST: \texttt{target\_name} ``JUPITER'', ``JUPITER-MAPS''… with the moving-target flag),
+  Voyager/Cassini (OPUS) and Juno (PDS), even if those archives are not ticked;
+\item coordinates in degrees (\texttt{83.82 -5.39}) or sexagesimal (\texttt{05:35:17 -05:23:28}).
+\end{itemize}
+Suggestions appear as you type (bodies, usual names). An object not found gives proposals and advice. Radius:
+3~arcminutes by default. Filters: instrument (part of the name: \texttt{NIRCAM}, \texttt{ACS}), filter
+(\texttt{F444W}), dates. Boxes: \emph{Final products only}, \emph{Public data only}, \emph{Show variants}. Archives
+answer in parallel; one that is unreachable, requires an account or has no interface is reported without stopping the
+others. A reply truncated by the limit is reported; when an archive serves two missions (OPUS: Voyager and Cassini),
+the limit is shared between them (in 0.2.1, ``saturne'' returned only Voyager).
+
+\paragraph{Size, record and preview.} The size of each file shows up by itself: announced by the archive, or measured
+in the background by a one-byte request (at most 60 at once, the others extrapolated and marked ``≈''); the selection
+total is under the table. The record gives mission, instrument, filter (with its wavelength and amateur equivalent),
+nature, total exposure, dates, programme, investigator, calibration level, file, credit and terms of use. The preview
+is the archive's official thumbnail, read in full, reduced without being decompressed at full size and cropped to the
+useful area (MAST JPEGs are full resolution, up to 19,806 × 15,741 pixels, white where there are no data); failing
+that, a thumbnail made from the prepared file; otherwise the reason (``the archive gives no thumbnail…'').
 
 \subsection{Downloading and preparing}
-Select rows, then \emph{Estimate the volume}: announced sizes (ESO, IRSA, NOIRLab, PDS) are added up, the others
-measured by a one-byte request (beyond 60 files, a sample per instrument, extrapolated and marked « ≈ »). Real orders of
-magnitude: a NIRCam \texttt{i2d} of the Pillars of Creation 5.4~GB, a MIRI \texttt{i2d} 153~MB, a WFC3/IR
-\texttt{drz} 37 to 87~MB. \emph{Download the selection} estimates first and asks for confirmation beyond 2~GB
-(\texttt{archives\_seuil\_go} setting). Capped rate (8~MB/s, \texttt{archives\_debit\_mo\_s}), two files at a time,
-at most one search request per second and per service; an interrupted file resumes (partial request), except on a
-server refusing them (ESO, KOA) where it restarts. \emph{Pause} and \emph{Cancel} are immediate.
+Select rows, then \emph{Download the selection}. Beyond 2~GB (setting \texttt{archives\_seuil\_go}), confirmation.
+Capped rate (8~MB/s, setting \texttt{archives\_debit\_mo\_s}), two files at a time, an interrupted file resumes. The
+bar moves in \textbf{two phases}: download (up to 70~\%, from bytes received), then preparation (up to 100~\%); below
+it: files downloaded and prepared, bytes received out of the total, rate, time left in all and for the current file.
+At the end the state is spelt out: ``Finished: N files, X downloaded, Y kept, Z errors --- Open the folder''.
 
-Each file is filed in \texttt{<folder>/Archives/<mission>/<target>/<instrument>/<filter>/} and prepared:
+Each image is prepared then filed \textbf{by field}, as in the OHP image bank:
+\texttt{<folder>/Archives/<field>/<target>\_<instrument>\_<filter>\_<date>\_<type>\_<n>x<exp>s.xisf}, for example
+\texttt{Arp273\_WFC3-UVIS\_F390W\_2010-12-17\_MVM\_8x1200s.xisf} or
+\texttt{HUDF\_WFC3-IR\_F160W\_2009-11-03\_HLSP\_26x1361s.xisf} (type: MVM, SVM-v21 for visit 21, drz, drc, pose, i2d,
+HLSP…). The archive identifier stays in the header (\texttt{ARCHID}, \texttt{ORIGFILE}) and in the record.
+Preparation:
 \begin{itemize}
 \item science extension extracted (\texttt{SCI}; otherwise the first image), one file per detector for an ESO
   multi-detector exposure (\texttt{\_d1}, \texttt{\_d2}…);
-\item header: WCS (SIP distortions included), \texttt{BUNIT}, photometric constants (\texttt{PHOTMJSR},
-  \texttt{PIXAR\_SR}, \texttt{PHOTFLAM}…), telescope, instrument, filter, dates, exposure time, programme,
-  investigator, then \texttt{ARCHIVE}, \texttt{ARCHID}, \texttt{ORIGFILE}, \texttt{LAMBDA}, \texttt{CREDIT} and the
-  usage terms as a comment;
-\item pixels without data (NaN: mosaic edges) set to 0, mask \texttt{\_masque.fits} (1 = data);
-\item XISF Float32 (bounds = data minimum and maximum: physical values are kept) or FITS Float32;
-\item original file kept (unticked: deleted once the image is prepared).
+\item \textbf{cropping to the useful area}: smallest rectangle of valid pixels, the WCS follows (\texttt{CRPIX}
+  shifted; \texttt{CROPX0}, \texttt{CROPY0}, \texttt{ORIGNAX1}, \texttt{ORIGNAX2} keep track); sizes before and after
+  in the status bar, the record and the log;
+\item header: WCS (SIP included), \texttt{BUNIT}, photometric constants, telescope, instrument, filter, dates, exposure
+  time, number of exposures (\texttt{NPOSES}), programme, investigator, \texttt{CREDIT} and terms of use;
+\item remaining pixels without data (NaN) set to 0 (\texttt{NANCOUNT}, \texttt{NANFILL});
+\item XISF Float32 (physical values kept) or FITS Float32.
 \end{itemize}
-The state is kept in \texttt{Archives/\_etat/etat.sqlite} (same network-share logic as the OHP bank,
-section~\ref{sec:partage}) and the bilingual log in \texttt{Archives/\_etat/JOURNAL.txt}; a prepared file is never
-redone. Double-click: open the prepared image; right-click: \emph{Open with}, location, archive page.
+\textbf{By default nothing but the prepared product}: the original file (\emph{Also keep the original file} box, filed
+in \texttt{<field>/\_originaux}) and the mask of pixels without data (\emph{Mask…} box, compressed 8-bit integers,
+written after cropping) are options. Without a mask, alignment treats exact zeros as ``no data''. The state is kept in
+\texttt{Archives/\_etat/etat.sqlite} and the bilingual log in \texttt{Archives/\_etat/JOURNAL.txt}.
+
+\paragraph{Reorganising downloads.} The \emph{Reorganise downloads…} button (and \cmd{coupole archives reorganise})
+takes up what was downloaded with 0.2.0 or 0.2.1: readable names, filing by field, cropping, deletion of full-size
+masks, variants and detection images in \texttt{<field>/\_variantes}. A confirmation shows what will change; nothing
+is ever overwritten (a taken name gets \texttt{\_2}); every move is written in the log and the state database follows.
+Real test on 18 files of a database written under Windows: 18 filed, 11 cropped, 16 masks deleted, 1,641 → 910~MB.
+
+\subsection{Target catalogue}
+\capture{img/archives_catalogue_en.png}{1.0}
+The \emph{Catalogue} tab lists an archive's targets \textbf{without criteria}, most observed first, in pages of 100,
+filtered by object type (galaxy, cluster, nebula, star, Solar System, deep field) and by name; double-click: the search
+starts. Aggregate queries (\texttt{GROUP BY target\_name}) measured: Hubble 12 to 17~s (restricted to multi-visit
+mosaics: the full table exceeds the service time-out), JWST 34~s, ESO 2~s, Voyager, Cassini (OPUS) and Juno (PDS) in
+under a second; lists are kept 30 days (\emph{Refresh} to read them again). IRSA, NOIRLab, Keck and SDSS have no useful
+list (all-sky surveys, numbered fields, raw frames): the tab explains it. \emph{Famous programmes}: Hubble Deep Field
+(6337), Hubble Ultra Deep Field (9978, 10086), HUDF09 (11563), HUDF12 (12498), Pillars of Creation 1995 (5773), 2014
+(13926) and JWST 2022 (2739), Carina (10475; JWST 2731), Stephan's Quintet (2732), Southern Ring (2733), Arp~273
+(12326): the search then keeps only that programme's products.
+
+\subsection{Hubble Ultra Deep Field}
+\capture{img/archives_hudf_en.png}{1.0}
+The tab leads to the HUDF (centre 3h32m39s, −27°47′29″): calibrated single exposures (\texttt{flt}, \texttt{flc})
+number in the hundreds per filter; the teams published \textbf{high-level science products} (HLSP) already stacked and
+aligned between filters: XDF (Illingworth et al. 2013: every ACS and WFC3/IR exposure from 2002 to 2012, about 1.8
+million seconds), HUDF09, HUDF12. Exposure times checked in MAST (sum of the pipeline products): programmes 9978 +
+10086, ACS/WFC F435W 134,880~s, F606W 135,320~s, F775W 347,110~s, F850LP 346,620~s; HUDF12 (team readme) F105W
+198,423~s, F140W 82,676~s, F160W 71,652~s. ``3-filter colour'' preset: XDF F435W, F775W and F160W at 60~mas, 3 ×
+110~MB, same grid (\cmd{coupole archives hudf --download}).
+
+\subsection{Instruments and filters}
+The \emph{Instruments and filters} tab gives, for each instrument (Hubble ACS/WFC, WFC3 UVIS and IR, WFPC2; JWST
+NIRCam, MIRI, NIRISS; ESO HAWK-I, FORS2, MUSE, VIRCAM, OmegaCAM; Spitzer IRAC and MIPS; WISE; 2MASS; SDSS; Keck NIRC2;
+Voyager and Cassini ISS; JunoCam) its field, scale and range, and for each filter its wavelength, width, use and
+\textbf{amateur equivalent}. Hovering over a filter name in the results table gives the summary. The name encodes the
+filter: F = filter, number = wavelength (nm for Hubble, hundredths of a µm for JWST), letter = width (W wide, M medium,
+N narrow, LP long pass, X extra wide).
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}llllX@{}}
+\toprule
+\textbf{Filter} & \textbf{Instrument} & \textbf{λ (nm)} & \textbf{Width} & \textbf{Amateur equivalent}\\
+\midrule
+F435W & ACS/WFC & 430 & 104 & B\\
+F555W, F606W & ACS/WFC & 535, 591 & 119, 234 & V; F606W, very wide, comes close to a luminance\\
+F656N, F657N & WFC3/UVIS & 656 & 2, 12 & Hα (your 3–7~nm filters)\\
+F502N & WFC3/UVIS & 501 & 7 & OIII\\
+F673N & WFC3/UVIS & 677 & 12 & SII\\
+F775W, F814W & ACS/WFC & 776, 833 & 153, 251 & near infrared (IR-pass filter)\\
+F160W & WFC3/IR & 1,537 & 268 & none: beyond 1~µm a CMOS sensor sees nothing\\
+F444W, F770W & NIRCam, MIRI & 4,402, 7,639 & 1,024, 1,950 & none: infrared, in false colour\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Sources: WFC3 (tables 6.2 and 7.2, pivot wavelength) and ACS (table 5.1, central wavelength) instrument handbooks, JDox
+(NIRCam, MIRI, NIRISS), ESO instrument pages, Spitzer handbooks, WISE and 2MASS explanatory supplements, SDSS, PDS
+Ring-Moon Systems Node, Hansen et al. 2017 (JunoCam); approximate values marked ``≈'' in the tab.
 
 \paragraph{Planetary formats.} Voyager and Cassini products are VICAR files with a PDS3 label; Juno products are PDS3
 files; PDS4 (XML label) is read too. Coupole reads these formats itself (8 to 32-bit integers, IEEE reals, byte
@@ -705,17 +820,25 @@ files.
 \begin{verbatim}
 coupole --lang en archives list
 coupole --lang en archives search "M 16" --radius 6 --mission JWST --instrument MIRI
-coupole --lang en archives estimate "M 16" --mission JWST
+coupole --lang en archives search arp273                # one product per filter
+coupole --lang en archives search arp273 --variants     # every variant
+coupole --lang en archives search saturn                # MAST, Voyager, Cassini by target name
 coupole --lang en archives download "M 16" --mission JWST --instrument MIRI --dest ~/Sky
 coupole --lang en archives download M51 --archive sdss --filter g --filter r --filter i --dest ~/Sky --yes
-coupole --lang en archives search --archive opus --body Io --from 1979-03-01 --to 1979-03-10
+coupole --lang en archives catalog                      # famous programmes
+coupole --lang en archives catalog jwst --type nebuleuse --page 2
+coupole --lang en archives search HUDF --radius 2 --program 9978 --program 10086
+coupole --lang en archives hudf --download --dest ~/Sky
+coupole --lang en archives instruments F656N
+coupole --lang en archives reorganise --dest ~/Sky --dry-run
 coupole --lang en archives prepare file_i2d.fits --format fits
-coupole --lang en archives align A_sci.xisf B_sci.xisf C_sci.xisf --dest ~/Sky/Pillars --optimal
+coupole --lang en archives align A.xisf B.xisf C.xisf --dest ~/Sky/Pillars --optimal
 coupole --lang en archives status --dest ~/Sky
 \end{verbatim}
 \cmd{--id} keeps precise observations (identifier, with or without the archive prefix, or beginning of the file
-name); \cmd{--all-levels} also shows calibrated and raw frames; \cmd{--json} and \cmd{--csv} for scripts. Beyond the
-threshold, \cmd{download} needs \cmd{--yes}.
+name); \cmd{--all-levels} also shows calibrated and raw frames; \cmd{--keep-original} and \cmd{--mask} keep the
+original file and the mask; \cmd{--json} and \cmd{--csv} for scripts. Beyond the threshold, \cmd{download} needs
+\cmd{--yes}.
 
 \paragraph{Credits.} Any image published from these data must cite the archive and the mission: « NASA/ESA/CSA,
 STScI » (JWST), « NASA/ESA, STScI » (Hubble), « ESO » and the programme ID, « NASA/JPL-Caltech » (Spitzer),
@@ -1136,6 +1259,9 @@ Everything « to download » on Windows although the folder (network drive) is c
 « The tracking database of this folder could not be read » & the cause follows the message (and \texttt{coupole.log}): damaged database, share unplugged, permissions; do not start a full download again.\\
 No \texttt{\_traitement/} but sorted images & \emph{Recognise existing files} (banner), or \cmd{coupole ohp recognise --dest FOLDER}.\\
 « Could not copy the state database to the share » & share unplugged or database open elsewhere: nothing is lost, retried on the next pass and at the next start.\\
+Archives: black image except a strip, 300~MB mask, 17 files for 3 filters (0.2.1) & update then \emph{Reorganise downloads}: cropping, masks deleted, variants aside (section~\ref{sec:archives}).\\
+Archives: ``jupiter'', ``saturne'' not found, nothing for Cassini, no preview (0.2.1) & update: bodies searched by target name, shared limit, thumbnails read in full.\\
+Archives: black image when opened & normal: electrons/s or MJy/sr; stretch it (STF, autostretch).\\
 \bottomrule
 \end{tabularx}
 \end{center}

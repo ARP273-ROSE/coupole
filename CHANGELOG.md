@@ -2,6 +2,61 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.2.2 — 12 octobre 2026
+
+**Archives des observatoires : comprendre ce qu'on télécharge par rapport à ce qu'on prend avec son télescope.**
+
+- **Retour d'utilisateur (Windows, 0.2.1) : « je ne comprends pas ce que j'obtiens ».** Diagnostic sur ses vrais
+  téléchargements : M 16 donnait une image « noire sauf un bout à droite » — produit Hubble « skycell » (mosaïque
+  multi-visites) de 19 806 × 15 741 pixels (2,49 Go chez MAST) dont le filtre F775W n'occupe qu'un coin — et un
+  masque pleine taille de 312 Mo ; Arp 273 donnait 17 fichiers pour 3 filtres (pour chaque filtre : `drz` du
+  pipeline par visite, mosaïque d'une visite, mosaïque multi-visites, plus deux images de détection « total »).
+- **Recadrage automatique sur la zone utile** : la WCS suit (CRPIX décalés ; `CROPX0`, `CROPY0`, `ORIGNAX1`,
+  `ORIGNAX2`), tailles avant et après dans la barre d'état, la fiche et le journal. M 16 : 762 × 5 217 pixels.
+- **Rien d'autre que le produit préparé par défaut** : ni fichier d'origine, ni masque. Le masque devient une
+  option (entiers 8 bits compressés, après recadrage) ; sans lui, l'alignement tient les 0 exacts pour « sans
+  donnée ».
+- **Un produit logique par filtre**, choisi d'après la documentation de MAST et de DrizzlePac : la mosaïque
+  multi-visites (toutes les poses, corrigées de la CTE, grille commune à tous les filtres), sinon par visite la
+  mosaïque d'une visite (SVM, alignée sur Gaia), sinon le pipeline standard ; JWST : la mosaïque `c…`, sinon
+  l'observation la plus longue. Les autres produits des mêmes poses deviennent des **variantes** (case « Montrer
+  les variantes »), les images de détection sont écartées ; la fiche dit pourquoi. Arp 273 : 3 produits au lieu de 17.
+- **Nature des données en clair** : colonnes « nature » (pose unitaire, produit combiné, mosaïque, image de
+  détection) et « pose totale » (« 8 × 650 s = 5 200 s (1 h 27 min) ») ; badges « Produit final » et « Pose
+  calibrée » ; niveau de calibration expliqué ; aide sur les unités (électrons/s, MJy/sr : pas des ADU, d'où
+  l'image noire sans étirement) ; explication de drz/drc (CTE), SVM/MVM et « skycell ».
+- **Noms lisibles et rangement par champ** (comme la Banque OHP) :
+  `Archives/<champ>/<cible>_<instrument>_<filtre>_<date>_<type>_<n>x<pose>s.xisf` ; identifiant de l'archive dans
+  l'en-tête et la fiche. **Réorganiser les téléchargements** (bouton et `coupole archives reorganiser`) : renomme,
+  range, recadre, supprime les masques pleine taille et met les variantes à part, sans jamais écraser, journalisé.
+  Essai sur une copie des vrais téléchargements : 18 fichiers rangés, 11 recadrés, 16 masques supprimés,
+  1 641 → 910 Mo.
+- **Recherche tolérante.** « jupiter », « saturne » ne donnaient rien : le nom était envoyé à SIMBAD (qui ne connaît
+  pas les planètes) et l'échec arrêtait toute la recherche ; de plus OPUS rend Voyager puis Cassini et la limite de
+  lignes coupait Cassini. Désormais : table FR/EN des corps du Système solaire (Jupiter, Saturne, Io, Titan,
+  Encelade, Japet, Phœbé…), cherchés **par nom de cible** dans MAST (cible mobile), Voyager/Cassini et Juno ; limite
+  partagée entre missions ; noms usuels (« Piliers de la Création », « Carène », « HUDF ») et numéros de catalogue
+  réécrits (« m16 », « ngc6611 », « arp273 ») ; suggestions pendant la frappe ; propositions si introuvable.
+- **Catalogue des cibles sans critère** (nouvel onglet, `coupole archives catalogue`) : Hubble (mosaïques
+  multi-visites), JWST, ESO, Voyager, Cassini, Juno ; les plus observées d'abord, par type d'objet, pages de 100,
+  cache de 30 jours, requêtes agrégées (`GROUP BY target_name`) ; programmes célèbres vérifiés (HDF, HUDF, HUDF09,
+  HUDF12, Piliers 1995/2014/2022, Carène, Quintette de Stephan, Anneau austral, Arp 273).
+- **Taille affichée d'emblée** (annoncée, ou mesurée en fond, plus de bouton « Estimer ») et total de la sélection.
+- **Aperçus.** MAST fournit des JPEG pleine résolution (jusqu'à 19 806 × 15 741 px) que la 0.2.1 tronquait à 3 Mo :
+  lus en entier, décodés réduits, recadrés sur la zone utile ; vignettes de l'ESO ; sinon vignette générée après
+  téléchargement ; sinon la raison.
+- **Progression** : débit, temps restant (fichier et total), barre en deux phases (téléchargement puis
+  préparation), état final « Terminé : N fichiers, X téléchargés, Y gardés, Z erreurs — Ouvrir le dossier ».
+- **Guide Hubble Ultra Deep Field** (onglet, `coupole archives hudf`) : programmes, poses `flt`/`flc` contre
+  produits HLSP déjà empilés (XDF, HUDF09, HUDF12), temps de pose par filtre vérifiés sur MAST, préréglage
+  « couleur en 3 filtres » (XDF F435W, F775W, F160W, 3 × 110 Mo).
+- **Topo instruments et filtres** (onglet, info-bulles des noms de filtres, `coupole archives instruments`, chapitre
+  du manuel) : Hubble, JWST, ESO, Spitzer, WISE, 2MASS, SDSS, Keck, Voyager, Cassini, JunoCam ; champ, échelle,
+  longueurs d'onde ; équivalent amateur (L, R, V, B, Hα, OIII, SII) ; sources officielles citées.
+- Essais réels : Jupiter (Hubble), Saturne (Cassini), Arp 273 (produit le plus léger, 218 Mo), HUDF09 F160W ;
+  cellule de M 16 recadrée depuis une copie des fichiers existants. Manuels FR/EN, aide F1, méthode
+  (`docs/archives_methode.md`, section 5) mis à jour.
+
 ## 0.2.1 — 9 octobre 2026
 
 **Possession reconnue sous Windows sur un lecteur réseau ; bibliothèques facultatives embarquées dans tous les

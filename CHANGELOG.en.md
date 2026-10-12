@@ -2,6 +2,60 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.2.2 — 12 October 2026
+
+**Observatory archives: understanding what you download compared with what you take with your telescope.**
+
+- **User report (Windows, 0.2.1): "I don't understand what I get".** Diagnosis on the real downloads: M 16 gave an
+  image "black except a strip on the right" — a Hubble "skycell" product (multi-visit mosaic) of 19,806 × 15,741
+  pixels (2.49 GB at MAST) where the F775W filter fills only a corner — and a 312 MB full-size mask; Arp 273 gave 17
+  files for 3 filters (for each filter: per-visit pipeline `drz`, single-visit mosaic, multi-visit mosaic, plus two
+  "total" detection images).
+- **Automatic cropping to the useful area**: the WCS follows (CRPIX shifted; `CROPX0`, `CROPY0`, `ORIGNAX1`,
+  `ORIGNAX2`), sizes before and after in the status bar, the record and the log. M 16: 762 × 5,217 pixels.
+- **Nothing but the prepared product by default**: no original file, no mask. The mask becomes an option
+  (compressed 8-bit integers, after cropping); without it, alignment treats exact zeros as "no data".
+- **One logical product per filter**, chosen from the MAST and DrizzlePac documentation: the multi-visit mosaic (all
+  exposures, CTE-corrected, grid shared by all filters), else per visit the single-visit mosaic (SVM, aligned to
+  Gaia), else the standard pipeline; JWST: the `c…` mosaic, else the longest observation. The other products of the
+  same exposures become **variants** ("Show variants" box), detection images are left out; the record says why.
+  Arp 273: 3 products instead of 17.
+- **Nature of the data spelt out**: "nature" (single exposure, combined product, mosaic, detection image) and "total
+  exposure" ("8 × 650 s = 5,200 s (1 h 27 min)") columns; "Final product" and "Calibrated exposure" badges;
+  calibration level explained; help on units (electrons/s, MJy/sr: not ADU, hence the black image before
+  stretching); drz/drc (CTE), SVM/MVM and "skycell" explained.
+- **Readable names and filing by field** (as in the OHP image bank):
+  `Archives/<field>/<target>_<instrument>_<filter>_<date>_<type>_<n>x<exp>s.xisf`; archive identifier in the header
+  and the record. **Reorganise downloads** (button and `coupole archives reorganise`): renames, files, crops, deletes
+  full-size masks and puts variants aside, never overwriting, logged. Test on a copy of the real downloads: 18 files
+  filed, 11 cropped, 16 masks deleted, 1,641 → 910 MB.
+- **Tolerant search.** "jupiter", "saturne" gave nothing: the name was sent to SIMBAD (which does not know the
+  planets) and the failure stopped the whole search; moreover OPUS returns Voyager then Cassini and the row limit cut
+  Cassini off. Now: French/English table of Solar System bodies (Jupiter, Saturn, Io, Titan, Enceladus, Iapetus,
+  Phoebe…), searched **by target name** in MAST (moving target), Voyager/Cassini and Juno; limit shared between
+  missions; usual names ("Pillars of Creation", "Carina", "HUDF") and catalogue numbers rewritten ("m16", "ngc6611",
+  "arp273"); suggestions as you type; proposals when not found.
+- **Criteria-free target catalogue** (new tab, `coupole archives catalog`): Hubble (multi-visit mosaics), JWST, ESO,
+  Voyager, Cassini, Juno; most observed first, by object type, pages of 100, 30-day cache, aggregate queries
+  (`GROUP BY target_name`); checked famous programmes (HDF, HUDF, HUDF09, HUDF12, Pillars 1995/2014/2022, Carina,
+  Stephan's Quintet, Southern Ring, Arp 273).
+- **Size shown straight away** (announced, or measured in the background, no more "Estimate" button) and selection
+  total.
+- **Previews.** MAST provides full-resolution JPEGs (up to 19,806 × 15,741 px) that 0.2.1 truncated at 3 MB: read in
+  full, decoded reduced, cropped to the useful area; ESO thumbnails; else a thumbnail made after download; else the
+  reason.
+- **Progress**: rate, time left (file and total), two-phase bar (download then preparation), final state "Finished:
+  N files, X downloaded, Y kept, Z errors — Open the folder".
+- **Hubble Ultra Deep Field guide** (tab, `coupole archives hudf`): programmes, `flt`/`flc` exposures versus HLSP
+  products already stacked (XDF, HUDF09, HUDF12), exposure times per filter checked on MAST, "3-filter colour" preset
+  (XDF F435W, F775W, F160W, 3 × 110 MB).
+- **Instruments and filters guide** (tab, filter-name tooltips, `coupole archives instruments`, manual chapter):
+  Hubble, JWST, ESO, Spitzer, WISE, 2MASS, SDSS, Keck, Voyager, Cassini, JunoCam; field, scale, wavelengths; amateur
+  equivalent (L, R, V, B, Hα, OIII, SII); official sources cited.
+- Real tests: Jupiter (Hubble), Saturn (Cassini), Arp 273 (lightest product, 218 MB), HUDF09 F160W; M 16 cell cropped
+  from a copy of the existing files. French/English manuals, F1 help, method (`docs/archives_methode.md`, section 5)
+  updated.
+
 ## 0.2.1 — 9 October 2026
 
 **Ownership recognised on Windows on a network drive; optional libraries bundled in every package.**

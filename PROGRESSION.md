@@ -753,7 +753,7 @@ passées, comme la Banque OHP ; méthode tirée des pratiques publiées (fils et
   lancement, base de travail ancienne).
 - **Aucun tag posé** (publication et vérification du paquet par le mainteneur).
 
-## 2026-10-12 — version 0.2.2 (en cours) : rendre les Archives compréhensibles
+## 2026-10-12 — version 0.2.2 : rendre les Archives compréhensibles
 Objectif : un astrophotographe amateur doit comprendre ce qu'il télécharge par rapport à ce qu'il prend avec son
 télescope.  Retour d'utilisateur sous Windows (0.2.1), téléchargements réels relus en lecture seule (copie
 temporaire, jamais modifiés en place).
@@ -798,4 +798,27 @@ temporaire, jamais modifiés en place).
 - [x] Interface : onglets Catalogue, Hubble Ultra Deep Field, Instruments et filtres ; colonnes nature et pose totale ;
   CLI `catalogue`, `reorganiser`, `instruments`, `hudf`, `--variantes`, `--programme`, `--garder-original`, `--masque`
   (tests simulés : 66 dans `test_archives.py`)
-- [ ] Aide F1, manuels FR/EN, CHANGELOG, VERSION 0.2.2, validation 3.12 / 3.10, CI
+- [x] Aide F1, manuels FR/EN (chapitre Archives refait : nature des produits, drz/drc/SVM/MVM, recherche, taille,
+  aperçus, téléchargement en deux phases, réorganisation, catalogue, HUDF, instruments et filtres ; 55 et 54 pages),
+  captures FR/EN (`COUPOLE_CAPTURES=archives` dans `outils/captures.py`), tableaux des commandes régénérés, README,
+  CHANGELOG FR puis EN, VERSION 0.2.2
+- [ ] Validation 3.12 / 3.10, CI
+### Défauts trouvés en route
+- **« saturne » : rien pour Cassini** (cause distincte de SIMBAD) : OPUS rend Voyager puis Cassini, et la limite de
+  lignes coupait la fin de la liste → `recherche.tronquer_equitable` (limite partagée entre missions).
+- Durée de pose Cassini : le label donne `EXPOSURE_DURATION` en millisecondes sans unité (10000 pour 10 s) → durée
+  d'OPUS (secondes) écrite dans `EXPTIME`.
+- Cache des vignettes : les `.img` de la 0.2.1 sont tronqués à 3 Mo → nouveau nom (`.brut`), les anciens ignorés.
+- Catalogue : « Star; Exoplanets » classé Système solaire (mot « planet ») → exoplanète = étoile.
+- Libellé « produit final combiné » sur une pose Cassini isolée → badge « Pose calibrée », niveau 2 pour OPUS/PDS.
+### Essais réels (conteneur, dossier temporaire effacé ensuite)
+- `jupiter` : 188 produits HST retenus (target_name JUPITER…, mtflag) ; le plus léger, WFC3/UVIS F275W 13,6 Mo →
+  `Jupiter/Jupiter_WFC3-UVIS_F275W_2025-10-16_pose-v02_1x30s.xisf` (2,8 Mo).
+- `saturne` : Voyager et Cassini ; Cassini MT1 4,2 Mo → `Saturne_CASSINI-ISS_MT1_2001-07-13_pose_1x10s.xisf`.
+- Arp 273 : 17 produits → 3 MVM retenus ; le plus léger (drz `ibkx21020`, 218 Mo) téléchargé, préparé en 12 s →
+  `Arp273_WFC3-UVIS_F390W_2010-12-17_drz-v21_4x1200s.xisf`.
+- HUDF09 F160W (40 Mo) → `HUDF_WFC3-IR_F160W_2009-11-03_HLSP_26x1361s.xisf`, recadré de 3 186 × 3 148 à
+  3 174 × 3 100.
+- Interface réelle (hors écran) : « saturne » → 21 694 produits (MAST 1 821, OPUS 20 000 tronqué et signalé) ;
+  « M16 » → 396 produits retenus, 81 variantes cachées ; catalogue JWST 2 792 cibles, Hubble 2 960.
+- `tests/test_archives_reseau.py` (`COUPOLE_TEST_RESEAU=1`) : 3 réussis (dont le nouvel essai 0.2.2).

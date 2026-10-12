@@ -177,6 +177,8 @@ def _modules(app, f, capture, dossier, langue, seules):
             attendre(app, lambda: not p.occupe(), 120)
         if mid == 'archives':                      # vraie recherche (M 16) ; images préparées du dossier neutre
             f.barre.setCurrentRow(i)
+            p.onglets.setCurrentIndex(0)               # l'onglet mémorisé d'une capture précédente
+            p.c_variantes.setChecked(False)
             p.l_dossier.setText(os.path.join(DOSSIER_NEUTRE, 'Coupole'))
             p.e_nom.setText('M 16')
             p.s_rayon.setValue(6.0)
