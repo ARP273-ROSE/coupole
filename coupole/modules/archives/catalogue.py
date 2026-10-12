@@ -50,7 +50,7 @@ CATALOGUES = {
 SANS_LISTE = ('irsa', 'noirlab', 'koa', 'sdss', 'goa', 'smoka')
 
 # type d'objet : mots de la classification des propositions (MAST) → catégorie
-CATEGORIES = (('solar system', 'systeme_solaire'), ('planet', 'systeme_solaire'), ('comet', 'systeme_solaire'),
+CATEGORIES = (('exoplanet', 'etoile'), ('solar system', 'systeme_solaire'), ('planet', 'systeme_solaire'), ('comet', 'systeme_solaire'),
               ('cluster of galaxies', 'amas_galaxies'), ('clusters of ga', 'amas_galaxies'),
               ('galax', 'galaxie'), ('quasar', 'galaxie'), ('agn', 'galaxie'), ('globular', 'amas_stellaire'),
               ('stellar cluster', 'amas_stellaire'), ('open cluster', 'amas_stellaire'), ('nebula', 'nebuleuse'),

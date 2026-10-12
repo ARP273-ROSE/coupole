@@ -193,6 +193,21 @@ _F = [
     ('MT2', 'CASSINI ISS', 727, 4, 'méthane 727 nm', '', True),
     ('MT3', 'CASSINI ISS', 889, 10, 'méthane 889 nm', '', True),
     ('CL1', 'CASSINI ISS', 611, 440, 'sans filtre', 'L', True),
+    ('UV1', 'CASSINI ISS', 258, None, 'ultraviolet', '', True),
+    ('UV2', 'CASSINI ISS', 298, None, 'ultraviolet', '', True),
+    ('UV3', 'CASSINI ISS', 338, None, 'ultraviolet', '', True),
+    ('MT1', 'CASSINI ISS', 619, None, 'méthane 619 nm', '', True),
+    ('CB1', 'CASSINI ISS', 619, None, 'continuum du méthane', '', True),
+    ('CB2', 'CASSINI ISS', 750, None, 'continuum du méthane', '', True),
+    ('CB3', 'CASSINI ISS', 938, None, 'continuum du méthane', '', True),
+    ('IR1', 'CASSINI ISS', 752, None, 'proche infrarouge', '', True),
+    ('IR2', 'CASSINI ISS', 862, None, 'proche infrarouge', '', True),
+    ('IR3', 'CASSINI ISS', 928, None, 'proche infrarouge', '', True),
+    ('IR4', 'CASSINI ISS', 1002, None, 'proche infrarouge', '', True),
+    ('UV', 'VOYAGER ISS', 346, None, 'ultraviolet', '', True),
+    ('CH4_U', 'VOYAGER ISS', 541, None, 'méthane (U)', '', True),
+    ('CH4_JS', 'VOYAGER ISS', 619, None, 'méthane (J, S)', '', True),
+    ('SODIUM', 'VOYAGER ISS', 589, None, 'sodium D', '', True),
     ('BLUE', 'JUNOCAM', 480, 100, 'bleu', 'B', True),
     ('GREEN', 'JUNOCAM', 550, 100, 'vert', 'V', True),
     ('RED', 'JUNOCAM', 680, 150, 'rouge', 'R', True),
@@ -200,7 +215,7 @@ _F = [
 ]
 FILTRES: dict[tuple[str, str], dict] = {}
 for _n, _i, _l, _w, _u, _e, _a in _F:
-    FILTRES[(_i, _n)] = {'filtre': _n, 'instrument': _i, 'lambda': float(_l), 'largeur': float(_w), 'usage': _u,
+    FILTRES[(_i, _n)] = {'filtre': _n, 'instrument': _i, 'lambda': float(_l), 'largeur': float(_w) if _w else None, 'usage': _u,
                          'equivalent': _e, 'approche': _a}
 
 USAGES_EN = {'ultraviolet large': 'wide ultraviolet', 'bleu très large': 'very wide blue', 'V large': 'wide V',
@@ -216,7 +231,10 @@ USAGES_EN = {'ultraviolet large': 'wide ultraviolet', 'bleu très large': 'very 
              'violet': 'violet', 'bleu': 'blue', 'vert': 'green', 'orange': 'orange', 'rouge': 'red',
              'sans filtre': 'no filter', 'méthane 727 nm': 'methane 727 nm', 'méthane 889 nm': 'methane 889 nm',
              'Washington C (violet)': 'Washington C (violet)', 'Hα + [N II] large': 'wide Hα + [N II]',
-             'Ca II 3933/3968': 'Ca II 3933/3968', 'B (WFPC2)': 'B (WFPC2)', 'V (WFPC2)': 'V (WFPC2)'}
+             'Ca II 3933/3968': 'Ca II 3933/3968', 'B (WFPC2)': 'B (WFPC2)', 'V (WFPC2)': 'V (WFPC2)',
+             'ultraviolet': 'ultraviolet', 'méthane 619 nm': 'methane 619 nm',
+             'continuum du méthane': 'methane continuum', 'proche infrarouge': 'near infrared',
+             'méthane (U)': 'methane (U)', 'méthane (J, S)': 'methane (J, S)', 'sodium D': 'sodium D'}
 
 
 def normaliser_instrument(instrument: str) -> str:
@@ -312,11 +330,12 @@ def bulle_filtre(filtre: str, instrument: str = '', langue: str = 'fr') -> str:
     usage = f['usage'] if langue == 'fr' else USAGES_EN.get(f['usage'], f['usage'])
     lam = f['lambda']
     lam_txt = ('%s%.0f nm' % (approx, lam)) if lam < 2000 else ('%s%.2f µm' % (approx, lam / 1000)).replace('.', ',' if langue == 'fr' else '.')
+    larg = ('%s%.0f nm' % (approx, f['largeur'])) if f['largeur'] else '?'
     if langue == 'fr':
-        return '%s (%s) : %s, largeur %s%.0f nm — %s.\nÉquivalent amateur : %s' % (
-            f['filtre'], f['instrument'], lam_txt, approx, f['largeur'], usage, EXPLICATIONS.get(eq, ('—',))[0])
-    return '%s (%s): %s, width %s%.0f nm — %s.\nAmateur equivalent: %s' % (
-        f['filtre'], f['instrument'], lam_txt, approx, f['largeur'], usage, EXPLICATIONS.get(eq, ('', '—'))[1])
+        return '%s (%s) : %s, largeur %s — %s.\nÉquivalent amateur : %s' % (
+            f['filtre'], f['instrument'], lam_txt, larg, usage, EXPLICATIONS.get(eq, ('—',))[0])
+    return '%s (%s): %s, width %s — %s.\nAmateur equivalent: %s' % (
+        f['filtre'], f['instrument'], lam_txt, larg, usage, EXPLICATIONS.get(eq, ('', '—'))[1])
 
 
 def html_topo(langue: str = 'fr') -> str:
@@ -348,8 +367,8 @@ def html_topo(langue: str = 'fr') -> str:
     for f in FILTRES.values():
         eq = equivalent_amateur(f['lambda'], f['largeur'], f['equivalent'])
         a = '≈ ' if f['approche'] else ''
-        t.append('<tr><td>%s</td><td>%s</td><td>%s%.0f</td><td>%s%.0f</td><td>%s</td><td>%s</td></tr>' % (
-            e(f['filtre']), e(f['instrument']), a, f['lambda'], a, f['largeur'],
+        t.append('<tr><td>%s</td><td>%s</td><td>%s%.0f</td><td>%s</td><td>%s</td><td>%s</td></tr>' % (
+            e(f['filtre']), e(f['instrument']), a, f['lambda'], ('%s%.0f' % (a, f['largeur'])) if f['largeur'] else '?',
             e(f['usage'] if fr else USAGES_EN.get(f['usage'], f['usage'])),
             e(eq if fr else {'IR proche': 'near IR'}.get(eq, eq))))
     t.append('</table><p><small>%s</small></p>' % e(

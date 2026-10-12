@@ -5,6 +5,10 @@ _NOMS = {'mast': 'MAST (Hubble, JWST, GALEX)', 'eso': 'ESO', 'irsa': 'IRSA (Spit
          'opus': 'Voyager, Cassini (OPUS)', 'pds': 'Juno (PDS)'}
 
 TEXTES = {
+    'arc_calibree_court': {'fr': 'calibrée', 'en': 'calibrated'},
+    'arc_badge_pose': {'fr': 'Pose calibrée', 'en': 'Calibrated exposure'},
+    'arc_badge_pose_aide': {'fr': "une seule pose, déjà calibrée (offset, noir, PLU) : l'équivalent d'une de vos « lights » calibrées ; l'archive n'en propose pas d'empilement.", 'en': 'a single exposure, already calibrated (bias, dark, flat): the equivalent of one of your calibrated lights; the archive offers no stack of it.'},
+    'arc_f_mvm_taille': {'fr': "Le fichier téléchargé couvre toute la cellule du ciel (0,2° de côté à 0,04″ par pixel) : il peut peser plus d'un gigaoctet même si le filtre n'en remplit qu'un coin.  Coupole le recadre sur la zone utile : le fichier gardé est bien plus petit.", 'en': 'The downloaded file covers the whole sky cell (0.2° wide at 0.04″ per pixel): it can weigh over a gigabyte even if the filter fills only a corner.  Coupole crops it to the useful area: the kept file is much smaller.'},
     'arc_aide_variantes': {'fr': 'montrer aussi les variantes (autres produits des mêmes poses) et les images de détection ; par défaut, un produit par filtre', 'en': 'also show variants (other products of the same exposures) and detection images; by default, one product per filter'},
     'arc_aide_programme': {'fr': 'ne garder que les produits de ce programme (répétable), par exemple 9978', 'en': 'keep only the products of this programme (repeatable), e.g. 9978'},
     'arc_aide_garder_original': {'fr': "garder aussi le fichier d'origine (dans <champ>/_originaux) ; par défaut, seul le produit préparé reste", 'en': 'also keep the original file (in <field>/_originaux); by default only the prepared product remains'},
@@ -419,7 +423,7 @@ TEXTES = {
     'arc_f_page': {'fr': "Page de l'archive", 'en': 'Archive page'},
     'arc_f_reservee': {'fr': "Pas encore publique (période réservée à l'équipe).", 'en': 'Not yet public (proprietary period).'},
     'arc_f_possede': {'fr': 'Déjà téléchargée et préparée : {chemin}', 'en': 'Already downloaded and prepared: {chemin}'},
-    'arc_selection': {'fr': '{n} fichiers choisis : {taille}.', 'en': '{n} files selected: {taille}.'},
+    'arc_selection': {'fr': 'Fichiers choisis : {n}, {taille}.', 'en': 'Files selected: {n}, {taille}.'},
     # ---------------------------------------------------------------- interface : téléchargement
     'arc_dossier': {'fr': 'Dossier', 'en': 'Folder'},
     'arc_dossier_aide': {'fr': "Dossier de sortie ; les fichiers vont dans <dossier>/Archives/<mission>/<cible>/"

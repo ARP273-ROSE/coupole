@@ -317,6 +317,8 @@ class Panneau(QWidget):
             t = tr('arc_nature_' + n)
         if o.get('variante'):
             t += ' · ' + tr('arc_variante_court')
+        elif o.get('final') and n == 'pose':
+            t += ' · ' + tr('arc_calibree_court')
         elif o.get('final') and n != 'detection':
             t += ' · ' + tr('arc_final_court')
         return t
@@ -595,9 +597,12 @@ class Panneau(QWidget):
                   ('arc_f_calib', _tr_ou('arc_calib_%s' % o['calib'], str(o['calib'])) if o['calib'] is not None else ''),
                   ('arc_f_fichier', o['fichier']), ('arc_f_taille', _taille(o.get('taille')))]
         h = ['<h3>%s</h3>' % e(o['obs_id'] or o['id'])]
-        if o.get('final') and not o.get('variante') and o.get('nature') != 'detection':
+        if o.get('final') and not o.get('variante') and o.get('nature') not in ('detection', 'pose'):
             h.append('<p><span style="background:#2e7d32;color:white">&nbsp;%s&nbsp;</span> %s</p>' % (
                 e(tr('arc_badge_final')), e(tr('arc_badge_final_aide'))))
+        elif o.get('final') and o.get('nature') == 'pose':
+            h.append('<p><span style="background:#1565c0;color:white">&nbsp;%s&nbsp;</span> %s</p>' % (
+                e(tr('arc_badge_pose')), e(tr('arc_badge_pose_aide'))))
         h.append('<table>')
         for cle, val in lignes:
             if val:
@@ -610,6 +615,8 @@ class Panneau(QWidget):
             h.append('<p><b>%s</b> %s</p>' % (e(tr('arc_f_produit')), e(_tr_ou('arc_produit_' + o['produit']))))
         if o.get('raison'):
             h.append('<p><i>%s</i></p>' % e(tr(o['raison'])))
+        if o.get('produit') == 'mvm':
+            h.append('<p>%s</p>' % e(tr('arc_f_mvm_taille')))
         if o.get('nature'):
             h.append('<p>%s</p>' % e(tr('arc_nature_aide_' + o['nature'])))
         h.append('<p>%s</p>' % e(tr('arc_unites_aide')))

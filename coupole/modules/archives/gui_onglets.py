@@ -138,6 +138,10 @@ class OngletCatalogue(QWidget):
 
     def _page(self):
         self.modele.remplir_objets(K.page(self.filtrees, self.numero))
+        if self.modele.donnees and not getattr(self, '_colonnes_ajustees', False):
+            self._colonnes_ajustees = True
+            for c in range(len(COLONNES_CAT)):
+                self.vue.resizeColumnToContents(c)
         n = K.nombre_pages(self.filtrees)
         self.l_page.setText(tr('arc_cat_page', k=self.numero + 1, n=n, total=len(self.filtrees)))
         self.b_prec.setEnabled(self.numero > 0)

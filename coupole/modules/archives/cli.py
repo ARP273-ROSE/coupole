@@ -449,9 +449,10 @@ def cmd_instruments(a):
     print()
     for f in I.FILTRES.values():
         eq = I.equivalent_amateur(f['lambda'], f['largeur'], f['equivalent'])
-        print('%-10s %-12s %s%8.1f nm %s%8.1f nm  %-6s %s' % (f['filtre'], f['instrument'], '≈' if f['approche'] else ' ',
-                                                            f['lambda'], '≈' if f['approche'] else ' ', f['largeur'], eq,
-                                                            f['usage']))
+        larg = ('%8.1f nm' % f['largeur']) if f['largeur'] else '       ? nm'
+        print('%-10s %-12s %s%8.1f nm %s%s  %-6s %s' % (f['filtre'], f['instrument'], '≈' if f['approche'] else ' ',
+                                                      f['lambda'], '≈' if f['approche'] else ' ', larg, eq,
+                                                      f['usage'] if langue() == 'fr' else I.USAGES_EN.get(f['usage'], f['usage'])))
     return 0
 
 

@@ -119,7 +119,7 @@ class Opus(Archive):
         fichier = url.rsplit('/', 1)[-1]
         return observation(
             id='opus:' + opusid, archive='opus', mission=mission, instrument=instrument, filtre=filtre or '',
-            lambda_nm=lambda_filtre(filtre), debut=iso_normal(debut), publique='', public=True, calib=3, final=True,
+            lambda_nm=lambda_filtre(filtre), debut=iso_normal(debut), publique='', public=True, calib=2, final=True,
             cible=cible or planete, url=url, fichier=fichier, format='pds3', etiquette=etiquette, apercu=apercu,
             page=lien('archives.opus.page', id=opusid), programme=volume, credit=CREDITS[mission],
             conditions=self.conditions, obs_id=opusid, exposition=nombre(l[7]) if len(l) > 7 else None, poses=1)
@@ -189,7 +189,7 @@ class PdsAtlas(Archive):
         return observation(
             id='pds:' + ident, archive='pds', mission='Juno', instrument='JunoCam', filtre=';'.join(filtres),
             lambda_nm=None, debut=iso_normal(d.get('START_TIME')), publique='', public=True,
-            calib=3 if rdr else 1, final=rdr, cible=cible.title() if isinstance(cible, str) else '', url=url,
+            calib=2 if rdr else 1, final=rdr, cible=cible.title() if isinstance(cible, str) else '', url=url,
             fichier=url.rsplit('/', 1)[-1], format='pds3', etiquette=d.get('ATLAS_LABEL_URL') or '',
             taille=taille, apercu=d.get('ATLAS_THUMBNAIL_URL') or '', page=lien('archives.pds.page', id=ident),
             programme=d.get('MISSION_PHASE_NAME') or '', titre=d.get('DATA_SET_ID') or '', credit=self.credit,
