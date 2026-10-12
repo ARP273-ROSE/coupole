@@ -2,7 +2,7 @@
 
 Synthèse des pratiques publiées par les amateurs qui retraitent les données publiques de Hubble et de JWST, des
 documentations des archives et de celles des outils d'alignement, et de ce qu'en applique le module **Archives**
-de Coupole (0.2.0).  Les mesures citées ont été faites sur les services réels le 9 octobre 2026.
+de Coupole (0.2.0 à 0.2.2).  Les mesures citées ont été faites sur les services réels le 9 octobre 2026.
 
 ## 1. Sources consultées
 
@@ -105,6 +105,48 @@ de Coupole (0.2.0).  Les mesures citées ont été faites sur les services réel
   étoiles (StarAlignment de PixInsight, alignement global de Siril) sur les fichiers déjà rééchantillonnés : il ne
   reste alors qu'une petite translation à corriger.
 
+## 5. Version 0.2.2 : rendre les produits compréhensibles
+
+Retour d'utilisateur sur la 0.2.1 : « je ne comprends pas ce que j'obtiens ».  Diagnostic sur de vrais
+téléchargements (copie en lecture seule) et vérifications sur les services, le 12 octobre 2026.
+
+| Source | Ce qu'on en retient |
+|---|---|
+| MAST, « HAP Single Visit Mosaics Now Available » (décembre 2020), https://archive.stsci.edu/contents/newsletters/december-2020/hap-single-visit-mosaics-now-available | Mosaïques d'une visite : toutes les poses d'une visite, filtres alignés entre eux et sur Gaia (`WCSNAME` contient `FIT_SVM_GAIA`), même grille orientée nord en haut ; trois niveaux : pose, filtre, « total » (image de **détection** pour les catalogues). |
+| MAST, « Multi-Visit Mosaics from Hubble Now Available » (mai 2022), https://archive.stsci.edu/contents/newsletters/may-2022/multi-visit-mosaics-from-hubble-now-available | Mosaïques multi-visites : toutes les observations publiques ACS et WFC3 d'un champ, sur une grille prédéfinie ; cellules de 0,2° (21 × 21 par cellule de projection de 4,2°), 0,04″/px (WFC3/IR aussi 0,12″/px, « coarse ») ; alignées sur Gaia ; les produits d'une même « couche » (cellule, détecteur) partagent la grille et s'empilent directement. |
+| DrizzlePac, « Multi-visit Mosaic Processing » et « Multi-visit Mosaic Products », https://drizzlepac.readthedocs.io/en/latest/mast_data_products/mvm_processing.html | Nom `hst_skycell-pPPPPxXXyYY_<inst>_<det>_<filtre>_all_drc` ; l'emprise d'une cellule est le plus petit rectangle qui contient **toutes les poses de la cellule** (tous filtres confondus) : un filtre peut n'en occuper qu'un coin (cas réel de M 16). Limites : décalage de quelques pixels possible entre visites, objets mobiles dédoublés. |
+| HST Data Handbook (ACS), « Types of ACS files » | `drz` : poses combinées et corrigées de la distorsion ; `drc` : idem à partir de poses corrigées de la CTE (ACS/WFC, WFC3/UVIS). |
+| En-têtes réels (lecture des 600 premiers ko par requête partielle) | `drz` du pipeline et `drc` SVM d'une même visite : mêmes 4 poses (`NCOMBINE = 4`, `NDRIZIM = 8` = 4 poses × 2 détecteurs), 2 600 s ; MVM : 8 poses (`NUMEXP = 8`), 5 200 s. |
+| MAST TAP `dbo.obspointing` | `provenance_name` (CALWF3, CALACS, HAP-SVM, HAP-MVM), `t_exptime` (temps total), `target_classification`, `mtflag` (cible mobile), `intenttype`. |
+| HUDF : MAST (programmes 9978, 10086, 11563, 12498), readme HUDF12, https://archive.stsci.edu/prepds/xdf/ | Temps de pose par filtre (somme des produits du pipeline par programme), XDF ≈ 1,8 million de secondes, 30 et 60 mas ; fichiers de 110 Mo (60 mas) et 441 Mo (30 mas). |
+| Documentations des instruments (WFC3, ACS, JDox, ESO, IRSA, SDSS, PDS) | Topo des instruments et des filtres (`coupole/modules/archives/instruments.py`, sources dans l'en-tête du fichier). |
+
+Ce que Coupole en fait :
+
+1. **Recadrage sur la zone utile** : plus petit rectangle des pixels valides (finis et non nuls), lu par blocs de
+   lignes ; `CRPIX1/CRPIX2` décalés (WCS exacte, SIP comprise) ; `CROPX0`, `CROPY0`, `ORIGNAX1`, `ORIGNAX2`.
+   Cellule de M 16 : 19 806 × 15 741 → 762 × 5 217 px.
+2. **Pas de masque par défaut** (le masque pleine taille non compressé de la 0.2.1 pesait 312 Mo) ; sur option,
+   entiers 8 bits compressés après recadrage.  Sans masque, l'alignement tient les 0 exacts pour « sans donnée »
+   (`NANCOUNT` > 0 et `NANFILL` = 0).  Original non gardé par défaut.
+3. **Un produit logique par filtre** : MVM si elle existe (toutes les poses, CTE corrigée, grille commune), sinon par
+   visite la SVM, sinon le pipeline standard ; JWST : mosaïque `c…` sinon l'observation au plus long temps de
+   pose.  Les autres deviennent des variantes (cachées), les images de détection sont écartées.  Arp 273 : 17
+   produits → 3.
+4. **Noms lisibles et rangement par champ**, réorganisation des téléchargements existants (déplacements, jamais
+   d'écrasement, journal).
+5. **Recherche tolérante** : la 0.2.1 résolvait « jupiter » par SIMBAD dès qu'une archive céleste était cochée
+   (`LookupError`, recherche abandonnée) ; un corps du Système solaire est désormais cherché par nom de cible
+   (MAST `target_name LIKE 'JUPITER%' AND mtflag = 1`, OPUS, PDS).  Second défaut trouvé : OPUS rend Voyager puis
+   Cassini, et la limite de lignes coupait la fin de la liste (aucune image de Cassini pour « saturne ») : limite
+   désormais répartie entre missions.
+6. **Catalogue sans critère** (`GROUP BY target_name`) : HST limité aux MVM (la table entière dépasse 60 s : 504),
+   JWST `i2d` (34 s), ESO (1,7 s), OPUS `meta/mults`, facettes Solr du PDS ; cache de 30 jours.
+7. **Aperçus** : `jpegurl` de MAST est un JPEG pleine résolution (jusqu'à 19 806 × 15 741 px, 3,7 à 4,2 Mo) ; la 0.2.1
+   le tronquait à 3 Mo.  Lu en entier, décodé réduit (`QImageReader.setScaledSize`), recadré sur la zone qui diffère
+   du fond (blanc chez MAST), PNG de 400 px ; ESO : `previews/v1/files/<id>/thumbnail` (le lien « preview » de
+   DataLink est un PDF) ; sinon vignette générée après téléchargement, sinon la raison.
+
 ## English summary
 
 The **Archives** module follows the practices published by amateurs who reprocess Hubble and JWST public data
@@ -114,4 +156,8 @@ Siril and reproject: download final products only (`i2d`, `drc`/`drz`, ESO Phase
 estimate the volume first and confirm beyond a threshold, be polite to servers, extract the SCI extension with its
 WCS, units and photometric keywords, handle NaN with a mask, align by astrometry (reprojection onto a common grid)
 rather than by stars, correct per-pixel units for the pixel-area ratio, colour the filters in chromatic order, and
-always credit the archive.  Gemini (account required) and SMOKA (web form only) are reported, not downloaded.
+always credit the archive.  Since 0.2.2 (section 5): prepared images are cropped to their useful area (a Hubble
+multi-visit "sky cell" can be 19,806 × 15,741 px for a corner of data), no mask by default, one logical product per
+filter (MVM, else SVM, else standard pipeline; variants hidden, detection images left out, choice from the MAST and
+DrizzlePac documentation), readable names filed by field, Solar System bodies searched by target name, a
+criteria-free target catalogue, reduced official previews and a filter guide with amateur equivalents.  Gemini (account required) and SMOKA (web form only) are reported, not downloaded.

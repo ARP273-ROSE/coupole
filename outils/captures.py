@@ -3,7 +3,7 @@
     QT_QPA_PLATFORM=offscreen python outils/captures.py fr docs/manuel/img [DOSSIER_QUALITE] [DESTINATION]
 
 DESTINATION : un dossier de sortie (INDEX_LOTS.csv et quelques images par lot) pour l'onglet Lots et son encadré
-« Pour PixInsight / N.I.N.A. ».
+« Pour PixInsight / N.I.N.A. ».  COUPOLE_CAPTURES=archives : seulement les captures du module Archives.
 """
 import os
 import sys
@@ -118,6 +118,9 @@ def main():
         attendre(app, lambda: False, 0.4)
         f.grab().save(str(dossier / ('%s_%s.png' % (nom, langue))))
 
+    seules = os.environ.get('COUPOLE_CAPTURES', '')
+    if seules:
+        return _modules(app, f, capture, dossier, langue, seules)
     capture('catalogue')
     ohp.vers_traitement()
     capture('traitement')
@@ -140,8 +143,14 @@ def main():
     attendre(app, lambda: ohp.fiche.resultat() is not None, 30)
     capture('fiche')
     ohp.onglets.setCurrentIndex(0)
+    _modules(app, f, capture, dossier, langue, '')
+
+
+def _modules(app, f, capture, dossier, langue, seules):
     for i, p in enumerate(f.panneaux):
         mid = getattr(getattr(p, 'module', None), 'id', '')
+        if seules and mid not in seules.split(','):
+            continue
         if mid == 'donnees':
             p.ouvrir(spectre_exemple(dossier))
             p.axe.setCurrentIndex(2)
@@ -183,7 +192,24 @@ def main():
                     break
             attendre(app, lambda: p.l_vignette.pixmap() is not None and not p.l_vignette.pixmap().isNull(), 30)
             capture('module_archives')
-            p.onglets.setCurrentIndex(1)
+            p.e_nom.setText('Arp 273')                 # un produit logique par filtre (0.2.2)
+            p.s_rayon.setValue(3.0)
+            p.chercher()
+            attendre(app, lambda: p.b_chercher.isEnabled() and p.observations, 120)
+            attendre(app, lambda: False, 6)            # tailles mesurées en fond
+            p.vue.selectRow(0)
+            attendre(app, lambda: p.l_vignette.pixmap() is not None and not p.l_vignette.pixmap().isNull(), 30)
+            capture('archives_produits')
+            p.onglets.setCurrentIndex(1)               # catalogue : Hubble (requête agrégée ou cache)
+            c = p.catalogue
+            c.c_archive.setCurrentIndex(c.c_archive.findData('hst'))
+            attendre(app, lambda: c.b_actualiser.isEnabled() and c.modele.donnees, 90)
+            capture('archives_catalogue')
+            p.onglets.setCurrentIndex(2)
+            capture('archives_hudf')
+            p.onglets.setCurrentIndex(3)
+            capture('archives_instruments')
+            p.onglets.setCurrentIndex(4)
             p.rafraichir_possession()
             attendre(app, lambda: p.l_fichiers.count() > 0, 20)
             for k in range(p.l_fichiers.count()):
@@ -191,17 +217,20 @@ def main():
                 if 'MIRI' in it.text():
                     from PyQt6.QtCore import Qt
                     it.setCheckState(Qt.CheckState.Checked)
-            if p.fichiers_coches():
+            if p.fichiers_coches():                   # sans images préparées : la capture existante est gardée
                 p.c_reference.setCurrentIndex(0)
                 p.aligner()
                 attendre(app, lambda: p.b_aligner.isEnabled() and p.l_apercu.pixmap() is not None, 300)
-            capture('archives_alignement')
+                capture('archives_alignement')
             p.onglets.setCurrentIndex(0)
             continue
         if mid and mid != 'ohp':
             f.barre.setCurrentRow(i)
             attendre(app, lambda: False, 1.5)
             capture('module_' + mid)
+    if seules:
+        print('captures dans', dossier)
+        return
     from coupole.gui import dialogues
     for nom, classe in (('astap', dialogues.DialogueASTAP), ('apropos', dialogues.DialogueAPropos),
                         ('reglages', dialogues.DialogueReglages)):
