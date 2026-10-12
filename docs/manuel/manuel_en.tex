@@ -144,7 +144,7 @@ Ctrl+Shift+A & ASTAP assistant\\ Ctrl+Shift+D & dark / light theme\\ Ctrl+R & OH
 
 \capture{img/reglages_en.png}{0.62}
 Preferences (Ctrl+,): interface language; language of folder names, object names and FITS comments;
-appearance (section~\ref{sec:apparence}); file dialogs (section~\ref{sec:dialogues}); PixInsight already open (section~\ref{sec:ouvrir}); output folder; format; parallelism; maximum rate; economy mode; update check; check of the bank for new images at startup and its maximum frequency (section~\ref{sec:nouveautes}). The \emph{Sources} tab lists the service
+appearance (section~\ref{sec:apparence}); file dialogs (section~\ref{sec:dialogues}); PixInsight already open (section~\ref{sec:ouvrir}); output folder; format; parallelism; download rate (\emph{Limit the rate} box, unticked by default: no cap; ticked: cap from 0.1 to 1,000~MB/s, for the OHP bank and the Archives alike); economy mode; update check; check of the bank for new images at startup and its maximum frequency (section~\ref{sec:nouveautes}). The \emph{Sources} tab lists the service
 addresses (chapter~\ref{chap:evolutif}). An unreadable settings file is set aside (suffix \texttt{.corrompu-…}) and
 the defaults take over: the application always starts.
 
@@ -269,7 +269,7 @@ ohp list}.
 \capture{img/traitement_en.png}{1.0}
 For each image, duplicates excluded:
 \begin{enumerate}[leftmargin=*,itemsep=1pt]
-\item download: at most 4 at once (3 by default), total rate capped (8 MB/s by default), User-Agent naming Coupole,
+\item download: at most 4 at once (3 by default), full rate by default (total cap available in the Preferences), User-Agent naming Coupole,
   resume by HTTP Range requests, checks of size (server and inventory), multiple of 2,880 bytes and \texttt{SIMPLE}
   card;
 \item reading of the FITS cards as written and of the pixels; SHA-1 fingerprint of the pixels (exact duplicates);
@@ -303,7 +303,8 @@ The state database, however, is never written directly on a share: section~\ref{
 \emph{Download everything…} takes the whole bank (about 8,000 images, 78 GB of FITS, 30 GB as XISF). On first use
 (or when no output folder is set), Coupole asks for the destination folder through a native dialog and proposes
 \texttt{Documents/Coupole/OHP\_DU\_ECU}; then it shows, \textbf{before any confirmation}, the volume to download,
-the expected output volume, the estimated duration at the rate cap (78 GB at 8 MB/s: 2~h~42) and the free space; it
+the expected output volume, the estimated duration --- at the rate cap if one is set (78 GB at 8 MB/s: 2~h~42), otherwise at the rate measured
+during previous downloads, otherwise ``depends on the connection'' --- and the free space; it
 clearly refuses when space is short. Processing is the same as for any selection: resume after a cut or a close
 (per-image state in \texttt{\_traitement/etat.sqlite}, already downloaded FITS found again), pause, end report.
 Command line: \cmd{coupole ohp all --yes}.
@@ -705,7 +706,7 @@ that, a thumbnail made from the prepared file; otherwise the reason (``the archi
 
 \subsection{Downloading and preparing}
 Select rows, then \emph{Download the selection}. Beyond 2~GB (setting \texttt{archives\_seuil\_go}), confirmation.
-Capped rate (8~MB/s, setting \texttt{archives\_debit\_mo\_s}), two files at a time, an interrupted file resumes. The
+Full rate by default (cap: Preferences, or setting \texttt{archives\_debit\_mo\_s}), two files at a time, an interrupted file resumes. The
 bar moves in \textbf{two phases}: download (up to 70~\%, from bytes received), then preparation (up to 100~\%); below
 it: files downloaded and prepared, bytes received out of the total, rate, time left in all and for the current file.
 At the end the state is spelt out: ``Finished: N files, X downloaded, Y kept, Z errors --- Open the folder''.

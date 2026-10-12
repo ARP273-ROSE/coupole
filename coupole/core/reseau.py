@@ -1,10 +1,12 @@
-"""Accès réseau poli : User-Agent identifiant, débit plafonné, reprise, annulation.
+"""Accès réseau poli : User-Agent identifiant, débit éventuellement plafonné, reprise, annulation.
 
 Le serveur de l'Observatoire de Paris est public et partagé : Coupole ne le
 martèle pas.  Toutes les requêtes portent un User-Agent qui nomme
-l'application et sa version ; le débit total est plafonné (seau à jetons
-partagé par tous les fils) ; le nombre de téléchargements simultanés est
-borné (core.parallele).
+l'application et sa version ; le nombre de téléchargements simultanés est
+borné (core.parallele).  Le débit total n'est plus plafonné par défaut (0.2.3) :
+un plafond reste réglable (seau à jetons partagé par tous les fils).  Le même
+seau MESURE le débit réellement obtenu, ce qui sert à estimer la durée des
+téléchargements suivants quand aucun plafond n'est posé.
 """
 from __future__ import annotations
 
@@ -30,23 +32,56 @@ class Annule(Exception):
 
 
 class LimiteurDebit:
-    """Seau à jetons partagé : au plus `octets_s` octets par seconde, tous fils confondus."""
+    """Seau à jetons partagé : au plus `octets_s` octets par seconde, tous fils confondus.
 
-    def __init__(self, octets_s: float):
-        self.debit = max(0.0, float(octets_s))
+    `octets_s` nul, négatif ou None : AUCUN plafond (comportement par défaut depuis 0.2.3).  Plafonné ou non,
+    le seau compte les octets qui le traversent : `mesure()` donne le débit moyen réellement obtenu.
+    """
+
+    def __init__(self, octets_s: float | None = 0.0):
+        self.debit = _octets_s(octets_s)
         self.jetons = self.debit
         self.t = time.monotonic()
         self.verrou = threading.Lock()
+        self.octets_total = 0
+        self._t_premier = None
+        self._t_dernier = None
 
-    def regler(self, octets_s: float):
+    @property
+    def plafonne(self) -> bool:
+        return self.debit > 0
+
+    def regler(self, octets_s: float | None):
         with self.verrou:
-            self.debit = max(0.0, float(octets_s))
+            self.debit = _octets_s(octets_s)
+            self.jetons = min(self.jetons, self.debit) if self.debit else 0.0
+
+    def _compter(self, n: int):
+        maintenant = time.monotonic()
+        with self.verrou:
+            if self._t_premier is None:
+                self._t_premier = maintenant
+            self._t_dernier = maintenant
+            self.octets_total += n
+
+    def mesure(self) -> float:
+        """Débit moyen obtenu (octets/s) entre le premier et le dernier bloc reçu ; 0 si trop peu de données."""
+        with self.verrou:
+            if self._t_premier is None or self._t_dernier is None:
+                return 0.0
+            duree = self._t_dernier - self._t_premier
+            if duree < MESURE_DUREE_MIN or self.octets_total < MESURE_OCTETS_MIN:
+                return 0.0
+            return self.octets_total / duree
 
     def prendre(self, n: int, arret: threading.Event | None = None):
+        self._compter(n)
         if self.debit <= 0:
             return
         while True:
             with self.verrou:
+                if self.debit <= 0:                      # plafond levé en cours de route
+                    return
                 maintenant = time.monotonic()
                 self.jetons = min(self.debit, self.jetons + (maintenant - self.t) * self.debit)
                 self.t = maintenant
@@ -58,6 +93,58 @@ class LimiteurDebit:
                 raise Annule()
             elif arret is None:
                 time.sleep(min(attente, 0.5))
+
+
+#: une mesure de débit n'est retenue qu'au-delà de ce volume et de cette durée (un petit fichier ne dit rien)
+MESURE_OCTETS_MIN = 4_000_000
+MESURE_DUREE_MIN = 2.0
+
+
+def _octets_s(v) -> float:
+    try:
+        v = float(v or 0.0)
+    except (TypeError, ValueError):
+        return 0.0
+    return v if v > 0 else 0.0
+
+
+def plafond_reglage(valeur_mo_s) -> float:
+    """Plafond en octets/s d'après un réglage en Mo/s : 0 (ou vide, ou invalide) = aucun plafond."""
+    return _octets_s(valeur_mo_s) * 1e6
+
+
+def memoriser_debit(limiteur: LimiteurDebit) -> float:
+    """Garde dans les réglages (`debit_mesure_mo_s`) le débit obtenu par un traitement, pour estimer les durées
+    suivantes.  Seulement s'il dit quelque chose du RÉSEAU : sans plafond, ou nettement sous le plafond (sinon
+    on ne mesurerait que le plafond).  Rend le débit retenu (octets/s), 0 sinon ; jamais d'exception."""
+    try:
+        m = limiteur.mesure()
+        if m <= 0 or (limiteur.plafonne and m >= 0.9 * limiteur.debit):
+            return 0.0
+        from . import config
+        config.reglages()['debit_mesure_mo_s'] = round(m / 1e6, 2)
+        return m
+    except Exception:
+        return 0.0
+
+
+def debit_estime(plafond_octets_s: float | None) -> tuple[float, str]:
+    """(octets/s, genre) pour estimer une durée de téléchargement AVANT de la lancer.
+
+    genre : 'plafond' (plafond posé, et pas de mesure plus lente), 'mesure' (débit mesuré lors des
+    téléchargements précédents), 'inconnu' (ni plafond ni mesure : 0 octet/s, pas d'estimation possible).
+    """
+    plafond = _octets_s(plafond_octets_s)
+    try:
+        from . import config
+        mesure = _octets_s(config.reglages().get('debit_mesure_mo_s')) * 1e6
+    except Exception:
+        mesure = 0.0
+    if plafond and (not mesure or mesure >= plafond):
+        return plafond, 'plafond'
+    if mesure:
+        return mesure, 'mesure'
+    return 0.0, 'inconnu'
 
 
 def requete(url, data=None, en_tetes=None, delai=60):

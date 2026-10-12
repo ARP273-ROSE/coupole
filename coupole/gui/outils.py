@@ -13,8 +13,8 @@ import traceback
 
 from PyQt6.QtCore import QObject, QThread, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction
-from PyQt6.QtWidgets import (QCheckBox, QComboBox, QLabel, QLineEdit, QPushButton, QSpinBox, QDoubleSpinBox,
-                             QToolButton)
+from PyQt6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QLabel, QLineEdit, QPushButton, QSpinBox,
+                             QDoubleSpinBox, QToolButton, QWidget)
 
 from ..core.i18n import tr
 
@@ -98,6 +98,46 @@ def decimal(cle_aide: str, mini: float, maxi: float, valeur: float, suffixe_cle:
     if suffixe_cle:
         s.setSuffix(' ' + tr(suffixe_cle))
     return aide(s, cle_aide)
+
+
+#: bornes du plafond de débit proposé quand on choisit d'en poser un (Mo/s)
+DEBIT_MINI, DEBIT_MAXI, DEBIT_PROPOSE = 0.1, 1000.0, 8.0
+
+
+class ChampDebit(QWidget):
+    """Case « Limiter le débit » + valeur en Mo/s.  `value()` rend 0.0 quand la case est décochée (aucun plafond,
+    comportement par défaut depuis 0.2.3), sinon le plafond choisi.  `valueChanged(float)` suit les deux."""
+
+    valueChanged = pyqtSignal(float)
+
+    def __init__(self, valeur_mo_s: float = 0.0, parent=None):
+        super().__init__(parent)
+        h = QHBoxLayout(self)
+        h.setContentsMargins(0, 0, 0, 0)
+        try:
+            v = float(valeur_mo_s or 0.0)
+        except (TypeError, ValueError):
+            v = 0.0
+        self.case = case('reg_debit_limiter', v > 0)
+        self.valeur = decimal('reg_debit_aide', DEBIT_MINI, DEBIT_MAXI, v if v > 0 else DEBIT_PROPOSE, 'unite_mos')
+        self.valeur.setEnabled(v > 0)
+        h.addWidget(self.case)
+        h.addWidget(self.valeur)
+        self.case.toggled.connect(self._bascule)
+        self.valeur.valueChanged.connect(lambda *_: self.valueChanged.emit(self.value()))
+
+    def _bascule(self, oui):
+        self.valeur.setEnabled(bool(oui))
+        self.valueChanged.emit(self.value())
+
+    def value(self) -> float:
+        return float(self.valeur.value()) if self.case.isChecked() else 0.0
+
+    def setValue(self, valeur_mo_s: float):
+        v = float(valeur_mo_s or 0.0)
+        self.case.setChecked(v > 0)
+        if v > 0:
+            self.valeur.setValue(v)
 
 
 class _Signaux(QObject):

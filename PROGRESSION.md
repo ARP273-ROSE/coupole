@@ -328,6 +328,8 @@ dans `<dossier de travail>/coupole_audit3/`.
   réussis, 11 sautés, code 0 ; python:3.10-slim 282 réussis, 11 sautés, code 0** ; `test_adaptatif` + `test_echelle`
   à `QT_SCALE_FACTOR=1.5` et `2` : 33 réussis, code 0 (3.12 et 3.10).
 - CI `tests.yml` du commit `c193ab5` : **6/6** (Linux, Windows, macOS × 3.10, 3.12), étape « Liens du guide ASTAP » comprise. Premiers passages rouges : tests sous Windows (police large : colonnes au contenu plus larges que la vue → défilement admis ; hauteur du tableau empilé qui oubliait l’ascenseur horizontal : corrigé dans le code) et SourceForge en 403 pour les machines de CI (repli sur le flux RSS du dossier).
+- [x] Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 619 réussis,
+  22 sautés, code 0 ; python:3.10-slim 619 / 22, code 0**.
 - **Aucun tag posé.**
 
 ## 2026-10-09 — version 0.1.6 : réglages conservés d'une fermeture à l'autre
@@ -500,6 +502,8 @@ mesures : `docs/AUDIT2_2026-10.md` § 9.
   passés à part. Manuels FR/EN (41 p.) recompilés, temporaires supprimés ; captures refaites (Lots avec l'encadré,
   Cosmologie côte à côte et empilée, Traitement avec « qui lit quoi »).
 - CI `tests.yml` du commit `c193ab5` : **6/6** (Linux, Windows, macOS × 3.10, 3.12), étape « Liens du guide ASTAP » comprise. Premiers passages rouges : tests sous Windows (police large : colonnes au contenu plus larges que la vue → défilement admis ; hauteur du tableau empilé qui oubliait l’ascenseur horizontal : corrigé dans le code) et SourceForge en 403 pour les machines de CI (repli sur le flux RSS du dossier).
+- [x] Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 619 réussis,
+  22 sautés, code 0 ; python:3.10-slim 619 / 22, code 0**.
 - **Aucun tag posé.**
 
 ## 2026-10-09 — version 0.1.10 : base d'état sur un partage réseau (le « à décider » de la 0.1.9)
@@ -536,6 +540,8 @@ partagée avec le NAS) : sous Linux, télécharger, *Tout télécharger* ou réo
   15 sautés, code 0 ; python:3.10-slim 389 / 15, code 0**. Banc Samba (`outils/audit2/samba/essai.sh`, conteneurs
   retirés ensuite) : tests avec `COUPOLE_TEST_SMB` réussis, essai réel refait (3 converties, base du partage intègre).
 - CI `tests.yml` du commit `09f8ae8` : **6/6** (Linux, Windows, macOS × 3.10, 3.12) ; sous Windows, `test_chemin_unc_reel` de la base de travail (`\\localhost\C$`) passe.
+- [x] Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 619 réussis,
+  22 sautés, code 0 ; python:3.10-slim 619 / 22, code 0**.
 - **Aucun tag posé.**
 
 ## 2026-10-09 — version 0.1.11 : copie d'un ancien traitement, menus, dialogues, Qualité sur les poses d'un utilisateur
@@ -590,6 +596,8 @@ Retours d'utilisateur (Linux/KDE, 0.1.10, `/mnt/partage/OHP_DU_ECU` = copie prod
   15 sautés, code 0 ; python:3.10-slim 480 / 15, code 0**.
 - CI `tests.yml` : commit `0f261ca` 4/6 (Windows : test du dossier de départ qui supposait « / » comme racine) ;
   commit `b459b98` **6/6** (Linux, Windows, macOS × 3.10, 3.12).
+- [x] Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 619 réussis,
+  22 sautés, code 0 ; python:3.10-slim 619 / 22, code 0**.
 - **Aucun tag posé.**
 
 ## 2026-10-09 — version 0.1.12 : lancements journalisés, PixInsight, dépôt sans données personnelles
@@ -642,6 +650,8 @@ n'en gardait aucune trace. Diagnostic sur le poste : `PixInsight.sh` (eval, guil
 - CI `tests.yml` : commit `ce9bed1` 4/6 (macOS : test flatpak, `/tmp` résolu en `/private/tmp` — flatpak n'existe
   que sous Linux, test limité à Linux) ; commit `307efe4` **6/6** (Linux, Windows, macOS × 3.10, 3.12), garde-fou de
   confidentialité compris (PDF lus par pdftotext sous Linux).
+- [x] Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 619 réussis,
+  22 sautés, code 0 ; python:3.10-slim 619 / 22, code 0**.
 - **Aucun tag posé.**
 - Non vérifiable ici : PixInsight réel (logiciel commercial, absent du serveur de développement) — le comportement
   du script et de `-n` vient de l'essai sur le poste de l'utilisateur ; macOS et Windows : commandes d'après les
@@ -701,6 +711,8 @@ passées, comme la Banque OHP ; méthode tirée des pratiques publiées (fils et
   17 sautés, code 0 (reproject 0.21.0) ; python:3.10-slim 548 / 17, code 0 (reproject 0.14.1)**.
 - CI `tests.yml` : commit `9d21622` **6/6** du premier coup (Linux, Windows, macOS × 3.10, 3.12), garde-fou de
   confidentialité compris.
+- [x] Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 619 réussis,
+  22 sautés, code 0 ; python:3.10-slim 619 / 22, code 0**.
 - **Aucun tag posé.**
 
 ## 2026-10-09 — version 0.2.1 : possession sous Windows (lecteur réseau), bibliothèques embarquées
@@ -806,6 +818,8 @@ temporaire, jamais modifiés en place).
   22 sautés, code 0 (reproject 0.21.0) ; python:3.10-slim 604 / 22, code 0 (reproject 0.14.1)**.
 - [x] CI `tests.yml` : commit `5d827ac` **6/6** (Linux, Windows, macOS × 3.10, 3.12), garde-fou de confidentialité compris.
 - Téléchargements d'essai et copie temporaire des vrais téléchargements effacés ; dossier d'origine jamais modifié.
+- [x] Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 619 réussis,
+  22 sautés, code 0 ; python:3.10-slim 619 / 22, code 0**.
 - **Aucun tag posé.**
 ### Défauts trouvés en route
 - **« saturne » : rien pour Cassini** (cause distincte de SIMBAD) : OPUS rend Voyager puis Cassini, et la limite de
@@ -826,3 +840,23 @@ temporaire, jamais modifiés en place).
 - Interface réelle (hors écran) : « saturne » → 21 694 produits (MAST 1 821, OPUS 20 000 tronqué et signalé) ;
   « M16 » → 396 produits retenus, 81 variantes cachées ; catalogue JWST 2 792 cibles, Hubble 2 960.
 - `tests/test_archives_reseau.py` (`COUPOLE_TEST_RESEAU=1`) : 3 réussis (dont le nouvel essai 0.2.2).
+
+## 2026-10-12 — 0.2.3 : plus de limite de débit par défaut
+Demande d'utilisateur : « enlever la limite de vitesse de téléchargement ».
+- [x] `core/reseau.LimiteurDebit` : 0, négatif ou None = aucun plafond ; le seau compte les octets dans tous les cas
+  (`mesure()`), `memoriser_debit()` garde le débit obtenu (`debit_mesure_mo_s`) à la fin d'un traitement OHP ou
+  Archives s'il dit quelque chose du réseau (sans plafond, ou < 90 % du plafond) ; `debit_estime()` choisit
+  plafond / mesure / inconnu ; `plafond_reglage()` normalise un réglage en Mo/s.
+- [x] Défauts `debit_max_mo_s` et `archives_debit_mo_s` à 0 ; migration unique (marqueur `debit_sans_plafond_023`) :
+  8 exactement → 0, toute autre valeur conservée.
+- [x] Préférences et onglet Traitement : `gui.outils.ChampDebit` (case « Limiter le débit » + valeur 0,1 à
+  1 000 Mo/s, info-bulles) ; Archives : `telechargement.plafond_octets_s()` (option, réglage propre, sinon plafond
+  des Préférences) ; CLI `--debit 0` = illimité, défaut = réglage.
+- [x] Estimation « Tout télécharger » (interface et `coupole ohp tout`) : `pilote.phrase_duree` (plafond, débit
+  mesuré, ou « selon la connexion »).
+- [x] Courtoisie inchangée : User-Agent, téléchargements simultanés bornés, une recherche par seconde et par service.
+- [x] Textes FR/EN, aide F1 et des commandes, manuels FR/EN recompilés, captures Préférences et Traitement, README,
+  `docs/archives_methode.md`, CHANGELOG FR puis EN, VERSION 0.2.3 ; tests `tests/test_debit_libre.py`.
+- [x] Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 619 réussis,
+  22 sautés, code 0 ; python:3.10-slim 619 / 22, code 0**.
+- **Aucun tag posé.**

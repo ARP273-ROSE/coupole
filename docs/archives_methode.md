@@ -32,7 +32,7 @@ de Coupole (0.2.0 à 0.2.2).  Les mesures citées ont été faites sur les servi
    ACS/WFC classique plus de 200 Mo.  → « Estimer le volume » : tailles annoncées (ESO, IRSA, NOIRLab, PDS) ou
    mesurées par une requête d'un octet (MAST, OPUS), échantillon par instrument au-delà de 60 fichiers ;
    confirmation au-delà de 2 Go (réglage `archives_seuil_go`).
-4. **Courtoisie envers les serveurs.**  → User-Agent qui nomme Coupole, débit plafonné (8 Mo/s par défaut),
+4. **Courtoisie envers les serveurs.**  → User-Agent qui nomme Coupole, débit libre par défaut depuis 0.2.3 (plafond réglable ; 8 Mo/s jusqu'en 0.2.2),
    deux téléchargements à la fois, une recherche par seconde au plus par service, reprise d'un fichier interrompu
    (requête partielle) plutôt que de tout recommencer, aucune requête au démarrage.
 5. **N'ouvrir que l'image scientifique.**  Les FITS des pipelines ont une extension principale vide et des

@@ -23,7 +23,7 @@ from ...gui.dialogues import DialogueASTAP, ouvrir_fichier
 from ...gui import fichiers, memoire, pastilles
 from ...gui.modele import (DelegueProgression, ModeleParesseux, ModeleTableau, Nombre, Progression, lignes_choisies,
                            vue_tableau)
-from ...gui.outils import (FileEvenements, Tache, aide, bouton, case, champ, decimal, enregistrer_arret, est_detruit,
+from ...gui.outils import (ChampDebit, FileEvenements, Tache, aide, bouton, case, champ, enregistrer_arret, est_detruit,
                            lancer_fil, liste, nombre)
 from . import cibles
 from .conversion import ident
@@ -1263,7 +1263,7 @@ class Panneau(QWidget):
         gl.addWidget(self.l_plan, 0, 0, 1, 6)
         self.n_dl = nombre('reg_dl_aide', 0, 4, int(r['telechargements_max'] or 0), 'reg_auto')
         self.n_conv = nombre('reg_conv_aide', 0, 16, int(r['conversions_max'] or 0), 'reg_auto')
-        self.debit = decimal('reg_debit_aide', 0.5, 20.0, float(r['debit_max_mo_s'] or 8.0), 'unite_mos')
+        self.debit = ChampDebit(r['debit_max_mo_s'] or 0.0)
         self.eco = case('reg_econome', bool(r['mode_econome']))
         flux = Flux()                              # paires « libellé + réglage » qui passent à la ligne
         for cle, wid in (('reg_dl', self.n_dl), ('reg_conv', self.n_conv), ('reg_debit', self.debit)):
@@ -1401,7 +1401,7 @@ class Panneau(QWidget):
         return os.path.abspath(d)
 
     def tout_telecharger(self):
-        """Toute la banque : estimation (volume, temps au débit plafond, place libre), confirmation, puis traitement."""
+        """Toute la banque : estimation (volume, temps au plafond ou au débit mesuré, place libre), confirmation, traitement."""
         if self.occupe() or not self.inv:
             return
         dest = self._choisir_dest_si_besoin()
@@ -1414,11 +1414,10 @@ class Panneau(QWidget):
         self.lancer(confirmer=True)
 
     def _estimation_tout(self, est, fmt, plan):
-        from .pilote import estimation_temps
-        debit = self.debit.value()
+        from .pilote import phrase_duree
         return tr('ohp_estimation_tout', images=est['images'], objets=est['objets'], fits=_taille(est['octets_fits']),
-                  sortie=_taille(est['octets_sortie']), format=fmt.upper(), debit='%.1f' % debit,
-                  temps=duree_lisible(estimation_temps(est['octets_fits'], debit * 1e6)))
+                  sortie=_taille(est['octets_sortie']), format=fmt.upper(),
+                  duree=phrase_duree(est['octets_fits'], self.debit.value() * 1e6, duree_lisible))
 
     def ouvrir_journal(self):
         p = os.path.join(self.dest.text().strip(), '_traitement', 'JOURNAL.txt')

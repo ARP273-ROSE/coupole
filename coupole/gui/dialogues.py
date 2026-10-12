@@ -15,7 +15,7 @@ from .. import __version__
 from ..core import config, i18n
 from ..core.i18n import tr
 from . import adaptatif, fichiers
-from .outils import Tache, aide, bouton, case, champ, decimal, liste, nombre
+from .outils import ChampDebit, Tache, aide, bouton, case, champ, liste, nombre
 
 
 def _boutons(dlg, ok=True, annuler=True):
@@ -118,7 +118,7 @@ class DialogueReglages(QDialog):
         f.addRow(tr('reg_dl'), self.dl)
         self.conv = nombre('reg_conv_aide', 0, 16, int(r['conversions_max'] or 0), 'reg_auto')
         f.addRow(tr('reg_conv'), self.conv)
-        self.debit = decimal('reg_debit_aide', 0.5, 20.0, float(r['debit_max_mo_s'] or 8.0), 'unite_mos')
+        self.debit = ChampDebit(r['debit_max_mo_s'] or 0.0)
         f.addRow(tr('reg_debit'), self.debit)
         self.eco = case('reg_econome', bool(r['mode_econome']))
         f.addRow('', self.eco)

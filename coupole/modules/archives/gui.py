@@ -21,7 +21,6 @@ from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import (QComboBox, QCompleter, QDoubleSpinBox, QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
                              QMenu, QMessageBox, QProgressBar, QSplitter, QTabWidget, QTextBrowser, QVBoxLayout, QWidget)
 
-from ...core import config
 from ...core.i18n import tr
 from ...gui import fichiers, memoire, ouvrir
 from ...gui.adaptatif import Flux, coupable, texte_reel
@@ -750,8 +749,7 @@ class Panneau(QWidget):
         self._lancer(obs, e['octets'], cible)
 
     def _lancer(self, obs, octets, cible=None):
-        r = config.reglages()
-        debit = float(r.get('archives_debit_mo_s', r['debit_max_mo_s']) or 8.0) * 1e6
+        debit = T.plafond_octets_s()                     # 0 : aucun plafond (défaut depuis 0.2.3)
         if cible is None:
             cible = self.requete.nom if self.requete is not None and self.requete.nom else ''
             from .recherche import interpreter

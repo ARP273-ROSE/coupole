@@ -139,13 +139,24 @@ def seuil_octets() -> float:
         return SEUIL_GO_DEFAUT * 1e9
 
 
+def plafond_octets_s(debit_mo_s: float | None = None) -> float:
+    """Plafond de débit des archives en octets/s ; 0 = aucun plafond (défaut depuis 0.2.3).
+
+    `debit_mo_s` (option --debit) s'il est donné, sinon le réglage propre aux archives (`archives_debit_mo_s`),
+    sinon le plafond général des Préférences (`debit_max_mo_s`)."""
+    if debit_mo_s is not None:
+        return reseau.plafond_reglage(debit_mo_s)
+    r = config.reglages()
+    return reseau.plafond_reglage(r.get('archives_debit_mo_s')) or reseau.plafond_reglage(r.get('debit_max_mo_s'))
+
+
 # ================================================================================================ pilote
 class Telechargement:
     """Télécharge, prépare et range une liste d'observations.  Événements (`rapporter(dict)`) :
     {'genre': 'debut'|'octets'|'fini'|'erreur'|'deja'|'fin', …}.  `arret` annule ; `pause` suspend."""
 
     def __init__(self, sortie, observations: list[dict], cible: str = '', fmt: str = 'xisf',
-                 garder_original: bool = False, debit_octets_s: float = 8e6, paralleles: int = 2,
+                 garder_original: bool = False, debit_octets_s: float = 0.0, paralleles: int = 2,
                  rapporter=None, arret: threading.Event | None = None, pause: threading.Event | None = None,
                  masque: bool = False, recadrer: bool = True):
         self.sortie = os.path.abspath(os.path.expanduser(str(sortie)))
@@ -164,7 +175,7 @@ class Telechargement:
         self.rapporter = rapporter or (lambda ev: None)
         self.arret = arret or threading.Event()
         self.pause = pause or threading.Event()
-        self.limiteur = reseau.LimiteurDebit(debit_octets_s)
+        self.limiteur = reseau.LimiteurDebit(debit_octets_s)        # 0 : aucun plafond ; mesure le débit obtenu
         self.journal = Journal(self.trav, 1.0)
         self.etat = Etat(os.path.join(self.trav, 'etat.sqlite'), 1.0)
         self._verrou = threading.Lock()
@@ -319,6 +330,7 @@ class Telechargement:
         res['octets_gardes'] = self._gardes
         res['dossier'] = self.racine
         res['secondes'] = time.monotonic() - t0
+        reseau.memoriser_debit(self.limiteur)
         self._evt(genre='fin', bilan=res)
         return res
 

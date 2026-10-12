@@ -259,7 +259,7 @@ class Traitement:
     """Télécharge, convertit et range une sélection d'images.
 
     options : format, langue (noms et en-têtes), astap (EtatASTAP ou None), mode_astap,
-              debit_octets_s, garder_fits (bool), garder_doublons (bool).
+              debit_octets_s (0 ou absent : aucun plafond), garder_fits (bool), garder_doublons (bool).
     arret : threading.Event (annulation) ; pause : threading.Event (suspend l'alimentation du pipeline).
     """
 
@@ -284,7 +284,7 @@ class Traitement:
         self.journal = Journal(self.trav, DELAI_VALIDATION)
         self.etat = Etat(os.path.join(self.trav, 'etat.sqlite'), DELAI_VALIDATION, rapporter=self._avis_base)
         self._verifier_coherence()
-        self.limiteur = reseau.LimiteurDebit(self.options.get('debit_octets_s', 8e6))
+        self.limiteur = reseau.LimiteurDebit(self.options.get('debit_octets_s', 0.0))   # 0 : aucun plafond
         self._med = self._medo = None
         self._essais = {}
         self._octets = 0
@@ -526,6 +526,7 @@ class Traitement:
                             duree=int(bilan['duree']), sortie='%.2f' % (bilan['octets_sortie'] / 1e9), lots=len(index),
                             etat='interrompu / interrupted' if annule else 'terminé / finished')
         self.journal.vider()
+        reseau.memoriser_debit(self.limiteur)            # débit obtenu : estimation des durées suivantes
         self.rapporter({'type': 'fin', 'bilan': bilan})
         return bilan
 
@@ -694,8 +695,18 @@ class Traitement:
 
 # ============================================================================ estimations (avant de lancer)
 def estimation_temps(octets: float, debit_octets_s: float) -> float:
-    """Durée (s) du téléchargement au débit plafond ; la conversion se recouvre avec le réseau (pipeline)."""
+    """Durée (s) du téléchargement au débit donné ; la conversion se recouvre avec le réseau (pipeline)."""
     return octets / max(1.0, debit_octets_s)
+
+
+def phrase_duree(octets: float, plafond_octets_s: float | None, duree_lisible) -> str:
+    """Fin de phrase d'estimation : au plafond s'il est posé, sinon au débit mesuré lors des derniers
+    téléchargements, sinon « dépend de la connexion » (0.2.3 : plus de plafond par défaut)."""
+    debit, genre = reseau.debit_estime(plafond_octets_s)
+    if genre == 'inconnu':
+        return tr('ohp_duree_inconnue')
+    return tr('ohp_duree_au_' + genre, debit='%.1f' % (debit / 1e6),
+              temps=duree_lisible(estimation_temps(octets, debit)))
 
 
 def dossier_sortie_propose() -> str:

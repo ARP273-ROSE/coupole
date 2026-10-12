@@ -123,7 +123,7 @@ OBJET & objet(s) : « NGC 6888 », « Pluton », « 1998 AG6 », ou un nom de la
 --telechargements,\allowbreak{} --downloads N & téléchargements simultanés (défaut automatique ; 4 au plus)\\
 --conversions N & conversions simultanées (défaut : selon cœurs et mémoire)\\
 --econome,\allowbreak{} --eco & mode économe : 1 conversion, 2 téléchargements\\
---debit,\allowbreak{} --rate Mo/s & débit maximal vers le serveur (défaut 8 Mo/s)\\
+--debit,\allowbreak{} --rate Mo/s & plafond de débit vers le serveur en Mo/s (défaut : réglage ; aucun plafond, 0 = illimité)\\
 --garder-fits,\allowbreak{} --keep-fits & garde aussi les FITS d'origine (dans \_traitement/fits\_origine)\\
 --garder-doublons,\allowbreak{} --keep-duplicates & traite aussi les doublons (inventaire et pixels identiques) au lieu de les écarter\\
 --oui,\allowbreak{} --yes & accepte une sélection de plus de 5 Go sans confirmation\\
@@ -141,7 +141,7 @@ OBJET & objet(s) : « NGC 6888 », « Pluton », « 1998 AG6 », ou un nom de la
 --telechargements,\allowbreak{} --downloads N & téléchargements simultanés (défaut automatique ; 4 au plus)\\
 --conversions N & conversions simultanées (défaut : selon cœurs et mémoire)\\
 --econome,\allowbreak{} --eco & mode économe : 1 conversion, 2 téléchargements\\
---debit,\allowbreak{} --rate Mo/s & débit maximal vers le serveur (défaut 8 Mo/s)\\
+--debit,\allowbreak{} --rate Mo/s & plafond de débit vers le serveur en Mo/s (défaut : réglage ; aucun plafond, 0 = illimité)\\
 --garder-fits,\allowbreak{} --keep-fits & garde aussi les FITS d'origine (dans \_traitement/fits\_origine)\\
 --garder-doublons,\allowbreak{} --keep-duplicates & traite aussi les doublons (inventaire et pixels identiques) au lieu de les écarter\\
 --oui,\allowbreak{} --yes & accepte une sélection de plus de 5 Go sans confirmation\\
@@ -160,7 +160,7 @@ OBJET & objet(s) : « NGC 6888 », « Pluton », « 1998 AG6 », ou un nom de la
 --telechargements,\allowbreak{} --downloads N & téléchargements simultanés (défaut automatique ; 4 au plus)\\
 --conversions N & conversions simultanées (défaut : selon cœurs et mémoire)\\
 --econome,\allowbreak{} --eco & mode économe : 1 conversion, 2 téléchargements\\
---debit,\allowbreak{} --rate Mo/s & débit maximal vers le serveur (défaut 8 Mo/s)\\
+--debit,\allowbreak{} --rate Mo/s & plafond de débit vers le serveur en Mo/s (défaut : réglage ; aucun plafond, 0 = illimité)\\
 --garder-fits,\allowbreak{} --keep-fits & garde aussi les FITS d'origine (dans \_traitement/fits\_origine)\\
 --garder-doublons,\allowbreak{} --keep-duplicates & traite aussi les doublons (inventaire et pixels identiques) au lieu de les écarter\\
 --oui,\allowbreak{} --yes & accepte une sélection de plus de 5 Go sans confirmation\\
@@ -189,7 +189,7 @@ OBJET & objet(s) : « NGC 6888 », « Pluton », « 1998 AG6 », ou un nom de la
 --tout,\allowbreak{} --all & toute la banque (≈ 78 Go)\\
 --dest DOSSIER & dossier de destination (défaut : \textasciitilde{}/Coupole/OHP\_DU\_ECU ou celui des réglages)\\
 --telechargements,\allowbreak{} --downloads N & téléchargements simultanés (défaut automatique ; 4 au plus)\\
---debit,\allowbreak{} --rate Mo/s & débit maximal vers le serveur (défaut 8 Mo/s)\\
+--debit,\allowbreak{} --rate Mo/s & plafond de débit vers le serveur en Mo/s (défaut : réglage ; aucun plafond, 0 = illimité)\\
 --oui,\allowbreak{} --yes & accepte une sélection de plus de 5 Go sans confirmation\\
 \bottomrule
 \end{tabularx}
@@ -337,7 +337,7 @@ OBJET & objet (nom ou coordonnées)\\
 --sans-original,\allowbreak{} --no-original & (comportement par défaut depuis 0.2.2) n'efface que le fichier d'origine une fois l'image préparée\\
 --garder-original,\allowbreak{} --keep-original & garder aussi le fichier d'origine (dans <champ>/\_originaux) ; par défaut, seul le produit préparé reste\\
 --masque,\allowbreak{} --mask & écrire aussi le masque des pixels sans donnée (compressé, après recadrage)\\
---debit,\allowbreak{} --rate MO/S & plafond de débit en Mo/s (défaut : réglage, 8)\\
+--debit,\allowbreak{} --rate MO/S & plafond de débit en Mo/s (défaut : réglage ; aucun plafond, 0 = illimité)\\
 --paralleles,\allowbreak{} --parallel N & téléchargements simultanés (défaut : 2, au plus 6)\\
 --max N & au plus N fichiers (les plus proches)\\
 --oui,\allowbreak{} --yes & confirme un téléchargement au-delà du seuil\\

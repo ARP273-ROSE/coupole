@@ -452,9 +452,9 @@ TEXTES = {
                                'per file, a sample beyond 60 files).  Nothing is downloaded.'},
     'arc_telecharger': {'fr': 'Télécharger la sélection', 'en': 'Download the selection'},
     'arc_telecharger_aide': {'fr': "Estime le volume, demande confirmation au-delà du seuil (2 Go par défaut), puis "
-                                   "télécharge (débit plafonné, reprise), extrait l'image scientifique et la range.",
+                                   "télécharge (débit libre ou plafonné selon les Préférences, reprise), extrait l'image scientifique et la range.",
                              'en': 'Estimate the volume, ask for confirmation beyond the threshold (2 GB by default), then '
-                                   'download (capped rate, resume), extract the science image and file it.'},
+                                   'download (full rate, or capped in the Preferences; resume), extract the science image and file it.'},
     'arc_pause': {'fr': 'Pause', 'en': 'Pause'},
     'arc_pause_aide': {'fr': 'Suspend les téléchargements (ceux en cours finissent leur fichier).',
                        'en': 'Suspend the downloads (the current ones finish their file).'},
@@ -650,7 +650,7 @@ TEXTES = {
     'arc_aide_sans_original': {'fr': "(comportement par défaut depuis 0.2.2) n'efface que le fichier d'origine une fois "
                                      "l'image préparée", 'en': '(default since 0.2.2) delete the original file once the '
                                      'image is prepared'},
-    'arc_aide_debit': {'fr': 'plafond de débit en Mo/s (défaut : réglage, 8)', 'en': 'rate cap in MB/s (default: setting, 8)'},
+    'arc_aide_debit': {'fr': 'plafond de débit en Mo/s (défaut : réglage ; aucun plafond, 0 = illimité)', 'en': 'rate cap in MB/s (default: setting; no cap, 0 = unlimited)'},
     'arc_aide_paralleles': {'fr': 'téléchargements simultanés (défaut : 2, au plus 6)', 'en': 'simultaneous downloads (default: 2, at most 6)'},
     'arc_aide_max': {'fr': 'au plus N fichiers (les plus proches)', 'en': 'at most N files (the closest)'},
     'arc_aide_oui': {'fr': 'confirme un téléchargement au-delà du seuil', 'en': 'confirm a download beyond the threshold'},

@@ -69,7 +69,8 @@ DEFAUTS = {
     'astap_catalogue': '',
     'telechargements_max': 0,          # 0 : automatique
     'conversions_max': 0,              # 0 : automatique
-    'debit_max_mo_s': 8.0,             # plafond de débit vers le serveur public
+    'debit_max_mo_s': 0.0,             # plafond de débit vers le serveur public ; 0 = aucun (défaut depuis 0.2.3)
+    'debit_mesure_mo_s': 0.0,          # débit obtenu au dernier traitement sans plafond (estimation des durées)
     'mode_econome': False,
     'dossier_sortie': '',
     'format_sortie': 'xisf',
@@ -90,7 +91,8 @@ DEFAUTS = {
     # module Archives (0.2.0)
     'archives_dossier': '',            # vide : le dossier de sortie (Préférences), sinon ~/Coupole
     'archives_seuil_go': 2.0,          # au-delà, confirmation avant de télécharger
-    'archives_debit_mo_s': 8.0,        # plafond de débit vers les archives (seau à jetons partagé)
+    'archives_debit_mo_s': 0.0,        # plafond de débit vers les archives (seau à jetons partagé) ; 0 = aucun
+    'debit_sans_plafond_023': True,    # migration 0.2.3 faite (absente d'un ancien fichier : voir _migrer)
     'archives_format': 'xisf',         # image préparée : xisf | fits
 }
 
@@ -149,6 +151,28 @@ def lire_json_protege(chemin, defaut=None, attendu=dict):
         return defaut
 
 
+#: ancien plafond de débit par défaut (jusqu'à 0.2.2), en Mo/s
+ANCIEN_DEBIT_DEFAUT = 8.0
+
+
+def _migrer(lu: dict, valeurs: dict) -> bool:
+    """Migrations des réglages d'une version antérieure ; True si `valeurs` a changé (à enregistrer).
+
+    0.2.3 : plus de plafond de débit par défaut.  Un fichier écrit avant 0.2.3 contient l'ancien défaut (8 Mo/s),
+    puisque tous les réglages y sont recopiés : une valeur EXACTEMENT égale à 8 passe à 0 (aucun plafond) ; une
+    valeur choisie par l'utilisateur est conservée.  Faite une seule fois (marqueur `debit_sans_plafond_023`) :
+    un plafond de 8 Mo/s choisi ensuite reste en place.
+    """
+    if lu.get('debit_sans_plafond_023'):
+        return False
+    for cle in ('debit_max_mo_s', 'archives_debit_mo_s'):
+        v = lu.get(cle)
+        if isinstance(v, (int, float)) and not isinstance(v, bool) and float(v) == ANCIEN_DEBIT_DEFAUT:
+            valeurs[cle] = 0.0
+    valeurs['debit_sans_plafond_023'] = True
+    return True
+
+
 class Reglages:
     """Réglages lus et écrits de façon atomique (fichier temporaire + remplacement).
 
@@ -166,6 +190,8 @@ class Reglages:
         lu = lire_json_protege(self.chemin, None)
         self.valeurs.update(lu or {})
         self.restaure = existait and lu is None            # fichier présent mais illisible : mis de côté
+        if isinstance(lu, dict) and _migrer(lu, self.valeurs):
+            self.enregistrer()
         if not self.valeurs.get('id_installation'):
             self.valeurs['id_installation'] = uuid.uuid4().hex[:12]
             self.enregistrer()

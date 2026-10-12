@@ -576,9 +576,19 @@ TEXTES = {
     'reg_conv_aide': {'fr': 'Auto : cœurs physiques moins un, borné par la mémoire disponible.',
                       'en': 'Auto: physical cores minus one, bounded by available memory.'},
     'reg_auto': {'fr': 'auto', 'en': 'auto'},
-    'reg_debit': {'fr': 'Débit maximal', 'en': 'Maximum rate'},
-    'reg_debit_aide': {'fr': 'Plafond du débit total de téléchargement (politesse envers le serveur public).',
-                       'en': 'Cap on the total download rate (courtesy to the public server).'},
+    'reg_debit': {'fr': 'Débit de téléchargement', 'en': 'Download rate'},
+    'reg_debit_limiter': {'fr': 'Limiter le débit', 'en': 'Limit the rate'},
+    'reg_debit_limiter_aide': {'fr': "Décochée (par défaut) : aucun plafond, les téléchargements vont à la vitesse de la "
+                                     "connexion. Cochée : plafond du débit total, tous téléchargements confondus (Banque "
+                                     "OHP et Archives). Le nombre de téléchargements simultanés reste borné dans tous les "
+                                     "cas, par courtoisie envers les serveurs publics.",
+                               'en': 'Unticked (default): no cap, downloads run at the speed of the connection. Ticked: cap '
+                                     'on the total rate, all downloads together (OHP image bank and Archives). The number '
+                                     'of simultaneous downloads stays bounded in every case, as a courtesy to the public '
+                                     'servers.'},
+    'reg_debit_aide': {'fr': 'Plafond du débit total de téléchargement, de 0,1 à 1 000 Mo/s (case « Limiter le débit » '
+                             'cochée).',
+                       'en': 'Cap on the total download rate, from 0.1 to 1,000 MB/s ("Limit the rate" ticked).'},
     'reg_econome': {'fr': 'Mode économe (petite machine)', 'en': 'Economy mode (small computer)'},
     'reg_econome_aide': {'fr': 'Une conversion et deux téléchargements à la fois : peu de mémoire, machine réactive.',
                          'en': 'One conversion and two downloads at a time: little memory, responsive computer.'},

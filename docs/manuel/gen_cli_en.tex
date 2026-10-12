@@ -123,7 +123,7 @@ OBJECT & object(s): « NGC 6888 », « Pluto », « 1998 AG6 », or a database n
 --telechargements,\allowbreak{} --downloads N & simultaneous downloads (automatic by default; at most 4)\\
 --conversions N & simultaneous conversions (default: from cores and memory)\\
 --econome,\allowbreak{} --eco & economy mode: 1 conversion, 2 downloads\\
---debit,\allowbreak{} --rate MB/s & maximum download rate (default 8 MB/s)\\
+--debit,\allowbreak{} --rate MB/s & download rate cap in MB/s (default: setting; no cap, 0 = unlimited)\\
 --garder-fits,\allowbreak{} --keep-fits & also keep the original FITS (in \_traitement/fits\_origine)\\
 --garder-doublons,\allowbreak{} --keep-duplicates & also process duplicates (inventory and identical pixels) instead of leaving them out\\
 --oui,\allowbreak{} --yes & accept a selection over 5 GB without confirmation\\
@@ -141,7 +141,7 @@ OBJECT & object(s): « NGC 6888 », « Pluto », « 1998 AG6 », or a database n
 --telechargements,\allowbreak{} --downloads N & simultaneous downloads (automatic by default; at most 4)\\
 --conversions N & simultaneous conversions (default: from cores and memory)\\
 --econome,\allowbreak{} --eco & economy mode: 1 conversion, 2 downloads\\
---debit,\allowbreak{} --rate MB/s & maximum download rate (default 8 MB/s)\\
+--debit,\allowbreak{} --rate MB/s & download rate cap in MB/s (default: setting; no cap, 0 = unlimited)\\
 --garder-fits,\allowbreak{} --keep-fits & also keep the original FITS (in \_traitement/fits\_origine)\\
 --garder-doublons,\allowbreak{} --keep-duplicates & also process duplicates (inventory and identical pixels) instead of leaving them out\\
 --oui,\allowbreak{} --yes & accept a selection over 5 GB without confirmation\\
@@ -160,7 +160,7 @@ OBJECT & object(s): « NGC 6888 », « Pluto », « 1998 AG6 », or a database n
 --telechargements,\allowbreak{} --downloads N & simultaneous downloads (automatic by default; at most 4)\\
 --conversions N & simultaneous conversions (default: from cores and memory)\\
 --econome,\allowbreak{} --eco & economy mode: 1 conversion, 2 downloads\\
---debit,\allowbreak{} --rate MB/s & maximum download rate (default 8 MB/s)\\
+--debit,\allowbreak{} --rate MB/s & download rate cap in MB/s (default: setting; no cap, 0 = unlimited)\\
 --garder-fits,\allowbreak{} --keep-fits & also keep the original FITS (in \_traitement/fits\_origine)\\
 --garder-doublons,\allowbreak{} --keep-duplicates & also process duplicates (inventory and identical pixels) instead of leaving them out\\
 --oui,\allowbreak{} --yes & accept a selection over 5 GB without confirmation\\
@@ -189,7 +189,7 @@ OBJECT & object(s): « NGC 6888 », « Pluto », « 1998 AG6 », or a database n
 --tout,\allowbreak{} --all & the whole bank (≈ 78 GB)\\
 --dest FOLDER & destination folder (default: \textasciitilde{}/Coupole/OHP\_DU\_ECU or the one in the settings)\\
 --telechargements,\allowbreak{} --downloads N & simultaneous downloads (automatic by default; at most 4)\\
---debit,\allowbreak{} --rate MB/s & maximum download rate (default 8 MB/s)\\
+--debit,\allowbreak{} --rate MB/s & download rate cap in MB/s (default: setting; no cap, 0 = unlimited)\\
 --oui,\allowbreak{} --yes & accept a selection over 5 GB without confirmation\\
 \bottomrule
 \end{tabularx}
@@ -337,7 +337,7 @@ OBJECT & object (name or coordinates)\\
 --sans-original,\allowbreak{} --no-original & (default since 0.2.2) delete the original file once the image is prepared\\
 --garder-original,\allowbreak{} --keep-original & also keep the original file (in <field>/\_originaux); by default only the prepared product remains\\
 --masque,\allowbreak{} --mask & also write the mask of pixels without data (compressed, after cropping)\\
---debit,\allowbreak{} --rate MB/S & rate cap in MB/s (default: setting, 8)\\
+--debit,\allowbreak{} --rate MB/S & rate cap in MB/s (default: setting; no cap, 0 = unlimited)\\
 --paralleles,\allowbreak{} --parallel N & simultaneous downloads (default: 2, at most 6)\\
 --max N & at most N files (the closest)\\
 --oui,\allowbreak{} --yes & confirm a download beyond the threshold\\

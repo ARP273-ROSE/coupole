@@ -2,6 +2,30 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.2.3 — 12 October 2026
+
+**No download rate limit by default any more.**
+
+- **User request: "remove the download speed limit".**  Up to 0.2.2, every download (OHP image bank, Archives,
+  command line) was capped at 8 MB/s by default.  Now there is **no cap by default**: downloads run at the speed of
+  the connection.  A value of 0 or empty means unlimited everywhere (`debit_max_mo_s`, `archives_debit_mo_s`,
+  `--rate 0`).
+- **The cap is still available** for anyone who wants to throttle their connection: Preferences and Processing tab,
+  **"Limit the rate"** box then the value, range widened to **0.1 to 1,000 MB/s** (instead of 0.5 to 20).  The
+  Preferences cap also applies to the Archives (unless the dedicated `archives_debit_mo_s` setting is set).
+- **Migration**: an installation that had kept the old default (8 MB/s saved) switches to unlimited on the first
+  start of 0.2.3; any other value, chosen by the user, is kept.  The migration runs once: an 8 MB/s cap chosen
+  afterwards stays in place.
+- **Duration estimates without a cap**: "Download everything" (interface and `coupole ohp tout`) estimates the
+  duration from the **rate measured** during previous downloads (saved at the end of each processing run, only when
+  it says something about the network and not about the cap); at the cap when one is set and slower; otherwise
+  "depends on the connection".  During a download, the time left still follows the rate actually measured.
+- **Courtesy towards the public servers remains**: User-Agent naming Coupole, bounded number of simultaneous
+  downloads (3 by default, at most 4 for the OHP bank; 2 for the Archives), at most one search per second per
+  service, resume of an interrupted file.  Only the rate cap goes.
+- FR/EN texts, tooltips, F1 help, command help, FR/EN manuals (Preferences, download, "Download everything",
+  Archives) and screenshots updated; tests `tests/test_debit_libre.py`.
+
 ## 0.2.2 — 12 October 2026
 
 **Observatory archives: understanding what you download compared with what you take with your telescope.**

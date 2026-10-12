@@ -2,6 +2,30 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.2.3 — 12 octobre 2026
+
+**Plus de limite de débit par défaut.**
+
+- **Demande d'utilisateur : « enlever la limite de vitesse de téléchargement ».**  Jusqu'en 0.2.2, tout
+  téléchargement (Banque OHP, Archives, ligne de commande) était plafonné à 8 Mo/s par défaut.  Désormais **aucun
+  plafond par défaut** : les téléchargements vont à la vitesse de la connexion.  Valeur 0 ou vide = illimité,
+  partout (`debit_max_mo_s`, `archives_debit_mo_s`, `--debit 0`).
+- **Le plafond reste disponible** pour qui veut brider sa connexion : Préférences et onglet Traitement, case
+  **« Limiter le débit »** puis la valeur, plage étendue de **0,1 à 1 000 Mo/s** (au lieu de 0,5 à 20).  Le plafond des
+  Préférences vaut aussi pour les Archives (sauf réglage propre `archives_debit_mo_s`).
+- **Migration** : une installation qui avait gardé l'ancien défaut (8 Mo/s enregistré) passe à illimité au premier
+  lancement de la 0.2.3 ; une autre valeur, choisie par l'utilisateur, est conservée.  Migration faite une seule
+  fois : un plafond de 8 Mo/s choisi ensuite reste en place.
+- **Estimation des durées sans plafond** : « Tout télécharger » (interface et `coupole ohp tout`) estime la durée
+  d'après le **débit mesuré** lors des téléchargements précédents (mémorisé à la fin de chaque traitement, seulement
+  s'il dit quelque chose du réseau et pas du plafond) ; au plafond s'il est posé et plus lent ; sinon « selon la
+  connexion ».  Pendant un téléchargement, le temps restant suit toujours le débit réellement mesuré.
+- **La courtoisie envers les serveurs publics demeure** : User-Agent qui nomme Coupole, nombre de téléchargements
+  simultanés borné (3 par défaut, 4 au plus pour la Banque OHP ; 2 pour les Archives), une recherche par seconde au
+  plus par service, reprise d'un fichier interrompu.  Seul le plafond de débit disparaît.
+- Textes FR/EN, info-bulles, aide F1, aide des commandes, manuels FR/EN (Préférences, téléchargement, « Tout
+  télécharger », Archives) et captures mis à jour ; tests `tests/test_debit_libre.py`.
+
 ## 0.2.2 — 12 octobre 2026
 
 **Archives des observatoires : comprendre ce qu'on télécharge par rapport à ce qu'on prend avec son télescope.**

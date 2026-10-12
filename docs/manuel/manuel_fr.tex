@@ -148,7 +148,7 @@ Ctrl+Maj+A & assistant ASTAP\\ Ctrl+Maj+D & thème sombre / clair\\ Ctrl+R & Ban
 
 \capture{img/reglages_fr.png}{0.62}
 Préférences (Ctrl+,) : langue de l'interface ; langue des noms de dossiers, d'objets et des commentaires FITS ;
-apparence (section~\ref{sec:apparence}) ; boîtes de dialogue de fichiers (section~\ref{sec:dialogues}) ; PixInsight déjà ouvert (section~\ref{sec:ouvrir}) ; dossier de sortie ; format ; parallélisme ; débit maximal ; mode économe ; recherche de mise à jour ; vérification des nouveautés de la banque au démarrage et sa fréquence maximale (section~\ref{sec:nouveautes}). L'onglet
+apparence (section~\ref{sec:apparence}) ; boîtes de dialogue de fichiers (section~\ref{sec:dialogues}) ; PixInsight déjà ouvert (section~\ref{sec:ouvrir}) ; dossier de sortie ; format ; parallélisme ; débit de téléchargement (case \emph{Limiter le débit}, décochée par défaut : aucun plafond ; cochée : plafond de 0,1 à 1~000~Mo/s, pour la Banque OHP comme pour les Archives) ; mode économe ; recherche de mise à jour ; vérification des nouveautés de la banque au démarrage et sa fréquence maximale (section~\ref{sec:nouveautes}). L'onglet
 \emph{Sources} donne les adresses des services (chapitre~\ref{chap:evolutif}). Un fichier de réglages illisible est
 mis de côté (suffixe \texttt{.corrompu-…}) et les valeurs par défaut reprennent : l'application démarre toujours.
 
@@ -275,7 +275,7 @@ colonnes \texttt{possedee}, \texttt{statut\_local}, \texttt{fichier\_local} dans
 \capture{img/traitement_fr.png}{1.0}
 Pour chaque image, hors doublons :
 \begin{enumerate}[leftmargin=*,itemsep=1pt]
-\item téléchargement : au plus 4 simultanés (3 par défaut), débit total plafonné (8 Mo/s par défaut), User-Agent
+\item téléchargement : au plus 4 simultanés (3 par défaut), débit libre par défaut (plafond total réglable dans les Préférences), User-Agent
   identifiant Coupole, reprise par requêtes HTTP Range, contrôle de la taille (serveur et inventaire), du multiple
   de 2~880 octets et de la carte \texttt{SIMPLE} ;
 \item lecture des cartes FITS telles qu'écrites et des pixels ; empreinte SHA-1 des pixels (doublons exacts) ;
@@ -310,7 +310,8 @@ La base d'état, elle, n'est jamais écrite directement sur un partage : section
 \emph{Tout télécharger…} prend la banque entière (environ 8~000 images, 78 Go de FITS, 30 Go en XISF). Au premier
 usage (ou si aucun dossier de sortie n'est défini), Coupole demande le dossier de destination par un dialogue natif et
 propose \texttt{Documents/Coupole/OHP\_DU\_ECU} ; puis il affiche, \textbf{avant toute confirmation}, le volume à
-télécharger, le volume attendu en sortie, la durée estimée au débit plafond (78 Go à 8 Mo/s : 2~h~42) et la place
+télécharger, le volume attendu en sortie, la durée estimée --- au plafond de débit s'il est posé (78 Go à 8 Mo/s : 2~h~42), sinon au débit mesuré
+lors des téléchargements précédents, sinon « selon la connexion » --- et la place
 libre ; il refuse clairement s'il en manque. Le traitement est celui de toute sélection : reprise après coupure ou
 fermeture (état par image dans \texttt{\_traitement/etat.sqlite}, FITS déjà téléchargés retrouvés), pause, rapport
 de fin. Ligne de commande : \cmd{coupole ohp tout --oui}.
@@ -728,7 +729,7 @@ sinon la raison (« l'archive ne fournit pas de vignette… »).
 
 \subsection{Télécharger et préparer}
 Choisir des lignes, puis \emph{Télécharger la sélection}. Au-delà de 2~Go (réglage \texttt{archives\_seuil\_go}),
-confirmation. Débit plafonné (8~Mo/s, réglage \texttt{archives\_debit\_mo\_s}), deux fichiers à la fois, reprise
+confirmation. Débit libre par défaut (plafond : Préférences, ou réglage \texttt{archives\_debit\_mo\_s}), deux fichiers à la fois, reprise
 d'un fichier interrompu. La barre avance en \textbf{deux phases} : téléchargement (jusqu'à 70~\%, d'après les octets
 reçus), puis préparation (jusqu'à 100~\%) ; dessous : fichiers téléchargés et préparés, octets reçus sur le total,
 débit, temps restant de l'ensemble et du fichier en cours. À la fin, l'état est écrit en clair : « Terminé :

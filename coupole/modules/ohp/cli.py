@@ -403,23 +403,28 @@ def _astap_pour(mode):
     return e, mode
 
 
+def _plafond(a) -> float:
+    """Plafond de débit en octets/s : --debit s'il est donné, sinon le réglage ; 0 = aucun plafond."""
+    from ...core import reseau
+    return reseau.plafond_reglage(a.debit if a.debit is not None else config.reglages()['debit_max_mo_s'])
+
+
 def _duree(s):
     from .gui_sans_qt import duree_lisible
     return duree_lisible(s)
 
 
 def cmd_tout(a):
-    """Toute la banque : estimation (volume, temps au débit plafond), confirmation (--oui), traitement reprenable."""
-    from .pilote import estimation_temps
+    """Toute la banque : estimation (volume, temps au plafond ou au débit mesuré), confirmation (--oui), traitement."""
+    from .pilote import phrase_duree
     from .selection import estimer
     r = config.reglages()
     inv = _inventaire()
     fmt = a.format or r['format_sortie']
-    debit = (a.debit if a.debit is not None else r['debit_max_mo_s'])
     est = estimer(inv.images, fmt)
     print(tr('ohp_estimation_tout', images=est['images'], objets=est['objets'], fits=_taille(est['octets_fits']),
-             sortie=_taille(est['octets_sortie']), format=fmt.upper(), debit='%.1f' % debit,
-             temps=_duree(estimation_temps(est['octets_fits'], debit * 1e6))))
+             sortie=_taille(est['octets_sortie']), format=fmt.upper(),
+             duree=phrase_duree(est['octets_fits'], _plafond(a), _duree)))
     if not a.oui:
         print(tr('ohp_confirmer_tout'), file=sys.stderr)
         return 4
@@ -526,7 +531,7 @@ def _traiter(a, inv, sel, confirmer_gros=True):
     else:
         print(tr('ohp_avec_astap', exe=etat.executable, cat=etat.catalogue.upper()))
     langue = a.noms or (r['langue_noms'] if r['langue_noms'] in ('fr', 'en') else i18n.langue())
-    debit = (a.debit if a.debit is not None else r['debit_max_mo_s']) * 1e6
+    debit = _plafond(a)                                  # 0 : aucun plafond
     arret = threading.Event()
     etat_aff = {'octets': 0, 't': time.time()}
 
@@ -707,7 +712,7 @@ def cmd_telecharger(a):
     if est['octets_fits'] > 5e9 and not a.oui:
         print(tr('ohp_confirmer_gros', taille=_taille(est['octets_fits'])), file=sys.stderr)
         return 4
-    lim = reseau.LimiteurDebit((a.debit if a.debit is not None else config.reglages()['debit_max_mo_s']) * 1e6)
+    lim = reseau.LimiteurDebit(_plafond(a))
     pris, plan_f = set(), []
     for x in sorted(xs, key=lambda x: (x['t_min'], x['access_url'])):
         sous = os.path.join(dest, sur(nom_affiche(x['objet'])), '%s_%s' % (x['nuit'], x['tel']))

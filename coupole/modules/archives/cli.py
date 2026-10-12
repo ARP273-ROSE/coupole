@@ -277,7 +277,7 @@ def cmd_estimer(a):
 
 
 def cmd_telecharger(a):
-    from .telechargement import estimer, seuil_octets, sortie_par_defaut
+    from .telechargement import estimer, plafond_octets_s, seuil_octets, sortie_par_defaut
     q, obs = _chercher(a)
     if obs is None:
         return 2
@@ -294,7 +294,7 @@ def cmd_telecharger(a):
         return 3
     dest = a.dest or sortie_par_defaut()
     r = config.reglages()
-    debit = (a.debit if a.debit is not None else r.get('archives_debit_mo_s', r['debit_max_mo_s'])) * 1e6
+    debit = plafond_octets_s(a.debit)                    # 0 : aucun plafond
     fmt = a.format or r.get('archives_format', 'xisf')
     cible = a.nom if a.nom and not _ressemble_coordonnees(a.nom) else (a.corps or '')
     from .recherche import interpreter
@@ -458,7 +458,7 @@ def cmd_instruments(a):
 
 def cmd_hudf(a):
     from . import celebres as C
-    from .telechargement import estimer, seuil_octets, sortie_par_defaut
+    from .telechargement import estimer, plafond_octets_s, seuil_octets, sortie_par_defaut
     filtres = tuple(f.upper() for f in (a.filtres or C.PRESET_HUDF))
     obs = C.observations_hlsp(filtres)
     if not a.telecharger:
@@ -475,6 +475,6 @@ def cmd_hudf(a):
         print(tr('arc_confirmer_cli', seuil=_taille(seuil_octets())))
         return 3
     r = config.reglages()
-    debit = r.get('archives_debit_mo_s', r['debit_max_mo_s']) * 1e6
+    debit = plafond_octets_s()
     return _executer(a.dest or sortie_par_defaut(), obs, 'HUDF', a.format or r.get('archives_format', 'xisf'), False,
                      False, debit)
