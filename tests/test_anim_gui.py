@@ -71,8 +71,8 @@ def test_animation_creee_animee_dessinee(propre, ident):
     img = w.image(800, 520)
     dt = time.perf_counter() - t0
     assert not img.isNull()
-    couleurs = {img.pixel(x, y) for x in range(0, 800, 37) for y in range(0, 520, 29)}
-    assert len(couleurs) > 3, 'rendu vide'
+    couleurs = {img.pixel(x, y) for x in range(0, 800, 4) for y in range(0, 520, 4)}
+    assert len(couleurs) > 8, 'rendu vide'          # un fond uni n'a qu'une couleur ; tracés lissés : des dizaines
     assert dt < 0.5                    # large pour les machines de CI ; en local ≈ 10 à 30 ms
     for c in w.findChildren((QAbstractButton, QAbstractSpinBox, QComboBox, QSlider)):
         if c.isVisibleTo(w):
