@@ -1,0 +1,170 @@
+"""Catalogue des 92 animations ClassAction (University of Nebraska-Lincoln Astronomy Education, Apache 2.0).
+
+Chaque entrée : identifiant ClassAction, thème, titre d'origine (anglais), fichier Flash d'origine, et la classe
+Python qui la refait (« module:Classe » dans ``animations/``) ou None si elle est encore à venir.  Les noms et
+descriptions FR/EN sont dans ``textes.py`` (clés ``anim_nom_<id>`` et ``anim_desc_<id>``, id en minuscules).
+Pour ajouter une animation d'un lot suivant : écrire ``animations/<id>.py`` et renseigner sa classe ici."""
+from __future__ import annotations
+
+import importlib
+
+THEMES = ('coordsmotion', 'lunarcycles', 'renaissance', 'stellarprops', 'light', 'extrasolarplanets',
+          'binaryvariablestars', 'ancientastro', 'solar', 'solarsystemdebris', 'sunsolarenergy', 'milkyway',
+          'cosmology', 'telescopes', 'intro')
+
+# (id, thème, titre d'origine, fichier d'origine, classe ou None)
+ANIMATIONS = (
+    ('hammerthrower', 'extrasolarplanets', 'Hammer Thrower Comparison', 'extrasolarplanets/hammerthrower.swf', None),
+    ('eclipsingbinarysim', 'binaryvariablestars', 'Eclipsing Binary Simulator',
+     'binaryvariablestars/eclipsingbinarysim.swf', None),
+    ('gravalgebra', 'renaissance', 'Gravity Algebra', 'renaissance/gravalgebra.swf', None),
+    ('lightcurve', 'binaryvariablestars', 'Lightcurve Simulator', 'binaryvariablestars/lightcurve.swf', None),
+    ('centerofmass', 'binaryvariablestars', 'Center of Mass Simulator', 'binaryvariablestars/centerofmass.swf', None),
+    ('solarsystemproperties', 'solar', 'Solar System Properties Explorer', 'solar/solarsystemproperties.swf', None),
+    ('formationtemps', 'solar', 'Planet Formation Temperatures Plot', 'solar/formationtemps.swf', None),
+    ('daylightsimulator', 'coordsmotion', 'Daylight Simulator', 'coordsmotion/daylightsimulator.swf', None),
+    ('celestialhorizon', 'coordsmotion', 'Celestial and Horizon Systems Comparison',
+     'coordsmotion/celestialhorizon.swf', None),
+    ('siderealTimeAndHourAngleDemo', 'coordsmotion', 'Sidereal Time and Hour Angle Demonstrator',
+     '200level/siderealTimeAndHourAngleDemo.swf', 'angle_horaire:AngleHoraire'),
+    ('smallangledemo', 'ancientastro', 'Small-Angle Approximation Demonstrator', 'ancientastro/smallangledemo.swf',
+     None),
+    ('dipperclock', 'ancientastro', 'Big Dipper Clock', 'ancientastro/dipperclock.swf', None),
+    ('heliacalrisingsim', 'ancientastro', 'Heliacal Rising Simulator', 'ancientastro/heliacalrisingsim.swf', None),
+    ('wagonwheel', 'binaryvariablestars', 'Aliasing in Wagon Wheels', 'binaryvariablestars/wagonwheel.swf', None),
+    ('daylighthoursexplorer', 'coordsmotion', 'Daylight Hours Explorer', 'coordsmotion/daylighthoursexplorer.swf',
+     None),
+    ('meridaltdiagram', 'coordsmotion', 'Meridional Altitude Simulator', 'coordsmotion/meridaltdiagram.swf', None),
+    ('latsim', 'coordsmotion', 'Declination Ranges Simulator', 'coordsmotion/latsim.swf', 'plages:PlagesDeclinaison'),
+    ('seasonsim', 'coordsmotion', 'Ecliptic Simulator', 'coordsmotion/seasonsim.swf', 'ecliptique:Ecliptique'),
+    ('transitmovie', 'coordsmotion', 'Union Seasons Demonstrator', 'coordsmotion/transitmovie.swf', None),
+    ('altazimuth', 'coordsmotion', 'Azimuth/Altitude Demonstrator', 'coordsmotion/altazimuth.swf',
+     'azimut_hauteur:AzimutHauteur'),
+    ('obliquity', 'coordsmotion', 'Obliquity Simulator', 'coordsmotion/obliquity.swf', 'obliquite:Obliquite'),
+    ('zodiac', 'coordsmotion', 'Ecliptic (Zodiac) Simulator', 'coordsmotion/zodiac.swf', 'zodiaque:Zodiaque'),
+    ('longlat', 'coordsmotion', 'Longitude/Latitude Demonstrator', 'coordsmotion/longlat.swf',
+     'longitude_latitude:LongitudeLatitude'),
+    ('radecdemo', 'coordsmotion', 'Celestial-Equatorial (RA/Dec) Demonstrator', 'coordsmotion/radecdemo.swf',
+     'alpha_delta:AlphaDelta'),
+    ('sunpaths', 'coordsmotion', 'Paths of the Sun', 'coordsmotion/sunpaths.swf', None),
+    ('sunmotions', 'coordsmotion', 'Sun Motions Demonstrator', 'coordsmotion/sunmotions.swf',
+     'mouvements_soleil:MouvementsSoleil'),
+    ('sunsrays', 'coordsmotion', "Sun's Rays Simulator", 'coordsmotion/sunsrays.swf', 'rayons_soleil:RayonsSoleil'),
+    ('horizon', 'coordsmotion', "Sun's Position on Horizon", 'coordsmotion/horizon.swf', None),
+    ('bigdipper', 'coordsmotion', 'Big Dipper 3D', 'coordsmotion/bigdipper.swf', None),
+    ('eclipticsimulator', 'coordsmotion', 'Seasons Simulator (NAAP)', 'coordsmotion/eclipticsimulator.swf',
+     'saisons:Saisons'),
+    ('celhorcomp', 'coordsmotion', 'Coordinate Systems Comparison', 'coordsmotion/celhorcomp.swf',
+     'comparaison_reperes:ComparaisonReperes'),
+    ('balloon', 'cosmology', 'Balloon Universe', 'cosmology/balloon.swf', None),
+    ('ca_extrasolarplanets_graph', 'extrasolarplanets', 'Radial Velocity Graph',
+     'extrasolarplanets/ca_extrasolarplanets_graph.swf', None),
+    ('ca_extrasolarplanets_starwobble', 'extrasolarplanets', 'Influence of Planets on the Sun',
+     'extrasolarplanets/ca_extrasolarplanets_starwobble.swf', None),
+    ('pulsarPeriodSim', 'extrasolarplanets', 'Pulsar Period Simulator', 'extrasolarplanets/pulsarPeriodSim001.swf',
+     None),
+    ('radialvelocitydemo', 'extrasolarplanets', 'Extrasolar Planet Radial Velocity Demonstrator',
+     'extrasolarplanets/radialvelocitydemo.swf', None),
+    ('transitsimulator', 'extrasolarplanets', 'Transit Simulator (NAAP)', 'extrasolarplanets/transitsimulator.swf',
+     None),
+    ('radialvelocitysimulator', 'extrasolarplanets', 'Radial Velocity Simulator (NAAP)',
+     'extrasolarplanets/radialvelocitysimulator.swf', None),
+    ('lookbacktimesim', 'intro', 'Lookback Time Simulator', 'intro/lookbacktimesim.swf', None),
+    ('meltednail', 'light', 'Blackbody Curves of Melting', 'light/meltednail.swf', None),
+    ('spectrum010', 'light', 'Spectrum Explorer', 'light/spectrum010.swf', None),
+    ('emspectrum', 'light', 'EM Spectrum Module', 'light/emspectrum.swf', None),
+    ('bbexplorer', 'light', 'Blackbody Curves (NAAP)', 'light/bbexplorer.swf', None),
+    ('dopplershift', 'light', 'Doppler Shift Demonstrator', 'light/dopplershift.swf', None),
+    ('filters', 'light', 'Filters Simulator (NAAP)', 'light/filters.swf', None),
+    ('hydrogenatom', 'light', 'Hydrogen Atom Simulator (NAAP)', 'light/hydrogenatom.swf', None),
+    ('threeviewsspectra', 'light', 'Three Views Spectrum Demonstrator', 'light/threeviewsspectra.swf', None),
+    ('basketball', 'lunarcycles', 'Basketball Phases Simulator', 'lunarcycles/basketball.swf', None),
+    ('eclipsetable', 'lunarcycles', 'Eclipse Table', 'lunarcycles/eclipsetable.swf', None),
+    ('fullmoondec', 'lunarcycles', 'Full Moon Declination Simulator', 'lunarcycles/fullmoondec.swf', None),
+    ('lunar_applet', 'lunarcycles', 'Lunar Phases Simulator (NAAP)', 'lunarcycles/lunarapplet.swf',
+     'phases_lune:PhasesLune'),
+    ('lunar_phaser', 'lunarcycles', 'Lunar Phase Vocabulary', 'lunarcycles/lunar_phaser.swf', None),
+    ('mooninc', 'lunarcycles', 'Moon Inclination', 'lunarcycles/mooninc.swf', None),
+    ('moonphases', 'lunarcycles', 'Three Views Simulator', 'lunarcycles/moonphases.swf', None),
+    ('phaseDemonstrator', 'lunarcycles', 'Phase Positions Demonstrator', 'lunarcycles/phaseDemonstrator.swf', None),
+    ('positionsdemonstrator', 'lunarcycles', 'Moon Phases and the Horizon Diagram',
+     'lunarcycles/positionsdemonstrator.swf', None),
+    ('shadowsim', 'lunarcycles', 'Eclipse Shadow Simulator', 'lunarcycles/shadowsim.swf', 'ombres:OmbresEclipse'),
+    ('synodiclag', 'lunarcycles', 'Synodic Lag', 'lunarcycles/synodiclag.swf', None),
+    ('tidesim', 'lunarcycles', 'Tidal Bulge Simulation', 'lunarcycles/tidesim.swf', None),
+    ('milkywayrotationalvelocity', 'milkyway', 'Milky Way Rotational Velocity',
+     'milkyway/milkywayrotationalvelocity.swf', None),
+    ('trafficdensity', 'milkyway', 'Traffic Density Analogy', 'milkyway/trafficdensity.swf', None),
+    ('venusphases', 'renaissance', 'Phases of Venus', 'renaissance/venusphases.swf', None),
+    ('ptolemaic', 'renaissance', 'Ptolemaic Phases of Venus', 'renaissance/ptolemaic.swf', None),
+    ('marsorbit', 'renaissance', 'Ptolemaic Orbit of Mars', 'renaissance/marsorbit.swf', 'mars_ptolemee:MarsPtolemee'),
+    ('pathtracer', 'renaissance', 'Epicycles Demo', 'renaissance/pathtracer.swf', 'epicycles:Epicycles'),
+    ('retrograde', 'renaissance', 'Retrograde Motion', 'renaissance/retrograde.swf', 'retrograde:Retrograde'),
+    ('keplers_third', 'renaissance', "Kepler's Third Law", 'renaissance/keplers_third.swf', None),
+    ('synodiccalculator', 'renaissance', 'Synodic Period Calculator', 'renaissance/synodiccalculator.swf', None),
+    ('configurationssimulator', 'renaissance', 'Planetary Configurations Simulator (NAAP)',
+     'renaissance/configurationssimulator.swf', None),
+    ('kepler', 'renaissance', 'Planetary Orbit Simulator (NAAP)', 'renaissance/kepler.swf', 'kepler:OrbiteKepler'),
+    ('ellipsedemo', 'renaissance', 'Eccentricity Demonstrator', 'renaissance/ellipsedemo.swf', None),
+    ('stellarmag', 'stellarprops', 'Distance Modulus Explorer', 'stellarprops/stellarmag.swf',
+     'module_distance:ModuleDistance'),
+    ('stellarvel', 'stellarprops', 'Stellar Velocity Calculator', 'stellarprops/stellarvel.swf', None),
+    ('parallaxdiag', 'stellarprops', 'Parallax Calculator', 'stellarprops/parallaxdiag.swf', 'parallaxe:Parallaxe'),
+    ('spectroparallax', 'stellarprops', 'Spectroscopic Parallax Simulator', 'stellarprops/spectroparallax.swf', None),
+    ('stellarlum', 'stellarprops', 'Stellar Luminosity Calculator', 'stellarprops/stellarlum.swf', None),
+    ('lightdetector', 'stellarprops', 'Flux Simulator', 'stellarprops/lightdetector.swf', None),
+    ('hrexplorer', 'stellarprops', 'HR Explorer (NAAP)', 'stellarprops/hrexplorer.swf', None),
+    ('fusion01', 'sunsolarenergy', 'Proton-Proton Animation', 'sunsolarenergy/fusion01.swf', None),
+    ('fusion02', 'sunsolarenergy', 'CNO Cycle Animation', 'sunsolarenergy/fusion02.swf', None),
+    ('telescope10', 'telescopes', 'Telescope Simulator', 'telescopes/telescope10.swf', None),
+    ('buckets', 'telescopes', 'CCD Simulator', 'telescopes/buckets.swf', None),
+    ('drivingthroughsnow', 'solarsystemdebris', 'Driving Through Snow', 'solarsystemdebris/drivingthroughsnow.swf',
+     None),
+    ('antipodesexplorer', 'coordsmotion', 'Antipodes Explorer', 'coordsmotion/antipodesexplorer.swf', None),
+    ('sunmotionsoverview', 'coordsmotion', 'Sun Motions Overview', 'coordsmotion/sunmotionsoverview.swf', None),
+    ('gravcalc', 'renaissance', "Newton's Law of Gravity Calculator", 'renaissance/gravcalc.swf', None),
+    ('earthorbitplot', 'renaissance', 'Earth Orbit Plot', 'renaissance/earthorbitplot.swf', None),
+    ('lunarphasequizzer', 'lunarcycles', 'Lunar Phase Quizzer', 'lunarcycles/lunarphasequizzer.swf', None),
+    ('snellslaw', 'telescopes', "Snell's Law Demonstrator", 'telescopes/snellslaw.swf', None),
+    ('galacticredshift', 'cosmology', 'Galactic Redshift Simulator', 'cosmology/galacticredshift.swf', None),
+    ('moonbisector', 'lunarcycles', 'Moon Phases With Bisectors', 'lunarcycles/moonbisector.swf', None),
+    ('siderealSolarTime', 'coordsmotion', 'Sidereal and Solar Time Simulator', 'coordsmotion/siderealSolarTime.swf',
+     'temps_sideral:TempsSideral'),
+)
+
+# Lot 1 (0.3.0) : sphère céleste, repères, Soleil, saisons, Lune, éclipses, orbites, distances (ordre du catalogue)
+LOT1 = ('longlat', 'sunmotions', 'eclipticsimulator', 'lunar_applet', 'sunsrays', 'altazimuth', 'radecdemo',
+        'celhorcomp', 'siderealTimeAndHourAngleDemo', 'seasonsim', 'obliquity', 'zodiac', 'siderealSolarTime',
+        'latsim', 'shadowsim', 'marsorbit', 'pathtracer', 'retrograde', 'kepler', 'parallaxdiag', 'stellarmag')
+
+
+class Entree:
+    __slots__ = ('id', 'theme', 'titre', 'fichier', 'classe')
+
+    def __init__(self, ident, theme, titre, fichier, classe):
+        self.id, self.theme, self.titre, self.fichier, self.classe = ident, theme, titre, fichier, classe
+
+    @property
+    def cle(self) -> str:
+        return self.id.lower()
+
+    @property
+    def faite(self) -> bool:
+        return self.classe is not None
+
+    def charger(self):
+        """Classe de l'animation (importée à la demande)."""
+        mod, _, nom = self.classe.partition(':')
+        return getattr(importlib.import_module('%s.animations.%s' % (__package__, mod)), nom)
+
+
+ENTREES = tuple(Entree(*a) for a in ANIMATIONS)
+PAR_ID = {e.id: e for e in ENTREES}
+
+
+def faites() -> list:
+    return [e for e in ENTREES if e.faite]
+
+
+def a_venir() -> list:
+    return [e for e in ENTREES if not e.faite]

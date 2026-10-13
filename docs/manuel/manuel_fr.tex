@@ -1171,6 +1171,97 @@ coupole cosmo --courbes 0,001 1500 300 --csv courbes.csv
 \end{ccode}
 
 % =====================================================================
+\section{Animations}\label{sec:anim}
+\capture{img/module_anim_fr.png}{1.0}
+Le module refait en Python les animations pédagogiques \emph{ClassAction} de l'université du Nebraska-Lincoln
+(\emph{Astronomy Education}), écrites à l'origine en Flash et devenues illisibles avec la fin de ce lecteur. Elles
+tournent désormais sous Windows, macOS et Linux, en français et en anglais, dans le thème de Coupole, et leurs calculs
+reposent sur des formules de référence vérifiées. D'après ClassAction, University of Nebraska-Lincoln Astronomy
+Education, licence Apache 2.0 (fichiers \texttt{NOTICE} et \texttt{LICENCES/Apache-2.0.txt}).
+
+\paragraph{Catalogue.} À gauche, les 92 animations du catalogue d'origine, classées par thème (coordonnées et
+mouvements, Lune, Renaissance et orbites, propriétés stellaires, lumière et spectres, exoplanètes…), avec une recherche
+(française ou anglaise, sans accents), un filtre par thème et par état. Chacune a son nom et sa description dans les
+deux langues, et son titre d'origine. Le lot~1 (0.3.0) en rend 21 disponibles ; les autres sont marquées « à venir »
+(décrites, pas encore refaites) et seront ajoutées par lots.
+
+\paragraph{Manipuler.} Glisser sur une sphère la fait tourner ; glisser une étoile, la Lune, la Terre ou un
+observateur les déplace. \emph{Lecture / Pause} et \emph{Vitesse} (0,1 à 10~fois, échelle logarithmique) animent le
+temps ; \emph{Réinitialiser} revient à l'état de départ. Chaque réglage a un curseur et un champ numérique (la valeur
+exacte est gardée : le champ n'en montre qu'un arrondi) ; les valeurs calculées s'affichent sous les réglages. Tous
+les réglages, le thème et l'animation choisie sont retrouvés au lancement suivant. Une seule animation tourne à la
+fois, et seulement quand elle est affichée ; une image coûte quelques millisecondes (rien de lourd dans le fil
+graphique).
+
+\subsection{Les animations du lot 1}
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.30\linewidth}X@{}}
+\toprule
+Animation & Ce qu'elle montre, ce qu'elle calcule\\
+\midrule
+Longitude / latitude & globe (côtes, villes, équateur, méridien de Greenwich, ligne de changement de date) ; un point à déplacer, coordonnées en décimal ou sexagésimal\\
+Mouvements du Soleil & sphère locale : course diurne, culmination, ombre, mois, analemme ; hauteur, azimut, $\alpha$, $\delta$, angle horaire, temps sidéral, équation du temps, lever et coucher ($h_0=-0{,}833^\circ$), durée du jour\\
+Saisons (NAAP) & orbite (axe fixe dans l'espace), Terre de côté ou depuis le Soleil, point subsolaire, hauteur à midi $90^\circ-|\varphi-\delta|$, étalement d'un faisceau $1/\sin h$\\
+Phases de la Lune (NAAP) & orbite vue du dessus, phase vue de la Terre, ciel de l'observateur ; fraction éclairée $(1-\cos\phi)/2$, âge (lunaison 29,53~j), pas de $\pm$1~j, 1~h, 1~min\\
+Rayons du Soleil & rayons parallèles, latitude du rayon le plus direct ($\delta_\odot$), tropiques et cercles polaires, équinoxes et solstices 2026\\
+Azimut / hauteur & repère horizontal : arcs de l'azimut (depuis le nord vers l'est) et de la hauteur ; étoile à glisser\\
+Coordonnées équatoriales & sphère céleste, Terre au centre, arcs de $\alpha$ (depuis le cercle horaire 0~h) et de $\delta$, écliptique\\
+Comparaison des systèmes & sphère céleste et diagramme d'horizon côte à côte ; régions circumpolaire, de lever et coucher, jamais levée ; traînées ; Grande Ourse, Orion, Croix du Sud\\
+Temps sidéral et angle horaire & $H = \mathrm{TSL}-\alpha$ ramené entre $-12$ et $+12$~h, arc de l'angle horaire, le ciel tourne avec le TSL\\
+Écliptique & carte $(\alpha,\delta)$ vue de l'intérieur ou de l'extérieur, écliptique $\tan\delta=\tan\varepsilon\sin\alpha$, trajet du Soleil entre deux dates\\
+Obliquité & définition de l'angle ; Terre (IAU 2006, J2000 et 2026), Mars, Uranus\\
+Écliptique (zodiaque) & Soleil devant les 13 constellations traversées (limites officielles de l'UAI, Ophiuchus compris) ; constellation de minuit ; signes de 30$^\circ$\\
+Temps sidéral et solaire & orbite et deux horloges de 24~h ; jour sidéral $86\,400\,N/(N+1)$~s pour une année de $N$ jours (365, 365,25 ou 365,2422)\\
+Plages de déclinaison & coupe Terre et sphère céleste ; limites $\delta=\pm(90^\circ-|\varphi|)$, hauteur du pôle $=|\varphi|$\\
+Ombres d'éclipse & Terre et Lune à glisser, ombre et pénombre par les tangentes communes, type d'éclipse ; encart aux proportions réelles (méthode d'Aristarque)\\
+Mars selon Ptolémée & déférent excentrique, point équant, épicycle parcouru en un an, Soleil ; boucles de la trajectoire\\
+Épicycles & trois corps, l'un gardé fixe : héliocentrique et géocentrique donnent les mêmes positions relatives\\
+Mouvement rétrograde & Terre et Mars sur leurs orbites, lignes de visée, Mars devant les étoiles (boucle avec l'inclinaison de 1,85$^\circ$) ; durée et amplitude de la rétrogradation\\
+Orbite planétaire (NAAP) & lois de Kepler : ellipse et foyers, aires balayées, $P^2=a^3$, vitesse par la relation de vis-viva ; orbites des planètes\\
+Parallaxe & $d=1/p$ ; conversions seconde d'arc, parsec, année-lumière, ua ; Proxima, Sirius, Véga\\
+Module de distance & $m-M=5\log_{10}d-5$, une grandeur verrouillée, l'étoile sur une échelle de 1 à 1~000~pc\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\capture{img/anim_eclipticsimulator_fr.png}{0.95}
+\capture{img/anim_lunar_applet_fr.png}{0.95}
+\capture{img/anim_shadowsim_fr.png}{0.95}
+\capture{img/anim_celhorcomp_fr.png}{0.95}
+\capture{img/anim_kepler_fr.png}{0.95}
+\capture{img/anim_marsorbit_fr.png}{0.95}
+\capture{img/anim_longlat_fr.png}{0.95}
+
+\subsection{Calculs et vérification}
+Les animations d'origine employaient des approximations commodes (obliquité de 23,5$^\circ$, orbite circulaire,
+ajustement de Fourier pour le Soleil, 3,26~al par parsec). Coupole les remplace par :
+\begin{itemize}
+\item jour julien et temps sidéral moyen de Greenwich (IAU 1982, Meeus éq.~12.4) ; obliquité moyenne P03 / IAU 2006
+      ($\varepsilon_{J2000}=84\,381{,}406''$) ;
+\item position apparente du Soleil et équation du temps (Meeus chap.~25 et 28, précision $\approx 0{,}01^\circ$) ;
+\item changements de repère par trigonométrie sphérique (azimut compté depuis le nord vers l'est) et matrices de
+      rotation pour le dessin ;
+\item équation de Kepler (Newton), relation de vis-viva ($GM_\odot = 1{,}327\,124\,400\,18\times10^{20}$~m$^3$\,s$^{-2}$),
+      3$^\text{e}$ loi $P^2=a^3$ ;
+\item parsec et année-lumière exacts de l'UAI ($1~\mathrm{pc}=3{,}261\,564$~al) ; rayons nominaux de l'UAI.
+\end{itemize}
+Le script \texttt{outils/verif\_anim/verif\_anim.sage} recalcule chaque grandeur sous SageMath en 100~bits, par une
+autre voie que le code (rotations au lieu des formules fermées, racines numériques, triangles semblables) ; ses
+valeurs sont figées dans \texttt{tests/anim\_reference\_sage.json} et \texttt{tests/test\_anim\_calculs.py} y compare
+Coupole (écarts $\le 10^{-9}$), ainsi qu'aux exemples publiés de Meeus (temps sidéral du 10 avril 1987,
+Soleil du 13 octobre 1992) et à astropy (Soleil apparent à mieux que $0{,}01^\circ$, limites des constellations à
+$0{,}05^\circ$). Quelques valeurs obtenues : éclipse centrale de Lune, ombre de 4~607~km de rayon à la distance de
+la Lune, soit 2,65 rayons lunaires, totalité de 1~h~41~min ; rétrogradation de Mars (orbites circulaires) de 73~jours
+sur 15,9$^\circ$ ; jour sidéral de 23~h~56~min~4,091~s.
+
+\begin{ccode}
+coupole anim liste\\
+coupole anim liste --faites --json\\
+coupole anim info sunmotions
+\end{ccode}
+
+% =====================================================================
 \section{Machine et performance}
 \capture{img/module_machine_fr.png}{0.9}
 Détection sans dépendance obligatoire : système, architecture, processeur, cœurs physiques et logiques (bornés par
@@ -1312,5 +1403,5 @@ Barbary (2016), Bertin \& Arnouts (1996). Moments adaptatifs : Bernstein \& Jarv
 © OpenStreetMap contributors. SIMBAD et Sesame : CDS, Strasbourg (Wenger et al. 2000) ; Aladin Lite (CDS) ;
 NED (NASA/IPAC) ; JPL Small-Body Database (NASA/JPL). Cosmologie : Planck Collaboration (2020, A\&A 641, A6) ;
 Hinshaw et al. (2013, WMAP 9) ; Riess et al. (2022, SH0ES) ; Hogg (1999, astro-ph/9905116) ; Komatsu et al. (2011)
-pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur). Archives : MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), Astro Data Archive de NOIRLab, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS du nœud Anneaux et Lunes, Imaging Node) ; reproject (Astropy) ; Rector et al. (2007, AJ 133, 598) pour l'ordre chromatique ; pratiques des amateurs : voir \texttt{docs/archives\_methode.md}.
+pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur). Archives : MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), Astro Data Archive de NOIRLab, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS du nœud Anneaux et Lunes, Imaging Node) ; reproject (Astropy) ; Rector et al. (2007, AJ 133, 598) pour l'ordre chromatique ; pratiques des amateurs : voir \texttt{docs/archives\_methode.md}. Animations : ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0) ; Meeus (1998, \emph{Astronomical Algorithms}, 2\textsuperscript{e} éd.) ; obliquité P03 / IAU 2006 ; limites des constellations de l'UAI (données livrées avec astropy) ; côtes d'après GSHHS (via ClassAction).
 \end{document}

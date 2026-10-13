@@ -860,3 +860,67 @@ Demande d'utilisateur : « enlever la limite de vitesse de téléchargement ».
 - [x] Validation locale (copie sans build/dist, `pip install ".[test]"`, offscreen) : **python:3.12-slim 619 réussis,
   22 sautés, code 0 ; python:3.10-slim 619 / 22, code 0**.
 - **Aucun tag posé.**
+
+## 2026-10-14 — 0.3.0 : module « Animations », lot 1 (animations ClassAction)
+Demande : refaire en Python moderne et multiplateforme les animations pédagogiques ClassAction de l'université du
+Nebraska-Lincoln (Flash/ActionScript, Apache 2.0) ; lot 1 = 21 animations (repères, mouvements, Lune, orbites,
+  distances).
+- [x] Sources lues : catalogue `animations.xml` (92 animations), code ActionScript des dépôts `flash-animations` et
+  `interactives-air-app` ; pour les animations sans source (sunsrays, altazimuth, latsim, shadowsim, retrograde,
+  stellarmag, lunarapplet…), `.swf` décompilés avec JPEXS FFDec 26.3.0 (`-export script`) : réglages, bornes,
+  défauts, formules repris de là (ex. Ptolémée : déférent 60, excentricité 6, épicycle 39,5, apogée 106,67° ; bornes
+  du module de distance selon le verrou ; tolérances des noms de phase ±12° / ±5°).
+- [x] Socle `coupole/modules/anim/` : `astro.py` (calculs sans Qt), `dessin.py` (projection orthographique d'une
+  sphère, tracés en deux passes sous/sur l'horizon, pointillés derrière la sphère, palettes des deux thèmes),
+  `scenes.py` (sphère locale, points cardinaux, observateur), `base.py` (classe `Animation` : toile QPainter, lecture /
+  pause / vitesse 0,1–10 × / réinitialiser, `Reglage` curseur + champ à valeur exacte, cases, listes, mémoire de
+  l'interface, valeurs en tableau, rendu hors écran `image()`), `catalogue.py` (92 entrées, classe de chaque animation
+  faite, `LOT1`), `textes.py` + `textes_catalogue.py` (FR/EN, descriptions anglaises d'origine), `gui.py` (catalogue
+  par thème, recherche sans accents, filtres, description, animation créée à la demande, une seule animée), `cli.py`
+  (`coupole anim liste|info`), données `donnees/cotes.json.gz` (côtes si100 de ClassAction, 10 ko).
+- [x] **21 animations** (`animations/*.py`) : longlat, sunmotions, eclipticsimulator, lunar_applet, sunsrays,
+  altazimuth, radecdemo, celhorcomp, siderealTimeAndHourAngleDemo, seasonsim, obliquity, zodiac, siderealSolarTime,
+  latsim, shadowsim, marsorbit, pathtracer, retrograde, kepler, parallaxdiag, stellarmag.
+- [x] Calculs exacts : jour julien, TSMG IAU 1982, obliquité IAU 2006, Soleil et équation du temps (Meeus, 0,01°),
+  repères (trigonométrie sphérique, matrices), lever/coucher (h₀ = −0,833°), Kepler + vis-viva, parsec et
+  année-lumière UAI, cônes d'ombre et éclipse de Lune (2,65 rayons lunaires, totalité 1 h 41 min), rétrogradation de
+  Mars (73 j, 15,9°), équant de Ptolémée, limites des 13 constellations zodiacales (astropy, équinoxe 2026,0 :
+  `outils/verif_anim/limites_zodiaque.py`).
+- [x] Vérification SageMath (conteneur `sagemath`, 10.10, 100 bits) : `outils/verif_anim/verif_anim.sage` recalcule
+  tout par d'autres voies → `tests/anim_reference_sage.json` ; `tests/test_anim_calculs.py` (20 tests : Sage ≤ 1e-9,
+  exemples 12.a, 12.b, 25.a de Meeus, Soleil contre astropy TETE < 0,01°, limites contre astropy ± 0,05°, équinoxe et
+  solstice 2026, 2e loi de Kepler par intégration).
+- [x] `tests/test_anim_gui.py` (33 tests) : catalogue (92, 21 faites, textes FR/EN), chaque animation créée hors écran,
+  10 pas, rendu non vide, info-bulles de tous les réglages, réinitialisation, lecture/pause ; deux langues ;
+  contraste des couleurs du dessin (≥ 3 dans les deux thèmes) ; réglages gardés ; valeur exacte du `Reglage` ;
+  souris (glisser l'étoile) ; panneau dans la fenêtre principale ; CLI.  Rendu mesuré ≈ 5 ms par image (profil).
+- [x] Licence : `NOTICE` (d'après ClassAction, University of Nebraska-Lincoln Astronomy Education, Apache License 2.0,
+  ce qui est repris, ce qui est modifié), `LICENCES/Apache-2.0.txt`, livrés (MANIFEST.in, kit.json), paragraphe
+  Apache-2.0 dans le `copyright` du `.deb`.
+- [x] Aide F1, info-bulles, manuels FR/EN (chapitre « Animations » : catalogue, manipulation, tableau des 21, calculs
+  et vérification ; captures `outils/captures_anim.py`), tableaux des commandes régénérés, README, CHANGELOG FR puis
+  EN, VERSION 0.3.0.
+- [x] Validation locale (python:3.12-slim, offscreen) : **674 réussis, 22 sautés, code 0** (619 avant).
+- **Aucun tag ni Release.**
+
+### Reste à faire (lots suivants) — 71 animations « à venir » dans le catalogue
+Pour ajouter une animation : écrire `coupole/modules/anim/animations/<nom>.py` (classe héritant de `base.Animation`,
+`ID` = identifiant ClassAction), renseigner sa classe dans `catalogue.ANIMATIONS`, ses textes dans `textes.py` ; les
+tests génériques de `test_anim_gui.py` la prennent d'office.
+- Coordonnées et mouvements (10) : daylightsimulator, celestialhorizon, daylighthoursexplorer, meridaltdiagram,
+  transitmovie (film : à remplacer par une simulation de l'ombre d'un bâtiment), sunpaths, horizon, bigdipper,
+  antipodesexplorer, sunmotionsoverview.
+- La Lune (12) : basketball, eclipsetable, fullmoondec, lunar_phaser, mooninc, moonphases, phaseDemonstrator,
+  positionsdemonstrator, synodiclag, tidesim, lunarphasequizzer, moonbisector.
+- Renaissance et orbites (9) : gravalgebra, venusphases, ptolemaic, keplers_third, synodiccalculator,
+  configurationssimulator, ellipsedemo, gravcalc, earthorbitplot.
+- Propriétés stellaires (5) : stellarvel, spectroparallax, stellarlum, lightdetector, hrexplorer.
+- Lumière et spectres (8) : meltednail, spectrum010, emspectrum, bbexplorer, dopplershift, filters, hydrogenatom,
+  threeviewsspectra.
+- Exoplanètes (7) : hammerthrower, ca_extrasolarplanets_graph, ca_extrasolarplanets_starwobble, pulsarPeriodSim,
+  radialvelocitydemo, transitsimulator, radialvelocitysimulator.
+- Étoiles doubles et variables (4) : eclipsingbinarysim, lightcurve, centerofmass, wagonwheel.
+- Astronomie antique (3) : smallangledemo, dipperclock, heliacalrisingsim.
+- Divers (13) : solarsystemproperties, formationtemps (Système solaire) ; drivingthroughsnow ; fusion01, fusion02 ;
+  milkywayrotationalvelocity, trafficdensity ; balloon, galacticredshift ; telescope10, buckets, snellslaw ;
+  lookbacktimesim.

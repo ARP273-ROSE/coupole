@@ -1,0 +1,15 @@
+{
+  "id": "anim",
+  "version": "1.0.0",
+  "nom": {"fr": "Animations", "en": "Animations"},
+  "description": {
+    "fr": "Animations pédagogiques d'après ClassAction (University of Nebraska-Lincoln) : sphère céleste, repères, mouvements du Soleil, saisons, phases de la Lune, éclipses, orbites, distances stellaires",
+    "en": "Teaching animations after ClassAction (University of Nebraska-Lincoln): celestial sphere, coordinates, Sun motions, seasons, lunar phases, eclipses, orbits, stellar distances"
+  },
+  "icone": "icone.svg",
+  "ordre": 36,
+  "textes": "textes:TEXTES",
+  "gui": "gui:Panneau",
+  "cli": "cli:enregistrer",
+  "coupole_min": "0.3.0"
+}

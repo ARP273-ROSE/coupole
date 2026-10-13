@@ -23,6 +23,7 @@ anglais, sur Windows, macOS et Linux. Architecture **modulaire** : d'autres modu
 | **Qualité des images** | Facultatif : FWHM, ellipticité (carte 3 × 3), fond, bruit, gradient, saturation, traînées, échantillonnage — mesures validées sur images synthétiques. |
 | **Spectres et séries** | Lecture et tracé de données 1D (spectres H I à 21 cm avec axe fréquence ↔ vitesse radio, courbes de lumière, tables FITS ou CSV). |
 | **Cosmologie** | Du redshift aux distances (comobile, luminosité, angulaire, trajet de la lumière), âges, volume comobile, module de distance, échelle en kpc/″ ; Planck 2018 avec incertitudes, SH0ES, Planck 2015, WMAP 9, jeu personnalisé ; redshift d'un objet demandé à SIMBAD ; courbes, export CSV. Noyau repris du calculateur [cosmologie-redshift](https://github.com/ARP273-ROSE/cosmologie-redshift), vérifié sous SageMath. |
+| **Animations** | Animations pédagogiques d'après ClassAction (University of Nebraska-Lincoln, Apache 2.0), refaites en Python : sphère céleste et repères, mouvements du Soleil, saisons, phases de la Lune, ombres d'éclipse, temps sidéral, zodiaque, Ptolémée, épicycles, rétrogradation, lois de Kepler, parallaxe, module de distance. Catalogue des 92 animations d'origine (21 disponibles en 0.3.0, les autres à venir) ; calculs vérifiés sous SageMath et avec astropy. |
 | **Sites et heures** | Sites d'observation (MPC), carte OpenStreetMap, heure UTC et heure locale du site. |
 | **Ma machine** | Diagnostic matériel et parallélisme retenu (exemple minimal de module). |
 
@@ -156,6 +157,9 @@ Node) ; chaque image téléchargée porte le crédit de son archive (`CREDIT`), 
 reproject (Astropy, BSD, facultatif).
 Cosmologie : noyau de calcul repris du calculateur « cosmologie-redshift » du même auteur (publié sans licence
 formelle, intégré ici par son auteur sous GPL-3), astropy.cosmology, paramètres Planck 2018 / 2015, WMAP 9, SH0ES.
+Animations : d'après ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0 ; fichiers
+`NOTICE` et `LICENCES/Apache-2.0.txt`) ; formules de J. Meeus (*Astronomical Algorithms*), IAU 1982 et IAU 2006 ;
+limites des constellations de l'UAI (astropy).
 Auteur : ARP273-ROSE. Licence : GNU GPL version 3 ou ultérieure.
 
 ---
@@ -174,6 +178,7 @@ English, on Windows, macOS and Linux. **Modular** architecture: more modules wil
 | **Image quality** | Optional: FWHM, ellipticity (3 × 3 map), background, noise, gradient, saturation, trails, sampling — measurements validated on synthetic images. |
 | **Spectra and series** | Reading and plotting 1D data (21 cm H I spectra with frequency ↔ radio velocity axis, light curves, FITS or CSV tables). |
 | **Cosmology** | From redshift to distances (comoving, luminosity, angular, light travel), ages, comoving volume, distance modulus, scale in kpc/″; Planck 2018 with uncertainties, SH0ES, Planck 2015, WMAP 9, custom set; an object's redshift requested from SIMBAD; curves, CSV export. Core taken from the [cosmologie-redshift](https://github.com/ARP273-ROSE/cosmologie-redshift) calculator, checked with SageMath. |
+| **Animations** | Teaching animations after ClassAction (University of Nebraska-Lincoln, Apache 2.0), remade in Python: celestial sphere and coordinates, Sun motions, seasons, lunar phases, eclipse shadows, sidereal time, zodiac, Ptolemy, epicycles, retrograde motion, Kepler's laws, parallax, distance modulus. Catalogue of the 92 original animations (21 available in 0.3.0, the others to come); computations checked with SageMath and astropy. |
 | **Sites and times** | Observing sites (MPC), OpenStreetMap map, UTC and site local time. |
 | **My computer** | Hardware diagnosis and chosen parallelism (minimal example module). |
 
@@ -263,4 +268,6 @@ JPL Small-Body Database. Archives: MAST (STScI; NASA/ESA, NASA/ESA/CSA), ESO Sci
 Systems Node: OPUS; Imaging Node); every downloaded image carries its archive's credit (`CREDIT`), to repeat under any
 published image; reproject (Astropy, BSD, optional). Cosmology: computation core taken from the same author's « cosmologie-redshift » calculator
 (published without a formal licence, included here by its author under GPL-3), astropy.cosmology, Planck 2018 / 2015,
-WMAP 9, SH0ES parameters. Author: ARP273-ROSE. Licence: GNU GPL version 3 or later.
+WMAP 9, SH0ES parameters. Animations: after ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache
+License 2.0; `NOTICE` and `LICENCES/Apache-2.0.txt` files); formulas from J. Meeus (*Astronomical Algorithms*), IAU 1982
+and IAU 2006; IAU constellation boundaries (astropy). Author: ARP273-ROSE. Licence: GNU GPL version 3 or later.

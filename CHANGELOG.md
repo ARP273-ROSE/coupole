@@ -2,6 +2,38 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.3.0 — 14 octobre 2026
+
+**Nouveau module « Animations » (lot 1) : les animations pédagogiques ClassAction refaites en Python.**
+
+- **Module Animations** : les animations ClassAction de l'université du Nebraska-Lincoln (Flash/ActionScript, licence
+  Apache 2.0), devenues illisibles avec la fin de Flash, refaites en Python pour Windows, macOS et Linux, dessinées
+  en QPainter (3D par projection calculée, sans OpenGL ni dépendance nouvelle), dans le thème sombre par défaut, en
+  français et en anglais.  Lecture / pause, vitesse (0,1 à 10 ×), réinitialisation, curseurs et champs numériques,
+  valeurs calculées affichées, sphères à faire tourner et objets à déplacer à la souris ; réglages gardés d'une session
+  à l'autre ; une seule animation tourne à la fois, et seulement quand elle est affichée.
+- **Catalogue** des 92 animations d'origine par thème, avec recherche (FR/EN, sans accents), filtres par thème et par
+  état, nom et description dans les deux langues, titre d'origine ; « à venir » pour celles des lots suivants.
+- **Lot 1 — 21 animations** : démonstrateur longitude/latitude (globe, côtes, villes, ligne de changement de date),
+  mouvements du Soleil (analemme, ombre, lever et coucher), simulateur des saisons (NAAP), phases de la Lune (NAAP),
+  rayons du Soleil, azimut/hauteur, coordonnées équatoriales, comparaison des systèmes de coordonnées, temps sidéral et
+  angle horaire, simulateur de l'écliptique, obliquité, écliptique (zodiaque, 13 constellations officielles), temps
+  sidéral et solaire, plages de déclinaison, ombres d'éclipse (avec la méthode d'Aristarque en proportions réelles),
+  orbite de Mars selon Ptolémée, épicycles, mouvement rétrograde, orbite planétaire (NAAP, lois de Kepler), calculateur
+  de parallaxe, module de distance.  Comportements et réglages repris du code ActionScript d'origine (décompilé quand
+  la source manquait).
+- **Calculs exacts** au lieu des approximations d'origine : temps sidéral IAU 1982, obliquité IAU 2006, Soleil et
+  équation du temps de Meeus (0,01°), équation de Kepler et vis-viva, parsec et année-lumière de l'UAI, limites des
+  constellations de l'UAI.  Vérifiés par `outils/verif_anim/verif_anim.sage` (SageMath, 100 bits, par d'autres voies
+  que le code), par les exemples publiés de Meeus et par astropy.
+- **Ligne de commande** : `coupole anim liste [--faites] [--json]`, `coupole anim info ID`.
+- **Licence** : fichier `NOTICE` (« d'après ClassAction, University of Nebraska-Lincoln Astronomy Education, Apache
+  License 2.0 ») et texte de la licence Apache dans `LICENCES/Apache-2.0.txt`, livrés dans les paquets ; paragraphe
+  dédié dans le `copyright` du paquet Debian.
+- Aide F1, info-bulles, manuels FR/EN (chapitre « Animations », captures), README.  Tests : `tests/test_anim_calculs.py`
+  (calculs contre SageMath, Meeus et astropy) et `tests/test_anim_gui.py` (catalogue, chaque animation créée hors
+  écran, animée et dessinée, réglages gardés, souris, panneau, ligne de commande).
+
 ## 0.2.3 — 12 octobre 2026
 
 **Plus de limite de débit par défaut.**

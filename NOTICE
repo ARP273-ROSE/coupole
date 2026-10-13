@@ -1,0 +1,31 @@
+Coupole — NOTICE
+
+Coupole est distribué sous licence GPL-3.0-or-later (fichier LICENSE).
+Coupole is distributed under the GPL-3.0-or-later licence (LICENSE file).
+
+Module « Animations » (coupole/modules/anim)
+--------------------------------------------
+Les animations de ce module sont refaites en Python d'après ClassAction, University of Nebraska-Lincoln Astronomy
+Education, Apache License 2.0 (texte complet : LICENCES/Apache-2.0.txt).
+The animations of this module are remade in Python after ClassAction, University of Nebraska-Lincoln Astronomy
+Education, Apache License 2.0 (full text: LICENCES/Apache-2.0.txt).
+
+    Copyright 2026 The Board of Regents of the University of Nebraska
+    Licensed under the Apache License, Version 2.0.
+    Sources : https://github.com/astroUNL/classaction-air-app
+              https://github.com/astroUNL/flash-animations
+              https://github.com/astroUNL/interactives-air-app
+
+Repris ou adaptés de ces sources / taken or adapted from these sources :
+  - le catalogue des 92 animations (identifiants, titres, descriptions anglaises : animations.xml) ;
+  - les comportements, réglages et paramètres des animations (lus dans le code ActionScript d'origine) ;
+  - le tracé des côtes du globe (shoreDemo/si100.xml, d'après les côtes GSHHS), converti en
+    coupole/modules/anim/donnees/cotes.json.gz ;
+  - les positions d'étoiles des constellations de la comparaison des repères, la liste des villes et le tracé
+    simplifié de la ligne de changement de date du démonstrateur longitude/latitude.
+
+Modifications : code entièrement réécrit en Python (PyQt6, QPainter), interface bilingue français/anglais, calculs
+astronomiques remplacés par des formules de référence vérifiées (temps sidéral IAU 1982, obliquité IAU 2006,
+position du Soleil et équation du temps de Meeus, limites officielles des constellations).
+Changes: code fully rewritten in Python (PyQt6, QPainter), bilingual French/English interface, astronomical
+computations replaced by checked reference formulas.

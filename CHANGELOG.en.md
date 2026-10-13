@@ -2,6 +2,37 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.3.0 — 14 October 2026
+
+**New « Animations » module (batch 1): the ClassAction teaching animations remade in Python.**
+
+- **Animations module**: the ClassAction animations of the University of Nebraska-Lincoln (Flash/ActionScript, Apache
+  License 2.0), unreadable since the end of Flash, remade in Python for Windows, macOS and Linux, drawn with QPainter
+  (3D by computed projection, no OpenGL nor new dependency), in the default dark theme, in French and English.
+  Play / pause, speed (0.1 to 10 ×), reset, sliders and numeric fields, computed values shown, spheres to rotate and
+  objects to move with the mouse; settings kept from one session to the next; only one animation runs at a time, and
+  only while it is shown.
+- **Catalogue** of the 92 original animations by topic, with search (FR/EN, accents ignored), topic and status
+  filters, name and description in both languages, original title; « coming » for those of the next batches.
+- **Batch 1 — 21 animations**: longitude/latitude demonstrator (globe, coastlines, cities, date line), Sun motions
+  (analemma, shadow, sunrise and sunset), seasons simulator (NAAP), lunar phases (NAAP), Sun's rays, azimuth/altitude,
+  equatorial coordinates, coordinate systems comparison, sidereal time and hour angle, ecliptic simulator, obliquity,
+  ecliptic (zodiac, 13 official constellations), sidereal and solar time, declination ranges, eclipse shadows (with
+  Aristarchus' method in real proportions), Ptolemaic orbit of Mars, epicycles, retrograde motion, planetary orbit
+  (NAAP, Kepler's laws), parallax calculator, distance modulus.  Behaviours and settings taken from the original
+  ActionScript code (decompiled when the source was missing).
+- **Exact computations** instead of the original approximations: IAU 1982 sidereal time, IAU 2006 obliquity, Meeus
+  Sun and equation of time (0.01°), Kepler's equation and vis-viva, IAU parsec and light-year, IAU constellation
+  boundaries.  Checked by `outils/verif_anim/verif_anim.sage` (SageMath, 100 bits, by other routes than the code), by
+  Meeus' published examples and by astropy.
+- **Command line**: `coupole anim liste [--faites] [--json]`, `coupole anim info ID`.
+- **Licence**: `NOTICE` file (« after ClassAction, University of Nebraska-Lincoln Astronomy Education, Apache License
+  2.0 ») and the Apache licence text in `LICENCES/Apache-2.0.txt`, shipped in the packages; dedicated paragraph in the
+  Debian package `copyright`.
+- F1 help, tooltips, FR/EN manuals (« Animations » chapter, screenshots), README.  Tests: `tests/test_anim_calculs.py`
+  (computations against SageMath, Meeus and astropy) and `tests/test_anim_gui.py` (catalogue, each animation created
+  off screen, animated and drawn, kept settings, mouse, panel, command line).
+
 ## 0.2.3 — 12 October 2026
 
 **No download rate limit by default any more.**
