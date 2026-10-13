@@ -1148,8 +1148,9 @@ checked reference formulas. After ClassAction, University of Nebraska-Lincoln As
 \paragraph{Catalogue.} On the left, the 92 animations of the original catalogue, sorted by topic (coordinates and
 motions, Moon, Renaissance and orbits, stellar properties, light and spectra, extrasolar planets…), with a search
 (French or English, accents ignored) and filters by topic and status. Each has its name and description in both
-languages, and its original title. Batch~1 (0.3.0) makes 21 of them available; the others are marked « coming »
-(described, not yet remade) and will be added batch by batch.
+languages, and its original title. Version 0.3.0 makes 30 of them available (batch~1, and every « coordinates and
+motions » animation but one movie); the others are marked « coming » (described, not yet remade) and will be added
+batch by batch.
 
 \paragraph{Handling.} Dragging a sphere rotates it; dragging a star, the Moon, the Earth or an observer moves it.
 \emph{Play / Pause} and \emph{Speed} (0.1 to 10 times, logarithmic scale) run the time; \emph{Reset} goes back to the
@@ -1158,7 +1159,7 @@ one); computed values are shown below the settings. All settings, the theme and 
 next launch. Only one animation runs at a time, and only while it is shown; one frame costs a few milliseconds
 (nothing heavy in the GUI thread).
 
-\subsection{Batch 1 animations}
+\subsection{Available animations}
 \begin{center}
 \small
 \begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.30\linewidth}X@{}}
@@ -1186,6 +1187,16 @@ Retrograde motion & Earth and Mars on their orbits, lines of sight, Mars against
 Planetary orbit (NAAP) & Kepler's laws: ellipse and foci, swept areas, $P^2=a^3$, speed from the vis-viva relation; planets' orbits\\
 Parallax & $d=1/p$; arcsecond, parsec, light-year, AU conversions; Proxima, Sirius, Vega\\
 Distance modulus & $m-M=5\log_{10}d-5$, one quantity locked, the star on a 1 to 1,000~pc scale\\
+\midrule
+Daylight hours & day length over the year for a latitude, day and night arcs of the parallel, yearly average; geometric horizon or refraction\\
+Meridional altitude & meridian cut: $h = 90^\circ-\varphi+\delta$ (or $180^\circ-h$ north of the zenith), Sun ($\pm23.44^\circ$) and Moon ($\pm28.6^\circ$) ranges\\
+Paths of the Sun & daily paths at the solstices, equinoxes and on the chosen day, rising and setting points, day lengths\\
+Sun motions overview & four-step construction: poles, celestial equator, equinox path, solstice paths\\
+Position on the horizon & sunrise (or sunset) point sliding along the horizon over the year, spread between the solstices\\
+Daylight simulator & flat map: terminator, subsolar point (latitude $\delta_\odot$, apparent noon), civil, nautical, astronomical twilights\\
+Antipodes & a point and its antipode $(-\varphi, \lambda\pm180^\circ)$ on the globe and the map, constrained dragging, 5$^\circ$ steps\\
+Big Dipper 3D & the seven stars at their distances (78 to 124~ly), lines of sight, projection on the celestial sphere\\
+Celestial and horizon frames & switching frames by a rotation of $90^\circ-\varphi$ about the east-west axis\\
 \bottomrule
 \end{tabularx}
 \end{center}

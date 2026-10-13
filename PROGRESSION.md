@@ -901,15 +901,33 @@ Nebraska-Lincoln (Flash/ActionScript, Apache 2.0) ; lot 1 = 21 animations (repè
   et vérification ; captures `outils/captures_anim.py`), tableaux des commandes régénérés, README, CHANGELOG FR puis
   EN, VERSION 0.3.0.
 - [x] Validation locale (python:3.12-slim, offscreen) : **674 réussis, 22 sautés, code 0** (619 avant).
+- [x] Commit `6ec5f2f` poussé : CI `tests.yml` **6/6** (Linux, Windows, macOS × 3.10, 3.12).
+
+### 2026-10-14 — lot 1 bis : les autres animations « Coordonnées et mouvements » (même version 0.3.0)
+- [x] `.swf` décompilés (daylightsimulator, celestialhorizon, daylighthoursexplorer, meridaltdiagram, sunpaths,
+  horizon, bigdipper, antipodesexplorer, sunmotionsoverview) : réglages, défauts (latitude 41°), formules (durée du
+  jour géométrique cos H₀ = −tan φ tan δ ; hauteur méridienne 90° − φ + δ, ou 180° − h au nord), distances des étoiles
+  de la Grande Ourse (années-lumière, Hipparcos) reprises.
+- [x] 9 animations : `duree_jour.py` (courbe annuelle, arcs de jour et de nuit du parallèle, moyenne, réfraction en
+  option), `hauteur_meridienne.py` (coupe du méridien, plages du Soleil et de la Lune), `trajectoires_soleil.py`
+  (trajectoires des solstices et équinoxes ; vue d'ensemble en 4 étapes), `lever_horizon.py` (point de lever ou de
+  coucher sur l'horizon), `jour_nuit.py` (carte plane, terminateur, point subsolaire avec l'équation du temps,
+  crépuscules), `antipodes.py` (globe + carte, déplacement contraint, multiples de 5°), `grande_ourse.py` (étoiles à
+  leur distance, projection sur le ciel), `repere_celeste_horizon.py` (rotation de 90° − φ entre les deux repères).
+  `dessin.hemisphere_nuit` (moitié nuit d'une sphère vue sous n'importe quel angle).
+- [x] Tests ajoutés : hauteur méridienne, antipode, terminateur et courbe de −6° (Soleil à 0° et −6° le long des
+  courbes), courbe de la durée du jour (12 h à l'équateur, 8 h et 16 h à 48,85° N, jour et nuit polaires à 70°),
+  azimut du lever ; les tests génériques couvrent les 9 nouvelles animations.  **30 animations disponibles.**
+- [x] Validation locale (python:3.12-slim, offscreen) : **688 réussis, 22 sautés, code 0**.
+- Reste dans ce thème : `transitmovie` (film accéléré de l'ombre d'un bâtiment de l'université : à remplacer par une
+  simulation d'ombre portée).
 - **Aucun tag ni Release.**
 
-### Reste à faire (lots suivants) — 71 animations « à venir » dans le catalogue
+### Reste à faire (lots suivants) — 62 animations « à venir » dans le catalogue
 Pour ajouter une animation : écrire `coupole/modules/anim/animations/<nom>.py` (classe héritant de `base.Animation`,
 `ID` = identifiant ClassAction), renseigner sa classe dans `catalogue.ANIMATIONS`, ses textes dans `textes.py` ; les
 tests génériques de `test_anim_gui.py` la prennent d'office.
-- Coordonnées et mouvements (10) : daylightsimulator, celestialhorizon, daylighthoursexplorer, meridaltdiagram,
-  transitmovie (film : à remplacer par une simulation de l'ombre d'un bâtiment), sunpaths, horizon, bigdipper,
-  antipodesexplorer, sunmotionsoverview.
+- Coordonnées et mouvements (1) : transitmovie (film : à remplacer par une simulation de l'ombre d'un bâtiment).
 - La Lune (12) : basketball, eclipsetable, fullmoondec, lunar_phaser, mooninc, moonphases, phaseDemonstrator,
   positionsdemonstrator, synodiclag, tidesim, lunarphasequizzer, moonbisector.
 - Renaissance et orbites (9) : gravalgebra, venusphases, ptolemaic, keplers_third, synodiccalculator,

@@ -1182,8 +1182,9 @@ Education, licence Apache 2.0 (fichiers \texttt{NOTICE} et \texttt{LICENCES/Apac
 \paragraph{Catalogue.} À gauche, les 92 animations du catalogue d'origine, classées par thème (coordonnées et
 mouvements, Lune, Renaissance et orbites, propriétés stellaires, lumière et spectres, exoplanètes…), avec une recherche
 (française ou anglaise, sans accents), un filtre par thème et par état. Chacune a son nom et sa description dans les
-deux langues, et son titre d'origine. Le lot~1 (0.3.0) en rend 21 disponibles ; les autres sont marquées « à venir »
-(décrites, pas encore refaites) et seront ajoutées par lots.
+deux langues, et son titre d'origine. La version 0.3.0 en rend 30 disponibles (le lot~1, et toutes les animations
+« coordonnées et mouvements » sauf un film) ; les autres sont marquées « à venir » (décrites, pas encore refaites) et
+seront ajoutées par lots.
 
 \paragraph{Manipuler.} Glisser sur une sphère la fait tourner ; glisser une étoile, la Lune, la Terre ou un
 observateur les déplace. \emph{Lecture / Pause} et \emph{Vitesse} (0,1 à 10~fois, échelle logarithmique) animent le
@@ -1193,7 +1194,7 @@ les réglages, le thème et l'animation choisie sont retrouvés au lancement sui
 fois, et seulement quand elle est affichée ; une image coûte quelques millisecondes (rien de lourd dans le fil
 graphique).
 
-\subsection{Les animations du lot 1}
+\subsection{Les animations disponibles}
 \begin{center}
 \small
 \begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.30\linewidth}X@{}}
@@ -1221,6 +1222,16 @@ Mouvement rétrograde & Terre et Mars sur leurs orbites, lignes de visée, Mars 
 Orbite planétaire (NAAP) & lois de Kepler : ellipse et foyers, aires balayées, $P^2=a^3$, vitesse par la relation de vis-viva ; orbites des planètes\\
 Parallaxe & $d=1/p$ ; conversions seconde d'arc, parsec, année-lumière, ua ; Proxima, Sirius, Véga\\
 Module de distance & $m-M=5\log_{10}d-5$, une grandeur verrouillée, l'étoile sur une échelle de 1 à 1~000~pc\\
+\midrule
+Durée du jour & courbe de la durée du jour sur l'année pour une latitude, arcs de jour et de nuit du parallèle, moyenne annuelle ; horizon géométrique ou réfraction\\
+Hauteur méridienne & coupe du méridien : $h = 90^\circ-\varphi+\delta$ (ou $180^\circ-h$ au nord du zénith), plages du Soleil ($\pm23{,}44^\circ$) et de la Lune ($\pm28{,}6^\circ$)\\
+Trajectoires du Soleil & trajets diurnes aux solstices, aux équinoxes et le jour choisi, points de lever et de coucher, durées du jour\\
+Vue d'ensemble du Soleil & construction en quatre étapes : pôles, équateur céleste, trajet des équinoxes, trajets des solstices\\
+Position sur l'horizon & point de lever (ou de coucher) qui glisse sur l'horizon au fil de l'année, écart entre les solstices\\
+Jour et nuit & carte plane : terminateur, point subsolaire (latitude $\delta_\odot$, midi solaire vrai), crépuscules civil, nautique, astronomique\\
+Antipodes & un point et son antipode $(-\varphi, \lambda\pm180^\circ)$ sur le globe et la carte, déplacement contraint, multiples de 5$^\circ$\\
+Grande Ourse en 3D & les sept étoiles à leur distance (78 à 124~al), lignes de visée, projection sur la sphère céleste\\
+Repères céleste et horizontal & passage d'un repère à l'autre par une rotation de $90^\circ-\varphi$ autour de l'axe est-ouest\\
 \bottomrule
 \end{tabularx}
 \end{center}

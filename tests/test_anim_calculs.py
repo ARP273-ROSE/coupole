@@ -220,3 +220,63 @@ def test_equinoxes_solstices_2026():
     # équinoxe de mars 2026 : 20 mars vers 14 h 46 TU ; solstice de juin : 21 juin vers 8 h 24 TU (≈ 0,01 j)
     assert REMARQUABLES['equinoxe_mars'] == pytest.approx(78 + 14.77 / 24, abs=0.02)
     assert REMARQUABLES['solstice_juin'] == pytest.approx(171 + 8.4 / 24, abs=0.02)
+
+
+# ---------------------------------------------------------------- lot 1 bis (coordonnées et mouvements)
+def test_hauteur_meridienne():
+    from coupole.modules.anim.animations.hauteur_meridienne import culmination
+    assert culmination(41.0, 23.5) == (pytest.approx(72.5), 'S')
+    assert culmination(41.0, 60.0) == (pytest.approx(71.0), 'N')          # au nord du zénith : 180° − 109°
+    assert culmination(-33.9, 0.0) == (pytest.approx(56.1), 'N')
+    for lat, dec in ((48.85, 23.44), (0.0, -10.0), (-45.0, 30.0)):
+        assert culmination(lat, dec)[0] == pytest.approx(astro.hauteur_culmination(dec, lat))
+
+
+def test_antipode():
+    from coupole.modules.anim.animations.antipodes import antipode
+    assert antipode(48.85, 2.35) == pytest.approx((-48.85, -177.65))
+    assert antipode(-33.9, -151.2) == pytest.approx((33.9, 28.8))
+    for la, lo in ((10.0, 20.0), (-80.0, -170.0), (0.0, 180.0)):
+        a = antipode(la, lo)
+        v1 = astro.vecteur_equatorial(lo, la)
+        v2 = astro.vecteur_equatorial(a[1], a[0])
+        assert sum(x * y for x, y in zip(v1, v2)) == pytest.approx(-1.0)
+
+
+def test_terminateur_et_point_subsolaire():
+    from coupole.modules.anim.animations import jour_nuit as J
+    import numpy as np
+    jour = 172.0 + 0.5                              # 22 juin, 12 h TU
+    dec, lon = J.subsolaire(jour)
+    s = astro.soleil_jour(J.ANNEE, jour)
+    assert dec == pytest.approx(s['delta'])
+    assert lon == pytest.approx(-s['eqt'] / 4.0)
+    # sur le terminateur, le Soleil est à l'horizon ; sur la courbe de −6°, à −6°
+    lons = np.linspace(-180, 180, 37)
+    for lo, la in zip(lons, J.latitude_terminateur(lons, dec, lon)):
+        assert astro.equatorial_vers_horizon(lo - lon, dec, la)[1] == pytest.approx(0.0, abs=1e-7)
+    for lo in lons:
+        la = J.latitude_hauteur(lo, dec, lon, -6.0)
+        if abs(la) < 89.99:
+            assert astro.equatorial_vers_horizon(lo - lon, dec, la)[1] == pytest.approx(-6.0, abs=1e-6)
+
+
+def test_courbe_duree_du_jour():
+    from coupole.modules.anim.animations.duree_jour import courbe_duree
+    import numpy as np
+    jours, durees = courbe_duree(0.0)
+    assert durees == pytest.approx(np.full(len(durees), 12.0), abs=1e-9)
+    jours, durees = courbe_duree(48.85)
+    assert durees.max() == pytest.approx(16.0, abs=0.1) and durees.min() == pytest.approx(8.0, abs=0.1)
+    assert durees.mean() == pytest.approx(12.0, abs=0.1)
+    _, polaire = courbe_duree(70.0)
+    assert polaire.max() == 24.0 and polaire.min() == 0.0
+
+
+def test_azimut_du_lever_aux_solstices():
+    # à 41° N, l'azimut du lever au solstice de juin vaut acos(sin ε / cos φ) depuis le nord
+    eps = 23.44
+    az = astro.azimut_lever(eps, 41.0)
+    assert az == pytest.approx(math.degrees(math.acos(math.sin(math.radians(eps)) / math.cos(math.radians(41.0)))),
+                               abs=1e-9)
+    assert astro.azimut_lever(0.0, 41.0) == pytest.approx(90.0)

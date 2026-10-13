@@ -313,6 +313,38 @@ class Peintre3D:
         return u * self.vue.droite + v * self.vue.haut + w * self.vue.d
 
 
+def hemisphere_nuit(pe: 'Peintre3D', soleil, couleur='nuit', alpha: float = 0.6):
+    """Ombre la moitié de la sphère opposée à la direction `soleil` (repère monde) : demi-ellipse du terminateur
+    visible, fermée par le bord du disque du côté opposé au Soleil."""
+    s = np.asarray(soleil, dtype=float)
+    s = s / np.linalg.norm(s)
+    d = pe.vue.d
+    a = np.cross(s, d)
+    pe.p.save()
+    pe.p.setPen(Qt.PenStyle.NoPen)
+    pe.p.setBrush(c(couleur, alpha))
+    if np.linalg.norm(a) < 1e-6:
+        if float(s @ d) < 0:
+            pe.p.drawEllipse(QPointF(pe.cx, pe.cy), pe.r, pe.r)
+        pe.p.restore()
+        return
+    a = a / np.linalg.norm(a)
+    b = np.cross(s, a)
+    if float(b @ d) < 0:
+        b = -b
+    cc = np.cross(d, a)
+    cc = cc / np.linalg.norm(cc)
+    if float(cc @ s) > 0:
+        cc = -cc
+    t = np.linspace(0.0, math.pi, 61)
+    terminateur = np.cos(t)[:, None] * a + np.sin(t)[:, None] * b          # de a à −a, face avant
+    limbe = -np.cos(t)[:, None] * a + np.sin(t)[:, None] * cc             # de −a à a, côté nuit
+    pts = np.vstack([terminateur, limbe])
+    x, y, _ = pe.vue.projeter(pts)
+    pe.p.drawPolygon(QPolygonF([QPointF(pe.cx + pe.r * u, pe.cy - pe.r * v) for u, v in zip(x, y)]))
+    pe.p.restore()
+
+
 def scene_en_deux_passes(pe: Peintre3D, dessiner, plan=None):
     """Appelle dessiner(pe) sous le plan, dessine le plan (fonction sans argument), puis dessiner(pe) au-dessus."""
     pe.passe = 'dessous'

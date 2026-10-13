@@ -22,6 +22,10 @@ Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
   orbite de Mars selon Ptolémée, épicycles, mouvement rétrograde, orbite planétaire (NAAP, lois de Kepler), calculateur
   de parallaxe, module de distance.  Comportements et réglages repris du code ActionScript d'origine (décompilé quand
   la source manquait).
+- **Et 9 autres animations « coordonnées et mouvements »** (toutes, sauf le film de l'ombre d'un bâtiment) : durée du
+  jour, hauteur méridienne, trajectoires du Soleil, vue d'ensemble des mouvements du Soleil, position du Soleil sur
+  l'horizon, jour et nuit sur une carte (terminateur, crépuscules), antipodes, Grande Ourse en 3D, repères céleste et
+  horizontal.  30 animations disponibles en tout.
 - **Calculs exacts** au lieu des approximations d'origine : temps sidéral IAU 1982, obliquité IAU 2006, Soleil et
   équation du temps de Meeus (0,01°), équation de Kepler et vis-viva, parsec et année-lumière de l'UAI, limites des
   constellations de l'UAI.  Vérifiés par `outils/verif_anim/verif_anim.sage` (SageMath, 100 bits, par d'autres voies

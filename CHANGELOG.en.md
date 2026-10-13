@@ -21,6 +21,10 @@ French version (reference): [CHANGELOG.md](CHANGELOG.md).
   Aristarchus' method in real proportions), Ptolemaic orbit of Mars, epicycles, retrograde motion, planetary orbit
   (NAAP, Kepler's laws), parallax calculator, distance modulus.  Behaviours and settings taken from the original
   ActionScript code (decompiled when the source was missing).
+- **And 9 more « coordinates and motions » animations** (all of them except the movie of a building's shadow): daylight
+  hours, meridional altitude, paths of the Sun, Sun motions overview, Sun's position on the horizon, day and night on a
+  map (terminator, twilights), antipodes, Big Dipper 3D, celestial and horizon frames.  30 animations available in
+  all.
 - **Exact computations** instead of the original approximations: IAU 1982 sidereal time, IAU 2006 obliquity, Meeus
   Sun and equation of time (0.01°), Kepler's equation and vis-viva, IAU parsec and light-year, IAU constellation
   boundaries.  Checked by `outils/verif_anim/verif_anim.sage` (SageMath, 100 bits, by other routes than the code), by

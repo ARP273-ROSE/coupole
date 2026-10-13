@@ -142,7 +142,7 @@ class Panneau(QWidget):
             racine.setFont(0, f)
             self.arbre.addTopLevelItem(racine)
             # disponibles d'abord (dans l'ordre du lot), puis à venir par ordre alphabétique
-            entrees.sort(key=lambda e: (not e.faite, catalogue.LOT1.index(e.id) if e.id in catalogue.LOT1 else 99,
+            entrees.sort(key=lambda e: (not e.faite, catalogue.ORDRE.index(e.id) if e.id in catalogue.ORDRE else 99,
                                         tr('anim_nom_' + e.cle).lower()))
             for e in entrees:
                 it = QTreeWidgetItem([tr('anim_nom_' + e.cle) + ('' if e.faite else ' — ' + tr('anim_a_venir'))])

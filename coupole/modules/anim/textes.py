@@ -657,6 +657,138 @@ _ANIM = {
 }
 TEXTES.update({k: _t(*v) for k, v in _ANIM.items()})
 
+# ==================================================================== lot 1 bis (coordonnées et mouvements)
+_ANIM_BIS = {
+    # durée du jour
+    'anim_daylighthoursexplorer_moyenne': ('Afficher la moyenne annuelle', 'Show the yearly average'),
+    'anim_daylighthoursexplorer_moyenne_aide': ('Ligne de la durée moyenne du jour sur l’année.',
+                                                'Line of the average day length over the year.'),
+    'anim_daylighthoursexplorer_point': ('Point sur la courbe', 'Point on the curve'),
+    'anim_daylighthoursexplorer_point_aide': ('Point à faire glisser sur la courbe pour choisir le jour.',
+                                              'Point to drag along the curve to choose the day.'),
+    'anim_daylighthoursexplorer_refraction': ('Réfraction', 'Refraction'),
+    'anim_daylighthoursexplorer_refraction_aide': ('Lever et coucher du bord supérieur du Soleil, réfraction comprise '
+                                                   '(h₀ = −0,833°) au lieu de l’horizon géométrique (comme l’original).',
+                                                   'Rising and setting of the Sun’s upper limb, refraction included '
+                                                   '(h₀ = −0.833°) instead of the geometric horizon (as in the '
+                                                   'original).'),
+    'anim_daylighthoursexplorer_vue_globe': ('Parallèle de l’observateur', 'Observer’s parallel'),
+    'anim_daylighthoursexplorer_vue_courbe': ('Durée du jour au fil de l’année', 'Day length over the year'),
+    'anim_daylighthoursexplorer_extremes': ('Plus court / plus long', 'Shortest / longest'),
+    # hauteur méridienne
+    'anim_meridaltdiagram_objet': ('Astre', 'Object'),
+    'anim_meridaltdiagram_objet_aide': ('Astre dessiné à sa hauteur de passage au méridien.',
+                                        'Object drawn at its meridian altitude.'),
+    'anim_meridaltdiagram_etoile': ('étoile', 'star'), 'anim_meridaltdiagram_soleil': ('Soleil', 'Sun'),
+    'anim_meridaltdiagram_lune': ('Lune', 'Moon'), 'anim_meridaltdiagram_planete': ('planète', 'planet'),
+    'anim_meridaltdiagram_aucun': ('aucun', 'none'),
+    'anim_meridaltdiagram_plage_soleil': ('Plage du Soleil et des planètes', 'Sun and planets range'),
+    'anim_meridaltdiagram_plage_soleil_aide': ('Hauteurs possibles du Soleil et des planètes au méridien '
+                                               '(δ de −23,44° à +23,44°).',
+                                               'Possible meridian altitudes of the Sun and planets (δ from −23.44° '
+                                               'to +23.44°).'),
+    'anim_meridaltdiagram_plage_lune': ('Plage de la Lune', 'Moon range'),
+    'anim_meridaltdiagram_plage_lune_aide': ('Hauteurs possibles de la Lune au méridien (δ jusqu’à ±28,6°).',
+                                             'Possible meridian altitudes of the Moon (δ up to ±28.6°).'),
+    'anim_meridaltdiagram_hauteur': ('Hauteur au méridien', 'Meridian altitude'),
+    'anim_meridaltdiagram_formule': ('Calcul', 'Computation'),
+    'anim_meridaltdiagram_eq': ('Hauteur de l’équateur céleste', 'Altitude of the celestial equator'),
+    'anim_meridaltdiagram_remarque': ('Remarque', 'Note'),
+    'anim_meridaltdiagram_jamais': ('l’astre ne se lève pas à cette latitude', 'the object never rises at this '
+                                                                               'latitude'),
+    # trajectoires du Soleil, vue d'ensemble
+    'anim_sunpaths_reference': ('Solstices et équinoxes', 'Solstices and equinoxes'),
+    'anim_sunpaths_reference_aide': ('Trajectoires du Soleil aux solstices (δ = ±23,44°) et aux équinoxes (δ = 0).',
+                                     'Paths of the Sun at the solstices (δ = ±23.44°) and equinoxes (δ = 0).'),
+    'anim_sunpaths_du_jour': ('Trajectoire du jour', 'Path of the day'),
+    'anim_sunpaths_du_jour_aide': ('Trajectoire du Soleil le jour choisi.', 'Path of the Sun on the chosen day.'),
+    'anim_sunpaths_solstice_juin': ('solstice de juin', 'June solstice'),
+    'anim_sunpaths_equinoxes': ('équinoxes', 'equinoxes'),
+    'anim_sunpaths_solstice_dec': ('solstice de décembre', 'December solstice'),
+    'anim_sunpaths_duree_solstice_juin': ('Jour au solstice de juin', 'Day at the June solstice'),
+    'anim_sunpaths_duree_equinoxes': ('Jour aux équinoxes', 'Day at the equinoxes'),
+    'anim_sunpaths_duree_solstice_dec': ('Jour au solstice de décembre', 'Day at the December solstice'),
+    'anim_sunmotionsoverview_etape1': ('1. Pôles', '1. Poles'),
+    'anim_sunmotionsoverview_etape1_aide': ('Étape 1 : l’axe du monde et les pôles célestes.',
+                                            'Step 1: the celestial axis and poles.'),
+    'anim_sunmotionsoverview_etape2': ('2. Équateur céleste', '2. Celestial equator'),
+    'anim_sunmotionsoverview_etape2_aide': ('Étape 2 : l’équateur céleste, perpendiculaire à l’axe.',
+                                            'Step 2: the celestial equator, perpendicular to the axis.'),
+    'anim_sunmotionsoverview_etape3': ('3. Trajet des équinoxes', '3. Equinox path'),
+    'anim_sunmotionsoverview_etape3_aide': ('Étape 3 : aux équinoxes, le Soleil suit l’équateur céleste.',
+                                            'Step 3: at the equinoxes, the Sun follows the celestial equator.'),
+    'anim_sunmotionsoverview_etape4': ('4. Trajets des solstices', '4. Solstice paths'),
+    'anim_sunmotionsoverview_etape4_aide': ('Étape 4 : aux solstices, parallèles à ±23,44° de l’équateur.',
+                                            'Step 4: at the solstices, parallels at ±23.44° from the equator.'),
+    # lever sur l'horizon
+    'anim_horizon_cote': ('Horizon', 'Horizon'),
+    'anim_horizon_cote_aide': ('Regarder vers l’est (lever) ou vers l’ouest (coucher).',
+                               'Look toward east (sunrise) or west (sunset).'),
+    'anim_horizon_est': ('est (lever)', 'east (sunrise)'), 'anim_horizon_ouest': ('ouest (coucher)', 'west (sunset)'),
+    'anim_horizon_trace': ('Repères', 'Marks'),
+    'anim_horizon_trace_aide': ('Directions du lever aux solstices et aux équinoxes.',
+                                'Sunrise directions at the solstices and equinoxes.'),
+    'anim_horizon_azimut': ('Azimut', 'Azimuth'),
+    'anim_horizon_amplitude': ('Écart entre les solstices', 'Spread between the solstices'),
+    'anim_horizon_ne': ('NE', 'NE'), 'anim_horizon_se': ('SE', 'SE'), 'anim_horizon_sw': ('SO', 'SW'),
+    'anim_horizon_nw': ('NO', 'NW'),
+    # jour et nuit
+    'anim_daylightsimulator_mode': ('Animation', 'Animation'),
+    'anim_daylightsimulator_mode_aide': ('Faire avancer l’heure (mouvement quotidien) ou la date à heure fixe '
+                                         '(mouvement annuel).',
+                                         'Run the time (daily motion) or the date at a fixed time (yearly motion).'),
+    'anim_daylightsimulator_jour': ('jour', 'day'), 'anim_daylightsimulator_annee': ('année', 'year'),
+    'anim_daylightsimulator_tu': ('Temps universel', 'Universal time'),
+    'anim_daylightsimulator_tu_aide': ('Heure à Greenwich (TU).', 'Time at Greenwich (UT).'),
+    'anim_daylightsimulator_crepuscule': ('Crépuscules', 'Twilights'),
+    'anim_daylightsimulator_crepuscule_aide': ('Bandes des crépuscules civil, nautique et astronomique (Soleil à 6°, '
+                                               '12° et 18° sous l’horizon).',
+                                               'Bands of civil, nautical and astronomical twilight (Sun 6°, 12° and '
+                                               '18° below the horizon).'),
+    'anim_daylightsimulator_subsolaire': ('Point subsolaire', 'Subsolar point'),
+    'anim_daylightsimulator_h_soleil': ('Hauteur du Soleil pour l’observateur', 'Sun’s altitude for the observer'),
+    # antipodes
+    'anim_antipodesexplorer_contrainte': ('Déplacement', 'Dragging'),
+    'anim_antipodesexplorer_contrainte_aide': ('Déplacer librement, ou seulement le long d’un parallèle ou d’un '
+                                               'méridien.',
+                                               'Drag freely, or only along a parallel or a meridian.'),
+    'anim_antipodesexplorer_libre': ('libre', 'free'), 'anim_antipodesexplorer_parallele': ('le long du parallèle',
+                                                                                           'along the parallel'),
+    'anim_antipodesexplorer_meridien': ('le long du méridien', 'along the meridian'),
+    'anim_antipodesexplorer_aimant': ('Multiples de 5°', 'Snap to 5°'),
+    'anim_antipodesexplorer_aimant_aide': ('Arrondir la position aux multiples de 5°.',
+                                           'Round the position to multiples of 5°.'),
+    'anim_antipodesexplorer_point': ('Point', 'Point'), 'anim_antipodesexplorer_antipode': ('Antipode', 'Antipode'),
+    'anim_antipodesexplorer_globe': ('Globe', 'Globe'),
+    'anim_antipodesexplorer_carte': ('Carte (glisser le point)', 'Map (drag the point)'),
+    # Grande Ourse
+    'anim_bigdipper_lignes': ('Lignes de visée', 'Lines of sight'),
+    'anim_bigdipper_lignes_aide': ('Lignes de la Terre à chaque étoile, jusqu’à la sphère céleste.',
+                                   'Lines from the Earth to each star, up to the celestial sphere.'),
+    'anim_bigdipper_noms': ('Noms et distances', 'Names and distances'),
+    'anim_bigdipper_noms_aide': ('Nom de chaque étoile et sa distance en années-lumière.',
+                                 'Name of each star and its distance in light-years.'),
+    'anim_bigdipper_sphere': ('Projection sur le ciel', 'Projection on the sky'),
+    'anim_bigdipper_sphere_aide': ('L’astérisme tel qu’on le voit, projeté sur la sphère céleste, avec sa grille '
+                                   '(α, δ).',
+                                   'The asterism as seen, projected on the celestial sphere, with its (α, δ) grid.'),
+    # repères céleste et horizontal
+    'anim_celestialhorizon_bascule': ('Repère', 'Frame'),
+    'anim_celestialhorizon_bascule_aide': ('0 : repère local (zénith en haut) ; 1 : repère céleste (pôle en haut).',
+                                           '0: local frame (zenith up); 1: celestial frame (pole up).'),
+    'anim_celestialhorizon_basculer': ('Basculer', 'Switch'),
+    'anim_celestialhorizon_basculer_aide': ('Passer d’un repère à l’autre (rotation de 90° − φ autour de l’axe '
+                                            'est-ouest).',
+                                            'Go from one frame to the other (rotation of 90° − φ about the east-west '
+                                            'axis).'),
+    'anim_celestialhorizon_rotation': ('Angle de rotation (90° − φ)', 'Rotation angle (90° − φ)'),
+    'anim_celestialhorizon_titre_local': ('Repère local : zénith en haut, horizon horizontal',
+                                          'Local frame: zenith up, horizon level'),
+    'anim_celestialhorizon_titre_celeste': ('Repère céleste : pôle en haut, équateur céleste horizontal',
+                                            'Celestial frame: pole up, celestial equator level'),
+}
+TEXTES.update({k: _t(*v) for k, v in _ANIM_BIS.items()})
+
 for _cle, _fr, _en in (('buenos_aires', 'Buenos Aires', 'Buenos Aires'), ('lima', 'Lima', 'Lima'),
                        ('casablanca', 'Casablanca', 'Casablanca'), ('monrovia', 'Monrovia', 'Monrovia'),
                        ('sao_paulo', 'São Paulo', 'São Paulo'), ('lincoln', 'Lincoln', 'Lincoln'),
