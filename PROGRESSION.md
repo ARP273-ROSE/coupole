@@ -919,6 +919,10 @@ Nebraska-Lincoln (Flash/ActionScript, Apache 2.0) ; lot 1 = 21 animations (repè
   courbes), courbe de la durée du jour (12 h à l'équateur, 8 h et 16 h à 48,85° N, jour et nuit polaires à 70°),
   azimut du lever ; les tests génériques couvrent les 9 nouvelles animations.  **30 animations disponibles.**
 - [x] Validation locale (python:3.12-slim, offscreen) : **688 réussis, 22 sautés, code 0**.
+- [x] CI `tests.yml` : `a2cf90c` rouge sous macOS (test de rendu des animations trop lâche : l'horizon n'avait que 3
+  couleurs sur la grille d'échantillonnage) → échantillon dense (`9852115`) ; puis **6/6** au commit
+  « Tests des animations » après relance d'un test existant sensible au temps sous macOS 3.10
+  (`test_qualite_inventaire::test_annulation_pendant_l_inventaire`, sans rapport avec le module).
 - Reste dans ce thème : `transitmovie` (film accéléré de l'ombre d'un bâtiment de l'université : à remplacer par une
   simulation d'ombre portée).
 - **Aucun tag ni Release.**
