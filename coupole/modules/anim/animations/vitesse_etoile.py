@@ -1,6 +1,6 @@
 """Stellar Velocity Calculator : la vitesse d'une étoile dans l'espace d'après sa vitesse radiale (effet Doppler sur
 la raie Hα) et sa vitesse transverse (mouvement propre et distance).  v_r = c Δλ / λ₀ (λ₀ = 656,28 nm, Hα dans
-l'air ; l'original prenait 656,3 nm et c = 300 000 km/s) ; v_t = 4,740 47 μ d (μ en ″/an, d en parsecs) ;
+l'air ; l'original prenait 656,3 nm et c = 300 000 km·s⁻¹) ; v_t = 4,740 47 μ d (μ en ″/an, d en parsecs) ;
 v = √(v_r² + v_t²).  Réglages de l'original : λ de 655 à 657 nm, μ de 0 à 10 ″/an, d de 1 à 10 pc."""
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ class VitesseEtoile(Animation):
 
     def construire(self):
         self.lam = self.curseur('lambda', 655.0, 657.0, 656.5, dec=3, unite='nm')
-        self.mu = self.curseur('mu', 0.0, 10.0, 10.0, dec=2, unite='″/an')
+        self.mu = self.curseur('mu', 0.0, 10.0, 10.0, dec=2, unite='″·a⁻¹')
         self.d = self.curseur('distance', 1.0, 10.0, 10.0, dec=2, unite='pc')
         self._zone = None
 
@@ -33,12 +33,12 @@ class VitesseEtoile(Animation):
 
     def valeurs(self):
         v = self.vitesses()
-        return [(tr('anim_stellarvel_vr'), '%s km/s (%s)' % (nombre(v['vr'], 2), tr(
+        return [(tr('anim_stellarvel_vr'), '%s km·s⁻¹ (%s)' % (nombre(v['vr'], 2), tr(
                     'anim_stellarvel_eloigne' if v['vr'] > 0 else 'anim_stellarvel_approche'))),
-                (tr('anim_stellarvel_vt'), '%s km/s' % nombre(v['vt'], 2)),
-                (tr('anim_stellarvel_v'), '%s km/s' % nombre(v['v'], 2)),
+                (tr('anim_stellarvel_vt'), '%s km·s⁻¹' % nombre(v['vt'], 2)),
+                (tr('anim_stellarvel_v'), '%s km·s⁻¹' % nombre(v['v'], 2)),
                 (tr('anim_stellarvel_angle'), angle(v['angle'], 1)),
-                (tr('anim_stellarvel_relativiste'), '%s km/s' % nombre(v['vr_rel'], 2))]
+                (tr('anim_stellarvel_relativiste'), '%s km·s⁻¹' % nombre(v['vr_rel'], 2))]
 
     def presser(self, pos, bouton):
         if self._zone is not None:

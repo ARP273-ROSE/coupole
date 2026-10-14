@@ -67,9 +67,21 @@ TEXTES = {
         "<h3>Animations</h3><p>Les animations pédagogiques ClassAction de l’université du Nebraska-Lincoln, écrites à "
         "l’origine en Flash, refaites en Python pour Windows, macOS et Linux. Les 92 animations du catalogue sont "
         "toutes disponibles, classées par thème ; celles qui n’étaient que des films sont devenues des simulations. "
-        "S’y ajoute une 93ᵉ, dans « Astronomie antique » : la machine d’Anticythère en 3D, adaptée d’Anticythere3D, "
-        "du même auteur (manivelle à la souris, cadrans gravés en grec, machine ouverte ou éclatée, rapports exacts des "
-        "engrenages ; application complète : github.com/ARP273-ROSE/Anticythere3D).</p>"
+        "S’y ajoutent, dans « Astronomie antique », la machine d’Anticythère en 3D, adaptée d’Anticythere3D, du même "
+        "auteur (manivelle à la souris, cadrans gravés en grec, machine ouverte ou éclatée, rapports exacts des "
+        "engrenages ; application complète : github.com/ARP273-ROSE/Anticythere3D), et, dans « Milieu interstellaire "
+        "et formation des étoiles », Orion en 3D : la constellation dépliée à ses vraies distances, avec ses nuages, la "
+        "nébuleuse d’Orion et la Tête de Cheval, et une plongée avec les images de l’ESO et de Hubble.</p>"
+        "<h4>Fiches au survol</h4><p>Dans Orion en 3D, la Grande Ourse 3D, l’horloge de la Grande Ourse, le lever "
+        "héliaque, la comparaison des repères et le diagramme HR, survoler (ou toucher) une étoile ou une nébuleuse "
+        "ouvre sa fiche, posée à côté d’elle : nom, type, magnitudes, distance et son incertitude, température, rayon, "
+        "luminosité, et la source de chaque valeur (SIMBAD, Gaia DR3, Hipparcos, articles). Au clavier : Tab passe "
+        "d’un objet à l’autre, du plus brillant au plus faible, les flèches aussi quand une fiche est ouverte, Échap "
+        "la ferme ; le résumé est lu par les lecteurs d’écran. Les étoiles réelles ont leur couleur vraie (corps noir "
+        "à leur température, CIE 1931).</p>"
+        "<h4>Spectres</h4><p>L’Explorateur de spectres et la Parallaxe spectroscopique calculent les raies "
+        "(Saha–Boltzmann sur des atmosphères modèles, 133 raies du NIST, bandes moléculaires de TiO et de CH, continu "
+        "de Planck) ; les cas extrapolés et l’ancien étalonnage des magnitudes absolues sont signalés.</p>"
         "<h4>Manipuler</h4><ul><li><b>Glisser</b> sur une sphère la fait tourner (le point saisi suit la souris) ; sur "
         "une étoile, la Lune, la Terre ou un observateur, les déplace. Ce que fait la souris dans chaque animation est "
         "rappelé en petit sous la scène.</li><li><b>Lecture / Pause</b> et <b>Vitesse</b> (0,1 à 10 ×) animent le temps ; "
@@ -96,10 +108,22 @@ TEXTES = {
         "NOTICE).</p>",
         "<h3>Animations</h3><p>The ClassAction teaching animations of the University of Nebraska-Lincoln, originally "
         "written in Flash, remade in Python for Windows, macOS and Linux. All 92 animations of the catalogue are "
-        "available, sorted by topic; those that were only movies have become simulations. A 93rd is added, in "
-        "“Ancient astronomy”: the Antikythera Mechanism in 3D, adapted from Anticythere3D, by the same author (crank "
+        "available, sorted by topic; those that were only movies have become simulations. Added to them are, in "
+        "“Ancient astronomy”, the Antikythera Mechanism in 3D, adapted from Anticythere3D, by the same author (crank "
         "turned with the mouse, dials engraved in Greek, open or exploded machine, exact gear ratios; full "
-        "application: github.com/ARP273-ROSE/Anticythere3D).</p>"
+        "application: github.com/ARP273-ROSE/Anticythere3D), and, in “Interstellar Medium and Star Formation”, Orion "
+        "in 3D: the constellation unfolded to its true distances, with its clouds, the Orion Nebula and the Horsehead, "
+        "and a dive with ESO and Hubble images.</p>"
+        "<h4>Hover data sheets</h4><p>In Orion in 3D, Big Dipper 3D, the Big Dipper clock, heliacal rising, the "
+        "coordinate systems comparison and the HR diagram, hovering over (or touching) a star or a nebula opens its "
+        "data sheet, laid next to it: name, type, magnitudes, distance and its uncertainty, temperature, radius, "
+        "luminosity, and the source of each value (SIMBAD, Gaia DR3, Hipparcos, papers). With the keyboard: Tab goes "
+        "from one object to the next, brightest first, so do the arrows while a sheet is open, Escape closes it; the "
+        "summary is read by screen readers. Real stars have their true colour (black body at their temperature, CIE "
+        "1931).</p>"
+        "<h4>Spectra</h4><p>The Spectrum Explorer and the Spectroscopic Parallax compute the lines (Saha–Boltzmann on "
+        "model atmospheres, 133 NIST lines, TiO and CH molecular bands, Planck continuum); extrapolated cases and the "
+        "former absolute-magnitude calibration are flagged.</p>"
         "<h4>Handling</h4><ul><li><b>Dragging</b> a sphere rotates it (the grabbed point follows the mouse); dragging "
         "a star, the Moon, the Earth or an observer moves it. What the mouse does in each animation is recalled in "
         "small print below the scene.</li><li><b>Play / Pause</b> and <b>Speed</b> (0.1 to 10 ×) run the time; <b>Reset</b> "
@@ -191,6 +215,7 @@ THEMES_TEXTES = {
     'solar': ('Système solaire', 'Solar System'),
     'solarsystemdebris': ('Petits corps du Système solaire', 'Solar System Debris'),
     'sunsolarenergy': ('Le Soleil et son énergie', 'Sun and Solar Energy'),
+    'ismstarformation': ('Milieu interstellaire et formation des étoiles', 'Interstellar Medium and Star Formation'),
     'milkyway': ('La Voie lactée', 'Milky Way'),
     'cosmology': ('Cosmologie', 'Cosmology'),
     'telescopes': ('Télescopes', 'Telescopes'),
@@ -910,6 +935,10 @@ from .textes_anticythere import ANIM_ANTICYTHERE  # noqa: E402  (la machine d'An
 
 TEXTES.update({k: _t(*v) for k, v in ANIM_ANTICYTHERE.items()})
 
+from .textes_orion import ANIM_ORION  # noqa: E402  (0.5.0 : spectres physiques, Orion en 3D, fiches au survol)
+
+TEXTES.update({k: _t(*v) for k, v in ANIM_ORION.items()})
+
 for _cle, _fr, _en in (('buenos_aires', 'Buenos Aires', 'Buenos Aires'), ('lima', 'Lima', 'Lima'),
                        ('casablanca', 'Casablanca', 'Casablanca'), ('monrovia', 'Monrovia', 'Monrovia'),
                        ('sao_paulo', 'São Paulo', 'São Paulo'), ('lincoln', 'Lincoln', 'Lincoln'),
@@ -925,3 +954,12 @@ for _h in (0, 6, 12, 18):
     TEXTES['anim_siderealsolartime_ts%d' % _h] = _t('TS %d h' % _h, 'ST %dh' % _h)
     TEXTES['anim_siderealsolartime_ts%d_aide' % _h] = _t('Aller au prochain instant où le temps sidéral vaut %d h.' % _h,
                                                          'Go to the next time the sidereal time is %dh.' % _h)
+
+
+# règle typographique : milliers séparés par une espace fine insécable (formateur commun, typographie.normaliser)
+from .typographie import normaliser as _normaliser  # noqa: E402
+
+for _v in TEXTES.values():
+    for _lg in ('fr', 'en'):
+        if isinstance(_v.get(_lg), str):
+            _v[_lg] = _normaliser(_v[_lg])

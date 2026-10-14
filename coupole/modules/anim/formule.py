@@ -112,6 +112,12 @@ def jetons(s: str) -> list:
                             break
                     if not (d == '(' and n == 1):
                         v += d
+            elif c == '_' and i + 1 < len(car) and re.match(r'[A-Za-zα-ωΑ-Ω]', car[i]) and \
+                    re.match(r'[A-Za-zα-ωΑ-Ω]', car[i + 1]):
+                # indice d'un mot entier (λ_max, f_obs, a_int) : un seul identificateur, en romain
+                while i < len(car) and re.match(r'[A-Za-zα-ωΑ-Ω]', car[i]):
+                    v += car[i]
+                    i += 1
             else:
                 v = car[i] if i < len(car) else ''
                 i += 1
@@ -156,6 +162,9 @@ def _sous_formule(s: str):
         return ('nb', s)
     if len(s) == 1 and not s.isdigit():
         return ('op', '∗') if s == '*' else ('id', s)
+    # un mot (max, obs, int…) : un identificateur droit, pas un produit de lettres en italique
+    if re.fullmatch(r'[A-Za-zα-ωΑ-Ω]{2,}', s):
+        return ('id', s)
     return analyser(s)
 
 

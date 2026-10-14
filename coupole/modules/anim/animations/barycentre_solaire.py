@@ -26,7 +26,7 @@ class BarycentreSolaire(Animation):
 
     def construire(self):
         self.annee = self.curseur('annee', 1800.0, 2050.0, 2026.0, dec=1)
-        self.vitesse_ans = self.curseur('ans_par_s', 0.1, 10.0, 2.0, dec=1, unite=tr('anim_c_ans') + '/s', log=True)
+        self.vitesse_ans = self.curseur('ans_par_s', 0.1, 10.0, 2.0, dec=1, unite='a·s⁻¹', log=True)
         self.cases = {n: self.coche('p_' + n, n in ('jupiter', 'saturne'))
                       for n in PLANETES}
         self.trainee = []                         # (année, x, y) en rayons solaires

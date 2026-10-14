@@ -46,8 +46,8 @@ class CCD(Animation):
 
     def construire(self):
         self.pose = self.curseur('pose', 1.0, 60.0, 10.0, dec=0, unite='s')
-        self.etoile = self.curseur('etoile', 0.0, 5000.0, 1500.0, dec=0, unite='ph/s')
-        self.ciel = self.curseur('ciel', 0.0, 200.0, 20.0, dec=0, unite='ph/s')
+        self.etoile = self.curseur('etoile', 0.0, 5000.0, 1500.0, dec=0, unite='ph·s⁻¹')
+        self.ciel = self.curseur('ciel', 0.0, 200.0, 20.0, dec=0, unite='ph·s⁻¹')
         self.bouton('anim_buckets_poser', self.poser)
         self.bouton('anim_buckets_lire', self.lire)
         self.etat_initial()

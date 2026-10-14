@@ -1,0 +1,412 @@
+{
+ "methode": "scripts/couleur_etoile.py (corps noir → CIE 1931 2° → sRGB, composante max = 1)",
+ "etoiles": [
+  {
+   "nom": "Soleil",
+   "simbad": null,
+   "teff_K": 5772,
+   "teff_source": "IAU 2015 Résolution B3 (Prša et al. 2016, AJ 152, 41 ; arXiv:1605.09788) : T☉N = 5772 K",
+   "B_V": null,
+   "rgb": [
+    255,
+    241,
+    234
+   ],
+   "hex": "#fff1ea"
+  },
+  {
+   "nom": "Sirius",
+   "simbad": "* alf CMa",
+   "sp_type": "A0mA1Va",
+   "teff_K": 9850,
+   "teff_source": "médiane de 41 mesures SIMBAD mesFe_h (1962ApJ...135..459W, 1964ZA.....60..115K, 1966ApJ...146..880S, 1966MNRAS.133..389W, 1967cmrs..R....339A, 1968Obs....88..160S, 1969A&A.....3..169G, 1970SAOSR.321....1L, 1978ApJ...219..515B, 1981ApJ...248.1031B, 1989A&A...225..125L, 1991A&A...249..205B, 1993A&A...276..142H, 1997A&A...323..901H, 2001Ap)",
+   "B_V": 0.0,
+   "rgb": [
+    206,
+    218,
+    255
+   ],
+   "hex": "#cedaff",
+   "teff_depuis_BV_naine_K": 9700,
+   "rgb_depuis_BV": [
+    207,
+    219,
+    255
+   ]
+  },
+  {
+   "nom": "Véga",
+   "simbad": "* alf Lyr",
+   "sp_type": "A0V",
+   "teff_K": 9509,
+   "teff_source": "médiane de 47 mesures SIMBAD mesFe_h (1966ApJ...146..880S, 1967cmrs..R....339A, 1968ApJ...152..483C, 1968MNRAS.139..313P, 1968Obs....88..160S, 1969A&A.....3..169G, 1974ApJ...189..101S, 1978ApJ...219..515B, 1979A&A....79..174C, 1980ApJ...241..736D, 1981PASJ...33..189S, 1986A&A...165..170G, 1986PASJ...38..215S, 1990ApJ...348..712A, 1990Ap)",
+   "B_V": 0.0,
+   "rgb": [
+    209,
+    220,
+    255
+   ],
+   "hex": "#d1dcff",
+   "teff_depuis_BV_naine_K": 9700,
+   "rgb_depuis_BV": [
+    207,
+    219,
+    255
+   ]
+  },
+  {
+   "nom": "Antarès",
+   "simbad": "* alf Sco",
+   "sp_type": "M1.5Iab+B2Vn",
+   "teff_K": 3660,
+   "teff_source": "Ohnaka et al. 2013, A&A 555, A24 (arXiv:1304.4800), résumé : « 3660 ± 120 K »",
+   "B_V": 1.84,
+   "rgb": [
+    255,
+    203,
+    148
+   ],
+   "hex": "#ffcb94",
+   "teff_depuis_BV_naine_K": 3048,
+   "rgb_depuis_BV": [
+    255,
+    185,
+    112
+   ]
+  },
+  {
+   "nom": "Arcturus",
+   "simbad": "* alf Boo",
+   "sp_type": "K1.5IIIFe-0.5",
+   "teff_K": 4300,
+   "teff_source": "médiane de 108 mesures SIMBAD mesFe_h (1967MNRAS.137..253G, 1970A&A.....7..408C, 1975A&A....38..239M, 1977A&A....61...17O, 1977A&A....61..591M, 1977MNRAS.180...19P, 1978ApJ...225..902B, 1981ApJ...248..228L, 1982MNRAS.201..807G, 1985MNRAS.212..497B, 1986A&A...169..201G, 1986A&AS...65...11K, 1987AJ.....93..338L, 1988A&A...190..148E, 1990AJ)",
+   "B_V": 1.23,
+   "rgb": [
+    255,
+    218,
+    179
+   ],
+   "hex": "#ffdab3",
+   "teff_depuis_BV_naine_K": 4316,
+   "rgb_depuis_BV": [
+    255,
+    218,
+    180
+   ]
+  },
+  {
+   "nom": "Aldébaran",
+   "simbad": "* alf Tau",
+   "sp_type": "K5+III",
+   "teff_K": 3900,
+   "teff_source": "médiane de 69 mesures SIMBAD mesFe_h (1974A&A....35..225V, 1974PhDT.........8F, 1978A&A....67..311F, 1981ApJ...248..228L, 1983A&A...120...21K, 1985ApJ...294..326S, 1990AJ.....99.1961F, 1990ApJS...74.1075M, 1995AJ....110.2968L, 1998A&A...338..623M, 1999A&AS..139..335A, 2005ApJ...626..446R, 2007A&A...475.1003H, 2007MNRAS.374..664C, 2008A&)",
+   "B_V": 1.54,
+   "rgb": [
+    255,
+    209,
+    160
+   ],
+   "hex": "#ffd1a0",
+   "teff_depuis_BV_naine_K": 3407,
+   "rgb_depuis_BV": [
+    255,
+    196,
+    134
+   ]
+  },
+  {
+   "nom": "Spica",
+   "simbad": "* alf Vir",
+   "sp_type": "B1V",
+   "teff_K": 24683,
+   "teff_source": "médiane de 1 mesures SIMBAD mesFe_h (2023ApJS..266...11B)",
+   "B_V": -0.23,
+   "rgb": [
+    166,
+    190,
+    255
+   ],
+   "hex": "#a6beff",
+   "teff_depuis_BV_naine_K": 22181,
+   "rgb_depuis_BV": [
+    168,
+    192,
+    255
+   ]
+  },
+  {
+   "nom": "Polaris",
+   "simbad": "* alf UMi",
+   "sp_type": "F8Ib",
+   "teff_K": 6072,
+   "teff_source": "médiane de 7 mesures SIMBAD mesFe_h (1967PTarO..36..227K, 1981IzKry..64....3B, 2012A&A...538A.143K, 2022A&A...663A...4S)",
+   "B_V": 0.6,
+   "rgb": [
+    255,
+    244,
+    243
+   ],
+   "hex": "#fff4f3",
+   "teff_depuis_BV_naine_K": 5917,
+   "rgb_depuis_BV": [
+    255,
+    242,
+    238
+   ]
+  },
+  {
+   "nom": "Deneb",
+   "simbad": "* alf Cyg",
+   "sp_type": "A2Ia",
+   "teff_K": 8710,
+   "teff_source": "médiane de 8 mesures SIMBAD mesFe_h (1961ZA.....51..206G, 1972MNRAS.159..155P, 2000A&A...364..237A, 2009A&A...501..297Z, 2012A&A...543A..80F, 2014AJ....147..137L)",
+   "B_V": 0.09,
+   "rgb": [
+    217,
+    225,
+    255
+   ],
+   "hex": "#d9e1ff",
+   "teff_depuis_BV_naine_K": 8667,
+   "rgb_depuis_BV": [
+    218,
+    226,
+    255
+   ]
+  },
+  {
+   "nom": "Capella",
+   "simbad": "* alf Aur",
+   "sp_type": "G3III:",
+   "teff_K": 5270,
+   "teff_source": "médiane de 6 mesures SIMBAD mesFe_h (1990ApJS...74.1075M, 2004A&A...420..183A, 2016A&A...587A...2B, 2022A&A...663A...4S)",
+   "B_V": 0.8,
+   "rgb": [
+    255,
+    234,
+    217
+   ],
+   "hex": "#ffead9",
+   "teff_depuis_BV_naine_K": 5313,
+   "rgb_depuis_BV": [
+    255,
+    235,
+    219
+   ]
+  },
+  {
+   "nom": "Procyon",
+   "simbad": "* alf CMi",
+   "sp_type": "F5IV-V+DQZ",
+   "teff_K": 6588,
+   "teff_source": "médiane de 136 mesures SIMBAD mesFe_h (1948ApJ...107..151G, 1951PDAO....8....1W, 1966ApJ...143..336M, 1970MNRAS.148..477P, 1971MNRAS.155..139G, 1975SenAR.164..126H, 1978ApJ...223..937T, 1982A&A...113..135K, 1984Msngr..38...33E, 1985A&AS...59..403S, 1993A&A...275..101E, 1994A&A...281..775N, 1995A&AS..110..553S, 1995PASP..107..219A, 1996A&)",
+   "B_V": 0.42,
+   "rgb": [
+    254,
+    248,
+    255
+   ],
+   "hex": "#fef8ff",
+   "teff_depuis_BV_naine_K": 6630,
+   "rgb_depuis_BV": [
+    253,
+    247,
+    255
+   ]
+  },
+  {
+   "nom": "Altaïr",
+   "simbad": "* alf Aql",
+   "sp_type": "A7Vn",
+   "teff_K": 7568,
+   "teff_source": "médiane de 9 mesures SIMBAD mesFe_h (1995A&AS..110..553S, 1998A&A...339..858D, 2003A&A...398.1121E, 2003AJ....126.2048G, 2004A&A...420..183A, 2012A&A...537A.120Z, 2017AJ....153...21L, 2023ApJS..266...11B, 2024A&A...683A.125P)",
+   "B_V": 0.22,
+   "rgb": [
+    233,
+    236,
+    255
+   ],
+   "hex": "#e9ecff",
+   "teff_depuis_BV_naine_K": 7718,
+   "rgb_depuis_BV": [
+    231,
+    234,
+    255
+   ]
+  },
+  {
+   "nom": "Régulus",
+   "simbad": "* alf Leo",
+   "sp_type": "B8IVn",
+   "teff_K": 11850,
+   "teff_source": "médiane de 4 mesures SIMBAD mesFe_h (1995A&AS..110..553S, 2003AJ....126.2048G, 2012A&A...537A.120Z, 2023ApJS..266...11B)",
+   "B_V": -0.16,
+   "rgb": [
+    193,
+    209,
+    255
+   ],
+   "hex": "#c1d1ff",
+   "teff_depuis_BV_naine_K": 16011,
+   "rgb_depuis_BV": [
+    178,
+    199,
+    255
+   ]
+  },
+  {
+   "nom": "Rigel",
+   "simbad": "* bet Ori",
+   "sp_type": "B8Ia",
+   "teff_K": 12000,
+   "teff_source": "Przybilla et al. 2006, A&A 445, 1099, table 2 (12 000 ± 200 K)",
+   "B_V": -0.03,
+   "rgb": [
+    192,
+    209,
+    255
+   ],
+   "hex": "#c0d1ff",
+   "teff_depuis_BV_naine_K": 10120,
+   "rgb_depuis_BV": [
+    204,
+    217,
+    255
+   ]
+  },
+  {
+   "nom": "Bételgeuse",
+   "simbad": "* alf Ori",
+   "sp_type": "M1-M2Ia-Iab",
+   "teff_K": 3600,
+   "teff_source": "Levesque & Massey 2020, cité par Joyce et al. 2020, ApJ 902, 63, table 1 (3 600 ± 25 K)",
+   "B_V": 1.85,
+   "rgb": [
+    255,
+    202,
+    145
+   ],
+   "hex": "#ffca91",
+   "teff_depuis_BV_naine_K": 3036,
+   "rgb_depuis_BV": [
+    255,
+    185,
+    112
+   ]
+  },
+  {
+   "nom": "Fomalhaut",
+   "simbad": "* alf PsA",
+   "sp_type": "A4V",
+   "teff_K": 8616,
+   "teff_source": "médiane de 10 mesures SIMBAD mesFe_h (1995A&AS..110..553S, 1997MNRAS.286..604D, 1998A&AS..129..505B, 2003A&A...398.1121E, 2003AJ....125.1598L, 2012A&A...537A.120Z, 2013ApJ...771...40B, 2017AJ....153...21L, 2021A&A...647A..49S)",
+   "B_V": 0.09,
+   "rgb": [
+    218,
+    226,
+    255
+   ],
+   "hex": "#dae2ff",
+   "teff_depuis_BV_naine_K": 8667,
+   "rgb_depuis_BV": [
+    218,
+    226,
+    255
+   ]
+  },
+  {
+   "nom": "α Centauri A",
+   "simbad": "* alf Cen A",
+   "sp_type": "G2V",
+   "teff_K": 5793,
+   "teff_source": "médiane de 60 mesures SIMBAD mesFe_h (1971RGOB..173...63F, 1980MNRAS.191...23E, 1986A&A...165..126S, 1986A&A...166..195R, 1988A&A...190..148E, 1988A&A...206..100A, 1990ApJ...350..827F, 1992A&A...263..219C, 1993A&A...275..101E, 1996A&A...314..191G, 1997A&A...323..809F, 1997A&A...328..261N, 2001A&A...367..253F, 2004A&A...420..183A, 2005A&)",
+   "B_V": 0.71,
+   "rgb": [
+    255,
+    241,
+    234
+   ],
+   "hex": "#fff1ea",
+   "teff_depuis_BV_naine_K": 5550,
+   "rgb_depuis_BV": [
+    255,
+    238,
+    227
+   ]
+  },
+  {
+   "nom": "Bellatrix",
+   "simbad": "* gam Ori",
+   "sp_type": "B2III",
+   "teff_K": 21920,
+   "teff_source": "médiane de 8 mesures SIMBAD mesFe_h (1992ApJ...387..673G, 1995A&AS..110..553S, 2006MNRAS.371..252L, 2008AJ....135..209M, 2009A&A...501..297Z, 2023ApJS..266...11B, 2023MNRAS.519.5472M)",
+   "B_V": -0.22,
+   "rgb": [
+    168,
+    192,
+    255
+   ],
+   "hex": "#a8c0ff",
+   "teff_depuis_BV_naine_K": 21127,
+   "rgb_depuis_BV": [
+    169,
+    192,
+    255
+   ]
+  },
+  {
+   "nom": "Alnitak A",
+   "simbad": "* zet Ori A",
+   "sp_type": "O9.2IbvarNwk",
+   "teff_K": 30550,
+   "teff_source": "médiane de 2 mesures SIMBAD mesFe_h (2022A&A...665A.150H, 2024A&A...687A.228D)",
+   "B_V": -0.11,
+   "rgb": [
+    162,
+    187,
+    255
+   ],
+   "hex": "#a2bbff",
+   "teff_depuis_BV_naine_K": 12389,
+   "rgb_depuis_BV": [
+    190,
+    207,
+    255
+   ]
+  },
+  {
+   "nom": "Yildun",
+   "simbad": "* del UMi",
+   "sp_type": "A1Van",
+   "teff_K": 9070,
+   "teff_source": "médiane de 1 mesures SIMBAD mesFe_h (1995A&AS..110..553S)",
+   "B_V": 0.031,
+   "rgb": [
+    213,
+    223,
+    255
+   ],
+   "hex": "#d5dfff",
+   "teff_depuis_BV_naine_K": 9346,
+   "rgb_depuis_BV": [
+    211,
+    221,
+    255
+   ]
+  },
+  {
+   "nom": "η UMi",
+   "simbad": "* eta UMi",
+   "sp_type": "F5V",
+   "teff_K": 6804,
+   "teff_source": "médiane de 2 mesures SIMBAD mesFe_h (2011A&A...530A.138C, 2017AJ....153...21L)",
+   "B_V": null,
+   "rgb": [
+    249,
+    245,
+    255
+   ],
+   "hex": "#f9f5ff"
+  }
+ ]
+}

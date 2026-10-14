@@ -1,8 +1,8 @@
 """HR Explorer (NAAP) : le diagramme de Hertzsprung-Russell.  On déplace une étoile (température, luminosité) : son
 rayon suit la loi de Stefan-Boltzmann R / R☉ = √(L / L☉) / (T / T☉)², comparé au Soleil.  Droites d'égal rayon,
 séquence principale et autres classes de luminosité, et les étoiles les plus proches ou les plus brillantes du ciel
-(données de l'original, placées d'après leur type spectral et leur magnitude absolue).  T☉ = 5 772 K (l'original
-prenait 5 800 K)."""
+(données de l'original, placées d'après leur type spectral et leur magnitude absolue), en couleur vraie (corps noir
+→ CIE 1931 → sRGB) avec leur fiche au survol.  T☉ = 5 772 K (l'original prenait 5 800 K)."""
 from __future__ import annotations
 
 import math
@@ -13,7 +13,9 @@ from PyQt6.QtGui import QColor, QPolygonF
 from ....core.i18n import tr
 from .. import dessin, hr
 from ..base import Animation, nombre
+from ..couleur_etoile import couleur_etoile
 from ..donnees_etoiles import BRILLANTES, COMMUNES, PROCHES
+from ..etoiles_reelles import reelle
 
 LOG_T = (3.3617, 4.6021)
 LOG_L = (-4.0, 6.0)
@@ -24,6 +26,7 @@ RAYONS = (1e-4, 1e-3, 1e-2, 0.1, 1.0, 10.0, 100.0, 1000.0)
 class DiagrammeHR(Animation):
     ID = 'hrexplorer'
     ANIMEE = False
+    FICHES = True
 
     def construire(self):
         self.t = self.curseur('temperature', 2300.0, 40000.0, 5800.0, dec=0, unite='K', log=True)
@@ -32,6 +35,7 @@ class DiagrammeHR(Animation):
         self.c_sp = self.coche('sequence', True)
         self.c_classes = self.coche('classes', False)
         self.c_rayons = self.coche('rayons', True)
+        self.c_couleur = self.coche('couleur_t', True)
         self._graphe = None
 
     def rayon(self) -> float:
@@ -87,15 +91,25 @@ class DiagrammeHR(Animation):
             p.drawPolyline(QPolygonF([xy(a + (b - a) * i / 60, hr.log_lum_classe(a + (b - a) * i / 60, n))
                                       for i in range(61)]))
         g = self.groupe.currentData()
-        couches = {'aucune': (), 'proches': ((PROCHES, 'accent2'), (COMMUNES, 'accent3')),
-                   'brillantes': ((BRILLANTES, 'accent1'), (COMMUNES, 'accent3')),
-                   'les_deux': ((PROCHES, 'accent2'), (BRILLANTES, 'accent1'), (COMMUNES, 'accent3')),
-                   'communes': ((COMMUNES, 'accent3'),)}[g]
-        for etoiles, cle in couches:
-            for _, t, mv, _ in etoiles:
+        couches = {'aucune': (),
+                   'proches': ((PROCHES, 'accent2', 'proches'), (COMMUNES, 'accent3', 'communes')),
+                   'brillantes': ((BRILLANTES, 'accent1', 'brillantes'), (COMMUNES, 'accent3', 'communes')),
+                   'les_deux': ((PROCHES, 'accent2', 'proches'), (BRILLANTES, 'accent1', 'brillantes'),
+                                (COMMUNES, 'accent3', 'communes')),
+                   'communes': ((COMMUNES, 'accent3', 'communes'),)}[g]
+        vraie = self.c_couleur.isChecked()
+        for etoiles, cle, groupe in couches:
+            for nom, t, mv, _ in etoiles:
                 lt, ll = hr.position_hr(t, mv)
                 q = xy(lt, ll)
-                dessin.disque(p, q.x(), q.y(), 2.6, cle)
+                # couleur = température (corps noir → CIE 1931) avec le contour du groupe, ou couleur du groupe
+                if vraie:
+                    dessin.disque(p, q.x(), q.y(), 3.0, QColor(*couleur_etoile(10 ** lt)), cle)
+                else:
+                    dessin.disque(p, q.x(), q.y(), 2.6, cle)
+                f = reelle('hrexplorer:' + groupe, nom)
+                if f and x0 <= q.x() <= x1 and y0 <= q.y() <= y1:
+                    self.survolable(p, f['fiche'], q.x(), q.y(), 4, mv)
         p.restore()
         p.setPen(dessin.stylo('grille', 1.0))
         p.setBrush(dessin.Qt.BrushStyle.NoBrush)
@@ -130,8 +144,8 @@ class DiagrammeHR(Animation):
         k = place / max(1.0, rr)                              # pixels par R☉
         rs, re = max(1.5, k), max(1.5, k * rr)
         xs, xe = r.x() + r.width() * 0.26, r.x() + r.width() * 0.72
-        dessin.disque(p, xs, cy, rs, QColor(*hr.couleur_rvb(hr.T_SOLEIL)))
-        dessin.disque(p, xe, cy, re, QColor(*hr.couleur_rvb(self.t.value())))
+        dessin.disque(p, xs, cy, rs, QColor(*couleur_etoile(hr.T_SOLEIL)), 'grille')
+        dessin.disque(p, xe, cy, re, QColor(*couleur_etoile(self.t.value())), 'grille')
         dessin.texte(p, xs, r.bottom() - 26, tr('anim_stellarlum_soleil'), 'doux')
         dessin.texte(p, xe, r.bottom() - 26, '%s R☉' % nombre(rr, 4 if rr < 0.1 else 2), 'texte')
         if k * 1.0 < 1.5 or k * rr < 1.5:

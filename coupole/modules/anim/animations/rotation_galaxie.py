@@ -29,7 +29,7 @@ from ..graphe import Axes
 from .gravitation import scientifique
 
 KPC_M = astro.PC_M * 1000.0
-G_KPC = astro.GM_SOLEIL / (KPC_M * 1e6)          # G en kpc (km/s)² / M☉ : 4,3009 × 10⁻⁶
+G_KPC = astro.GM_SOLEIL / (KPC_M * 1e6)          # G en kpc (km·s⁻¹)² / M☉ : 4,3009 × 10⁻⁶
 R_MAX = 25.0
 
 
@@ -53,7 +53,7 @@ def _interpoler(xs, ys, x: float) -> float:
 
 
 def vitesse(r: float, cle: str = 'v') -> float:
-    """Vitesse circulaire du modèle (km/s) à r kpc du centre ; `cle` : 'v' (total), 'bulbe', 'disques' ou 'halo'."""
+    """Vitesse circulaire du modèle (km·s⁻¹) à r kpc du centre ; `cle` : 'v' (total), 'bulbe', 'disques' ou 'halo'."""
     m = donnees()['modele']
     return _interpoler(m['R'], m[cle], r)
 
@@ -112,7 +112,7 @@ class RotationGalaxie(Animation):
         tour = 2 * math.pi * r * KPC_M / (vitesse(r) * 1000) / (astro.ANNEE_JULIENNE_J * 86400) / 1e6
         return [(tr('anim_milkywayrotationalvelocity_r'), '%s kpc (%s %s)' % (
                     nombre(r, 2), nombre(r * 1000 * astro.PC_EN_AL, 0), tr('anim_spectroparallax_al'))),
-                (tr('anim_milkywayrotationalvelocity_v'), '%s km/s' % nombre(vitesse(r), 1)),
+                (tr('anim_milkywayrotationalvelocity_v'), '%s km·s⁻¹' % nombre(vitesse(r), 1)),
                 (tr('anim_milkywayrotationalvelocity_m'), '%s M☉' % scientifique(masse(r))),
                 (tr('anim_milkywayrotationalvelocity_masse_sphere'), '%s M☉' % scientifique(masse_sphere(r))),
                 (tr('anim_milkywayrotationalvelocity_tour'), '%s %s' % (nombre(tour, 0),

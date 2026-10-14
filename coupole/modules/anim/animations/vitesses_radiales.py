@@ -33,7 +33,7 @@ class VitessesRadiales(Animation):
         self.e = self.curseur('e', 0.0, 0.9, 0.0, dec=3)
         self.i = self.curseur('i', 0.0, 90.0, 90.0, dec=1, unite='°')
         self.w = self.curseur('omega', 0.0, 360.0, 0.0, dec=1, unite='°')
-        self.bruit = self.curseur('bruit', 0.0, 50.0, 3.0, dec=1, unite='m/s')
+        self.bruit = self.curseur('bruit', 0.0, 50.0, 3.0, dec=1, unite='m·s⁻¹')
         self.n_mesures = self.curseur('mesures', 0.0, 200.0, 40.0, dec=0)
         self.phase = 0.0
         self._mesures = None
@@ -80,12 +80,12 @@ class VitessesRadiales(Animation):
     def valeurs(self):
         s = self.systeme()
         out = [(tr('anim_c_periode'), texte_duree(s['P'])),
-               (tr('anim_ca_extrasolarplanets_graph_k'), '%s m/s' % nombre(s['K'], 2)),
+               (tr('anim_ca_extrasolarplanets_graph_k'), '%s m·s⁻¹' % nombre(s['K'], 2)),
                (tr('anim_radialvelocitysimulator_msini'), '%s M♃' % nombre(self.mp.value() *
                                                                         math.sin(math.radians(s['i'])), 3))]
         t = PRERELAGES[self.prereglage.currentData()]
         if len(t) == 9:
-            out.append((tr('anim_ca_extrasolarplanets_graph_k_mesuree'), '%s m/s' % nombre(t[8], 1)))
+            out.append((tr('anim_ca_extrasolarplanets_graph_k_mesuree'), '%s m·s⁻¹' % nombre(t[8], 1)))
         return out
 
     def dessiner(self, p, rect):

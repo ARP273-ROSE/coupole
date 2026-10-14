@@ -115,3 +115,74 @@ STIX Two Math (version 2.13), Copyright 2001-2021 The STIX Fonts Project Authors
 SIL Open Font License 1.1 (texte complet / full text : LICENCES/OFL-STIX-Two.txt).  Sous-ensemble (latin, grec,
 chiffres en exposant et en indice, opérateurs usuels, lettres mathématiques italiques ; table MATH conservée) dans
 coupole/modules/anim/donnees/stix-two-math.otf, pour les formules des animations.
+
+Spectres sur bases physiques / physically based spectra
+-------------------------------------------------------
+(0.5.0 ; Explorateur de spectres, Parallaxe spectroscopique ; coupole/modules/anim/spectres_physiques.py et
+donnees/modele_spectres.json.gz, intégrés sous GPL-3.0-or-later)
+Moteur et données écrits pour ce projet par son auteur (modèle « spectres physiques » 1.0.0, 14/10/2026) : intensités
+des familles de raies par Saha–Boltzmann sur des atmosphères modèles, 133 raies, bandes moléculaires, continu de
+Planck ; tables dérivées des sources publiques suivantes (consultées le 14/10/2026) / engine and data written for
+this project by its author; tables derived from these public sources:
+  - CODATA 2022 (NIST, Fundamental Physical Constants) : h, k, c, mₑ, e, a₀, u, eV ;
+  - E. Mamajek, « A Modern Mean Dwarf Stellar Color and Effective Temperature Sequence », version 2022.04.16 ;
+    Pecaut & Mamajek 2013, ApJS 208, 9 (classe V : T_eff, B−V, M_V, BC_V, L, R, M) ;
+  - Malkov, Kovaleva, Sichevsky & Zhao 2020, RAA 20, 139 (classes III et I) ; van Belle et al. 2021, ApJ 922, 163
+    (géantes G0–M7,75) ; Martins, Schaerer & Hillier 2005, A&A 436, 1049 (étoiles O) ;
+  - résolution UAI 2015 B3 (Prša et al. 2016, AJ 152, 41) : grandeurs solaires nominales ;
+  - NIST Atomic Spectra Database (Kramida, Ralchenko, Reader & NIST ASD Team) : énergies d'ionisation, niveaux,
+    raies (λ dans l'air, log gf) ; conversion vide/air de Peck & Reeder 1972 (JOSA 62, 958) ; NIST « Atomic Weights
+    and Isotopic Compositions » ;
+  - Castelli & Kurucz 2003 (IAU Symp. 210), grille d'atmosphères ATLAS9 ODFNEW [M/H] = 0, ξ = 2 km·s⁻¹ ;
+  - NIST-JANAF Thermochemical Tables (Chase 1998, 4ᵉ éd.) ; Huber & Herzberg 1979 (NIST Chemistry WebBook : TiO, CH) ;
+    Allard, Hauschildt & Schwenke 2000, ApJ 540, 1005 ; Alvarez & Plez 1998 ; Weselak et al. 2014 ;
+    Meléndez & Barbuy 1999, ApJS 124, 527 ; Ramírez & Cohen 2003, AJ 125, 224 ;
+  - CIE 2019, fonctions colorimétriques CIE 1931 2° (doi:10.25039/CIE.DS.xvudnb9b), CC BY-SA 4.0 : seules des
+    tables dérivées (couleurs sRGB) sont incluses ; W3C CSS Color Module Level 4 (matrice XYZ → sRGB).
+Vérifications SageMath indépendantes du moteur (46 comparaisons) ; tests de référence (100 cas) repris tels quels.
+Limites dites dans l'interface : extrapolation des atmosphères hors de la grille ATLAS9, étalonnages bornés ou
+interpolés, magnitude absolue de l'ancien étalonnage là où aucune n'est publiée.
+
+Orion en 3D, fiches au survol, couleur vraie des étoiles (0.5.0) / Orion in 3D, hover data sheets, true star colours
+-------------------------------------------------------------------------------------------------------------------
+Données préparées pour ce projet par son auteur (requêtes du 14/10/2026, gardées avec leur date) ; chaque valeur des
+fiches cite sa source / data prepared for this project by its author; each value of the data sheets cites its source.
+  - This research has made use of the SIMBAD database, operated at CDS, Strasbourg, France.
+  - This work has made use of data from the European Space Agency (ESA) mission Gaia
+    (https://www.cosmos.esa.int/gaia), processed by the Gaia Data Processing and Analysis Consortium (DPAC,
+    https://www.cosmos.esa.int/web/gaia/dpac/consortium). Gaia DR3 : Gaia Collaboration, Vallenari et al. 2023,
+    A&A 674, A1 ; point zéro des parallaxes : Lindegren et al. 2021, A&A 649, A4 ; FLAME : Creevey et al. 2023,
+    A&A 674, A26.
+  - Hipparcos, nouvelle réduction : F. van Leeuwen 2007, A&A 474, 653 (VizieR I/311).
+  - Squelettes 3D d'Orion A, d'Orion B et de λ Orionis : Zucker et al. 2021, ApJ 919, 35, Harvard Dataverse
+    doi:10.7910/DVN/YQYBRD, CC0 1.0.
+  - Lignes de la figure d'Orion : Stellarium, ciel « modern » (skycultures/modern), CC BY-SA 4.0.
+  - Structure et distances publiées : Großschedl et al. 2018, A&A 619, A106 ; Zucker et al. 2019, ApJ 879, 125 ;
+    Zucker et al. 2020, A&A 633, A51 ; Rezaei Kh. & Kainulainen 2022, ApJL 930, L22 ; Kounkel et al. 2017,
+    ApJ 834, 142 ; Kounkel et al. 2018, AJ 156, 84 ; Menten et al. 2007, A&A 474, 515 ; Kuhn et al. 2019, ApJ 870,
+    32 ; Joyce et al. 2020, ApJ 902, 63 ; Hummel et al. 2013, A&A 554, A52 ; Schaefer et al. 2016, AJ 152, 213 ;
+    Shenar et al. 2015, ApJ 809, 135 ; Przybilla et al. 2006, A&A 445, 1099 ; de Almeida et al. 2022, MNRAS 515, 1 ;
+    Ohnaka et al. 2013, A&A 555, A24 ; Wen & O'Dell 1995, ApJ 438, 784 ; O'Dell et al. 2009, AJ 137, 367 ; Gerin,
+    Pety & Goicoechea 2009 (arXiv:0905.3625) ; Ochsendorf et al. 2015, ApJ 808, 111 ; Pon et al. 2016, ApJ 827, 42 ;
+    Foley et al. 2023, ApJ 947, 66 ; Pecaut & Mamajek 2013, ApJS 208, 9 ; noms d'étoiles : UAI, WGSN (2022-04-04).
+  - Couleur des étoiles : corps noir à T_eff → CIE 1931 2° (CIE, CC BY-SA 4.0 ; table dérivée) → sRGB (W3C CSS
+    Color 4), vérifiée par SageMath.
+  - Images posées sur le ciel (adaptées : recadrées, réorientées nord en haut et est à gauche, rééchantillonnées,
+    compressées en WebP), sous licence Creative Commons Attribution 4.0 International
+    (https://creativecommons.org/licenses/by/4.0/) ; crédits mot pour mot / images laid on the sky (adapted:
+    cropped, reoriented, resampled, WebP-compressed), CC BY 4.0; credits verbatim:
+      coupole/modules/anim/donnees/orion/m42_vst.webp — ESO eso1723a, https://www.eso.org/public/images/eso1723a/ — Crédit : ESO/G. Beccari
+      coupole/modules/anim/donnees/orion/m42_hubble.webp — ESA/Hubble heic0601a, https://esahubble.org/images/heic0601a/ — Crédit : NASA, ESA,
+        M. Robberto (Space Telescope Science Institute/ESA) and the Hubble Space Telescope Orion Treasury Project Team
+      coupole/modules/anim/donnees/orion/tete_de_cheval_vlt.webp — ESO eso0202a, https://www.eso.org/public/images/eso0202a/ — Crédit : ESO
+      coupole/modules/anim/donnees/orion/tete_de_cheval_hubble_ir.webp — ESA/Hubble heic1307a, https://esahubble.org/images/heic1307a/ —
+        Crédit : NASA, ESA, and the Hubble Heritage Team (AURA/STScI)
+    Le crédit est affiché avec l'image (sur la scène et en lien actif sous la scène) ; aucune approbation de l'ESO ou
+    de l'ESA n'est suggérée / the credit is shown with the image; no endorsement by ESO or ESA is implied.
+  - Distances de la Grande Ourse 3D : parallaxes adoptées par SIMBAD (Hipparcos 2007, Gaia), au lieu de celles de
+    l'original.
+
+Typographie / typography
+------------------------
+Formateur commun aux ressources et aux applications (typographie : unités SI à exposants, nombres, notation
+scientifique, espaces fines, contrôle), écrit pour ce projet par son auteur.

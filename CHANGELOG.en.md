@@ -2,6 +2,39 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.5.0 — 14 October 2026
+
+**« Animations » module: physically based spectra, “Orion in 3D” (94th animation), hover data sheets, true star
+colours, typography rule everywhere.**
+
+- **Orion in 3D** (new topic “Interstellar Medium and Star Formation”, between Extrasolar Planets and Milky Way),
+  Coupole's own: the constellation as we see it, then gradually unfolded in three dimensions, every star at its
+  measured distance (SIMBAD, Gaia DR3, Hipparcos 2007, dedicated measurements) with its error bar; Orion A and B
+  molecular clouds (Zucker et al. 2021, Großschedl et al. 2018), λ Orionis ring, Barnard's Loop (Foley et al. 2023),
+  the Orion Nebula as a “blister” (Wen & O'Dell 1995, O'Dell et al. 2009), the Horsehead; dive towards M42 and the
+  Horsehead with ESO and ESA/Hubble images laid on the sky (CC BY 4.0, credit verbatim on the scene and as a link below
+  it). Published distances by default for Alnilam, Mintaka, Meissa and Hatysa, “raw measured distances” option;
+  Trapezium at 388 ± 5 pc (VLBA), Gaia DR3 (402 pc) and Menten et al. 2007 (414 pc) in the data sheet; “enhanced
+  colours” option, off by default.
+- **Generic hover data sheet**: hover, touch or keyboard (Tab, arrows, Escape) open a sheet laid next to the object,
+  never over it, read by screen readers: names, type, magnitudes, distance and uncertainty, temperature, radius,
+  luminosity, and the source of each value. Wired to Orion in 3D, Big Dipper 3D, the Big Dipper clock, heliacal rising,
+  the coordinate systems comparison and the HR diagram (321 sheets).
+- **True star colours** (black body → CIE 1931 → sRGB, checked with SageMath) in these animations; HR diagram:
+  “Colour = temperature” box; Big Dipper 3D: updated distances (SIMBAD adopted parallaxes).
+- **Physically based spectra** (Spectrum Explorer, Spectroscopic Parallax): Saha–Boltzmann on ATLAS9 atmospheres,
+  smooth curves per class, axis in spectral type and temperature, 133 NIST lines, TiO and CH bands, coloured Planck
+  continuum; G2 V = 5,770 K; extrapolated cases and the former absolute-magnitude calibration flagged on screen. Engine
+  and data copied unchanged, with their 100 reference cases.
+- **Typography rule** in the 94 animations: SI units (km·s⁻¹, m·s⁻², W·m⁻²…), “−” minus sign, thin spaces, decimal
+  comma in French (numeric fields too), powers of ten as superscripts, formulas with stretchy delimiters and radicals,
+  word subscripts upright; formatter shared by the desktop, the web and the resources; test on every displayed text.
+- **Measurements** (offscreen QPainter, 720 × 470, loaded NAS): Orion in 3D 5.5 ms (sky) to 7.4 ms (3D), 1.7 ms when
+  diving; Spectrum Explorer 3.3 ms; Spectroscopic Parallax 3.4 ms.
+- **Checked**: SageMath (parsec → light-year, distances and error bars of the data sheets, Trapezium parallax, ICRS →
+  galactic matrix); same numbers and same data sheets as Coupole Web (shared references); FR (88 p.) and EN (86 p.)
+  manuals; F1 help.
+
 ## 0.4.2 — 14 October 2026
 
 **« Animations » module: the Antikythera Mechanism in 3D (93rd animation), panel titles that no longer overflow,

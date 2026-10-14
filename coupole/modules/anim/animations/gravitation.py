@@ -107,8 +107,8 @@ class Gravitation(Animation):
         c = calcul(m1, m2, r)
         return [('M₁', '%s kg' % scientifique(m1)), ('M₂', '%s kg' % scientifique(m2)), ('R', '%s m' % scientifique(r)),
                 (tr('anim_gravcalc_force'), '%s N' % scientifique(c['F'])),
-                (tr('anim_gravcalc_a1'), '%s m/s²' % scientifique(c['a1'])),
-                (tr('anim_gravcalc_a2'), '%s m/s²' % scientifique(c['a2']))]
+                (tr('anim_gravcalc_a1'), '%s m·s⁻²' % scientifique(c['a1'])),
+                (tr('anim_gravcalc_a2'), '%s m·s⁻²' % scientifique(c['a2']))]
 
     def dessiner(self, p, rect):
         m1, m2, r = self.grandeurs()
@@ -132,7 +132,7 @@ class Gravitation(Animation):
             if lg > 3:
                 dessin.fleche(p, x + sens * rr, yc, x + sens * (rr + lg), yc, dessin.stylo(cle, 2.4), 9)
             dessin.disque(p, x, yc, rr, cle)
-            dessin.texte(p, x, yc + rr + 14, 'a = %s m/s²' % scientifique(a), cle)
+            dessin.texte(p, x, yc + rr + 14, 'a = %s m·s⁻²' % scientifique(a), cle)
         if self.memoire:
             self._table(p, QRectF(rect.x() + 10, rect.y() + rect.height() * 0.70, rect.width() - 20,
                                   rect.height() * 0.30 - 8))

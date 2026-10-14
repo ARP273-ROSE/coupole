@@ -12,6 +12,7 @@ import numpy as np
 from ....core.i18n import tr
 from .. import astro, dessin, scenes
 from ..base import Animation, angle, heures_minutes
+from ..etoiles_reelles import couleur_reelle, reelle
 
 # (α en heures, δ en degrés), tracés comme dans l'original (suites d'indices)
 CONSTELLATIONS = {
@@ -30,6 +31,7 @@ TRAINEES = {'aucune': 0.0, 'courtes': 30.0, 'longues': 90.0}     # longueur en d
 
 class ComparaisonReperes(Animation):
     ID = 'celhorcomp'
+    FICHES = True
     HEURES_PAR_S = 1.0
 
     def construire(self):
@@ -160,7 +162,12 @@ class ComparaisonReperes(Animation):
             pts = [np.array(astro.vecteur_equatorial(a, d)) for a, d in etoiles]
             for i, j in traits:
                 pe.courbe(conv(dessin.arc(pts[i], pts[j], 12)), 'accent1', 1.4, 0.8)
-            for (a, d), v in zip(etoiles, pts):
+            for k, ((a, d), v) in enumerate(zip(etoiles, pts)):
                 if lon_trainee > 0:
                     pe.courbe(conv(scenes.arc_equateur(a, a + lon_trainee, d, 30)), 'etoile', 1.0, 0.45)
-                pe.point(conv(v), 'etoile', 3.0)
+                # étoiles réelles des constellations : couleur vraie et fiche ; étoiles « libres » : couleur du thème
+                f = reelle('celhorcomp', '%s_%d' % (nom, k)) if nom != 'libres' else None
+                col = couleur_reelle('celhorcomp', '%s_%d' % (nom, k)) if f else None
+                q = pe.point(conv(v), col or 'etoile', 3.0, bord='doux' if f and dessin.theme() == 'clair' else None)
+                if q and q[2] and f:
+                    self.survolable(pe.p, f['fiche'], q[0], q[1], 6, k)

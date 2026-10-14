@@ -323,7 +323,7 @@ def test_aide_propre_a_chaque_animation(appli):
 def test_ordre_pedagogique_des_themes():
     assert catalogue.THEMES == ('intro', 'coordsmotion', 'lunarcycles', 'ancientastro', 'renaissance', 'solar',
                                 'solarsystemdebris', 'sunsolarenergy', 'light', 'telescopes', 'stellarprops',
-                                'binaryvariablestars', 'extrasolarplanets', 'milkyway', 'cosmology')
+                                'binaryvariablestars', 'extrasolarplanets', 'ismstarformation', 'milkyway', 'cosmology')
     assert {e.theme for e in catalogue.ENTREES} <= set(catalogue.THEMES)
 
 

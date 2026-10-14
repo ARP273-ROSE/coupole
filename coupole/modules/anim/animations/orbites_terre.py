@@ -57,7 +57,7 @@ class OrbitesTerre(Animation):
         out = [(tr('anim_earthorbitplot_rayon'), '%s km' % nombre(r / 1000, 0)),
                (tr('anim_earthorbitplot_altitude'), '%s km' % nombre((r - R_MIN) / 1000, 0)),
                (tr('anim_earthorbitplot_periode'), texte_periode(astro.periode_orbite_terre(r))),
-               (tr('anim_earthorbitplot_vitesse'), '%s km/s' % nombre(astro.vitesse_circulaire(r) / 1000, 3))]
+               (tr('anim_earthorbitplot_vitesse'), '%s km·s⁻¹' % nombre(astro.vitesse_circulaire(r) / 1000, 3))]
         if self.choix_point.currentData() == 'lune':
             gm = astro.GM_TERRE * (1 + astro.MASSE_LUNE_KG / astro.MASSE_TERRE_KG)
             out.append((tr('anim_earthorbitplot_lune_vraie'), texte_periode(astro.periode_orbite_terre(r, gm))))

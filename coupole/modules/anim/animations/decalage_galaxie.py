@@ -41,7 +41,7 @@ def flux_observe(z: float):
 
 
 def vitesse_relativiste(z: float) -> float:
-    """Vitesse (km/s) donnant ce décalage par l'effet Doppler relativiste : v / c = ((1+z)² − 1) / ((1+z)² + 1)."""
+    """Vitesse (km·s⁻¹) donnant ce décalage par l'effet Doppler relativiste : v / c = ((1+z)² − 1) / ((1+z)² + 1)."""
     s = (1 + z) ** 2
     return lumiere.C / 1000 * (s - 1) / (s + 1)
 
@@ -76,7 +76,7 @@ class DecalageGalaxie(Animation):
         z = self.z.value()
         m = self.magnitudes()
         return [('z', nombre(z, 3)),
-                (tr('anim_galacticredshift_v'), '%s km/s' % nombre(vitesse_relativiste(z), 0)),
+                (tr('anim_galacticredshift_v'), '%s km·s⁻¹' % nombre(vitesse_relativiste(z), 0)),
                 (tr('anim_galacticredshift_halpha'), '%s nm' % nombre(656.28 * (1 + z), 1)),
                 ('B − V', nombre(m['B'] - m['V'], 2))]
 

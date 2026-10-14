@@ -28,9 +28,9 @@ class OndesDensite(Animation):
     LECTURE_AU_DEPART = True
 
     def construire(self):
-        self.v = self.curseur('vitesse', 15.0, 40.0, 30.0, dec=1, unite='m/s')
-        self.v_lente = self.curseur('lente', 4.0, 14.0, 10.0, dec=1, unite='m/s')
-        self.v_tracteur = self.curseur('v_tracteur', 1.0, 12.0, 5.0, dec=1, unite='m/s')
+        self.v = self.curseur('vitesse', 15.0, 40.0, 30.0, dec=1, unite='m·s⁻¹')
+        self.v_lente = self.curseur('lente', 4.0, 14.0, 10.0, dec=1, unite='m·s⁻¹')
+        self.v_tracteur = self.curseur('v_tracteur', 1.0, 12.0, 5.0, dec=1, unite='m·s⁻¹')
         self.etat_initial()
 
     def etat_initial(self):

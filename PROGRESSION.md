@@ -1175,3 +1175,45 @@ Web, sous-sections « Titres de panneaux », « Trois vues d'un spectre » et «
   VERSION 0.4.2.
 - [x] Validation locale (image coupole-test, Python 3.12, offscreen) : **1086 réussis, 22 sautés, code 0**.
 - **Aucun tag ni Release.**
+
+## 2026-10-14 — 0.5.0 : spectres physiques, Orion en 3D (94ᵉ animation), fiches au survol, couleur vraie, typographie
+Fait dans Coupole Web d'abord (0.3.0), puis ici, avec le même rendu et les mêmes nombres (section « Choix graphiques »
+du PROGRESSION.md de Coupole Web, sous-sections « Spectres sur bases physiques », « Orion en 3D », « Fiche au
+survol », « Couleur vraie des étoiles », « Règle typographique »).  Données préparées et vérifiées hors dépôt (modèle
+« spectres physiques » 1.0.0 ; jeu « Orion 3D » avec ses décisions du 14/10/2026), intégrées par
+`outils/donnees_etoiles_reelles.py DOSSIER_SPECTRES DOSSIER_ORION` (lancé dans l'image coupole-test : la matrice
+ICRS → galactique y est calculée par astropy).
+
+### Fait
+- [x] Données (`coupole/modules/anim/donnees/`) : `modele_spectres.json.gz`, `spectres_atmosphere.json.gz`,
+  `couleurs_etoiles.json.gz`, `orion3d.json.gz`, `fiches.json.gz` (321 fiches compactées, alternatives du Trapèze
+  complétées par la moyenne Gaia DR3 402 ± 4 pc), `etoiles_reelles.json.gz`, `orion/*.webp` (4 images CC BY 4.0) ;
+  `MANIFEST.in` et `pyproject.toml` : `*.webp`.  Références communes dans `tests/` : `spectres_physiques_reference.json.gz`,
+  `couleurs_reference.json`, `orion3d_reference.json` (`outils/verif_anim/references_etoiles.py`),
+  `typographie_cas.json`, `typographie_reference.json`, `etoiles_reelles_sage.json`.
+- [x] Moteur `spectres_physiques.py` copié tel quel ; `spectre_physique.py` (bande de spectre en `QImage` n × 1 mise
+  en cache, remarques) ; Explorateur de spectres et Parallaxe spectroscopique refaits (mêmes valeurs que le web).
+- [x] `orion3d_geo.py` (géométrie, identique à `src/calc/orion3d.ts`) et `animations/orion3d.py` (QPainter :
+  `QRadialGradient` pour les lueurs, tubes en polylignes, images par `QTransform` affine) ; catalogue (`LOT5`,
+  `HORS_CLASSACTION`, thème `ismstarformation`), textes `textes_orion.py`.
+- [x] Fiche au survol : `Animation.survolable / objet_sous / objets_ordonnes`, `Toile` (survol, clic ou toucher sans
+  glisser, Tab par `focusNextPrevChild`, flèches, Échap ; `StrongFocus`), `fiche_flottante.py` (`QFrame` transparent
+  à la souris, `placer_fiche` identique au web, compacte sous 560 × 480, description accessible de la toile),
+  `fiche_texte.py` (identique au web) ; crédits des images sous la scène (`l_credits`, liens actifs).
+- [x] Couleur vraie (`couleur_etoile.py`, `etoiles_reelles.py`) : Grande Ourse 3D (distances SIMBAD), horloge,
+  lever héliaque, comparaison des repères, diagramme HR (case « Couleur = température »), parallaxe.
+- [x] Règle typographique : `typographie.py` (formateur commun, copié), `typo.py` (règle des animations) appliqués
+  dans `dessin.texte/etiquette` et aux valeurs ; `nombre()` écrit « − » ; unités des sources en exposants ; champs
+  numériques à la virgule en français (`QLocale`) ; textes : milliers en espace fine (normaliser), indices hors
+  formule récrits ; `formule.py` : indice d'un mot entier en romain (λ_max, a_int).
+- [x] SageMath : `outils/verif_anim/etoiles_reelles_verif.sage` → `tests/etoiles_reelles_sage.json` (1 pc =
+  3,261563777 al ; 302 distances, écart relatif ≤ 5 × 10⁻⁴ ; Trapèze 401,98 −3,95/+4,03 pc ; matrice galactique à
+  10⁻⁷ de sa définition).
+- [x] Tests : `tests/test_anim_etoiles_reelles.py` (23 : moteur des spectres, contrôles physiques, ancien étalonnage,
+  couleurs, géométrie et fiches identiques au web, placement, objets à fiche des six animations, survol / toucher /
+  clavier, 300 glissers aberrants et transitions, crédits et images, durée de rendu, formateur commun, textes, valeurs
+  et toile des 94 animations selon la règle, délimiteurs extensibles, valeurs Sage) ; tests du catalogue à 94.
+- [x] Aide F1, manifeste (94), manuels FR (88 p.) et EN (86 p.) : section « Spectres physiques, Orion en 3D, fiches au
+  survol (0.5.0) », tableau des animations, sources ; captures nouvelles ; CHANGELOG FR puis EN, README, NOTICE
+  (sources des spectres, crédits exacts des images, CC0 Zucker, CC BY-SA Stellarium et CIE), VERSION 0.5.0.
+- **Aucun tag ni Release.**

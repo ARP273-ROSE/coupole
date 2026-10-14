@@ -10,7 +10,7 @@ from __future__ import annotations
 import math
 import time
 
-from PyQt6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QLocale, QPointF, QRectF, QSize, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QPainter, QPalette
 from PyQt6.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox, QHBoxLayout, QLabel, QPushButton, QSizePolicy,
                              QSlider, QVBoxLayout, QWidget)
@@ -20,6 +20,7 @@ from ...gui import memoire
 from ...gui.adaptatif import Flux
 from ...gui.outils import aide
 from . import dessin, formule
+from .typo import typo
 
 PERIODE_MS = 33                 # ≈ 30 images par seconde
 VITESSE_MIN, VITESSE_MAX = 0.1, 10.0
@@ -32,6 +33,8 @@ def nombre(x: float, dec: int = 1) -> str:
     s = '{:,.{d}f}'.format(x, d=dec).replace(',', ' ')
     if s.startswith('-') and float(s.replace(' ', '').replace(',', '.') or 0) == 0:
         s = s[1:]
+    # signe moins typographique (U+2212), comme le web
+    s = s.replace('-', '\u2212')
     return s.replace('.', ',') if langue() == 'fr' else s
 
 
@@ -105,6 +108,8 @@ class Reglage(QWidget):
         self.curseur.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         h.addWidget(self.curseur, 1)
         self.champ = QDoubleSpinBox()
+        # règle typographique : virgule décimale en français, point en anglais (la langue de l'interface)
+        self.champ.setLocale(QLocale(QLocale.Language.French if langue() == 'fr' else QLocale.Language.English))
         self.champ.setDecimals(dec)
         self.champ.setRange(mini, maxi)
         self.champ.setSingleStep(10 ** (-dec) if dec > 0 else 1)
@@ -201,9 +206,14 @@ class Toile(QWidget):
         # suivi de la souris sans bouton : info-bulle des titres abrégés, survol propre à l'animation
         self.setMouseTracking(True)
         self._dernier = None
+        self._depart = None
+        self._bouge = False
         self._titres = []
         self._infobulle = False
-        self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+        # Tab entre dans la toile et parcourt ses objets à fiche (étoiles, nébuleuses)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self._designe = None                     # (fiche, origine) de l'objet dont la fiche est montrée
+        self._fiche = None                       # FicheFlottante, créée à la première fiche
 
     def sizeHint(self):
         return QSize(720, 470)
@@ -216,11 +226,14 @@ class Toile(QWidget):
         p.fillRect(r, dessin.c('fond'))
         self.anim._vues = []
         dessin.debut_image(p, r)
+        self.anim.survolables = []
         try:
             self.anim.dessiner(p, r)
         finally:
             p.end()
         self._maj_titres()
+        self._suivre_fiche()
+        self.anim._maj_credits()
 
     def _maj_titres(self):
         """Titres complets des panneaux dans le nom accessible de la toile ; boîtes gardées pour l'info-bulle."""
@@ -243,9 +256,78 @@ class Toile(QWidget):
             self.setToolTip('')
             self._infobulle = False
 
+    # ------------------------------------------------------------ fiche de l'objet désigné
+    def designer(self, o, origine: str = 'souris'):
+        """Désigne un objet à fiche (dict de survolable) ou aucun (None) et montre sa fiche."""
+        self._designe = (o['fiche'], origine) if o else None
+        if o is None:
+            if self._fiche is not None:
+                self._fiche.cacher()
+            return
+        if self._fiche is None:
+            from .fiche_flottante import FicheFlottante
+            self._fiche = FicheFlottante(self)
+        self._fiche.suivre((o['fiche'], o['x'], o['y'], o['r']))
+
+    def _suivre_fiche(self):
+        """Après chaque image : la fiche suit son objet (qui a pu bouger), ou disparaît avec lui."""
+        if self._designe is None:
+            return
+        o = next((u for u in self.anim.survolables if u['fiche'] == self._designe[0]), None)
+        if o is None:
+            self.designer(None)
+        elif self._fiche is not None:
+            self._fiche.suivre((o['fiche'], o['x'], o['y'], o['r']))
+
+    def objet_suivant(self, sens: int, boucler: bool) -> bool:
+        """Clavier : objet suivant (+1) ou précédent (−1), du plus brillant au plus faible ; faux au bout de la liste."""
+        liste = self.anim.objets_ordonnes()
+        if not liste:
+            return False
+        i = next((k for k, o in enumerate(liste) if self._designe and o['fiche'] == self._designe[0]), -1)
+        j = (0 if sens > 0 else len(liste) - 1) if i < 0 else i + sens
+        if j < 0 or j >= len(liste):
+            if not boucler:
+                self.designer(None)
+                return False
+            j %= len(liste)
+        self.designer(liste[j], 'clavier')
+        return True
+
+    def focusNextPrevChild(self, suivant: bool) -> bool:
+        # Tab / Maj+Tab parcourent d'abord les objets à fiche, puis le focus quitte la toile
+        if self.anim.survolables and self.objet_suivant(1 if suivant else -1, False):
+            return True
+        return super().focusNextPrevChild(suivant)
+
+    def keyPressEvent(self, ev):
+        k = ev.key()
+        if k == Qt.Key.Key_Escape and self._designe is not None:
+            self.designer(None)
+            ev.accept()
+            return
+        if self._designe is not None and self._designe[1] == 'clavier' and k in (
+                Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Down):
+            self.objet_suivant(1 if k in (Qt.Key.Key_Right, Qt.Key.Key_Down) else -1, True)
+            ev.accept()
+            return
+        super().keyPressEvent(ev)
+
+    def focusOutEvent(self, ev):
+        super().focusOutEvent(ev)
+        if self._designe is not None and self._designe[1] == 'clavier':
+            self.designer(None)
+
+    def leaveEvent(self, ev):
+        super().leaveEvent(ev)
+        if self._designe is not None and self._designe[1] == 'souris':
+            self.designer(None)
+
     def mousePressEvent(self, ev):
         pos = ev.position()
         self._dernier = pos
+        self._depart = pos
+        self._bouge = False
         self.anim.presser(pos, ev.button())
 
     def mouseMoveEvent(self, ev):
@@ -254,15 +336,38 @@ class Toile(QWidget):
             self._survol_titre(pos)
             if self.anim.survoler(pos):
                 self.update()
+            o = self.anim.objet_sous(pos, 4)
+            if o is not None:
+                if self._designe is None or self._designe[0] != o['fiche']:
+                    self.designer(o, 'souris')
+            elif self._designe is not None and self._designe[1] == 'souris':
+                self.designer(None)
             return
         pos = ev.position()
         dx, dy = pos.x() - self._dernier.x(), pos.y() - self._dernier.y()
         self._dernier = pos
+        if self._depart is not None and math.hypot(pos.x() - self._depart.x(), pos.y() - self._depart.y()) > 8:
+            self._bouge = True
         self.anim.glisser(pos, dx, dy)
 
     def mouseReleaseEvent(self, ev):
         self._dernier = None
-        self.anim.relacher(ev.position())
+        pos = ev.position()
+        self.anim.relacher(pos)
+        if not self._bouge:
+            # toucher (ou clic) sans glisser : l'objet touché montre sa fiche ; à côté, la fiche se ferme
+            tactile = False
+            try:
+                from PyQt6.QtGui import QInputDevice
+                tactile = ev.pointingDevice().type() == QInputDevice.DeviceType.TouchScreen
+            except Exception:
+                pass
+            o = self.anim.objet_sous(pos, 14 if tactile else 4)
+            if o is not None:
+                self.designer(o, 'toucher' if tactile else 'souris')
+            elif self._designe is not None and self._designe[1] != 'souris':
+                self.designer(None)
+        self._depart = None
 
     def wheelEvent(self, ev):
         if self.anim.molette(ev.position(), ev.angleDelta().y()):
@@ -279,9 +384,12 @@ class Animation(QWidget):
     ID = ''
     ANIMEE = True               # boutons lecture / pause / vitesse
     LECTURE_AU_DEPART = False
+    FICHES = False              # l'animation enregistre des objets à fiche (survol, toucher, clavier) : l'aide le dit
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.survolables = []                    # objets à fiche de la dernière image (survolable())
+        self._signature_credits = None
         self._defauts = {}                       # cle → (widget, valeur par défaut)
         self._vues = []                          # (rect, Vue3D) des sphères qu'on fait tourner à la souris
         self._glisse = None                      # vue en cours de rotation, ou rappel de déplacement d'objet
@@ -301,6 +409,15 @@ class Animation(QWidget):
         self.l_aide.setFont(f)
         self.l_aide.setForegroundRole(QPalette.ColorRole.PlaceholderText)
         v.addWidget(self.l_aide)
+        # crédits des images posées dans la scène (texte mot pour mot, lien actif), seulement quand elles se voient
+        self.l_credits = QLabel('')
+        self.l_credits.setObjectName('anim_credits_images')
+        self.l_credits.setTextFormat(Qt.TextFormat.RichText)
+        self.l_credits.setOpenExternalLinks(True)
+        self.l_credits.setWordWrap(True)
+        self.l_credits.setFont(f)
+        self.l_credits.hide()
+        v.addWidget(self.l_credits)
         self.barre = Flux()
         v.addLayout(self.barre)
         self.flux = Flux()
@@ -365,6 +482,50 @@ class Animation(QWidget):
     def survoler(self, pos: QPointF) -> bool:
         """Souris qui survole la toile sans bouton enfoncé : vrai s'il faut redessiner (rien par défaut)."""
         return False
+
+    # ------------------------------------------------------------ objets à fiche (survol, toucher, clavier)
+    def survolable(self, p, fiche: str, x: float, y: float, r: float, ordre: float = 0.0):
+        """À appeler dans dessiner() pour chaque objet qui a une fiche : (x, y) et r dans le repère courant du peintre
+        (ramenés au repère de la toile).  Ignoré si une valeur n'est pas finie."""
+        if not fiche or not all(math.isfinite(v) for v in (x, y, r)):
+            return
+        q = p.transform().map(QPointF(x, y))
+        if not (math.isfinite(q.x()) and math.isfinite(q.y())):
+            return
+        k = math.sqrt(abs(p.transform().determinant())) or 1.0
+        self.survolables.append({'fiche': fiche, 'x': q.x(), 'y': q.y(), 'r': max(2.0, r * k),
+                                 'ordre': ordre if math.isfinite(ordre) else 0.0})
+
+    def objet_sous(self, pos, marge: float = 4.0):
+        """Objet à fiche le plus proche sous le point (marge en pixels autour du rayon de prise), ou None."""
+        meilleur, dmin = None, math.inf
+        for o in self.survolables:
+            d = math.hypot(o['x'] - pos.x(), o['y'] - pos.y()) - o['r']
+            if d <= marge and d < dmin:
+                dmin, meilleur = d, o
+        return meilleur
+
+    def objets_ordonnes(self) -> list:
+        """Objets à fiche dans l'ordre du clavier (sans doublon de fiche)."""
+        vus, out = set(), []
+        for o in sorted(self.survolables, key=lambda u: u['ordre']):
+            if o['fiche'] not in vus:
+                vus.add(o['fiche'])
+                out.append(o)
+        return out
+
+    def credits_visibles(self) -> list:
+        """Crédits des images affichées en ce moment : [(texte, adresse)] (vide par défaut)."""
+        return []
+
+    def _maj_credits(self):
+        cr = self.credits_visibles()
+        if cr == self._signature_credits:
+            return
+        self._signature_credits = list(cr)
+        import html
+        self.l_credits.setText(' · '.join('<a href="%s">%s</a>' % (html.escape(u), html.escape(t)) for t, u in cr))
+        self.l_credits.setVisible(bool(cr))
 
     def nom_accessible(self) -> str:
         """Nom de la scène pour les lecteurs d'écran (les titres complets des panneaux y sont ajoutés)."""
@@ -449,13 +610,14 @@ class Animation(QWidget):
         ident = self.ID.lower()
         propre = next((k for k in ('anim_%s_souris' % ident, 'anim_%s_aide_souris' % ident) if k in cles), None)
         deplace = type(self).presser is not Animation.presser
+        fiches = (' ' + tr('anim_aide_fiche')) if self.FICHES else ''
         if propre:
-            return tr(propre)
+            return tr(propre) + fiches
         if self.nb_vues:
-            return tr('anim_aide_tourner_deplacer' if deplace else 'anim_aide_tourner')
+            return tr('anim_aide_tourner_deplacer' if deplace else 'anim_aide_tourner') + fiches
         if deplace:
-            return tr('anim_aide_deplacer')
-        return ''
+            return tr('anim_aide_deplacer') + fiches
+        return fiches.strip()
 
     def zone_rotative(self, rect: QRectF, vue: dessin.Vue3D):
         """À appeler dans dessiner() : la souris fait tourner `vue` dans `rect`."""
@@ -569,7 +731,7 @@ class Animation(QWidget):
             rangs = []
             for i in range(0, len(lignes), par_ligne):
                 rangs.append(''.join('<td style="padding-right:8px">%s</td><td style="padding-right:24px"><b>%s</b></td>'
-                                     % (formule.enrichir(a, px, col), formule.enrichir(b, px, col, valeur=True))
+                                     % (formule.enrichir(typo(a), px, col), formule.enrichir(typo(b), px, col, valeur=True))
                                      for a, b in lignes[i:i + par_ligne]))
             texte = '<table>%s</table>' % ''.join('<tr>%s</tr>' % r for r in rangs)
         if texte != self.l_valeurs.text():
@@ -584,6 +746,7 @@ class Animation(QWidget):
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
         p.setRenderHint(QPainter.RenderHint.TextAntialiasing)
         self._vues = []
+        self.survolables = []
         r = QRectF(0, 0, largeur, hauteur)
         dessin.debut_image(p, r)
         try:

@@ -96,7 +96,7 @@ class CorpsNoir(Animation):
         m = lumiere.magnitudes_corps_noir(t)
         out = [(tr('anim_bbexplorer_temperature_v'), '%s K' % nombre(t, 0)),
                (tr('anim_c_pic_wien'), '%s nm' % nombre(lumiere.pic_wien_m(t) * 1e9, 1)),
-               (tr('anim_c_exitance'), '%s W/m²' % scientifique(lumiere.exitance(t))),
+               (tr('anim_c_exitance'), '%s W·m⁻²' % scientifique(lumiere.exitance(t))),
                (tr('anim_bbexplorer_rapport_soleil'), '× %s' % nombre((t / 5772.0) ** 4, 2))]
         if self.c_filtres.isChecked():
             out += [('U − B', nombre(m['U'] - m['B'], 2)), ('B − V', nombre(m['B'] - m['V'], 2)),

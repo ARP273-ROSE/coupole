@@ -2,7 +2,7 @@
 choisie : fréquence ν = c / λ, énergie du photon E = h ν, température d'un corps noir dont le maximum tombe là
 (loi de Wien), domaine (bornes de l'original), et objets de taille comparable.  L'original montrait des
 photographies ; ici l'onde est dessinée à côté d'objets de la même taille.  Constantes exactes du SI (l'original
-prenait c = 3 × 10⁸ m/s, h = 6,6 × 10⁻³⁴ J s)."""
+prenait c = 3 × 10⁸ m·s⁻¹, h = 6,6 × 10⁻³⁴ J s)."""
 from __future__ import annotations
 
 import math

@@ -1,0 +1,13 @@
+{
+ "pc_en_al": 3.2615637771674337,
+ "distances_verifiees": 302,
+ "ecart_relatif_max_al": 0.0005218006254214997,
+ "ecart_relatif_max_barres": 0.051181446642201096,
+ "trapeze_pc": 401.977730433734,
+ "trapeze_moins_pc": 3.9519383624077493,
+ "trapeze_plus_pc": 4.031201762774352,
+ "matrice_galactique_ecart_max": 9.729678463212244e-08,
+ "matrice_galactique_orthonormee": 9.90340132123464e-13,
+ "norme_xyz_moins_d_max": 0.010355794769113271,
+ "tabit_al": 26.320819681741188
+}

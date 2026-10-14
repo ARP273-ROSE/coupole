@@ -1145,7 +1145,7 @@ now run on Windows, macOS and Linux, in French and English, in the Coupole theme
 checked reference formulas. After ClassAction, University of Nebraska-Lincoln Astronomy Education, Apache License 2.0
 (\texttt{NOTICE} and \texttt{LICENCES/Apache-2.0.txt} files).
 
-\paragraph{Catalogue.} On the left, the 92 animations of the original catalogue, plus a 93rd (the Antikythera Mechanism, section~\ref{sec:anticythere}), sorted by topic (coordinates and
+\paragraph{Catalogue.} On the left, the 92 animations of the original catalogue, plus two (the Antikythera Mechanism, section~\ref{sec:anticythere}, and Orion in 3D, section~\ref{sec:orion}), sorted by topic (coordinates and
 motions, Moon, Renaissance and orbits, stellar properties, light and spectra, extrasolar planets…), with a search
 (French or English, accents ignored) and filters by topic and status. Topics follow a teaching order, from the
 introduction and the sky seen from the Earth to cosmology. Each has its name and description in both
@@ -1273,6 +1273,59 @@ full title staying in a tooltip and in the scene's accessible name. Three views 
 the cloud behind it (continuous spectrum); absorption appears only when the gas lies between the telescope and the
 bulb. The day-night simulator now opens on the 3D globe.
 
+\subsection{Physical spectra, Orion in 3D, hover data sheets (0.5.0)}\label{sec:orion}
+\paragraph{Physically based spectra.} The Spectrum Explorer and the Spectroscopic Parallax no longer use the
+original's straight segments and 37 lines: the strengths of the six line families are computed with Saha–Boltzmann on
+model atmospheres (Castelli \& Kurucz ATLAS9 grid), at optical depth $2/3$, for every spectral type and luminosity
+class (V, III, I); 133 NIST lines (air wavelengths, oscillator strengths), TiO bands and the CH G band degraded to the
+red, Planck continuum coloured with the CIE 1931 functions. Smooth curves, with the spectral type along the axis and
+the class temperature on top; names of the strongest lines above the spectrum. G2~V = 5,770~K (Mamajek 2022).
+Extrapolated cases (atmosphere outside the grid, clamped or interpolated calibration) are flagged below the spectrum
+and in the values; the Spectroscopic Parallax takes the published absolute magnitude (class V everywhere, III for O
+stars and from G to M7, I for O stars) and elsewhere the former calibration, flagged too (dotted curve). The engine and
+its data (copied unchanged, same reference tests as Coupole Web, checked with SageMath) are described in
+\texttt{NOTICE}.
+\capture{img/anim_spectrum010_m5_en.png}{0.95}
+
+\paragraph{Orion in 3D.} A 94th animation, Coupole's own, in a new topic “Interstellar Medium and Star Formation”.
+Orion as we see it (seen from the Sun: the perspective is the gnomonic projection of the sky, north up, east left),
+then \emph{Unfolding}: every star slides along its line of sight to its measured distance (SIMBAD, Gaia~DR3,
+Hipparcos~2007, dedicated measurements: Betelgeuse, $\zeta$~Ori, $\sigma$~Ori, VLBA Trapezium) and the view turns
+sideways: Tabit is 8~pc away, Bellatrix 77, Betelgeuse 168, Rigel 265, the Belt around 380–400~pc. Error bars along
+the line of sight; Alnilam, Mintaka, Meissa and Hatysa, whose own measurement is unreliable, are placed at the
+published distance of their group (\emph{Raw measured distances} option). Orion~A and B molecular clouds (3D skeletons
+of Zucker et al.~2021), $\lambda$~Orionis ring, Barnard's Loop on the Orion shell (Foley et al.~2023), the Orion
+Nebula as a “blister” (bowl-shaped ionisation front, Veil, Trapezium; Wen \& O'Dell~1995, O'Dell et al.~2009) and the
+Horsehead. \emph{Look at}: dive towards M42 or the Horsehead, with ESO (VST, VLT) or Hubble images laid on the sky at
+their exact place; their credit, verbatim, is shown on the scene and as a link below it. True star colours (black body
+at their temperature, CIE 1931), \emph{Enhanced colours} option. Everything is to scale except the size of the stars.
+Dragging turns the scene around the pivot; double-click: back; \emph{Play}: the scene turns slowly. A frame costs 5
+to 8~ms (QPainter, 720~pixels, loaded NAS), 0.4 to 1.1~ms in Coupole Web.
+\capture{img/anim_orion3d_ciel_en.png}{0.95}
+\capture{img/anim_orion3d_3d_en.png}{0.95}
+\capture{img/anim_orion3d_m42_en.png}{0.95}
+
+\paragraph{Hover data sheets.} In Orion in 3D, Big Dipper 3D, the Big Dipper clock, heliacal rising, the coordinate
+systems comparison and the HR diagram, hovering over a star or a nebula (or touching it, or reaching it with the
+keyboard: Tab from the brightest to the faintest, arrows, Escape) opens a small sheet laid next to the object, never
+over it: names and designations, type, magnitudes, distance in parsecs and light-years with its uncertainty
+(“uncertain measurement” when needed, other measurements), temperature, published radius and luminosity, age and
+exciting stars of nebulae, and the source of each value. The summary is read by screen readers. On a small canvas the
+sheet is compact. Big Dipper 3D: updated distances (SIMBAD adopted parallaxes); HR diagram: \emph{Colour = temperature}
+box.
+\capture{img/anim_orion3d_fiche_en.png}{0.95}
+
+\paragraph{Typography.} SI-style units (km$\cdot$s$^{-1}$, W$\cdot$m$^{-2}$…), true minus sign, thin spaces,
+decimal comma in French, powers of ten as superscripts, formulas with stretchy parentheses and radicals, multi-letter
+subscripts upright ($\lambda_{\mathrm{max}}$): in every animation, with a formatter shared by the desktop, the web and
+the resources, and a test that reviews every displayed text.
+
+\paragraph{Checks.} SageMath: parsec $\to$ light-year conversion from the IAU definitions, distances and error bars of
+the 300 data sheets, Trapezium parallax (Gaia~DR3, 4 stars: 402 $\pm$ 4~pc, shown in the sheet next to the VLBA
+388 $\pm$ 5~pc), ICRS $\to$ galactic matrix against its definition; colours (21 stars) and spectrum model (46
+comparisons) checked by the data sets. The numbers of Orion in 3D, the content of the sheets and their placement are
+identical to Coupole Web's (shared references).
+
 \subsection{Available animations}
 \begin{center}
 \small
@@ -1309,7 +1362,7 @@ Sun motions overview & four-step construction: poles, celestial equator, equinox
 Position on the horizon & sunrise (or sunset) point sliding along the horizon over the year, spread between the solstices\\
 Daylight simulator & flat map: terminator, subsolar point (latitude $\delta_\odot$, apparent noon), civil, nautical, astronomical twilights\\
 Antipodes & a point and its antipode $(-\varphi, \lambda\pm180^\circ)$ on the globe and the map, constrained dragging, 5$^\circ$ steps\\
-Big Dipper 3D & the seven stars at their distances (78 to 124~ly), lines of sight, projection on the celestial sphere\\
+Big Dipper 3D & the seven stars at their distances (81 to 123~ly, SIMBAD adopted parallaxes) in true colour, lines of sight, projection on the celestial sphere; hover data sheet\\
 Celestial and horizon frames & switching frames by a rotation of $90^\circ-\varphi$ about the east-west axis\\
 \bottomrule
 \end{tabularx}
@@ -1370,7 +1423,7 @@ Animation & What it shows, what it computes\\
 Stellar luminosity & $L/L_\odot=(R/R_\odot)^2(T/T_\odot)^4$, $L=4\pi R^2\sigma T^4$\\
 Flux & a bulb and a detector: $F=P/4\pi d^2$\\
 Stellar velocity & $v_r=c\,\Delta\lambda/\lambda_0$ (H$\alpha$), $v_t=4.74\,\mu d$, $v=\sqrt{v_r^2+v_t^2}$\\
-Spectroscopic parallax & type and class → luminosity → $M$; $d=10^{(m-M+5)/5}$~pc; spectrum and lines\\
+Spectroscopic parallax & type and class → published $M_V$ (or former calibration, flagged); $d=10^{(m-M+5)/5}$~pc; computed spectrum\\
 HR diagram (NAAP) & nearest and brightest stars, sequences, lines of equal radius, $R/R_\odot=\sqrt{L/L_\odot}/(T/T_\odot)^2$\\
 \bottomrule
 \end{tabularx}
@@ -1384,7 +1437,7 @@ Animation & What it shows, what it computes\\
 \midrule
 Melting nail & instead of the movie: colour and glow of the nail from Planck's law and the CIE colour matching functions (invisible below $\approx800$~K); Planck curve, $\lambda_\text{max}=b/T$, share radiated in the visible\\
 Blackbody curves (NAAP) & up to five curves, peak (Wien), area $\sigma T^4/\pi$, perceived colour; U, B, V, R magnitudes and colour indices\\
-Spectrum explorer & continuous, emission, absorption; six families of lines (He~\textsc{ii}, He~\textsc{i}, H, ionized and neutral metals, molecules) versus spectral type and class\\
+Spectrum explorer & continuous, emission, absorption; six families of lines (He~\textsc{ii}, He~\textsc{i}, H, ionized and neutral metals, molecules) computed with Saha–Boltzmann versus spectral type and class; 133 NIST lines, TiO and CH bands\\
 Electromagnetic spectrum & $\nu=c/\lambda$, $E=h\nu$, blackbody peaking there, band; the wave drawn next to an object of the same size\\
 Doppler effect & crests emitted by a moving source, signal received through the retarded time $|\vec r_\text{obs}-\vec r_s(\tau)|=c(t-\tau)$: $f=f_0/(1-v_r/c)$; draggable observer\\
 Filters (NAAP) & source (blackbody, Gaussian, Sun) × filters (U, B, V, R, atmosphere, Gaussian) = received spectrum; perceived colour (CIE, sRGB)\\
@@ -1417,6 +1470,7 @@ Planet properties & histograms: distance, period, mass, radius, moons (Jupiter 9
 Formation temperatures & $T=600~\text{K}\,(d/1~\text{au})^{-0.747}$; state (gas or solid) of nine substances, snow line\\
 Driving through snow & the flakes seem to burst from one point: radiant at $\arctan(v_\text{snow}/v_\text{car})$, like a meteor shower\\
 Proton-proton chain, CNO cycle & instead of the movies: each reaction, energy released (AME 2020), net 26.731~MeV, share of the neutrinos\\
+Orion in 3D & the constellation unfolded to its true distances, error bars, Orion A and B clouds, M42 as a “blister”, Horsehead, $\lambda$~Ori, Barnard's Loop; dive with ESO and Hubble images; hover data sheets\\
 Milky Way rotation & McMillan (2017) model and its components, Eilers et al. (2019) and galkin measurements, $M=v^2R/G$, Keplerian curve; Galaxy seen from the pole (bar, Reid et al. 2019 arms)\\
 Density waves & tractor and cars: $n_\text{jam}/n=(v-v_t)/(v_\text{slow}-v_t)$, analogy of the spiral arms\\
 Balloon universe & instead of the movie: galaxies on an inflating balloon, $v=Hd$, $H=\dot a/a$; the balloon turns with the mouse\\
@@ -1652,5 +1706,5 @@ Astrophoto). ASTAP: \url{https://www.hnsky.org/astap.htm}. Observatory codes: Mi
 contributors. SIMBAD and Sesame: CDS, Strasbourg (Wenger et al. 2000); Aladin Lite (CDS); NED (NASA/IPAC); JPL
 Small-Body Database (NASA/JPL). Cosmology: Planck Collaboration (2020, A\&A 641, A6); Hinshaw et al. (2013, WMAP 9);
 Riess et al. (2022, SH0ES); Hogg (1999, astro-ph/9905116); Komatsu et al. (2011) for the massive-neutrino density;
-astropy.cosmology; « cosmologie-redshift » calculator (same author). Archives: MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), NOIRLab Astro Data Archive, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS of the Ring-Moon Systems Node, Imaging Node); reproject (Astropy); Rector et al. (2007, AJ 133, 598) for chromatic ordering; amateur practices: see \texttt{docs/archives\_methode.md}. Animations: ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0); Meeus (1998, \emph{Astronomical Algorithms}, 2nd ed.); P03 / IAU 2006 obliquity; IAU constellation boundaries (data shipped with astropy); Natural Earth 1:50m coastlines (public domain); STIX Two Math font (SIL OFL 1.1); NASA Exoplanet Archive, NASA Planetary Fact Sheet, JPL DE440 ephemeris and Standish elements, AME 2020, Landolt filters (1992), spectrum of M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, rotation curve: McMillan (2017) model through galpy, Eilers et al. (2019) measurements and galkin compilation (Pato \& Iocco 2017), Reid et al. (2019) arms, Wegg et al. (2015) bar; Antikythera Mechanism: adapted from Anticythere3D (same author), after Freeth et al. (\emph{Nature} 444, 2006; \emph{Nature} 454, 2008; \emph{Scientific Reports} 11:5821, 2021).
+astropy.cosmology; « cosmologie-redshift » calculator (same author). Archives: MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), NOIRLab Astro Data Archive, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS of the Ring-Moon Systems Node, Imaging Node); reproject (Astropy); Rector et al. (2007, AJ 133, 598) for chromatic ordering; amateur practices: see \texttt{docs/archives\_methode.md}. Animations: ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0); Meeus (1998, \emph{Astronomical Algorithms}, 2nd ed.); P03 / IAU 2006 obliquity; IAU constellation boundaries (data shipped with astropy); Natural Earth 1:50m coastlines (public domain); STIX Two Math font (SIL OFL 1.1); NASA Exoplanet Archive, NASA Planetary Fact Sheet, JPL DE440 ephemeris and Standish elements, AME 2020, Landolt filters (1992), spectrum of M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, rotation curve: McMillan (2017) model through galpy, Eilers et al. (2019) measurements and galkin compilation (Pato \& Iocco 2017), Reid et al. (2019) arms, Wegg et al. (2015) bar; Antikythera Mechanism: adapted from Anticythere3D (same author), after Freeth et al. (\emph{Nature} 444, 2006; \emph{Nature} 454, 2008; \emph{Scientific Reports} 11:5821, 2021); physical spectra: CODATA 2022, NIST ASD, Mamajek (2022), Malkov et al. (2020), van Belle et al. (2021), Martins et al. (2005), Castelli \& Kurucz (2003, ATLAS9), NIST-JANAF, Allard et al. (2000), CIE 1931; Orion in 3D and hover data sheets: SIMBAD (CDS, Strasbourg), Gaia DR3 (ESA/DPAC), Hipparcos (van Leeuwen 2007), Zucker et al. (2021, CC0), Großschedl et al. (2018), Kounkel et al. (2017, 2018), Foley et al. (2023), O'Dell et al. (2009), Stellarium (figure, CC BY-SA 4.0); images ESO/G. Beccari, ESO, and NASA, ESA, M. Robberto (STScI/ESA) and the Hubble Space Telescope Orion Treasury Project Team, NASA, ESA, and the Hubble Heritage Team (AURA/STScI), under the CC BY 4.0 licence (details in \texttt{NOTICE}).
 \end{document}

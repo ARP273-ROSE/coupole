@@ -31,7 +31,18 @@ VARIANTES = (('daylightsimulator_nord', 'daylightsimulator', {'projection': 'nor
              # 0.4.2 : la machine d'Anticythère (fermée, face avant et arrière ; ouverte et éclatée)
              ('antikythera_avant', 'antikythera', {}),
              ('antikythera_arriere', 'antikythera', {'face': 'arriere'}),
-             ('antikythera_ouverte', 'antikythera', {'enveloppe': False, 'face': 'trois_quarts', 'eclatement': 60}))
+             ('antikythera_ouverte', 'antikythera', {'enveloppe': False, 'face': 'trois_quarts', 'eclatement': 60}),
+             # 0.5.0 : spectres physiques, Orion en 3D, fiches au survol, couleur vraie
+             ('spectrum010', 'spectrum010', {}),
+             ('spectrum010_m5', 'spectrum010', {'type': 65}),
+             ('spectroparallax', 'spectroparallax', {}),
+             ('orion3d_ciel', 'orion3d', {}),
+             ('orion3d_3d', 'orion3d', {'depliement': 100}),
+             ('orion3d_m42', 'orion3d', {'cible': 'm42'}),
+             ('orion3d_m42_3d', 'orion3d', {'cible': 'm42', 'depliement': 100}),
+             ('orion3d_tete', 'orion3d', {'cible': 'tete', 'image': 'hubble'}),
+             ('orion3d_fiche', 'orion3d', {'depliement': 40}),
+             ('bigdipper_fiche', 'bigdipper', {}))
 
 
 def attendre(app, s):
@@ -105,6 +116,10 @@ def main():
                 w.setChecked(v)
             else:
                 w.setValue(v)
+        if ident == 'orion3d':
+            a.arreter()
+            a._k = 1.0
+            a._de = a._vers = a.cible.currentData()
         if ident == 'daylightsimulator':
             a.jour.setValue(172.0)
             a.heure.setValue(15.5)
@@ -114,6 +129,11 @@ def main():
         a.resize(1100, 760)
         a.show()
         attendre(app, 0.2)
+        if nom.endswith('_fiche'):                      # fiche au survol de l'objet le plus brillant
+            a.toile.repaint()
+            attendre(app, 0.1)
+            a.toile.designer(a.objets_ordonnes()[0], 'clavier')
+            attendre(app, 0.2)
         a.grab().save(str(dossier / ('anim_%s_%s.png' % (nom, langue))))
         a.close()
     f.close()

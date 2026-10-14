@@ -29,7 +29,7 @@ class FluxLumineux(Animation):
     def valeurs(self):
         w, d = self.puissance.currentData(), self.d.value()
         f = hr.flux(w, d)
-        return [(tr('anim_lightdetector_flux'), '%s W/m²' % nombre(f, 3)),
+        return [(tr('anim_lightdetector_flux'), '%s W·m⁻²' % nombre(f, 3)),
                 (tr('anim_lightdetector_rapport'), '1 / %s² = 1 / %s' % (nombre(d, 2), nombre(d * d, 2))),
                 (tr('anim_lightdetector_aire'), '%s m²' % nombre(4 * math.pi * d * d, 2))]
 
@@ -73,7 +73,7 @@ class FluxLumineux(Animation):
         p.setBrush(dessin.c('accent2'))
         p.drawRect(QRectF(xd - 5, cy - cote * k / 2, 10, cote * k))
         dessin.texte(p, xd, cy - cote * k / 2 - 14, tr('anim_lightdetector_detecteur'), 'accent2', fond=True)
-        # jauge du flux (échelle logarithmique, de 0,01 à 50 W/m²)
+        # jauge du flux (échelle logarithmique, de 0,01 à 50 W·m⁻²)
         f = hr.flux(w, d)
         gx, gy, gl = rect.x() + 30, rect.bottom() - 18, rect.width() - 60
         p.setPen(dessin.stylo('grille', 1.0))
@@ -81,4 +81,4 @@ class FluxLumineux(Animation):
         p.drawRect(QRectF(gx, gy, gl, 12))
         t = max(0.0, min(1.0, (math.log10(f) + 2) / (math.log10(50) + 2)))
         p.fillRect(QRectF(gx, gy, gl * t, 12), dessin.c('accent1'))
-        dessin.formule_texte(p, gx + gl / 2, gy - 24, 'F = P / 4π d²', ' = %s W/m²' % nombre(f, 3), 'texte')
+        dessin.formule_texte(p, gx + gl / 2, gy - 24, 'F = P / 4π d²', ' = %s W·m⁻²' % nombre(f, 3), 'texte')

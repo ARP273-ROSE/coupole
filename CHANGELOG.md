@@ -2,6 +2,40 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.5.0 — 14 octobre 2026
+
+**Module « Animations » : spectres sur bases physiques, « Orion en 3D » (94ᵉ animation), fiches au survol, couleur
+vraie des étoiles, règle typographique partout.**
+
+- **Orion en 3D** (nouveau thème « Milieu interstellaire et formation des étoiles », entre Exoplanètes et Voie
+  lactée), propre à Coupole : la constellation telle qu'on la voit, puis dépliée progressivement en trois dimensions,
+  chaque étoile à sa distance mesurée (SIMBAD, Gaia DR3, Hipparcos 2007, mesures dédiées) avec sa barre d'erreur ;
+  nuages moléculaires Orion A et B (Zucker et al. 2021, Großschedl et al. 2018), anneau de λ Orionis, boucle de
+  Barnard (Foley et al. 2023), nébuleuse d'Orion en « blister » (Wen & O'Dell 1995, O'Dell et al. 2009), Tête de
+  Cheval ; plongée vers M42 et la Tête de Cheval avec les images de l'ESO et de l'ESA/Hubble posées sur le ciel
+  (CC BY 4.0, crédit mot pour mot sur la scène et en lien sous la scène). Distances publiées par défaut pour
+  Alnilam, Mintaka, Meissa et Hatysa, option « distances mesurées brutes » ; Trapèze à 388 ± 5 pc (VLBA), Gaia DR3
+  (402 pc) et Menten et al. 2007 (414 pc) dans la fiche ; option « couleurs accentuées », désactivée par défaut.
+- **Fiche au survol, générique** : survol, toucher ou clavier (Tab, flèches, Échap) ouvrent une fiche posée à côté de
+  l'objet, jamais dessus, lue par les lecteurs d'écran : noms, type, magnitudes, distance et incertitude, température,
+  rayon, luminosité, et la source de chaque valeur. Branchée sur Orion en 3D, la Grande Ourse 3D, l'horloge de la
+  Grande Ourse, le lever héliaque, la comparaison des repères et le diagramme HR (321 fiches).
+- **Couleur vraie des étoiles** (corps noir → CIE 1931 → sRGB, vérifiée par SageMath) dans ces animations ; diagramme
+  HR : case « Couleur = température » ; Grande Ourse 3D : distances mises à jour (parallaxes adoptées par SIMBAD).
+- **Spectres sur bases physiques** (Explorateur de spectres, Parallaxe spectroscopique) : Saha–Boltzmann sur des
+  atmosphères ATLAS9, courbes lisses par classe, axe en type spectral et en température, 133 raies NIST, bandes TiO et
+  CH, continu de Planck coloré ; G2 V = 5 770 K ; cas extrapolés et ancien étalonnage des magnitudes absolues
+  signalés à l'écran. Moteur et données copiés tels quels, avec leurs 100 cas de référence.
+- **Règle typographique** dans les 94 animations : unités SI (km·s⁻¹, m·s⁻², W·m⁻²…), signe moins « − », espaces
+  fines, virgule décimale (aussi dans les champs numériques), puissances de dix en exposant, formules aux
+  délimiteurs et radicaux extensibles, indices de mots en romain ; formateur commun au bureau, au web et aux
+  ressources ; test sur tous les textes affichés.
+- **Mesures** (QPainter hors écran, 720 × 470, NAS chargé) : Orion en 3D 5,5 ms (ciel) à 7,4 ms (3D), 1,7 ms en
+  plongée ; Explorateur de spectres 3,3 ms ; Parallaxe spectroscopique 3,4 ms.
+- **Vérifié** : SageMath (parsec → année-lumière, distances et barres des fiches, parallaxe du Trapèze, matrice
+  ICRS → galactique) ; mêmes nombres et mêmes fiches que Coupole Web (références communes) ; manuels FR (88 p.) et
+  EN (86 p.) ; aide F1.
+
 ## 0.4.2 — 14 octobre 2026
 
 **Module « Animations » : la machine d'Anticythère en 3D (93ᵉ animation), titres de panneaux qui ne débordent plus,

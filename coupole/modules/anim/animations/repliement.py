@@ -35,7 +35,7 @@ class Repliement(Animation):
 
     def construire(self):
         self.periode = self.curseur('periode', 1.0, 10.0, 5.0, dec=2, unite='s')
-        self.cadence = self.curseur('cadence', 0.1, 10.0, 3.0, dec=2, unite='/s')
+        self.cadence = self.curseur('cadence', 0.1, 10.0, 3.0, dec=2, unite='s⁻¹')
         self.rayons = self.choix('rayons', [('anim_wagonwheel_r_%d' % n, n) for n in (1, 2, 4, 8)], 1)
         self.etat_initial()
 
@@ -55,9 +55,9 @@ class Repliement(Animation):
         d = pas_apparent(self.periode.value(), self.cadence.value(), n)
         sens = tr('anim_wagonwheel_immobile') if not math.isfinite(pa) else (
             tr('anim_wagonwheel_avant') if pa > 0 else tr('anim_wagonwheel_arriere'))
-        return [(tr('anim_wagonwheel_vrai'), '%s° / %s' % (nombre(360.0 / (self.periode.value() * self.cadence.value()), 1),
-                                                            tr('anim_wagonwheel_image'))),
-                (tr('anim_wagonwheel_apparent'), '%s° / %s' % (nombre(d, 1), tr('anim_wagonwheel_image'))),
+        return [(tr('anim_wagonwheel_vrai'), '%s%s' % (nombre(360.0 / (self.periode.value() * self.cadence.value()), 1),
+                                                            tr('anim_wagonwheel_par_image'))),
+                (tr('anim_wagonwheel_apparent'), '%s%s' % (nombre(d, 1), tr('anim_wagonwheel_par_image'))),
                 (tr('anim_wagonwheel_p_apparente'), '%s s' % nombre(abs(pa), 2) if math.isfinite(pa) else '∞'),
                 (tr('anim_wagonwheel_sens'), sens)]
 

@@ -16,6 +16,7 @@ from PyQt6.QtGui import (QBrush, QColor, QFont, QFontMetricsF, QLinearGradient, 
                          QRadialGradient)
 
 from ...core import config
+from .typo import typo
 
 DEG = math.pi / 180.0
 
@@ -231,7 +232,8 @@ def texte(p, x: float, y: float, s: str, cle: str = 'texte', centre: bool = True
           fond: bool = False):
     """Texte centré (ou aligné à gauche) au point (x, y) ; `fond` : petit cartouche sous le texte, placé sans
     chevaucher les autres étiquettes.  Un texte plus large que la toile est réduit (8 px au moins) ; un texte qui
-    déborde à peine de la toile est ramené dedans."""
+    déborde à peine de la toile est ramené dedans.  Règle typographique (typo.py) appliquée."""
+    s = typo(s)
     fm = p.fontMetrics()
     w = _largeur_texte(p, s)
     police_avant = None
@@ -284,6 +286,7 @@ def texte(p, x: float, y: float, s: str, cle: str = 'texte', centre: bool = True
 def etiquette(p, x: float, y: float, s: str, cle: str = 'texte', ecart: float = 8.0, alpha: float | None = None):
     """Étiquette d'un objet en (x, y) : à côté de lui (en haut à droite si la place est libre), jamais par-dessus
     une autre étiquette ; reliée à l'objet par un trait de rappel si elle a dû s'en éloigner."""
+    s = typo(s)
     fm = p.fontMetrics()
     w, h = _largeur_texte(p, s) + 6, fm.height() + 2
     nx, ny = _placer(p, x + ecart, y - ecart - h, w, h, x, y, ecart)

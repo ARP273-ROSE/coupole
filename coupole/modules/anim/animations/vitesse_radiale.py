@@ -63,11 +63,11 @@ class CourbeVitesseRadiale(Animation):
         s = systeme(self.sys.currentData())
         v = -s['K'] * math.cos(2 * math.pi * self.phase)
         out = [(tr('anim_c_periode'), texte_duree(s['P'])),
-               (tr('anim_ca_extrasolarplanets_graph_k'), '%s m/s' % nombre(s['K'], 2)),
-               (tr('anim_ca_extrasolarplanets_graph_v'), '%s m/s' % nombre(v, 2))]
+               (tr('anim_ca_extrasolarplanets_graph_k'), '%s m·s⁻¹' % nombre(s['K'], 2)),
+               (tr('anim_ca_extrasolarplanets_graph_v'), '%s m·s⁻¹' % nombre(v, 2))]
         kp = K_PUBLIEE.get(self.sys.currentData())
         if kp:
-            out.append((tr('anim_ca_extrasolarplanets_graph_k_mesuree'), '%s m/s' % nombre(kp, 2)))
+            out.append((tr('anim_ca_extrasolarplanets_graph_k_mesuree'), '%s m·s⁻¹' % nombre(kp, 2)))
         return out
 
     def dessiner(self, p, rect):
@@ -142,8 +142,8 @@ class SpectreVitesseRadiale(Animation):
     def valeurs(self):
         g = self.grandeurs()
         return [(tr('anim_c_periode'), texte_duree(g['P'])),
-                (tr('anim_ca_extrasolarplanets_graph_k'), '%s m/s' % nombre(g['K'], 2)),
-                (tr('anim_ca_extrasolarplanets_graph_v'), '%s m/s' % nombre(g['v'], 2)),
+                (tr('anim_ca_extrasolarplanets_graph_k'), '%s m·s⁻¹' % nombre(g['K'], 2)),
+                (tr('anim_ca_extrasolarplanets_graph_v'), '%s m·s⁻¹' % nombre(g['v'], 2)),
                 (tr('anim_radialvelocitydemo_dl'), '%s pm' % nombre(656.28e3 * g['v'] / lumiere.C, 4))]
 
     def dessiner(self, p, rect):

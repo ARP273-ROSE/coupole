@@ -94,7 +94,7 @@ class Retrograde(Animation):
         v = self._vitesse()
         return [(tr('anim_retrograde_jours'), nombre(self.t * astro.ANNEE_JULIENNE_J, 0)),
                 (tr('anim_retrograde_lambda'), angle(pz['lambda'])), (tr('anim_retrograde_beta'), angle(pz['beta'], 2)),
-                (tr('anim_retrograde_vitesse'), '%s °/%s' % (nombre(v, 3), tr('anim_u_jour'))),
+                (tr('anim_retrograde_vitesse'), '%s%s' % (nombre(v, 3), tr('anim_retrograde_u_vitesse'))),
                 (tr('anim_retrograde_sens'), tr('anim_marsorbit_retro' if v < 0 else 'anim_marsorbit_direct')),
                 (tr('anim_retrograde_theorie'), tr('anim_retrograde_theorie_val', j=nombre(r['duree_j'], 0),
                                                    a=angle(r['amplitude'], 1)))]

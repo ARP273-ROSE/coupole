@@ -15,7 +15,7 @@ ANIM_LOT3 = {
     'anim_c_jours': ('jours', 'days'),
     'anim_c_heures': ('heures', 'hours'),
     'anim_c_flux_relatif': ('flux relatif', 'relative flux'),
-    'anim_c_vitesse_radiale': ('vitesse radiale (m/s)', 'radial velocity (m/s)'),
+    'anim_c_vitesse_radiale': ('vitesse radiale (m·s⁻¹)', 'radial velocity (m·s⁻¹)'),
     'anim_c_observateur': ('observateur', 'observer'),
     'anim_c_vers_observateur': ('vers l’observateur', 'to the observer'),
     'anim_c_etoile': ('étoile', 'star'),
@@ -518,19 +518,19 @@ ANIM_LOT3.update({
                                             'Eccentricity: the curve is no longer a sine wave.'),
     'anim_radialvelocitysimulator_i': ('Inclinaison', 'Inclination'),
     'anim_radialvelocitysimulator_i_aide': ('Inclinaison de l’orbite (90° : vue par la tranche, 0° : vue de face, '
-                                            'aucune vitesse radiale). On ne mesure que M_p sin i.',
+                                            'aucune vitesse radiale). On ne mesure que Mₚ sin i.',
                                             'Inclination of the orbit (90°: edge-on, 0°: face-on, no radial '
-                                            'velocity). Only M_p sin i is measured.'),
+                                            'velocity). Only Mₚ sin i is measured.'),
     'anim_radialvelocitysimulator_omega': ('Argument du périastre', 'Argument of periastron'),
     'anim_radialvelocitysimulator_omega_aide': ('Orientation de l’ellipse par rapport à la ligne de visée.',
                                                 'Orientation of the ellipse relative to the line of sight.'),
     'anim_radialvelocitysimulator_bruit': ('Bruit des mesures', 'Measurement noise'),
-    'anim_radialvelocitysimulator_bruit_aide': ('Écart type du bruit des mesures simulées (m/s).',
-                                                'Standard deviation of the simulated measurement noise (m/s).'),
+    'anim_radialvelocitysimulator_bruit_aide': ('Écart type du bruit des mesures simulées (m·s⁻¹).',
+                                                'Standard deviation of the simulated measurement noise (m·s⁻¹).'),
     'anim_radialvelocitysimulator_mesures': ('Nombre de mesures', 'Number of measurements'),
     'anim_radialvelocitysimulator_mesures_aide': ('Mesures simulées à des phases tirées au hasard (0 : aucune).',
                                                   'Simulated measurements at random phases (0: none).'),
-    'anim_radialvelocitysimulator_msini': ('M_p sin i (ce que mesure la méthode)', 'M_p sin i (what the method measures)'),
+    'anim_radialvelocitysimulator_msini': ('Mₚ sin i (ce que mesure la méthode)', 'Mₚ sin i (what the method measures)'),
     'anim_radialvelocitysimulator_titre_orbite': ('Orbite vue de dessus', 'Orbit seen from above'),
     'anim_radialvelocitysimulator_titre_courbe': ('Vitesse radiale de l’étoile', 'Radial velocity of the star'),
 })
@@ -700,7 +700,7 @@ ANIM_LOT3.update({
     'anim_solarsystemproperties_u_rayon': ('rayons terrestres', 'Earth radii'),
     'anim_solarsystemproperties_u_satellites': ('NASA, 2026', 'NASA, 2026'),
     'anim_solarsystemproperties_u_rotation': ('jours ; négatif : rétrograde', 'days; negative: retrograde'),
-    'anim_solarsystemproperties_u_densite': ('g/cm³', 'g/cm³'),
+    'anim_solarsystemproperties_u_densite': ('g·cm⁻³', 'g·cm⁻³'),
 })
 
 ANIM_LOT3.update({
@@ -814,7 +814,7 @@ ANIM_LOT3.update({
     'anim_milkywayrotationalvelocity_bras_local': ('bras local', 'Local arm'),
     'anim_milkywayrotationalvelocity_bras_3kpc': ('bras de 3 kpc', '3-kpc arm'),
     'anim_milkywayrotationalvelocity_axe_r': ('distance au centre (kpc)', 'distance from the center (kpc)'),
-    'anim_milkywayrotationalvelocity_axe_v': ('vitesse (km/s)', 'speed (km/s)'),
+    'anim_milkywayrotationalvelocity_axe_v': ('vitesse (km·s⁻¹)', 'speed (km·s⁻¹)'),
 })
 
 ANIM_LOT3.update({

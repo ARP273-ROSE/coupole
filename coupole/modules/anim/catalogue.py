@@ -1,5 +1,6 @@
-"""Catalogue des 93 animations : les 92 de ClassAction (University of Nebraska-Lincoln Astronomy Education, Apache 2.0)
-et la machine d'Anticythère, adaptée d'Anticythere3D (du même auteur ; fichier d'origine « Anticythere3D »).
+"""Catalogue des 94 animations : les 92 de ClassAction (University of Nebraska-Lincoln Astronomy Education, Apache 2.0),
+la machine d'Anticythère, adaptée d'Anticythere3D (du même auteur ; fichier d'origine « Anticythere3D »), et
+« Orion en 3D », propre à Coupole.
 
 Chaque entrée : identifiant ClassAction, thème, titre d'origine (anglais), fichier Flash d'origine, et la classe
 Python qui la refait (« module:Classe » dans ``animations/``) ou None si elle est encore à venir.  Les noms et
@@ -13,7 +14,7 @@ import importlib
 # cosmologie ; même ordre que Coupole Web.
 THEMES = ('intro', 'coordsmotion', 'lunarcycles', 'ancientastro', 'renaissance', 'solar', 'solarsystemdebris',
           'sunsolarenergy', 'light', 'telescopes', 'stellarprops', 'binaryvariablestars', 'extrasolarplanets',
-          'milkyway', 'cosmology')
+          'ismstarformation', 'milkyway', 'cosmology')
 
 # (id, thème, titre d'origine, fichier d'origine, classe ou None)
 ANIMATIONS = (
@@ -37,6 +38,7 @@ ANIMATIONS = (
     ('siderealTimeAndHourAngleDemo', 'coordsmotion', 'Sidereal Time and Hour Angle Demonstrator',
      '200level/siderealTimeAndHourAngleDemo.swf', 'angle_horaire:AngleHoraire'),
     ('antikythera', 'ancientastro', 'Antikythera Mechanism', 'Anticythere3D', 'anticythere:Anticythere'),
+    ('orion3d', 'ismstarformation', 'Orion in 3D', 'Coupole', 'orion3d:Orion3D'),
     ('smallangledemo', 'ancientastro', 'Small-Angle Approximation Demonstrator', 'ancientastro/smallangledemo.swf',
      'petits_angles:PetitsAngles'),
     ('dipperclock', 'ancientastro', 'Big Dipper Clock', 'ancientastro/dipperclock.swf',
@@ -191,9 +193,12 @@ LOT3 = ('meltednail', 'bbexplorer', 'spectrum010', 'emspectrum', 'dopplershift',
         'snellslaw', 'lookbacktimesim')
 # 0.4.2 : la machine d'Anticythère, adaptée d'Anticythere3D (du même auteur) : hors ClassAction
 LOT4 = ('antikythera',)
+# 0.5.0 : Orion en 3D (propre à Coupole ; thème « Milieu interstellaire et formation des étoiles »)
+LOT5 = ('orion3d',)
 #: animations qui ne viennent pas de ClassAction : identifiant → (application d'origine, adresse de son dépôt)
-HORS_CLASSACTION = {'antikythera': ('Anticythere3D', 'https://github.com/ARP273-ROSE/Anticythere3D')}
-ORDRE = LOT1 + LOT1_BIS + LOT2 + LOT2_BIS + LOT3 + LOT4
+HORS_CLASSACTION = {'antikythera': ('Anticythere3D', 'https://github.com/ARP273-ROSE/Anticythere3D'),
+                    'orion3d': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE')}
+ORDRE = LOT1 + LOT1_BIS + LOT2 + LOT2_BIS + LOT3 + LOT4 + LOT5
 
 
 class Entree:

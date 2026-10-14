@@ -87,7 +87,7 @@ class OrbiteKepler(Animation):
         out = [(tr('anim_kepler_periode'), '%s %s' % (nombre(p, 3), tr('anim_u_annees'))),
                (tr('anim_kepler_b'), '%s ua' % nombre(a * math.sqrt(1 - e * e), 3)),
                (tr('anim_kepler_peri_aphe'), '%s / %s ua' % (nombre(a * (1 - e), 3), nombre(a * (1 + e), 3))),
-               (tr('anim_kepler_r'), '%s ua' % nombre(o['r'], 3)), (tr('anim_kepler_v'), '%s km/s' % nombre(o['v'], 2)),
+               (tr('anim_kepler_r'), '%s ua' % nombre(o['r'], 3)), (tr('anim_kepler_v'), '%s km·s⁻¹' % nombre(o['v'], 2)),
                (tr('anim_kepler_temps'), '%s %s' % (nombre(self.f * p, 3), tr('anim_u_annees')))]
         if self.aires:
             f0, f1 = self.aires[-1]

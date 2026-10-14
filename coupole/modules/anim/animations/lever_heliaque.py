@@ -15,6 +15,7 @@ from PyQt6.QtGui import QImage, QPainter
 from ....core.i18n import tr
 from .. import astro, dessin, scenes
 from ..base import MOIS_JOURS, Animation, angle, date_du_jour, heures_minutes, nombre
+from ..etoiles_reelles import couleur_reelle, reelle
 
 ANNEE = 2026
 # α (heures) et δ (degrés) J2000, SIMBAD ; l'original proposait Véga et Sirius
@@ -57,6 +58,7 @@ def _heliaques(ra_h: float, dec: float, lat: float, depression: float) -> tuple:
 
 class LeverHeliaque(Animation):
     ID = 'heliacalrisingsim'
+    FICHES = True
     JOURS_PAR_S = 10.0
 
     def construire(self):
@@ -209,7 +211,12 @@ class LeverHeliaque(Animation):
             pe.courbe(scenes.cercle_declinaison(de) @ m.T, 'accent2', 1.0, 0.7)
             pe.courbe(dessin.cercle((0, 0, 1)) @ m.T, 'equateur', 1.2, 0.8)
             pe.point(soleil, 'soleil', 8.0, repere_monde=True)
-            pe.point(etoile, 'etoile', 5.0, bord='accent2', repere_monde=True)
+            cle = self.etoile.currentData()
+            q = pe.point(etoile, (couleur_reelle('heliacalrisingsim', cle) if cle else None) or 'etoile', 5.0,
+                         bord='accent2', repere_monde=True)
+            f = reelle('heliacalrisingsim', cle) if cle else None
+            if q and f:
+                self.survolable(pe.p, f['fiche'], q[0], q[1], 7, 0)
 
         couleur = 'ciel' if h_sol > 0 else ('nuit' if h_sol < -self.depression.value() else 'grille')
         rr = min(r.width(), r.height()) * 0.40

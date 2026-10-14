@@ -70,7 +70,7 @@ class ClouFondu(Animation):
         fv = 100 * fraction_visible(t)
         return [(tr('anim_meltednail_temperature_v'), '%s K (%s °C)' % (nombre(t, 0), nombre(t - 273.15, 0))),
                 (tr('anim_c_pic_wien'), '%s nm' % nombre(lumiere.pic_wien_m(t) * 1e9, 0)),
-                (tr('anim_c_exitance'), '%s W/m²' % scientifique(lumiere.exitance(t))),
+                (tr('anim_c_exitance'), '%s W·m⁻²' % scientifique(lumiere.exitance(t))),
                 (tr('anim_meltednail_visible'), '%s %%' % (scientifique(fv) if fv < 0.01 else nombre(fv, 2)))]
 
     def dessiner(self, p, rect):

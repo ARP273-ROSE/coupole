@@ -1,0 +1,42 @@
+{
+  "description": "Règle typographique commune (bureau typo.py, web src/noyau/typo.ts) : unités SI à exposants négatifs, signe moins typographique, puissances de dix en exposant ; chaque cas : [entrée, sortie attendue].",
+  "typo": [
+    ["12,46 m/s", "12,46 m·s⁻¹"],
+    ["-12,46 m/s", "−12,46 m·s⁻¹"],
+    ["30,30 km/s", "30,30 km·s⁻¹"],
+    ["9,82 m/s²", "9,82 m·s⁻²"],
+    ["1,68 × 10⁻²⁵ m/s²", "1,68 × 10⁻²⁵ m·s⁻²"],
+    ["7,35 × 10⁷ W/m²", "7,35 × 10⁷ W·m⁻²"],
+    ["5,51 g/cm³", "5,51 g·cm⁻³"],
+    ["1000 kg/m³", "1000 kg·m⁻³"],
+    ["1,380649 × 10⁻²³ J/K", "1,380649 × 10⁻²³ J·K⁻¹"],
+    ["1500 ph/s", "1500 ph·s⁻¹"],
+    ["2,5 ans/s", "2,5 a·s⁻¹"],
+    ["2.5 years/s", "2.5 a·s⁻¹"],
+    ["10 ″/an", "10 ″·a⁻¹"],
+    ["70 km/s/Mpc", "70 km·s⁻¹·Mpc⁻¹"],
+    ["vitesse radiale (m/s)", "vitesse radiale (m·s⁻¹)"],
+    ["nuit polaire (Soleil à -0,4°)", "nuit polaire (Soleil à −0,4°)"],
+    ["-2,00 h (-30,0°)", "−2,00 h (−30,0°)"],
+    ["90° − 81,6° + (-70,7°) = -62,3°", "90° − 81,6° + (−70,7°) = −62,3°"],
+    ["-90,0° → -49,0°", "−90,0° → −49,0°"],
+    ["x = -.5", "x = −.5"],
+    ["6,67 × 10^-11", "6,67 × 10⁻¹¹"],
+    ["10^24 kg", "10²⁴ kg"],
+    ["H = (da/dt) / a", "H = (da/dt) / a"],
+    ["Azimuth/Altitude Demonstrator", "Azimuth/Altitude Demonstrator"],
+    ["360°/n", "360°/n"],
+    ["P (1 ± v/c)", "P (1 ± v/c)"],
+    ["G2-V", "G2-V"],
+    ["2015–2044", "2015–2044"],
+    ["arp273-rose.github.io/coupole-web", "arp273-rose.github.io/coupole-web"],
+    ["Gaia DR3 3206991473643150464", "Gaia DR3 3206991473643150464"],
+    ["β Ori · HD 34085", "β Ori · HD 34085"]
+  ],
+  "interdits": [
+    ["12 m/s", true], ["3 km/s", true], ["ph/s", true], ["10^5", true], ["6.67e-11", true], ["1E+5", true],
+    ["(-3,2)", true], ["-5 °C", true], ["= -1", true],
+    ["12 m·s⁻¹", false], ["−3,2", false], ["G2-V", false], ["H = (da/dt) / a", false], ["2015–2044", false],
+    ["HD 34085", false], ["arp273-rose.github.io/coupole-web", false], ["360°/n", false]
+  ]
+}

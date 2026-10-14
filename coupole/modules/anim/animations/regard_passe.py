@@ -40,7 +40,7 @@ class RegardPasse(Animation):
         self.exemple.activated.connect(self._exemple)
         self.distance = self.curseur('distance', 100.0, 9000.0, 3000.0, dec=0, unite=tr('anim_spectroparallax_al'))
         self.explosion = self.curseur('explosion', AN_MIN, 9000.0, 1200.0, dec=0)
-        self.vitesse_ans = self.curseur('vitesse_ans', 50.0, 3000.0, 600.0, dec=0, unite=tr('anim_c_ans') + '/s',
+        self.vitesse_ans = self.curseur('vitesse_ans', 50.0, 3000.0, 600.0, dec=0, unite='a·s⁻¹',
                                         log=True)
         self.etat_initial()
 

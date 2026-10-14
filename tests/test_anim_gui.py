@@ -11,8 +11,8 @@ from coupole.modules.anim import catalogue
 
 # ---------------------------------------------------------------- catalogue (sans Qt)
 def test_catalogue_complet():
-    assert len(catalogue.ENTREES) == 93
-    assert len({e.id for e in catalogue.ENTREES}) == 93
+    assert len(catalogue.ENTREES) == 94
+    assert len({e.id for e in catalogue.ENTREES}) == 94
     assert set(e.theme for e in catalogue.ENTREES) <= set(catalogue.THEMES)
     assert set(catalogue.LOT1) <= {e.id for e in catalogue.faites()}
     assert len(catalogue.LOT1) == 21
@@ -39,7 +39,7 @@ def test_cli_liste_et_info(capsys):
     from coupole.cli import main
     assert main(['--lang', 'fr', 'anim', 'liste', '--json']) in (0, None)
     d = json.loads(capsys.readouterr().out)
-    assert len(d) == 93 and sum(x['disponible'] for x in d) == len(catalogue.faites())
+    assert len(d) == 94 and sum(x['disponible'] for x in d) == len(catalogue.faites())
     assert main(['--lang', 'fr', 'anim', 'info', 'sunmotions']) in (0, None)
     assert 'Soleil' in capsys.readouterr().out
     assert main(['--lang', 'fr', 'anim', 'info', 'inexistante']) == 1
@@ -292,9 +292,9 @@ def test_retard_synodique_un_jour(propre):
 # ---------------------------------------------------------------- lot 3 (0.4.0) : catalogue complet
 def test_lot3_catalogue_complet():
     faites = {e.id for e in catalogue.faites()}
-    assert len(faites) == 93 and not catalogue.a_venir()
+    assert len(faites) == 94 and not catalogue.a_venir()
     assert len(catalogue.LOT3) == 32 and set(catalogue.LOT3) <= faites
-    assert len(set(catalogue.ORDRE)) == 93
+    assert len(set(catalogue.ORDRE)) == 94
     themes = {e.id: e.theme for e in catalogue.ENTREES}
     assert sum(themes[i] == 'light' for i in catalogue.LOT3) == 8
     assert sum(themes[i] == 'extrasolarplanets' for i in catalogue.LOT3) == 7

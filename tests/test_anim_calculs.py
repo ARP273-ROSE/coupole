@@ -547,9 +547,11 @@ def test_parallaxe_spectroscopique():
         assert astro.distance_du_module(m - mm) == pytest.approx(d, rel=1e-12)
     soleil = magnitude_absolue(42, 5)                      # G2 V : le Soleil, M_V ≈ 4,8
     assert soleil['M'] == pytest.approx(4.83, abs=0.1) and 10 ** soleil['log_t'] == pytest.approx(5772, rel=0.02)
-    # intensités des raies de l'original : hélium ionisé dans les O, molécules dans les M, hydrogène maximal vers A0
-    assert intensites(0)['he_ii'] == 100 and intensites(5)['molecules'] == 0 and intensites(69)['molecules'] > 90
-    assert max(range(70), key=lambda t: intensites(t)['h']) in (19, 20)
+    # intensités des raies (modèle physique, classe V) : hélium ionisé dans les O, molécules dans les M, hydrogène
+    # maximal vers A2 (Saha–Boltzmann : population de n = 2 contre ionisation)
+    assert max(range(70), key=lambda t: intensites(t, 'V')['he_ii']) < 8
+    assert intensites(5, 'V')['molecules'] == 0 and intensites(69, 'V')['molecules'] > 80
+    assert max(range(70), key=lambda t: intensites(t, 'V')['h']) in (21, 22, 23)
     # position HR du Soleil d'après sa magnitude absolue
     lt, ll = hr.position_hr(42, 4.83)
     assert ll == pytest.approx(0.0, abs=0.05) and 10 ** lt == pytest.approx(5772, rel=0.02)

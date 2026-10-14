@@ -24,7 +24,7 @@ class BallonUnivers(Animation):
 
     def construire(self):
         self.a = self.curseur('rayon', A_MIN, A_MAX, A_MIN, dec=3)
-        self.taux = self.curseur('taux', 0.02, 0.5, 0.1, dec=3, unite='/s')
+        self.taux = self.curseur('taux', 0.02, 0.5, 0.1, dec=3, unite='s⁻¹')
         self.c_distances = self.coche('distances', True)
         g = np.random.default_rng(9)
         v = g.normal(size=(N_GALAXIES, 3))
@@ -49,7 +49,7 @@ class BallonUnivers(Animation):
         d = self.distances()
         h = self.taux.value() / self.a.value()
         return [(tr('anim_balloon_rayon_v'), nombre(self.a.value(), 3)),
-                (tr('anim_balloon_h'), '%s /s' % nombre(h, 4)),
+                (tr('anim_balloon_h'), '%s s⁻¹' % nombre(h, 4)),
                 (tr('anim_balloon_age'), '%s s' % nombre(1 / h, 1)),
                 (tr('anim_balloon_plus_proche'), nombre(float(np.sort(d)[1]), 3))]
 

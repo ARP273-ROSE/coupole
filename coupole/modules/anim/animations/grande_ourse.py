@@ -1,7 +1,7 @@
-"""Big Dipper 3D : les sept étoiles de la Grande Ourse sont à des distances très différentes (de 78 à 124
+"""Big Dipper 3D : les sept étoiles de la Grande Ourse sont à des distances très différentes (de 81 à 123
 années-lumière) ; vues de la Terre, elles se projettent sur la sphère céleste en l'astérisme familier.  Tourner la
-vue montre qu'il n'y a aucune figure dans l'espace.  Positions J2000 et distances (années-lumière, parallaxes
-Hipparcos) reprises de l'original."""
+vue montre qu'il n'y a aucune figure dans l'espace.  Positions J2000 de l'original ; distances mises à jour
+(parallaxes adoptées par SIMBAD : Hipparcos 2007, Gaia), couleur vraie et fiche au survol de chaque étoile."""
 from __future__ import annotations
 
 import numpy as np
@@ -9,12 +9,22 @@ import numpy as np
 from ....core.i18n import tr
 from .. import astro, dessin
 from ..base import Animation, nombre
+from ..etoiles_reelles import couleur_reelle, reelle
 
-# (nom, α en heures, δ en degrés, distance en années-lumière, incertitude)
-ETOILES = (('Dubhe', 11.06215, 61.75092, 123.6, 2.5), ('Merak', 11.03068, 56.38236, 79.4, 1.2),
-           ('Phecda', 11.89717, 53.69475, 83.7, 1.5), ('Megrez', 12.25709, 57.03258, 81.4, 1.2),
-           ('Alioth', 12.90048, 55.95989, 80.9, 1.2), ('Mizar', 13.39875, 54.92539, 78.2, 1.1),
-           ('Alkaid', 13.79235, 49.31336, 100.7, 2.3))
+# (nom, α en heures, δ en degrés) de l'original ; distance en années-lumière et barres −/+ : parallaxes adoptées par
+# SIMBAD (consultées le 14/10/2026)
+ETOILES = tuple((n, a, d, reelle('bigdipper', n)['al'], reelle('bigdipper', n)['al_moins'], reelle('bigdipper', n)['al_plus'])
+                for n, a, d in (('Dubhe', 11.06215, 61.75092), ('Merak', 11.03068, 56.38236),
+                                ('Phecda', 11.89717, 53.69475), ('Megrez', 12.25709, 57.03258),
+                                ('Alioth', 12.90048, 55.95989), ('Mizar', 13.39875, 54.92539),
+                                ('Alkaid', 13.79235, 49.31336)))
+
+
+def avec_ecart(v: float, moins: float, plus: float) -> str:
+    """« 84,5 ± 2,4 » ou « 84,5 (−2,4/+2,5) »."""
+    if abs(moins - plus) < 0.05:
+        return '%s ± %s' % (nombre(v, 1), nombre(moins, 1))
+    return '%s (−%s/+%s)' % (nombre(v, 1), nombre(moins, 1), nombre(plus, 1))
 TRAITS = ((0, 1), (1, 2), (2, 3), (3, 0), (3, 4), (4, 5), (5, 6))
 RAYON_AL = 250.0                       # rayon de la sphère céleste dessinée, en années-lumière (comme l'original)
 CENTRE = np.array(astro.vecteur_equatorial(15 * 12.5, 55.0))
@@ -23,6 +33,7 @@ CENTRE = np.array(astro.vecteur_equatorial(15 * 12.5, 55.0))
 class GrandeOurse(Animation):
     ID = 'bigdipper'
     ANIMEE = False
+    FICHES = True
 
     def construire(self):
         # vue de côté : la ligne de visée Terre → constellation (α = 12,5 h, δ = 55°) traverse l'écran
@@ -32,11 +43,12 @@ class GrandeOurse(Animation):
         self.c_sphere = self.coche('sphere', True)
 
     def valeurs(self):
-        return [(e[0], '%s ± %s al' % (nombre(e[3], 1), nombre(e[4], 1))) for e in ETOILES]
+        return [(e[0], '%s al' % avec_ecart(e[3], e[4], e[5])) for e in ETOILES] + \
+            [(tr('anim_bigdipper_source'), tr('anim_bigdipper_source_v'))]
 
     def dessiner(self, p, rect):
         self.zone_rotative(rect, self.vue3d)
-        pts = [np.array(astro.vecteur_equatorial(15 * a, d)) for _, a, d, _, _ in ETOILES]
+        pts = [np.array(astro.vecteur_equatorial(15 * a, d)) for _, a, d, _, _, _ in ETOILES]
         # on cadre toute la scène (la Terre, les étoiles à leur distance, le ciel) dans la toile, quelle que soit sa
         # forme : la Terre ne sort plus de l'image sur un écran très large
         tous = np.vstack([np.zeros(3)] + pts + [v * e[3] / RAYON_AL for e, v in zip(ETOILES, pts)])
@@ -64,11 +76,13 @@ class GrandeOurse(Animation):
             xs, ys, _, _ = pe.ecran(v)
             dessin.reserver(p, xs[0], ys[0], 6)
         noms = []
-        for (nom, a, d, dist, err), v, reel in zip(ETOILES, pts, reels):
+        for k, ((nom, a, d, dist, moins, plus), v, reel) in enumerate(zip(ETOILES, pts, reels)):
             if self.c_lignes.isChecked():
                 pe.segment(np.zeros(3), v, 'doux', 0.8, 0.35)
-            pe.segment(v * (dist - err) / RAYON_AL, v * (dist + err) / RAYON_AL, 'accent2', 3.0)
-            q = pe.point(reel, 'etoile', 4.5, bord='soleil', toujours=True)
+            pe.segment(v * (dist - moins) / RAYON_AL, v * (dist + plus) / RAYON_AL, 'accent2', 3.0)
+            q = pe.point(reel, couleur_reelle('bigdipper', nom) or 'etoile', 4.5, bord='grille', toujours=True)
+            if q:
+                self.survolable(p, reelle('bigdipper', nom)['fiche'], q[0], q[1], 7, k)
             if q and self.c_noms.isChecked():
                 noms.append((q[0], q[1], '%s (%s al)' % (nom, nombre(dist, 0))))
             if self.c_sphere.isChecked():

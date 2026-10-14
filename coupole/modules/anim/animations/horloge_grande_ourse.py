@@ -15,6 +15,7 @@ from PyQt6.QtGui import QPainterPath, QPolygonF
 from ....core.i18n import tr
 from .. import astro, dessin
 from ..base import Animation, angle, date_du_jour, heures_minutes, jour_de_date
+from ..etoiles_reelles import couleur_reelle, reelle
 
 ANNEE = 2026
 # (nom, α J2000 en degrés, δ J2000, magnitude V) — SIMBAD ; η UMi sans magnitude V dans SIMBAD : 4,95 (BSC)
@@ -61,6 +62,7 @@ def stereo(h: float, dec: float) -> tuple[float, float]:
 class HorlogeGrandeOurse(Animation):
     ID = 'dipperclock'
     HEURES_PAR_S = 1.0
+    FICHES = True
 
     def construire(self):
         self.jour = self.curseur('jour', 0.0, 364.0, 78.0, dec=0, cle_texte='anim_c_jour')
@@ -126,7 +128,16 @@ class HorlogeGrandeOurse(Animation):
                         p.drawLine(vis[a], vis[b])
             for n, pt in vis.items():
                 mag = c['etoiles'][n][2]
-                dessin.disque(p, pt.x(), pt.y(), max(1.5, 4.2 - 0.6 * mag), 'etoile', alpha=nuit)
+                # couleur vraie (corps noir à T_eff) ; un fin contour la garde visible sur un ciel clair
+                r = max(1.5, 4.2 - 0.6 * mag)
+                col = couleur_reelle('dipperclock', n)
+                if col is not None:
+                    col.setAlphaF(max(0.0, min(1.0, nuit)))
+                dessin.disque(p, pt.x(), pt.y(), r, col if col is not None else 'etoile',
+                              'doux' if dessin.theme() == 'clair' else None, alpha=nuit)
+                f = reelle('dipperclock', n)
+                if f:
+                    self.survolable(p, f['fiche'], pt.x(), pt.y(), max(5.0, r + 2), mag)
             if self.c_noms.isChecked():
                 dessin.police(p, 0.85)
                 for cle, etoile in ETIQUETTES.items():
