@@ -13,7 +13,7 @@ import math
 
 import numpy as np
 from PyQt6.QtCore import QPointF, QRectF, Qt
-from PyQt6.QtGui import QBrush, QColor, QImage, QPainter, QRadialGradient
+from PyQt6.QtGui import QBrush, QColor, QImage, QPainter, QPixmap, QRadialGradient
 
 from ....core.i18n import langue, tr
 from .. import astro, dessin
@@ -244,30 +244,55 @@ class Orion3D(Animation):
             dessin.texte(p, rect.x() + 10, rect.y() + rect.height() - 30, tr('anim_orion3d_agrandi', k=N.AGRANDI), 'doux',
                          centre=False)
 
+    _couche = None
+
+    def _peindre_particules(self, p, pe, liste, pts, echelle):
+        """Particules de l'arrière vers l'avant (gaz en mélange additif, poussière opaque), sprites dégradés."""
+        xs, ys, zs, _ = pe.ecran(pts)
+        ordre = np.argsort(zs, kind='stable').tolist()
+        k = echelle / RAYON_PC
+        # vue de face (depuis la Terre), les nuages agrandis masqueraient la figure : ils s'estompent
+        face = max(0.0, -float(np.dot(self.vue3d.d, CENTRE_SCENE)))
+        voile = 1 - 0.65 * face * face
+        rp = np.maximum(1.2, _RAYONS * k).tolist()
+        xl, yl = xs.tolist(), ys.tolist()
+        plus = QPainter.CompositionMode.CompositionMode_Plus
+        dessus = QPainter.CompositionMode.CompositionMode_SourceOver
+        mode = None
+        for i in ordre:
+            q = liste[i]
+            x, y, r = xl[i], yl[i], rp[i]
+            if not (math.isfinite(x) and math.isfinite(y)):
+                continue
+            m = plus if q['genre'] == 'gaz' else dessus
+            if m is not mode:
+                p.setCompositionMode(m)
+                mode = m
+            p.setOpacity(q['alpha'] * voile)
+            p.drawPixmap(QRectF(x - r, y - r, 2 * r, 2 * r), _sprite(q['rvb']), _SOURCE)
+
     def _nebuleuses(self, p, pe, echelle, noms):
         """M42 et IC 434 / Tête de Cheval en volume : particules pré-calculées (géométrie publiée, taille agrandie
         ×AGRANDI), projetées puis dessinées de l'arrière vers l'avant ; gaz ionisé en mélange additif, poussière opaque ;
         sprites dégradés préparés une fois par couleur."""
         liste, pts = _particules_scene()
-        xs, ys, zs, _ = pe.ecran(pts)
-        ordre = np.argsort(zs, kind='stable')
-        k = echelle / RAYON_PC
-        # vue de face (depuis la Terre), les nuages agrandis masqueraient la figure : ils s'estompent
-        face = max(0.0, -float(np.dot(self.vue3d.d, CENTRE_SCENE)))
-        voile = 1 - 0.65 * face * face
-        p.save()
-        plus = QPainter.CompositionMode.CompositionMode_Plus
-        dessus = QPainter.CompositionMode.CompositionMode_SourceOver
-        for i in ordre:
-            q = liste[i]
-            x, y = float(xs[i]), float(ys[i])
-            if not (math.isfinite(x) and math.isfinite(y)):
-                continue
-            rp = max(1.2, q['r'] * k)
-            p.setCompositionMode(plus if q['genre'] == 'gaz' else dessus)
-            p.setOpacity(q['alpha'] * voile)
-            p.drawImage(QRectF(x - rp, y - rp, 2 * rp, 2 * rp), _sprite(q['rvb']))
-        p.restore()
+        # couche des nébuleuses gardée tant que la vue et la taille ne changent pas (survol, fiche, valeurs : la scène
+        # est redessinée sans repeindre les 1 038 particules)
+        dev = p.device()
+        dpr = dev.devicePixelRatioF() if dev is not None else 1.0
+        tw, th = (dev.width(), dev.height()) if dev is not None else (800, 600)
+        cle = (round(self.vue3d.az, 6), round(self.vue3d.alt, 6), tw, th, round(dpr, 3), round(echelle, 4),
+               round(pe.cx, 3), round(pe.cy, 3))
+        if self._couche is None or self._couche[0] != cle:
+            img = QImage(max(1, int(tw * dpr)), max(1, int(th * dpr)), QImage.Format.Format_ARGB32_Premultiplied)
+            img.setDevicePixelRatio(dpr)
+            img.fill(Qt.GlobalColor.transparent)
+            q = QPainter(img)
+            q.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
+            self._peindre_particules(q, pe, liste, pts, echelle)
+            q.end()
+            self._couche = (cle, img)
+        p.drawImage(QPointF(0, 0), self._couche[1])
         # étoiles excitatrices (Trapèze, σ Ori) et repères à fiche
         for n in N.nebuleuses():
             for e in n['etoiles']:
@@ -293,19 +318,24 @@ class Orion3D(Animation):
 _PS = None
 
 
+_RAYONS = None
+
+
 def _particules_scene():
     """Particules des deux nébuleuses dans le repère de la scène (calculées une fois)."""
-    global _PS
+    global _PS, _RAYONS
     if _PS is None:
         liste = [q for n in N.nebuleuses() for q in n['particules']]
         _PS = (liste, np.array([scene(q['p']) / RAYON_PC for q in liste]))
+        _RAYONS = np.array([q['r'] for q in liste])
     return _PS
 
 
 _SPRITES: dict = {}
+_SOURCE = QRectF(0, 0, 48, 48)
 
 
-def _sprite(rvb) -> QImage:
+def _sprite(rvb) -> QPixmap:
     """Disque dégradé (couleur pleine au centre → transparent au bord), préparé une fois par couleur."""
     img = _SPRITES.get(rvb)
     if img is None:
@@ -321,5 +351,6 @@ def _sprite(rvb) -> QImage:
         q.setBrush(QBrush(g))
         q.drawRect(0, 0, 48, 48)
         q.end()
+        img = QPixmap.fromImage(img)
         _SPRITES[rvb] = img
     return img
