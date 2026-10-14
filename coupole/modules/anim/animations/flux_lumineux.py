@@ -75,10 +75,10 @@ class FluxLumineux(Animation):
         dessin.texte(p, xd, cy - cote * k / 2 - 14, tr('anim_lightdetector_detecteur'), 'accent2', fond=True)
         # jauge du flux (échelle logarithmique, de 0,01 à 50 W/m²)
         f = hr.flux(w, d)
-        gx, gy, gl = rect.x() + 30, rect.bottom() - 34, rect.width() - 60
+        gx, gy, gl = rect.x() + 30, rect.bottom() - 18, rect.width() - 60
         p.setPen(dessin.stylo('grille', 1.0))
         p.setBrush(dessin.Qt.BrushStyle.NoBrush)
         p.drawRect(QRectF(gx, gy, gl, 12))
         t = max(0.0, min(1.0, (math.log10(f) + 2) / (math.log10(50) + 2)))
         p.fillRect(QRectF(gx, gy, gl * t, 12), dessin.c('accent1'))
-        dessin.texte(p, gx + gl / 2, gy + 26, 'F = P / 4π d² = %s W/m²' % nombre(f, 3), 'texte')
+        dessin.formule_texte(p, gx + gl / 2, gy - 24, 'F = P / 4π d²', ' = %s W/m²' % nombre(f, 3), 'texte')

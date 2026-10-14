@@ -96,7 +96,10 @@ class PlagesDeclinaison(Animation):
         dessin.texte(p, cx + math.cos(a) * rc * 1.07, cy - math.sin(a) * rc * 1.07, tr('anim_altazimuth_zenith'),
                      'accent3', fond=True)
         # légende
-        x0, y0 = rect.right() - rect.width() * 0.22, rect.y() + 30
+        # légende : assez à gauche pour que les libellés tiennent dans la toile
+        larg = max(p.fontMetrics().horizontalAdvance(tr(k)) for k in ('anim_latsim_circumpolaire', 'anim_latsim_lever',
+                                                                      'anim_latsim_jamais'))
+        x0, y0 = min(rect.right() - rect.width() * 0.22, rect.right() - 10 - 28 - larg), rect.y() + 30
         for i, (cle, coul) in enumerate((('anim_latsim_circumpolaire', 'accent1'), ('anim_latsim_lever', 'accent2'),
                                          ('anim_latsim_jamais', 'accent3'))):
             p.setPen(dessin.stylo(coul, 8.0))

@@ -136,4 +136,3 @@ class PositionsPhases(Animation):
             p.setBrush(dessin.c(couleurs[k]))
             p.drawPie(QRectF(px - rr, py - rr, 2 * rr, 2 * rr), int((a - 90) * 16), 180 * 16)
             dessin.texte(p, px + rr + 9, py - rr - 6, str(k), couleurs[k], fond=True)
-        dessin.texte(p, r.x() + 8, r.bottom() - 10, tr('anim_phasedemonstrator_glisser'), 'doux', centre=False)

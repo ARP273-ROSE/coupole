@@ -1181,7 +1181,8 @@ Education, licence Apache 2.0 (fichiers \texttt{NOTICE} et \texttt{LICENCES/Apac
 
 \paragraph{Catalogue.} À gauche, les 92 animations du catalogue d'origine, classées par thème (coordonnées et
 mouvements, Lune, Renaissance et orbites, propriétés stellaires, lumière et spectres, exoplanètes…), avec une recherche
-(française ou anglaise, sans accents), un filtre par thème et par état. Chacune a son nom et sa description dans les
+(française ou anglaise, sans accents), un filtre par thème et par état. Les thèmes suivent un ordre pédagogique, de
+l'introduction et du ciel vu de la Terre jusqu'à la cosmologie. Chacune a son nom et sa description dans les
 deux langues, et son titre d'origine. Depuis la version 0.4.0, les 92 sont disponibles : celles qui n'étaient que
 des films (ombre d'un bâtiment, clou qui fond, lanceur de marteau, ballon, réactions de fusion, embouteillage…) sont
 devenues des simulations, et celles qui reposent sur des données réelles (spectres, courbes de lumière, exoplanètes,
@@ -1193,7 +1194,65 @@ temps ; \emph{Réinitialiser} revient à l'état de départ. Chaque réglage a u
 exacte est gardée : le champ n'en montre qu'un arrondi) ; les valeurs calculées s'affichent sous les réglages. Tous
 les réglages, le thème et l'animation choisie sont retrouvés au lancement suivant. Une seule animation tourne à la
 fois, et seulement quand elle est affichée ; une image coûte quelques millisecondes (rien de lourd dans le fil
-graphique).
+graphique). Ce que fait la souris dans l'animation affichée est rappelé en petit sous la scène (plus d'info-bulle
+par-dessus le dessin). Le bouton \emph{Version web} ouvre l'animation, avec ses réglages, dans Coupole Web
+(\texttt{arp273-rose.github.io/coupole-web}) : les mêmes animations dans un navigateur, sur ordinateur, tablette ou
+téléphone.
+
+\subsection{Rendu, formules et cartes (0.4.1)}
+\paragraph{Astres.} Le Soleil, la Lune, la Terre et Mars sont dessinés en sphères : dégradé radial dont le foyer est
+décalé vers la lumière (limbe assombri) et, quand un Soleil est dessiné dans le même panneau, côté nuit ombré au-delà du
+terminateur ; le Soleil a un limbe assombri et un halo discret. Tout reste vectoriel et lissé ; les brosses sont mises
+en cache, si bien qu'une image coûte toujours quelques millisecondes (médiane 1,5~ms par image à 720 × 470, comme avant ces changements, mesurée sur les
+92 animations). Les symboles (icônes de la table des éclipses, repères) restent plats.
+
+\paragraph{Formules.} Les formules sont composées par un petit moteur de mise en page écrit pour Coupole (QPainter,
+sans \LaTeX{} ni matplotlib) : fractions empilées, exposants et indices bien placés, radicaux, parenthèses extensibles,
+$\times 10^n$ en vrai exposant, variables d'une lettre en italique mathématique, mots (sin, log, TSL) droits. La police
+est STIX Two Math (licence SIL OFL 1.1, sous-ensemble embarqué de 139~ko, \texttt{LICENCES/OFL-STIX-Two.txt}). Les
+formules dessinées dans les animations (calculateur de la loi de Newton, algèbre de la gravitation, module de distance,
+petits angles, luminosité, flux, excentricité…) et celles des descriptions, des libellés et des valeurs affichées sont
+toutes mises en forme ; les mises en page sont gardées en cache.
+
+\paragraph{Étiquettes.} Toutes les étiquettes à cartouche passent par un placeur commun : si leur place est prise
+(autre étiquette, petit astre, texte déjà écrit, bord de l'image), elles essaient 24 positions autour de leur objet et
+prennent la première libre, reliée à l'objet par un trait de rappel. Un test vérifie, pour les 92 animations, quatre
+tailles (420 à 2560 pixels de large) et trois instants, qu'aucune étiquette n'en recouvre une autre ni ne sort de
+l'image.
+
+\paragraph{Cartes.} Les côtes viennent de Natural Earth 1:50m (domaine public), simplifiées (Douglas-Peucker 0,07°,
+65~ko), chargées au premier globe affiché. Le simulateur jour-nuit propose quatre projections. Équirectangulaire :
+correspondance linéaire entre la souris et la latitude-longitude. Pôle Nord ou pôle Sud : azimutale équidistante
+centrée sur le pôle (distance au pôle vraie), bord à l'équateur ou 30° au-delà pour voir les deux tropiques ;
+méridiens tous les 15° (30° marqués), parallèles tous les 15°, tropiques et cercles polaires en pointillé ; par défaut
+la Terre tourne sous un terminateur fixe (midi en bas), et \emph{Terminateur tournant} fixe la carte (Greenwich en
+bas au Nord). La nuit et les crépuscules y sont tracés méridien par méridien, à la latitude exacte où le Soleil est à
+0°, −6°, −12° ou −18° : une boucle autour du pôle, sans artefact au pôle (au solstice, elle est tangente au cercle
+polaire). Globe 3D vu de l'espace (projection orthographique) : il se tourne dans tous les sens à la souris (rotation
+de boule de commande : le point saisi suit la souris, avec une légère inertie), la molette zoome, le double-clic
+revient au point subsolaire, le clic droit place l'observateur ; atmosphère fine, sphère éclairée du côté du Soleil,
+lignes coupées exactement au limbe, nuit et crépuscules exacts (parties visibles des calottes de la sphère opposées
+au Soleil), axe des pôles et flèche « vers le Soleil ». Au pôle Nord et au pôle Sud, le jour ou la nuit polaire
+s'affiche avec les valeurs.
+
+\paragraph{Éclipses.} Dans le simulateur des ombres d'éclipse, le Soleil est dessiné en entier, et \emph{Rejouer une
+éclipse} montre chacune des 133 éclipses de la table 2015–2044 en proportions réelles : la Lune traverse l'ombre et la
+pénombre de la Terre, ou l'ombre de la Lune balaie la Terre ; l'écart à l'axe vient de l'argument de latitude moyen de
+la Lune ($y = D \sin 5{,}145^\circ \sin F$, Meeus), ramené dans le domaine compatible avec le type de l'éclipse, et un
+curseur fait avancer l'instant.
+
+\paragraph{Corrections.} Le globe du démonstrateur longitude/latitude (et toutes les sphères) tournait à l'envers du
+glisser : le point saisi suit maintenant la souris. Les rayons du Soleil du simulateur des saisons s'arrêtent au limbe
+et au bord du panneau ; les noms des étoiles de la Grande Ourse 3D et du lanceur de marteau ne se chevauchent plus ;
+quelques textes trop longs pour les petites fenêtres ont été déplacés (légendes, horloges, niveaux de l'hydrogène,
+ombre du bâtiment, rayons du Soleil, spectre électromagnétique).
+
+\capture{img/anim_daylightsimulator_nord_fr.png}{0.95}
+\capture{img/anim_daylightsimulator_globe_fr.png}{0.95}
+\capture{img/anim_shadowsim_rejeu_fr.png}{0.95}
+\capture{img/anim_gravcalc_fr.png}{0.95}
+\capture{img/anim_hammerthrower_fr.png}{0.95}
+\capture{img/anim_bigdipper_fr.png}{0.95}
 
 \subsection{Les animations disponibles}
 \begin{center}
@@ -1579,5 +1638,5 @@ Barbary (2016), Bertin \& Arnouts (1996). Moments adaptatifs : Bernstein \& Jarv
 © OpenStreetMap contributors. SIMBAD et Sesame : CDS, Strasbourg (Wenger et al. 2000) ; Aladin Lite (CDS) ;
 NED (NASA/IPAC) ; JPL Small-Body Database (NASA/JPL). Cosmologie : Planck Collaboration (2020, A\&A 641, A6) ;
 Hinshaw et al. (2013, WMAP 9) ; Riess et al. (2022, SH0ES) ; Hogg (1999, astro-ph/9905116) ; Komatsu et al. (2011)
-pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur). Archives : MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), Astro Data Archive de NOIRLab, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS du nœud Anneaux et Lunes, Imaging Node) ; reproject (Astropy) ; Rector et al. (2007, AJ 133, 598) pour l'ordre chromatique ; pratiques des amateurs : voir \texttt{docs/archives\_methode.md}. Animations : ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0) ; Meeus (1998, \emph{Astronomical Algorithms}, 2\textsuperscript{e} éd.) ; obliquité P03 / IAU 2006 ; limites des constellations de l'UAI (données livrées avec astropy) ; côtes d'après GSHHS (via ClassAction) ; NASA Exoplanet Archive, NASA Planetary Fact Sheet, éphéméride JPL DE440 et éléments de Standish, AME 2020, filtres de Landolt (1992), spectre de M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, courbe de rotation d'Eilers et al. (2019).
+pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur). Archives : MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), Astro Data Archive de NOIRLab, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS du nœud Anneaux et Lunes, Imaging Node) ; reproject (Astropy) ; Rector et al. (2007, AJ 133, 598) pour l'ordre chromatique ; pratiques des amateurs : voir \texttt{docs/archives\_methode.md}. Animations : ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0) ; Meeus (1998, \emph{Astronomical Algorithms}, 2\textsuperscript{e} éd.) ; obliquité P03 / IAU 2006 ; limites des constellations de l'UAI (données livrées avec astropy) ; côtes Natural Earth 1:50m (domaine public) ; police STIX Two Math (SIL OFL 1.1) ; NASA Exoplanet Archive, NASA Planetary Fact Sheet, éphéméride JPL DE440 et éléments de Standish, AME 2020, filtres de Landolt (1992), spectre de M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, courbe de rotation d'Eilers et al. (2019).
 \end{document}

@@ -8,10 +8,12 @@ l'azimut astronomique, depuis +x vers −y) et sa hauteur au-dessus du plan xy.
 from __future__ import annotations
 
 import math
+import re
 
 import numpy as np
 from PyQt6.QtCore import QPointF, QRectF, Qt
-from PyQt6.QtGui import QBrush, QColor, QFont, QPainterPath, QPen, QPolygonF
+from PyQt6.QtGui import (QBrush, QColor, QFont, QFontMetricsF, QLinearGradient, QPainterPath, QPen, QPolygonF,
+                         QRadialGradient)
 
 from ...core import config
 
@@ -43,8 +45,15 @@ def theme() -> str:
     return nom if nom in PALETTES else 'sombre'
 
 
+_COULEURS: dict = {}
+
+
 def c(cle: str, alpha: float | None = None) -> QColor:
-    col = QColor(PALETTES[theme()][cle])
+    k = (theme(), cle)
+    base = _COULEURS.get(k)
+    if base is None:
+        base = _COULEURS[k] = QColor(PALETTES[k[0]][cle])
+    col = QColor(base)
     if alpha is not None:
         col.setAlphaF(max(0.0, min(1.0, alpha)))
     return col
@@ -70,28 +79,363 @@ def police(p, taille_relative: float = 1.0, gras: bool = False) -> QFont:
     return f
 
 
+# ==================================================================== étiquettes sans chevauchement
+# Toutes les étiquettes à cartouche (texte(..., fond=True) et etiquette()) d'une image passent par un placeur commun :
+# si la place voulue est prise (autre étiquette, petit objet, texte déjà écrit, bord de la toile), l'étiquette essaie
+# 24 positions autour de son point d'accroche (en haut à droite, en bas à droite, en haut à gauche, en bas à gauche,
+# dessus, dessous, droite, gauche, sur trois distances) et prend la première libre, sinon la moins encombrée ; déplacée,
+# elle est reliée à sa place d'origine par un trait de rappel.  Boîtes en pixels de la toile (transformations
+# comprises) ; les textes tournés ne sont pas déplacés.  Mêmes règles que Coupole Web (src/noyau/dessin.ts).
+_etiquettes: list = []
+_objets: list = []
+_cadre = None
+_lumiere = None
+
+
+def debut_image(p=None, r: QRectF | None = None):
+    """À appeler au début de chaque image (fait par la toile et Animation.image) : `r` est toute la toile."""
+    global _etiquettes, _objets, _cadre, _lumiere
+    _etiquettes, _objets, _cadre, _lumiere = [], [], None, None
+    if p is not None and r is not None:
+        a, d, e, f, _ = _matrice(p)
+        _cadre = (a * r.x() + e, d * r.y() + f, abs(a * r.width()), abs(d * r.height()))
+
+
+def etiquettes_posees() -> list:
+    """Boîtes (x, y, l, h) des étiquettes posées depuis le début de l'image (tests)."""
+    return list(_etiquettes)
+
+
+def _matrice(p):
+    m = p.worldTransform()
+    return m.m11(), m.m22(), m.dx(), m.dy(), abs(m.m12()) > 1e-6 or abs(m.m21()) > 1e-6
+
+
+def _commun(a, b) -> float:
+    w = min(a[0] + a[2], b[0] + b[2]) - max(a[0], b[0])
+    h = min(a[1] + a[3], b[1] + b[3]) - max(a[1], b[1])
+    return w * h if w > 0 and h > 0 else 0.0
+
+
+def reserver(p, x: float, y: float, r: float):
+    """Un petit objet (astre, point…) que les étiquettes évitent ; les grands disques ne sont pas réservés."""
+    if not (r > 0) or r > 24:
+        return
+    a, d, e, f, tourne = _matrice(p)
+    if tourne:
+        return
+    k = abs(a)
+    _objets.append((a * x + e - r * k, d * y + f - r * k, 2 * r * k, 2 * r * k))
+
+
+def _encombrement(b) -> float:
+    c_ = (b[2] * b[3] - _commun(b, _cadre)) * 8 if _cadre else 0.0
+    for o in _etiquettes:
+        c_ += _commun(b, o) * 4
+    for o in _objets:
+        c_ += _commun(b, o)
+    return c_
+
+
+def _placer(p, x0, y0, w, h, ax, ay, ecart):
+    """Place une boîte w × h voulue en (x0, y0) (coin haut gauche, repère local) ; rend le coin retenu."""
+    a, d, e, f, tourne = _matrice(p)
+    if tourne:
+        return x0, y0
+
+    def dev(x, y):
+        X, Y = a * x + e, d * y + f
+        return (min(X, X + a * w), min(Y, Y + d * h), abs(a * w), abs(d * h))
+
+    meilleur = (x0, y0)
+    cout = _encombrement(dev(x0, y0))
+    if cout > 0.5:
+        cands = []
+        for k in (1, 2, 3):
+            ec = ecart * k + (k - 1) * h * 0.6
+            cands += [(ax + ec, ay - ec - h), (ax + ec, ay + ec), (ax - ec - w, ay - ec - h), (ax - ec - w, ay + ec),
+                      (ax - w / 2, ay - ec - h), (ax - w / 2, ay + ec), (ax + ec, ay - h / 2),
+                      (ax - ec - w, ay - h / 2)]
+        for cx, cy in cands:
+            dep = 0.02 * math.hypot(cx - x0, cy - y0)
+            cc = _encombrement(dev(cx, cy)) + dep
+            if cc < cout - 1e-9:
+                cout, meilleur = cc, (cx, cy)
+                if cc < 0.5 + dep:
+                    break
+    _etiquettes.append(dev(*meilleur))
+    return meilleur
+
+
+_PUISSANCE = re.compile('10([⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+)')
+_EXP_VERS = str.maketrans('⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺', '0123456789−+')
+
+
+def _morceaux_puissances(s: str):
+    """« 6,67 × 10⁻¹¹ » → [('6,67 × 10', False), ('−11', True)] : les puissances de dix sont composées en vrai
+    exposant (chiffres de la police, plus petits et surélevés) plutôt qu'avec les caractères en exposant."""
+    out, i = [], 0
+    for m in _PUISSANCE.finditer(s):
+        out.append((s[i:m.start(1)], False))
+        out.append((m.group(1).translate(_EXP_VERS), True))
+        i = m.end()
+    out.append((s[i:], False))
+    return [(t, e) for t, e in out if t]
+
+
+def _largeur_texte(p, s: str) -> float:
+    if not _PUISSANCE.search(s):
+        return p.fontMetrics().horizontalAdvance(s)
+    fm = p.fontMetrics()
+    f = QFont(p.font())
+    if f.pointSizeF() > 0:
+        f.setPointSizeF(f.pointSizeF() * 0.72)
+    else:
+        f.setPixelSize(max(6, int(f.pixelSize() * 0.72)))
+    fe = QFontMetricsF(f, p.device())
+    return sum(fe.horizontalAdvance(t) + 1 if e else fm.horizontalAdvance(t) for t, e in _morceaux_puissances(s))
+
+
+def _ecrire(p, x0: float, y0: float, s: str):
+    if not _PUISSANCE.search(s):
+        p.drawText(QPointF(x0, y0), s)
+        return
+    fm = p.fontMetrics()
+    normale = QFont(p.font())
+    petite = QFont(normale)
+    if petite.pointSizeF() > 0:
+        petite.setPointSizeF(petite.pointSizeF() * 0.72)
+    else:
+        petite.setPixelSize(max(6, int(petite.pixelSize() * 0.72)))
+    x = x0
+    for t, e in _morceaux_puissances(s):
+        if e:
+            p.setFont(petite)
+            p.drawText(QPointF(x + 0.5, y0 - fm.ascent() * 0.42), t)
+            x += p.fontMetrics().horizontalAdvance(t) + 1
+            p.setFont(normale)
+        else:
+            p.drawText(QPointF(x, y0), t)
+            x += fm.horizontalAdvance(t)
+
+
 def texte(p, x: float, y: float, s: str, cle: str = 'texte', centre: bool = True, alpha: float | None = None,
           fond: bool = False):
-    """Texte centré (ou aligné à gauche) au point (x, y) ; `fond` : petit cartouche sous le texte."""
+    """Texte centré (ou aligné à gauche) au point (x, y) ; `fond` : petit cartouche sous le texte, placé sans
+    chevaucher les autres étiquettes.  Un texte plus large que la toile est réduit (8 px au moins) ; un texte qui
+    déborde à peine de la toile est ramené dedans."""
     fm = p.fontMetrics()
-    w, h = fm.horizontalAdvance(s), fm.height()
+    w = _largeur_texte(p, s)
+    police_avant = None
+    a, d, e, f, tourne = _matrice(p)
+    if _cadre and not tourne and a > 0 and w * a > _cadre[2] - 8:
+        police_avant = QFont(p.font())
+        nf = QFont(police_avant)
+        px = nf.pixelSize() if nf.pixelSize() > 0 else nf.pointSizeF() * p.device().logicalDpiY() / 72.0
+        nf.setPixelSize(max(8, int(px * (_cadre[2] - 8) / (w * a))))
+        p.setFont(nf)
+        fm = p.fontMetrics()
+        w = _largeur_texte(p, s)
+    h = fm.height()
     x0 = x - w / 2 if centre else x
     y0 = y + fm.ascent() / 2 - 1 if centre else y
+    if _cadre and not tourne and a > 0:
+        X0 = a * x0 + e
+        X1 = X0 + a * w
+        g, dr = _cadre[0] + 2, _cadre[0] + _cadre[2] - 2
+        if X0 < g < X1:
+            x0 += (g - X0) / a
+        elif X0 < dr < X1:
+            x0 -= (X1 - dr) / a
     if fond:
+        bx, by = x0 - 3, y0 - fm.ascent() - 1
+        ax, ay = x, (y if centre else y0 - fm.ascent() / 2)
+        nx, ny = _placer(p, bx, by, w + 6, h + 2, ax, ay, 6)
+        if abs(nx - bx) > 0.5 or abs(ny - by) > 0.5:
+            px_, py_ = max(nx, min(nx + w + 6, ax)), max(ny, min(ny + h + 2, ay))
+            p.save()
+            p.setPen(stylo(cle, 0.9, 0.55 * (alpha if alpha is not None else 1.0)))
+            p.drawLine(QPointF(ax, ay), QPointF(px_, py_))
+            p.restore()
+            x0, y0 = nx + 3, ny + fm.ascent() + 1
         p.save()
         p.setPen(Qt.PenStyle.NoPen)
-        p.setBrush(c('fond', 0.75))
+        p.setBrush(c('fond', 0.78))
         p.drawRoundedRect(QRectF(x0 - 3, y0 - fm.ascent() - 1, w + 6, h + 2), 4, 4)
         p.restore()
+    elif not tourne and s.strip():
+        # texte sans cartouche (titres, graduations) : il ne bouge pas, mais les étiquettes l'évitent
+        X, Y = a * x0 + e, d * (y0 - fm.ascent()) + f
+        _objets.append((min(X, X + a * w), min(Y, Y + d * h), abs(a * w), abs(d * h)))
     p.setPen(c(cle, alpha))
-    p.drawText(QPointF(x0, y0), s)
+    _ecrire(p, x0, y0, s)
+    if police_avant is not None:
+        p.setFont(police_avant)
+
+
+def etiquette(p, x: float, y: float, s: str, cle: str = 'texte', ecart: float = 8.0, alpha: float | None = None):
+    """Étiquette d'un objet en (x, y) : à côté de lui (en haut à droite si la place est libre), jamais par-dessus
+    une autre étiquette ; reliée à l'objet par un trait de rappel si elle a dû s'en éloigner."""
+    fm = p.fontMetrics()
+    w, h = _largeur_texte(p, s) + 6, fm.height() + 2
+    nx, ny = _placer(p, x + ecart, y - ecart - h, w, h, x, y, ecart)
+    if math.hypot(nx - (x + ecart), ny - (y - ecart - h)) > 0.5 and \
+            (abs(nx + w / 2 - x) > w / 2 + ecart * 1.6 or abs(ny + h / 2 - y) > h / 2 + ecart * 1.6):
+        px_, py_ = max(nx, min(nx + w, x)), max(ny, min(ny + h, y))
+        p.save()
+        p.setPen(stylo(cle, 0.9, 0.55))
+        p.drawLine(QPointF(x, y), QPointF(px_, py_))
+        p.restore()
+    p.save()
+    p.setPen(Qt.PenStyle.NoPen)
+    p.setBrush(c('fond', 0.78))
+    p.drawRoundedRect(QRectF(nx, ny, w, h), 4, 4)
+    p.restore()
+    p.setPen(c(cle, alpha))
+    _ecrire(p, nx + 3, ny + 1 + fm.ascent(), s)
+
+
+def formule(p, x: float, y: float, s: str, cle: str = 'texte', centre: bool = True):
+    """Formule mise en forme (fractions empilées, exposants, indices, italiques ; police STIX Two Math) : centrée en
+    (x, y), ou à partir de x (ligne de base y) si `centre` est faux.  Elle devient un obstacle pour les étiquettes."""
+    from . import formule as fo
+    bx, by, bw, bh = fo.dessiner(p, x, y, s, centre, c(cle))
+    a, d, e, f, tourne = _matrice(p)
+    if not tourne:
+        X, Y = a * bx + e, d * by + f
+        _objets.append((min(X, X + a * bw), min(Y, Y + d * bh), abs(a * bw), abs(d * bh)))
+    return bw
+
+
+def formule_texte(p, x: float, y: float, f: str, suite: str, cle: str = 'texte', cle_suite: str | None = None):
+    """Une formule mise en forme suivie d'un texte simple (résultat avec unité : « = 3,98 × 10²⁶ W »), le tout centré
+    en (x, y)."""
+    from . import formule as fo
+    wf = fo.largeur(p, f)
+    ws = _largeur_texte(p, suite)
+    x0 = x - (wf + ws) / 2
+    formule(p, x0, y + p.fontMetrics().ascent() / 2 - 1, f, cle, centre=False)
+    yb = y + p.fontMetrics().ascent() / 2 - 1
+    texte(p, x0 + wf, yb, suite, cle_suite or cle, centre=False)
+
+
+# ==================================================================== corps célestes en sphères
+ASTRES = frozenset(('soleil', 'lune', 'terre', 'mars'))
+
+
+def oublier_lumiere():
+    """Oublie la source de lumière (début d'image, nouveau panneau)."""
+    global _lumiere
+    _lumiere = None
+
+
+def _fonce(col: QColor, k: float, alpha: float) -> QColor:
+    out = QColor.fromRgbF(col.redF() * k, col.greenF() * k, col.blueF() * k)
+    out.setAlphaF(alpha)
+    return out
+
+
+def _avec(col: QColor, alpha: float) -> QColor:
+    out = QColor(col)
+    out.setAlphaF(max(0.0, min(1.0, alpha)))
+    return out
+
+
+_BROSSES: dict = {}
+
+
+def _brosse(cle: str, al: float, genre: str, *param):
+    """Brosses des astres, en coordonnées relatives à la boîte de l'ellipse (ObjectBoundingMode) : indépendantes de
+    la position et du rayon, donc mises en cache (une image peut compter des centaines d'astres)."""
+    k = (theme(), cle, round(al, 3), genre) + param
+    br = _BROSSES.get(k)
+    if br is not None:
+        return br
+    base = c(cle)
+    if genre == 'soleil':
+        g = QRadialGradient(QPointF(0.5, 0.5), 0.5)
+        g.setColorAt(0.0, _avec(base.lighter(118), al))
+        g.setColorAt(0.65, _avec(base, al))
+        g.setColorAt(1.0, _fonce(base, 0.78, al))
+    elif genre == 'halo':
+        g = QRadialGradient(QPointF(0.5, 0.5), 0.5)
+        h0 = _avec(base, 0.28 * al)
+        g.setColorAt(0.0, h0)
+        g.setColorAt(param[0], h0)
+        g.setColorAt(1.0, _avec(base, 0.0))
+    elif genre == 'volume':
+        lx, ly, nuit = param
+        g = QRadialGradient(QPointF(0.5, 0.5), 0.5, QPointF(0.5 + lx * 0.21, 0.5 + ly * 0.21), 0.025)
+        g.setColorAt(0.0, _avec(base.lighter(132 if nuit else 122), al))
+        g.setColorAt(0.55, _avec(base, al))
+        g.setColorAt(1.0, _fonce(base, 0.62 if nuit else 0.7, al))
+    else:                                              # 'nuit' : voile au-delà du terminateur
+        lx, ly = param
+        g = QLinearGradient(QPointF(0.5 + lx * 0.5, 0.5 + ly * 0.5), QPointF(0.5 - lx * 0.5, 0.5 - ly * 0.5))
+        g.setColorAt(0.0, _avec(base, 0.0))
+        g.setColorAt(0.47, _avec(base, 0.0))
+        g.setColorAt(0.56, _avec(base, 0.62 * al))
+        g.setColorAt(1.0, _avec(base, 0.8 * al))
+    g.setCoordinateMode(QRadialGradient.CoordinateMode.ObjectBoundingMode)
+    br = _BROSSES[k] = QBrush(g)
+    if len(_BROSSES) > 4000:
+        _BROSSES.clear()
+    return br
+
+
+def astre(p, x: float, y: float, r: float, cle: str, bord=None, alpha: float | None = None):
+    """Corps céleste à l'aspect d'une sphère : dégradé radial (volume) au foyer décalé de 0,42 r vers la lumière,
+    limbe assombri et, si un Soleil a été dessiné dans le panneau, côté nuit ombré au-delà du terminateur ; le Soleil
+    a un limbe assombri et un halo discret.  Vectoriel ; brosses mises en cache : coût négligeable."""
+    global _lumiere
+    al = 1.0 if alpha is None else alpha
+    a, d, e, f, tourne = _matrice(p)
+    centre = QPointF(x, y)
+    p.save()
+    p.setPen(Qt.PenStyle.NoPen)
+    if cle == 'soleil':
+        if r >= 5:
+            rh = r + min(0.9 * r, 26.0)
+            p.setBrush(_brosse(cle, al, 'halo', round(r * 0.9 / rh, 2)))
+            p.drawEllipse(centre, rh, rh)
+        p.setBrush(_brosse(cle, al, 'soleil'))
+        p.setPen(stylo(bord, 1.0) if bord else Qt.PenStyle.NoPen)
+        p.drawEllipse(centre, r, r)
+        p.restore()
+        if not tourne:
+            _lumiere = (a * x + e, d * y + f)
+        return
+    lx, ly, nuit = -0.55, -0.83, False
+    if _lumiere is not None and not tourne and a != 0 and d != 0:
+        sx, sy = (_lumiere[0] - e) / a, (_lumiere[1] - f) / d
+        dist = math.hypot(sx - x, sy - y)
+        if dist > r * 1.2:
+            # direction du Soleil, arrondie au degré (cache des brosses)
+            ang = round(math.degrees(math.atan2(sy - y, sx - x)))
+            lx, ly, nuit = math.cos(math.radians(ang)), math.sin(math.radians(ang)), True
+    p.setBrush(_brosse(cle, al, 'volume', round(lx, 4), round(ly, 4), nuit))
+    p.drawEllipse(centre, r, r)
+    if nuit:
+        # côté nuit : le terminateur est le diamètre perpendiculaire à la direction du Soleil
+        p.setBrush(_brosse('nuit', al, 'nuit', round(lx, 4), round(ly, 4)))
+        p.drawEllipse(centre, r, r)
+    if bord:
+        p.setPen(stylo(bord, 1.0, 0.6 * al))
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawEllipse(centre, r, r)
+    p.restore()
 
 
 def disque(p, x: float, y: float, r: float, cle_ou_couleur='soleil', bord=None, alpha: float | None = None):
-    col = c(cle_ou_couleur, alpha) if isinstance(cle_ou_couleur, str) else cle_ou_couleur
-    p.setBrush(QBrush(col))
-    p.setPen(stylo(bord, 1.0) if bord else Qt.PenStyle.NoPen)
-    p.drawEllipse(QPointF(x, y), r, r)
+    """Disque ; le Soleil, la Lune, la Terre et Mars (dès 3,5 px de rayon) sont dessinés en sphères (astre())."""
+    if isinstance(cle_ou_couleur, str) and cle_ou_couleur in ASTRES and r >= 3.5:
+        astre(p, x, y, r, cle_ou_couleur, bord, alpha)
+    else:
+        col = c(cle_ou_couleur, alpha) if isinstance(cle_ou_couleur, str) else cle_ou_couleur
+        p.setBrush(QBrush(col))
+        p.setPen(stylo(bord, 1.0) if bord else Qt.PenStyle.NoPen)
+        p.drawEllipse(QPointF(x, y), r, r)
+    reserver(p, x, y, r)
 
 
 def fleche(p, x0, y0, x1, y1, pen: QPen, tete: float = 8.0):
@@ -112,7 +456,7 @@ def phase_lune(p, x: float, y: float, r: float, angle: float, cle_eclairee='lune
     p.translate(x, y)
     p.rotate(rotation)
     p.setPen(Qt.PenStyle.NoPen)
-    p.setBrush(c(cle_sombre))
+    p.setBrush(c(cle_sombre) if isinstance(cle_sombre, str) else QColor(cle_sombre))
     p.drawEllipse(QPointF(0, 0), r, r)
     a = angle % 360.0
     k = math.cos(a * DEG)                      # demi-axe du terminateur (en rayons), signé
@@ -128,12 +472,41 @@ def phase_lune(p, x: float, y: float, r: float, angle: float, cle_eclairee='lune
         xx = r * math.cos(t) * k * (1 if droite else -1)
         pts.append(QPointF(xx, r * math.sin(t)))
     chemin.addPolygon(QPolygonF(pts))
-    p.setBrush(c(cle_eclairee))
+    base = c(cle_eclairee) if isinstance(cle_eclairee, str) else QColor(cle_eclairee)
+    if r >= 6:
+        # partie éclairée : léger volume (plus clair vers le Soleil, limbe assombri)
+        g = QRadialGradient(QPointF(0, 0), r * 1.02, QPointF((1 if droite else -1) * r * 0.35, -r * 0.15), r * 0.05)
+        g.setColorAt(0.0, base.lighter(116))
+        g.setColorAt(0.6, base)
+        g.setColorAt(1.0, _fonce(base, 0.8, base.alphaF()))
+        p.setBrush(QBrush(g))
+    else:
+        p.setBrush(base)
     p.drawPath(chemin)
     p.setPen(stylo('doux', 1.0, 0.6))
     p.setBrush(Qt.BrushStyle.NoBrush)
     p.drawEllipse(QPointF(0, 0), r, r)
     p.restore()
+
+
+def polygone(xs, ys) -> QPolygonF:
+    """QPolygonF depuis deux tableaux de coordonnées, sans créer un QPointF par point (copie directe dans la mémoire
+    du polygone ; repli point par point si la liaison Qt ne l'expose pas)."""
+    xs = np.asarray(xs, dtype=float)
+    ys = np.asarray(ys, dtype=float)
+    n = len(xs)
+    try:
+        poly = QPolygonF()
+        poly.resize(n)
+        if n:
+            ptr = poly.data()
+            ptr.setsize(16 * n)
+            a = np.frombuffer(ptr, dtype=np.float64).reshape(n, 2)
+            a[:, 0] = xs
+            a[:, 1] = ys
+        return poly
+    except Exception:
+        return QPolygonF(list(map(QPointF, xs.tolist(), ys.tolist())))
 
 
 # ==================================================================== projection d'une sphère
@@ -143,9 +516,12 @@ class Vue3D:
     def __init__(self, az: float = 215.0, alt: float = 30.0, alt_min: float = -89.0, alt_max: float = 89.0):
         self.alt_min, self.alt_max = alt_min, alt_max
         self.defaut = (az, alt)
+        self.rayon_px = 0.0                    # rayon à l'écran de la dernière sphère dessinée avec cette vue
         self.regler(az, alt)
 
     def regler(self, az: float, alt: float):
+        if not (math.isfinite(az) and math.isfinite(alt)):
+            return                              # garde-fou : jamais d'état invalide (NaN) gardé
         self.az = az % 360.0
         self.alt = max(self.alt_min, min(self.alt_max, alt))
         a, h = self.az * DEG, self.alt * DEG
@@ -159,8 +535,20 @@ class Vue3D:
     def reinitialiser(self):
         self.regler(*self.defaut)
 
-    def tourner(self, dx_px: float, dy_px: float, sensibilite: float = 0.4):
-        self.regler(self.az - dx_px * sensibilite, self.alt + dy_px * sensibilite)
+    def tourner(self, dx_px: float, dy_px: float, sensibilite: float | None = None):
+        """Glisser de (dx, dy) pixels : le point de la sphère sous la souris suit la souris (vers la droite, la face
+        visible part vers la droite ; vers le bas, elle descend), au rythme d'un radian par rayon de sphère ; sans
+        rayon connu, 0,4° par pixel."""
+        if not (math.isfinite(dx_px) and math.isfinite(dy_px)):
+            return
+        if sensibilite is None:
+            s = min(0.6, 180.0 / math.pi / self.rayon_px) if self.rayon_px > 20 and math.isfinite(self.rayon_px) \
+                else 0.4
+            # à la hauteur h, un tour d'azimut ne déplace le centre de l'image que de cos h : on compense (borné)
+            k = 1.0 / max(0.35, math.cos(self.alt * DEG))
+        else:
+            s, k = sensibilite, 1.0
+        self.regler(self.az + dx_px * s * k, self.alt + dy_px * s)
 
     def projeter(self, pts: np.ndarray):
         """pts (N, 3) → x (droite), y (haut), profondeur (> 0 : devant le centre)."""
@@ -209,6 +597,8 @@ class Peintre3D:
 
     def __init__(self, p, vue: Vue3D, cx: float, cy: float, rayon: float, transformer=None):
         self.p, self.vue, self.cx, self.cy, self.r = p, vue, cx, cy, rayon
+        if rayon > 20:
+            vue.rayon_px = rayon
         self.passe = None
         self.transformer = transformer         # fonction (N, 3) → (N, 3) : repère de l'objet → monde
 
@@ -259,7 +649,7 @@ class Peintre3D:
             if not devant and arriere == 'pointille':
                 pen.setStyle(Qt.PenStyle.DashLine)
             self.p.setPen(pen)
-            self.p.drawPolyline(QPolygonF(list(map(QPointF, xs[d:f + 1].tolist(), ys[d:f + 1].tolist()))))
+            self.p.drawPolyline(polygone(xs[d:f + 1], ys[d:f + 1]))
 
     def point(self, v, couleur, rayon_px: float = 5.0, repere_monde: bool = False, etiquette: str | None = None,
               decal=(10, -10), bord=None, toujours: bool = False):
@@ -267,12 +657,16 @@ class Peintre3D:
         if not toujours and not self._garder(hs[0] >= -1e-9):
             return None
         av = zs[0] >= 0
-        col = c(couleur) if isinstance(couleur, str) else QColor(couleur)
-        if not av:
-            col.setAlphaF(col.alphaF() * 0.4)
-        self.p.setPen(stylo(bord, 1.0) if bord else Qt.PenStyle.NoPen)
-        self.p.setBrush(QBrush(col))
-        self.p.drawEllipse(QPointF(xs[0], ys[0]), rayon_px, rayon_px)
+        if isinstance(couleur, str) and couleur in ASTRES and rayon_px >= 3.5:
+            astre(self.p, xs[0], ys[0], rayon_px, couleur, bord, 1.0 if av else 0.4)
+        else:
+            col = c(couleur) if isinstance(couleur, str) else QColor(couleur)
+            if not av:
+                col.setAlphaF(col.alphaF() * 0.4)
+            self.p.setPen(stylo(bord, 1.0) if bord else Qt.PenStyle.NoPen)
+            self.p.setBrush(QBrush(col))
+            self.p.drawEllipse(QPointF(xs[0], ys[0]), rayon_px, rayon_px)
+        reserver(self.p, xs[0], ys[0], rayon_px + 1)
         if etiquette:
             texte(self.p, xs[0] + decal[0], ys[0] + decal[1], etiquette, alpha=1.0 if av else 0.5, fond=True)
         return xs[0], ys[0], av
@@ -388,7 +782,9 @@ def zones_principale(rect: QRectF, n_secondaires: int = 2, part: float = 0.56):
 
 
 def cadre(p, r: QRectF, titre: str | None = None):
-    """Fond arrondi d'un panneau, avec son titre en haut à gauche ; rend le rectangle utile."""
+    """Fond arrondi d'un panneau, avec son titre en haut à gauche ; rend le rectangle utile.  Un nouveau panneau
+    oublie la source de lumière des astres."""
+    oublier_lumiere()
     p.save()
     p.setPen(stylo('grille', 1.0, 0.8))
     p.setBrush(c('sphere', 0.18))

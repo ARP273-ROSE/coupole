@@ -41,10 +41,19 @@ TEXTES = {
                        'After ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0). '
                        'Remade in Python: checked computations, bilingual interface.'),
     'anim_erreur': _t('Impossible d’ouvrir cette animation : {erreur}', 'Unable to open this animation: {erreur}'),
-    'anim_toile_aide': _t('Glisser : faire tourner la sphère ou déplacer un objet (étoile, Lune, Terre…). Les valeurs '
-                          'calculées sont sous les réglages.',
-                          'Drag: rotate the sphere or move an object (star, Moon, Earth…). Computed values are below '
-                          'the settings.'),
+    'anim_version_web': _t('Version web ↗', 'Web version ↗'),
+    'anim_version_web_aide': _t('Ouvrir cette animation, avec ses réglages, dans Coupole Web '
+                                '(arp273-rose.github.io/coupole-web) : les mêmes animations dans un navigateur, sur '
+                                'ordinateur, tablette ou téléphone, sans installation.',
+                                'Open this animation, with its settings, in Coupole Web '
+                                '(arp273-rose.github.io/coupole-web): the same animations in a browser, on a computer, '
+                                'tablet or phone, with nothing to install.'),
+    'anim_aide_tourner': _t('Glisser avec la souris : faire tourner la vue.', 'Drag with the mouse: rotate the view.'),
+    'anim_aide_tourner_deplacer': _t('Glisser avec la souris : faire tourner la sphère, ou déplacer un objet en le '
+                                     'saisissant.', 'Drag with the mouse: rotate the sphere, or move an object by '
+                                     'grabbing it.'),
+    'anim_aide_deplacer': _t('Glisser avec la souris : déplacer les objets de la scène.',
+                             'Drag with the mouse: move the objects in the scene.'),
     'anim_lecture': _t('▶ Lecture', '▶ Play'),
     'anim_lecture_aide': _t('Lancer ou mettre en pause l’animation.', 'Start or pause the animation.'),
     'anim_pause': _t('⏸ Pause', '⏸ Pause'),
@@ -58,11 +67,19 @@ TEXTES = {
         "<h3>Animations</h3><p>Les animations pédagogiques ClassAction de l’université du Nebraska-Lincoln, écrites à "
         "l’origine en Flash, refaites en Python pour Windows, macOS et Linux. Les 92 animations du catalogue sont "
         "toutes disponibles, classées par thème ; celles qui n’étaient que des films sont devenues des simulations.</p>"
-        "<h4>Manipuler</h4><ul><li><b>Glisser</b> sur une sphère la fait tourner ; sur une étoile, la Lune, la Terre ou "
-        "un observateur, les déplace.</li><li><b>Lecture / Pause</b> et <b>Vitesse</b> (0,1 à 10 ×) animent le temps ; "
+        "<h4>Manipuler</h4><ul><li><b>Glisser</b> sur une sphère la fait tourner (le point saisi suit la souris) ; sur "
+        "une étoile, la Lune, la Terre ou un observateur, les déplace. Ce que fait la souris dans chaque animation est "
+        "rappelé en petit sous la scène.</li><li><b>Lecture / Pause</b> et <b>Vitesse</b> (0,1 à 10 ×) animent le temps ; "
         "<b>Réinitialiser</b> revient à l’état de départ.</li><li>Chaque réglage a un curseur et un champ numérique ; "
         "les valeurs calculées s’affichent sous les réglages.</li><li>Les réglages sont gardés d’une session à "
-        "l’autre.</li></ul><h4>Calculs</h4><p>Temps sidéral (IAU 1982), obliquité (IAU 2006), position du Soleil et "
+        "l’autre.</li><li><b>Version web ↗</b> ouvre l’animation, avec ses réglages, dans Coupole Web "
+        "(arp273-rose.github.io/coupole-web), dans un navigateur, sur ordinateur, tablette ou téléphone.</li></ul>"
+        "<h4>Rendu</h4><p>Soleil, Lune, Terre et planètes en sphères ombrées (côté nuit tourné à l’opposé du Soleil), "
+        "formules mises en forme (fractions, exposants, indices, radicaux ; police STIX Two Math), étiquettes placées "
+        "sans se chevaucher. Simulateur jour-nuit : côtes Natural Earth, projection équirectangulaire, polaire (pôle "
+        "Nord ou Sud) ou globe 3D à tourner à la souris (molette : zoom ; double-clic : face au point subsolaire). "
+        "Simulateur des ombres d’éclipse : « Rejouer une éclipse » montre chacune des 133 éclipses de la table "
+        "2015–2044 en proportions réelles.</p><h4>Calculs</h4><p>Temps sidéral (IAU 1982), obliquité (IAU 2006), position du Soleil et "
         "équation du temps (Meeus, précision 0,01°), changements de repère, équation de Kepler, module de distance, "
         "cônes d’ombre, phases moyennes de la Lune et nœuds de son orbite (saisons d’éclipses), précession, marées "
         "d’équilibre, périodes synodiques, gravitation de Newton, loi de Stefan-Boltzmann et constantes solaires de "
@@ -77,10 +94,18 @@ TEXTES = {
         "<h3>Animations</h3><p>The ClassAction teaching animations of the University of Nebraska-Lincoln, originally "
         "written in Flash, remade in Python for Windows, macOS and Linux. All 92 animations of the catalogue are "
         "available, sorted by topic; those that were only movies have become simulations.</p>"
-        "<h4>Handling</h4><ul><li><b>Dragging</b> a sphere rotates it; dragging a star, the Moon, the Earth or an "
-        "observer moves it.</li><li><b>Play / Pause</b> and <b>Speed</b> (0.1 to 10 ×) run the time; <b>Reset</b> "
+        "<h4>Handling</h4><ul><li><b>Dragging</b> a sphere rotates it (the grabbed point follows the mouse); dragging "
+        "a star, the Moon, the Earth or an observer moves it. What the mouse does in each animation is recalled in "
+        "small print below the scene.</li><li><b>Play / Pause</b> and <b>Speed</b> (0.1 to 10 ×) run the time; <b>Reset</b> "
         "goes back to the initial state.</li><li>Each setting has a slider and a numeric field; computed values are "
-        "shown below the settings.</li><li>Settings are kept from one session to the next.</li></ul>"
+        "shown below the settings.</li><li>Settings are kept from one session to the next.</li><li><b>Web version ↗</b> "
+        "opens the animation, with its settings, in Coupole Web (arp273-rose.github.io/coupole-web), in a browser, on "
+        "a computer, tablet or phone.</li></ul><h4>Rendering</h4><p>Sun, Moon, Earth and planets as shaded spheres "
+        "(night side turned away from the Sun), typeset formulas (fractions, superscripts, subscripts, radicals; STIX "
+        "Two Math font), labels placed without overlapping. Daylight simulator: Natural Earth coastlines, "
+        "equirectangular or polar (North or South Pole) projection, or a 3D globe rotated with the mouse (wheel: zoom; "
+        "double-click: face the subsolar point). Eclipse shadow simulator: “Replay an eclipse” shows each of the 133 "
+        "eclipses of the 2015–2044 table to true scale.</p>"
         "<h4>Computations</h4><p>Sidereal time (IAU 1982), obliquity (IAU 2006), position of the Sun and equation of "
         "time (Meeus, 0.01° accuracy), coordinate changes, Kepler’s equation, distance modulus, shadow cones, mean "
         "lunar phases and nodes of the lunar orbit (eclipse seasons), precession, equilibrium tides, synodic periods, "
@@ -528,6 +553,27 @@ _ANIM = {
     'anim_shadowsim_titre_reel': ('Éclipse centrale de Lune, proportions réelles', 'Central lunar eclipse, real '
                                                                                    'proportions'),
     'anim_shadowsim_rapport': ('Ombre ≈ {x} diamètres lunaires', 'Shadow ≈ {x} lunar diameters'),
+    'anim_shadowsim_rejouer': ('Rejouer une éclipse', 'Replay an eclipse'),
+    'anim_shadowsim_rejouer_aide': ('Rejouer une éclipse de la table 2015–2044 : passage de la Lune dans l’ombre de la '
+                                    'Terre, ou de l’ombre de la Lune sur la Terre, en proportions réelles.',
+                                    'Replay an eclipse from the 2015–2044 table: the Moon crossing the Earth’s shadow, '
+                                    'or the Moon’s shadow crossing the Earth, to true scale.'),
+    'anim_shadowsim_libre': ('— aucune (placement libre) —', '— none (free placement) —'),
+    'anim_shadowsim_soleil': ('Soleil', 'Sun'), 'anim_shadowsim_lune_t': ('Lune', 'Moon'),
+    'anim_shadowsim_instant': ('Instant de l’éclipse', 'Moment of the eclipse'),
+    'anim_shadowsim_instant_aide': ('Faire avancer la Lune (ou son ombre) le long de sa trajectoire, du début à la fin '
+                                    'de l’éclipse.', 'Move the Moon (or its shadow) along its path, from the start to '
+                                    'the end of the eclipse.'),
+    'anim_shadowsim_rejouee': ('Éclipse rejouée', 'Replayed eclipse'),
+    'anim_shadowsim_ecart': ('Écart à l’axe de l’ombre', 'Distance from the shadow axis'),
+    'anim_shadowsim_titre_lune': ('Éclipse de Lune du {date} : la Lune traverse l’ombre de la Terre (proportions '
+                                  'réelles, nord en haut)', 'Lunar eclipse of {date}: the Moon crosses the Earth’s '
+                                  'shadow (true scale, north up)'),
+    'anim_shadowsim_titre_soleil': ('Éclipse de Soleil du {date} : l’ombre de la Lune balaie la Terre (proportions '
+                                    'réelles, nord en haut)', 'Solar eclipse of {date}: the Moon’s shadow sweeps the '
+                                    'Earth (true scale, north up)'),
+    'anim_shadowsim_note': ('Trajectoire approchée (éléments moyens, Meeus).', 'Approximate path (mean elements, '
+                            'Meeus).'),
     'anim_shadowsim_duree_tot': ('Totalité : {d}', 'Totality: {d}'),
     # ------------------------------------------------------------ Mars de Ptolémée
     'anim_marsorbit_soleil': ('Soleil', 'Sun'),
@@ -759,6 +805,49 @@ _ANIM_BIS = {
                                                '12° et 18° sous l’horizon).',
                                                'Bands of civil, nautical and astronomical twilight (Sun 6°, 12° and '
                                                '18° below the horizon).'),
+    'anim_daylightsimulator_projection': ('Projection', 'Projection'),
+    'anim_daylightsimulator_projection_aide': ('Carte équirectangulaire (latitude et longitude proportionnelles), ou '
+                                               'azimutale équidistante centrée sur le pôle Nord ou le pôle Sud, jusqu’à '
+                                               'l’équateur (régions polaires, nuit et jour polaires sans déformation), '
+                                               'ou globe 3D vu de l’espace, à tourner à la souris.',
+                                               'Equirectangular map (latitude and longitude proportional), '
+                                               'azimuthal equidistant centred on the North or South Pole, down to the '
+                                               'equator (polar regions, polar night and day without distortion), or a '
+                                               '3D globe seen from space, rotated with the mouse.'),
+    'anim_daylightsimulator_proj_equi': ('équirectangulaire', 'equirectangular'),
+    'anim_daylightsimulator_proj_nord': ('pôle Nord', 'North Pole'),
+    'anim_daylightsimulator_proj_sud': ('pôle Sud', 'South Pole'),
+    'anim_daylightsimulator_proj_globe': ('globe 3D (vue de l’espace)', '3D globe (view from space)'),
+    'anim_daylightsimulator_souris': ('Carte : glisser pour placer l’observateur. Globe 3D : glisser pour le faire '
+                                      'tourner dans tous les sens (le point saisi suit la souris), molette pour '
+                                      'zoomer, double-clic pour revenir au point subsolaire, clic droit pour placer '
+                                      'l’observateur.',
+                                      'Map: drag to place the observer. 3D globe: drag to rotate it in any direction '
+                                      '(the grabbed point follows the mouse), wheel to zoom, double-click to go back to '
+                                      'the subsolar point, right click to place the observer.'),
+    'anim_daylightsimulator_jour_polaire': ('jour polaire (Soleil à {h} de hauteur)', 'polar day (Sun {h} high)'),
+    'anim_daylightsimulator_nuit_polaire': ('nuit polaire (Soleil à {h})', 'polar night (Sun at {h})'),
+    'anim_daylightsimulator_pole_horizon': ('le Soleil fait le tour de l’horizon (équinoxe)',
+                                            'the Sun runs along the horizon (equinox)'),
+    'anim_daylightsimulator_pole_n': ('Au pôle Nord', 'At the North Pole'),
+    'anim_daylightsimulator_pole_s': ('Au pôle Sud', 'At the South Pole'),
+    'anim_daylightsimulator_bord': ('Vue polaire jusqu’à', 'Polar view down to'),
+    'anim_daylightsimulator_bord_aide': ('Bord de la vue polaire : l’équateur, ou 30° au-delà pour voir les deux '
+                                         'tropiques.', 'Edge of the polar view: the equator, or 30° beyond to see both '
+                                         'tropics.'),
+    'anim_daylightsimulator_bord_0': ('l’équateur', 'the equator'),
+    'anim_daylightsimulator_bord_30': ('30° au-delà (tropiques)', '30° beyond (tropics)'),
+    'anim_daylightsimulator_tournant': ('Terminateur tournant', 'Rotating terminator'),
+    'anim_daylightsimulator_tournant_aide': ('Vue polaire et globe : la carte reste fixe (méridien de Greenwich en bas, '
+                                             'ou en haut au pôle Sud) et le terminateur tourne ; sinon la Terre tourne '
+                                             'sous un terminateur fixe (midi en bas).',
+                                             'Polar view and globe: the map stays fixed (Greenwich meridian at the '
+                                             'bottom, or at the top for the South Pole) and the terminator turns; '
+                                             'otherwise the Earth turns under a fixed terminator (noon at the bottom).'),
+    'anim_daylightsimulator_axe': ('Axe des pôles', 'Polar axis'),
+    'anim_daylightsimulator_axe_aide': ('Montrer l’axe de rotation de la Terre (partie cachée en pointillé).',
+                                        'Show the Earth’s rotation axis (hidden part dotted).'),
+    'anim_daylightsimulator_vers_soleil': ('vers le Soleil', 'to the Sun'),
     'anim_daylightsimulator_subsolaire': ('Point subsolaire', 'Subsolar point'),
     'anim_daylightsimulator_h_soleil': ('Hauteur du Soleil pour l’observateur', 'Sun’s altitude for the observer'),
     # antipodes

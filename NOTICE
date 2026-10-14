@@ -19,8 +19,8 @@ Education, Apache License 2.0 (full text: LICENCES/Apache-2.0.txt).
 Repris ou adaptés de ces sources / taken or adapted from these sources :
   - le catalogue des 92 animations (identifiants, titres, descriptions anglaises : animations.xml) ;
   - les comportements, réglages et paramètres des animations (lus dans le code ActionScript d'origine) ;
-  - le tracé des côtes du globe (shoreDemo/si100.xml, d'après les côtes GSHHS), converti en
-    coupole/modules/anim/donnees/cotes.json.gz ;
+  - (jusqu'en 0.4.0) le tracé des côtes du globe (shoreDemo/si100.xml, d'après les côtes GSHHS), remplacé en 0.4.1
+    par Natural Earth (voir plus bas) ;
   - les positions d'étoiles des constellations de la comparaison des repères, la liste des villes et le tracé
     simplifié de la ligne de changement de date du démonstrateur longitude/latitude ;
   - (0.3.1) la table des éclipses 2015-2044, convertie en coupole/modules/anim/donnees_eclipses.py (coquilles
@@ -73,3 +73,17 @@ exactes du SI, lois de Planck et de Wien, hydrogène avec la masse réduite, sRG
 ballon, réactions de fusion, embouteillage, spectre électromagnétique…) sont remplacés par des simulations.
 Changes: code fully rewritten in Python (PyQt6, QPainter), bilingual French/English interface, astronomical
 computations replaced by checked reference formulas.
+
+Côtes des globes et des cartes (0.4.1) / Coastlines of globes and maps (0.4.1)
+-------------------------------------------------------------------------------
+Natural Earth 1:50m, ne_50m_land (naturalearthdata.com), domaine public / public domain ; simplifié (Douglas-Peucker
+0,07°, îles de moins de 0,25 degré carré omises) par outils/verif_anim/cotes_natural_earth.py, dans
+coupole/modules/anim/donnees/cotes.json.gz.  Made with Natural Earth. Free vector and raster map data @
+naturalearthdata.com.
+
+Police mathématique (0.4.1) / Mathematical font (0.4.1)
+-------------------------------------------------------
+STIX Two Math (version 2.13), Copyright 2001-2021 The STIX Fonts Project Authors (https://github.com/stipub/stixfonts),
+SIL Open Font License 1.1 (texte complet / full text : LICENCES/OFL-STIX-Two.txt).  Sous-ensemble (latin, grec,
+chiffres en exposant et en indice, opérateurs usuels, lettres mathématiques italiques ; table MATH conservée) dans
+coupole/modules/anim/donnees/stix-two-math.otf, pour les formules des animations.

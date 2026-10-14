@@ -36,14 +36,17 @@ class GrandeOurse(Animation):
 
     def dessiner(self, p, rect):
         self.zone_rotative(rect, self.vue3d)
-        r = min(rect.width() * 0.75, rect.height() * 1.1)
-        # on cadre la région de la constellation : le centre de la scène est entre les étoiles et le ciel
-        cible = CENTRE * 0.62
-        x, y, _ = self.vue3d.projeter(cible[None, :])
-        cx = rect.center().x() - r * float(x[0])
-        cy = rect.center().y() + r * float(y[0])
-        pe = dessin.Peintre3D(p, self.vue3d, cx, cy, r)
         pts = [np.array(astro.vecteur_equatorial(15 * a, d)) for _, a, d, _, _ in ETOILES]
+        # on cadre toute la scène (la Terre, les étoiles à leur distance, le ciel) dans la toile, quelle que soit sa
+        # forme : la Terre ne sort plus de l'image sur un écran très large
+        tous = np.vstack([np.zeros(3)] + pts + [v * e[3] / RAYON_AL for e, v in zip(ETOILES, pts)])
+        x, y, _ = self.vue3d.projeter(tous)
+        marge = 46
+        bw, bh = max(1e-6, float(x.max() - x.min())), max(1e-6, float(y.max() - y.min()))
+        r = max(10.0, min((rect.width() - 2 * marge) / bw, (rect.height() - 2 * marge) / bh))
+        cx = rect.center().x() - r * float(x.max() + x.min()) / 2
+        cy = rect.center().y() + r * float(y.max() + y.min()) / 2
+        pe = dessin.Peintre3D(p, self.vue3d, cx, cy, r)
         if self.c_sphere.isChecked():
             for dec in (50, 55, 60):
                 pe.courbe(dessin.cercle((0, 0, 1), 90 - dec, 361, debut=0, fin=360)[150:220], 'grille', 1.0,
@@ -55,13 +58,23 @@ class GrandeOurse(Animation):
                           1.0, arriere='normal', profondeur=False)
             for i, j in TRAITS:
                 pe.courbe(dessin.arc(pts[i], pts[j], 10), 'accent1', 1.6, arriere='normal', profondeur=False)
-        for (nom, a, d, dist, err), v in zip(ETOILES, pts):
-            reel = v * dist / RAYON_AL
+        # étiquettes placées sans chevauchement : on réserve d'abord la place de toutes les étoiles
+        reels = [v * e[3] / RAYON_AL for e, v in zip(ETOILES, pts)]
+        for v in reels + (pts if self.c_sphere.isChecked() else []) + [np.zeros(3)]:
+            xs, ys, _, _ = pe.ecran(v)
+            dessin.reserver(p, xs[0], ys[0], 6)
+        noms = []
+        for (nom, a, d, dist, err), v, reel in zip(ETOILES, pts, reels):
             if self.c_lignes.isChecked():
                 pe.segment(np.zeros(3), v, 'doux', 0.8, 0.35)
             pe.segment(v * (dist - err) / RAYON_AL, v * (dist + err) / RAYON_AL, 'accent2', 3.0)
-            pe.point(reel, 'etoile', 4.5, bord='soleil', toujours=True,
-                     etiquette=('%s (%s al)' % (nom, nombre(dist, 0))) if self.c_noms.isChecked() else None)
+            q = pe.point(reel, 'etoile', 4.5, bord='soleil', toujours=True)
+            if q and self.c_noms.isChecked():
+                noms.append((q[0], q[1], '%s (%s al)' % (nom, nombre(dist, 0))))
             if self.c_sphere.isChecked():
                 pe.point(v, 'accent1', 3.0, toujours=True)
-        pe.point(np.zeros(3), 'terre', 6.0, toujours=True, etiquette=tr('anim_shadowsim_terre'))
+        t = pe.point(np.zeros(3), 'terre', 6.0, toujours=True)
+        for x, y, s_ in noms:
+            dessin.etiquette(p, x, y, s_, 'texte', 8)
+        if t:
+            dessin.etiquette(p, t[0], t[1], tr('anim_shadowsim_terre'), 'texte', 9)

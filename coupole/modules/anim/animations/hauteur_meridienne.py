@@ -111,4 +111,4 @@ class HauteurMeridienne(Animation):
             arc(eq, hs, 'arc2', 3.0)
             h, cote = culmination(lat, dec)
             dessin.texte(p, o.x(), o.y() - 18, 'h = %s' % angle(h), 'texte', fond=True)
-        dessin.texte(p, rect.x() + 10, rect.y() + 18, 'h = 90° − φ + δ', 'texte', centre=False)
+        dessin.formule(p, rect.x() + 10, rect.y() + 20, 'h = 90° − φ + δ', 'texte', centre=False)

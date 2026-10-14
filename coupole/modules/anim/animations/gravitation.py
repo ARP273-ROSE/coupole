@@ -116,11 +116,11 @@ class Gravitation(Animation):
         cx = rect.center().x()
         y = rect.y() + rect.height() * 0.18
         dessin.police(p, 1.25)
-        dessin.texte(p, cx, y, 'F = G M₁ M₂ / R²')
-        dessin.texte(p, cx, y + 34, '= (%s) (%s) (%s) / (%s)²' % (scientifique(astro.G_SI), scientifique(m1),
+        dessin.formule(p, cx, y, 'F = G M₁ M₂ / R²')
+        dessin.formule(p, cx, y + 44, '= (%s) (%s) (%s) / (%s)²' % (scientifique(astro.G_SI), scientifique(m1),
                                                                  scientifique(m2), scientifique(r)), 'doux')
         dessin.police(p, 1.25, gras=True)
-        dessin.texte(p, cx, y + 70, '= %s N' % scientifique(c['F']), 'accent1')
+        dessin.texte(p, cx, y + 86, '= %s N' % scientifique(c['F']), 'accent1')
         dessin.police(p, 1 / 1.25 / 1.25)
         # deux corps, flèches d'accélération à l'échelle logarithmique
         yc = rect.y() + rect.height() * 0.55

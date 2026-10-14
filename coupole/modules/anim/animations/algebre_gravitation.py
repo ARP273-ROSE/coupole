@@ -65,11 +65,12 @@ class AlgebreGravitation(Animation):
         dessin.texte(p, x2, cy - r2 - 12, 'M₂ × %s' % texte_fraction(b), 'accent2')
         # la formule
         y = rect.y() + rect.height() * 0.80
-        dessin.police(p, 1.5, gras=True)
-        dessin.texte(p, cx, y, 'F × (%s × %s) / %s² = F × %s' % (texte_fraction(a), texte_fraction(b), texte_fraction(c),
-                                                               texte_fraction(f)))
+        dessin.police(p, 1.5)
+        tc = texte_fraction(c) if c.denominator == 1 else '(%s)' % texte_fraction(c)
+        dessin.formule(p, cx, y - 8, 'F × (%s × %s) / %s² = F × %s' % (texte_fraction(a), texte_fraction(b), tc,
+                                                                      texte_fraction(f)))
         dessin.police(p, 1 / 1.5)
-        dessin.texte(p, cx, y + 26, 'F = G M₁ M₂ / d²', 'doux')
+        dessin.formule(p, cx, y + 34, 'F = G M₁ M₂ / d²', 'doux')
         p.setPen(dessin.stylo('grille', 1.0))
         p.setBrush(dessin.Qt.BrushStyle.NoBrush)
-        p.drawRoundedRect(QRectF(rect.x() + 10, y - 26, rect.width() - 20, 66), 8, 8)
+        p.drawRoundedRect(QRectF(rect.x() + 10, y - 40, rect.width() - 20, 96), 8, 8)

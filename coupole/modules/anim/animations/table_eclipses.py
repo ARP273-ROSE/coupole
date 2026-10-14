@@ -173,15 +173,17 @@ class TableEclipses(Animation):
             p.setPen(dessin.stylo('accent3', 2.0))
             p.setBrush(dessin.Qt.BrushStyle.NoBrush)
             p.drawEllipse(QPointF(x, y), r + 5, r + 5)
+        # icônes (symboles plats, pas des astres en volume)
+        c = dessin.c
         if genre == 'soleil':
             plein = {'total': 'nuit', 'annular': 'nuit', 'hybrid': 'nuit'}.get(type_)
-            dessin.disque(p, x, y, r, 'soleil')
+            dessin.disque(p, x, y, r, c('soleil'))
             if plein:
-                dessin.disque(p, x, y, r * (0.62 if type_ == 'annular' else 0.9), plein)
+                dessin.disque(p, x, y, r * (0.62 if type_ == 'annular' else 0.9), c(plein))
             else:
-                dessin.disque(p, x + r * 0.45, y - r * 0.2, r * 0.8, 'nuit')
+                dessin.disque(p, x + r * 0.45, y - r * 0.2, r * 0.8, c('nuit'))
         else:
             couleur = {'total': 'mars', 'partial': 'accent3', 'penumbral': 'penombre'}.get(type_, 'lune')
-            dessin.disque(p, x, y, r, 'lune')
-            dessin.disque(p, x, y, r * (0.85 if type_ == 'total' else 0.6), couleur)
+            dessin.disque(p, x, y, r, c('lune'))
+            dessin.disque(p, x, y, r * (0.85 if type_ == 'total' else 0.6), c(couleur))
 

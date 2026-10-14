@@ -127,7 +127,7 @@ class ModuleDistance(Animation):
         dessin.disque(p, x, y, rayon, 'etoile', alpha=1.0 - 0.3 * f)
         dessin.texte(p, x, y - rayon - 14, 'd = %s pc' % nombre(self.d.value(), 1), 'accent2', fond=True)
         dessin.police(p, 1.25, gras=True)
-        dessin.texte(p, rect.center().x(), rect.y() + 34, 'm − M = 5 log₁₀ d − 5', 'texte')
+        dessin.formule(p, rect.center().x(), rect.y() + 34, 'm − M = 5 log₁₀ d − 5', 'texte')
         dessin.police(p, 1 / 1.25)
         dessin.texte(p, rect.center().x(), rect.y() + 62, '%s − (%s) = %s' % (
             nombre(self.m.value(), 1), nombre(self.M.value(), 1), nombre(self.m.value() - self.M.value(), 1)), 'accent1')

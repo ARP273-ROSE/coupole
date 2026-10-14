@@ -137,10 +137,7 @@ class CorpsNoir(Animation):
             if choisie and self.c_aire.isChecked():
                 ax.remplir(pts, COULEURS[k], 0.25)
             ax.courbe(pts, COULEURS[k], 3.0 if choisie else 1.4, 1.0 if choisie else 0.75)
-        if self.c_pic.isChecked():
-            lp = lumiere.pic_wien_m(t_sel) * 1e9
-            ax.verticale(lp, COULEURS[self.choisie], etiquette=tr('anim_bbexplorer_pic_a', l=nombre(lp, 1)))
-        # légende : couleur perçue de chaque courbe
+        # légende : couleur perçue de chaque courbe (avant l'étiquette du maximum, qui l'évite)
         dessin.police(p, 0.9)
         x, y = ax.r.right() - 150, ax.r.top() + 14
         for k, t in enumerate(self.temperatures):
@@ -148,6 +145,9 @@ class CorpsNoir(Animation):
             dessin.disque(p, x, y + 18 * k, 6, QColor(*rgb), bord=COULEURS[k])
             dessin.texte(p, x + 12, y + 18 * k + 4, '%s K' % nombre(t, 0), COULEURS[k], centre=False)
         dessin.police(p, 1 / 0.9)
+        if self.c_pic.isChecked():
+            lp = lumiere.pic_wien_m(t_sel) * 1e9
+            ax.verticale(lp, COULEURS[self.choisie], etiquette=tr('anim_bbexplorer_pic_a', l=nombre(lp, 1)))
         if filtres:
             self._barres(p, dessin.cadre(p, z[1], tr('anim_bbexplorer_titre_filtres')), t_sel)
 

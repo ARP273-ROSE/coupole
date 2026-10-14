@@ -7,12 +7,11 @@ Une animation hérite de `Animation`, déclare `ID` (identifiant du catalogue Cl
 ``relacher`` (souris).  Rien de lourd n'est calculé : une image coûte quelques millisecondes (anti-gel)."""
 from __future__ import annotations
 
-import html
 import math
 import time
 
 from PyQt6.QtCore import QPointF, QRectF, QSize, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QPainter
+from PyQt6.QtGui import QPainter, QPalette
 from PyQt6.QtWidgets import (QCheckBox, QComboBox, QDoubleSpinBox, QHBoxLayout, QLabel, QPushButton, QSizePolicy,
                              QSlider, QVBoxLayout, QWidget)
 
@@ -20,7 +19,7 @@ from ...core.i18n import langue, tr
 from ...gui import memoire
 from ...gui.adaptatif import Flux
 from ...gui.outils import aide
-from . import dessin
+from . import dessin, formule
 
 PERIODE_MS = 33                 # ≈ 30 images par seconde
 VITESSE_MIN, VITESSE_MAX = 0.1, 10.0
@@ -95,6 +94,10 @@ class Reglage(QWidget):
         h = QHBoxLayout(self)
         h.setContentsMargins(0, 0, 8, 0)
         self.libelle = QLabel(texte)
+        if any(g == 'formule' for g, _ in formule.morceaux(texte)):
+            px, col, _ = formule.contexte_widget(self.libelle)
+            self.libelle.setTextFormat(Qt.TextFormat.RichText)
+            self.libelle.setText(formule.enrichir(texte, px, col))
         h.addWidget(self.libelle)
         self.curseur = QSlider(Qt.Orientation.Horizontal)
         self.curseur.setRange(0, self.PAS)
@@ -209,6 +212,7 @@ class Toile(QWidget):
         r = QRectF(self.rect())
         p.fillRect(r, dessin.c('fond'))
         self.anim._vues = []
+        dessin.debut_image(p, r)
         try:
             self.anim.dessiner(p, r)
         finally:
@@ -231,6 +235,16 @@ class Toile(QWidget):
         self._dernier = None
         self.anim.relacher(ev.position())
 
+    def wheelEvent(self, ev):
+        if self.anim.molette(ev.position(), ev.angleDelta().y()):
+            ev.accept()
+        else:
+            super().wheelEvent(ev)
+
+    def mouseDoubleClickEvent(self, ev):
+        if not self.anim.double_clic(ev.position()):
+            super().mouseDoubleClickEvent(ev)
+
 
 class Animation(QWidget):
     ID = ''
@@ -246,8 +260,18 @@ class Animation(QWidget):
         self._t_dernier = None
         v = QVBoxLayout(self)
         v.setContentsMargins(0, 0, 0, 0)
-        self.toile = aide(Toile(self), 'anim_toile_aide')
+        self.nb_vues = 0                         # sphères qu'on fait tourner au glisser (pour l'aide)
+        self.toile = Toile(self)
         v.addWidget(self.toile, 1)
+        # aide propre à l'animation, discrète, sous la scène (jamais d'info-bulle par-dessus le dessin)
+        self.l_aide = QLabel('')
+        self.l_aide.setWordWrap(True)
+        self.l_aide.setObjectName('anim_aide_scene')
+        f = self.l_aide.font()
+        f.setPointSizeF(f.pointSizeF() * 0.9)
+        self.l_aide.setFont(f)
+        self.l_aide.setForegroundRole(QPalette.ColorRole.PlaceholderText)
+        v.addWidget(self.l_aide)
         self.barre = Flux()
         v.addLayout(self.barre)
         self.flux = Flux()
@@ -273,6 +297,7 @@ class Animation(QWidget):
         b.clicked.connect(self.reinitialiser)
         self.barre.addWidget(b)
         self.construire()
+        self.l_aide.setText(self.aide_interaction())
         self.rafraichir()
         if self.ANIMEE and self.LECTURE_AU_DEPART:
             self.basculer_lecture()
@@ -307,6 +332,13 @@ class Animation(QWidget):
 
     def relacher(self, pos: QPointF):
         self._glisse = None
+
+    def molette(self, pos: QPointF, delta: float) -> bool:
+        """Molette sur la toile (delta en huitièmes de degré) ; rend True si l'animation s'en sert."""
+        return False
+
+    def double_clic(self, pos: QPointF) -> bool:
+        return False
 
     # ------------------------------------------------------------ réglages
     def _cle(self, cle: str) -> str:
@@ -358,6 +390,7 @@ class Animation(QWidget):
         h.addWidget(lab)
         h.addWidget(w)
         (flux or self.flux).addWidget(boite)
+        w._boite = boite                         # pour masquer la liste avec son libellé
         return w
 
     def bouton(self, cle_texte: str, rappel, flux=None) -> QPushButton:
@@ -368,11 +401,61 @@ class Animation(QWidget):
         return b
 
     def vue(self, az: float, alt: float, alt_min: float = -89.0, alt_max: float = 89.0) -> dessin.Vue3D:
+        self.nb_vues += 1
         return dessin.Vue3D(az, alt, alt_min, alt_max)
+
+    def aide_interaction(self) -> str:
+        """Ce que fait la souris dans cette animation précise (texte « souris » propre à l'animation s'il existe,
+        sinon selon qu'elle a une sphère à tourner et/ou des objets à déplacer)."""
+        from ...core import i18n
+        cles = i18n.toutes_les_cles()
+        ident = self.ID.lower()
+        propre = next((k for k in ('anim_%s_souris' % ident, 'anim_%s_aide_souris' % ident) if k in cles), None)
+        deplace = type(self).presser is not Animation.presser
+        if propre:
+            return tr(propre)
+        if self.nb_vues:
+            return tr('anim_aide_tourner_deplacer' if deplace else 'anim_aide_tourner')
+        if deplace:
+            return tr('anim_aide_deplacer')
+        return ''
 
     def zone_rotative(self, rect: QRectF, vue: dessin.Vue3D):
         """À appeler dans dessiner() : la souris fait tourner `vue` dans `rect`."""
         self._vues.append((QRectF(rect), vue))
+
+    def etat_reglages(self, modifies: bool = True) -> dict:
+        """Réglages courants (clé → valeur), seulement ceux qui diffèrent du défaut si `modifies`."""
+        out = {}
+        for cle, (w, defaut) in self._defauts.items():
+            if isinstance(w, Reglage):
+                v = round(w.champ.value(), w.champ.decimals())
+                d = round(float(defaut), w.champ.decimals())
+            elif isinstance(w, QCheckBox):
+                v, d = w.isChecked(), defaut
+            elif isinstance(w, QComboBox):
+                v, d = w.currentData(), defaut
+            else:
+                continue
+            if not modifies or v != d:
+                out[cle] = v
+        return out
+
+    def adresse_web(self) -> str:
+        """Fragment de l'adresse partageable de Coupole Web pour cette animation (« #/a/<id>?clé=valeur&… »)."""
+        from urllib.parse import quote, urlencode
+        parametres = []
+        for cle, v in self.etat_reglages().items():
+            if isinstance(v, bool):
+                s = 'true' if v else 'false'
+            elif isinstance(v, float):
+                s = repr(int(v)) if v == int(v) else repr(v)
+            else:
+                s = str(v)
+            if len(s) <= 80:
+                parametres.append((cle, s))
+        q = urlencode(parametres)
+        return '#/a/%s%s' % (quote(self.ID, safe=''), '?' + q if q else '')
 
     def reglage_change(self):
         self.rafraichir()
@@ -445,10 +528,12 @@ class Animation(QWidget):
         texte = ''
         if lignes:
             par_ligne = 2 if len(lignes) > 4 and self.width() >= 700 else 1
+            px, col, _ = formule.contexte_widget(self.l_valeurs)
             rangs = []
             for i in range(0, len(lignes), par_ligne):
                 rangs.append(''.join('<td style="padding-right:8px">%s</td><td style="padding-right:24px"><b>%s</b></td>'
-                                     % (html.escape(a), html.escape(b)) for a, b in lignes[i:i + par_ligne]))
+                                     % (formule.enrichir(a, px, col), formule.enrichir(b, px, col, valeur=True))
+                                     for a, b in lignes[i:i + par_ligne]))
             texte = '<table>%s</table>' % ''.join('<tr>%s</tr>' % r for r in rangs)
         if texte != self.l_valeurs.text():
             self.l_valeurs.setText(texte)
@@ -456,13 +541,16 @@ class Animation(QWidget):
     def image(self, largeur: int = 720, hauteur: int = 470):
         """Rendu hors écran (tests, captures du manuel)."""
         from PyQt6.QtGui import QImage
-        img = QImage(largeur, hauteur, QImage.Format.Format_ARGB32)
+        img = QImage(largeur, hauteur, QImage.Format.Format_ARGB32_Premultiplied)  # comme l’écran
         img.fill(dessin.c('fond'))
         p = QPainter(img)
         p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        p.setRenderHint(QPainter.RenderHint.TextAntialiasing)
         self._vues = []
+        r = QRectF(0, 0, largeur, hauteur)
+        dessin.debut_image(p, r)
         try:
-            self.dessiner(p, QRectF(0, 0, largeur, hauteur))
+            self.dessiner(p, r)
         finally:
             p.end()
         return img

@@ -31,17 +31,84 @@ LIGNE_DATE = ((90, 180), (75, 180), (72, -169), (65.5, -169), (64, -175), (50.5,
               (-51.5, 180), (-90, 180))
 
 _COTES = None
+_COTES_TOUT = None
+_CHEMIN_CARTE = None
+
+
+def _lire_cotes() -> list:
+    """Lignes de côte (Natural Earth 1:50m simplifié, domaine public) : liste de tableaux (N, 2) (longitude,
+    latitude), lus une fois, au premier globe ou à la première carte affichés (chargement à la demande)."""
+    doc = json.loads(gzip.decompress((Path(__file__).resolve().parents[1] / 'donnees' / 'cotes.json.gz').read_bytes()))
+    return [np.asarray(poly, dtype=float) for poly in doc['polygones']]
 
 
 def cotes():
-    """Polygones des côtes (longitude, latitude) → liste de tableaux (N, 3) sur la sphère unité (chargés une fois)."""
+    """Lignes de côte → liste de tableaux (N, 3) sur la sphère unité (chargées une fois)."""
     global _COTES
     if _COTES is None:
-        doc = json.loads(gzip.decompress((Path(__file__).resolve().parents[1] / 'donnees' / 'cotes.json.gz')
-                                         .read_bytes()))
-        _COTES = [globe_xyz(np.array([q[1] for q in poly]), np.array([q[0] for q in poly]))
-                  for poly in doc['polygones']]
+        _COTES = [globe_xyz(q[:, 1], q[:, 0]) for q in _lire_cotes()]
     return _COTES
+
+
+def _cotes_tout():
+    """Toutes les côtes dans un seul tableau (N, 3), et le masque des segments à ne pas tracer (entre deux lignes)."""
+    global _COTES_TOUT
+    if _COTES_TOUT is None:
+        lignes = cotes()
+        pts = np.vstack(lignes)
+        relie = np.ones(len(pts) - 1, dtype=bool)
+        fins = np.cumsum([len(q) for q in lignes])[:-1]
+        relie[fins - 1] = False
+        _COTES_TOUT = (pts, relie)
+    return _COTES_TOUT
+
+
+def dessiner_cotes_globe(pe, cle: str = 'doux', epaisseur: float = 1.0, alpha: float = 0.9):
+    """Côtes de la face visible d'un globe (Peintre3D sans transformation) : une projection numpy de tous les points,
+    puis un tracé par morceau visible."""
+    pts, relie = _cotes_tout()
+    x, y, z = pe.vue.projeter(pts)
+    vis = relie & (z[:-1] >= 0) & (z[1:] >= 0)
+    if not vis.any():
+        return
+    d = np.flatnonzero(np.diff(np.concatenate(([0], vis.astype(np.int8), [0]))))
+    xs, ys = pe.cx + pe.r * x, pe.cy - pe.r * y
+    pe.p.setPen(dessin.stylo(cle, epaisseur, alpha))
+    pe.p.setBrush(Qt.BrushStyle.NoBrush)
+    for a, b in zip(d[0::2].tolist(), d[1::2].tolist()):
+        pe.p.drawPolyline(dessin.polygone(xs[a:b + 1], ys[a:b + 1]))
+
+
+def chemin_carte():
+    """Côtes en projection équirectangulaire, dans le repère (longitude, −latitude) en degrés (chemin mis en cache,
+    coupé au passage de la ligne ±180°)."""
+    global _CHEMIN_CARTE
+    if _CHEMIN_CARTE is None:
+        from PyQt6.QtGui import QPainterPath
+        ch = QPainterPath()
+        for q in _lire_cotes():
+            lo, la = q[:, 0], q[:, 1]
+            coupe = np.flatnonzero(np.abs(np.diff(lo)) > 180) + 1
+            for morceau in np.split(np.arange(len(lo)), coupe):
+                if len(morceau) < 2:
+                    continue
+                ch.addPolygon(dessin.polygone(lo[morceau], -la[morceau]))
+        _CHEMIN_CARTE = ch
+    return _CHEMIN_CARTE
+
+
+def dessiner_cotes_carte(p, carte, cle: str = 'doux', epaisseur: float = 0.8, alpha: float = 0.8):
+    """Côtes sur une carte équirectangulaire occupant le rectangle `carte` (longitude −180…180, latitude 90…−90)."""
+    p.save()
+    p.setClipRect(carte)
+    p.translate(carte.x() + carte.width() / 2, carte.y() + carte.height() / 2)
+    p.scale(carte.width() / 360.0, carte.height() / 180.0)
+    pen = dessin.stylo(cle, epaisseur, alpha)
+    pen.setCosmetic(True)
+    p.setPen(pen)
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    p.drawPath(chemin_carte())
+    p.restore()
 
 
 def globe_xyz(lat, lon) -> np.ndarray:
@@ -132,9 +199,7 @@ class LongitudeLatitude(Animation):
         for lon in range(0, 180, 30):
             pe.courbe(dessin.cercle((math.sin(math.radians(lon)), -math.cos(math.radians(lon)), 0)), 'grille', 0.8,
                       0.6, arriere='cache')
-        for poly in cotes():
-            if len(poly) >= 5:                                  # les îlots de 3-4 points ne font que du bruit
-                pe.courbe(poly, 'doux', 1.0, 0.9, arriere='cache', ferme=True)
+        dessiner_cotes_globe(pe)
         if self.c_reperes.isChecked():
             pe.courbe(dessin.cercle((0, 0, 1)), 'equateur', 2.0, arriere='cache')
             pe.courbe(globe_xyz(np.linspace(-90, 90, 91), np.zeros(91)), 'accent1', 2.0, arriere='cache')
@@ -165,6 +230,3 @@ class LongitudeLatitude(Animation):
         pe.etiquette(globe_xyz(la / 2, lo) * 1.02, t_la, 'arc1')
         pe.etiquette(globe_xyz(-6, lo / 2) * 1.02, t_lo, 'arc2')
         pe.point(globe_xyz(la, lo), 'soleil', 6.0, bord='fond')
-        dessin.police(p, 0.85)
-        dessin.texte(p, rect.x() + 8, rect.bottom() - 10, tr('anim_longlat_souris'), 'doux', centre=False)
-        dessin.police(p, 1 / 0.85)

@@ -64,19 +64,25 @@ class LanceurMarteau(Animation):
             p.drawEllipse(QPointF(cx, cy), r1, r1)
             p.setPen(dessin.stylo('equateur', 1.0, 0.7, True))
             p.drawEllipse(QPointF(cx, cy), r2, r2)
+        # tailles proportionnées au panneau : le lanceur (ou l'étoile) ne recouvre jamais la boule (ou la planète)
+        rg = max(6.0, min(16.0, d * 0.16))
+        rp = max(4.0, min(7.0, d * 0.07))
         p.setPen(dessin.stylo('doux', 1.5))
         p.drawLine(QPointF(x1, y1), QPointF(x2, y2))
-        if genre == 'lanceur':
-            dessin.disque(p, x1, y1, 16, 'accent2', bord='texte')
-            dessin.disque(p, x2, y2, 7, 'doux', bord='texte')
-            dessin.texte(p, x1, y1 - 24, tr('anim_hammerthrower_lanceur_n'), 'accent2', fond=True)
-            dessin.texte(p, x2, y2 - 16, tr('anim_hammerthrower_boule'), 'doux', fond=True)
-        else:
-            dessin.disque(p, x1, y1, 16, 'soleil')
-            dessin.disque(p, x2, y2, 6, 'equateur', bord='texte')
-            dessin.texte(p, x1, y1 - 24, tr('anim_c_etoile'), 'accent1', fond=True)
-            dessin.texte(p, x2, y2 - 15, tr('anim_c_planete'), 'equateur', fond=True)
         p.setPen(dessin.stylo('accent3', 2.0))
         p.drawLine(QPointF(cx - 6, cy), QPointF(cx + 6, cy))
         p.drawLine(QPointF(cx, cy - 6), QPointF(cx, cy + 6))
-        dessin.texte(p, cx, cy + 16, tr('anim_c_barycentre'), 'accent3', fond=True)
+        dessin.reserver(p, cx, cy, 7)
+        if genre == 'lanceur':
+            dessin.disque(p, x1, y1, rg, 'accent2', bord='texte')
+            dessin.disque(p, x2, y2, rp, 'doux', bord='texte')
+            noms = ((x1, y1, rg, tr('anim_hammerthrower_lanceur_n'), 'accent2'),
+                    (x2, y2, rp, tr('anim_hammerthrower_boule'), 'doux'))
+        else:
+            dessin.disque(p, x1, y1, rg, 'soleil')
+            dessin.disque(p, x2, y2, rp, 'equateur', bord='texte')
+            noms = ((x1, y1, rg, tr('anim_c_etoile'), 'accent1'), (x2, y2, rp, tr('anim_c_planete'), 'equateur'))
+        # étiquettes autour des objets (placeur commun : jamais l'une sur l'autre ni sur un objet)
+        dessin.etiquette(p, cx, cy, tr('anim_c_barycentre'), 'accent3', 9)
+        for x, y, rr, s_, cle in noms:
+            dessin.etiquette(p, x, y, s_, cle, rr * 0.75 + 5)

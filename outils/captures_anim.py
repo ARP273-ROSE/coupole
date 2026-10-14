@@ -21,7 +21,13 @@ RENDUS = ('eclipticsimulator', 'lunar_applet', 'shadowsim', 'celhorcomp', 'keple
           'transitmovie', 'hrexplorer',
           # lot 3 (0.4.0)
           'bbexplorer', 'hydrogenatom', 'threeviewsspectra', 'transitsimulator', 'ca_extrasolarplanets_starwobble',
-          'eclipsingbinarysim', 'galacticredshift', 'milkywayrotationalvelocity', 'telescope10', 'fusion02')
+          'eclipsingbinarysim', 'galacticredshift', 'milkywayrotationalvelocity', 'telescope10', 'fusion02',
+          # 0.4.1 : formules, étiquettes, sphères
+          'gravcalc', 'hammerthrower', 'bigdipper')
+# 0.4.1 : variantes (nom du fichier, identifiant, réglages)
+VARIANTES = (('daylightsimulator_nord', 'daylightsimulator', {'projection': 'nord', 'crepuscule': True}),
+             ('daylightsimulator_globe', 'daylightsimulator', {'projection': 'globe', 'crepuscule': True}),
+             ('shadowsim_rejeu', 'shadowsim', {'rejouer': 'S20', 'instant': 0.15}))
 
 
 def attendre(app, s):
@@ -84,6 +90,27 @@ def main():
                 a.pas(0.1)
         attendre(app, 0.2)
         a.grab().save(str(dossier / ('anim_%s_%s.png' % (ident.lower(), langue))))
+        a.close()
+    for nom, ident, reglages in VARIANTES:
+        a = catalogue.PAR_ID[ident].charger()()
+        for cle, v in reglages.items():
+            w = a._defauts[cle][0]
+            if hasattr(w, 'findData'):
+                w.setCurrentIndex(w.findData(v))
+            elif hasattr(w, 'setChecked'):
+                w.setChecked(v)
+            else:
+                w.setValue(v)
+        if ident == 'daylightsimulator':
+            a.jour.setValue(172.0)
+            a.heure.setValue(15.5)
+            if reglages.get('projection') == 'globe':
+                a.recentrer()
+                a.tourner_globe(-140, 110, 250)
+        a.resize(1100, 760)
+        a.show()
+        attendre(app, 0.2)
+        a.grab().save(str(dossier / ('anim_%s_%s.png' % (nom, langue))))
         a.close()
     f.close()
 

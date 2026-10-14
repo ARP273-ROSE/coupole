@@ -58,7 +58,7 @@ class Excentricite(Animation):
     def dessiner(self, p, rect):
         a, c = self.a.value(), self.c.value()
         g = ellipse(a, c, self.t)
-        k = min((rect.width() - 40) / 200.0, (rect.height() - 70) / 200.0)
+        k = min((rect.width() - 40) / 200.0, (rect.height() - 84) / 200.0)
         cx, cy = rect.center().x(), rect.center().y() - 10
 
         def q(x, y):
@@ -92,7 +92,7 @@ class Excentricite(Animation):
             dessin.disque(p, m.x(), m.y(), 5, 'accent1', bord='texte')
         p.setPen(dessin.stylo('grille', 1.0))
         p.setBrush(dessin.Qt.BrushStyle.NoBrush)
-        p.drawRoundedRect(QRectF(cx - 110, rect.bottom() - 36, 220, 34), 8, 8)
+        p.drawRoundedRect(QRectF(cx - 110, rect.bottom() - 50, 220, 48), 8, 8)
         dessin.police(p, 1.3, gras=True)
-        dessin.texte(p, cx, rect.bottom() - 19, 'e = c / a = %s' % nombre(g['e'], 3))
+        dessin.formule_texte(p, cx, rect.bottom() - 26, 'e = c / a', ' = %s' % nombre(g['e'], 3))
         dessin.police(p, 1 / 1.3)

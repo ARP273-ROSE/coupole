@@ -2,6 +2,40 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.4.1 — 14 octobre 2026
+
+**Module « Animations » : graphismes modernisés, formules mises en forme, étiquettes sans chevauchement, cartes
+précises, et les corrections demandées.**
+
+- **Astres en sphères** : Soleil, Lune, Terre et Mars ont du volume (dégradé radial au foyer tourné vers la lumière,
+  limbe assombri), un côté nuit au-delà du terminateur quand un Soleil est dans le panneau, et le Soleil un halo
+  discret ; phases de la Lune avec le même volume. Vectoriel, lissé, brosses en cache : le rendu reste à environ
+  1,5 ms par image (médiane des 92 animations à 720 × 470, comme avant).
+- **Formules** : moteur de mise en page maison en QPainter (fractions empilées, exposants, indices, radicaux,
+  parenthèses extensibles, × 10ⁿ en vrai exposant, italique mathématique), police STIX Two Math embarquée
+  (OFL, sous-ensemble de 139 ko), cache ; sur la toile (calculateur de Newton, algèbre de la gravitation, module de
+  distance, petits angles, luminosité, flux, excentricité, hauteur méridienne, vitesse d'une étoile) et dans les
+  descriptions, libellés et valeurs.
+- **Étiquettes** : placeur commun anti-chevauchement (24 positions autour de l'objet, évitement des objets et des
+  textes, trait de rappel, fond semi-transparent) ; un test vérifie les 92 animations à quatre tailles et trois
+  instants.
+- **Cartes** : côtes Natural Earth 1:50m (domaine public, 65 ko, chargées à la demande) au lieu du tracé grossier de
+  l'original ; le simulateur jour-nuit propose quatre projections (équirectangulaire ; polaire Nord ou Sud, jusqu'à
+  l'équateur ou aux tropiques, Terre ou terminateur tournant ; globe 3D vu de l'espace à tourner librement, avec
+  inertie, molette pour zoomer, double-clic pour revenir au point subsolaire, clic droit pour l'observateur) avec un
+  terminateur exact, les crépuscules, le jour et la nuit polaires.
+- **Éclipses** : le Soleil du simulateur des ombres n'est plus tronqué ; « Rejouer une éclipse » montre chacune des
+  133 éclipses de la table 2015–2044 en proportions réelles, avec un curseur d'instant.
+- **Corrections** : le globe tournait à l'envers du glisser (longitude/latitude et toutes les sphères) ; rayons du
+  Soleil qui débordaient du panneau « Vue de la Terre » des saisons ; étiquettes empilées de la Grande Ourse 3D et du
+  lanceur de marteau (et la Terre qui sortait de l'image sur un écran très large) ; textes coupés ou superposés en
+  petite fenêtre (légendes, horloges, niveaux de l'hydrogène, rayons du Soleil, spectre électromagnétique, ombre du
+  bâtiment, phase de la Lune…), trouvés par un audit visuel des 92 animations à 420, 1280 et 2560 pixels de large.
+- **Aide** : plus d'info-bulle générique géante sur la scène ; une aide discrète, propre à chaque animation, sous la
+  scène. Thèmes dans un ordre pédagogique (Introduction d'abord, Cosmologie à la fin).
+- **Version web** : un bouton ouvre l'animation, avec ses réglages, dans Coupole Web
+  (arp273-rose.github.io/coupole-web).
+
 ## 0.4.0 — 14 octobre 2026
 
 **Module « Animations », lot 3 : les 32 dernières animations ; le catalogue ClassAction est complet (92 sur 92).**

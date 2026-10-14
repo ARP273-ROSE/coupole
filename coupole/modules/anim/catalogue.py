@@ -8,9 +8,11 @@ from __future__ import annotations
 
 import importlib
 
-THEMES = ('coordsmotion', 'lunarcycles', 'renaissance', 'stellarprops', 'light', 'extrasolarplanets',
-          'binaryvariablestars', 'ancientastro', 'solar', 'solarsystemdebris', 'sunsolarenergy', 'milkyway',
-          'cosmology', 'telescopes', 'intro')
+# Ordre pédagogique des thèmes (catalogue et filtre) : de l'introduction et du ciel vu de la Terre jusqu'à la
+# cosmologie ; même ordre que Coupole Web.
+THEMES = ('intro', 'coordsmotion', 'lunarcycles', 'ancientastro', 'renaissance', 'solar', 'solarsystemdebris',
+          'sunsolarenergy', 'light', 'telescopes', 'stellarprops', 'binaryvariablestars', 'extrasolarplanets',
+          'milkyway', 'cosmology')
 
 # (id, thème, titre d'origine, fichier d'origine, classe ou None)
 ANIMATIONS = (

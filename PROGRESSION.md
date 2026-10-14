@@ -1041,3 +1041,89 @@ films de l'original refaits en simulations ; données réelles reprises de l'ori
 - [x] Commit `12147d4` poussé : CI `tests.yml` **6/6** (Linux, Windows, macOS × 3.10, 3.12).
 - **Aucun tag ni Release.**
 - Le module Animations est complet : plus rien « à venir ».
+
+## 2026-10-14 — 0.4.1 : retours d'utilisateur sur le module Animations (graphismes, formules, étiquettes, cartes)
+Demande (retours sur la 0.4.0 sous Windows, 11 points) : rendu « sphère 3D » des astres, vraie typographie
+mathématique, étiquetage anti-collision générique et test, côtes précises et projection réfléchie, sens du glisser,
+rayons des saisons, étiquettes de la Grande Ourse et du lanceur de marteau, Soleil tronqué et éclipses de la table
+rejouées, infobulle générique géante, ordre des thèmes, audit visuel des 92 animations.  Ajouts demandés en cours de
+route : bouton « Version web », projections polaires et globe 3D du simulateur jour-nuit, garde-fous du glisser.
+
+### Choix graphiques (alignés sur Coupole Web, dont la section « Choix graphiques » de PROGRESSION.md fait référence)
+- Palette inchangée (`dessin.PALETTES`, identique au web).
+- Astres (`dessin.astre`, appelée par `disque` et `Peintre3D.point` pour `soleil`, `lune`, `terre`, `mars` dès
+  3,5 px) : dégradé radial au foyer décalé de 0,42 r vers la lumière (122 % → base à 0,55 → 70 % ; 132 % et 62 % quand
+  un Soleil éclaire), lumière vers le dernier Soleil du panneau (oubliée à chaque `cadre()` et à chaque image), sinon
+  d'en haut à gauche ; voile de nuit linéaire (0 jusqu'à 0,47, 62 % à 0,56, 80 % au limbe) ; Soleil : limbe assombri
+  (118 % → base à 0,65 → 78 %) et halo 28 % → 0 jusqu'à r + min(0,9 r ; 26 px) ; phases de la Lune : même volume.
+  Brosses en coordonnées relatives (ObjectBoundingMode) mises en cache : indépendantes de la position et du rayon.
+  Les symboles (icônes de la table des éclipses, repères) sont passés en couleur explicite : plats.
+- Étiquettes (`dessin.texte(..., fond=True)`, `dessin.etiquette`) : placeur commun par image (`debut_image`), 24
+  positions candidates, coût recouvrement d'étiquettes × 4, d'objets × 1, hors toile × 8, + 0,02 × déplacement ; trait
+  de rappel 0,9 px à 55 % ; cartouche fond 78 %, coins 4 px ; textes sans cartouche = obstacles, ramenés dans la toile,
+  réduits s'ils sont plus larges qu'elle.  `× 10ⁿ` en vrai exposant dans les textes de la toile et des valeurs.
+- Formules (`formule.py`) : même analyseur que le web (`formule.ts`, mêmes arbres testés), mise en page QPainter
+  (fractions 0,82, exposants 0,68 à −0,42 t, indices à +0,2 t, radical, parenthèses étirées), italique mathématique
+  Unicode de STIX Two Math (sous-ensemble OTF de 139 ko : Qt ne lit pas le woff2 du web), cache des mises en page ;
+  textes riches de Qt (descriptions, libellés, valeurs) : formules en images PNG en ligne (data URL, rendu × 2,
+  centrées sur l'axe mathématique).
+- Glisser : le point saisi suit la souris (1 radian par rayon, compensé 1 / cos h en azimut, borné).
+- Aide : propre à l'animation (texte « souris » s'il existe, sinon selon sphère et/ou objets), en petit sous la scène ;
+  plus d'info-bulle sur la toile.  (Écart assumé : les deux textes « souris » qui étaient dessinés sur la toile —
+  longitude/latitude, ombres d'éclipse — n'y sont plus, ils sont sous la scène.)
+- Cartes : Natural Earth 1:50m (mêmes lignes que le web, `outils/verif_anim/cotes_natural_earth.py`, vérifié
+  identique) ; tracé numpy → QPolygonF par copie mémoire (`dessin.polygone`), chemins en cache pour les cartes planes et
+  polaires.
+- Simulateur jour-nuit, quatre projections (comme le web) : équirectangulaire ; pôle Nord / pôle Sud (azimutale
+  équidistante, bord à l'équateur ou 30° au-delà, méridiens tous les 15° — 30° marqués —, parallèles 15°, équateur
+  plein, tropiques et cercles polaires (23,44°) en pointillé, longitudes 0°, 90°, 180° au bord, Terre tournant sous un
+  terminateur fixe ou « Terminateur tournant », nuit et crépuscules méridien par méridien, boucle pair-impair) ; globe
+  3D (orthographique, matrice de rotation réorthonormalisée, boule de commande, inertie ×0,9 par image jusqu'à 0,3 px,
+  double-clic : point subsolaire, clic droit : observateur, vue de départ 25° N, 50° à l'ouest du point subsolaire,
+  atmosphère `ciel` 55 % de 0,98 r à 1,06 r, sphère 135 % → base → 60 % centrée vers le point subsolaire, voile de nuit
+  jusqu'à 30 %, lignes coupées au limbe au point exact, calottes de nuit exactes, axe des pôles, flèche « vers le
+  Soleil », étiquettes au point visible le plus à droite).  Bureau en plus : molette = zoom du globe ; jour ou nuit
+  polaire aux deux pôles dans les valeurs ; pas de découpe par le disque (coûteuse en QPainter) : inutile puisque tout
+  est coupé au limbe.
+- Garde-fous : orientation du globe toujours finie et orthonormée (sinon l'ancienne est gardée), `Vue3D` ignore les
+  valeurs non finies ; test « fuzz » de 1 000 glissers pendant la lecture.
+- Ombres d'éclipse : Soleil entier (centre à r + 8 px) ; « Rejouer une éclipse » : 133 éclipses, y = D sin 5,145° sin F
+  ramené dans le domaine du type, curseur « instant ».
+- Ordre des thèmes : Introduction, Coordonnées et mouvements, Lune, Astronomie antique, Renaissance, Système solaire,
+  Petits corps, Soleil, Lumière et spectres, Télescopes, Propriétés stellaires, Étoiles doubles et variables,
+  Exoplanètes, Voie lactée, Cosmologie.
+
+### Fait
+- [x] Socle : `dessin.py` (astres, placeur, `polygone`, `formule`, `formule_texte`, `debut_image`), `formule.py`
+  (nouveau), `base.py` (aide sous la scène, formules dans les libellés et valeurs, molette, double-clic,
+  `adresse_web`, rendu hors écran en ARGB32 prémultiplié comme l'écran), `gui.py` (bouton « Version web ↗ » vers
+  `https://arp273-rose.github.io/coupole-web/#/a/<id>?réglages modifiés`, description avec formules), `catalogue.py`
+  (ordre des thèmes).
+- [x] Bogues des retours : sens du glisser ; rayons des saisons (découpe par panneau, du bord au limbe) ; Grande Ourse
+  (étoiles réservées puis noms placés ; cadrage de toute la scène, la Terre ne sort plus à 2560 px) ; lanceur de
+  marteau (tailles proportionnées au panneau, étiquettes placées) ; Soleil tronqué + mode « Rejouer » ; côtes et
+  projections ; infobulle ; ordre des thèmes.
+- [x] Audit visuel des 92 animations à 420 × 560, 1280 × 800 et 2560 × 1440 (planches avant/après) : corrigés
+  `bbexplorer` (légende sous l'étiquette du maximum), `keplers_third` et `formationtemps` (noms des planètes placés),
+  `hydrogenatom` (niveaux nommés seulement s'il y a la place), `obliquity` (libellé du plan), `siderealSolarTime`
+  (horloges), `lunar_applet` (disque et textes de la phase), `stellarlum` (Soleil coupé ; formules), `sunsrays`
+  (libellés des parallèles dans le globe en petite fenêtre), `transitmovie` (sol découpé au panneau), `emspectrum`
+  (libellés des domaines en rangées), `earthorbitplot` (étiquettes en dernier), `ellipsedemo` (e = c / a en formule),
+  `lightdetector` (formule du flux), `stellarvel` (v_r, v_t en formule), `phaseDemonstrator` (aide sortie de la
+  toile), `eclipsetable` (icônes plates).
+- [x] Tests : `tests/test_anim_rendu.py` (141 cas : chevauchement des étiquettes des 92 animations × 4 tailles × 3
+  instants et des trois projections du jour-nuit, placeur, glisser, formules (mêmes arbres que le web), police, mise en
+  page, textes riches, astres, côtes, terminateur exact, Soleil entier, 133 éclipses rejouées, aide, thèmes, lien web,
+  projections polaires directe/inverse et tangence au cercle polaire, nuit du globe contre p·s, tronçons au limbe,
+  souris du globe, fuzz 1 000 glissers × 5 animations, rendu rapide).
+- [x] Performances (`QImage` prémultipliée, comme l'écran ; NAS chargé, charge 9 à 30) : médiane des 92 animations à
+  720 × 470 ≈ 1,5 ms par image, avant ≈ 1,4–1,5 ms (mêmes conditions) ; les plus lentes 5–7 ms avant comme après
+  (zodiaque, Grande Ourse, longitude/latitude) ; jour-nuit : équirectangulaire 1,4 ms, polaire 3,8 ms, globe 4,7 ms
+  (minimum de 20 rendus).
+- [x] Aide F1, manuels FR (80 p.) et EN (77 p.) : section « Rendu, formules et cartes (0.4.1) », captures nouvelles
+  (jour-nuit pôle Nord et globe, éclipse rejouée, calculateur de Newton, lanceur de marteau, Grande Ourse) et toutes
+  les captures d'animations régénérées ; CHANGELOG FR puis EN, NOTICE (Natural Earth, STIX Two Math), README,
+  `LICENCES/OFL-STIX-Two.txt`, paquet (`*.otf` dans les données, copyright du .deb), VERSION 0.4.1.
+- [x] Validation locale (image coupole-test, Python 3.12, offscreen) : **944 réussis**,
+  22 sautés, code 0 ; tests des animations sous Python 3.10 : réussis.
+- **Aucun tag ni Release.**

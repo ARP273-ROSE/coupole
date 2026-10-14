@@ -67,7 +67,10 @@ class ProprietesPlanetes(Animation):
             y0, y1 = ax.py(base), ax.py(v)
             p.fillRect(QRectF(x0, min(y0, y1), x1 - x0, abs(y1 - y0)), dessin.c(COULEURS[pl[8]], 0.8))
             dessin.police(p, 0.85)
-            dessin.texte(p, (x0 + x1) / 2, ax.r.bottom() + 11, tr('anim_planete_' + pl[0]), 'texte')
+            # noms en quinconce quand la place manque
+            nom = tr('anim_planete_' + pl[0])
+            serre = p.fontMetrics().horizontalAdvance(nom) > ax.px(k + 1) - ax.px(k) - 2
+            dessin.texte(p, (x0 + x1) / 2, ax.r.bottom() + 11 + (11 if serre and k % 2 else 0), nom, 'texte')
             txt = nombre(v, 0 if prop == 'satellites' else (2 if abs(v) < 10 else 0))
             dessin.texte(p, (x0 + x1) / 2, min(y0, y1) - 8, txt, 'doux')
             dessin.police(p, 1 / 0.85)

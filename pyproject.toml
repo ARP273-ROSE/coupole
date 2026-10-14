@@ -59,7 +59,7 @@ version = {file = "VERSION"}
 include = ["coupole*"]
 
 [tool.setuptools.package-data]
-"*" = ["*.json", "*.json.gz", "*.svg", "*.png", "*.pdf"]
+"*" = ["*.json", "*.json.gz", "*.svg", "*.png", "*.pdf", "*.otf"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

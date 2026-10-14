@@ -186,11 +186,15 @@ class AtomeHydrogene(Animation):
         y_de = lambda e: r.top() + 12 + (r.height() - 30) * (e / -lumiere.E_IONISATION_EV)
         x0, x1 = r.left() + 40, r.right() - 10
         dessin.police(p, 0.85)
+        h_txt = p.fontMetrics().height()
+        dernier = None
         for n in range(1, N_MAX + 1):
             y = y_de(lumiere.niveau_ev(n))
             p.setPen(dessin.stylo('accent2' if n == self.n else 'grille', 2.0 if n == self.n else 1.0))
             p.drawLine(QPointF(x0, y), QPointF(x1, y))
-            if n <= 4:
+            # un niveau n'est nommé que s'il reste la place (les niveaux se resserrent vers 0 eV)
+            if n <= 4 and (dernier is None or dernier - y >= h_txt) and y - y_de(0.0) >= h_txt:
+                dernier = y
                 dessin.texte(p, r.left() + 4, y + 4, 'n=%d' % n, 'doux', centre=False)
                 dessin.texte(p, x1 - 4 - p.fontMetrics().horizontalAdvance('%s eV' % nombre(lumiere.niveau_ev(n), 2)),
                              y - 4, '%s eV' % nombre(lumiere.niveau_ev(n), 2), 'doux', centre=False)

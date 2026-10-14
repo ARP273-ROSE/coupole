@@ -92,7 +92,11 @@ class OmbreBatiment(Animation):
 
     def dessiner(self, p, rect):
         haut = rect.height() * 0.74
-        self._scene(p, dessin.cadre(p, QRectF(rect.x(), rect.y(), rect.width(), haut), tr('anim_transitmovie_scene')))
+        r = dessin.cadre(p, QRectF(rect.x(), rect.y(), rect.width(), haut), tr('anim_transitmovie_scene'))
+        p.save()
+        p.setClipRect(r.adjusted(-5, -5, 5, 5))           # le sol ne déborde pas du panneau
+        self._scene(p, r)
+        p.restore()
         self._annee(p, dessin.cadre(p, QRectF(rect.x(), rect.y() + haut, rect.width(), rect.height() - haut),
                                     tr('anim_transitmovie_graphe')))
 

@@ -45,13 +45,13 @@ class LuminositeEtoile(Animation):
         p.setPen(dessin.Qt.PenStyle.NoPen)
         p.setBrush(couleur)
         p.drawEllipse(dessin.QPointF(cx, cy), taille(g['r']), taille(g['r']))
-        sx = rect.right() - rect.width() * 0.14
+        sx = rect.right() - max(rect.width() * 0.14, taille(1.0) + 8)
         dessin.disque(p, sx, cy, taille(1.0), QColor(*hr.couleur_rvb(hr.T_SOLEIL)))
         dessin.texte(p, sx, cy + taille(1.0) + 14, tr('anim_stellarlum_soleil'), 'doux')
         dessin.police(p, 1.15)
         y = rect.bottom() - 52
-        dessin.texte(p, rect.center().x(), y, 'L / L☉ = (R / R☉)² (T / T☉)⁴ = (%s)² × (%s)⁴ = %s'
-                     % (nombre(g['r'], 2), nombre(g['t'] / hr.T_SOLEIL, 3), scientifique(g['l'])))
+        dessin.formule(p, rect.center().x(), y - 6, 'L / L☉ = (R / R☉)² (T / T☉)⁴ = (%s)² × (%s)⁴ = %s'
+                       % (nombre(g['r'], 2), nombre(g['t'] / hr.T_SOLEIL, 3), scientifique(g['l'])))
         dessin.police(p, 1 / 1.15)
-        dessin.texte(p, rect.center().x(), y + 24, 'L = 4π R² σ T⁴ = %s W' % scientifique(g['w']), 'doux')
+        dessin.formule_texte(p, rect.center().x(), y + 28, 'L = 4π R² σ T⁴', ' = %s W' % scientifique(g['w']), 'doux')
         dessin.texte(p, rect.x() + 10, rect.y() + 16, tr('anim_stellarlum_echelle'), 'doux', centre=False)

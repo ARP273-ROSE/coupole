@@ -136,8 +136,9 @@ class TempsSideral(Animation):
         p.drawLine(QPointF(ex, ey), QPointF(cx, cy))
 
     def _horloge(self, p, r, heures: float, titre: str, cle: str):
-        cx, cy = r.center().x(), r.center().y() + 8
-        rr = min(r.width(), r.height()) * 0.36
+        # le cadran, son titre au-dessus et l'heure en dessous tiennent dans le panneau
+        rr = max(10.0, min(r.width() * 0.36, (r.height() - 52) / 2))
+        cx, cy = r.center().x(), r.y() + 24 + rr + max(0.0, (r.height() - 52 - 2 * rr) / 2)
         p.setPen(dessin.stylo('grille', 1.5))
         p.setBrush(dessin.c('sphere', 0.4))
         p.drawEllipse(QPointF(cx, cy), rr, rr)

@@ -70,9 +70,9 @@ class VitesseEtoile(Animation):
             dessin.fleche(p, xs, cy, xs + lr, cy - lt, dessin.stylo('accent1', 2.4), 9)
         dessin.disque(p, xs, cy, 9, 'soleil', bord='texte')
         dessin.police(p, 0.85)
-        dessin.texte(p, xs + lr / 2, cy + 16, 'v_r', 'accent3' if v['vr'] > 0 else 'accent2')
-        dessin.texte(p, xs - 18, cy - lt / 2, 'v_t', 'horizon')
-        dessin.texte(p, xs + lr / 2 + 16, cy - lt / 2 - 10, 'v', 'accent1')
+        dessin.formule(p, xs + lr / 2, cy + 16, 'v_r', 'accent3' if v['vr'] > 0 else 'accent2')
+        dessin.formule(p, xs - 18, cy - lt / 2, 'v_t', 'horizon')
+        dessin.formule(p, xs + lr / 2 + 16, cy - lt / 2 - 10, 'v', 'accent1')
         for d in range(0, 11, 2):
             dessin.texte(p, x0 + k * d, cy + 34, '%d pc' % d, 'doux')
         dessin.police(p, 1 / 0.85)

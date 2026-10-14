@@ -49,7 +49,9 @@ class TemperaturesFormation(Animation):
         for nom, d in D.DISTANCES_UA:
             t = temperature(d)
             ax.points([(d, t)], 'equateur', 5, 1.0)
-            dessin.texte(p, ax.px(d) + 6, ax.py(t) - 10, tr('anim_planete_' + nom), 'texte', centre=False)
+            dessin.reserver(p, ax.px(d), ax.py(t), 5)
+        for nom, d in D.DISTANCES_UA:                  # noms placés sans chevauchement (placeur commun)
+            dessin.etiquette(p, ax.px(d), ax.py(temperature(d)), tr('anim_planete_' + nom), 'texte', 5)
         dessin.police(p, 1 / 0.85)
         t = self.t.value()
         ax.horizontale(t, 'accent3', 1.2, True)

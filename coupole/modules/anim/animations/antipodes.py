@@ -12,7 +12,7 @@ from PyQt6.QtGui import QPolygonF
 from ....core.i18n import tr
 from .. import dessin
 from ..base import Animation
-from .longitude_latitude import cotes, decimal, globe_xyz
+from .longitude_latitude import decimal, dessiner_cotes_carte, dessiner_cotes_globe, globe_xyz
 
 
 def antipode(lat: float, lon: float) -> tuple[float, float]:
@@ -72,9 +72,7 @@ class Antipodes(Animation):
         rr = min(r.width(), r.height()) * 0.42
         pe = dessin.Peintre3D(p, self.globe, r.center().x(), r.center().y(), rr)
         pe.contour('grille', 'terre', 0.25)
-        for poly in cotes():
-            if len(poly) >= 5:
-                pe.courbe(poly, 'doux', 1.0, 0.9, arriere='cache', ferme=True)
+        dessiner_cotes_globe(pe)
         la, lo = self.lat.value(), self.lon.value()
         a1, a2 = antipode(la, lo)
         pe.segment(globe_xyz(la, lo), globe_xyz(a1, a2), 'accent2', 1.5, 0.7)
@@ -92,20 +90,7 @@ class Antipodes(Animation):
         p.setPen(dessin.stylo('grille', 1.0))
         p.setBrush(dessin.c('terre', 0.18))
         p.drawRect(carte)
-        p.setPen(dessin.stylo('doux', 0.8, 0.8))
-        for poly in cotes():
-            if len(poly) < 5:
-                continue
-            la = np.degrees(np.arcsin(np.clip(poly[:, 2], -1, 1)))
-            lo = np.degrees(np.arctan2(poly[:, 1], poly[:, 0]))
-            pts = []
-            for i in range(len(la)):
-                if pts and abs(lo[i] - lo[i - 1]) > 180:            # passage de la ligne ±180°
-                    p.drawPolyline(QPolygonF(pts))
-                    pts = []
-                pts.append(xy(la[i], lo[i]))
-            if len(pts) > 1:
-                p.drawPolyline(QPolygonF(pts))
+        dessiner_cotes_carte(p, carte, 'doux', 0.8, 0.8)
         p.setPen(dessin.stylo('grille', 0.6, 0.6))
         for k in range(-60, 90, 30):
             p.drawLine(xy(k, -180), xy(k, 180))

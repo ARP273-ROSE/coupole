@@ -39,8 +39,15 @@ class Obliquite(Animation):
         # plan de l'orbite (vu par la tranche)
         p.setPen(dessin.stylo('grille', 1.5))
         p.drawLine(QPointF(rect.x() + 20, cy), QPointF(rect.right() - 20, cy))
-        dessin.texte(p, rect.right() - 24 - p.fontMetrics().horizontalAdvance(tr('anim_obliquity_plan')), cy + 16,
-                     tr('anim_obliquity_plan'), 'doux', centre=False)
+        # libellé du plan : à droite de la Terre s'il y tient, sinon à gauche, sinon tout en bas
+        lib = tr('anim_obliquity_plan')
+        w = p.fontMetrics().horizontalAdvance(lib)
+        if rect.right() - 24 - w > cx + rt + 6:
+            dessin.texte(p, rect.right() - 24 - w, cy + 16, lib, 'doux', centre=False)
+        elif rect.x() + 20 + w < cx - rt - 6:
+            dessin.texte(p, rect.x() + 20, cy + 16, lib, 'doux', centre=False)
+        else:
+            dessin.texte(p, rect.x() + 20, rect.bottom() - 8, lib, 'doux', centre=False)
         dessin.disque(p, cx, cy, rt, 'terre')
         # perpendiculaire au plan de l'orbite
         p.setPen(dessin.stylo('doux', 1.5, pointille=True))

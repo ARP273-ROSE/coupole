@@ -2,6 +2,38 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.4.1 — 14 October 2026
+
+**« Animations » module: modernised graphics, typeset formulas, labels without overlaps, accurate maps, and the
+requested fixes.**
+
+- **Bodies as spheres**: the Sun, Moon, Earth and Mars have volume (radial gradient focused towards the light,
+  darkened limb), a night side beyond the terminator when a Sun is in the panel, and the Sun a faint halo; lunar
+  phases get the same volume. Vector, antialiased, cached brushes: rendering stays at about 1.5 ms per frame (median
+  of the 92 animations at 720 × 470, as before).
+- **Formulas**: home-made QPainter layout engine (stacked fractions, superscripts, subscripts, radicals, stretchy
+  parentheses, × 10ⁿ as a true superscript, mathematical italic), embedded STIX Two Math font (OFL, 139 kB subset),
+  cache; on the canvas (Newton calculator, gravity algebra, distance modulus, small angles, luminosity, flux,
+  eccentricity, meridian altitude, stellar velocity) and in descriptions, labels and values.
+- **Labels**: common anti-overlap placer (24 positions around the object, avoiding objects and texts, leader line,
+  semi-transparent box); a test checks the 92 animations at four sizes and three instants.
+- **Maps**: Natural Earth 1:50m coastlines (public domain, 65 kB, loaded on demand) instead of the coarse original
+  outline; the daylight simulator offers four projections (equirectangular; North or South polar, down to the equator
+  or the tropics, rotating Earth or terminator; 3D globe seen from space rotated freely, with inertia, wheel to zoom,
+  double-click to go back to the subsolar point, right click for the observer) with an exact terminator, twilights,
+  polar day and night.
+- **Eclipses**: the Sun of the shadow simulator is no longer cut; “Replay an eclipse” shows each of the 133 eclipses
+  of the 2015–2044 table to true scale, with an instant slider.
+- **Fixes**: the globe turned against the drag (longitude/latitude and every sphere); Sun's rays overflowing the
+  “View from the Earth” panel of the seasons; stacked labels in the Big Dipper 3D and the hammer thrower (and the Earth
+  leaving the image on a very wide screen); texts cut or overlapping in small windows (legends, clocks, hydrogen
+  levels, Sun's rays, electromagnetic spectrum, building shadow, Moon phase…), found by a visual audit of the 92
+  animations at 420, 1280 and 2560 pixels wide.
+- **Help**: no more giant generic tooltip over the scene; a discreet help, specific to each animation, below it.
+  Topics in a teaching order (Introduction first, Cosmology last).
+- **Web version**: a button opens the animation, with its settings, in Coupole Web
+  (arp273-rose.github.io/coupole-web).
+
 ## 0.4.0 — 14 October 2026
 
 **« Animations » module, batch 3: the last 32 animations; the ClassAction catalogue is complete (92 out of 92).**

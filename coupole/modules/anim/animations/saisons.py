@@ -100,6 +100,7 @@ class Saisons(Animation):
         cx, cy = r.center().x(), r.center().y()
         de_cote = self.vue_terre.currentData() == 'cote'
         p.save()
+        p.setClipRect(r)
         p.translate(cx, cy)
         dessin.disque(p, 0, 0, ray, 'terre')
         if de_cote:
@@ -125,9 +126,12 @@ class Saisons(Animation):
             p.rotate(d)
             if self.c_subsolaire.isChecked():
                 dessin.disque(p, -ray, 0, 5, 'soleil', bord='fond')
+            # rayons du Soleil : du bord du panneau jusqu'au limbe (le Soleil est loin à gauche), jamais au travers
+            depart = max(-ray * 2.2, -(cx - r.left()) + 4)
             for k in (-0.6, -0.3, 0.0, 0.3, 0.6):
-                dessin.fleche(p, -ray * 2.2, k * ray, -ray * 1.1 if k == 0 else -ray * math.sqrt(1 - k * k) - 6,
-                              k * ray, dessin.stylo('soleil', 1.4, 0.8), 6)
+                limbe = -ray * math.sqrt(1 - k * k) - (7 if k == 0 and self.c_subsolaire.isChecked() else 2)
+                if limbe - depart > 12:
+                    dessin.fleche(p, depart, k * ray, limbe, k * ray, dessin.stylo('soleil', 1.4, 0.8), 6)
         else:
             # vue depuis le Soleil : parallèles projetés (ellipses écrasées selon δ), point subsolaire au centre
             sd, cd = math.sin(math.radians(d)), math.cos(math.radians(d))
@@ -155,6 +159,8 @@ class Saisons(Animation):
         h = e['h_midi']
         cx, base = r.center().x(), r.bottom() - r.height() * 0.22
         larg = r.width() * 0.8
+        p.save()
+        p.setClipRect(r)
         p.setPen(dessin.stylo('horizon', 2.5))
         p.drawLine(QPointF(cx - larg / 2, base), QPointF(cx + larg / 2, base))
         if self.observ.currentData() == 'angle':
@@ -189,3 +195,4 @@ class Saisons(Animation):
             p.setPen(dessin.stylo('soleil', 3.0))
             p.drawLine(a, b)
             dessin.texte(p, cx, base + 16, tr('anim_eclipticsimulator_surface', x=nombre(et, 2)), 'texte')
+        p.restore()

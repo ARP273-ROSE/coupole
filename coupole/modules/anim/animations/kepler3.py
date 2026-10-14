@@ -101,8 +101,11 @@ class Kepler3(Animation):
         dessin.police(p, 0.8)
         for n, a, pj in PLANETES:
             q = xy(a, pj / astro.ANNEE_SIDERALE_J)
-            dessin.disque(p, q.x(), q.y(), 4, 'soleil' if n == self.choix_planete.currentData() else 'accent1')
-            dessin.texte(p, q.x() + 6, q.y() + 11, tr('anim_planete_' + n), 'doux', centre=False)
+            dessin.disque(p, q.x(), q.y(), 4, dessin.c('soleil' if n == self.choix_planete.currentData() else 'accent1'))
+            dessin.reserver(p, q.x(), q.y(), 4)
+        for n, a, pj in PLANETES:                      # noms placés sans chevauchement (placeur commun)
+            q = xy(a, pj / astro.ANNEE_SIDERALE_J)
+            dessin.etiquette(p, q.x(), q.y(), tr('anim_planete_' + n), 'doux', 5)
         dessin.police(p, 1 / 0.8)
         q = xy(self.a.value(), astro.periode_annees(self.a.value(), m))
         p.setPen(dessin.stylo('accent3', 1.0, 0.8, pointille=True))

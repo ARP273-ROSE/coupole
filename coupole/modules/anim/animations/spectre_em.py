@@ -73,14 +73,21 @@ class SpectreEM(Animation):
         def x_de(lg):
             return bande.left() + bande.width() * (lg - LOG_MIN) / (LOG_MAX - LOG_MIN)
         dessin.police(p, 0.85)
+        fins = {}                                    # bord droit du dernier libellé de chaque rangée
         for nom, a, b, cle in DOMAINES:
             r = QRectF(x_de(a), bande.top(), x_de(b) - x_de(a), bande.height())
             if nom == 'visible':
                 p.fillRect(r, degrade_spectre(r.left(), r.right(), r.top(), 1.0, 380, 750))
             else:
                 p.fillRect(r, dessin.c(cle, 0.45))
-            dessin.texte(p, r.center().x(), bande.top() - 9 - (12 if nom == 'visible' else 0),
-                         tr('anim_emspectrum_c_' + nom), cle if nom != 'visible' else 'texte')
+            # libellés serrés (petite fenêtre) : sur la première rangée libre au-dessus de la bande
+            s_ = tr('anim_emspectrum_c_' + nom)
+            w = p.fontMetrics().horizontalAdvance(s_)
+            rang = 1 if nom == 'visible' else 0
+            while fins.get(rang, -1e9) > r.center().x() - w / 2 - 4:
+                rang += 1
+            fins[rang] = r.center().x() + w / 2
+            dessin.texte(p, r.center().x(), bande.top() - 9 - 12 * rang, s_, cle if nom != 'visible' else 'texte')
         for k in range(int(LOG_MIN) + 2, int(LOG_MAX), 2 if bande.width() >= 600 else 4):
             dessin.texte(p, x_de(k), bande.bottom() + 11, '10%s m' % str(k).translate(
                 str.maketrans('-0123456789', '⁻⁰¹²³⁴⁵⁶⁷⁸⁹')), 'doux')

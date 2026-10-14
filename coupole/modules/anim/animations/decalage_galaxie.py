@@ -121,5 +121,9 @@ class DecalageGalaxie(Animation):
             x = r.left() + i * w + w * 0.15
             p.fillRect(QRectF(x, r.bottom() - 14 - h, w * 0.5, h), dessin.c(cle, 0.8))
             dessin.texte(p, x + w * 0.25, r.bottom() - 4, n, 'texte')
-            dessin.texte(p, x + w * 0.5 + 6, r.bottom() - 20, 'Δm = %s%s' % ('+' if m[n] >= m0[n] else '', nombre(m[n] - m0[n], 2)),
-                         'doux', centre=False)
+            dm = 'Δm = %s%s' % ('+' if m[n] >= m0[n] else '', nombre(m[n] - m0[n], 2))
+            # à côté de la barre s'il y a la place, sinon au-dessus
+            if p.fontMetrics().horizontalAdvance(dm) < w * 0.5 - 8:
+                dessin.texte(p, x + w * 0.5 + 6, r.bottom() - 20, dm, 'doux', centre=False)
+            else:
+                dessin.texte(p, x + w * 0.25, max(r.top() + 8, r.bottom() - 22 - h), dm, 'doux')

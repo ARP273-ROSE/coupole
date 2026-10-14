@@ -165,8 +165,9 @@ class PhasesLune(Animation):
                          angle(self.phase.value(), 0), 'accent1')
 
     def _phase(self, p, r):
-        rr = min(r.width(), r.height()) * 0.36
-        cx, cy = r.center().x(), r.center().y() - 8
+        # le disque et ses deux lignes de texte (≈ 42 px) tiennent toujours dans le panneau
+        rr = max(6.0, min(r.width() * 0.36, (r.height() - 46) / 2 - 2))
+        cx, cy = r.center().x(), r.top() + (r.height() - 42) / 2
         dessin.phase_lune(p, cx, cy, rr, self.phase.value())
         if self.c_repere.isChecked():
             dessin.disque(p, cx, cy, 3, 'accent3')

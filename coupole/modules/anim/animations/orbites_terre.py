@@ -114,16 +114,17 @@ class OrbitesTerre(Animation):
             pts.append(xy(r, astro.periode_orbite_terre(r)))
         p.setPen(dessin.stylo('accent2', 2.0))
         p.drawPolyline(QPolygonF(pts))
-        dessin.police(p, 0.8)
-        for i, (k, r) in enumerate(POINTS):
-            q = xy(r, astro.periode_orbite_terre(r))
-            dessin.disque(p, q.x(), q.y(), 4, 'accent3')
-            dy = -10 - 14 * (i % 2) if i < 2 else -10
-            dessin.texte(p, q.x() + 6, q.y() + dy, tr('anim_earthorbitplot_p_' + k), 'doux', centre=False, fond=True)
-        dessin.police(p, 1 / 0.8)
         r = self.rayon_m()
         q = xy(r, astro.periode_orbite_terre(r))
         p.setPen(dessin.stylo('accent1', 1.0, 0.8, pointille=True))
         p.drawLine(QPointF(q.x(), y1), q)
         p.drawLine(QPointF(x0, q.y()), q)
         dessin.disque(p, q.x(), q.y(), 6, 'accent1', bord='texte')
+        dessin.police(p, 0.8)
+        # étiquettes en dernier : le placeur commun les écarte du point réglé et les unes des autres
+        for i, (k, r) in enumerate(POINTS):
+            q = xy(r, astro.periode_orbite_terre(r))
+            dessin.disque(p, q.x(), q.y(), 4, 'accent3')
+            dy = -10 - 14 * (i % 2) if i < 2 else -10
+            dessin.texte(p, q.x() + 6, q.y() + dy, tr('anim_earthorbitplot_p_' + k), 'doux', centre=False, fond=True)
+        dessin.police(p, 1 / 0.8)

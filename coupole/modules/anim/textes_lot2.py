@@ -91,7 +91,7 @@ ANIM_LOT2.update({
     'anim_phasedemonstrator_lune': ('lune {n}', 'moon {n}'),
     'anim_phasedemonstrator_vu': ('{a} vue de {b}', '{a} seen from {b}'),
     'anim_phasedemonstrator_plan': ('Le plan des orbites, vu de dessus', 'The plane of the orbits, seen from above'),
-    'anim_phasedemonstrator_glisser': ('Faire glisser les corps ; tout près de l’autre, un corps devient sa lune.',
+    'anim_phasedemonstrator_souris': ('Faire glisser les corps ; tout près de l’autre, un corps devient sa lune.',
                                        'Drag the bodies; very close to the other one, a body becomes its moon.'),
     'anim_phasedemonstrator_dist_soleil': ('Distances au Soleil (1 / 2)', 'Distances to the Sun (1 / 2)'),
     'anim_phasedemonstrator_dist_mutuelle': ('Distance entre les deux corps', 'Distance between the two bodies'),

@@ -1147,7 +1147,8 @@ checked reference formulas. After ClassAction, University of Nebraska-Lincoln As
 
 \paragraph{Catalogue.} On the left, the 92 animations of the original catalogue, sorted by topic (coordinates and
 motions, Moon, Renaissance and orbits, stellar properties, light and spectra, extrasolar planets…), with a search
-(French or English, accents ignored) and filters by topic and status. Each has its name and description in both
+(French or English, accents ignored) and filters by topic and status. Topics follow a teaching order, from the
+introduction and the sky seen from the Earth to cosmology. Each has its name and description in both
 languages, and its original title. Since version 0.4.0 all 92 are available: those that were only movies (a building's shadow, the melting nail, the hammer thrower, the balloon, the fusion reactions, the traffic jam…) have become simulations, and those that rely on real data (spectra, light curves, exoplanets, planets) cite their source in the \texttt{NOTICE} file, updated where it was outdated.
 
 \paragraph{Handling.} Dragging a sphere rotates it; dragging a star, the Moon, the Earth or an observer moves it.
@@ -1155,7 +1156,61 @@ languages, and its original title. Since version 0.4.0 all 92 are available: tho
 initial state. Each setting has a slider and a numeric field (the exact value is kept: the field only shows a rounded
 one); computed values are shown below the settings. All settings, the theme and the chosen animation come back at the
 next launch. Only one animation runs at a time, and only while it is shown; one frame costs a few milliseconds
-(nothing heavy in the GUI thread).
+(nothing heavy in the GUI thread). What the mouse does in the shown animation is recalled in small print below the
+scene (no more tooltip over the drawing). The \emph{Web version} button opens the animation, with its settings, in
+Coupole Web (\texttt{arp273-rose.github.io/coupole-web}): the same animations in a browser, on a computer, tablet or
+phone.
+
+\subsection{Rendering, formulas and maps (0.4.1)}
+\paragraph{Bodies.} The Sun, the Moon, the Earth and Mars are drawn as spheres: a radial gradient whose focus is
+shifted towards the light (darkened limb) and, when a Sun is drawn in the same panel, a shaded night side beyond the
+terminator; the Sun has a darkened limb and a faint halo. Everything stays vector and antialiased; brushes are cached,
+so a frame still costs a few milliseconds (median 1.5~ms per frame at 720 × 470, as before these changes, measured on the 92 animations). Symbols (icons
+of the eclipse table, markers) stay flat.
+
+\paragraph{Formulas.} Formulas are typeset by a small layout engine written for Coupole (QPainter, without \LaTeX{}
+or matplotlib): stacked fractions, well-placed superscripts and subscripts, radicals, stretchy parentheses,
+$\times 10^n$ as a true superscript, one-letter variables in mathematical italic, words (sin, log, LST) upright. The
+font is STIX Two Math (SIL OFL 1.1 licence, embedded 139~kB subset, \texttt{LICENCES/OFL-STIX-Two.txt}). The formulas
+drawn in the animations (Newton's law calculator, gravity algebra, distance modulus, small angles, luminosity, flux,
+eccentricity…) and those of descriptions, labels and shown values are all typeset; layouts are cached.
+
+\paragraph{Labels.} Every boxed label goes through a common placer: if its place is taken (another label, a small
+body, text already written, the edge of the image), it tries 24 positions around its object and takes the first free
+one, linked to the object by a leader line. A test checks, for the 92 animations, four sizes (420 to 2560 pixels
+wide) and three instants, that no label overlaps another or leaves the image.
+
+\paragraph{Maps.} Coastlines come from Natural Earth 1:50m (public domain), simplified (Douglas-Peucker 0.07°, 65~kB),
+loaded with the first globe shown. The daylight simulator offers four projections. Equirectangular: linear mapping
+between the mouse and latitude-longitude. North Pole or South Pole: azimuthal equidistant centred on the pole (true
+distance to the pole), edge at the equator or 30° beyond to see both tropics; meridians every 15° (30° emphasised),
+parallels every 15°, tropics and polar circles dashed; by default the Earth turns under a fixed terminator (noon at
+the bottom), and \emph{Rotating terminator} keeps the map fixed (Greenwich at the bottom in the North). Night and
+twilights are drawn meridian by meridian, at the exact latitude where the Sun is at 0°, −6°, −12° or −18°: a loop
+around the pole, with no artefact at the pole (at the solstice it is tangent to the polar circle). 3D globe seen from
+space (orthographic projection): it turns in any direction with the mouse (trackball rotation: the grabbed point
+follows the mouse, with a light inertia), the wheel zooms, a double-click goes back to the subsolar point, a right
+click places the observer; thin atmosphere, sphere lit on the Sun's side, lines cut exactly at the limb, exact night
+and twilights (visible parts of the spherical caps opposite the Sun), polar axis and a “to the Sun” arrow. Polar day
+or night at the North and South Poles is shown with the values.
+
+\paragraph{Eclipses.} In the eclipse shadow simulator the Sun is drawn whole, and \emph{Replay an eclipse} shows each
+of the 133 eclipses of the 2015–2044 table to true scale: the Moon crosses the Earth's umbra and penumbra, or the
+Moon's shadow sweeps the Earth; the offset from the axis comes from the Moon's mean argument of latitude
+($y = D \sin 5.145^\circ \sin F$, Meeus), brought into the range allowed by the eclipse type, and a slider moves the
+instant.
+
+\paragraph{Fixes.} The globe of the longitude/latitude demonstrator (and every sphere) turned against the drag: the
+grabbed point now follows the mouse. The Sun's rays of the seasons simulator stop at the limb and at the panel edge;
+the star names of the Big Dipper 3D and the hammer thrower labels no longer overlap; a few texts too long for small
+windows were moved (legends, clocks, hydrogen levels, building shadow, Sun's rays, electromagnetic spectrum).
+
+\capture{img/anim_daylightsimulator_nord_en.png}{0.95}
+\capture{img/anim_daylightsimulator_globe_en.png}{0.95}
+\capture{img/anim_shadowsim_rejeu_en.png}{0.95}
+\capture{img/anim_gravcalc_en.png}{0.95}
+\capture{img/anim_hammerthrower_en.png}{0.95}
+\capture{img/anim_bigdipper_en.png}{0.95}
 
 \subsection{Available animations}
 \begin{center}
@@ -1536,5 +1591,5 @@ Astrophoto). ASTAP: \url{https://www.hnsky.org/astap.htm}. Observatory codes: Mi
 contributors. SIMBAD and Sesame: CDS, Strasbourg (Wenger et al. 2000); Aladin Lite (CDS); NED (NASA/IPAC); JPL
 Small-Body Database (NASA/JPL). Cosmology: Planck Collaboration (2020, A\&A 641, A6); Hinshaw et al. (2013, WMAP 9);
 Riess et al. (2022, SH0ES); Hogg (1999, astro-ph/9905116); Komatsu et al. (2011) for the massive-neutrino density;
-astropy.cosmology; « cosmologie-redshift » calculator (same author). Archives: MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), NOIRLab Astro Data Archive, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS of the Ring-Moon Systems Node, Imaging Node); reproject (Astropy); Rector et al. (2007, AJ 133, 598) for chromatic ordering; amateur practices: see \texttt{docs/archives\_methode.md}. Animations: ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0); Meeus (1998, \emph{Astronomical Algorithms}, 2nd ed.); P03 / IAU 2006 obliquity; IAU constellation boundaries (data shipped with astropy); coastlines after GSHHS (through ClassAction); NASA Exoplanet Archive, NASA Planetary Fact Sheet, JPL DE440 ephemeris and Standish elements, AME 2020, Landolt filters (1992), spectrum of M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, rotation curve of Eilers et al. (2019).
+astropy.cosmology; « cosmologie-redshift » calculator (same author). Archives: MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), NOIRLab Astro Data Archive, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS of the Ring-Moon Systems Node, Imaging Node); reproject (Astropy); Rector et al. (2007, AJ 133, 598) for chromatic ordering; amateur practices: see \texttt{docs/archives\_methode.md}. Animations: ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0); Meeus (1998, \emph{Astronomical Algorithms}, 2nd ed.); P03 / IAU 2006 obliquity; IAU constellation boundaries (data shipped with astropy); Natural Earth 1:50m coastlines (public domain); STIX Two Math font (SIL OFL 1.1); NASA Exoplanet Archive, NASA Planetary Fact Sheet, JPL DE440 ephemeris and Standish elements, AME 2020, Landolt filters (1992), spectrum of M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, rotation curve of Eilers et al. (2019).
 \end{document}

@@ -4,15 +4,19 @@ from __future__ import annotations
 
 import unicodedata
 
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QBrush
-from PyQt6.QtWidgets import (QLabel, QSplitter, QStackedWidget, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
+from PyQt6.QtCore import Qt, QUrl
+from PyQt6.QtGui import QBrush, QDesktopServices
+from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QSplitter, QStackedWidget, QTreeWidget,
+                             QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from ...core.i18n import tr
 from ...gui import memoire
 from ...gui.adaptatif import Flux
 from ...gui.outils import aide, champ, liste
-from . import catalogue
+from . import catalogue, formule
+
+# Coupole Web : les mêmes animations dans un navigateur (ordinateur, tablette, téléphone), sans installation.
+ADRESSE_WEB = 'https://arp273-rose.github.io/coupole-web/'
 
 ROLE_ID = Qt.ItemDataRole.UserRole
 
@@ -81,7 +85,14 @@ class Panneau(QWidget):
         f2.setPointSizeF(f2.pointSizeF() * 1.2)
         f2.setBold(True)
         self.l_titre.setFont(f2)
-        d.addWidget(self.l_titre)
+        tete = QHBoxLayout()
+        tete.setContentsMargins(0, 0, 0, 0)
+        tete.addWidget(self.l_titre, 1)
+        self.b_web = QPushButton(tr('anim_version_web'))
+        aide(self.b_web, 'anim_version_web_aide')
+        self.b_web.clicked.connect(self.ouvrir_web)
+        tete.addWidget(self.b_web, 0, Qt.AlignmentFlag.AlignTop)
+        d.addLayout(tete)
         self.pile = QStackedWidget()
         self.vide = QLabel(tr('anim_choisir'))
         self.vide.setWordWrap(True)
@@ -158,6 +169,17 @@ class Panneau(QWidget):
         if choisi is not None:
             self.arbre.setCurrentItem(choisi)
 
+    def adresse_web(self) -> str:
+        """Adresse de l'animation courante dans Coupole Web, avec ses réglages modifiés (lien partageable du site :
+        #/a/<id>?clé=valeur&…), ou l'accueil du site."""
+        w = self.animations.get(self.courante) if self.courante else None
+        if w is None:
+            return ADRESSE_WEB
+        return ADRESSE_WEB + w.adresse_web()
+
+    def ouvrir_web(self):
+        QDesktopServices.openUrl(QUrl(self.adresse_web()))
+
     def _selection(self, it, *_):
         if it is None or it.data(0, ROLE_ID) is None:
             return
@@ -175,7 +197,7 @@ class Panneau(QWidget):
         import html
         etat = tr('anim_disponible' if e.faite else 'anim_a_venir')
         return ('<b>%s</b> — <i>%s</i><br>%s<br><span>%s</span><br><small>%s</small>'
-                % (html.escape(tr('anim_nom_' + e.cle)), html.escape(etat), html.escape(tr('anim_desc_' + e.cle)),
+                % (html.escape(tr('anim_nom_' + e.cle)), html.escape(etat), formule.enrichir(tr('anim_desc_' + e.cle)),
                    html.escape(tr('anim_titre_origine', titre=e.titre)),
                    html.escape(tr('anim_theme_de', theme=tr('anim_theme_' + e.theme)))))
 
