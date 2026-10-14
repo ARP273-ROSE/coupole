@@ -117,9 +117,10 @@ def _commun(a, b) -> float:
     return w * h if w > 0 and h > 0 else 0.0
 
 
-def reserver(p, x: float, y: float, r: float):
-    """Un petit objet (astre, point…) que les étiquettes évitent ; les grands disques ne sont pas réservés."""
-    if not (r > 0) or r > 24:
+def reserver(p, x: float, y: float, r: float, toujours: bool = False):
+    """Un petit objet (astre, point…) que les étiquettes évitent ; les grands disques ne sont pas réservés, sauf si
+    `toujours` (halo qu'une étiquette ne doit pas couvrir)."""
+    if not (r > 0) or (r > 24 and not toujours):
         return
     a, d, e, f, tourne = _matrice(p)
     if tourne:

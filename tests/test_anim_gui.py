@@ -325,7 +325,8 @@ def test_souris_lot3(propre):
             glisser(w, QPoint(t.width() // 2 - 150, t.height() // 2 - 60), QPoint(t.width() // 2 - 40, t.height() // 2 - 200))
         elif ident == 'threeviewsspectra':
             cx, cy, k = w._scene
-            glisser(w, QPoint(int(cx - 4.6 * k), int(cy)), QPoint(int(cx), int(cy - 4.6 * k)))
+            from coupole.modules.anim.animations.kirchhoff import R_TELESCOPE
+            glisser(w, QPoint(int(cx - R_TELESCOPE * k), int(cy)), QPoint(int(cx), int(cy - R_TELESCOPE * k)))
         elif ident == 'emspectrum':
             r = w._zone
             glisser(w, QPoint(int(r.left() + 10), int(r.center().y())), QPoint(int(r.right() - 10), int(r.center().y())))

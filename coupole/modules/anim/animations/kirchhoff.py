@@ -22,26 +22,42 @@ GAZ = {'hydrogene': (656.28, 486.13, 434.05, 410.17, 397.01),
        'mercure': (579.07, 576.96, 546.07, 435.83, 404.66)}
 NUAGE = (0.0, 0.0, 1.0)              # x, y, rayon (unités de la scène)
 AMPOULE = (3.2, 0.0, 0.55)
-R_TELESCOPE = 4.6                    # rayon du cercle où se déplace le télescope
+# rayon du cercle où se déplace le télescope : hors du halo de l'ampoule (3,2 + 2,2 × 0,55 = 4,41), tube compris
+R_TELESCOPE = 5.6
+L_TUBE = 0.9                         # longueur du tube du télescope
+R_HALO = 2.2 * AMPOULE[2]            # rayon du halo de l'ampoule
+
+
+def _entree(obj, tx: float, ty: float, dx: float, dy: float):
+    """Distance s (≥ 0) le long de la visée (origine t, direction unitaire d) où elle entre dans le disque, ou None."""
+    ox, oy, r = obj
+    fx, fy = tx - ox, ty - oy
+    b = fx * dx + fy * dy
+    disc = b * b - (fx * fx + fy * fy - r * r)
+    if disc <= 0:
+        return None
+    q = math.sqrt(disc)
+    if -b + q <= 0:                  # tout le disque est derrière le télescope
+        return None
+    return max(0.0, -b - q)
 
 
 def vue(angle_deg: float, cible: str) -> dict:
     """Ce que voit le télescope placé à l'angle donné sur le cercle (autour du nuage) et visant `cible`
-    ('nuage' ou 'ampoule') : {'nuage': bool, 'ampoule': bool}."""
+    ('nuage' ou 'ampoule').  L'ordre le long de la visée compte : l'ampoule est opaque et cache ce qui est derrière
+    elle.  Absorption seulement si la visée traverse le gaz PUIS l'ampoule (télescope → nuage → ampoule) ; l'ampoule
+    devant le nuage donne un spectre continu.  Rend {'nuage': gaz vu (traversé avant l'ampoule ou sans elle),
+    'ampoule': ampoule sur la visée, 's_nuage', 's_ampoule': distances d'entrée le long de la visée ou None}."""
     a = math.radians(angle_deg)
     tx, ty = R_TELESCOPE * math.cos(a), R_TELESCOPE * math.sin(a)
     cx, cy = (NUAGE if cible == 'nuage' else AMPOULE)[:2]
     dx, dy = cx - tx, cy - ty
     n = math.hypot(dx, dy)
     dx, dy = dx / n, dy / n
-
-    def traverse(obj):
-        ox, oy, r = obj
-        s = (ox - tx) * dx + (oy - ty) * dy
-        if s <= 0:
-            return False
-        return math.hypot(tx + s * dx - ox, ty + s * dy - oy) < r
-    return {'nuage': traverse(NUAGE), 'ampoule': traverse(AMPOULE)}
+    sa = _entree(AMPOULE, tx, ty, dx, dy)
+    sn = _entree(NUAGE, tx, ty, dx, dy)
+    return {'nuage': sn is not None and (sa is None or sn < sa), 'ampoule': sa is not None,
+            's_nuage': sn, 's_ampoule': sa}
 
 
 def type_de_spectre(v: dict) -> str:
@@ -88,16 +104,18 @@ class Kirchhoff(Animation):
     def dessiner(self, p, rect):
         haut = QRectF(rect.x(), rect.y(), rect.width(), rect.height() * 0.68)
         r = dessin.cadre(p, haut, tr('anim_threeviewsspectra_titre_scene'))
-        k = min(r.width() / 11.0, r.height() / 10.5)
-        cx, cy = r.center().x() - 0.9 * k, r.center().y()
+        # le cercle du télescope (rayon 5,6) et son étiquette tiennent dans le panneau
+        k = min(r.width() / 13.4, r.height() / 12.6)
+        cx, cy = r.center().x(), r.center().y()
         self._scene = (cx, cy, k)
         p.setPen(dessin.stylo('grille', 1.0, None, True))
         p.setBrush(dessin.Qt.BrushStyle.NoBrush)
         p.drawEllipse(QPointF(cx, cy), R_TELESCOPE * k, R_TELESCOPE * k)
         # ampoule : halo chaud
         ax_, ay_ = cx + AMPOULE[0] * k, cy - AMPOULE[1] * k
-        for f, a in ((2.2, 0.08), (1.6, 0.15)):
+        for f, a in ((R_HALO / AMPOULE[2], 0.08), (1.6, 0.15)):
             dessin.disque(p, ax_, ay_, AMPOULE[2] * k * f, 'soleil', alpha=a)
+        dessin.reserver(p, ax_, ay_, R_HALO * k, toujours=True)
         dessin.disque(p, ax_, ay_, AMPOULE[2] * k, 'soleil', bord='texte')
         dessin.texte(p, ax_, ay_ + AMPOULE[2] * k + 14, tr('anim_threeviewsspectra_ampoule'), 'doux')
         # nuage de gaz
@@ -113,17 +131,31 @@ class Kirchhoff(Animation):
         gx, gy = cx + cible[0] * k, cy - cible[1] * k
         d = math.hypot(gx - tx, gy - ty)
         ux, uy = (gx - tx) / d, (gy - ty) / d
+        # la visée s'arrête sur l'ampoule, opaque : ce qui est derrière elle n'est pas vu
+        v = vue(self.angle.value(), self.cible.currentData())
+        portee = v['s_ampoule'] * k if v['s_ampoule'] is not None else 12 * k
         p.setPen(dessin.stylo('accent1', 1.0, 0.7, True))
-        p.drawLine(QPointF(tx, ty), QPointF(tx + ux * 12 * k, ty + uy * 12 * k))
+        p.drawLine(QPointF(tx, ty), QPointF(tx + ux * portee, ty + uy * portee))
         nx, ny = -uy, ux
-        w, l = 0.28 * k, 0.9 * k
+        w, l = 0.28 * k, L_TUBE * k
         poly = QPolygonF([QPointF(tx + nx * w, ty + ny * w), QPointF(tx + ux * l + nx * w * 1.3, ty + uy * l + ny * w * 1.3),
                           QPointF(tx + ux * l - nx * w * 1.3, ty + uy * l - ny * w * 1.3),
                           QPointF(tx - nx * w, ty - ny * w)])
         p.setPen(dessin.stylo('texte', 1.2))
         p.setBrush(dessin.c('accent2', 0.8))
         p.drawPolygon(poly)
-        dessin.texte(p, tx - ux * 18, ty - uy * 18, tr('anim_threeviewsspectra_telescope'), 'texte', fond=True)
+        # étiquette du télescope : à l'extérieur du cercle, placée sans chevauchement (le tube est réservé)
+        dessin.reserver(p, tx + ux * l * 0.5, ty + uy * l * 0.5, min(24.0, l * 0.6))
+        nom = tr('anim_threeviewsspectra_telescope')
+        fm = p.fontMetrics()
+        demi = 0.5 * (fm.horizontalAdvance(nom) + 6)
+        recul = 12 + demi * abs(ux) + 0.5 * (fm.height() + 2) * abs(uy)
+        lx, ly = tx - ux * recul, ty - uy * recul
+        # dehors, l'étiquette sortirait du panneau : elle passe au-dessus (ou au-dessous) du télescope
+        if lx - demi < r.x() or lx + demi > r.right():
+            lx = max(r.x() + demi, min(r.right() - demi, tx))
+            ly = ty + (1 if ty > cy else -1) * (0.6 * k + 4 + 0.5 * fm.height())
+        dessin.texte(p, lx, ly, nom, 'texte', fond=True)
         # spectre vu
         bas = QRectF(rect.x(), haut.bottom(), rect.width(), rect.height() - haut.height())
         rb = dessin.cadre(p, bas, tr('anim_threeviewsspectra_titre_spectre'))
