@@ -353,7 +353,7 @@ class JourNuit(Animation):
         self.projection = self.choix('projection', [('anim_daylightsimulator_proj_equi', 'equi'),
                                                     ('anim_daylightsimulator_proj_nord', 'nord'),
                                                     ('anim_daylightsimulator_proj_sud', 'sud'),
-                                                    ('anim_daylightsimulator_proj_globe', 'globe')], 'equi')
+                                                    ('anim_daylightsimulator_proj_globe', 'globe')], 'globe')
         self.bord = self.choix('bord', [('anim_daylightsimulator_bord_0', 0), ('anim_daylightsimulator_bord_30', 30)], 0)
         self.c_tournant = self.coche('tournant', False)
         self.c_axe = self.coche('axe', True)
