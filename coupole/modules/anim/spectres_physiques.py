@@ -104,8 +104,12 @@ class ModeleSpectres:
         a, b = tab[i], tab[j]
         tt = min(max(float(t), self.types[0]), self.types[-1])
         out = {}
+        colonnes = self.__dict__.setdefault('_colonnes', {})       # colonnes tabulées, extraites une fois
         for k in ('teff', 'logg', 'bv', 'mv', 'rayon', 'logl'):
-            ys = [None if e.get(k) is None else (math.log10(e[k]) if k == 'teff' else e[k]) for e in tab]
+            ys = colonnes.get((classe, k))
+            if ys is None:
+                ys = colonnes[(classe, k)] = [None if e.get(k) is None else (math.log10(e[k]) if k == 'teff' else e[k])
+                                              for e in tab]
             v = pchip(ys, tt)
             out[k] = None if v is None else (10 ** v if k == 'teff' else v)
         out['source'] = a['source'] if w < 0.5 else b['source']

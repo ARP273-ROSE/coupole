@@ -5,6 +5,7 @@ apparente m, le module de distance donne d = 10^((m − M + 5) / 5) parsecs.  Sp
 (celui de l'original), signalé.  Même rendu que Coupole Web (parallaxe_spectro.ts)."""
 from __future__ import annotations
 
+import functools
 import math
 
 from PyQt6.QtCore import QPointF, QRectF
@@ -21,6 +22,7 @@ CLASSES = (('I', 1), ('II', 2), ('III', 3), ('IV', 4), ('V', 5))
 NOM_CLASSE = {n: c for c, n in CLASSES}
 
 
+@functools.lru_cache(maxsize=4096)                  # pure : la courbe de chaque classe est redessinée à chaque image
 def magnitude_absolue(t: float, classe: int) -> dict:
     """Magnitude absolue M_V d'une étoile de type t et de classe n (1 = I … 5 = V) : T_eff et M_V du nouvel étalonnage
     (Mamajek 2022 pour V, Martins 2005 / van Belle 2021 pour III, Martins 2005 pour les supergéantes O) quand ils sont
@@ -66,7 +68,7 @@ class ParallaxeSpectro(Animation):
         return NOM_CLASSE[self.classe.currentData()]
 
     def resultat(self) -> dict:
-        r = magnitude_absolue(self.sp.value(), self.classe.currentData())
+        r = dict(magnitude_absolue(self.sp.value(), self.classe.currentData()))     # copie : le résultat est en cache
         r['d'] = astro.distance_du_module(self.m.value() - r['M'])
         return r
 
