@@ -201,6 +201,178 @@ for t in (0, 0.3, 1.0, 1.881 / 2, 2.5):
 # ------------------------------------------------------------------ jour sidéral
 ref['jour_sideral'] = [[y, float(86400 * R(y) / (R(y) + 1))] for y in (365, 365.25, 365.24219)]
 
+# ================================================================== lot 2 (0.3.1) : Lune, Renaissance, antique
+GSI = R('6.67430e-11')
+GMT = R('3.986004418e14')
+MT = GMT / GSI
+ML = MT / R('81.300568')
+MS = GM / GSI
+
+
+# ------------------------------------------------------------------ périodes synodiques : retour de l'alignement
+def synodique_par_racine(p1, p2):
+    # premier instant > 0 où l'écart angulaire 2π t (1/p1 − 1/p2) atteint un tour
+    f = lambda t: 2 * PI * t * (1 / R(p1) - 1 / R(p2)) - 2 * PI * sign(1 / R(p1) - 1 / R(p2))
+    return abs(find_root(f, R('1e-6'), R(1e6)))
+
+
+ref['synodique'] = [[p1, p2, float(synodique_par_racine(p1, p2))] for p1, p2 in
+                    [(1, 1.8808), (1, 0.6152), (1, 11.862), (1, 0.2408), (1, 29.457), (27.321661, 365.256363)]]
+ref['kepler3_inverse'] = [[pp, m, float(find_root(lambda a: a ** 3 - m * R(pp) ** 2, R('1e-6'), R(1e6)))]
+                          for pp, m in [(1, 1), (11.862, 1), (0.2408, 1), (100, 2.5), (0.01, 0.3)]]
+
+# ------------------------------------------------------------------ gravitation et satellites de la Terre
+ref['gravitation'] = [[m1, m2, r, float(GSI * R(m1) * R(m2) / R(r) ** 2)] for m1, m2, r in
+                      [(0.102, float(MT), 6.371e6), (72, 72, 2), (9.1093837e-31, 1.6726219e-27, 1e-10),
+                       (float(MS), float(MT), 149597870700)]]
+ref['orbite_terre'] = []
+for r in (6378137, 6798000, 26560000, 384400000):
+    pp = 2 * PI * sqrt(R(r) ** 3 / GMT)
+    ref['orbite_terre'].append([r, float(pp), float(sqrt(GMT / R(r)))])
+jsid = 86400 * R('365.256363004') / (R('365.256363004') + 1)     # rotation par rapport aux étoiles (année sidérale)
+ref['geostationnaire'] = {'jour_sideral_s': float(jsid),
+                          'rayon_m': float(find_root(lambda r: 2 * PI * sqrt(r ** 3 / GMT) - jsid, R(1e7), R(1e8)))}
+ref['lune_periode_deux_corps_j'] = float(2 * PI * sqrt(R(384400000) ** 3 / (GMT * (1 + 1 / R('81.300568')))) / 86400)
+
+# ------------------------------------------------------------------ petits angles
+ref['petits_angles'] = [[d, dd, float(2 * asin(R(d) / (2 * R(dd))) * 648000 / PI), float(R(d) / R(dd) * 648000 / PI)]
+                        for d, dd in [(2, 50), (1, 20), (3, 2), (12742, 384400), (3474.8, 384400)]]
+
+# ------------------------------------------------------------------ marées d'équilibre
+RT = R('6378137')
+k_l = ML / MT * (RT / R(384400000)) ** 3 * RT
+k_s = MS / MT * (RT / (UA)) ** 3 * RT
+ref['marees'] = {'amplitude_lune_m': float(k_l), 'rapport_soleil_lune': float(k_s / k_l),
+                 'marnage_lune_m': float(k_l * R(3) / 2)}
+
+# ------------------------------------------------------------------ Vénus : élongation et phase par la loi des cosinus
+ref['venus'] = []
+for av, at in [(28.6479, 0), (10, 0), (180, 0), (90, 0), (300, 45), (46.3, 0)]:
+    gamma = (R(at) - R(av)) * D                    # angle au Soleil entre la Terre et Vénus
+    a = R('0.723332')
+    d = sqrt(1 + a * a - 2 * a * cos(gamma))
+    elong = acos((1 + d * d - a * a) / (2 * d)) / D              # angle à la Terre
+    i = acos((a * a + d * d - 1) / (2 * a * d)) / D             # angle de phase, à Vénus
+    ref['venus'].append([av, at, float(d), float(elong), float(i)])
+# plus grande élongation : maximum de l'élongation, par la dérivée
+a = R('0.723332')
+el = lambda g: acos((1 + (1 + a * a - 2 * a * cos(g)) - a * a) / (2 * sqrt(1 + a * a - 2 * a * cos(g))))
+gg = var('gg')
+gmax = find_root(diff(el(gg), gg), R(0.1), R(1.5))
+ref['venus_elongation_max'] = float(el(R(gmax)) / D)
+
+# ------------------------------------------------------------------ configurations : instants des quadratures et élongations
+ref['configurations'] = []
+for a_obs, a_c in [(1, 2.4), (1, 1.523679), (1, 0.723332), (1.523679, 1), (1, 5.2026)]:
+    p1, p2 = R(a_obs) ** R(1.5), R(a_c) ** R(1.5)
+    s = 1 / abs(1 / p1 - 1 / p2)
+    def angle_terre(t):
+        th1, th2 = 2 * PI * t / p1, 2 * PI * t / p2
+        x1, y1, x2, y2 = R(a_obs) * cos(th1), R(a_obs) * sin(th1), R(a_c) * cos(th2), R(a_c) * sin(th2)
+        u = vector([x2 - x1, y2 - y1]); v = vector([-x1, -y1])
+        return acos(u.dot_product(v) / (u.norm() * v.norm()))
+    if a_c > a_obs:      # quadrature : angle de 90° à l'observateur
+        t1 = find_root(lambda t: angle_terre(t) - PI / 2, R('1e-9'), s / 2 - R('1e-9'))
+    else:                # plus grande élongation : maximum de l'angle à l'observateur
+        tt = var('tt')
+        t1 = find_root(lambda t: (angle_terre(t + R('1e-7')) - angle_terre(t - R('1e-7'))), R('1e-6'), s / 2 - R('1e-6'))
+    ref['configurations'].append([a_obs, a_c, float(s), float(t1)])
+
+# ------------------------------------------------------------------ Lune : phases moyennes, F, Soleil aux nœuds
+def phase_moyenne(k):
+    k = R(k); tt = k / R('1236.85')
+    return R('2451550.09766') + R('29.530588861') * k + R('0.00015437') * tt ** 2 - R('0.000000150') * tt ** 3 \
+        + R('0.00000000073') * tt ** 4
+
+
+def arg_lat(k):
+    k = R(k); tt = k / R('1236.85')
+    return md(R('160.7108') + R('390.67050284') * k - R('0.0016118') * tt ** 2 - R('0.00000227') * tt ** 3
+              + R('0.000000011') * tt ** 4, 360)
+
+
+ref['phases_moyennes'] = [[k, float(phase_moyenne(k)), float(arg_lat(k))] for k in (0, 0.5, 326, 329, 329.5, 500.5, -10)]
+
+
+def noeud(jd):
+    t = (jd - 2451545) / 36525
+    return md(R('125.0445479') - R('1934.1362891') * t + R('0.0020754') * t ** 2 + t ** 3 / 467441 - t ** 4 / 60616000,
+              360)
+
+
+ref['soleil_noeuds_2026'] = []
+for cible, j0 in ((0, jj(2026, 2, 20)), (180, jj(2026, 8, 18))):
+    f = lambda x: (md(R(soleil(R(x))[0]) - noeud(R(x)) - cible + 180, 360) - 180)
+    ref['soleil_noeuds_2026'].append([cible, float(find_root(f, j0 - 15, j0 + 15))])
+
+# ------------------------------------------------------------------ précession (IAU 1976) par matrices de rotation
+def precession_sage(ra, dec, jd):
+    t = (R(jd) - 2451545) / 36525
+    zeta = (R('2306.2181') * t + R('0.30188') * t ** 2 + R('0.017998') * t ** 3) / 3600 * D
+    z = (R('2306.2181') * t + R('1.09468') * t ** 2 + R('0.018203') * t ** 3) / 3600 * D
+    th = (R('2004.3109') * t - R('0.42665') * t ** 2 - R('0.041833') * t ** 3) / 3600 * D
+    rz = lambda a: matrix(R, [[cos(a), -sin(a), 0], [sin(a), cos(a), 0], [0, 0, 1]])
+    ry = lambda a: matrix(R, [[cos(a), 0, -sin(a)], [0, 1, 0], [sin(a), 0, cos(a)]])
+    m = rz(z) * ry(th) * rz(zeta)
+    v = m * matrix(R, 3, 1, [cos(R(dec) * D) * cos(R(ra) * D), cos(R(dec) * D) * sin(R(ra) * D), sin(R(dec) * D)])
+    return float(md(R(atan2(v[1, 0], v[0, 0])) / D, 360)), float(asin(v[2, 0]) / D)
+
+
+ref['precession'] = [[ra, dec, float(jd), *precession_sage(ra, dec, jd)] for ra, dec, jd in
+                     [(101.287155, -16.716116, jj(2026, 1, 1)), (279.234735, 38.783689, jj(2026, 7, 1)),
+                      (37.954561, 89.264109, jj(2026, 1, 1)), (10, 20, jj(2100, 1, 1)), (300, -60, jj(1950, 1, 1))]]
+
+
+# ------------------------------------------------------------------ lever héliaque (modèle de l'original : horizon, Soleil à −7°)
+def hauteur_aube(ra, dec, lat, jour, dep=7):
+    jd = jj(2026, 1, 1) + jour + R(1) / 2
+    lam, alpha, delta, eqt = soleil(jd)
+    p_, d_ = R(lat) * D, R(delta) * D
+    c = (sin(-R(dep) * D) - sin(p_) * sin(d_)) / (cos(p_) * cos(d_))
+    if abs(c) >= 1:
+        return None
+    hh = acos(c) / D
+    tsl = R(alpha) - hh
+    ra2, de2 = precession_sage(ra, dec, jd)
+    hs = (tsl - R(ra2)) * D
+    return float(asin(sin(p_) * sin(R(de2) * D) + cos(p_) * cos(R(de2) * D) * cos(hs)) / D)
+
+
+ref['heliaque'] = []
+for nom, ra, dec in (('sirius', 101.287155, -16.716116), ('vega', 279.234735, 38.783689),
+                     ('aldebaran', 68.980163, 16.509302)):
+    h = [hauteur_aube(ra, dec, 40.8, j) for j in range(365)]
+    vis = [x is not None and x > 0 for x in h]
+    jours = [j for j in range(365) if vis[j] and not vis[j - 1]]
+    ref['heliaque'].append([nom, ra, dec, 40.8, jours, [[j, h[j]] for j in (0, 100, 200, 300)]])
+
+# ------------------------------------------------------------------ pleine lune : déclinaison d'un point de latitude écliptique β
+def dec_ecl(lam, beta, eps):
+    v = matrix(R, 3, 1, [cos(R(beta) * D) * cos(R(lam) * D), cos(R(beta) * D) * sin(R(lam) * D), sin(R(beta) * D)])
+    rx = matrix(R, [[1, 0, 0], [0, cos(R(eps) * D), -sin(R(eps) * D)], [0, sin(R(eps) * D), cos(R(eps) * D)]])
+    return float(asin((rx * v)[2, 0]) / D)
+
+
+ref['dec_ecliptique'] = [[lam, beta, eps, dec_ecl(lam, beta, eps)] for lam, beta, eps in
+                         [(90, 5.145, 23.436), (270, -5.145, 23.436), (0, 5.145, 23.436), (135, 0, 23.44)]]
+
+
+# ------------------------------------------------------------------ propriétés stellaires (lot 2 bis)
+SIG = R('5.670374419e-8')
+RSOL, LSOL = R('6.957e8'), R('3.828e26')
+TSOL = find_root(lambda tt: 4 * PI * RSOL ** 2 * SIG * tt ** 4 - LSOL, R(5000), R(6500))
+ref['stellaire'] = {'t_soleil': float(TSOL),
+                    'ua_par_an_km_s': float(UA / 1000 / (R('365.25') * 86400)),
+                    'luminosites': [[r, tt, float((R(r) * RSOL) ** 2 * 4 * PI * SIG * R(tt) ** 4 / LSOL)]
+                                    for r, tt in [(1, 5830), (0.01, 9480), (100, 3800), (10, 38000)]],
+                    'flux': [[w, d, float(R(w) / (4 * PI * R(d) ** 2))] for w, d in [(25, 1), (100, 2.5), (500, 5)]],
+                    'doppler': [[lam, float(R('299792.458') * (R(lam) - R('656.28')) / R('656.28')),
+                                 float(R('299792.458') * ((R(lam) / R('656.28')) ** 2 - 1) / ((R(lam) / R('656.28')) ** 2 + 1))]
+                                for lam in (655, 656.28, 656.5, 657)],
+                    'distances': [[m, mm, float(10 ** ((R(m) - R(mm) + 5) / 5))] for m, mm in
+                                  [(1, 4.84), (-1.46, 1.42), (11.13, 15.53), (0, 0)]]}
+
+
 def natif(x):
     """Nombres de Sage (Integer, RealNumber) → int / float de Python, pour le JSON."""
     if isinstance(x, dict):

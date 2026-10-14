@@ -280,3 +280,289 @@ def test_azimut_du_lever_aux_solstices():
     assert az == pytest.approx(math.degrees(math.acos(math.sin(math.radians(eps)) / math.cos(math.radians(41.0)))),
                                abs=1e-9)
     assert astro.azimut_lever(0.0, 41.0) == pytest.approx(90.0)
+
+
+# ---------------------------------------------------------------- lot 2 (0.3.1) : Lune, Renaissance, antique
+def test_periodes_synodiques():
+    for p1, p2, s in REF['synodique']:
+        assert astro.periode_synodique(p1, p2) == pytest.approx(s, rel=1e-12)
+    # retour inverse : période sidérale d'après la synodique (Mars supérieure, Vénus inférieure)
+    s_mars = astro.periode_synodique(1.0, 1.8808)
+    assert astro.periode_siderale(s_mars, 1.0, superieure=True) == pytest.approx(1.8808, rel=1e-12)
+    s_venus = astro.periode_synodique(1.0, 0.6152)
+    assert astro.periode_siderale(s_venus, 1.0, superieure=False) == pytest.approx(0.6152, rel=1e-12)
+    assert math.isinf(astro.periode_siderale(0.9, 1.0, superieure=True))
+    # lunaison = combinaison du mois sidéral et de l'année sidérale
+    assert astro.periode_synodique(astro.MOIS_SIDERAL_J, astro.ANNEE_SIDERALE_J) == pytest.approx(
+        astro.MOIS_SYNODIQUE_J, abs=2e-4)
+
+
+def test_troisieme_loi_inverse():
+    for per, m, a in REF['kepler3_inverse']:
+        assert astro.demi_grand_axe(per, m) == pytest.approx(a, rel=1e-12)
+        assert astro.periode_annees(a, m) == pytest.approx(per, rel=1e-12)
+    from coupole.modules.anim.animations.kepler3 import PLANETES
+    for _, a, jours in PLANETES:          # P² = a³ à 1 % près pour les vraies planètes (perturbations, masse propre)
+        assert (jours / astro.ANNEE_SIDERALE_J) ** 2 == pytest.approx(a ** 3, rel=1e-2)
+
+
+def test_gravitation_et_satellites():
+    for m1, m2, r, f in REF['gravitation']:
+        assert astro.force_gravitation(m1, m2, r) == pytest.approx(f, rel=1e-12)
+    for r, per, v in REF['orbite_terre']:
+        assert astro.periode_orbite_terre(r) == pytest.approx(per, rel=1e-12)
+        assert astro.vitesse_circulaire(r) == pytest.approx(v, rel=1e-12)
+    g = REF['geostationnaire']
+    assert astro.jour_sideral_s(astro.ANNEE_SIDERALE_J) == pytest.approx(g['jour_sideral_s'], rel=1e-13)
+    assert astro.rayon_orbite_terre(g['jour_sideral_s']) == pytest.approx(g['rayon_m'], rel=1e-12)
+    assert g['rayon_m'] == pytest.approx(42_164_170, abs=50)                 # orbite géostationnaire
+    from coupole.modules.anim.animations import orbites_terre as O
+    assert dict(O.POINTS)['geo'] == pytest.approx(g['rayon_m'], rel=1e-12)
+    gm = astro.GM_TERRE * (1 + astro.MASSE_LUNE_KG / astro.MASSE_TERRE_KG)
+    assert astro.periode_orbite_terre(astro.D_LUNE_KM * 1e3, gm) / 86400 == pytest.approx(
+        REF['lune_periode_deux_corps_j'], rel=1e-12)
+    # pesanteur à la surface (préréglages de l'original : petite pomme, Terre, rayon terrestre) ≈ 9,82 m/s²
+    from coupole.modules.anim.animations.gravitation import calcul, scientifique
+    assert calcul(0.102, astro.MASSE_TERRE_KG, 6.371e6)['a1'] == pytest.approx(9.820, abs=1e-3)
+    assert scientifique(6.6743e-11) in ('6,67 × 10⁻¹¹', '6.67 × 10⁻¹¹')
+
+
+def test_petits_angles():
+    for d, dd, exact, approche in REF['petits_angles']:
+        r = astro.diametre_angulaire(d, dd)
+        assert r['sphere'] == pytest.approx(exact, rel=1e-12)
+        assert r['petits_angles'] == pytest.approx(approche, rel=1e-12)
+    assert astro.SECONDES_D_ARC_PAR_RADIAN == pytest.approx(206_264.806_247, rel=1e-12)
+
+
+def test_marees_d_equilibre():
+    m = REF['marees']
+    assert astro.maree_equilibre(0.0, astro.MASSE_LUNE_KG, astro.D_LUNE_KM * 1e3) == pytest.approx(
+        m['amplitude_lune_m'], rel=1e-12)
+    assert astro.rapport_marees_soleil_lune() == pytest.approx(m['rapport_soleil_lune'], rel=1e-12)
+    from coupole.modules.anim.animations.marees import niveau, type_de_maree
+    assert niveau(0.0, 0.0, False) - niveau(90.0, 0.0, False) == pytest.approx(m['marnage_lune_m'], rel=1e-12)
+    # vives eaux à la pleine lune, mortes eaux au premier quartier ; deux marées hautes opposées
+    vives = niveau(0.0, 180.0, True) - niveau(90.0, 180.0, True)
+    mortes = niveau(90.0, 90.0, True) - niveau(0.0, 90.0, True)
+    assert vives / mortes == pytest.approx((1 + m['rapport_soleil_lune']) / (1 - m['rapport_soleil_lune']), rel=1e-12)
+    assert niveau(37.0, 37.0, False) == pytest.approx(niveau(217.0, 37.0, False), abs=1e-12)
+    assert (type_de_maree(0.0), type_de_maree(90.0)) == ('vives', 'mortes')
+
+
+def test_phases_de_venus():
+    from coupole.modules.anim.animations import phases_venus as V
+    for av, at, d, elong, i in REF['venus']:
+        g = V.copernic(av, at)
+        assert g['distance'] == pytest.approx(d, rel=1e-6)          # a = 0,723 332 ua dans les deux calculs
+        assert abs(g['elongation']) == pytest.approx(elong, abs=1e-6)
+        assert g['i'] == pytest.approx(i, abs=1e-6)
+    assert math.degrees(math.asin(V.A_VENUS)) == pytest.approx(REF['venus_elongation_max'], abs=1e-9)
+    # Ptolémée : jamais plus qu'un croissant (Vénus toujours entre la Terre et le Soleil)
+    for t in [k * 0.037 for k in range(60)]:
+        g = V.ptolemee(360.0 * t, 360.0 * t / V.PTOLEMEE['periode'])
+        assert astro.fraction_eclairee_phase(g['i']) < 0.5
+        assert abs(g['elongation']) <= math.degrees(math.asin(108 / 150)) + 1e-9
+    # Copernic : pleine près de la conjonction supérieure, nouvelle à la conjonction inférieure
+    assert V.copernic(180.0, 0.0)['i'] == pytest.approx(0.0, abs=1e-9)
+    assert V.copernic(0.0, 0.0)['i'] == pytest.approx(180.0, abs=1e-9)
+
+
+def test_configurations_planetaires():
+    from coupole.modules.anim.animations.configurations import configurations
+    for a_obs, a_c, s, t1 in REF['configurations']:
+        c = configurations(a_obs, a_c)
+        assert c['S'] == pytest.approx(s, rel=1e-12)
+        assert c['temps'][1] == pytest.approx(t1, abs=1e-6)
+        assert c['temps'][3] == pytest.approx(s - t1, abs=1e-6)
+
+
+def test_phases_moyennes_et_argument_de_latitude():
+    for k, jde, f in REF['phases_moyennes']:
+        assert astro.phase_moyenne_jde(k) == pytest.approx(jde, abs=1e-6)
+        assert ecart_angle(astro.argument_latitude_lune(k), f) < 1e-8
+    # exemple 49.a de Meeus : nouvelle lune moyenne de février 1977, k = −283 : JDE 2443192,94102
+    assert astro.phase_moyenne_jde(-283) == pytest.approx(2443192.94102, abs=1e-5)
+
+
+def test_table_des_eclipses():
+    """Chaque éclipse de la table : phase moyenne à moins de 1,1 jour et |sin F| < 0,36 (condition de Meeus) ; et
+    toutes tombent dans une saison d'éclipses (±20,3 jours d'un passage du Soleil à un nœud)."""
+    from coupole.modules.anim.animations import table_eclipses as T
+    assert len(T.SOLEIL) == 66 and len(T.LUNE) == 67
+    noeuds = [jj for jj, _ in astro.soleil_au_noeud(astro.jour_julien(2014, 6, 1), astro.jour_julien(2045, 6, 1))]
+    for donnees, solaire in ((T.SOLEIL, True), (T.LUNE, False)):
+        for e in donnees:
+            v = T.verifier(e, solaire)
+            assert abs(v['ecart_j']) < 1.1 and v['sinF'] < 0.36, e
+            jj = astro.jour_julien(*e[:3], 12.0)
+            assert min(abs(jj - n) for n in noeuds) < T.DEMI_SAISON_J, e
+    # passages du Soleil aux nœuds en 2026, contre SageMath
+    passages = astro.soleil_au_noeud(astro.jour_julien(2026, 1, 1), astro.jour_julien(2027, 1, 1))
+    for (cible, jj_ref), (jj, nom) in zip(REF['soleil_noeuds_2026'], passages):
+        assert jj == pytest.approx(jj_ref, abs=1e-6) and nom == ('asc' if cible == 0 else 'desc')
+    assert T.format_duree('03h29m (00h05m)').startswith('3 h 29 min')
+
+
+def test_zones_traduites():
+    from coupole.modules.anim import donnees_eclipses as D
+    for e in D.SOLEIL + D.LUNE:
+        fr = D.zones(e[7], 'fr')
+        for mot in ('Africa', 'Asia', 'Pacific', 'America', 'Total:', 'Annular:'):
+            assert mot not in fr, (e, fr)
+
+
+def test_precession():
+    for ra, dec, jd, ra2, dec2 in REF['precession']:
+        a, d = astro.precession(ra, dec, jd)
+        assert ecart_angle(a, ra2) < 1e-8 and d == pytest.approx(dec2, abs=1e-8)
+
+
+def test_precession_proche_d_astropy():
+    pytest.importorskip('astropy')
+    from astropy import units as u
+    from astropy.coordinates import FK5, SkyCoord
+    from astropy.time import Time
+    for ra, dec, jd, _, _ in REF['precession']:
+        c = SkyCoord(ra=ra * u.deg, dec=dec * u.deg, frame=FK5(equinox='J2000')).transform_to(
+            FK5(equinox=Time(jd, format='jd')))
+        a, d = astro.precession(ra, dec, jd)
+        assert ecart_angle(a, c.ra.deg) * math.cos(math.radians(d)) < 1e-4 and abs(d - c.dec.deg) < 1e-4
+
+
+def test_lever_heliaque():
+    for nom, ra, dec, lat, jours, hauteurs in REF['heliaque']:
+        j, h = astro.lever_heliaque(ra, dec, lat)
+        assert j == jours, nom
+        for jour, hh in hauteurs:
+            assert h[jour] == pytest.approx(hh, abs=1e-6), (nom, jour)
+    # Sirius à 40,8° N : mi-août (modèle de l'original, horizon géométrique, Soleil à −7°)
+    assert REF['heliaque'][0][4] == [222]
+
+
+def test_pleine_lune_declinaison():
+    from coupole.modules.anim.animations.pleine_lune_declinaison import pleine_lune
+    for lam, beta, eps, dec in REF['dec_ecliptique']:
+        assert astro.ecliptique_vers_equatorial(lam, beta, eps)[1] == pytest.approx(dec, abs=1e-9)
+    hiver, ete = pleine_lune(355.0, 40.8), pleine_lune(172.0, 40.8)     # pleines lunes de décembre et de juin
+    assert hiver['dec'] == pytest.approx(23.44, abs=0.02) and ete['dec'] == pytest.approx(-23.44, abs=0.02)
+    assert hiver['h'] == pytest.approx(90 - 40.8 + hiver['dec'], abs=1e-9)
+    assert hiver['dec_max'] - hiver['dec_min'] == pytest.approx(2 * astro.INCLINAISON_LUNE, abs=0.01)
+
+
+def test_inclinaison_et_eclipses():
+    from coupole.modules.anim.animations import inclinaison_lune as I
+    # combinaison des périodes : la lunaison
+    assert astro.periode_synodique(I.MOIS_DRACONITIQUE_J, astro.ANNEE_DRACONITIQUE_J) == pytest.approx(
+        astro.MOIS_SYNODIQUE_J, rel=1e-12)
+    assert I.MOIS_DRACONITIQUE_J == pytest.approx(27.212_22, abs=1e-4)
+    # nouvelle lune au nœud : éclipse de Soleil ; pleine lune une demi-lunaison plus tard : éclipse de Lune
+    assert I.eclipse(I.geometrie(0.0)) == 'soleil'
+    assert I.eclipse(I.geometrie(astro.MOIS_SYNODIQUE_J / 2)) in ('lune_ombre', 'lune_penombre')
+    # trois lunaisons plus tard, le Soleil est à 32° du nœud : la Lune passe à côté
+    assert I.eclipse(I.geometrie(3 * astro.MOIS_SYNODIQUE_J)) is None
+    assert 4500 < I.OMBRE_TERRE_KM < 4700
+
+
+def test_jour_solaire_et_sideral():
+    from coupole.modules.anim.animations import retard_synodique as R
+    assert astro.jour_solaire(R.JOUR_SIDERAL_H, R.ANNEE_H) == pytest.approx(24.0, abs=1e-9)
+    assert R.JOUR_SIDERAL_H * 3600 == pytest.approx(86_164.0989, abs=1e-3)
+    assert astro.jour_solaire(240.0, R.ANNEE_H) == pytest.approx(1 / (1 / 240 - 1 / R.ANNEE_H), rel=1e-12)
+
+
+def test_phases_vues_de_partout():
+    from coupole.modules.anim.animations import ballon_phases as B, positions_phases as P, trois_vues as T3
+    from coupole.modules.anim.animations.questionnaire_phases import elongation, meme_phase
+    for e in range(0, 360, 15):
+        i, droite = T3.vue_depuis(T3.psi_de_la_terre(e))
+        assert astro.fraction_eclairee_phase(i) == pytest.approx(astro.fraction_eclairee(e), abs=1e-12)
+        if 0 < e < 180:
+            assert droite                                  # croissante : éclairée à droite (hémisphère nord)
+        v = B.vue_de_l_oeil((e - 180.0) % 360.0)
+        assert v['elongation'] == pytest.approx(e % 360.0, abs=1e-9) or e in (0, 180)
+    i, _ = P.vu_de((1.0, 0.0), (2.0, 0.0))                 # planète entre le Soleil et l'observateur : « nouvelle »
+    assert i == pytest.approx(180.0)
+    assert elongation(135.0, 45.0) == 90.0 and meme_phase(90.0, 93.0) and not meme_phase(90.0, 97.0)
+
+
+def test_lune_horizon_positions():
+    from coupole.modules.anim.animations import lune_horizon as L
+    assert L.heure_du_soleil(3) == 12.0 and L.heure_du_soleil(1) == 6.0 and L.heure_du_soleil(7) == 0.0
+    assert L.elongation(4, 2) == 90.0                       # deux positions vers l'est : premier quartier
+    assert L.elongation(3, 7) == 180.0
+
+
+def test_ombre_du_batiment():
+    from coupole.modules.anim.animations import ombre_batiment as O
+    # au midi vrai, hauteur du Soleil = 90° − φ + δ ; ombre vers le nord, longueur cotan(hauteur)
+    s = O.soleil_local(172.0, 12.0, 40.8, midi_vrai=True)
+    assert s['alt'] == pytest.approx(90 - 40.8 + s['dec'], abs=1e-9) and s['az'] == pytest.approx(180.0, abs=1e-7)
+    poly = O.ombre(s['az'], s['alt'])
+    assert max(y for _, y in poly) == pytest.approx(O.PROFONDEUR / 2 + 1 / math.tan(math.radians(s['alt'])), abs=1e-9)
+    assert O.ombre(180.0, -3.0) is None
+
+
+def test_lever_et_horloge_de_la_grande_ourse():
+    from coupole.modules.anim.animations import horloge_grande_ourse as H
+    c = H.ciel(78.0, 1.2, 41.0)
+    assert c['etoiles']['polaire'][1] > 89.2                 # Polaire à moins de 0,8° du pôle
+    x, y = H.stereo(0.0, 60.0)
+    assert x == pytest.approx(0.0) and y > 0                  # méridien supérieur au-dessus du pôle
+    x, _ = H.stereo(90.0, 60.0)
+    assert x < 0                                              # six heures après : à l'ouest (à gauche)
+
+
+# ---------------------------------------------------------------- lot 2 bis : propriétés stellaires
+def test_stefan_boltzmann_et_constantes_solaires():
+    from coupole.modules.anim import hr
+    s = REF['stellaire']
+    assert hr.T_SOLEIL == pytest.approx(s['t_soleil'], rel=1e-12)
+    assert hr.T_SOLEIL == pytest.approx(5772.0, abs=0.01)                 # UAI 2015 B3
+    for r, t, l in s['luminosites']:
+        assert hr.luminosite_solaire(r, t) == pytest.approx(l, rel=1e-12)
+        assert hr.puissance_w(r * hr.R_SOLEIL_M, t) / hr.L_SOLEIL_W == pytest.approx(l, rel=1e-12)
+        assert hr.rayon_solaire(l, t) == pytest.approx(r, rel=1e-12)
+    assert hr.UA_PAR_AN_KM_S == pytest.approx(s['ua_par_an_km_s'], rel=1e-14)
+    assert hr.mbol_de_log_lum(0.0) == 4.74 and hr.log_lum_de_mbol(4.74 - 5.0) == pytest.approx(2.0)
+
+
+def test_flux_et_vitesses():
+    from coupole.modules.anim import hr
+    s = REF['stellaire']
+    for w, d, f in s['flux']:
+        assert hr.flux(w, d) == pytest.approx(f, rel=1e-12)
+    for lam, v, vrel in s['doppler']:
+        assert hr.vitesse_radiale(lam, 656.28) == pytest.approx(v, abs=1e-9)
+        assert hr.vitesse_radiale(lam, 656.28, relativiste=True) == pytest.approx(vrel, abs=1e-9)
+    assert hr.vitesse_transverse(1.0, 1.0) == pytest.approx(4.740_47, abs=1e-5)
+    from coupole.modules.anim.animations.vitesse_etoile import H_ALPHA_NM
+    assert H_ALPHA_NM == 656.28
+
+
+def test_parallaxe_spectroscopique():
+    from coupole.modules.anim import hr
+    from coupole.modules.anim.animations.parallaxe_spectro import intensites, magnitude_absolue
+    for m, mm, d in REF['stellaire']['distances']:
+        assert astro.distance_du_module(m - mm) == pytest.approx(d, rel=1e-12)
+    soleil = magnitude_absolue(42, 5)                      # G2 V : le Soleil, M_V ≈ 4,8
+    assert soleil['M'] == pytest.approx(4.83, abs=0.1) and 10 ** soleil['log_t'] == pytest.approx(5772, rel=0.02)
+    # intensités des raies de l'original : hélium ionisé dans les O, molécules dans les M, hydrogène maximal vers A0
+    assert intensites(0)['he_ii'] == 100 and intensites(5)['molecules'] == 0 and intensites(69)['molecules'] > 90
+    assert max(range(70), key=lambda t: intensites(t)['h']) in (19, 20)
+    # position HR du Soleil d'après sa magnitude absolue
+    lt, ll = hr.position_hr(42, 4.83)
+    assert ll == pytest.approx(0.0, abs=0.05) and 10 ** lt == pytest.approx(5772, rel=0.02)
+
+
+def test_donnees_du_diagramme_hr():
+    from coupole.modules.anim import donnees_etoiles as E, hr
+    assert len(E.PROCHES) == 119 and len(E.BRILLANTES) == 144 and len(E.COMMUNES) == 5
+    proxima = E.PROCHES[0]
+    assert proxima[0] == 'Proxima Centauri' and proxima[3].startswith('M5.5')
+    for etoiles in (E.PROCHES, E.BRILLANTES):
+        for _, t, mv, _ in etoiles:
+            lt, ll = hr.position_hr(t, mv)
+            assert 3.3 < lt < 4.75 and -6 < ll < 7
+    assert hr.nom_type(42) == 'G2' and hr.nom_type(0) == 'O0' and hr.nom_type(65) == 'M5'
+    assert hr.temperature_de_type(42) == pytest.approx(5830.0)            # table de l'original (G2 V)

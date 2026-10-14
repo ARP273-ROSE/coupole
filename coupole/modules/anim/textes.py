@@ -64,7 +64,11 @@ TEXTES = {
         "les valeurs calculées s’affichent sous les réglages.</li><li>Les réglages sont gardés d’une session à "
         "l’autre.</li></ul><h4>Calculs</h4><p>Temps sidéral (IAU 1982), obliquité (IAU 2006), position du Soleil et "
         "équation du temps (Meeus, précision 0,01°), changements de repère, équation de Kepler, module de distance, "
-        "cônes d’ombre : vérifiés avec SageMath et astropy (voir le manuel, chapitre Animations).</p>"
+        "cônes d’ombre, phases moyennes de la Lune et nœuds de son orbite (saisons d’éclipses), précession, marées "
+        "d’équilibre, périodes synodiques, gravitation de Newton, loi de Stefan-Boltzmann et constantes solaires de "
+        "l’UAI : vérifiés avec SageMath et astropy (voir le manuel, chapitre Animations). Les étalonnages empiriques "
+        "de l’original (type spectral, corrections bolométriques, séquences du diagramme HR) sont repris tels quels."
+        "</p>"
         "<p>D’après ClassAction, University of Nebraska-Lincoln Astronomy Education, Apache License 2.0 (fichier "
         "NOTICE).</p>",
         "<h3>Animations</h3><p>The ClassAction teaching animations of the University of Nebraska-Lincoln, originally "
@@ -75,8 +79,11 @@ TEXTES = {
         "goes back to the initial state.</li><li>Each setting has a slider and a numeric field; computed values are "
         "shown below the settings.</li><li>Settings are kept from one session to the next.</li></ul>"
         "<h4>Computations</h4><p>Sidereal time (IAU 1982), obliquity (IAU 2006), position of the Sun and equation of "
-        "time (Meeus, 0.01° accuracy), coordinate changes, Kepler’s equation, distance modulus, shadow cones: checked "
-        "with SageMath and astropy (see the manual, Animations chapter).</p>"
+        "time (Meeus, 0.01° accuracy), coordinate changes, Kepler’s equation, distance modulus, shadow cones, mean "
+        "lunar phases and nodes of the lunar orbit (eclipse seasons), precession, equilibrium tides, synodic periods, "
+        "Newton’s gravitation, Stefan-Boltzmann law and IAU solar constants: checked with SageMath and astropy (see the "
+        "manual, Animations chapter). The empirical calibrations of the original (spectral type, bolometric "
+        "corrections, HR diagram sequences) are kept as they are.</p>"
         "<p>After ClassAction, University of Nebraska-Lincoln Astronomy Education, Apache License 2.0 (NOTICE "
         "file).</p>"),
     'anim_cli_aide': _t('Catalogue des animations (liste, description)', 'Animation catalogue (list, description)'),
@@ -788,6 +795,10 @@ _ANIM_BIS = {
                                             'Celestial frame: pole up, celestial equator level'),
 }
 TEXTES.update({k: _t(*v) for k, v in _ANIM_BIS.items()})
+
+from .textes_lot2 import ANIM_LOT2  # noqa: E402  (lot 2 : Lune, Renaissance, astronomie antique…)
+
+TEXTES.update({k: _t(*v) for k, v in ANIM_LOT2.items()})
 
 for _cle, _fr, _en in (('buenos_aires', 'Buenos Aires', 'Buenos Aires'), ('lima', 'Lima', 'Lima'),
                        ('casablanca', 'Casablanca', 'Casablanca'), ('monrovia', 'Monrovia', 'Monrovia'),

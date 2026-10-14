@@ -2,6 +2,40 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.3.1 — 14 October 2026
+
+**« Animations » module, batch 2: the Moon, the Renaissance, ancient astronomy and stellar properties; 60 animations
+available.**
+
+- **The Moon (12)**: lunar phase vocabulary, basketball phases, three views (Earth, Sun, free eye), positions and
+  phases of two bodies (one may become the moon of the other), phases and the horizon diagram, lunar phase quizzer
+  (phase, Moon or Sun hidden, with a verdict), bisecting planes in 3D, full moon declination, synodic lag (sidereal
+  and solar day), tides (equilibrium tide of the Moon and the Sun, tidal force, spring and neap tides, level at an
+  observer), Moon inclination (eclipse seasons, to-scale view from the Sun), table of the 133 eclipses from 2015 to
+  2044 (visibility areas translated).
+- **Renaissance and orbits (9)**: phases of Venus according to Copernicus and to Ptolemy, planetary configurations
+  simulator (stop or pause at each configuration), synodic period calculator, Kepler's third law, eccentricity of an
+  ellipse, gravity algebra (exact fraction), law of gravity from the electron to the Milky Way (stored results), Earth
+  orbits.
+- **Ancient astronomy (3)**: small-angle approximation, Big Dipper clock (northern sky in stereographic projection,
+  SIMBAD stars precessed to the date), heliacal rising (whole year, Sirius, Vega…).
+- **The shadow of a building** replaces the original movie (« Union Seasons Demonstrator »): simulation of the cast
+  shadow day after day, at a fixed time or at true noon; the whole « coordinates and motions » topic is available.
+- **Stellar properties (5)**: stellar luminosity (Stefan-Boltzmann), flux (inverse square), stellar velocity (Doppler
+  and proper motion), spectroscopic parallax (spectrum, luminosity classes), HR diagram (NAAP) with the nearest and
+  brightest stars, lines of equal radius and comparison with the Sun.
+- **Exact computations**: mean lunar phases and argument of latitude (Meeus 49 and 54), node of the lunar orbit, IAU
+  1976 precession, equilibrium tide, synodic periods, G (CODATA 2018), GM of the Earth, IAU nominal solar constants
+  (T☉ = 5,772 K), bolometric magnitude of the Sun 4.74 and Pogson's factor 2.5 (the original wrote 2.51189), Hα at
+  656.28 nm, 1 AU/yr = 4.740 47 km/s, sidereal day with respect to the stars.  The empirical calibrations of the
+  original (spectral type, bolometric corrections, HR sequences) are kept as they are.
+- **Checks**: `outils/verif_anim/verif_anim.sage` recomputes the new quantities under SageMath (numerical roots,
+  precession matrices, law of cosines…); tests: every eclipse of the table within 1.01 day of a mean phase with
+  |sin F| < 0.36 and inside an eclipse season, precession against astropy (10⁻⁴ °), heliacal rising of Sirius at
+  40.8° N on 11 August, geostationary orbit of 42,164 km; interface tests (mouse, stop at configurations, one exact
+  solar day) and FR/EN text keys.
+- Help (F1), FR/EN manuals (table of the 60 animations, eight new screenshots, computations), README.
+
 ## 0.3.0 — 14 October 2026
 
 **New « Animations » module (batch 1): the ClassAction teaching animations remade in Python.**

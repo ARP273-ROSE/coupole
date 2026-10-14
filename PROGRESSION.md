@@ -927,7 +927,7 @@ Nebraska-Lincoln (Flash/ActionScript, Apache 2.0) ; lot 1 = 21 animations (repè
   simulation d'ombre portée).
 - **Aucun tag ni Release.**
 
-### Reste à faire (lots suivants) — 62 animations « à venir » dans le catalogue
+### Reste à faire après le lot 1 bis — 62 animations « à venir » (état périmé : voir la section 0.3.1 ci-dessous)
 Pour ajouter une animation : écrire `coupole/modules/anim/animations/<nom>.py` (classe héritant de `base.Animation`,
 `ID` = identifiant ClassAction), renseigner sa classe dans `catalogue.ANIMATIONS`, ses textes dans `textes.py` ; les
 tests génériques de `test_anim_gui.py` la prennent d'office.
@@ -944,5 +944,52 @@ tests génériques de `test_anim_gui.py` la prennent d'office.
 - Étoiles doubles et variables (4) : eclipsingbinarysim, lightcurve, centerofmass, wagonwheel.
 - Astronomie antique (3) : smallangledemo, dipperclock, heliacalrisingsim.
 - Divers (13) : solarsystemproperties, formationtemps (Système solaire) ; drivingthroughsnow ; fusion01, fusion02 ;
+  milkywayrotationalvelocity, trafficdensity ; balloon, galacticredshift ; telescope10, buckets, snellslaw ;
+  lookbacktimesim.
+
+## 2026-10-14 — 0.3.1 : module « Animations », lot 2 (Lune, Renaissance, antique, stellaire)
+Demande : toutes les animations restantes des thèmes Lune (12), Renaissance (9), astronomie antique (3), `transitmovie`
+(simulation d'ombre au lieu du film), puis les 5 « propriétés stellaires » : **30 animations ajoutées, 60 disponibles**.
+- [x] `.swf` décompilés avec JPEXS FFDec (30 animations) : réglages, défauts, bornes et données repris (ex. table des
+  133 éclipses 2015-2044 ; listes d'étoiles proches et brillantes du diagramme HR ; étalonnages type spectral →
+  température, corrections bolométriques, séquences des classes de luminosité, intensités des raies ; Vénus de
+  Ptolémée : déférent 150, épicycle 108, Soleil 290 ; configurations : événements à `acos(a_int/a_ext)/ω` ; petits
+  angles 20–60 et 1–3 ; flux : ampoules 20 à 500 W, 1 à 5 m ; vitesse stellaire : λ 655–657 nm, μ 0–10″/an, d 1–10 pc).
+- [x] Calculs ajoutés à `astro.py` : angle de phase et fraction éclairée, périodes synodique/sidérale, 3e loi inversée,
+  gravitation (G CODATA 2018), orbites terrestres (GM⊕ IERS), diamètre angulaire exact, phases moyennes de la Lune et
+  argument de latitude (Meeus 49, 54), nœud lunaire (Meeus 47) et passages du Soleil aux nœuds, marée d'équilibre,
+  précession IAU 1976, hauteur à l'aube et lever héliaque.  Nouveau `hr.py` : Stefan-Boltzmann, constantes solaires
+  UAI 2015 (T☉ = 5 772 K), Pogson 2,5 et M_bol☉ = 4,74 (l'original : 2,51189 et 4,75), Doppler, 4,740 47 km/s ; et les
+  étalonnages empiriques de l'original tels quels.  Données : `donnees_eclipses.py` (zones traduites, coquilles
+  corrigées), `donnees_etoiles.py` (119 proches, 144 brillantes, 5 communes), étoiles de SIMBAD (J2000, précessées).
+- [x] 30 fichiers dans `animations/` (vocabulaire_phases, ballon_phases, trois_vues, positions_phases, lune_horizon,
+  questionnaire_phases, plans_bissecteurs, pleine_lune_declinaison, retard_synodique, marees, inclinaison_lune,
+  table_eclipses, phases_venus (2 classes), configurations, periode_synodique, kepler3, excentricite,
+  algebre_gravitation, gravitation, orbites_terre, petits_angles, horloge_grande_ourse, lever_heliaque, ombre_batiment,
+  luminosite_etoile, flux_lumineux, vitesse_etoile, parallaxe_spectro, diagramme_hr) ; textes FR/EN dans
+  `textes_lot2.py` ; `catalogue.LOT2`, `LOT2_BIS` ; `dessin.disque_phase`.  Rendu ≤ 5 ms par image (lever héliaque :
+  fond de l'année mis en cache dans une image, 3 ms).
+- [x] Corrigé en route : jour sidéral par rapport aux étoiles = `jour_sideral_s(ANNEE_SIDERALE_J)` (86 164,099 s).
+- [x] SageMath (`verif_anim.sage`, conteneur `sagemath` 10.10) : nouvelles sections (synodiques par racine,
+  3e loi par racine, gravitation, satellites et géostationnaire par racine, petits angles, marées, Vénus par la loi
+  des cosinus, élongation maximale par la dérivée, instants des quadratures/élongations par racine, phases moyennes et
+  F, Soleil aux nœuds 2026 par racine, précession par matrices de rotation, lever héliaque jour par jour, déclinaison
+  écliptique, Stefan-Boltzmann/T☉, Doppler, flux, distances) → `tests/anim_reference_sage.json` (valeurs du lot 1
+  inchangées).
+- [x] Tests : `test_anim_calculs.py` (+21 : écarts à Sage ≤ 1e-9…1e-6, table des éclipses complète, zones traduites,
+  précession contre astropy 1e-4°, Meeus 49.a, Sirius 11 août à 40,8° N), `test_anim_gui.py` (+5 : lot complet, clés
+  de texte FR/EN des sources, souris, arrêt aux configurations, un jour solaire exact).
+- [x] Aide F1, manifeste, manuels FR/EN (tableaux des 60 animations en quatre tableaux, 8 captures nouvelles
+  via `outils/captures_anim.py`, calculs et résultats du lot 2), NOTICE (données reprises, SIMBAD), README, CHANGELOG
+  FR puis EN, VERSION 0.3.1.
+- **Aucun tag ni Release.**
+
+### Reste à faire — 32 animations « à venir »
+- Lumière et spectres (8) : meltednail, spectrum010, emspectrum, bbexplorer, dopplershift, filters, hydrogenatom,
+  threeviewsspectra.
+- Exoplanètes (7) : hammerthrower, ca_extrasolarplanets_graph, ca_extrasolarplanets_starwobble, pulsarPeriodSim,
+  radialvelocitydemo, transitsimulator, radialvelocitysimulator.
+- Étoiles doubles et variables (4) : eclipsingbinarysim, lightcurve, centerofmass, wagonwheel.
+- Divers (13) : solarsystemproperties, formationtemps ; drivingthroughsnow ; fusion01, fusion02 ;
   milkywayrotationalvelocity, trafficdensity ; balloon, galacticredshift ; telescope10, buckets, snellslaw ;
   lookbacktimesim.

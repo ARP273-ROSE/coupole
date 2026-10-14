@@ -2,6 +2,40 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.3.1 — 14 octobre 2026
+
+**Module « Animations », lot 2 : la Lune, la Renaissance, l'astronomie antique et les propriétés stellaires ; 60
+animations disponibles.**
+
+- **La Lune (12)** : vocabulaire des phases, phases avec un ballon de basket, trois points de vue (Terre, Soleil, œil
+  libre), positions et phases de deux corps (l'un peut devenir la lune de l'autre), phases et diagramme d'horizon,
+  questionnaire des phases (phase, Lune ou Soleil cachés, avec verdict), plans bissecteurs en 3D, déclinaison de la
+  pleine lune, retard synodique (jour sidéral et jour solaire), marées (marée d'équilibre de la Lune et du Soleil,
+  force de marée, vives et mortes eaux, niveau chez un observateur), inclinaison de l'orbite lunaire (saisons
+  d'éclipses, vue du Soleil à l'échelle), table des 133 éclipses de 2015 à 2044 (zones de visibilité traduites).
+- **Renaissance et orbites (9)** : phases de Vénus selon Copernic et selon Ptolémée, simulateur des configurations
+  planétaires (arrêt ou pause à chaque configuration), calculateur de période synodique, 3e loi de Kepler, excentricité
+  d'une ellipse, algèbre de la gravitation (fraction exacte), loi de la gravitation de l'électron à la Voie lactée
+  (mémoire des résultats), orbites autour de la Terre.
+- **Astronomie antique (3)** : approximation des petits angles, horloge de la Grande Ourse (ciel du nord en projection
+  stéréographique, étoiles de SIMBAD précessées à la date), lever héliaque (année entière, Sirius, Véga…).
+- **L'ombre d'un bâtiment** remplace le film de l'original (« Union Seasons Demonstrator ») : simulation de l'ombre
+  portée jour après jour, à heure fixe ou au midi vrai ; tout le thème « coordonnées et mouvements » est disponible.
+- **Propriétés stellaires (5)** : luminosité d'une étoile (Stefan-Boltzmann), flux (inverse du carré), vitesse d'une
+  étoile (Doppler et mouvement propre), parallaxe spectroscopique (spectre, classes de luminosité), diagramme HR (NAAP)
+  avec les étoiles les plus proches et les plus brillantes, droites d'égal rayon et comparaison au Soleil.
+- **Calculs exacts** : phases moyennes de la Lune et argument de latitude (Meeus 49 et 54), nœud de l'orbite lunaire,
+  précession IAU 1976, marée d'équilibre, périodes synodiques, G (CODATA 2018), GM de la Terre, constantes solaires
+  nominales de l'UAI (T☉ = 5 772 K), magnitude bolométrique du Soleil 4,74 et facteur 2,5 de Pogson (l'original
+  écrivait 2,51189), Hα à 656,28 nm, 1 ua/an = 4,740 47 km/s, jour sidéral par rapport aux étoiles.  Les étalonnages
+  empiriques de l'original (type spectral, corrections bolométriques, séquences HR) sont repris tels quels.
+- **Vérification** : `outils/verif_anim/verif_anim.sage` recalcule les nouvelles grandeurs sous SageMath (racines
+  numériques, matrices de précession, loi des cosinus…) ; tests : chaque éclipse de la table à moins de 1,01 jour d'une
+  phase moyenne avec |sin F| < 0,36 et dans une saison d'éclipses, précession contre astropy (10⁻⁴ °), lever héliaque
+  de Sirius à 40,8° N le 11 août, orbite géostationnaire de 42 164 km ; tests d'interface (souris, arrêt aux
+  configurations, un jour solaire exact) et des clés de texte FR/EN.
+- Aide (F1), manuels FR/EN (tableau des 60 animations, huit captures nouvelles, calculs), README.
+
 ## 0.3.0 — 14 octobre 2026
 
 **Nouveau module « Animations » (lot 1) : les animations pédagogiques ClassAction refaites en Python.**

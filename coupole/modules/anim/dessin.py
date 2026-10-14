@@ -400,3 +400,19 @@ def cadre(p, r: QRectF, titre: str | None = None):
         police(p, 1 / 0.95)
         return r.adjusted(8, 10 + p.fontMetrics().height(), -8, -8)
     return r.adjusted(8, 8, -8, -8)
+
+
+def disque_phase(p, x: float, y: float, r: float, i: float, direction_soleil: float = 0.0, cle_eclairee='lune',
+                 cle_sombre='nuit'):
+    """Disque d'un corps vu sous l'angle de phase `i` (0 : plein, 180 : nouveau), le limbe éclairé tourné vers la
+    direction `direction_soleil` de l'écran (degrés, sens trigonométrique depuis la droite, y vers le haut)."""
+    phase_lune(p, x, y, r, 180.0 - max(0.0, min(180.0, i)), cle_eclairee, cle_sombre, rotation=-direction_soleil)
+
+
+def graduations(p, x0: float, x1: float, y: float, valeurs, positions, cle: str = 'doux', haut: bool = False):
+    """Petites graduations étiquetées le long d'un axe horizontal (valeurs : textes, positions : abscisses)."""
+    p.setPen(stylo('grille', 1.0))
+    for s, x in zip(valeurs, positions):
+        if x0 - 1 <= x <= x1 + 1:
+            p.drawLine(QPointF(x, y), QPointF(x, y + (-4 if haut else 4)))
+            texte(p, x, y + (-12 if haut else 13), s, cle)

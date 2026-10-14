@@ -1148,9 +1148,10 @@ checked reference formulas. After ClassAction, University of Nebraska-Lincoln As
 \paragraph{Catalogue.} On the left, the 92 animations of the original catalogue, sorted by topic (coordinates and
 motions, Moon, Renaissance and orbits, stellar properties, light and spectra, extrasolar planets…), with a search
 (French or English, accents ignored) and filters by topic and status. Each has its name and description in both
-languages, and its original title. Version 0.3.0 makes 30 of them available (batch~1, and every « coordinates and
-motions » animation but one movie); the others are marked « coming » (described, not yet remade) and will be added
-batch by batch.
+languages, and its original title. Version 0.3.1 makes 60 of them available: every topic « coordinates and motions »
+(the original movie of a building's shadow becoming a simulation), « lunar cycles », « Renaissance and orbits »,
+« ancient astronomy » and « stellar properties »; the others are marked « coming » (described, not yet remade) and
+will be added batch by batch.
 
 \paragraph{Handling.} Dragging a sphere rotates it; dragging a star, the Moon, the Earth or an observer moves it.
 \emph{Play / Pause} and \emph{Speed} (0.1 to 10 times, logarithmic scale) run the time; \emph{Reset} goes back to the
@@ -1201,6 +1202,67 @@ Celestial and horizon frames & switching frames by a rotation of $90^\circ-\varp
 \end{tabularx}
 \end{center}
 
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.30\linewidth}X@{}}
+\toprule
+Animation & What it shows, what it computes\\
+\midrule
+Lunar phase vocabulary & the Moon at each of the eight named phases, animated lunation (29.53~s on screen: one second per day), age and days elapsed\\
+Basketball phases & lamp, ball and eye seen from above; what the eye sees, phase angle $i$, fraction $(1+\cos i)/2$, equivalent lunar phase\\
+Three views & the Moon seen from the Earth, from the Sun (always full) and from a freely placed eye\\
+Phase positions & two bodies to place around the Sun, each seen from the other; very close, one becomes the moon of the other\\
+Phases and the horizon diagram & Sun and Moon on eight positions of the celestial equator: time, phase and position in the sky\\
+Lunar phase quizzer & the phase, the Moon or the Sun is hidden; answer with the slider or the mouse, verdict (same named phase)\\
+Bisecting planes & planes perpendicular to the Sun and to the Earth--Moon line: the phase is the lit part of the half facing us\\
+Full moon declination & opposite the Sun within $\pm5.145^\circ$; yearly curve, midnight altitude $90^\circ-\varphi+\delta$\\
+Synodic lag & sidereal and solar day: $1/S = 1/P_\text{rot} - 1/\text{year}$ (real rotation or slowed down to 240~h or 1,200~h)\\
+Tides & equilibrium tide of the Moon and the Sun $\zeta=(M/M_\oplus)(R/d)^3R\,(3\cos^2\psi-1)/2$, tidal force, spring and neap tides, level at an observer\\
+Moon inclination & orbit tilted by 5.145$^\circ$, draconic month 27.212~d, draconic year 346.62~d; to-scale view from the Sun, umbra and penumbra\\
+Eclipse table & the 133 eclipses from 2015 to 2044 in slanted bands; eclipse seasons (Sun at a node), check with Meeus' mean phases\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.30\linewidth}X@{}}
+\toprule
+Animation & What it shows, what it computes\\
+\midrule
+Phases of Venus & Copernican system: elongation, phase, apparent diameter (10 to 60$''$), greatest elongation $\arcsin a$\\
+Ptolemaic Venus & epicycle on the Earth--Sun line: never more than a crescent\\
+Planetary configurations & conjunctions, oppositions, quadratures, greatest elongations; synodic period, stop or pause at each configuration\\
+Synodic period & $1/S=1/E-1/P$ (superior) or $1/P-1/E$ (inferior), $E$ sidereal year (365.256~d)\\
+Kepler's third law & $P^2=a^3/M$, logarithmic plot, the planets on the line\\
+Eccentricity & $e=c/a$, $b=\sqrt{a^2-c^2}$, sum of the distances to the foci $=2a$\\
+Gravity algebra & factors $\frac13$ to 3 on $M_1$, $M_2$, $d$: force multiplied by $ab/c^2$ (exact fraction)\\
+Law of gravity & $F=GM_1M_2/R^2$ from the electron to the Milky Way, accelerations, presets, stored results\\
+Earth orbits & $P=2\pi\sqrt{r^3/GM}$: Space Station, GPS, geostationary (42,164~km), Moon\\
+\midrule
+Small angles & $\alpha\approx206\,265''\,d/D$ against the exact value $2\arcsin(d/2D)$\\
+Big Dipper clock & northern sky in stereographic projection; one turn per sidereal day, about 1$^\circ$ per day at a fixed time\\
+Heliacal rising & first morning the star is up at dawn (Sun at $-7^\circ$); whole year, Sirius, Vega…\\
+Shadow of a building & instead of the original movie: the cast shadow day after day, at a fixed time or at true noon\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.30\linewidth}X@{}}
+\toprule
+Animation & What it shows, what it computes\\
+\midrule
+Stellar luminosity & $L/L_\odot=(R/R_\odot)^2(T/T_\odot)^4$, $L=4\pi R^2\sigma T^4$\\
+Flux & a bulb and a detector: $F=P/4\pi d^2$\\
+Stellar velocity & $v_r=c\,\Delta\lambda/\lambda_0$ (H$\alpha$), $v_t=4.74\,\mu d$, $v=\sqrt{v_r^2+v_t^2}$\\
+Spectroscopic parallax & type and class → luminosity → $M$; $d=10^{(m-M+5)/5}$~pc; spectrum and lines\\
+HR diagram (NAAP) & nearest and brightest stars, sequences, lines of equal radius, $R/R_\odot=\sqrt{L/L_\odot}/(T/T_\odot)^2$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
 \capture{img/anim_eclipticsimulator_en.png}{0.95}
 \capture{img/anim_lunar_applet_en.png}{0.95}
 \capture{img/anim_shadowsim_en.png}{0.95}
@@ -1208,6 +1270,14 @@ Celestial and horizon frames & switching frames by a rotation of $90^\circ-\varp
 \capture{img/anim_kepler_en.png}{0.95}
 \capture{img/anim_marsorbit_en.png}{0.95}
 \capture{img/anim_longlat_en.png}{0.95}
+\capture{img/anim_eclipsetable_en.png}{0.95}
+\capture{img/anim_mooninc_en.png}{0.95}
+\capture{img/anim_tidesim_en.png}{0.95}
+\capture{img/anim_venusphases_en.png}{0.95}
+\capture{img/anim_configurationssimulator_en.png}{0.95}
+\capture{img/anim_heliacalrisingsim_en.png}{0.95}
+\capture{img/anim_transitmovie_en.png}{0.95}
+\capture{img/anim_hrexplorer_en.png}{0.95}
 
 \subsection{Computations and checks}
 The original animations used convenient approximations (23.5$^\circ$ obliquity, circular orbit, Fourier fit for the
@@ -1221,6 +1291,12 @@ Sun, 3.26~ly per parsec). Coupole replaces them with:
 \item Kepler's equation (Newton), vis-viva relation ($GM_\odot = 1.327\,124\,400\,18\times10^{20}$~m$^3$\,s$^{-2}$),
       3rd law $P^2=a^3$;
 \item exact IAU parsec and light-year ($1~\mathrm{pc}=3.261\,564$~ly); IAU nominal radii.
+\item mean lunar phases and argument of latitude $F$ (Meeus ch.~49 and 54), node of the lunar orbit (ch.~47);
+      rigorous IAU 1976 precession (ch.~21); equilibrium tide ($M_\oplus/M_{\mathrm{Moon}}=81.300\,568$);
+\item synodic periods, $G=6.674\,30\times10^{-11}$ (CODATA 2018), $GM_\oplus=3.986\,004\,418\times10^{14}$;
+      Stefan-Boltzmann ($\sigma$ exact) and IAU nominal solar constants ($R_\odot$, $L_\odot$, hence $T_\odot=5\,772$~K;
+      $M_{\text{bol},\odot}=4.74$ and Pogson's factor 2.5, the original wrote 2.51189). The empirical calibrations of
+      the original (spectral type, bolometric corrections, HR diagram sequences, line strengths) are kept as they are.
 \end{itemize}
 The script \texttt{outils/verif\_anim/verif\_anim.sage} recomputes each quantity under SageMath with 100~bits, by a
 different route than the code (rotations instead of closed forms, numerical roots, similar triangles); its values are
@@ -1230,6 +1306,11 @@ them (differences $\le 10^{-9}$), with Meeus' published examples (sidereal time 
 results: central lunar eclipse, Earth's shadow 4,607~km in radius at the Moon's distance, i.e. 2.65 lunar radii,
 totality of 1~h~41~min; retrograde motion of Mars (circular orbits) lasting 73~days over 15.9$^\circ$; sidereal day of
 23~h~56~min~4.091~s.
+
+Batch~2: the 133 eclipses of the table fall within 1.01~day of a mean phase, with $|\sin F|\le0.28$, and all within
+an eclipse season; in 2026 the Sun passes the nodes on 27~February and 22~August; heliacal rising of Sirius at
+40.8$^\circ$~N on 11~August (Vega on 14~November, Aldebaran on 19~June); geostationary orbit of 42,164~km; lunar
+equilibrium tide of 53.8~cm total range, Sun 0.459 times the Moon; precession within $10^{-4}$~degree of astropy.
 
 \begin{ccode}
 coupole anim liste\\

@@ -1182,9 +1182,10 @@ Education, licence Apache 2.0 (fichiers \texttt{NOTICE} et \texttt{LICENCES/Apac
 \paragraph{Catalogue.} À gauche, les 92 animations du catalogue d'origine, classées par thème (coordonnées et
 mouvements, Lune, Renaissance et orbites, propriétés stellaires, lumière et spectres, exoplanètes…), avec une recherche
 (française ou anglaise, sans accents), un filtre par thème et par état. Chacune a son nom et sa description dans les
-deux langues, et son titre d'origine. La version 0.3.0 en rend 30 disponibles (le lot~1, et toutes les animations
-« coordonnées et mouvements » sauf un film) ; les autres sont marquées « à venir » (décrites, pas encore refaites) et
-seront ajoutées par lots.
+deux langues, et son titre d'origine. La version 0.3.1 en rend 60 disponibles : tous les thèmes
+« coordonnées et mouvements » (le film d'origine de l'ombre d'un bâtiment devenant une simulation), « la Lune »,
+« Renaissance et orbites », « astronomie antique » et « propriétés stellaires » ; les autres sont marquées « à venir »
+(décrites, pas encore refaites) et seront ajoutées par lots.
 
 \paragraph{Manipuler.} Glisser sur une sphère la fait tourner ; glisser une étoile, la Lune, la Terre ou un
 observateur les déplace. \emph{Lecture / Pause} et \emph{Vitesse} (0,1 à 10~fois, échelle logarithmique) animent le
@@ -1236,6 +1237,67 @@ Repères céleste et horizontal & passage d'un repère à l'autre par une rotati
 \end{tabularx}
 \end{center}
 
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.30\linewidth}X@{}}
+\toprule
+Animation & Ce qu'elle montre, ce qu'elle calcule\\
+\midrule
+Vocabulaire des phases & la Lune à chacune des huit phases nommées, lunaison animée (29,53~s à l'écran : une seconde par jour), âge et jours écoulés\\
+Phases avec un ballon & lampe, ballon et œil vus de dessus ; ce que voit l'œil, angle de phase $i$, fraction $(1+\cos i)/2$, phase lunaire équivalente\\
+Trois points de vue & la Lune vue de la Terre, du Soleil (toujours pleine) et d'un œil qu'on place librement\\
+Positions et phases & deux corps à placer autour du Soleil, chacun vu de l'autre ; tout près, l'un devient la lune de l'autre\\
+Phases et diagramme d'horizon & Soleil et Lune sur huit positions de l'équateur céleste : l'heure, la phase et la position dans le ciel\\
+Questionnaire des phases & on cache la phase, la Lune ou le Soleil ; réponse au curseur ou à la souris, verdict (même phase nommée)\\
+Plans bissecteurs & plans perpendiculaires au Soleil et à la ligne Terre--Lune : la phase est la partie éclairée de la moitié tournée vers nous\\
+Déclinaison de la pleine lune & opposée au Soleil à $\pm5{,}145^\circ$ près ; courbe annuelle, hauteur à minuit $90^\circ-\varphi+\delta$\\
+Retard synodique & jour sidéral et jour solaire : $1/S = 1/P_\text{rot} - 1/\text{année}$ (rotation réelle ou ralentie à 240~h ou 1~200~h)\\
+Marées & marée d'équilibre de la Lune et du Soleil $\zeta=(M/M_\oplus)(R/d)^3R\,(3\cos^2\psi-1)/2$, force de marée, vives et mortes eaux, niveau chez un observateur\\
+Inclinaison de l'orbite lunaire & orbite inclinée de 5,145$^\circ$, mois draconitique 27,212~j, année draconitique 346,62~j ; vue du Soleil à l'échelle, ombre et pénombre\\
+Table des éclipses & les 133 éclipses de 2015 à 2044 en bandes obliques ; saisons d'éclipses (Soleil à un nœud), vérification par les phases moyennes de Meeus\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.30\linewidth}X@{}}
+\toprule
+Animation & Ce qu'elle montre, ce qu'elle calcule\\
+\midrule
+Phases de Vénus & système de Copernic : élongation, phase, diamètre apparent (de 10 à 60$''$), plus grande élongation $\arcsin a$\\
+Vénus selon Ptolémée & épicycle sur la ligne Terre--Soleil : jamais plus qu'un croissant\\
+Configurations planétaires & conjonctions, oppositions, quadratures, plus grandes élongations ; période synodique, arrêt ou pause à chaque configuration\\
+Période synodique & $1/S=1/E-1/P$ (supérieure) ou $1/P-1/E$ (inférieure), $E$ année sidérale (365,256~j)\\
+3$^\text{e}$ loi de Kepler & $P^2=a^3/M$, graphique logarithmique, les planètes sur la droite\\
+Excentricité & $e=c/a$, $b=\sqrt{a^2-c^2}$, somme des distances aux foyers $=2a$\\
+Algèbre de la gravitation & facteurs $\frac13$ à 3 sur $M_1$, $M_2$, $d$ : force multipliée par $ab/c^2$ (fraction exacte)\\
+Loi de la gravitation & $F=GM_1M_2/R^2$ de l'électron à la Voie lactée, accélérations, préréglages, mémoire des résultats\\
+Orbites autour de la Terre & $P=2\pi\sqrt{r^3/GM}$ : Station spatiale, GPS, géostationnaire (42~164~km), Lune\\
+\midrule
+Petits angles & $\alpha\approx206\,265''\,d/D$ contre la valeur exacte $2\arcsin(d/2D)$\\
+Horloge de la Grande Ourse & ciel du nord en projection stéréographique ; un tour par jour sidéral, environ 1$^\circ$ par jour à heure fixe\\
+Lever héliaque & premier matin où l'étoile est levée à l'aube (Soleil à $-7^\circ$) ; année entière, Sirius, Véga…\\
+Ombre d'un bâtiment & au lieu du film d'origine : l'ombre portée jour après jour, à heure fixe ou au midi vrai\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.30\linewidth}X@{}}
+\toprule
+Animation & Ce qu'elle montre, ce qu'elle calcule\\
+\midrule
+Luminosité d'une étoile & $L/L_\odot=(R/R_\odot)^2(T/T_\odot)^4$, $L=4\pi R^2\sigma T^4$\\
+Flux & une ampoule et un détecteur : $F=P/4\pi d^2$\\
+Vitesse d'une étoile & $v_r=c\,\Delta\lambda/\lambda_0$ (H$\alpha$), $v_t=4{,}74\,\mu d$, $v=\sqrt{v_r^2+v_t^2}$\\
+Parallaxe spectroscopique & type et classe → luminosité → $M$ ; $d=10^{(m-M+5)/5}$~pc ; spectre et raies\\
+Diagramme HR (NAAP) & étoiles proches et brillantes, séquences, droites d'égal rayon, $R/R_\odot=\sqrt{L/L_\odot}/(T/T_\odot)^2$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
 \capture{img/anim_eclipticsimulator_fr.png}{0.95}
 \capture{img/anim_lunar_applet_fr.png}{0.95}
 \capture{img/anim_shadowsim_fr.png}{0.95}
@@ -1243,6 +1305,14 @@ Repères céleste et horizontal & passage d'un repère à l'autre par une rotati
 \capture{img/anim_kepler_fr.png}{0.95}
 \capture{img/anim_marsorbit_fr.png}{0.95}
 \capture{img/anim_longlat_fr.png}{0.95}
+\capture{img/anim_eclipsetable_fr.png}{0.95}
+\capture{img/anim_mooninc_fr.png}{0.95}
+\capture{img/anim_tidesim_fr.png}{0.95}
+\capture{img/anim_venusphases_fr.png}{0.95}
+\capture{img/anim_configurationssimulator_fr.png}{0.95}
+\capture{img/anim_heliacalrisingsim_fr.png}{0.95}
+\capture{img/anim_transitmovie_fr.png}{0.95}
+\capture{img/anim_hrexplorer_fr.png}{0.95}
 
 \subsection{Calculs et vérification}
 Les animations d'origine employaient des approximations commodes (obliquité de 23,5$^\circ$, orbite circulaire,
@@ -1256,6 +1326,13 @@ ajustement de Fourier pour le Soleil, 3,26~al par parsec). Coupole les remplace 
 \item équation de Kepler (Newton), relation de vis-viva ($GM_\odot = 1{,}327\,124\,400\,18\times10^{20}$~m$^3$\,s$^{-2}$),
       3$^\text{e}$ loi $P^2=a^3$ ;
 \item parsec et année-lumière exacts de l'UAI ($1~\mathrm{pc}=3{,}261\,564$~al) ; rayons nominaux de l'UAI.
+\item phases moyennes de la Lune et argument de latitude $F$ (Meeus chap.~49 et 54), nœud de l'orbite lunaire
+      (chap.~47) ; précession rigoureuse IAU 1976 (chap.~21) ; marée d'équilibre ($M_\oplus/M_{\mathrm{Lune}}=81{,}300\,568$) ;
+\item périodes synodiques, $G=6{,}674\,30\times10^{-11}$ (CODATA 2018), $GM_\oplus=3{,}986\,004\,418\times10^{14}$ ;
+      Stefan-Boltzmann ($\sigma$ exacte) et constantes solaires nominales de l'UAI ($R_\odot$, $L_\odot$, d'où
+      $T_\odot=5\,772$~K ; $M_{\text{bol},\odot}=4{,}74$ et facteur 2,5 de Pogson, l'original écrivait 2,51189). Les
+      étalonnages empiriques de l'original (type spectral, corrections bolométriques, séquences du diagramme HR,
+      intensités des raies) sont repris tels quels.
 \end{itemize}
 Le script \texttt{outils/verif\_anim/verif\_anim.sage} recalcule chaque grandeur sous SageMath en 100~bits, par une
 autre voie que le code (rotations au lieu des formules fermées, racines numériques, triangles semblables) ; ses
@@ -1265,6 +1342,12 @@ Soleil du 13 octobre 1992) et à astropy (Soleil apparent à mieux que $0{,}01^\
 $0{,}05^\circ$). Quelques valeurs obtenues : éclipse centrale de Lune, ombre de 4~607~km de rayon à la distance de
 la Lune, soit 2,65 rayons lunaires, totalité de 1~h~41~min ; rétrogradation de Mars (orbites circulaires) de 73~jours
 sur 15,9$^\circ$ ; jour sidéral de 23~h~56~min~4,091~s.
+
+Lot~2 : les 133 éclipses de la table tombent à moins de 1,01~jour d'une phase moyenne, avec $|\sin F|\le0{,}28$, et
+toutes dans une saison d'éclipses ; en 2026, le Soleil passe aux nœuds le 27~février et le 22~août ; lever héliaque
+de Sirius à 40,8$^\circ$~N le 11~août (Véga le 14~novembre, Aldébaran le 19~juin) ; orbite géostationnaire de
+42~164~km ; marée d'équilibre de la Lune de 53,8~cm d'amplitude totale, Soleil 0,459 fois la Lune ; précession à
+$10^{-4}$~degré d'astropy.
 
 \begin{ccode}
 coupole anim liste\\

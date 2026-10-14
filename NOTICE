@@ -22,10 +22,20 @@ Repris ou adaptés de ces sources / taken or adapted from these sources :
   - le tracé des côtes du globe (shoreDemo/si100.xml, d'après les côtes GSHHS), converti en
     coupole/modules/anim/donnees/cotes.json.gz ;
   - les positions d'étoiles des constellations de la comparaison des repères, la liste des villes et le tracé
-    simplifié de la ligne de changement de date du démonstrateur longitude/latitude.
+    simplifié de la ligne de changement de date du démonstrateur longitude/latitude ;
+  - (0.3.1) la table des éclipses 2015-2044, convertie en coupole/modules/anim/donnees_eclipses.py (coquilles
+    corrigées, zones traduites en français) ; les étoiles proches et brillantes du diagramme HR
+    (coupole/modules/anim/donnees_etoiles.py) ; les étalonnages empiriques des propriétés stellaires (température
+    selon le type spectral, corrections bolométriques, séquences des classes de luminosité, intensités des raies,
+    couleur d'affichage), dans coupole/modules/anim/hr.py et parallaxe_spectro.py.
+
+Positions des étoiles de l'horloge de la Grande Ourse et du lever héliaque : base SIMBAD, exploitée au CDS,
+Strasbourg, France / This research has made use of the SIMBAD database, operated at CDS, Strasbourg, France.
 
 Modifications : code entièrement réécrit en Python (PyQt6, QPainter), interface bilingue français/anglais, calculs
 astronomiques remplacés par des formules de référence vérifiées (temps sidéral IAU 1982, obliquité IAU 2006,
-position du Soleil et équation du temps de Meeus, limites officielles des constellations).
+position du Soleil et équation du temps de Meeus, limites officielles des constellations ; en 0.3.1 : phases moyennes
+de la Lune, précession IAU 1976, constantes de l'UAI et du CODATA, loi de Pogson exacte) ; le film de l'ombre d'un
+bâtiment (transitmovie) est remplacé par une simulation.
 Changes: code fully rewritten in Python (PyQt6, QPainter), bilingual French/English interface, astronomical
 computations replaced by checked reference formulas.

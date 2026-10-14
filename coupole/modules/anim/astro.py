@@ -425,3 +425,204 @@ def constellation_du_soleil(lam: float, limites=None):
         if lam >= l0:
             nom = cle
     return nom
+
+
+# ================================================================ lot 2 : Lune, Renaissance, astronomie antique
+G_SI = 6.674_30e-11                      # constante de gravitation (CODATA 2018), m³ kg⁻¹ s⁻²
+GM_TERRE = 3.986_004_418e14              # m³ s⁻² (IERS 2010, WGS 84)
+MASSE_TERRE_KG = GM_TERRE / G_SI         # 5,972 × 10²⁴ kg
+MASSE_LUNE_KG = MASSE_TERRE_KG / 81.300_568   # rapport des masses Terre/Lune (IAU 2009)
+MASSE_SOLEIL_KG = GM_SOLEIL / G_SI       # 1,988 × 10³⁰ kg
+ANNEE_SIDERALE_J = 365.256_363_004       # année sidérale (J2000)
+MOIS_SIDERAL_J = 27.321_661_55           # mois sidéral moyen (Meeus, chap. 47)
+ANNEE_DRACONITIQUE_J = 346.620_075_883   # « année des éclipses » : retour du Soleil au même nœud de l'orbite lunaire
+INCLINAISON_LUNE = 5.145                 # inclinaison moyenne de l'orbite de la Lune sur l'écliptique, degrés
+SECONDES_D_ARC_PAR_RADIAN = 648_000.0 / math.pi    # 206 264,806…
+
+
+def angle_de_phase(corps, soleil, observateur) -> float:
+    """Angle de phase (degrés) d'un corps : angle, vu du corps, entre les directions du Soleil et de l'observateur
+    (positions en 2D ou 3D, mêmes unités).  0 : face éclairée tournée vers l'observateur (« plein ») ; 180 : vue de
+    nuit (« nouveau »)."""
+    a = [s - c for s, c in zip(soleil, corps)]
+    b = [o - c for o, c in zip(observateur, corps)]
+    na = math.sqrt(sum(x * x for x in a))
+    nb = math.sqrt(sum(x * x for x in b))
+    if na == 0 or nb == 0:
+        return 0.0
+    cosi = sum(x * y for x, y in zip(a, b)) / (na * nb)
+    return math.acos(max(-1.0, min(1.0, cosi))) * RAD
+
+
+def fraction_eclairee_phase(i: float) -> float:
+    """Fraction éclairée du disque apparent pour l'angle de phase i : (1 + cos i) / 2."""
+    return (1.0 + math.cos(i * DEG)) / 2.0
+
+
+def periode_synodique(p1: float, p2: float) -> float:
+    """Période synodique de deux corps de périodes sidérales p1 et p2 (même unité) : 1/S = |1/p1 − 1/p2|."""
+    d = abs(1.0 / p1 - 1.0 / p2)
+    return math.inf if d == 0 else 1.0 / d
+
+
+def periode_siderale(synodique: float, p_terre: float = 1.0, superieure: bool = True) -> float:
+    """Période sidérale d'une planète d'après sa période synodique vue de la Terre : 1/P = 1/E − 1/S (planète
+    supérieure, P > E) ou 1/P = 1/E + 1/S (planète inférieure).  Rend inf si le résultat n'a pas de sens (S ≤ E pour
+    une planète supérieure)."""
+    inv = 1.0 / p_terre - 1.0 / synodique if superieure else 1.0 / p_terre + 1.0 / synodique
+    return math.inf if inv <= 0 else 1.0 / inv
+
+
+def demi_grand_axe(periode: float, masse_soleils: float = 1.0) -> float:
+    """3e loi de Kepler inversée : a = (M P²)^(1/3) (a en ua, P en années, M en masses solaires)."""
+    return (masse_soleils * periode * periode) ** (1.0 / 3.0)
+
+
+def force_gravitation(m1_kg: float, m2_kg: float, r_m: float) -> float:
+    """Loi de Newton : F = G m₁ m₂ / r² (newtons)."""
+    return G_SI * m1_kg * m2_kg / (r_m * r_m)
+
+
+def periode_orbite_terre(r_m: float, gm: float = GM_TERRE) -> float:
+    """Période (s) d'une orbite circulaire de rayon r autour de la Terre : 2π √(r³ / GM)."""
+    return 2 * math.pi * math.sqrt(r_m ** 3 / gm)
+
+
+def vitesse_circulaire(r_m: float, gm: float = GM_TERRE) -> float:
+    """Vitesse (m/s) sur une orbite circulaire : √(GM / r)."""
+    return math.sqrt(gm / r_m)
+
+
+def rayon_orbite_terre(periode_s: float, gm: float = GM_TERRE) -> float:
+    """Rayon (m) de l'orbite circulaire de période donnée : (GM P² / 4π²)^(1/3)."""
+    return (gm * periode_s * periode_s / (4 * math.pi * math.pi)) ** (1.0 / 3.0)
+
+
+def diametre_angulaire(d: float, distance: float) -> dict:
+    """Diamètre angulaire (secondes d'arc) d'un objet de diamètre d à la distance `distance` (du centre) : valeur
+    exacte d'une sphère 2 asin(d / 2D), d'un segment perpendiculaire 2 atan(d / 2D), et approximation des petits
+    angles d / D (× 206 265″)."""
+    k = SECONDES_D_ARC_PAR_RADIAN
+    sphere = 2 * math.asin(min(1.0, d / (2 * distance))) * k
+    return {'sphere': sphere, 'segment': 2 * math.atan(d / (2 * distance)) * k, 'petits_angles': d / distance * k}
+
+
+def jour_solaire(rotation: float, annee: float) -> float:
+    """Durée du jour solaire (même unité que les arguments) pour une rotation sidérale `rotation` et une révolution
+    `annee` de même sens : 1/S = 1/rotation − 1/année."""
+    return periode_synodique(rotation, annee)
+
+
+# ---------------------------------------------------------------- Lune : phases moyennes et éclipses
+def phase_moyenne_jde(k: float) -> float:
+    """Instant (JDE) de la phase moyenne de numéro k (Meeus, éq. 49.1) : k entier = nouvelle lune, k + 0,5 =
+    pleine lune ; k = 0 à la nouvelle lune du 6 janvier 2000."""
+    t = k / 1236.85
+    return (2_451_550.097_66 + MOIS_SYNODIQUE_J * k + 0.000_154_37 * t * t - 0.000_000_150 * t ** 3
+            + 0.000_000_000_73 * t ** 4)
+
+
+def argument_latitude_lune(k: float) -> float:
+    """Argument de latitude F de la Lune (degrés) à la phase moyenne k (Meeus, éq. 49.6) ; une éclipse n'est possible
+    que si |sin F| < 0,36 (Meeus, chap. 54)."""
+    t = k / 1236.85
+    return mod(160.710_8 + 390.670_502_84 * k - 0.001_611_8 * t * t - 0.000_002_27 * t ** 3
+               + 0.000_000_011 * t ** 4, 360.0)
+
+
+def phase_la_plus_proche(jj: float, pleine: bool) -> float:
+    """Numéro k (entier ou demi-entier) de la nouvelle (ou pleine) lune moyenne la plus proche de l'instant jj."""
+    k = (jj - 2_451_550.097_66) / MOIS_SYNODIQUE_J
+    return math.floor(k) + 0.5 * pleine + (1.0 if k - math.floor(k) - 0.5 * pleine > 0.5 else 0.0)
+
+
+def noeud_ascendant_lune(jj: float) -> float:
+    """Longitude moyenne du nœud ascendant de l'orbite lunaire (Meeus, éq. 47.7), degrés."""
+    t = siecles_j2000(jj)
+    return mod(125.044_547_9 - 1_934.136_289_1 * t + 0.002_075_4 * t * t + t ** 3 / 467_441.0
+               - t ** 4 / 60_616_000.0, 360.0)
+
+
+def soleil_au_noeud(jj0: float, jj1: float) -> list:
+    """Instants (jj) où la longitude du Soleil égale celle d'un nœud de l'orbite lunaire (milieux des saisons
+    d'éclipses) entre jj0 et jj1 : (jj, 'asc' ou 'desc'), par la méthode de Newton sur λ☉ − Ω."""
+    vitesse = 360.0 / ANNEE_DRACONITIQUE_J
+    out = []
+    j = jj0
+    while j < jj1 + ANNEE_DRACONITIQUE_J:
+        for cible, nom in ((0.0, 'asc'), (180.0, 'desc')):
+            x = j + mod(cible - (soleil(j)['lambda'] - noeud_ascendant_lune(j)), 360.0) / vitesse
+            for _ in range(8):
+                ecart = mod180(soleil(x)['lambda'] - noeud_ascendant_lune(x) - cible)
+                x -= ecart / vitesse
+            if jj0 <= x <= jj1 and not any(abs(x - y) < 10 for y, _ in out):
+                out.append((x, nom))
+        j += ANNEE_DRACONITIQUE_J / 2
+    return sorted(out)
+
+
+# ---------------------------------------------------------------- marées (marée d'équilibre)
+def maree_equilibre(psi_deg: float, masse_kg: float, distance_m: float, r_terre_m: float = R_TERRE_KM * 1000.0,
+                    m_terre_kg: float = MASSE_TERRE_KG) -> float:
+    """Hauteur (m) de la marée d'équilibre statique due à un astre de masse M à la distance d, au point de la Terre
+    situé à l'angle ψ de la direction de l'astre : (M / M⊕)(R / d)³ R (3 cos² ψ − 1) / 2."""
+    k = masse_kg / m_terre_kg * (r_terre_m / distance_m) ** 3 * r_terre_m
+    c = math.cos(psi_deg * DEG)
+    return k * (3 * c * c - 1) / 2
+
+
+def rapport_marees_soleil_lune(d_lune_m: float = D_LUNE_KM * 1000.0, d_soleil_m: float = UA_KM * 1000.0) -> float:
+    """Rapport des effets de marée du Soleil et de la Lune : (M☉ / M☾)(d☾ / d☉)³ ≈ 0,46."""
+    return MASSE_SOLEIL_KG / MASSE_LUNE_KG * (d_lune_m / d_soleil_m) ** 3
+
+
+# ---------------------------------------------------------------- précession, lever héliaque
+def precession(ra_deg: float, dec_deg: float, jj: float, jj0: float = 2_451_545.0) -> tuple[float, float]:
+    """Précession rigoureuse (IAU 1976, Meeus éq. 21.2–21.4) d'une position équatoriale moyenne de l'équinoxe jj0
+    (J2000 par défaut) vers celle de jj ; degrés."""
+    t0 = siecles_j2000(jj0)
+    t = (jj - jj0) / 36_525.0
+    zeta = ((2306.2181 + 1.39656 * t0 - 0.000139 * t0 * t0) * t + (0.30188 - 0.000344 * t0) * t * t
+            + 0.017998 * t ** 3) / 3600.0
+    z = ((2306.2181 + 1.39656 * t0 - 0.000139 * t0 * t0) * t + (1.09468 + 0.000066 * t0) * t * t
+         + 0.018203 * t ** 3) / 3600.0
+    theta = ((2004.3109 - 0.85330 * t0 - 0.000217 * t0 * t0) * t - (0.42665 + 0.000217 * t0) * t * t
+             - 0.041833 * t ** 3) / 3600.0
+    a, d = ra_deg * DEG, dec_deg * DEG
+    ze, th = zeta * DEG, theta * DEG
+    aa = math.cos(d) * math.sin(a + ze)
+    bb = math.cos(th) * math.cos(d) * math.cos(a + ze) - math.sin(th) * math.sin(d)
+    cc = math.sin(th) * math.cos(d) * math.cos(a + ze) + math.cos(th) * math.sin(d)
+    ra = mod(math.atan2(aa, bb) * RAD + z, 360.0)
+    return ra, math.asin(max(-1.0, min(1.0, cc))) * RAD
+
+
+def hauteur(h_deg: float, dec: float, lat: float) -> float:
+    """Hauteur (degrés) d'un astre d'angle horaire H et de déclinaison δ pour la latitude φ."""
+    s = math.sin(lat * DEG) * math.sin(dec * DEG) + math.cos(lat * DEG) * math.cos(dec * DEG) * math.cos(h_deg * DEG)
+    return math.asin(max(-1.0, min(1.0, s))) * RAD
+
+
+def visible_a_l_aube(ra_etoile: float, dec_etoile: float, lat: float, annee: int, jour: int,
+                     depression: float = 7.0):
+    """Hauteur de l'étoile à l'instant du matin où le Soleil passe à −`depression` degrés (début de l'aube), ou
+    None si le Soleil ne descend pas jusque-là ce jour-là (ou ne remonte pas : nuit polaire).  Soleil de Meeus à midi
+    du jour ; étoile précessée à la date."""
+    jj = jj_jour_de_l_annee(annee, jour + 0.5)
+    s = soleil(jj)
+    hh = angle_horaire_lever(s['delta'], lat, -depression)
+    if hh in (0.0, 180.0):
+        return None
+    tsl = s['alpha'] - hh                       # TSL au moment où le Soleil est à −depression, le matin
+    ra, dec = precession(ra_etoile, dec_etoile, jj)
+    return hauteur(tsl - ra, dec, lat)
+
+
+def lever_heliaque(ra_etoile: float, dec_etoile: float, lat: float, annee: int = 2026, depression: float = 7.0):
+    """Jours de l'année (0 = 1er janvier) où l'étoile redevient visible à l'aube (au-dessus de l'horizon quand le
+    Soleil est à −depression), et liste des 365 hauteurs à l'aube (None : pas d'aube ce jour).  Modèle de
+    l'original : horizon géométrique, sans extinction atmosphérique."""
+    h = [visible_a_l_aube(ra_etoile, dec_etoile, lat, annee, j, depression) for j in range(365)]
+    vis = [x is not None and x > 0 for x in h]
+    jours = [j for j in range(365) if vis[j] and not vis[j - 1]]
+    return jours, h

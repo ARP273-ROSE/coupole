@@ -16,7 +16,9 @@ os.makedirs(DOSSIER_NEUTRE, exist_ok=True)
 os.environ['HOME'] = DOSSIER_NEUTRE
 os.environ['COUPOLE_HOME'] = tempfile.mkdtemp(prefix='coupole-captures-')
 
-RENDUS = ('eclipticsimulator', 'lunar_applet', 'shadowsim', 'celhorcomp', 'kepler', 'marsorbit', 'longlat')
+RENDUS = ('eclipticsimulator', 'lunar_applet', 'shadowsim', 'celhorcomp', 'kepler', 'marsorbit', 'longlat',
+          'eclipsetable', 'mooninc', 'tidesim', 'venusphases', 'configurationssimulator', 'heliacalrisingsim',
+          'transitmovie', 'hrexplorer')
 
 
 def attendre(app, s):
@@ -52,6 +54,8 @@ def main():
     from coupole.modules.anim import catalogue
     for ident in RENDUS:
         a = catalogue.PAR_ID[ident].charger()()
+        if ident == 'hrexplorer':                       # montrer les étoiles proches et brillantes
+            a.groupe.setCurrentIndex(a.groupe.findData('les_deux'))
         a.resize(1100, 760)
         a.show()
         for _ in range(12):

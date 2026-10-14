@@ -194,3 +194,94 @@ def test_panneau_animations(propre):
     p.arreter()
     f.close()
     attendre_taches()
+
+
+# ---------------------------------------------------------------- lot 2 (0.3.1)
+def test_lot2_complet():
+    faites = {e.id for e in catalogue.faites()}
+    assert len(catalogue.LOT2) == 25 and set(catalogue.LOT2) <= faites
+    themes = {e.id: e.theme for e in catalogue.ENTREES}
+    for theme in ('lunarcycles', 'renaissance', 'ancientastro', 'coordsmotion', 'stellarprops'):
+        assert all(e.faite for e in catalogue.ENTREES if e.theme == theme), theme
+    assert {themes[i] for i in catalogue.LOT2} == {'lunarcycles', 'renaissance', 'ancientastro', 'coordsmotion'}
+    assert {themes[i] for i in catalogue.LOT2_BIS} == {'stellarprops'} and len(catalogue.LOT2_BIS) == 5
+    assert len(catalogue.faites()) == 60
+
+
+def test_cles_de_texte_des_animations():
+    """Chaque clé « anim_… » écrite en toutes lettres dans le code d'une animation existe en français et en anglais
+    (les clés composées à la volée sont vérifiées par le rendu des deux langues)."""
+    import re
+    from pathlib import Path
+    from coupole.core import i18n
+    cles = i18n.toutes_les_cles()
+    dossier = Path(catalogue.__file__).with_name('animations')
+    for f in sorted(dossier.glob('*.py')):
+        for cle in set(re.findall(r"'(anim_[a-z0-9_]+)'", f.read_text(encoding='utf-8'))):
+            if cle.endswith('_'):
+                continue
+            assert cle in cles and cles[cle]['fr'] and cles[cle]['en'], (f.name, cle)
+
+
+def test_souris_lot2(propre):
+    """Glisser : la Lune du questionnaire, un corps du démonstrateur de phases (qui devient une lune), la boule des
+    petits angles."""
+    from PyQt6.QtCore import QPoint, Qt
+    from PyQt6.QtTest import QTest
+
+    def glisser(w, depart, arrivee):
+        QTest.mousePress(w.toile, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier, depart)
+        QTest.mouseMove(w.toile, arrivee)
+        QTest.mouseRelease(w.toile, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier, arrivee)
+
+    w = catalogue.PAR_ID['phaseDemonstrator'].charger()()
+    w.resize(900, 700)
+    w.show()
+    propre.processEvents()
+    w.toile.repaint()
+    _, cx, cy, s = w._zone
+    x1, y1 = w.pos[1]
+    x2, y2 = w.pos[2]
+    glisser(w, QPoint(int(cx + s * x1), int(cy - s * y1)), QPoint(int(cx + s * x2 + 8), int(cy - s * y2)))
+    assert w.lune == 1                                       # assez près : le corps 1 devient la lune du corps 2
+    w.close()
+
+    w = catalogue.PAR_ID['lunarphasequizzer'].charger()()
+    w.resize(900, 700)
+    w.show()
+    w.mode.setCurrentIndex(w.mode.findData('lune'))
+    propre.processEvents()
+    w.toile.repaint()
+    _, cx, cy, ro = w._schema
+    avant = w.devine['lune']
+    glisser(w, QPoint(int(cx + ro), int(cy)), QPoint(int(cx), int(cy - ro)))
+    assert w.devine['lune'] != avant
+    w.basculer_reponse()
+    assert any(lab == 'Verdict' or 'erdict' in lab for lab, _ in w.valeurs())
+    w.close()
+
+
+def test_configurations_s_arretent(propre):
+    w = catalogue.PAR_ID['configurationssimulator'].charger()()
+    w.action.setCurrentIndex(w.action.findData('arreter'))
+    w.basculer_lecture()
+    for _ in range(200):
+        if not w.en_lecture:
+            break
+        w.pas(0.2)
+    assert not w.en_lecture                                  # arrêt à la configuration suivante
+    tp, _ = w.prochain(w.t - 1e-6)
+    assert w.t == pytest.approx(tp, abs=1e-6)
+    w.close()
+
+
+def test_retard_synodique_un_jour(propre):
+    w = catalogue.PAR_ID['synodiclag'].charger()()
+    w.lancer('solaire')
+    for _ in range(500):
+        if not w.en_lecture:
+            break
+        w.pas(0.1)
+    rot, sol = w.durees()
+    assert w.ecoule_h == pytest.approx(sol) and (w.phi - w.theta) % 360.0 == pytest.approx(0.0, abs=1e-6)
+    w.close()
