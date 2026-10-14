@@ -89,5 +89,8 @@
       "plugins/imageformats/libqwebp.dylib",
       "plugins/imageformats/libqsvg.dylib"
     ]
+  },
+  "rapports": {
+    "poste": "installation"
   }
 }

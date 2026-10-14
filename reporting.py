@@ -238,10 +238,12 @@ def _place_libre_go(dossier) -> float:
 def _machine() -> dict:
     """Le strict nécessaire pour reproduire un problème."""
     infos = {
-        # identifiant aleatoire de l'installation, jamais le nom de la machine
-        # (repris de Coupole) : il distingue les postes sans rien dire de
-        # la personne
-        'poste': _identifiant_installation(),
+        # Par défaut le nom de la machine, pour reconnaître un poste suivi ;
+        # voir l'option kit.json « rapports.poste » (_poste). L'identifiant
+        # aléatoire part en plus, pour distinguer deux installations d'une
+        # même machine.
+        'poste': _poste(),
+        'installation': _identifiant_installation(),
         'os': f"{platform.system()} {platform.release()}",
         'os_detail': platform.version(),
         'arch': platform.machine(),
@@ -255,6 +257,20 @@ def _machine() -> dict:
     infos['application'] = APPLICATION
     infos['version'] = VERSION_APP or '?'
     return infos
+
+
+def _poste() -> str:
+    """Ce que le champ « poste » transmet.
+
+    Par défaut le NOM DE LA MACHINE (kit.json « rapports.poste » = « machine »).
+    Une application utilisée par des tiers (Coupole, par d'autres étudiants)
+    met « installation » : le nom de la machine — qui peut contenir un prénom,
+    « PC-de-Marie » — n'est alors jamais transmis, l'identifiant aléatoire le
+    remplace. Le nom reste lu localement pour être masqué dans les traces."""
+    mode = ((_lire_kit().get('rapports') or {}).get('poste') or 'machine')
+    if mode == 'installation':
+        return _identifiant_installation()
+    return platform.node() or '?'
 
 
 def _identifiant_installation() -> str:
