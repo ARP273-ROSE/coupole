@@ -1222,13 +1222,19 @@ class VueClasse(QWidget):
     def effacer(self, partie: dict, titre: str) -> bool:
         boite = QMessageBox(QMessageBox.Icon.Warning, titre, tr('classe_effacer_texte'),
                             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel, self)
-        case = QCheckBox(tr('classe_exporter_avant'))
+        # la case appartient à la boîte (parent Qt) : sans parent, Python la détruirait à la sortie de la fonction et
+        # la boîte garderait un pointeur vers elle (plantage au changement de thème suivant) ; la boîte est détruite
+        # aussitôt lue.
+        case = QCheckBox(tr('classe_exporter_avant'), boite)
         case.setChecked(True)
         boite.setCheckBox(case)
         boite.button(QMessageBox.StandardButton.Yes).setText(tr('classe_effacer'))
-        if boite.exec() != QMessageBox.StandardButton.Yes:
+        oui = boite.exec() == QMessageBox.StandardButton.Yes
+        exporter = case.isChecked()
+        boite.deleteLater()
+        if not oui:
             return False
-        copie = self.copie_avant('-avant-effacement') if case.isChecked() else None
+        copie = self.copie_avant('-avant-effacement') if exporter else None
         avant = S.migrer(S._clone(stockage().doc) if hasattr(S, '_clone') else stockage().doc)
         stockage().remplacer(S.reinitialiser(stockage().doc, partie))
         self._appliquer_preferences()

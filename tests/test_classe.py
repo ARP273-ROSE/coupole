@@ -176,7 +176,7 @@ def test_rendu_de_toutes_les_questions_et_ressources(app_qt):
         p.end()
 
 
-def test_pages_et_progression(app_qt, tmp_path):
+def test_pages_et_progression(app_qt, tmp_path, monkeypatch):
     from coupole.modules.anim.classe import stockage as ST
     from coupole.modules.anim.classe.gui import PageModule, PageProgression, PageQuestion, PageRecherche, VueClasse
     from coupole.modules.anim.classe.ressources_qt import fenetres_ouvertes, fermer_toutes, ouvrir_ressource
@@ -218,7 +218,7 @@ def test_pages_et_progression(app_qt, tmp_path):
     ST.stockage().exporter_vers(ch)
     avant = S.exporter(ST.stockage().doc)
     from PyQt6.QtWidgets import QMessageBox
-    QMessageBox.exec = lambda self: QMessageBox.StandardButton.Yes
+    monkeypatch.setattr(QMessageBox, 'exec', lambda self: QMessageBox.StandardButton.Yes)
     assert v.effacer({'partie': 'reponses'}, 'test')
     assert ST.stockage().doc['questions'] == {}
     v._annuler()
@@ -226,7 +226,7 @@ def test_pages_et_progression(app_qt, tmp_path):
     assert v.importer_fichier(str(ch), 'fusionner')
     assert 'ca_intro_scale' in ST.stockage().doc['questions']
     (tmp_path / 'abime.json').write_text('{pas du json')
-    QMessageBox.warning = lambda *a, **k: None
+    monkeypatch.setattr(QMessageBox, 'warning', lambda *a, **k: None)
     assert not v.importer_fichier(str(tmp_path / 'abime.json'), 'remplacer')
 
 

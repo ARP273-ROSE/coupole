@@ -6,6 +6,7 @@ from __future__ import annotations
 import html as _html
 import re
 
+from PyQt6 import sip
 from PyQt6.QtCore import QPoint, QRectF, QSize, Qt, QTimer
 from PyQt6.QtGui import QPainter, QPixmap
 from PyQt6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QHeaderView, QLabel, QScrollArea, QSizePolicy,
@@ -296,6 +297,8 @@ def ouvrir_ressource(genre: str, i: str) -> QWidget:
     """Ouvre (ou ramène au premier plan) la fenêtre de la ressource ; plusieurs fenêtres à la fois."""
     cle = genre + ':' + i
     f = _FENETRES.get(cle)
+    if f is not None and sip.isdeleted(f):
+        f = _FENETRES.pop(cle, None) and None
     try:
         if f is not None and f.isVisible():
             f.raise_()
@@ -316,7 +319,7 @@ def ouvrir_ressource(genre: str, i: str) -> QWidget:
 
 
 def fenetres_ouvertes() -> list:
-    return [f for f in _FENETRES.values() if f.isVisible()]
+    return [f for f in _FENETRES.values() if not sip.isdeleted(f) and f.isVisible()]
 
 
 def fermer_toutes():
@@ -394,7 +397,8 @@ _APERCU: Apercu | None = None
 
 
 def apercu() -> Apercu:
+    """La bulle d'aperçu, unique ; recréée si l'objet Qt a été détruit (fermeture de toutes les fenêtres, tests)."""
     global _APERCU
-    if _APERCU is None:
+    if _APERCU is None or sip.isdeleted(_APERCU):
         _APERCU = Apercu()
     return _APERCU

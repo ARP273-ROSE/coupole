@@ -59,7 +59,8 @@ def mesure_reelle(t: str, taille: float, gras: bool = False) -> float:
     k = (round(taille * 4), gras)
     fm = _POLICES.get(k)
     if fm is None:
-        f = QFont()
+        from ....gui.theme import police          # la police de Coupole (pas celle du système, qui varie)
+        f = police()
         f.setPixelSize(max(1, int(round(taille))))
         f.setBold(gras)
         fm = _POLICES[k] = QFontMetricsF(f)
