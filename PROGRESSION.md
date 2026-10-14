@@ -1036,6 +1036,8 @@ films de l'original refaits en simulations ; données réelles reprises de l'ori
   uniques, courbes denses en trait fin).
 - [x] Aide F1, manifeste, manuels FR/EN (deux tableaux de plus pour les 32, 10 captures nouvelles, calculs et résultats
   du lot 3, sources), NOTICE (sources des données, mises à jour), README, CHANGELOG FR puis EN, VERSION 0.4.0.
-- [x] Validation locale (image coupole-test, Python 3.12, offscreen) : **803 réussis, 22 sautés, code 0** (747 avant).
+- [x] Validation locale (image coupole-test, Python 3.12, offscreen) : **803 réussis, 22 sautés, code 0** (747 avant) ;
+  tests des animations sous Python 3.10 : 182 réussis.
+- [x] Commit `12147d4` poussé : CI `tests.yml` **6/6** (Linux, Windows, macOS × 3.10, 3.12).
 - **Aucun tag ni Release.**
 - Le module Animations est complet : plus rien « à venir ».
