@@ -373,13 +373,197 @@ ref['stellaire'] = {'t_soleil': float(TSOL),
                                   [(1, 4.84), (-1.46, 1.42), (11.13, 15.53), (0, 0)]]}
 
 
+# ================================================================== lot 3 (0.4.0)
+# ------------------------------------------------------------------ lumière : Planck, Wien, Stefan, hydrogène, Snell
+Hs, Cs, Ks, Es = R('6.62607015e-34'), R(299792458), R('1.380649e-23'), R('1.602176634e-19')
+xw = find_root(lambda x: x - 5 * (1 - exp(-x)), R(4), R(6))
+def planck_s(lam, t):
+    return 2 * Hs * Cs ** 2 / R(lam) ** 5 / (exp(Hs * Cs / (R(lam) * Ks * R(t))) - 1)
+# σ T⁴ par intégration numérique de π B_λ (autre voie que la formule fermée σ = 2π⁵k⁴ / 15h³c²)
+def exitance_integree(t):
+    v, _ = numerical_integral(lambda l: float(planck_s(l, t)), 1e-8, 1e-3)
+    return R(pi) * R(v)
+RINF, ME_MP = R('10973731.568160'), 1 / R('1836.15267343')
+RH = RINF / (1 + ME_MP)
+ref['lumiere'] = {
+    'x_wien': float(xw), 'wien_b': float(Hs * Cs / (Ks * xw)),
+    'sigma': float(2 * PI ** 5 * Ks ** 4 / (15 * Hs ** 3 * Cs ** 2)),
+    'planck': [[lam, t, float(planck_s(lam, t))] for lam, t in [(5e-7, 5772), (1e-6, 3000), (2.5e-7, 20000),
+                                                                (1.6e-6, 1811), (4e-6, 300)]],
+    'exitance': [[t, float(exitance_integree(t))] for t in (1811, 5772, 10000)],
+    'e_ionisation_ev': float(Hs * Cs * RH / Es),
+    # longueurs d'onde (vide) par 1/λ = R_H (1/n₁² − 1/n₂²)
+    'raies_nm': [[a, b, float(1e9 / (RH * (R(1) / a ** 2 - R(1) / b ** 2)))] for a, b in
+                 [(1, 2), (1, 3), (2, 3), (2, 4), (2, 5), (3, 4)]],
+    'hc_ev_nm': float(Hs * Cs / Es * 10 ** 9),
+}
+# Snell par racine ; Fresnel par les lois des sinus et des tangentes ; Brewster : racine de r_p
+def snell_racine(t1, n1, n2):
+    s1 = R(n1) * sin(R(t1) * D)
+    if s1 >= R(n2):
+        return None
+    return find_root(lambda t2: R(n2) * sin(t2 * D) - s1, 0, 90)
+def fresnel_sin_tan(t1, n1, n2):
+    t2 = snell_racine(t1, n1, n2)
+    if t2 is None:
+        return 1.0
+    a, b = R(t1) * D, R(t2) * D
+    if t1 == 0:
+        return float(((R(n1) - R(n2)) / (R(n1) + R(n2))) ** 2)
+    rs = -sin(a - b) / sin(a + b)
+    rp = tan(a - b) / tan(a + b)
+    return float((rs ** 2 + rp ** 2) / 2)
+ref['snell'] = [[t1, n1, n2, (float(snell_racine(t1, n1, n2)) if snell_racine(t1, n1, n2) is not None else None),
+                 fresnel_sin_tan(t1, n1, n2)] for t1, n1, n2 in
+                [(40, 1.0, 1.33), (60, 1.33, 1.0), (30, 1.5, 1.0), (45, 1.0, 2.42), (0, 1.0, 1.5), (75, 1.66, 1.92)]]
+ref['brewster'] = [[n1, n2, float(find_root(lambda t: tan((t - asin(R(n1) * sin(t * D) / R(n2)) / D) * D) /
+                                            tan((t + asin(R(n1) * sin(t * D) / R(n2)) / D) * D), 1, 89))]
+                   for n1, n2 in [(1.0, 1.33), (1.0, 1.5), (1.33, 1.0)]]
+ref['angle_critique'] = [[n1, n2, float(asin(R(n2) / R(n1)) / D)] for n1, n2 in [(1.33, 1.0), (2.42, 1.0), (1.5, 1.33)]]
+
+# ------------------------------------------------------------------ effet Doppler : temps retardé par racine
+# source en mouvement uniforme x = x0 + v t (le long de x), observateur fixe ; fréquence reçue = f0 dτ/dt
+def retard(t, x0, y0, vx, vy, ox, oy, c):
+    return find_root(lambda tau: sqrt((ox - x0 - vx * tau) ** 2 + (oy - y0 - vy * tau) ** 2) - c * (t - tau),
+                     t - 1e4, t)
+ref['doppler_retard'] = []
+for (x0, y0, vx, vy, ox, oy, c, t) in [(0, 0, 5, 0, 80, 12, 15, 3.0), (50, 30, -7, 3, 80, 12, 15, 1.5),
+                                       (10, 10, 0, 9, 20, 50, 15, 2.0)]:
+    tau = retard(t, x0, y0, vx, vy, ox, oy, c)
+    h = 1e-4
+    dtau = (retard(t + h, x0, y0, vx, vy, ox, oy, c) - retard(t - h, x0, y0, vx, vy, ox, oy, c)) / (2 * h)
+    ref['doppler_retard'].append([x0, y0, vx, vy, ox, oy, c, t, float(tau), float(dtau)])
+
+# ------------------------------------------------------------------ deux corps : Kepler, vitesse radiale, transits
+GMS, GMJ_N = R('1.32712440018e20'), R('1.2668653e17')
+Gs = R('6.67430e-11')
+def periode_newton(a_m, m1, m2):
+    return 2 * PI * sqrt(R(a_m) ** 3 / (Gs * (R(m1) + R(m2))))
+def k_par_derivee(m1, m2, a_m, e, i_deg, w_deg, phase):
+    """Vitesse radiale de l'étoile par dérivation numérique de sa position −q Z(t) (autre voie que la formule)."""
+    P = periode_newton(a_m, m1, m2)
+    q = R(m2) / (R(m1) + R(m2))
+    def z_etoile(ph):
+        m = 2 * PI * ph
+        ee = find_root(lambda x: x - e * sin(x) - m, m - 2, m + 2)
+        nu = 2 * atan2(sqrt(1 + e) * sin(ee / 2), sqrt(1 - e) * cos(ee / 2))
+        r = R(a_m) * (1 - e ** 2) / (1 + e * cos(nu))
+        return -q * r * sin(nu + R(w_deg) * D) * sin(R(i_deg) * D)
+    h = R('1e-6')
+    return float(-(z_etoile(phase + h) - z_etoile(phase - h)) / (2 * h) / P)
+MJ = GMJ_N / Gs
+MS = GMS / Gs
+UA_M = R('149597870700')
+ref['vitesse_radiale'] = [[m1s, m2j, a_ua, e, i, w, ph, k_par_derivee(m1s * MS, m2j * MJ, a_ua * UA_M, e, i, w, ph)]
+                          for m1s, m2j, a_ua, e, i, w, ph in
+                          [(1, 1, 1, 0, 90, 0, 0.1), (1, 1, 1, 0.4, 90, 0, 0.3), (1.07, 0.61, 0.052, 0, 49.8, 90, 0.7),
+                           (1.25, 9.1, 1.1, 0.34, 90, 205, 0.55)]]
+ref['periodes_kepler'] = [[m1s, m2j, a_ua, float(periode_newton(a_ua * UA_M, m1s * MS, m2j * MJ) / 86400)]
+                          for m1s, m2j, a_ua in [(1, 1, 1), (1.23, 0.73, 0.04857), (1.07, 0.61, 0.052)]]
+# aire de recouvrement de deux disques par intégration des cordes
+def aire_integree(r1, r2, d):
+    r1, r2, d = R(r1), R(r2), R(d)
+    lo, hi = max(-r1, d - r2), min(r1, d + r2)
+    if hi <= lo:
+        return 0.0
+    f = lambda x: max(0.0, float(min(sqrt(max(r1 ** 2 - R(x) ** 2, 0)), sqrt(max(r2 ** 2 - (R(x) - d) ** 2, 0)))))
+    v, _ = numerical_integral(f, float(lo), float(hi), max_points=200)
+    return float(2 * v)
+ref['recouvrement'] = [[r1, r2, d, aire_integree(r1, r2, d)] for r1, r2, d in
+                       [(1, 0.1, 0.5), (1, 0.1, 0.95), (1, 1, 1), (0.3, 0.2, 0.4), (0.5, 0.25, 0.6), (1, 0.5, 2)]]
+# transit circulaire : durée totale T = P/π asin((R*/a) √((1 + k)² − b²) / sin i) (Seager & Mallén-Ornelas 2003)
+def duree_transit_formule(rs_sur_a, k, i_deg):
+    b = cos(R(i_deg) * D) / R(rs_sur_a)
+    return float(asin(R(rs_sur_a) * sqrt((1 + R(k)) ** 2 - b ** 2) / sin(R(i_deg) * D)) / PI)
+ref['transits'] = [[rs, k, i, duree_transit_formule(rs, k, i)] for rs, k, i in
+                   [(0.1139, 0.1200, 86.71), (0.05, 0.1, 90.0), (0.2, 0.15, 82.0)]]
+# phase de conjonction : ν = 90° − ω, puis M par l'équation de Kepler
+def conjonction(e, w):
+    nu = (90 - R(w)) * D
+    ee = 2 * atan2(sqrt(1 - e) * sin(nu / 2), sqrt(1 + e) * cos(nu / 2))
+    return float(md((ee - e * sin(ee)) / (2 * PI), 1))
+ref['conjonction'] = [[e, w, conjonction(e, w)] for e, w in [(0, 0), (0.3, 0), (0.4, 90), (0.489, 329.9), (0.6, 205)]]
+
+# ------------------------------------------------------------------ barycentre du Système solaire (Standish, DE440)
+STANDISH = {
+    'mercure': ((0.38709927, 0.20563593, 7.00497902, 252.25032350, 77.45779628, 48.33076593),
+                (0.00000037, 0.00001906, -0.00594749, 149472.67411175, 0.16047689, -0.12534081)),
+    'venus': ((0.72333566, 0.00677672, 3.39467605, 181.97909950, 131.60246718, 76.67984255),
+              (0.00000390, -0.00004107, -0.00078890, 58517.81538729, 0.00268329, -0.27769418)),
+    'terre': ((1.00000261, 0.01671123, -0.00001531, 100.46457166, 102.93768193, 0.0),
+              (0.00000562, -0.00004392, -0.01294668, 35999.37244981, 0.32327364, 0.0)),
+    'mars': ((1.52371034, 0.09339410, 1.84969142, -4.55343205, -23.94362959, 49.55953891),
+             (0.00001847, 0.00007882, -0.00813131, 19140.30268499, 0.44441088, -0.29257343)),
+    'jupiter': ((5.20288700, 0.04838624, 1.30439695, 34.39644051, 14.72847983, 100.47390909),
+                (-0.00011607, -0.00013253, -0.00183714, 3034.74612775, 0.21252668, 0.20469106)),
+    'saturne': ((9.53667594, 0.05386179, 2.48599187, 49.95424423, 92.59887831, 113.66242448),
+                (-0.00125060, -0.00050991, 0.00193609, 1222.49362201, -0.41897216, -0.28867794)),
+    'uranus': ((19.18916464, 0.04725744, 0.77263783, 313.23810451, 170.95427630, 74.01692503),
+               (-0.00196176, -0.00004397, -0.00242939, 428.48202785, 0.40805281, 0.04240589)),
+    'neptune': ((30.06992276, 0.00859048, 1.77004347, -55.12002969, 44.96476227, 131.78422574),
+                (0.00026291, 0.00005105, 0.00035372, 218.45945325, -0.32241464, -0.00508664))}
+GM440 = {'soleil': R('132712440041.279419'), 'mercure': R('22031.868551'), 'venus': R('324858.592'),
+         'terre': R('398600.435507') + R('4902.800118'), 'mars': R('42828.375816'), 'jupiter': R('126712764.1'),
+         'saturne': R('37940584.8418'), 'uranus': R('5794556.4'), 'neptune': R('6836527.10058')}
+def rot(axe, a):
+    c, s_ = cos(a), sin(a)
+    if axe == 'z':
+        return matrix(R, [[c, -s_, 0], [s_, c, 0], [0, 0, 1]])
+    return matrix(R, [[1, 0, 0], [0, c, -s_], [0, s_, c]])
+def helio_sage(nom, T):
+    e0, de = STANDISH[nom]
+    a, e, i, l, varpi, om = [R(x) + R(d) * R(T) for x, d in zip(e0, de)]
+    w = varpi - om
+    m = md(l - varpi + 180, 360) - 180
+    ee = find_root(lambda x: x - e * sin(x) - m * D, m * D - 2, m * D + 2)
+    v = matrix(R, 3, 1, [a * (cos(ee) - e), a * sqrt(1 - e ** 2) * sin(ee), 0])
+    return rot('z', om * D) * rot('x', i * D) * rot('z', w * D) * v
+ref['barycentre'] = []
+for annee in (1850.0, 2000.0, 2026.8, 2045.5):
+    T = (R(annee) - 2000) / 100
+    tot = GM440['soleil'] + sum(GM440[n] for n in STANDISH)
+    s_ = sum((GM440[n] * helio_sage(n, T) for n in STANDISH), matrix(R, 3, 1, [0, 0, 0]))
+    ref['barycentre'].append([annee, [float(-s_[k, 0] / tot) for k in range(3)]])
+
+# ------------------------------------------------------------------ fusion (AME 2020, keV) et divers
+EXC = {'p': R('7288.971064'), 'd': R('13135.722895'), 'he3': R('14931.21888'), 'he4': R('2424.91587'),
+       'c12': R(0), 'n13': R('5345.481'), 'c13': R('3125.00933'), 'n14': R('2863.41683'), 'o15': R('2855.622'),
+       'n15': R('101.43809')}
+MEK = R('510.99895000')
+ref['fusion'] = {'pp': [float(2 * EXC['p'] - EXC['d'] - 2 * MEK), float(EXC['d'] + EXC['p'] - EXC['he3']),
+                        float(2 * EXC['he3'] - EXC['he4'] - 2 * EXC['p'])],
+                 'cno': [float(EXC['p'] - EXC['n13']), float(EXC['n13'] - EXC['c13'] - 2 * MEK),
+                         float(EXC['c13'] + EXC['p'] - EXC['n14']), float(EXC['n14'] + EXC['p'] - EXC['o15']),
+                         float(EXC['o15'] - EXC['n15'] - 2 * MEK), float(EXC['n15'] + EXC['p'] - EXC['he4'])],
+                 'total': float(4 * EXC['p'] - EXC['he4'])}
+PC_M = UA * 648000 / PI
+G_KPC = GMS / (PC_M * 1000 * 10 ** 6)
+ref['galaxie'] = {'g_kpc': float(G_KPC), 'masse_soleil': float(R(229) ** 2 * R('8.122') / G_KPC)}
+# repliement : rotation apparente par recherche exhaustive du plus petit écart à un multiple de 360°/n
+def pas_apparent_sage(P, f, n):
+    d = R(360) / (R(P) * R(f))
+    sym = R(360) / n
+    return float(min((d - k * sym for k in range(-200, 2000)), key=lambda x: (abs(x), -x)))
+ref['repliement'] = [[P, f, n, pas_apparent_sage(P, f, n)] for P, f, n in
+                     [(5, 3, 1), (5, 3, 8), (1, 1, 1), (1, 0.9, 1), (2, 1.1, 4), (10, 0.1, 2)]]
+# ondes de densité : conservation du débit dans le repère du tracteur, résolue symboliquement
+nz, n0, vv, vl, vt = var('nz n0 vv vl vt')
+sol = solve(nz * (vl - vt) == n0 * (vv - vt), nz)[0].rhs()
+ref['densite'] = [[v_, l_, t_, float(sol.subs(n0=1, vv=v_, vl=l_, vt=t_))] for v_, l_, t_ in
+                  [(30, 10, 5), (25, 8, 2), (40, 14, 12)]]
+# température de formation : loi de puissance par les deux points de l'original
+pente = log(R(600) / R(175)) / log(R('5.203'))
+ref['formation'] = {'pente': float(pente), 'd_175': float(R('5.203')),
+                    'd_1500': float(find_root(lambda d: 600 * d ** (-pente) - 1500, R('0.01'), R(1)))}
+
+
 def natif(x):
     """Nombres de Sage (Integer, RealNumber) → int / float de Python, pour le JSON."""
     if isinstance(x, dict):
         return {k: natif(v) for k, v in x.items()}
     if isinstance(x, (list, tuple)):
         return [natif(v) for v in x]
-    if isinstance(x, str):
+    if isinstance(x, str) or x is None:
         return x
     if x in ZZ:
         return int(x)

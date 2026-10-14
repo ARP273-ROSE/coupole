@@ -2,6 +2,52 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.4.0 — 14 octobre 2026
+
+**Module « Animations », lot 3 : les 32 dernières animations ; le catalogue ClassAction est complet (92 sur 92).**
+
+- **Lumière et spectres (8)** : clou chauffé jusqu'à la fusion (couleur et éclat calculés par la loi de Planck et la
+  vision humaine, au lieu du film de l'original), courbes du corps noir (cinq courbes, loi de Wien, aire σT⁴/π,
+  magnitudes et indices de couleur U, B, V, R), explorateur de spectres (continu, émission, absorption, six familles de
+  raies selon le type spectral), spectre électromagnétique (fréquence, énergie du photon, objets de même taille),
+  effet Doppler (crêtes émises par une source mobile, signal reçu calculé par le temps retardé, observateur à faire
+  glisser), filtres (corps noir, gaussienne ou Soleil ; filtres U, B, V, R, atmosphère, filtre gaussien ; couleur
+  perçue), atome d'hydrogène (photons absorbés, ionisation, réémission, niveaux d'énergie, journal), les trois lois
+  de Kirchhoff (télescope à faire glisser autour d'un nuage de gaz et d'une ampoule).
+- **Exoplanètes (7)** : lanceur de marteau et étoile à planète autour de leur centre de masse, courbe de vitesse radiale
+  (Soleil et Jupiter, Soleil et Terre, 51 Pegasi b), le Soleil autour du barycentre du Système solaire (positions
+  vraies des planètes de 1800 à 2050), période d'un pulsar en orbite, décalage des raies du spectre, simulateur de
+  transits (NAAP, 9 planètes réelles, mesures bruitées), simulateur de vitesses radiales (NAAP, orbites excentriques
+  et inclinées, planètes réelles).
+- **Étoiles doubles et variables (4)** : binaires à éclipses (NAAP) avec 46 systèmes réels et leurs courbes de lumière
+  observées, dont sept « à compléter » ; construction d'une courbe de lumière mesure après mesure ; centre de masse ;
+  repliement (roue de charrette vue image par image).
+- **Divers (13)** : propriétés des planètes (histogrammes), températures de formation et condensation, la neige vue
+  d'une voiture (radiant des étoiles filantes), chaîne proton-proton et cycle CNO (énergie de chaque étape), courbe de
+  rotation de la Voie lactée et masse contenue, ondes de densité (tracteur et voitures), univers-ballon et loi de
+  Hubble-Lemaître, décalage vers le rouge du spectre de M32, télescope (grossissement, champ, pouvoir séparateur, mise
+  au point), capteur CCD (pose et lecture case par case), loi de Snell-Descartes (réflexion totale, Fresnel, Brewster),
+  regard vers le passé (supernovæ de 1054 et de 1006).
+- **Les films de l'original** (clou, lanceur de marteau, ballon, réactions de fusion, spectre électromagnétique,
+  embouteillage…) sont devenus des simulations interactives.
+- **Données réelles, sources citées (NOTICE)** : filtres U, B, V, R de Landolt (1992) ; fonctions colorimétriques CIE
+  1931 corrigées par Judd et Vos ; spectre de M32 (Santos et al. 2002) ; courbes de lumière du Catalog and Atlas of
+  Eclipsing Binaries (numérisées depuis l'original) ; exoplanètes de la NASA Exoplanet Archive (2026) au lieu des
+  valeurs de 2007 (ex. HD 209458 b : 1,39 R♃, orbite circulaire) ; planètes de la NASA Planetary Fact Sheet (2026 :
+  95 satellites pour Jupiter, 274 pour Saturne) ; masses DE440 et éléments de Standish (JPL) ; excès de masse AME 2020 ;
+  courbe de rotation de Gaia (Eilers et al. 2019) au-delà de 5 kpc.
+- **Corrections de l'original** : constantes exactes du SI (σ, constante de Wien tirée de x = 5 (1 − e⁻ˣ), h, c),
+  hydrogène à 13,598 eV (masse réduite) et hc = 1 239,84 eV nm (l'original : 13,6 et 1 240), transformation sRGB de la
+  norme IEC 61966-2-1, période 0,1158 j pour a = 1 R☉ (l'original : 0,1155), brillance des binaires dans le filtre V
+  par la loi de Planck, Rayleigh et Dawes en millimètres, éclipses par l'aire exacte de recouvrement des disques.
+- **Vérification** : `outils/verif_anim/verif_anim.sage` recalcule les nouvelles grandeurs par d'autres voies (racine
+  de Wien, intégration numérique de Planck, lois de Fresnel en sinus et tangentes, temps retardé et vitesses radiales
+  par racines et dérivées, aire de recouvrement par intégration, durée de transit de Seager et Mallén-Ornelas,
+  barycentre par matrices de rotation) ; tests contre ERFA (barycentre à mieux que 5 × 10⁻⁵ ua), contre les courbes
+  observées des binaires, régime établi des ondes de densité ; tests d'interface (souris, atome qui absorbe puis
+  réémet, lecture complète du CCD, préréglages).  Rendu ≤ 5 ms par image.
+- Aide (F1), manuels FR/EN (tableaux des 92 animations, calculs et résultats du lot 3, captures), README, NOTICE.
+
 ## 0.3.1 — 14 octobre 2026
 
 **Module « Animations », lot 2 : la Lune, la Renaissance, l'astronomie antique et les propriétés stellaires ; 60

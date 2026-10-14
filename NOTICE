@@ -27,7 +27,39 @@ Repris ou adaptés de ces sources / taken or adapted from these sources :
     corrigées, zones traduites en français) ; les étoiles proches et brillantes du diagramme HR
     (coupole/modules/anim/donnees_etoiles.py) ; les étalonnages empiriques des propriétés stellaires (température
     selon le type spectral, corrections bolométriques, séquences des classes de luminosité, intensités des raies,
-    couleur d'affichage), dans coupole/modules/anim/hr.py et parallaxe_spectro.py.
+    couleur d'affichage), dans coupole/modules/anim/hr.py et parallaxe_spectro.py ;
+  - (0.4.0) les courbes de transmission des filtres U, B, V, R (d'après Landolt 1992, catalogue VizieR II/183A,
+    comme l'indique la source de l'original) et de l'atmosphère, le spectre solaire hors atmosphère (valeurs
+    relatives, origine non précisée par l'original) et les fonctions colorimétriques CIE 1931 corrigées par Judd
+    (1951) et Vos (1978), au pas de 5 nm, convertis en coupole/modules/anim/donnees/spectres.json.gz ;
+  - (0.4.0) le spectre de la galaxie M32 (fichier E7_M32.TPL du catalogue VizieR III/219, « A Spectral Library of
+    Galaxies, Clusters and Stars », Santos J.F.C. Jr., Alloin D., Bica E., Bonatto C., IAU Symp. 207, 2002), repris
+    de la source de l'original (même fichier spectres.json.gz) ;
+  - (0.4.0) les paramètres des 46 binaires à éclipses et leurs courbes de lumière observées, d'après le Catalog and
+    Atlas of Eclipsing Binaries (CALEB, Eastern University, ebola.eastern.edu), auquel renvoyait l'original : les
+    courbes, dessinées en images dans l'original, ont été numérisées (un point par tache, précision ≈ 1/200 en flux
+    et 1/320 en phase) dans coupole/modules/anim/donnees/binaires.json.gz par outils/verif_anim/donnees_lot3.py ;
+  - (0.4.0) les intensités et longueurs d'onde des raies du spectre stellaire, la séquence de condensation de la
+    nébuleuse solaire et sa loi de température, la relation masse-luminosité et les polynômes de température de la
+    séquence principale, les réglages des simulateurs (télescope, CCD, pulsar, roue…).
+
+Données mises à jour en 0.4.0 / data updated in 0.4.0 (coupole/modules/anim/donnees_lot3.py) :
+  - exoplanètes : NASA Exoplanet Archive (https://exoplanetarchive.ipac.caltech.edu), jeu de paramètres par défaut de
+    chaque planète, champs manquants pris dans la table composite pscomppars, excentricité manquante : orbite
+    circulaire ; consulté le 14 octobre 2026.  This research has made use of the NASA Exoplanet Archive, which is
+    operated by the California Institute of Technology, under contract with the National Aeronautics and Space
+    Administration under the Exoplanet Exploration Program.  Les valeurs de 2007 de l'original étaient périmées
+    (ex. HD 209458 b : rayon 1,32 → 1,39 R♃, excentricité 0,07 → 0) ;
+  - planètes : NASA Planetary Fact Sheet (D. R. Williams, NSSDCA, NASA Goddard), consultée le 14 octobre 2026 (nombre de
+    satellites : Jupiter 95, Saturne 274, Uranus 28, Neptune 16, Pluton 5, au lieu de 28, 30, 21, 8 et 1) ;
+  - masses des systèmes planétaires : éphéméride JPL DE440 (Park et al. 2021, AJ 161, 105) ; éléments orbitaux moyens :
+    « Keplerian Elements for Approximate Positions of the Major Planets », table 1 (E. M. Standish, JPL, 1800–2050) ;
+  - excès de masse atomique : AME 2020 (Chinese Physics C 45, 030002 et 030003, 2021) ; énergies
+    moyennes des neutrinos solaires : J. N. Bahcall ;
+  - courbe de rotation de la Voie lactée au-delà de 5 kpc : M. K. Eilers et al. 2019 (ApJ 871, 120), R☉ = 8,122 kpc
+    (GRAVITY Collaboration 2018) ; l'original (montée jusqu'à 292 km/s à 39 kpc) n'est gardé qu'en deçà de 4 kpc ;
+  - distances des supernovæ historiques : nébuleuse du Crabe ≈ 2,0 kpc (Trimble 1973), SN 1006 ≈ 2,2 kpc (Winkler,
+    Gupta et Long 2003).
 
 Positions des étoiles de l'horloge de la Grande Ourse et du lever héliaque : base SIMBAD, exploitée au CDS,
 Strasbourg, France / This research has made use of the SIMBAD database, operated at CDS, Strasbourg, France.
@@ -35,7 +67,9 @@ Strasbourg, France / This research has made use of the SIMBAD database, operated
 Modifications : code entièrement réécrit en Python (PyQt6, QPainter), interface bilingue français/anglais, calculs
 astronomiques remplacés par des formules de référence vérifiées (temps sidéral IAU 1982, obliquité IAU 2006,
 position du Soleil et équation du temps de Meeus, limites officielles des constellations ; en 0.3.1 : phases moyennes
-de la Lune, précession IAU 1976, constantes de l'UAI et du CODATA, loi de Pogson exacte) ; le film de l'ombre d'un
-bâtiment (transitmovie) est remplacé par une simulation.
+de la Lune, précession IAU 1976, constantes de l'UAI et du CODATA, loi de Pogson exacte ; en 0.4.0 : constantes
+exactes du SI, lois de Planck et de Wien, hydrogène avec la masse réduite, sRGB normalisé, Kepler en unités SI,
+éclipses par l'aire exacte de recouvrement) ; les films de l'original (ombre d'un bâtiment, clou, lanceur de marteau,
+ballon, réactions de fusion, embouteillage, spectre électromagnétique…) sont remplacés par des simulations.
 Changes: code fully rewritten in Python (PyQt6, QPainter), bilingual French/English interface, astronomical
 computations replaced by checked reference formulas.

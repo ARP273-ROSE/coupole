@@ -18,7 +18,10 @@ os.environ['COUPOLE_HOME'] = tempfile.mkdtemp(prefix='coupole-captures-')
 
 RENDUS = ('eclipticsimulator', 'lunar_applet', 'shadowsim', 'celhorcomp', 'kepler', 'marsorbit', 'longlat',
           'eclipsetable', 'mooninc', 'tidesim', 'venusphases', 'configurationssimulator', 'heliacalrisingsim',
-          'transitmovie', 'hrexplorer')
+          'transitmovie', 'hrexplorer',
+          # lot 3 (0.4.0)
+          'bbexplorer', 'hydrogenatom', 'threeviewsspectra', 'transitsimulator', 'ca_extrasolarplanets_starwobble',
+          'eclipsingbinarysim', 'galacticredshift', 'milkywayrotationalvelocity', 'telescope10', 'fusion02')
 
 
 def attendre(app, s):
@@ -56,10 +59,29 @@ def main():
         a = catalogue.PAR_ID[ident].charger()()
         if ident == 'hrexplorer':                       # montrer les étoiles proches et brillantes
             a.groupe.setCurrentIndex(a.groupe.findData('les_deux'))
+        elif ident == 'bbexplorer':                     # trois courbes et les filtres
+            for t in (4000.0, 9000.0):
+                a._ajouter()
+                a.t.setValue(t)
+            a.c_filtres.setChecked(True)
+        elif ident == 'eclipsingbinarysim':             # un système réel et sa courbe observée
+            a.prereglage.setCurrentIndex(a.prereglage.findData('EK Cep'))
+            a._appliquer()
+        elif ident == 'hydrogenatom':                   # un photon de Lyman β vient d'être absorbé
+            a.transition.setCurrentIndex(a.transition.findData('1-3'))
+            a.tirer_transition()
+            for _ in range(13):
+                a.pas(0.1)
+        elif ident == 'galacticredshift':
+            a.z.setValue(0.3)
+        elif ident == 'transitsimulator':
+            a.prereglage.setCurrentIndex(a.prereglage.findData('HD 209458 b'))
+            a._appliquer()
         a.resize(1100, 760)
         a.show()
-        for _ in range(12):
-            a.pas(0.1)
+        if ident != 'hydrogenatom':
+            for _ in range(12):
+                a.pas(0.1)
         attendre(app, 0.2)
         a.grab().save(str(dossier / ('anim_%s_%s.png' % (ident.lower(), langue))))
         a.close()

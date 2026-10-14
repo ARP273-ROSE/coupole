@@ -1182,10 +1182,10 @@ Education, licence Apache 2.0 (fichiers \texttt{NOTICE} et \texttt{LICENCES/Apac
 \paragraph{Catalogue.} À gauche, les 92 animations du catalogue d'origine, classées par thème (coordonnées et
 mouvements, Lune, Renaissance et orbites, propriétés stellaires, lumière et spectres, exoplanètes…), avec une recherche
 (française ou anglaise, sans accents), un filtre par thème et par état. Chacune a son nom et sa description dans les
-deux langues, et son titre d'origine. La version 0.3.1 en rend 60 disponibles : tous les thèmes
-« coordonnées et mouvements » (le film d'origine de l'ombre d'un bâtiment devenant une simulation), « la Lune »,
-« Renaissance et orbites », « astronomie antique » et « propriétés stellaires » ; les autres sont marquées « à venir »
-(décrites, pas encore refaites) et seront ajoutées par lots.
+deux langues, et son titre d'origine. Depuis la version 0.4.0, les 92 sont disponibles : celles qui n'étaient que
+des films (ombre d'un bâtiment, clou qui fond, lanceur de marteau, ballon, réactions de fusion, embouteillage…) sont
+devenues des simulations, et celles qui reposent sur des données réelles (spectres, courbes de lumière, exoplanètes,
+planètes) en citent la source dans le fichier \texttt{NOTICE}, mise à jour quand elle était périmée.
 
 \paragraph{Manipuler.} Glisser sur une sphère la fait tourner ; glisser une étoile, la Lune, la Terre ou un
 observateur les déplace. \emph{Lecture / Pause} et \emph{Vitesse} (0,1 à 10~fois, échelle logarithmique) animent le
@@ -1298,6 +1298,59 @@ Diagramme HR (NAAP) & étoiles proches et brillantes, séquences, droites d'éga
 \end{tabularx}
 \end{center}
 
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.30\linewidth}X@{}}
+\toprule
+Animation & Ce qu'elle montre, ce qu'elle calcule\\
+\midrule
+Clou chauffé jusqu'à la fusion & au lieu du film : couleur et éclat du clou par la loi de Planck et les fonctions colorimétriques CIE (invisible sous $\approx800$~K) ; courbe de Planck, $\lambda_\text{max}=b/T$, part rayonnée dans le visible\\
+Courbes du corps noir (NAAP) & jusqu'à cinq courbes, maximum (Wien), aire $\sigma T^4/\pi$, couleur perçue ; magnitudes U, B, V, R et indices de couleur\\
+Explorateur de spectres & continu, émission, absorption ; six familles de raies (He~\textsc{ii}, He~\textsc{i}, H, métaux ionisés et neutres, molécules) selon le type spectral et la classe\\
+Spectre électromagnétique & $\nu=c/\lambda$, $E=h\nu$, corps noir dont c'est le maximum, domaine ; l'onde dessinée à côté d'un objet de même taille\\
+Effet Doppler & crêtes émises par une source en mouvement, signal reçu par le temps retardé $|\vec r_\text{obs}-\vec r_s(\tau)|=c(t-\tau)$ : $f=f_0/(1-v_r/c)$ ; observateur à glisser\\
+Filtres (NAAP) & source (corps noir, gaussienne, Soleil) × filtres (U, B, V, R, atmosphère, gaussien) = spectre reçu ; couleur perçue (CIE, sRGB)\\
+Atome d'hydrogène (NAAP) & photon absorbé si $E=13{,}598\,(1/n^2-1/m^2)$~eV, ionisation au-delà, réémission ; niveaux d'énergie, journal\\
+Les trois spectres (Kirchhoff) & ampoule, nuage de gaz, télescope à glisser : continu, émission ou absorption aux mêmes longueurs d'onde\\
+\midrule
+Lanceur de marteau & au lieu du film : athlète et marteau (7,26~kg), étoile et planète, autour du centre de masse ; $r_1/r_2=m_2/m_1$\\
+Courbe de vitesse radiale & Soleil et Jupiter ($K=12{,}5$~m/s, 11,86~ans), Soleil et Terre, 51~Pegasi~b ; $K=(2\pi G/P)^{1/3}M_p\sin i/(M_\ast+M_p)^{2/3}$\\
+Le Soleil et les planètes & centre du Soleil autour du barycentre (positions vraies des planètes, éléments de Standish, masses DE440, 1800--2050) ; jusqu'à 2,2~$R_\odot$\\
+Période d'un pulsar & impulsions émises le long d'une orbite : intervalles d'arrivée $P(1\pm v/c)$ (temps de trajet exact)\\
+Décalage des raies & étoile et planète vues de dessus ; raies du spectre décalées de $\Delta\lambda/\lambda=v/c$ (amplifié), décalage réel de H$\alpha$\\
+Transits (NAAP) & profondeur $(R_p/R_\ast)^2$ (aire exacte de recouvrement), durée, paramètre d'impact ; 9 planètes réelles (NASA Exoplanet Archive) ; mesures bruitées\\
+Vitesses radiales (NAAP) & $v_r=K[\cos(\nu+\omega)+e\cos\omega]$, orbites excentriques et inclinées, $M_p\sin i$ ; planètes réelles, mesures bruitées\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.30\linewidth}X@{}}
+\toprule
+Animation & Ce qu'elle montre, ce qu'elle calcule\\
+\midrule
+Binaires à éclipses (NAAP) & deux étoiles et la courbe de lumière (filtre V, brillance par la loi de Planck) ; 46 binaires réelles et leurs mesures (CALEB), dont 7 « à compléter » ; écart modèle--mesures\\
+Courbe de lumière & un couple de période 3,65~j observé mesure après mesure, chaque point reporté à sa phase\\
+Centre de masse & $r_1=d\,m_2/(m_1+m_2)$, $m_1r_1=m_2r_2$ ; le couple tourne autour\\
+Repliement (roue de charrette) & roue vue image par image : rotation apparente ramenée dans $]-180^\circ/n,180^\circ/n]$, roue arrêtée ou à l'envers ; même piège pour une étoile variable\\
+\midrule
+Propriétés des planètes & histogrammes : distance, période, masse, rayon, satellites (Jupiter 95, Saturne 274), rotation, densité (NASA, 2026)\\
+Températures de formation & $T=600~\text{K}\,(d/1~\text{ua})^{-0{,}747}$ ; état (gaz ou solide) de neuf substances, ligne des glaces\\
+La neige vue d'une voiture & les flocons semblent jaillir d'un point : radiant à $\arctan(v_\text{neige}/v_\text{voiture})$, comme une pluie d'étoiles filantes\\
+Chaîne proton-proton, cycle CNO & au lieu des films : chaque réaction, énergie libérée (AME 2020), bilan 26,731~MeV, part des neutrinos\\
+Rotation de la Voie lactée & courbe de rotation (Gaia, Eilers et al. 2019, au-delà de 5~kpc), $M=v^2R/G$, courbe képlérienne ; galaxie vue de face\\
+Ondes de densité & tracteur et voitures : $n_\text{bouchon}/n=(v-v_t)/(v_\text{lente}-v_t)$, analogie des bras spiraux\\
+Univers-ballon & au lieu du film : galaxies sur un ballon qui gonfle, $v=Hd$, $H=\dot a/a$ ; le ballon se tourne à la souris\\
+Décalage vers le rouge & spectre de M32 décalé de $1+z$, raies, lumière reçue dans U, B, V, R ; vitesse par l'effet Doppler relativiste\\
+Télescope & grossissement $F/f$, champ réel, pouvoir séparateur $1{,}22\lambda/D$, pouvoir collecteur, mise au point ; Lune, Saturne, amas globulaire\\
+Capteur CCD & pose (photons au hasard, loi de Poisson, saturation) puis lecture ligne par ligne et case par case\\
+Loi de Snell-Descartes & $n_1\sin\theta_1=n_2\sin\theta_2$, réflexion totale, part réfléchie (Fresnel), angle de Brewster\\
+Regard vers le passé & l'explosion d'une étoile à $d$ années-lumière vue $d$ ans plus tard ; supernovæ de 1054 et de 1006\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
 \capture{img/anim_eclipticsimulator_fr.png}{0.95}
 \capture{img/anim_lunar_applet_fr.png}{0.95}
 \capture{img/anim_shadowsim_fr.png}{0.95}
@@ -1313,6 +1366,16 @@ Diagramme HR (NAAP) & étoiles proches et brillantes, séquences, droites d'éga
 \capture{img/anim_heliacalrisingsim_fr.png}{0.95}
 \capture{img/anim_transitmovie_fr.png}{0.95}
 \capture{img/anim_hrexplorer_fr.png}{0.95}
+\capture{img/anim_bbexplorer_fr.png}{0.95}
+\capture{img/anim_hydrogenatom_fr.png}{0.95}
+\capture{img/anim_threeviewsspectra_fr.png}{0.95}
+\capture{img/anim_transitsimulator_fr.png}{0.95}
+\capture{img/anim_ca_extrasolarplanets_starwobble_fr.png}{0.95}
+\capture{img/anim_eclipsingbinarysim_fr.png}{0.95}
+\capture{img/anim_galacticredshift_fr.png}{0.95}
+\capture{img/anim_milkywayrotationalvelocity_fr.png}{0.95}
+\capture{img/anim_telescope10_fr.png}{0.95}
+\capture{img/anim_fusion02_fr.png}{0.95}
 
 \subsection{Calculs et vérification}
 Les animations d'origine employaient des approximations commodes (obliquité de 23,5$^\circ$, orbite circulaire,
@@ -1332,7 +1395,16 @@ ajustement de Fourier pour le Soleil, 3,26~al par parsec). Coupole les remplace 
       Stefan-Boltzmann ($\sigma$ exacte) et constantes solaires nominales de l'UAI ($R_\odot$, $L_\odot$, d'où
       $T_\odot=5\,772$~K ; $M_{\text{bol},\odot}=4{,}74$ et facteur 2,5 de Pogson, l'original écrivait 2,51189). Les
       étalonnages empiriques de l'original (type spectral, corrections bolométriques, séquences du diagramme HR,
-      intensités des raies) sont repris tels quels.
+      intensités des raies) sont repris tels quels ;
+\item (lot~3) constantes exactes du SI ; loi de Planck, constante de Wien tirée de $x=5(1-e^{-x})$
+      ($b=2{,}897\,772$~mm\,K ; l'original : 2,897~768), $\sigma$ ; hydrogène avec la masse réduite
+      ($13{,}598$~eV, $hc=1\,239{,}84$~eV\,nm ; l'original : 13,6 et 1~240) ; Snell-Descartes et Fresnel ; effet
+      Doppler par le temps retardé ; couleur perçue par les fonctions CIE 1931 (Judd-Vos) et la transformation sRGB
+      normalisée ; magnitudes dans les filtres de Landolt ;
+\item (lot~3) deux corps : $P=2\pi\sqrt{a^3/G(M_1+M_2)}$ ($0{,}1158$~j pour $a=1~R_\odot$, l'original : 0,1155),
+      équation de Kepler, $K$ et $v_r$, aire exacte de recouvrement de deux disques (transits, éclipses) ; masses par
+      les $GM$ de l'UAI et de DE440, barycentre du Système solaire par les éléments de Standish ; bilans des réactions
+      de fusion par les excès de masse AME 2020 ; $G$ en kpc\,(km/s)$^2/M_\odot$.
 \end{itemize}
 Le script \texttt{outils/verif\_anim/verif\_anim.sage} recalcule chaque grandeur sous SageMath en 100~bits, par une
 autre voie que le code (rotations au lieu des formules fermées, racines numériques, triangles semblables) ; ses
@@ -1348,6 +1420,16 @@ toutes dans une saison d'éclipses ; en 2026, le Soleil passe aux nœuds le 27~f
 de Sirius à 40,8$^\circ$~N le 11~août (Véga le 14~novembre, Aldébaran le 19~juin) ; orbite géostationnaire de
 42~164~km ; marée d'équilibre de la Lune de 53,8~cm d'amplitude totale, Soleil 0,459 fois la Lune ; précession à
 $10^{-4}$~degré d'astropy.
+
+Lot~3 : constante de Wien, $\sigma$, loi de Planck à $10^{-11}$ près de SageMath, et $\sigma T^4$ égal à
+l'intégrale numérique de $\pi B_\lambda$ ; H$\alpha$ à 656,47~nm dans le vide ; Fresnel identique aux lois des sinus et
+des tangentes, $r_p$ nul à l'angle de Brewster ; fréquence Doppler égale à $f_0/(1-v_r/c)$ à $10^{-5}$ ; Soleil autour
+du barycentre à 1,65~$R_\odot$ le 1\textsuperscript{er}~janvier 2000, à mieux que $5\times10^{-5}$~ua d'ERFA ; Jupiter
+fait bouger le Soleil de 12,5~m/s ; HD~209458~b : transit de 1,44~\% et 3~h~05 ; les 39 binaires complètes suivent leurs
+mesures à 0,037 près (médiane, flux relatif), et DI~Her « à compléter » retrouve $e=0{,}49$ par ajustement ; fusion
+26,731~MeV ; masse de la Galaxie dans l'orbite du Soleil $9{,}9\times10^{10}~M_\odot$ ; le bouchon des ondes de densité
+atteint la densité prévue ($\times5$).  Les courbes de lumière des binaires, dessinées en images dans l'original, ont été
+numérisées par \texttt{outils/verif\_anim/donnees\_lot3.py}.
 
 \begin{ccode}
 coupole anim liste\\
@@ -1497,5 +1579,5 @@ Barbary (2016), Bertin \& Arnouts (1996). Moments adaptatifs : Bernstein \& Jarv
 © OpenStreetMap contributors. SIMBAD et Sesame : CDS, Strasbourg (Wenger et al. 2000) ; Aladin Lite (CDS) ;
 NED (NASA/IPAC) ; JPL Small-Body Database (NASA/JPL). Cosmologie : Planck Collaboration (2020, A\&A 641, A6) ;
 Hinshaw et al. (2013, WMAP 9) ; Riess et al. (2022, SH0ES) ; Hogg (1999, astro-ph/9905116) ; Komatsu et al. (2011)
-pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur). Archives : MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), Astro Data Archive de NOIRLab, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS du nœud Anneaux et Lunes, Imaging Node) ; reproject (Astropy) ; Rector et al. (2007, AJ 133, 598) pour l'ordre chromatique ; pratiques des amateurs : voir \texttt{docs/archives\_methode.md}. Animations : ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0) ; Meeus (1998, \emph{Astronomical Algorithms}, 2\textsuperscript{e} éd.) ; obliquité P03 / IAU 2006 ; limites des constellations de l'UAI (données livrées avec astropy) ; côtes d'après GSHHS (via ClassAction).
+pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur). Archives : MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), Astro Data Archive de NOIRLab, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS du nœud Anneaux et Lunes, Imaging Node) ; reproject (Astropy) ; Rector et al. (2007, AJ 133, 598) pour l'ordre chromatique ; pratiques des amateurs : voir \texttt{docs/archives\_methode.md}. Animations : ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0) ; Meeus (1998, \emph{Astronomical Algorithms}, 2\textsuperscript{e} éd.) ; obliquité P03 / IAU 2006 ; limites des constellations de l'UAI (données livrées avec astropy) ; côtes d'après GSHHS (via ClassAction) ; NASA Exoplanet Archive, NASA Planetary Fact Sheet, éphéméride JPL DE440 et éléments de Standish, AME 2020, filtres de Landolt (1992), spectre de M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, courbe de rotation d'Eilers et al. (2019).
 \end{document}

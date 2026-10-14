@@ -23,7 +23,7 @@ anglais, sur Windows, macOS et Linux. Architecture **modulaire** : d'autres modu
 | **Qualité des images** | Facultatif : FWHM, ellipticité (carte 3 × 3), fond, bruit, gradient, saturation, traînées, échantillonnage — mesures validées sur images synthétiques. |
 | **Spectres et séries** | Lecture et tracé de données 1D (spectres H I à 21 cm avec axe fréquence ↔ vitesse radio, courbes de lumière, tables FITS ou CSV). |
 | **Cosmologie** | Du redshift aux distances (comobile, luminosité, angulaire, trajet de la lumière), âges, volume comobile, module de distance, échelle en kpc/″ ; Planck 2018 avec incertitudes, SH0ES, Planck 2015, WMAP 9, jeu personnalisé ; redshift d'un objet demandé à SIMBAD ; courbes, export CSV. Noyau repris du calculateur [cosmologie-redshift](https://github.com/ARP273-ROSE/cosmologie-redshift), vérifié sous SageMath. |
-| **Animations** | Animations pédagogiques d'après ClassAction (University of Nebraska-Lincoln, Apache 2.0), refaites en Python : sphère céleste et repères, mouvements du Soleil, saisons, phases de la Lune, éclipses et table des éclipses, marées, temps sidéral, zodiaque, Ptolémée, épicycles, phases de Vénus, configurations planétaires, lois de Kepler et de Newton, lever héliaque, luminosité, parallaxe, diagramme HR. Catalogue des 92 animations d'origine (60 disponibles en 0.3.1, les autres à venir) ; calculs vérifiés sous SageMath et avec astropy. |
+| **Animations** | Animations pédagogiques d'après ClassAction (University of Nebraska-Lincoln, Apache 2.0), refaites en Python : sphère céleste et repères, mouvements du Soleil, saisons, phases de la Lune, éclipses et table des éclipses, marées, temps sidéral, zodiaque, Ptolémée, épicycles, phases de Vénus, configurations planétaires, lois de Kepler et de Newton, lever héliaque, luminosité, parallaxe, diagramme HR, corps noir et spectres, atome d'hydrogène, effet Doppler, exoplanètes (vitesses radiales, transits), binaires à éclipses et courbes de lumière réelles, fusion dans le Soleil, rotation de la Voie lactée, univers en expansion, télescope et CCD. Le catalogue est complet : les 92 animations d'origine (les films sont devenus des simulations) ; calculs vérifiés sous SageMath, avec astropy et ERFA. |
 | **Sites et heures** | Sites d'observation (MPC), carte OpenStreetMap, heure UTC et heure locale du site. |
 | **Ma machine** | Diagnostic matériel et parallélisme retenu (exemple minimal de module). |
 
@@ -159,7 +159,9 @@ Cosmologie : noyau de calcul repris du calculateur « cosmologie-redshift » du 
 formelle, intégré ici par son auteur sous GPL-3), astropy.cosmology, paramètres Planck 2018 / 2015, WMAP 9, SH0ES.
 Animations : d'après ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0 ; fichiers
 `NOTICE` et `LICENCES/Apache-2.0.txt`) ; formules de J. Meeus (*Astronomical Algorithms*), IAU 1982 et IAU 2006 ;
-limites des constellations de l'UAI (astropy).
+limites des constellations de l'UAI (astropy) ; NASA Exoplanet Archive, NASA Planetary Fact Sheet, éphéméride JPL
+DE440 et éléments de Standish, AME 2020, filtres de Landolt, spectre de M32 (Santos et al. 2002), Catalog and Atlas of
+Eclipsing Binaries, courbe de rotation d'Eilers et al. (2019) ; détail dans `NOTICE`.
 Auteur : ARP273-ROSE. Licence : GNU GPL version 3 ou ultérieure.
 
 ---
@@ -178,7 +180,7 @@ English, on Windows, macOS and Linux. **Modular** architecture: more modules wil
 | **Image quality** | Optional: FWHM, ellipticity (3 × 3 map), background, noise, gradient, saturation, trails, sampling — measurements validated on synthetic images. |
 | **Spectra and series** | Reading and plotting 1D data (21 cm H I spectra with frequency ↔ radio velocity axis, light curves, FITS or CSV tables). |
 | **Cosmology** | From redshift to distances (comoving, luminosity, angular, light travel), ages, comoving volume, distance modulus, scale in kpc/″; Planck 2018 with uncertainties, SH0ES, Planck 2015, WMAP 9, custom set; an object's redshift requested from SIMBAD; curves, CSV export. Core taken from the [cosmologie-redshift](https://github.com/ARP273-ROSE/cosmologie-redshift) calculator, checked with SageMath. |
-| **Animations** | Teaching animations after ClassAction (University of Nebraska-Lincoln, Apache 2.0), remade in Python: celestial sphere and coordinates, Sun motions, seasons, lunar phases, eclipses and eclipse table, tides, sidereal time, zodiac, Ptolemy, epicycles, phases of Venus, planetary configurations, Kepler's and Newton's laws, heliacal rising, luminosity, parallax, HR diagram. Catalogue of the 92 original animations (60 available in 0.3.1, the others to come); computations checked with SageMath and astropy. |
+| **Animations** | Teaching animations after ClassAction (University of Nebraska-Lincoln, Apache 2.0), remade in Python: celestial sphere and coordinates, Sun motions, seasons, lunar phases, eclipses and eclipse table, tides, sidereal time, zodiac, Ptolemy, epicycles, phases of Venus, planetary configurations, Kepler's and Newton's laws, heliacal rising, luminosity, parallax, HR diagram, blackbody and spectra, hydrogen atom, Doppler effect, extrasolar planets (radial velocities, transits), eclipsing binaries with real light curves, fusion in the Sun, rotation of the Milky Way, expanding universe, telescope and CCD. The catalogue is complete: all 92 original animations (the movies have become simulations); computations checked with SageMath, astropy and ERFA. |
 | **Sites and times** | Observing sites (MPC), OpenStreetMap map, UTC and site local time. |
 | **My computer** | Hardware diagnosis and chosen parallelism (minimal example module). |
 
@@ -270,4 +272,6 @@ published image; reproject (Astropy, BSD, optional). Cosmology: computation core
 (published without a formal licence, included here by its author under GPL-3), astropy.cosmology, Planck 2018 / 2015,
 WMAP 9, SH0ES parameters. Animations: after ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache
 License 2.0; `NOTICE` and `LICENCES/Apache-2.0.txt` files); formulas from J. Meeus (*Astronomical Algorithms*), IAU 1982
-and IAU 2006; IAU constellation boundaries (astropy). Author: ARP273-ROSE. Licence: GNU GPL version 3 or later.
+and IAU 2006; IAU constellation boundaries (astropy); NASA Exoplanet Archive, NASA Planetary Fact Sheet, JPL DE440
+ephemeris and Standish elements, AME 2020, Landolt filters, spectrum of M32 (Santos et al. 2002), Catalog and Atlas of
+Eclipsing Binaries, rotation curve of Eilers et al. (2019); details in `NOTICE`. Author: ARP273-ROSE. Licence: GNU GPL version 3 or later.

@@ -566,3 +566,241 @@ def test_donnees_du_diagramme_hr():
             assert 3.3 < lt < 4.75 and -6 < ll < 7
     assert hr.nom_type(42) == 'G2' and hr.nom_type(0) == 'O0' and hr.nom_type(65) == 'M5'
     assert hr.temperature_de_type(42) == pytest.approx(5830.0)            # table de l'original (G2 V)
+
+
+# ---------------------------------------------------------------- lot 3 (0.4.0) : lumière et spectres
+def test_planck_wien_stefan():
+    from coupole.modules.anim import lumiere as L
+    s = REF['lumiere']
+    assert L.X_WIEN == pytest.approx(s['x_wien'], rel=1e-12)
+    assert L.WIEN_B == pytest.approx(s['wien_b'], rel=1e-12)
+    assert L.SIGMA == pytest.approx(s['sigma'], rel=1e-12)
+    for lam, t, b in s['planck']:
+        assert L.planck(lam, t) == pytest.approx(b, rel=1e-11)
+    for t, m in s['exitance']:                                  # σ T⁴ = π ∫ B_λ dλ (intégration numérique)
+        assert L.exitance(t) == pytest.approx(m, rel=1e-6)
+    # le maximum de B_λ est bien à b / T
+    t = 5772.0
+    lp = L.pic_wien_m(t)
+    assert L.planck(lp, t) > L.planck(lp * 1.001, t) and L.planck(lp, t) > L.planck(lp * 0.999, t)
+
+
+def test_atome_hydrogene():
+    from coupole.modules.anim import lumiere as L
+    from coupole.modules.anim.animations.atome_hydrogene import evenement_photon
+    s = REF['lumiere']
+    assert L.E_IONISATION_EV == pytest.approx(s['e_ionisation_ev'], rel=1e-12)       # 13,598 eV
+    assert L.HC_EV_NM == pytest.approx(s['hc_ev_nm'], rel=1e-12)
+    for a, b, lam in s['raies_nm']:
+        assert L.longueur_onde_nm(L.transition_ev(a, b)) == pytest.approx(lam, rel=1e-11)
+    assert L.longueur_onde_nm(L.transition_ev(2, 3)) == pytest.approx(656.47, abs=0.01)  # Hα dans le vide
+    assert evenement_photon(1, round(L.transition_ev(1, 2), 2)) == ('absorbe', 2)
+    assert evenement_photon(1, 11.0)[0] == 'passe'
+    issue, ec = evenement_photon(2, 5.0)
+    assert issue == 'ionise' and ec == pytest.approx(5.0 - L.E_IONISATION_EV / 4)
+    assert evenement_photon(0, 12.0)[0] == 'passe'
+
+
+def test_snell_fresnel_brewster():
+    from coupole.modules.anim import lumiere as L
+    for t1, n1, n2, t2, r in REF['snell']:
+        if t2 is None:
+            assert L.snell(t1, n1, n2) is None and L.fresnel(t1, n1, n2)['r'] == 1.0
+        else:
+            assert L.snell(t1, n1, n2) == pytest.approx(t2, abs=1e-9)
+            assert L.fresnel(t1, n1, n2)['r'] == pytest.approx(r, abs=1e-12)
+    for n1, n2, b in REF['brewster']:
+        assert L.angle_brewster(n1, n2) == pytest.approx(b, abs=1e-8)
+        assert L.fresnel(b, n1, n2)['rp'] == pytest.approx(0.0, abs=1e-15)
+    for n1, n2, c in REF['angle_critique']:
+        assert L.angle_critique(n1, n2) == pytest.approx(c, abs=1e-12)
+    assert L.angle_critique(1.0, 1.33) is None
+
+
+def test_doppler_temps_retarde():
+    from coupole.modules.anim import lumiere as L
+    for x0, y0, vx, vy, ox, oy, c, t, tau, dtau in REF['doppler_retard']:
+        pos = lambda s, x0=x0, y0=y0, vx=vx, vy=vy: (x0 + vx * s, y0 + vy * s)
+        assert L.temps_retarde(t, pos, (ox, oy), c, t_min=-1e5) == pytest.approx(tau, abs=1e-8)
+        # f / f₀ = dτ/dt = 1 / (1 − v_r / c), v_r : vitesse de la source vers l'observateur à l'émission
+        sx, sy = pos(tau)
+        n = math.hypot(ox - sx, oy - sy)
+        vr = (vx * (ox - sx) + vy * (oy - sy)) / n
+        assert dtau == pytest.approx(1 / (1 - vr / c), rel=1e-6)
+
+
+def test_effet_doppler_animation(app_qt):
+    from coupole.modules.anim.animations.effet_doppler import EffetDoppler
+    w = EffetDoppler()
+    for _ in range(30):
+        w.pas(0.1)
+    mesuree, predite, _ = w.frequence_recue()
+    assert mesuree == pytest.approx(predite, rel=1e-5)
+    w.close()
+
+
+def test_couleurs_et_magnitudes():
+    from coupole.modules.anim import lumiere as L
+    m = L.magnitudes_corps_noir(9600.0)                 # un corps noir de type A0 : indices de couleur ≈ 0
+    assert abs(m['B'] - m['V']) < 0.05 and abs(m['U'] - m['B']) < 0.05
+    assert L.magnitudes_corps_noir(3500)['B'] - L.magnitudes_corps_noir(3500)['V'] > 1.0
+    r, g, b = L.couleur_corps_noir(3000)
+    assert r > g > b                                    # rougeâtre
+    r, g, b = L.couleur_corps_noir(20000)
+    assert b > r                                         # bleuté
+    d = L.spectres()
+    assert len(d['cie']['x']) == 90 and d['cie']['y'][35] == 1.0             # ȳ(555 nm) = 1
+    assert len(d['m32']['f']) == 4301 and d['m32']['z_original'] == pytest.approx(6.84e-4)
+
+
+# ---------------------------------------------------------------- lot 3 : exoplanètes et étoiles doubles
+def test_vitesse_radiale_et_periodes():
+    from coupole.modules.anim import deux_corps as dc
+    for m1s, m2j, a, e, i, w, ph, v in REF['vitesse_radiale']:
+        m1, m2 = m1s * dc.M_SOLEIL_KG, m2j * dc.M_JUPITER_KG
+        k = dc.amplitude_k(m1, m2, a * dc.UA_M, e, i)
+        assert dc.vitesse_radiale(ph, k, e, w) == pytest.approx(v, abs=2e-4)
+    for m1s, m2j, a, p in REF['periodes_kepler']:
+        assert dc.periode_s(a * dc.UA_M, m1s * dc.M_SOLEIL_KG, m2j * dc.M_JUPITER_KG) / dc.JOUR_S == \
+            pytest.approx(p, rel=1e-6)                   # G CODATA 2018 et GM : même relation, autre voie
+    from coupole.modules.anim.animations.vitesse_radiale import systeme
+    assert systeme('soleil_jupiter')['K'] == pytest.approx(12.5, abs=0.1)           # le Soleil bouge de 12,5 m/s
+    assert systeme('51peg')['K'] == pytest.approx(55.77, rel=0.01)                   # mesure publiée
+
+
+def test_transits_et_recouvrement():
+    from coupole.modules.anim import deux_corps as dc
+    for r1, r2, d, aire in REF['recouvrement']:
+        assert dc.aire_recouvrement(r1, r2, d) == pytest.approx(aire, abs=2e-6)
+    for rs, k, i, duree in REF['transits']:
+        assert dc.duree_transit(dc.phase_conjonction(0.0, 90.0), rs, k * rs, 0.0, i, 90.0, n=8000) == \
+            pytest.approx(duree, abs=2.5e-4)
+    for e, w, ph in REF['conjonction']:
+        assert dc.phase_conjonction(e, w) == pytest.approx(ph, abs=1e-12)
+        x, y, z = dc.relative(ph, 1.0, e, 90.0, w)
+        assert abs(x) < 1e-9 and z > 0                   # au milieu du transit, devant l'étoile
+    # profondeur d'un transit central : (R_p / R_*)²
+    s = {'r1': 0.1, 'r2': 0.01, 'e': 0.0, 'i': 90.0, 'w': 90.0}
+    from coupole.modules.anim.animations.transits import Transits
+    assert 1 - Transits.flux_relatif(s, dc.phase_conjonction(0, 90)) == pytest.approx(0.01, rel=1e-12)
+
+
+def test_prereglages_exoplanetes():
+    from coupole.modules.anim import deux_corps as dc, donnees_lot3 as D
+    hd = [t for t in D.TRANSITS if t[0] == 'HD 209458 b'][0]
+    a = dc.demi_grand_axe_m(hd[9] * dc.JOUR_S, hd[3] * dc.M_SOLEIL_KG, hd[1] * dc.M_JUPITER_KG) / dc.UA_M
+    assert a == pytest.approx(0.04857, abs=2e-5)
+    assert hd[2] == 1.39 and hd[6] == 0.0               # archive 2026 (l'original : 1,32 R♃, e = 0,07)
+    assert len(D.TRANSITS) == 9 and len(D.VITESSES_RADIALES) == 4
+
+
+def test_barycentre_du_systeme_solaire():
+    from coupole.modules.anim import deux_corps as dc
+    planetes = ['mercure', 'venus', 'terre', 'mars', 'jupiter', 'saturne', 'uranus', 'neptune']
+    for annee, ref in REF['barycentre']:
+        b = dc.soleil_barycentrique((annee - 2000.0) / 100.0, planetes)
+        for u, v in zip(b, ref):
+            assert u == pytest.approx(v, abs=1e-12)
+
+
+def test_barycentre_proche_d_erfa():
+    """Position du Soleil par rapport au barycentre contre ERFA (epv00, VSOP87 : Terre héliocentrique et
+    barycentrique) : à mieux que 5 × 10⁻⁵ ua (7 500 km, 1 % du rayon solaire)."""
+    erfa = pytest.importorskip('erfa')
+    from coupole.modules.anim import deux_corps as dc
+    eps = math.radians(84381.406 / 3600)
+    for annee in (1990.0, 2000.0, 2026.8, 2040.0):
+        jj = 2451545.0 + (annee - 2000.0) * 365.25
+        pvh, pvb = erfa.epv00(jj, 0.0)
+        x, y, z = (pvb[0] - pvh[0])                     # Soleil barycentrique, équateur J2000 (ICRS)
+        ye, ze = y * math.cos(eps) + z * math.sin(eps), -y * math.sin(eps) + z * math.cos(eps)
+        b = dc.soleil_barycentrique((annee - 2000.0) / 100.0, ['mercure', 'venus', 'terre', 'mars', 'jupiter',
+                                                                'saturne', 'uranus', 'neptune'])
+        assert math.dist(b, (x, ye, ze)) < 5e-5
+
+
+def test_binaires_a_eclipses():
+    from coupole.modules.anim import donnees_lot3 as D, deux_corps as dc
+    from coupole.modules.anim.animations.binaire_eclipses import brillance_v
+    c = D.courbes_binaires()
+    assert len(c) == 46 and set(c) == {b[0] for b in D.BINAIRES}
+    assert all(len(v) > 100 for v in c.values())
+    # le modèle (disques uniformes, brillance V par Planck) suit les mesures des systèmes complets : écart < 0,07
+    for nom in ('KP Aql', 'EK Cep', 'CW CMa', 'V442 Cyg'):
+        _, m1, m2, a, r1, r2, t1, t2, i, w, e, _t, _v = [b for b in D.BINAIRES if b[0] == nom][0]
+        s1, s2 = brillance_v(t1), brillance_v(t2)
+        ph0 = dc.phase_conjonction(e, w)
+        fmax = math.pi * (r1 * r1 * s1 + r2 * r2 * s2)
+        ecart = math.sqrt(sum((dc.flux_deux_disques(ph0 + ph, r1, r2, s1, s2, e, i, w) / fmax - f) ** 2
+                              for ph, f in c[nom]) / len(c[nom]))
+        assert ecart < 0.07, (nom, ecart)
+    assert 'DI Her' in D.BINAIRES_A_COMPLETER and len(D.BINAIRES_A_COMPLETER) == 7
+    # période : 0,1158 j pour a = 1 R☉, M = 1 M☉ (3e loi de Kepler)
+    assert dc.periode_s(dc.R_SOLEIL_M, dc.M_SOLEIL_KG, 0.0) / dc.JOUR_S == pytest.approx(0.11584, abs=1e-5)
+
+
+def test_centre_de_masse_et_repliement():
+    from coupole.modules.anim.animations.centre_masse import distances
+    from coupole.modules.anim.animations.repliement import pas_apparent, periode_apparente
+    r1, r2 = distances(7, 3, 10)
+    assert (r1, r2) == pytest.approx((3.0, 7.0)) and 7 * r1 == pytest.approx(3 * r2)
+    for p, f, n, d in REF['repliement']:
+        assert pas_apparent(p, f, n) == pytest.approx(d, abs=1e-9)
+    assert periode_apparente(1, 1, 1) == math.inf and periode_apparente(5, 3, 8) < 0     # immobile ; à l'envers
+
+
+# ---------------------------------------------------------------- lot 3 : divers
+def test_fusion_bilans():
+    from coupole.modules.anim.animations import fusion as F
+    f = REF['fusion']
+    assert [e[2] for e in F.ETAPES_PP] == pytest.approx(f['pp'], abs=1e-6)
+    assert [e[2] for e in F.ETAPES_CNO] == pytest.approx(f['cno'], abs=1e-6)
+    assert F.energie_totale(F.ETAPES_PP) == pytest.approx(f['total'], abs=1e-6)       # 26,731 MeV
+    assert F.energie_totale(F.ETAPES_CNO) == pytest.approx(f['total'], abs=1e-6)
+    assert f['pp'][0] == pytest.approx(420.2, abs=0.1) and f['pp'][2] == pytest.approx(12859.6, abs=0.1)
+
+
+def test_voie_lactee_et_formation():
+    from coupole.modules.anim.animations import rotation_galaxie as G, temperatures_formation as T
+    assert G.G_KPC == pytest.approx(REF['galaxie']['g_kpc'], rel=1e-12)
+    assert G.vitesse(G.R_SOLEIL_KPC) == pytest.approx(229.0)
+    assert G.masse(G.R_SOLEIL_KPC) == pytest.approx(REF['galaxie']['masse_soleil'], rel=1e-9)
+    assert abs(G.vitesse(4.0) - G.v_interne(4.0)) < 1e-9 and abs(G.vitesse(5.0) - G.v_eilers(5.0)) < 1e-9
+    f = REF['formation']
+    assert T.PENTE == pytest.approx(f['pente'], rel=1e-12)
+    assert T.distance(175.0) == pytest.approx(f['d_175'], rel=1e-12)
+    assert T.distance(1500.0) == pytest.approx(f['d_1500'], rel=1e-9)
+    assert T.temperature(1.0) == pytest.approx(600.0)
+
+
+def test_ondes_de_densite(app_qt):
+    from coupole.modules.anim.animations.ondes_densite import OndesDensite, rapport_densite
+    for v, vl, vt, r in REF['densite']:
+        assert rapport_densite(v, vl, vt) == pytest.approx(r, rel=1e-12)
+    w = OndesDensite()
+    for _ in range(1500):                                # régime établi : la densité comptée rejoint la prévue
+        w.avancer(0.2)
+    prevu, compte = (float(x.split()[-1].replace(',', '.')) for _, x in w.valeurs()[:2])
+    assert compte == pytest.approx(prevu, rel=0.25)
+    w.close()
+
+
+def test_regard_vers_le_passe():
+    from coupole.core import i18n
+    from coupole.modules.anim.animations.regard_passe import EXEMPLES, annee_observee, annee_texte
+    from coupole.modules.anim.textes import TEXTES
+    i18n.enregistrer(TEXTES)
+    vu, d = EXEMPLES['crabe']
+    assert annee_observee(vu - d, d) == vu
+    assert annee_texte(vu - d) in ('5447 av. J.-C.', '5447 BC')                  # pas d'année zéro
+    assert annee_texte(0) in ('1 av. J.-C.', '1 BC') and annee_texte(1) in ('1 apr. J.-C.', 'AD 1')
+
+
+def test_proprietes_planetes():
+    from coupole.modules.anim import donnees_lot3 as D
+    from coupole.modules.anim.animations.proprietes_planetes import valeur
+    terre = D.PLANETES_FICHE[2]
+    assert valeur(terre, 'masse') == 1.0 and valeur(terre, 'rayon') == 1.0
+    assert valeur(terre, 'distance') == pytest.approx(1.0, abs=0.001)
+    sat = {p[0]: p[7] for p in D.PLANETES_FICHE}
+    assert sat['saturne'] == 274 and sat['jupiter'] == 95 and sat['pluton'] == 5     # NASA, 2026

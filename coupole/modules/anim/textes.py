@@ -56,8 +56,8 @@ TEXTES = {
                                   'Put back the settings, view and time of this animation to their initial state.'),
     'anim_aide_html': _t(
         "<h3>Animations</h3><p>Les animations pédagogiques ClassAction de l’université du Nebraska-Lincoln, écrites à "
-        "l’origine en Flash, refaites en Python pour Windows, macOS et Linux. Le catalogue complet (92 animations) est "
-        "classé par thème ; celles marquées « à venir » seront refaites dans les prochains lots.</p>"
+        "l’origine en Flash, refaites en Python pour Windows, macOS et Linux. Les 92 animations du catalogue sont "
+        "toutes disponibles, classées par thème ; celles qui n’étaient que des films sont devenues des simulations.</p>"
         "<h4>Manipuler</h4><ul><li><b>Glisser</b> sur une sphère la fait tourner ; sur une étoile, la Lune, la Terre ou "
         "un observateur, les déplace.</li><li><b>Lecture / Pause</b> et <b>Vitesse</b> (0,1 à 10 ×) animent le temps ; "
         "<b>Réinitialiser</b> revient à l’état de départ.</li><li>Chaque réglage a un curseur et un champ numérique ; "
@@ -66,14 +66,17 @@ TEXTES = {
         "équation du temps (Meeus, précision 0,01°), changements de repère, équation de Kepler, module de distance, "
         "cônes d’ombre, phases moyennes de la Lune et nœuds de son orbite (saisons d’éclipses), précession, marées "
         "d’équilibre, périodes synodiques, gravitation de Newton, loi de Stefan-Boltzmann et constantes solaires de "
-        "l’UAI : vérifiés avec SageMath et astropy (voir le manuel, chapitre Animations). Les étalonnages empiriques "
-        "de l’original (type spectral, corrections bolométriques, séquences du diagramme HR) sont repris tels quels."
-        "</p>"
+        "l’UAI, lois de Planck et de Wien, niveaux de l’hydrogène, réfraction et formules de Fresnel, effet Doppler "
+        "par le temps retardé, vitesses radiales, transits et éclipses (aire exacte de recouvrement des disques), "
+        "barycentre du Système solaire, bilans des réactions de fusion : vérifiés avec SageMath, astropy et ERFA "
+        "(voir le manuel, chapitre Animations). Les étalonnages empiriques de l’original (type spectral, corrections "
+        "bolométriques, séquences du diagramme HR) sont repris tels quels ; les données réelles (exoplanètes, "
+        "planètes, binaires à éclipses, spectres) citent leur source dans le fichier NOTICE.</p>"
         "<p>D’après ClassAction, University of Nebraska-Lincoln Astronomy Education, Apache License 2.0 (fichier "
         "NOTICE).</p>",
         "<h3>Animations</h3><p>The ClassAction teaching animations of the University of Nebraska-Lincoln, originally "
-        "written in Flash, remade in Python for Windows, macOS and Linux. The full catalogue (92 animations) is sorted "
-        "by topic; those marked « coming » will be remade in the next batches.</p>"
+        "written in Flash, remade in Python for Windows, macOS and Linux. All 92 animations of the catalogue are "
+        "available, sorted by topic; those that were only movies have become simulations.</p>"
         "<h4>Handling</h4><ul><li><b>Dragging</b> a sphere rotates it; dragging a star, the Moon, the Earth or an "
         "observer moves it.</li><li><b>Play / Pause</b> and <b>Speed</b> (0.1 to 10 ×) run the time; <b>Reset</b> "
         "goes back to the initial state.</li><li>Each setting has a slider and a numeric field; computed values are "
@@ -81,9 +84,13 @@ TEXTES = {
         "<h4>Computations</h4><p>Sidereal time (IAU 1982), obliquity (IAU 2006), position of the Sun and equation of "
         "time (Meeus, 0.01° accuracy), coordinate changes, Kepler’s equation, distance modulus, shadow cones, mean "
         "lunar phases and nodes of the lunar orbit (eclipse seasons), precession, equilibrium tides, synodic periods, "
-        "Newton’s gravitation, Stefan-Boltzmann law and IAU solar constants: checked with SageMath and astropy (see the "
-        "manual, Animations chapter). The empirical calibrations of the original (spectral type, bolometric "
-        "corrections, HR diagram sequences) are kept as they are.</p>"
+        "Newton’s gravitation, Stefan-Boltzmann law and IAU solar constants, Planck’s and Wien’s laws, hydrogen levels, "
+        "refraction and Fresnel formulas, Doppler effect through the retarded time, radial velocities, transits and "
+        "eclipses (exact overlap area of the discs), barycenter of the Solar System, energy budgets of the fusion "
+        "reactions: checked with SageMath, astropy and ERFA (see the manual, Animations chapter). The empirical "
+        "calibrations of the original (spectral type, bolometric corrections, HR diagram sequences) are kept as they "
+        "are; the real data (exoplanets, planets, eclipsing binaries, spectra) cite their source in the NOTICE "
+        "file.</p>"
         "<p>After ClassAction, University of Nebraska-Lincoln Astronomy Education, Apache License 2.0 (NOTICE "
         "file).</p>"),
     'anim_cli_aide': _t('Catalogue des animations (liste, description)', 'Animation catalogue (list, description)'),
@@ -799,6 +806,10 @@ TEXTES.update({k: _t(*v) for k, v in _ANIM_BIS.items()})
 from .textes_lot2 import ANIM_LOT2  # noqa: E402  (lot 2 : Lune, Renaissance, astronomie antique…)
 
 TEXTES.update({k: _t(*v) for k, v in ANIM_LOT2.items()})
+
+from .textes_lot3 import ANIM_LOT3  # noqa: E402  (lot 3 : lumière, exoplanètes, étoiles doubles, divers)
+
+TEXTES.update({k: _t(*v) for k, v in ANIM_LOT3.items()})
 
 for _cle, _fr, _en in (('buenos_aires', 'Buenos Aires', 'Buenos Aires'), ('lima', 'Lima', 'Lima'),
                        ('casablanca', 'Casablanca', 'Casablanca'), ('monrovia', 'Monrovia', 'Monrovia'),

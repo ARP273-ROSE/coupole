@@ -987,7 +987,7 @@ Demande : toutes les animations restantes des thèmes Lune (12), Renaissance (9)
 - [x] Commit `1df3eea` poussé : CI `tests.yml` **6/6** (Linux, Windows, macOS × 3.10, 3.12).
 - **Aucun tag ni Release.**
 
-### Reste à faire — 32 animations « à venir »
+### Reste à faire après le lot 2 — 32 animations « à venir » (faites en 0.4.0 : voir ci-dessous)
 - Lumière et spectres (8) : meltednail, spectrum010, emspectrum, bbexplorer, dopplershift, filters, hydrogenatom,
   threeviewsspectra.
 - Exoplanètes (7) : hammerthrower, ca_extrasolarplanets_graph, ca_extrasolarplanets_starwobble, pulsarPeriodSim,
@@ -996,3 +996,46 @@ Demande : toutes les animations restantes des thèmes Lune (12), Renaissance (9)
 - Divers (13) : solarsystemproperties, formationtemps ; drivingthroughsnow ; fusion01, fusion02 ;
   milkywayrotationalvelocity, trafficdensity ; balloon, galacticredshift ; telescope10, buckets, snellslaw ;
   lookbacktimesim.
+
+## 2026-10-14 — 0.4.0 : module « Animations », lot 3 (les 32 dernières) : catalogue complet, 92 sur 92
+Demande : les 32 animations restantes (lumière et spectres 8, exoplanètes 7, étoiles doubles et variables 4, divers 13) ;
+films de l'original refaits en simulations ; données réelles reprises de l'original, origine vérifiée et citée, mises
+à jour quand elles étaient périmées.
+- [x] `.swf` décompilés avec JPEXS FFDec (scripts, textes, et sprites en SVG pour eclipsingbinarysim) ; sources
+  ActionScript du dépôt flash-animations quand elles existent (galacticRedshift : spectre de M32 et sa provenance,
+  filtres de Landolt 1992).
+- [x] Nouveaux modules sans Qt : `lumiere.py` (Planck, Wien par la racine de x = 5(1 − e⁻ˣ), σ, photons, hydrogène
+  avec masse réduite, Snell, Fresnel, Brewster, temps retardé, couleur CIE → sRGB, magnitudes U B V R),
+  `deux_corps.py` (Kepler en SI, K et v_r, aire de recouvrement, transits, Soleil autour du barycentre par Standish +
+  DE440), `donnees_lot3.py` (planètes NASA Fact Sheet, GM DE440, éléments de Standish, exoplanètes de la NASA Exoplanet
+  Archive, 46 binaires CALEB, AME 2020…), `graphe.py` (axes lin/log, courbes, bandes de spectre en un dégradé) ;
+  données `donnees/spectres.json.gz` (17 ko) et `donnees/binaires.json.gz` (70 ko), reproductibles par
+  `outils/verif_anim/donnees_lot3.py` (courbes des binaires numérisées depuis les PNG de l'original).
+- [x] 30 fichiers dans `animations/` (32 classes : clou_fondu, corps_noir, explorateur_spectres, spectre_em,
+  effet_doppler, filtres, atome_hydrogene, kirchhoff, lanceur_marteau, vitesse_radiale (2 classes), barycentre_solaire,
+  pulsar, transits, vitesses_radiales, binaire_eclipses, courbe_lumiere, centre_masse, repliement, proprietes_planetes,
+  temperatures_formation, neige, fusion (2 classes), rotation_galaxie, ondes_densite, ballon_univers, decalage_galaxie,
+  telescope, ccd, snell, regard_passe) ; textes FR/EN dans `textes_lot3.py` ; `catalogue.LOT3`.
+- [x] Corrections de l'original : constantes SI exactes (σ 5,669 → 5,670 374 ; b 2,897 768 → 2,897 772 mm K ;
+  h 6,6 → 6,626 ; c 3 × 10⁸ → 299 792 458), hydrogène 13,6 → 13,598 eV et 1 240 → 1 239,84 eV nm, sRGB normalisé,
+  P = 0,1155 → 0,1158 j pour a = 1 R☉, binaires : brillance V par Planck et filtre V, exoplanètes 2007 → archive 2026
+  (HD 209458 b 1,32 → 1,39 R♃ et e 0,07 → 0 ; a tiré de la période publiée), satellites 2006 → 2026 (Saturne 30 → 274),
+  courbe de rotation de la Galaxie au-delà de 5 kpc par Eilers et al. 2019 (l'original montait à 292 km/s à 39 kpc).
+  Binaires « à compléter » de l'original (RT CrB, V478 Cyg, V477 Cyg, DI Her, AG Phe, RZ Cas, AF Gem : paramètre
+  volontairement faux) gardées comme exercices, signalées.
+- [x] SageMath (`verif_anim.sage`, conteneur `sagemath`) : section lot 3 (racine de Wien, σ, Planck, σT⁴ par intégration
+  numérique, raies de l'hydrogène par Rydberg, Snell par racine, Fresnel par les lois des sinus et des tangentes,
+  Brewster par racine de r_p, temps retardé et dτ/dt par racines, v_r par dérivée numérique de la position, périodes,
+  recouvrement par intégration des cordes, durée de transit de Seager et Mallén-Ornelas, conjonction, barycentre par
+  matrices de rotation, bilans de fusion AME 2020, G en kpc, repliement par recherche exhaustive, ondes de densité par
+  `solve`, loi de formation) → `tests/anim_reference_sage.json` (valeurs des lots 1 et 2 inchangées).
+- [x] Tests : `test_anim_calculs.py` (+17 : écarts à Sage ≤ 1e-12…2e-4, barycentre à < 5 × 10⁻⁵ ua d'ERFA epv00,
+  binaires complètes à < 0,07 de leurs mesures, régime établi des ondes de densité, années sans zéro, fiche NASA),
+  `test_anim_gui.py` (+6 : catalogue complet 92/92, souris de 5 animations, atome qui absorbe puis réémet et s'ionise,
+  lecture complète du CCD, courbe de lumière, préréglages réels).  Rendu ≈ 1 à 5 ms par image (spectres : dégradés
+  uniques, courbes denses en trait fin).
+- [x] Aide F1, manifeste, manuels FR/EN (deux tableaux de plus pour les 32, 10 captures nouvelles, calculs et résultats
+  du lot 3, sources), NOTICE (sources des données, mises à jour), README, CHANGELOG FR puis EN, VERSION 0.4.0.
+- [x] Validation locale (image coupole-test, Python 3.12, offscreen) : **803 réussis, 22 sautés, code 0** (747 avant).
+- **Aucun tag ni Release.**
+- Le module Animations est complet : plus rien « à venir ».

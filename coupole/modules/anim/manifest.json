@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "nom": {"fr": "Animations", "en": "Animations"},
   "description": {
-    "fr": "Animations pédagogiques d'après ClassAction (University of Nebraska-Lincoln) : sphère céleste, repères, mouvements du Soleil, saisons, phases de la Lune, éclipses, marées, orbites et configurations planétaires, astronomie antique, propriétés des étoiles et diagramme HR",
-    "en": "Teaching animations after ClassAction (University of Nebraska-Lincoln): celestial sphere, coordinates, Sun motions, seasons, lunar phases, eclipses, tides, orbits and planetary configurations, ancient astronomy, stellar properties and HR diagram"
+    "fr": "Animations pédagogiques d'après ClassAction (University of Nebraska-Lincoln) : sphère céleste, repères, mouvements du Soleil, saisons, phases de la Lune, éclipses, marées, orbites et configurations planétaires, astronomie antique, propriétés des étoiles et diagramme HR, lumière et spectres, exoplanètes, étoiles doubles, Système solaire, fusion, Voie lactée, cosmologie, télescopes (92 animations)",
+    "en": "Teaching animations after ClassAction (University of Nebraska-Lincoln): celestial sphere, coordinates, Sun motions, seasons, lunar phases, eclipses, tides, orbits and planetary configurations, ancient astronomy, stellar properties and HR diagram, light and spectra, extrasolar planets, binary stars, Solar System, fusion, Milky Way, cosmology, telescopes (92 animations)"
   },
   "icone": "icone.svg",
   "ordre": 36,

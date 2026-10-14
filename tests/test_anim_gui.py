@@ -182,7 +182,9 @@ def test_panneau_animations(propre):
     assert p.arbre.topLevelItemCount() == len(catalogue.THEMES)
     w = p.ouvrir('kepler')
     assert w is not None and p.pile.currentWidget() is w
-    assert p.ouvrir('balloon') is None and p.pile.currentWidget() is p.vide         # à venir : description seule
+    assert p.ouvrir('balloon') is not None                    # 0.4.0 : le catalogue est complet
+    p.etat.setCurrentIndex(p.etat.findData('a_venir'))
+    assert sum(p.arbre.topLevelItem(i).childCount() for i in range(p.arbre.topLevelItemCount())) == 0
     p.etat.setCurrentIndex(p.etat.findData('faites'))
     n = sum(p.arbre.topLevelItem(i).childCount() for i in range(p.arbre.topLevelItemCount()))
     assert n == len(catalogue.faites())
@@ -205,7 +207,7 @@ def test_lot2_complet():
         assert all(e.faite for e in catalogue.ENTREES if e.theme == theme), theme
     assert {themes[i] for i in catalogue.LOT2} == {'lunarcycles', 'renaissance', 'ancientastro', 'coordsmotion'}
     assert {themes[i] for i in catalogue.LOT2_BIS} == {'stellarprops'} and len(catalogue.LOT2_BIS) == 5
-    assert len(catalogue.faites()) == 60
+    assert len(catalogue.faites()) >= 60
 
 
 def test_cles_de_texte_des_animations():
@@ -284,4 +286,130 @@ def test_retard_synodique_un_jour(propre):
         w.pas(0.1)
     rot, sol = w.durees()
     assert w.ecoule_h == pytest.approx(sol) and (w.phi - w.theta) % 360.0 == pytest.approx(0.0, abs=1e-6)
+    w.close()
+
+
+# ---------------------------------------------------------------- lot 3 (0.4.0) : catalogue complet
+def test_lot3_catalogue_complet():
+    faites = {e.id for e in catalogue.faites()}
+    assert len(faites) == 92 and not catalogue.a_venir()
+    assert len(catalogue.LOT3) == 32 and set(catalogue.LOT3) <= faites
+    assert len(set(catalogue.ORDRE)) == 92
+    themes = {e.id: e.theme for e in catalogue.ENTREES}
+    assert sum(themes[i] == 'light' for i in catalogue.LOT3) == 8
+    assert sum(themes[i] == 'extrasolarplanets' for i in catalogue.LOT3) == 7
+    assert sum(themes[i] == 'binaryvariablestars' for i in catalogue.LOT3) == 4
+
+
+def test_souris_lot3(propre):
+    """Glisser : le laser de Snell-Descartes, le télescope des trois spectres, la longueur d'onde du spectre EM,
+    l'observateur de l'effet Doppler, le rayon de la courbe de rotation."""
+    from PyQt6.QtCore import QPoint, Qt
+    from PyQt6.QtTest import QTest
+
+    def glisser(w, depart, arrivee):
+        QTest.mousePress(w.toile, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier, depart)
+        QTest.mouseMove(w.toile, arrivee)
+        QTest.mouseRelease(w.toile, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier, arrivee)
+
+    for ident, attribut in (('snellslaw', 'theta'), ('threeviewsspectra', 'angle'), ('emspectrum', 'l'),
+                            ('milkywayrotationalvelocity', 'r')):
+        w = catalogue.PAR_ID[ident].charger()()
+        w.resize(900, 700)
+        w.show()
+        propre.processEvents()
+        w.toile.repaint()
+        avant = getattr(w, attribut).value()
+        t = w.toile
+        if ident == 'snellslaw':
+            glisser(w, QPoint(t.width() // 2 - 150, t.height() // 2 - 60), QPoint(t.width() // 2 - 40, t.height() // 2 - 200))
+        elif ident == 'threeviewsspectra':
+            cx, cy, k = w._scene
+            glisser(w, QPoint(int(cx - 4.6 * k), int(cy)), QPoint(int(cx), int(cy - 4.6 * k)))
+        elif ident == 'emspectrum':
+            r = w._zone
+            glisser(w, QPoint(int(r.left() + 10), int(r.center().y())), QPoint(int(r.right() - 10), int(r.center().y())))
+        else:
+            ax = w._axes
+            glisser(w, QPoint(int(ax.px(3.0)), int(ax.py(150))), QPoint(int(ax.px(18.0)), int(ax.py(150))))
+        assert getattr(w, attribut).value() != pytest.approx(avant), ident
+        w.close()
+    w = catalogue.PAR_ID['dopplershift'].charger()()
+    w.resize(900, 700)
+    w.show()
+    propre.processEvents()
+    w.toile.repaint()
+    boite, k = w._zone
+    avant = list(w.obs)
+    glisser(w, QPoint(int(boite.left() + avant[0] * k), int(boite.top() + avant[1] * k)),
+            QPoint(int(boite.left() + 20 * k), int(boite.top() + 40 * k)))
+    assert w.obs != avant
+    w.close()
+
+
+def test_atome_absorbe_puis_reemet(propre):
+    from coupole.modules.anim import lumiere
+    w = catalogue.PAR_ID['hydrogenatom'].charger()()
+    w.transition.setCurrentIndex(w.transition.findData('1-3'))
+    w.tirer_transition()
+    for _ in range(15):                                  # 1,5 s : le photon arrive et il est absorbé
+        w.pas(0.1)
+    assert w.n == 3
+    for _ in range(80):                                  # puis l'atome retombe, en émettant
+        w.pas(0.1)
+    assert w.n == 1 and any('3 → ' in j for j in w.journal)
+    w.e.setValue(14.0)
+    w.tirer()
+    for _ in range(15):
+        w.pas(0.1)
+    assert w.n == 0                                      # ionisé
+    assert lumiere.transition_ev(1, 3) == pytest.approx(12.09, abs=0.005)
+    w.close()
+
+
+def test_ccd_pose_et_lecture(propre):
+    w = catalogue.PAR_ID['buckets'].charger()()
+    w.pose.setValue(4.0)
+    w.poser()
+    for _ in range(400):
+        w.pas(0.1)
+        if w.mode == 'fini':
+            break
+    assert w.mode == 'fini'
+    lues = [v for ligne in w.lues for v in ligne]
+    assert None not in lues and len(lues) == 20
+    assert max(lues) == w.lues[1][2] or max(lues) == w.lues[1][1] or max(lues) == w.lues[2][2]   # l'étoile
+    w.close()
+
+
+def test_courbe_de_lumiere_mesures(propre):
+    w = catalogue.PAR_ID['lightcurve'].charger()()
+    w.mesurer()
+    assert len(w.points) == 1
+    w.c_auto.setChecked(True)
+    for _ in range(100):
+        w.pas(0.1)
+    assert len(w.points) > 10
+    w.effacer()
+    assert not w.points
+    w.close()
+
+
+def test_prereglages_lot3(propre):
+    """Choisir un système réel règle tous les curseurs (transits, vitesses radiales, binaires à éclipses)."""
+    w = catalogue.PAR_ID['transitsimulator'].charger()()
+    w.prereglage.setCurrentIndex(w.prereglage.findData('HD 189733 b'))
+    w._appliquer()
+    assert w.rp.value() == pytest.approx(1.13) and w.i.value() == pytest.approx(85.71)
+    w.close()
+    w = catalogue.PAR_ID['radialvelocitysimulator'].charger()()
+    w.prereglage.setCurrentIndex(w.prereglage.findData('HD 39091 b'))
+    w._appliquer()
+    assert w.e.value() == pytest.approx(0.642) and w.i.value() == pytest.approx(45.8)
+    w.close()
+    w = catalogue.PAR_ID['eclipsingbinarysim'].charger()()
+    w.prereglage.setCurrentIndex(w.prereglage.findData('EK Cep'))
+    w._appliquer()
+    assert w.r1.value() == pytest.approx(0.095 * 16.58, rel=1e-3) and w.donnees()
+    assert any('cart' in lab for lab, _ in w.valeurs())
     w.close()

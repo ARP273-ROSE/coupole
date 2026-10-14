@@ -2,6 +2,52 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.4.0 — 14 October 2026
+
+**« Animations » module, batch 3: the last 32 animations; the ClassAction catalogue is complete (92 out of 92).**
+
+- **Light and spectra (8)**: a nail heated until it melts (colour and brightness computed from Planck's law and human
+  vision, instead of the original movie), blackbody curves (five curves, Wien's law, area σT⁴/π, U, B, V, R
+  magnitudes and colour indices), spectrum explorer (continuous, emission, absorption, six families of lines versus
+  spectral type), electromagnetic spectrum (frequency, photon energy, objects of the same size), Doppler effect
+  (crests emitted by a moving source, received signal computed through the retarded time, draggable observer),
+  filters (blackbody, Gaussian or Sun; U, B, V, R, atmosphere, Gaussian filter; perceived colour), hydrogen atom
+  (absorbed photons, ionization, re-emission, energy levels, event log), Kirchhoff's three laws (telescope dragged
+  around a gas cloud and a light bulb).
+- **Extrasolar planets (7)**: hammer thrower and star with planet around their center of mass, radial velocity curve
+  (Sun and Jupiter, Sun and Earth, 51 Pegasi b), the Sun around the barycenter of the Solar System (true positions of
+  the planets from 1800 to 2050), period of an orbiting pulsar, shift of the spectral lines, transit simulator (NAAP,
+  9 real planets, noisy measurements), radial velocity simulator (NAAP, eccentric and inclined orbits, real planets).
+- **Binary and variable stars (4)**: eclipsing binaries (NAAP) with 46 real systems and their observed light curves,
+  seven of them « to complete »; building a light curve measurement after measurement; center of mass; aliasing
+  (wagon wheel seen frame by frame).
+- **Other topics (13)**: properties of the planets (histograms), formation temperatures and condensation, snow seen
+  from a car (radiant of meteor showers), proton-proton chain and CNO cycle (energy of each step), rotation curve of
+  the Milky Way and enclosed mass, density waves (tractor and cars), balloon universe and Hubble-Lemaître law, redshift
+  of the spectrum of M32, telescope (magnification, field, resolving power, focus), CCD sensor (exposure and readout
+  pixel by pixel), Snell's law (total internal reflection, Fresnel, Brewster), lookback time (supernovae of 1054 and
+  1006).
+- **The original movies** (nail, hammer thrower, balloon, fusion reactions, electromagnetic spectrum, traffic jam…)
+  have become interactive simulations.
+- **Real data, sources cited (NOTICE)**: Landolt (1992) U, B, V, R filters; CIE 1931 colour matching functions
+  corrected by Judd and Vos; spectrum of M32 (Santos et al. 2002); light curves of the Catalog and Atlas of Eclipsing
+  Binaries (digitized from the original); exoplanets from the NASA Exoplanet Archive (2026) instead of the 2007 values
+  (e.g. HD 209458 b: 1.39 R♃, circular orbit); planets from the NASA Planetary Fact Sheet (2026: 95 moons for Jupiter,
+  274 for Saturn); DE440 masses and Standish elements (JPL); AME 2020 mass excesses; Gaia rotation curve (Eilers et al.
+  2019) beyond 5 kpc.
+- **Corrections of the original**: exact SI constants (σ, Wien's constant from x = 5 (1 − e⁻ˣ), h, c), hydrogen at
+  13.598 eV (reduced mass) and hc = 1,239.84 eV nm (the original: 13.6 and 1,240), sRGB transform of the IEC 61966-2-1
+  standard, period of 0.1158 d for a = 1 R☉ (the original: 0.1155), surface brightness of binaries in the V filter
+  from Planck's law, Rayleigh and Dawes in millimetres, eclipses through the exact overlap area of the discs.
+- **Verification**: `outils/verif_anim/verif_anim.sage` recomputes the new quantities by other routes (Wien root,
+  numerical integration of Planck's law, Fresnel's sine and tangent laws, retarded time and radial velocities by roots
+  and derivatives, overlap area by integration, Seager and Mallén-Ornelas transit duration, barycenter by rotation
+  matrices); tests against ERFA (barycenter better than 5 × 10⁻⁵ AU), against the observed light curves of the
+  binaries, steady state of the density waves; interface tests (mouse, atom absorbing then re-emitting, complete CCD
+  readout, presets).  Rendering ≤ 5 ms per frame.
+- Help (F1), FR/EN manuals (tables of the 92 animations, computations and results of batch 3, screenshots), README,
+  NOTICE.
+
 ## 0.3.1 — 14 October 2026
 
 **« Animations » module, batch 2: the Moon, the Renaissance, ancient astronomy and stellar properties; 60 animations
