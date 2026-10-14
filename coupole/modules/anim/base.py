@@ -198,8 +198,11 @@ class Toile(QWidget):
         self.anim = anim
         self.setMinimumSize(300, 250)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        self.setMouseTracking(False)
+        # suivi de la souris sans bouton : info-bulle des titres abrégés, survol propre à l'animation
+        self.setMouseTracking(True)
         self._dernier = None
+        self._titres = []
+        self._infobulle = False
         self.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
 
     def sizeHint(self):
@@ -217,6 +220,28 @@ class Toile(QWidget):
             self.anim.dessiner(p, r)
         finally:
             p.end()
+        self._maj_titres()
+
+    def _maj_titres(self):
+        """Titres complets des panneaux dans le nom accessible de la toile ; boîtes gardées pour l'info-bulle."""
+        self._titres = dessin.titres_poses()
+        noms = list(dict.fromkeys(t['complet'] for t in self._titres))
+        nom = '%s — %s' % (self.anim.nom_accessible(), ' ; '.join(noms)) if noms else self.anim.nom_accessible()
+        if nom != self.accessibleName():
+            self.setAccessibleName(nom)
+
+    def _survol_titre(self, pos):
+        """Info-bulle du titre complet seulement au-dessus d'un titre abrégé (rien ailleurs sur la toile)."""
+        for t in self._titres:
+            x, y, w, h = t['boite']
+            if t['abrege'] and x <= pos.x() <= x + w and y <= pos.y() <= y + h:
+                if self.toolTip() != t['complet']:
+                    self.setToolTip(t['complet'])
+                self._infobulle = True
+                return
+        if self._infobulle:
+            self.setToolTip('')
+            self._infobulle = False
 
     def mousePressEvent(self, ev):
         pos = ev.position()
@@ -225,6 +250,10 @@ class Toile(QWidget):
 
     def mouseMoveEvent(self, ev):
         if self._dernier is None:
+            pos = ev.position()
+            self._survol_titre(pos)
+            if self.anim.survoler(pos):
+                self.update()
             return
         pos = ev.position()
         dx, dy = pos.x() - self._dernier.x(), pos.y() - self._dernier.y()
@@ -332,6 +361,14 @@ class Animation(QWidget):
 
     def relacher(self, pos: QPointF):
         self._glisse = None
+
+    def survoler(self, pos: QPointF) -> bool:
+        """Souris qui survole la toile sans bouton enfoncé : vrai s'il faut redessiner (rien par défaut)."""
+        return False
+
+    def nom_accessible(self) -> str:
+        """Nom de la scène pour les lecteurs d'écran (les titres complets des panneaux y sont ajoutés)."""
+        return tr('anim_nom_' + self.ID.lower()) if self.ID else ''
 
     def molette(self, pos: QPointF, delta: float) -> bool:
         """Molette sur la toile (delta en huitièmes de degré) ; rend True si l'animation s'en sert."""

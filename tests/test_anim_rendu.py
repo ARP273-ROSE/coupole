@@ -572,3 +572,78 @@ def test_fuzz_glisser_pendant_la_lecture(appli, ident, proj):
     if a.ANIMEE and a.en_lecture:
         a.basculer_lecture()
     a.close()
+
+
+# ------------------------------------------------------------------ titres des panneaux (0.4.2)
+def test_mise_en_page_des_titres():
+    from coupole.modules.anim import dessin
+
+    def mesure(s):
+        return len(s) * 7
+
+    assert dessin.titre_court('Système de Copernic (vu du nord)') == 'Système de Copernic'
+    assert dessin.titre_court('Système de Ptolémée : épicycle sur le déférent') == 'Système de Ptolémée'
+    t = 'Vénus au télescope (taille apparente à l’échelle)'
+    assert dessin.mettre_en_page_titre(t, 1000, False, mesure) == ([t], False)
+    lignes, abrege = dessin.mettre_en_page_titre(t, 200, True, mesure)
+    assert len(lignes) == 2 and not abrege and ' '.join(lignes) == t
+    assert dessin.mettre_en_page_titre(t, 140, False, mesure) == (['Vénus au télescope'], True)
+    lignes, abrege = dessin.mettre_en_page_titre(t, 70, False, mesure)
+    assert abrege and lignes[0].endswith('…')
+    for larg in (0, 7, 30, 60, 100, 150, 220, 400):
+        for deux in (True, False):
+            assert all(mesure(x) <= max(larg, 7) for x in dessin.mettre_en_page_titre(t, larg, deux, mesure)[0])
+
+
+@pytest.mark.parametrize('ident', [e.id for e in catalogue.ENTREES])
+def test_titres_dans_leur_panneau(appli, ident):
+    """Pour chaque animation, en français et en anglais, à 420 px de large (et dans les autres formats) : chaque titre
+    de panneau reste dans son panneau, aucun ne recouvre un autre (bogue des « Phases de Vénus » sur fenêtre étroite)."""
+    from coupole.core import i18n
+    from coupole.modules.anim import dessin
+    fautes = []
+    langue = i18n.langue()
+    try:
+        for lg in ('fr', 'en'):
+            i18n.choisir_langue(lg)
+            a = catalogue.PAR_ID[ident].charger()()
+            for w, h in ((420, 560), (300, 640)) + TAILLES[1:]:
+                a.image(w, h)
+                t = dessin.titres_poses()
+                for j, u in enumerate(t):
+                    x, y, bw, bh = u['boite']
+                    px, py, pw, ph = u['panneau']
+                    if x < px + 4 or x + bw > px + pw - 4 or y < py or y + bh > py + ph:
+                        fautes.append('%s %dx%d : titre « %s » hors de son panneau' % (lg, w, h, u['complet']))
+                    for v in t[j + 1:]:
+                        if _recouvrement(u['boite'], v['boite']) > 0.25:
+                            fautes.append('%s %dx%d : « %s » et « %s »' % (lg, w, h, u['complet'], v['complet']))
+            a.close()
+    finally:
+        i18n.choisir_langue(langue)
+    assert not fautes, fautes[:6]
+
+
+def test_titre_abrege_infobulle_et_nom_accessible(appli):
+    """Un titre abrégé garde son texte complet : info-bulle au survol du titre, et nom accessible de la toile."""
+    from PyQt6.QtCore import QPoint, Qt
+    from PyQt6.QtTest import QTest
+    from coupole.modules.anim import dessin
+    a = catalogue.PAR_ID['venusphases'].charger()()
+    a.resize(420, 330)
+    a.show()
+    appli.processEvents()
+    a.toile.repaint()
+    appli.processEvents()
+    t = a.toile._titres
+    assert t and all(u['complet'] in a.toile.accessibleName() for u in t)
+    # info-bulle : seulement au-dessus d'un titre abrégé (titre factice posé sur la toile déjà dessinée)
+    a.toile._titres = [{'boite': (20.0, 10.0, 120.0, 16.0), 'abrege': True, 'complet': 'Titre complet (long)'}]
+    QTest.mouseMove(a.toile, QPoint(60, 18))
+    appli.processEvents()
+    assert a.toile.toolTip() == 'Titre complet (long)'
+    QTest.mouseMove(a.toile, QPoint(a.toile.width() // 2, a.toile.height() - 5))
+    appli.processEvents()
+    assert a.toile.toolTip() == ''
+    a.close()
+    assert dessin.titre_court('A (b)') == 'A'

@@ -88,14 +88,15 @@ def police(p, taille_relative: float = 1.0, gras: bool = False) -> QFont:
 # comprises) ; les textes tournés ne sont pas déplacés.  Mêmes règles que Coupole Web (src/noyau/dessin.ts).
 _etiquettes: list = []
 _objets: list = []
+_titres: list = []
 _cadre = None
 _lumiere = None
 
 
 def debut_image(p=None, r: QRectF | None = None):
     """À appeler au début de chaque image (fait par la toile et Animation.image) : `r` est toute la toile."""
-    global _etiquettes, _objets, _cadre, _lumiere
-    _etiquettes, _objets, _cadre, _lumiere = [], [], None, None
+    global _etiquettes, _objets, _titres, _cadre, _lumiere
+    _etiquettes, _objets, _titres, _cadre, _lumiere = [], [], [], None, None
     if p is not None and r is not None:
         a, d, e, f, _ = _matrice(p)
         _cadre = (a * r.x() + e, d * r.y() + f, abs(a * r.width()), abs(d * r.height()))
@@ -104,6 +105,12 @@ def debut_image(p=None, r: QRectF | None = None):
 def etiquettes_posees() -> list:
     """Boîtes (x, y, l, h) des étiquettes posées depuis le début de l'image (tests)."""
     return list(_etiquettes)
+
+
+def titres_poses() -> list:
+    """Titres des panneaux posés depuis le début de l'image : dictionnaires {'boite', 'panneau' (x, y, l, h en
+    pixels de la toile), 'complet', 'lignes', 'abrege'} (tests, info-bulle et nom accessible de la toile)."""
+    return list(_titres)
 
 
 def _matrice(p):
@@ -782,9 +789,68 @@ def zones_principale(rect: QRectF, n_secondaires: int = 2, part: float = 0.56):
     return out
 
 
+def titre_court(t: str) -> str:
+    """Forme courte d'un titre : sans ses parenthèses, puis sans ce qui suit les deux-points."""
+    s = re.sub(r'\s*\([^()]*\)', '', t).strip()
+    m = re.search(r'\s*:\s', s)
+    if m and m.start() > 0:
+        s = s[:m.start()].strip()
+    return s or t
+
+
+def _en_lignes(t: str, larg: float, n: int, mesure):
+    """Coupe `t` en mots sur au plus `n` lignes de largeur `larg` ; None si un mot ou une ligne ne tient pas."""
+    lignes, cur = [], ''
+    for m in t.split():
+        essai = cur + ' ' + m if cur else m
+        if mesure(essai) <= larg:
+            cur = essai
+        else:
+            if not cur or mesure(m) > larg:
+                return None
+            lignes.append(cur)
+            cur = m
+    if cur:
+        lignes.append(cur)
+    return lignes if len(lignes) <= n else None
+
+
+def _avec_ellipse(t: str, larg: float, mesure) -> str:
+    """Plus long début de `t` qui tient dans `larg` avec « … » (au moins « … »)."""
+    lo, hi = 0, len(t)
+    while lo < hi:
+        m = (lo + hi + 1) // 2
+        if mesure(t[:m].rstrip() + '…') <= larg:
+            lo = m
+        else:
+            hi = m - 1
+    return t[:lo].rstrip() + '…'
+
+
+def mettre_en_page_titre(t: str, larg: float, deux_lignes: bool, mesure):
+    """Mise en page d'un titre de panneau dans la largeur `larg` : (lignes, abrégé).  En entier sur une ligne s'il
+    tient ; sinon sur deux lignes si le panneau est assez haut ; sinon sa forme courte (sans parenthèses ni
+    sous-titre), sur une ou deux lignes ; sinon coupé par « … ».  Jamais plus large que `larg`.  Comme le web."""
+    if mesure(t) <= larg:
+        return [t], False
+    n = 2 if deux_lignes else 1
+    plein = _en_lignes(t, larg, n, mesure)
+    if plein:
+        return plein, False
+    court = titre_court(t)
+    if court != t:
+        c2 = _en_lignes(court, larg, n, mesure)
+        if c2:
+            return c2, True
+    base = court if court != t and mesure(court) <= mesure(t) else t
+    return [_avec_ellipse(base, larg, mesure)], True
+
+
 def cadre(p, r: QRectF, titre: str | None = None):
     """Fond arrondi d'un panneau, avec son titre en haut à gauche ; rend le rectangle utile.  Un nouveau panneau
-    oublie la source de lumière des astres."""
+    oublie la source de lumière des astres.  Le titre ne déborde jamais du panneau (donc jamais sur le panneau
+    voisin) : deux lignes, forme courte ou « … » s'il le faut ; le titre complet reste dans `titres_poses()`
+    (info-bulle et nom accessible de la toile)."""
     oublier_lumiere()
     p.save()
     p.setPen(stylo('grille', 1.0, 0.8))
@@ -792,10 +858,34 @@ def cadre(p, r: QRectF, titre: str | None = None):
     p.drawRoundedRect(r.adjusted(3, 3, -3, -3), 10, 10)
     p.restore()
     if titre:
+        h_base = p.fontMetrics().height()
         police(p, 0.95, gras=True)
-        texte(p, r.x() + 12, r.y() + 8 + p.fontMetrics().ascent(), titre, centre=False)
+        fm = QFontMetricsF(p.font())
+        larg = max(0.0, r.width() - 24)
+        lignes, abrege = mettre_en_page_titre(titre, larg, r.height() >= 150, fm.horizontalAdvance)
+        a, d, e, f, tourne = _matrice(p)
+        y0 = r.y() + 8
+        p.setPen(c('texte'))
+        for i, ligne in enumerate(lignes):
+            # tracé direct (pas texte()) : le titre est déjà ajusté à son panneau, il ne bouge ni ne rétrécit
+            y = y0 + fm.ascent() + i * fm.height()
+            w = fm.horizontalAdvance(ligne)
+            if not tourne:
+                X, Y = a * (r.x() + 12) + e, d * (y - fm.ascent()) + f
+                _objets.append((min(X, X + a * w), min(Y, Y + d * fm.height()), abs(a * w), abs(d * fm.height())))
+            p.drawText(QPointF(r.x() + 12, y), ligne)
+        if not tourne:
+            lw = max(fm.horizontalAdvance(x) for x in lignes)
+            X, Y = a * (r.x() + 12) + e, d * y0 + f
+            PX, PY = a * r.x() + e, d * r.y() + f
+            hh = len(lignes) * fm.height()
+            _titres.append({'boite': (min(X, X + a * lw), min(Y, Y + d * hh), abs(a * lw), abs(d * hh)),
+                            'panneau': (min(PX, PX + a * r.width()), min(PY, PY + d * r.height()),
+                                        abs(a * r.width()), abs(d * r.height())),
+                            'complet': titre, 'lignes': lignes, 'abrege': abrege})
+        h_titre = (len(lignes) - 1) * fm.height()
         police(p, 1 / 0.95)
-        return r.adjusted(8, 10 + p.fontMetrics().height(), -8, -8)
+        return r.adjusted(8, 10 + h_base + h_titre, -8, -8)
     return r.adjusted(8, 8, -8, -8)
 
 
