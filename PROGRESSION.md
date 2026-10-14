@@ -1142,3 +1142,36 @@ route : bouton « Version web », projections polaires et globe 3D du simulateur
   (jour-nuit aligné sur le web, garde-fous, Voie lactée) poussés : CI `tests.yml` **6/6** (Linux, Windows, macOS ×
   3.10, 3.12) ; au premier, macOS 3.12 rouge sur `test_qualite_inventaire::test_annulation_pendant_l_inventaire`
   (sensible au temps, sans rapport), vert à la relance.
+
+## 2026-10-14 — 0.4.2 : machine d'Anticythère (93ᵉ animation), titres de panneaux, Kirchhoff, jour-nuit
+Demandes : titres de panneaux qui se chevauchaient en fenêtre étroite (Phases de Vénus, Copernic et Ptolémée) ;
+trois vues d'un spectre (ampoule devant le nuage annoncée « absorption ») ; globe 3D par défaut dans le jour-nuit ;
+nouvelle animation « machine d'Anticythère » en 3D, adaptée d'Anticythere3D (même auteur), sans OpenGL.  Fait dans
+Coupole Web d'abord (0.2.0), puis ici, avec le même rendu (section « Choix graphiques » du PROGRESSION.md de Coupole
+Web, sous-sections « Titres de panneaux », « Trois vues d'un spectre » et « Machine d'Anticythère »).
+
+### Fait
+- [x] Kirchhoff (`animations/kirchhoff.py`) : `vue()` calcule les distances d'entrée dans le nuage et dans l'ampoule
+  le long de la visée ; absorption seulement si le gaz est traversé avant l'ampoule ; visée arrêtée sur l'ampoule ;
+  télescope sur un cercle de rayon 5,6 (tube hors du halo), étiquette hors du halo (`dessin.reserver(...,
+  toujours=True)`).  `tests/test_anim_kirchhoff.py` (0° continu, 180° absorption, ampoule hors nuage, nuage seul,
+  balayage contre une marche le long du rayon, étiquette hors du halo à 4 tailles).  Références inchangées.
+- [x] Titres (`dessin.cadre`) : une ligne, deux lignes (panneau ≥ 150 px), forme courte (`titre_court`) ou « … » ;
+  `titres_poses()` ; la toile suit la souris (info-bulle du titre complet sur un titre abrégé seulement, crochet
+  `Animation.survoler`) et a un nom accessible avec les titres complets.  Test des 92 (93) animations à 420 et 300 px
+  et aux autres formats, FR et EN.
+- [x] Jour-nuit : projection par défaut « globe ».
+- [x] Anticythère : `anticythere_meca.py` (sans Qt, identique à `src/calc/anticythere.ts`), `animations/anticythere.py`
+  (QPainter : `QTransform` affine par plan, tri du peintre, cache `QImage` des cadrans 256–2048 px, couronne pour les
+  faces cachées, spirales précalculées), `textes_anticythere.py`, catalogue (`LOT4`, `HORS_CLASSACTION`), lien croisé
+  dans la description (`setOpenExternalLinks`).  SageMath : `outils/verif_anim/anticythere_verif.sage` →
+  `tests/anticythere_reference_sage.json` (conteneur `sagemath`).  `tests/test_anim_anticythere.py` : tests du
+  mécanisme d'Anticythere3D, références Sage, caméra (1 000 glissers aberrants), rendu des 6 vues × 2 éclatements × 3
+  tailles, survol, toucher, manivelle, lecture, rendu rapide.
+- [x] Mesures (`image()`, NAS chargé, charge 20–40, médiane de 20) : fermée 0,9–4,0 ms, ouverte 7,2–9,3 ms (420 et
+  720 px) ; avant les couronnes et spirales précalculées, 13–18 ms.
+- [x] Aide F1, manifeste (93 animations), manuels FR (84 p.) et EN (81 p.) : section « La machine d'Anticythère
+  (0.4.2) », captures nouvelles et régénérées (`outils/captures_anim.py`), NOTICE, README, CHANGELOG FR puis EN,
+  VERSION 0.4.2.
+- [x] Validation locale (image coupole-test, Python 3.12, offscreen) : **1086 réussis, 22 sautés, code 0**.
+- **Aucun tag ni Release.**

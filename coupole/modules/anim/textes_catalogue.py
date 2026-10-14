@@ -1,4 +1,5 @@
-"""Noms et descriptions FR/EN des 92 animations du catalogue ClassAction.
+"""Noms et descriptions FR/EN des 93 animations : les 92 du catalogue ClassAction et la machine d'Anticythère
+(adaptée d'Anticythere3D, du même auteur).
 
 Descriptions anglaises : celles du catalogue d'origine (animations.xml de ClassAction, University of Nebraska-Lincoln
 Astronomy Education, Apache License 2.0), coquilles corrigées ; françaises : traductions."""
@@ -187,6 +188,9 @@ NOMS_DESCRIPTIONS = {
     'trafficdensity': ('Analogie des embouteillages', 'Traffic Density Analogy',
         "La file qui se forme derrière un tracteur lent : analogie de l'onde de densité qui forme les bras spiraux.",
         'The build-up of traffic behind a slow moving tractor provides an analogy to the density wave formation of spiral arms.'),
+    'antikythera': ('La machine d’Anticythère', 'The Antikythera Mechanism',
+        "Le calculateur astronomique grec du IIᵉ siècle av. J.-C., en 3D : on tourne la manivelle et les 33 roues font avancer le calendrier égyptien, le Soleil et la Lune dans le zodiaque, la phase de la Lune, les planètes du Cosmos, les spirales métonique et du Saros et leurs glyphes d’éclipses. Machine fermée ou ouverte, étages éclatés, rapports exacts des engrenages. Adaptée d’Anticythere3D, du même auteur.",
+        'The Greek astronomical calculator of the 2nd century BC, in 3D: turn the crank and the 33 gears drive the Egyptian calendar, the Sun and the Moon through the zodiac, the Moon phase, the planets of the Cosmos, the Metonic and Saros spirals and their eclipse glyphs. Closed or open machine, exploded levels, exact gear ratios. Adapted from Anticythere3D, by the same author.'),
     'venusphases': ('Phases de Vénus', 'Phases of Venus',
         'Aspect de Vénus au télescope pendant que les planètes parcourent leurs orbites ; à comparer au modèle de Ptolémée.',
         'Shows what Venus looks like through a telescope as the planets go around in their orbits. Compare with the Ptolemaic Phases of Venus simulation.'),

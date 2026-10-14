@@ -72,6 +72,7 @@ class Panneau(QWidget):
         self.l_desc = QLabel('')
         self.l_desc.setWordWrap(True)
         self.l_desc.setTextFormat(Qt.TextFormat.RichText)
+        self.l_desc.setOpenExternalLinks(True)          # lien croisé (Anticythere3D)
         self.l_desc.setMinimumHeight(self.l_desc.fontMetrics().height() * 4)
         g.addWidget(self.l_desc)
         sp.addWidget(gauche)
@@ -196,10 +197,16 @@ class Panneau(QWidget):
     def description(e: catalogue.Entree) -> str:
         import html
         etat = tr('anim_disponible' if e.faite else 'anim_a_venir')
+        hors = catalogue.HORS_CLASSACTION.get(e.id)
+        if hors:
+            # animation hors ClassAction : sa provenance et le lien croisé vers l'application complète
+            origine = '%s<br><a href="%s">%s</a> ↗' % (html.escape(tr('anim_%s_adapte' % e.cle)), html.escape(hors[1]),
+                                                       html.escape(tr('anim_%s_lien' % e.cle)))
+        else:
+            origine = html.escape(tr('anim_titre_origine', titre=e.titre))
         return ('<b>%s</b> — <i>%s</i><br>%s<br><span>%s</span><br><small>%s</small>'
                 % (html.escape(tr('anim_nom_' + e.cle)), html.escape(etat), formule.enrichir(tr('anim_desc_' + e.cle)),
-                   html.escape(tr('anim_titre_origine', titre=e.titre)),
-                   html.escape(tr('anim_theme_de', theme=tr('anim_theme_' + e.theme)))))
+                   origine, html.escape(tr('anim_theme_de', theme=tr('anim_theme_' + e.theme)))))
 
     # ------------------------------------------------------------ animation
     def ouvrir(self, ident: str):

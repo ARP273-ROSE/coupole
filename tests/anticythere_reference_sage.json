@@ -1,0 +1,72 @@
+{
+ "rapports": {
+  "moon_sid": "254/19",
+  "metonic": "5/19",
+  "callippic": "1/76",
+  "carrier_e3": "477/4237",
+  "saros": "940/4237",
+  "exeligmos": "235/12711"
+ },
+ "lunaisons_par_an": "235/19",
+ "reduites_annee_sur_lunaison": [
+  "12",
+  "25/2",
+  "37/3",
+  "99/8",
+  "136/11",
+  "235/19",
+  "4131/334",
+  "12628/1021"
+ ],
+ "mois_anomalistique_j": 27.55330114893617,
+ "mois_sideral_j": 27.321266181102363,
+ "mois_synodique_j": 29.530219617021277,
+ "saros_j": 6585.238974595744,
+ "exeligmos_ans": 54.08936170212766,
+ "porte_satellite_ans": 8.882599580712789,
+ "manivelle_jours_par_tour": 78.61715300448431,
+ "planetes": {
+  "mercury": {
+   "sidereal_ratio": "1993/480",
+   "periode_ans": 0.2408429503261415
+  },
+  "venus": {
+   "sidereal_ratio": "751/462",
+   "periode_ans": 0.6151797603195739
+  },
+  "mars": {
+   "sidereal_ratio": "151/284",
+   "periode_ans": 1.880794701986755
+  },
+  "jupiter": {
+   "sidereal_ratio": "29/344",
+   "periode_ans": 11.862068965517242
+  },
+  "saturn": {
+   "sidereal_ratio": "15/442",
+   "periode_ans": 29.466666666666665
+  }
+ },
+ "entraxes_mm": {
+  "a1-b1": 135.5,
+  "b2-c1": 51.0,
+  "c2-d1": 36.0,
+  "d2-e2": 79.5,
+  "e5-k1": 50.0,
+  "k2-e6": 50.0,
+  "e1-b3": 32.0,
+  "b2-l1": 51.0,
+  "l2-m1": 74.5,
+  "m2-n1": 34.0,
+  "n2-p1": 37.5,
+  "p2-o1": 36.0,
+  "m3-e3": 125.0,
+  "e4-f1": 120.5,
+  "f2-g1": 42.0,
+  "g2-h1": 40.0,
+  "h2-i1": 37.5
+ },
+ "tenon_fente_amplitude_deg": 6.579592944977629,
+ "nabonassar_jd": 1448638,
+ "dents_total": 2000
+}

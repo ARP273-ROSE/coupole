@@ -1145,7 +1145,7 @@ now run on Windows, macOS and Linux, in French and English, in the Coupole theme
 checked reference formulas. After ClassAction, University of Nebraska-Lincoln Astronomy Education, Apache License 2.0
 (\texttt{NOTICE} and \texttt{LICENCES/Apache-2.0.txt} files).
 
-\paragraph{Catalogue.} On the left, the 92 animations of the original catalogue, sorted by topic (coordinates and
+\paragraph{Catalogue.} On the left, the 92 animations of the original catalogue, plus a 93rd (the Antikythera Mechanism, section~\ref{sec:anticythere}), sorted by topic (coordinates and
 motions, Moon, Renaissance and orbits, stellar properties, light and spectra, extrasolar planets…), with a search
 (French or English, accents ignored) and filters by topic and status. Topics follow a teaching order, from the
 introduction and the sky seen from the Earth to cosmology. Each has its name and description in both
@@ -1220,6 +1220,58 @@ windows were moved (legends, clocks, hydrogen levels, building shadow, Sun's ray
 \capture{img/anim_gravcalc_en.png}{0.95}
 \capture{img/anim_hammerthrower_en.png}{0.95}
 \capture{img/anim_bigdipper_en.png}{0.95}
+
+\subsection{The Antikythera Mechanism (0.4.2)}\label{sec:anticythere}
+\capture{img/anim_antikythera_avant_en.png}{0.95}
+A 93rd animation, outside ClassAction, under “Ancient astronomy”: the Greek astronomical calculator of the 2nd century
+BC, in 3D, adapted from \emph{Anticythere3D}, by the same author (full application:
+\texttt{github.com/ARP273-ROSE/Anticythere3D}). Tooth counts (Freeth et al., \emph{Nature}~444, 2006;
+\emph{Nature}~454, 2008), trains, exact ratios (fractions), the layout of the 15 arbors (constrained optimisation, 17
+exact centre distances), the pin and slot, the dials and their graduations are those of Anticythere3D 1.3.1, taken
+unchanged, with its tests.
+
+\paragraph{Handling.} Grab the crank handle (right side of the front face) and turn it: one turn of the handle is
+$48/223$ of a turn of the great wheel b1, that is 78.6~days. Elsewhere, dragging turns the machine in any direction
+(quaternion orientation, never invalid); \emph{Play} turns the crank once per second (times the speed);
+\emph{Today}, \emph{+1~lunation}, \emph{+1~year}. \emph{Case}: closed machine (wooden case, bronze plates engraved in
+Greek) or open (the 33 gears coloured by function, with a legend); \emph{Exploded levels} spreads the 16 meshing planes
+along the arbors; \emph{View}: front face, back face or three-quarter. Hovering over a gear (or tapping it) gives its
+name, teeth, exact ratio in turns per year and function.
+
+\paragraph{What the dials show.} Front: zodiac (360 divisions, Greek names, parapegma letters), 365-day Egyptian
+calendar ring, turned so that the Sun pointer shows the date (era of Nabonassar, 1~Thoth of year~1 = JD~1,448,638,
+checked with SageMath), Sun and Moon pointers, half-silvered phase ball, Cosmos rings (Freeth et al.,
+\emph{Scientific Reports}~11:5821, 2021) whose small sphere shows the planet's geocentric longitude (period relation
+and epicycle). Back: Metonic spiral (5~turns, 235~cells, Corinthian months, years in Greek numerals), Saros spiral
+(4~turns, 223~cells, computed $\mathrm{H}$ and $\Sigma$ glyphs), Callippic, exeligmos (0, 8, 16~h) and Games dials, each on the arbor
+that carries its pointer. The values: date (Gregorian or Julian), Egyptian date, Sun, Moon, phase, anomaly correction,
+node, spiral cells, possible eclipse, planets, error against the real sky (Meeus).
+
+\paragraph{Rendering without OpenGL.} Orthographic projection and painter's algorithm: all parts are flat and
+parallel, each is drawn in its plane through an exact affine transform, the planes are sorted along the line of sight,
+the arbors are cut into segments at the planes of the gears that may cover them; the closed case is convex, only its
+visible faces are drawn. The engraved dials are drawn as vectors (same strokes as Anticythere3D) and cached in an image
+whose resolution follows the zoom; teeth smaller than 3~pixels are replaced by the pitch circle. A frame costs 1 to
+4~ms closed, 5 to 9~ms open (QPainter, 420 to 720~pixels, loaded NAS); in Coupole Web, 0.4 to 1.2~ms (Chromium,
+emulated phone) and 1.5 to 5~ms with a CPU slowed down 4 times.
+
+\paragraph{Checks.} SageMath (\texttt{outils/verif\_anim/anticythere\_verif.sage}, tooth counts typed again, rational
+arithmetic): sidereal Moon $254/19$, hence $254-19=235$ lunations in 19~years ($235/19$, a convergent of the continued
+fraction of the year in lunations), Metonic $5/19$, Callippic $1/76$, Saros $940/4237=(4/223)(235/19)$, exeligmos
+$235/12711$ (54.09~years), carrier $477/4237$ (8.8826~years), anomalistic month of the machine 27.5533~d, pin-and-slot
+amplitude $\arcsin(1.1/9.6)=6.58^\circ$, 17 centre distances. The tests of Anticythere3D (ratios, carrier, pin and
+slot, return of the dials, planets, calibration, centre distances) are taken over, with rendering tests (views,
+aberrant drags while playing, hovered gear, crank); the displayed values are identical, character for character, to
+those of Coupole Web.
+
+\capture{img/anim_antikythera_arriere_en.png}{0.95}
+\capture{img/anim_antikythera_ouverte_en.png}{0.95}
+
+\paragraph{Other fixes (0.4.2).} Panel titles no longer spill onto the neighbouring panel in a narrow window (Phases
+of Venus, Copernican and Ptolemaic, and 20 other animations): wrapped on two lines, shortened or ended with “…”, the
+full title staying in a tooltip and in the scene's accessible name. Three views of a spectrum: the opaque bulb hides
+the cloud behind it (continuous spectrum); absorption appears only when the gas lies between the telescope and the
+bulb. The day-night simulator now opens on the 3D globe.
 
 \subsection{Available animations}
 \begin{center}
@@ -1600,5 +1652,5 @@ Astrophoto). ASTAP: \url{https://www.hnsky.org/astap.htm}. Observatory codes: Mi
 contributors. SIMBAD and Sesame: CDS, Strasbourg (Wenger et al. 2000); Aladin Lite (CDS); NED (NASA/IPAC); JPL
 Small-Body Database (NASA/JPL). Cosmology: Planck Collaboration (2020, A\&A 641, A6); Hinshaw et al. (2013, WMAP 9);
 Riess et al. (2022, SH0ES); Hogg (1999, astro-ph/9905116); Komatsu et al. (2011) for the massive-neutrino density;
-astropy.cosmology; « cosmologie-redshift » calculator (same author). Archives: MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), NOIRLab Astro Data Archive, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS of the Ring-Moon Systems Node, Imaging Node); reproject (Astropy); Rector et al. (2007, AJ 133, 598) for chromatic ordering; amateur practices: see \texttt{docs/archives\_methode.md}. Animations: ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0); Meeus (1998, \emph{Astronomical Algorithms}, 2nd ed.); P03 / IAU 2006 obliquity; IAU constellation boundaries (data shipped with astropy); Natural Earth 1:50m coastlines (public domain); STIX Two Math font (SIL OFL 1.1); NASA Exoplanet Archive, NASA Planetary Fact Sheet, JPL DE440 ephemeris and Standish elements, AME 2020, Landolt filters (1992), spectrum of M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, rotation curve: McMillan (2017) model through galpy, Eilers et al. (2019) measurements and galkin compilation (Pato \& Iocco 2017), Reid et al. (2019) arms, Wegg et al. (2015) bar.
+astropy.cosmology; « cosmologie-redshift » calculator (same author). Archives: MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), NOIRLab Astro Data Archive, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS of the Ring-Moon Systems Node, Imaging Node); reproject (Astropy); Rector et al. (2007, AJ 133, 598) for chromatic ordering; amateur practices: see \texttt{docs/archives\_methode.md}. Animations: ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0); Meeus (1998, \emph{Astronomical Algorithms}, 2nd ed.); P03 / IAU 2006 obliquity; IAU constellation boundaries (data shipped with astropy); Natural Earth 1:50m coastlines (public domain); STIX Two Math font (SIL OFL 1.1); NASA Exoplanet Archive, NASA Planetary Fact Sheet, JPL DE440 ephemeris and Standish elements, AME 2020, Landolt filters (1992), spectrum of M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, rotation curve: McMillan (2017) model through galpy, Eilers et al. (2019) measurements and galkin compilation (Pato \& Iocco 2017), Reid et al. (2019) arms, Wegg et al. (2015) bar; Antikythera Mechanism: adapted from Anticythere3D (same author), after Freeth et al. (\emph{Nature} 444, 2006; \emph{Nature} 454, 2008; \emph{Scientific Reports} 11:5821, 2021).
 \end{document}

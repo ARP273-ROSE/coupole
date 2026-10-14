@@ -1,4 +1,5 @@
-"""Catalogue des 92 animations ClassAction (University of Nebraska-Lincoln Astronomy Education, Apache 2.0).
+"""Catalogue des 93 animations : les 92 de ClassAction (University of Nebraska-Lincoln Astronomy Education, Apache 2.0)
+et la machine d'Anticythère, adaptée d'Anticythere3D (du même auteur ; fichier d'origine « Anticythere3D »).
 
 Chaque entrée : identifiant ClassAction, thème, titre d'origine (anglais), fichier Flash d'origine, et la classe
 Python qui la refait (« module:Classe » dans ``animations/``) ou None si elle est encore à venir.  Les noms et
@@ -35,6 +36,7 @@ ANIMATIONS = (
      'coordsmotion/celestialhorizon.swf', 'repere_celeste_horizon:RepereCelesteHorizon'),
     ('siderealTimeAndHourAngleDemo', 'coordsmotion', 'Sidereal Time and Hour Angle Demonstrator',
      '200level/siderealTimeAndHourAngleDemo.swf', 'angle_horaire:AngleHoraire'),
+    ('antikythera', 'ancientastro', 'Antikythera Mechanism', 'Anticythere3D', 'anticythere:Anticythere'),
     ('smallangledemo', 'ancientastro', 'Small-Angle Approximation Demonstrator', 'ancientastro/smallangledemo.swf',
      'petits_angles:PetitsAngles'),
     ('dipperclock', 'ancientastro', 'Big Dipper Clock', 'ancientastro/dipperclock.swf',
@@ -187,7 +189,11 @@ LOT3 = ('meltednail', 'bbexplorer', 'spectrum010', 'emspectrum', 'dopplershift',
         'solarsystemproperties', 'formationtemps', 'drivingthroughsnow', 'fusion01', 'fusion02',
         'milkywayrotationalvelocity', 'trafficdensity', 'balloon', 'galacticredshift', 'telescope10', 'buckets',
         'snellslaw', 'lookbacktimesim')
-ORDRE = LOT1 + LOT1_BIS + LOT2 + LOT2_BIS + LOT3
+# 0.4.2 : la machine d'Anticythère, adaptée d'Anticythere3D (du même auteur) : hors ClassAction
+LOT4 = ('antikythera',)
+#: animations qui ne viennent pas de ClassAction : identifiant → (application d'origine, adresse de son dépôt)
+HORS_CLASSACTION = {'antikythera': ('Anticythere3D', 'https://github.com/ARP273-ROSE/Anticythere3D')}
+ORDRE = LOT1 + LOT1_BIS + LOT2 + LOT2_BIS + LOT3 + LOT4
 
 
 class Entree:

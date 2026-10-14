@@ -2,6 +2,37 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.4.2 — 14 October 2026
+
+**« Animations » module: the Antikythera Mechanism in 3D (93rd animation), panel titles that no longer overflow,
+three views of a spectrum fixed, 3D globe by default in the day-night simulator.**
+
+- **Antikythera Mechanism** (“Ancient astronomy” topic, added to the 92 animations after ClassAction), adapted from
+  [Anticythere3D](https://github.com/ARP273-ROSE/Anticythere3D), by the same author: the 33 gears, their tooth counts
+  (Freeth et al. 2006, 2008), the exact ratios, the arbor layout, the pin and slot, the dials and their Greek
+  inscriptions, taken unchanged with their tests. Crank grabbed with the mouse and animated playback; date, Egyptian
+  calendar (ring turned to the Sun pointer), zodiac, phase with the half-silvered ball, Cosmos planets (period
+  relations of Freeth et al. 2021, geocentric longitude through the epicycle), Metonic and Saros spirals with their
+  pointer and eclipse glyphs, Callippic, exeligmos and Games dials; closed or open machine (“Case” box), exploded
+  levels, front, back or three-quarter view; hovering over a gear: name, teeth, exact ratio, function; link to the
+  full application.
+- **Rendering without OpenGL**: orthographic projection, quaternion camera (never an invalid orientation), painter's
+  algorithm, engraved dials cached according to the zoom, simplified teeth when they get too small: 1 to 4 ms per
+  frame closed, 5 to 9 ms open.
+- **Checked**: ratios recomputed with SageMath (Metonic 235/19, Saros 223 lunations, Callippic 1/76, exeligmos
+  235/12711, sidereal Moon 254/19, carrier 477/4237, anomalistic month, 17 centre distances, era of Nabonassar);
+  Anticythere3D's mechanism tests taken over; values identical to Coupole Web, character for character.
+- **Panel titles**: in a narrow window, a panel's title spilled onto the neighbouring panel (Phases of Venus,
+  Copernican and Ptolemaic, and 20 other animations). It is now wrapped on two lines, shortened or ended with “…”,
+  never wider than its panel; the full title stays in a tooltip and in the scene's accessible name; the 92
+  animations are tested at 420 px.
+- **Three views of a spectrum**: the telescope at 0°, aiming at the cloud with the bulb in front, announced absorption
+  lines; the opaque bulb hides the cloud: continuous spectrum. The order along the line of sight is taken into
+  account (absorption only when the gas lies between the telescope and the bulb); the telescope and its label stay
+  out of the bulb's halo.
+- **Day-night simulator**: opens on the 3D globe (a choice already remembered is kept).
+- French and English manuals: “The Antikythera Mechanism” section, new and regenerated screenshots.
+
 ## 0.4.1 — 14 October 2026
 
 **« Animations » module: modernised graphics, typeset formulas, labels without overlaps, accurate maps, and the

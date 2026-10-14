@@ -2,6 +2,37 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.4.2 — 14 octobre 2026
+
+**Module « Animations » : la machine d'Anticythère en 3D (93ᵉ animation), titres de panneaux qui ne débordent plus,
+trois vues d'un spectre corrigé, globe 3D par défaut dans le simulateur jour-nuit.**
+
+- **Machine d'Anticythère** (thème « Astronomie antique », s'ajoute aux 92 animations d'après ClassAction), adaptée
+  d'[Anticythere3D](https://github.com/ARP273-ROSE/Anticythere3D), du même auteur : les 33 roues, leurs nombres de
+  dents (Freeth et al. 2006, 2008), les rapports exacts, l'implantation des arbres, le tenon et la fente, les cadrans
+  et leurs inscriptions grecques, repris à l'identique avec leurs tests. Manivelle saisie à la souris et lecture
+  animée ; date, calendrier égyptien (anneau tourné vers l'aiguille du Soleil), zodiaque, phase avec la sphère
+  demi-argentée, planètes du Cosmos (relations de période de Freeth et al. 2021, longitude géocentrique par
+  l'épicycle), spirales métonique et du Saros avec leur aiguille et les glyphes d'éclipses, cadrans callippique,
+  exeligmos et Jeux ; machine fermée ou ouverte (case « Enveloppe »), étages éclatés, face avant, face arrière ou
+  trois-quarts ; survol d'une roue : nom, dents, rapport exact, fonction ; lien vers l'application complète.
+- **Rendu sans OpenGL** : projection orthographique, caméra par quaternion (jamais d'orientation invalide), algorithme
+  du peintre, cadrans gravés mis en cache selon le zoom, dentures simplifiées quand elles deviennent trop petites :
+  1 à 4 ms par image fermée, 5 à 9 ms ouverte.
+- **Vérifié** : rapports recalculés sous SageMath (métonique 235/19, Saros 223 lunaisons, callippique 1/76,
+  exeligmos 235/12711, Lune sidérale 254/19, porte-satellite 477/4237, mois anomalistique, 17 entraxes, ère de
+  Nabonassar) ; tests du mécanisme d'Anticythere3D repris ; valeurs identiques à Coupole Web au caractère près.
+- **Titres de panneaux** : dans une fenêtre étroite, le titre d'un panneau débordait sur le panneau voisin (Phases de
+  Vénus chez Copernic et chez Ptolémée, et 20 autres animations). Il est désormais coupé sur deux lignes, raccourci
+  ou terminé par « … », jamais plus large que son panneau ; le titre complet reste en info-bulle et dans le nom
+  accessible de la scène ; test des 92 animations à 420 px.
+- **Trois vues d'un spectre** : le télescope à 0°, visant le nuage avec l'ampoule devant, annonçait des raies
+  d'absorption ; l'ampoule, opaque, cache le nuage : spectre continu. L'ordre le long de la visée est pris en compte
+  (absorption seulement si le gaz est entre le télescope et l'ampoule) ; le télescope et son étiquette restent hors
+  du halo de l'ampoule.
+- **Simulateur jour-nuit** : s'ouvre sur le globe 3D (un choix déjà mémorisé est gardé).
+- Manuels FR et EN : section « La machine d'Anticythère », captures nouvelles et régénérées.
+
 ## 0.4.1 — 14 octobre 2026
 
 **Module « Animations » : graphismes modernisés, formules mises en forme, étiquettes sans chevauchement, cartes

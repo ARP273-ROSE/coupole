@@ -27,7 +27,11 @@ RENDUS = ('eclipticsimulator', 'lunar_applet', 'shadowsim', 'celhorcomp', 'keple
 # 0.4.1 : variantes (nom du fichier, identifiant, réglages)
 VARIANTES = (('daylightsimulator_nord', 'daylightsimulator', {'projection': 'nord', 'crepuscule': True}),
              ('daylightsimulator_globe', 'daylightsimulator', {'projection': 'globe', 'crepuscule': True}),
-             ('shadowsim_rejeu', 'shadowsim', {'rejouer': 'S20', 'instant': 0.15}))
+             ('shadowsim_rejeu', 'shadowsim', {'rejouer': 'S20', 'instant': 0.15}),
+             # 0.4.2 : la machine d'Anticythère (fermée, face avant et arrière ; ouverte et éclatée)
+             ('antikythera_avant', 'antikythera', {}),
+             ('antikythera_arriere', 'antikythera', {'face': 'arriere'}),
+             ('antikythera_ouverte', 'antikythera', {'enveloppe': False, 'face': 'trois_quarts', 'eclatement': 60}))
 
 
 def attendre(app, s):

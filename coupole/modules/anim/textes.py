@@ -66,7 +66,10 @@ TEXTES = {
     'anim_aide_html': _t(
         "<h3>Animations</h3><p>Les animations pédagogiques ClassAction de l’université du Nebraska-Lincoln, écrites à "
         "l’origine en Flash, refaites en Python pour Windows, macOS et Linux. Les 92 animations du catalogue sont "
-        "toutes disponibles, classées par thème ; celles qui n’étaient que des films sont devenues des simulations.</p>"
+        "toutes disponibles, classées par thème ; celles qui n’étaient que des films sont devenues des simulations. "
+        "S’y ajoute une 93ᵉ, dans « Astronomie antique » : la machine d’Anticythère en 3D, adaptée d’Anticythere3D, "
+        "du même auteur (manivelle à la souris, cadrans gravés en grec, machine ouverte ou éclatée, rapports exacts des "
+        "engrenages ; application complète : github.com/ARP273-ROSE/Anticythere3D).</p>"
         "<h4>Manipuler</h4><ul><li><b>Glisser</b> sur une sphère la fait tourner (le point saisi suit la souris) ; sur "
         "une étoile, la Lune, la Terre ou un observateur, les déplace. Ce que fait la souris dans chaque animation est "
         "rappelé en petit sous la scène.</li><li><b>Lecture / Pause</b> et <b>Vitesse</b> (0,1 à 10 ×) animent le temps ; "
@@ -93,7 +96,10 @@ TEXTES = {
         "NOTICE).</p>",
         "<h3>Animations</h3><p>The ClassAction teaching animations of the University of Nebraska-Lincoln, originally "
         "written in Flash, remade in Python for Windows, macOS and Linux. All 92 animations of the catalogue are "
-        "available, sorted by topic; those that were only movies have become simulations.</p>"
+        "available, sorted by topic; those that were only movies have become simulations. A 93rd is added, in "
+        "“Ancient astronomy”: the Antikythera Mechanism in 3D, adapted from Anticythere3D, by the same author (crank "
+        "turned with the mouse, dials engraved in Greek, open or exploded machine, exact gear ratios; full "
+        "application: github.com/ARP273-ROSE/Anticythere3D).</p>"
         "<h4>Handling</h4><ul><li><b>Dragging</b> a sphere rotates it (the grabbed point follows the mouse); dragging "
         "a star, the Moon, the Earth or an observer moves it. What the mouse does in each animation is recalled in "
         "small print below the scene.</li><li><b>Play / Pause</b> and <b>Speed</b> (0.1 to 10 ×) run the time; <b>Reset</b> "
@@ -899,6 +905,10 @@ TEXTES.update({k: _t(*v) for k, v in ANIM_LOT2.items()})
 from .textes_lot3 import ANIM_LOT3  # noqa: E402  (lot 3 : lumière, exoplanètes, étoiles doubles, divers)
 
 TEXTES.update({k: _t(*v) for k, v in ANIM_LOT3.items()})
+
+from .textes_anticythere import ANIM_ANTICYTHERE  # noqa: E402  (la machine d'Anticythère, d'après Anticythere3D)
+
+TEXTES.update({k: _t(*v) for k, v in ANIM_ANTICYTHERE.items()})
 
 for _cle, _fr, _en in (('buenos_aires', 'Buenos Aires', 'Buenos Aires'), ('lima', 'Lima', 'Lima'),
                        ('casablanca', 'Casablanca', 'Casablanca'), ('monrovia', 'Monrovia', 'Monrovia'),

@@ -3,6 +3,28 @@ Coupole — NOTICE
 Coupole est distribué sous licence GPL-3.0-or-later (fichier LICENSE).
 Coupole is distributed under the GPL-3.0-or-later licence (LICENSE file).
 
+Machine d'Anticythère (coupole/modules/anim/anticythere_meca.py, animations/anticythere.py)
+-----------------------------------------------------------------------------------------
+Adaptée d'Anticythere3D, du même auteur (https://github.com/ARP273-ROSE/Anticythere3D, version 1.3.1), écrite pour
+ce projet par son auteur et intégrée ici sous GPL-3.0-or-later : nombres de dents, trains, rapports exacts,
+tenon et fente, implantation des arbres, cadrans et inscriptions gravées, astronomie de calage, et ses tests.
+Adapted from Anticythere3D, by the same author (version 1.3.1), written for this project by its author and included
+here under GPL-3.0-or-later: tooth counts, trains, exact ratios, pin and slot, arbor layout, dials and engraved
+inscriptions, calibration astronomy, and its tests.
+Données scientifiques, avec leurs publications (telles que citées par Anticythere3D) / scientific data:
+  - Freeth T. et al., « Decoding the ancient Greek astronomical calculator known as the Antikythera Mechanism »,
+    Nature 444 (2006) 587-591, et notes supplémentaires (nombres de dents) ;
+  - Freeth T., Jones A., Steele J., Bitsakis Y., « Calendars with Olympiad display and eclipse prediction on the
+    Antikythera Mechanism », Nature 454 (2008) 614-617 (spirales, mois corinthiens, Jeux, glyphes d'éclipses) ;
+  - Freeth T., Higgon D., Dacanalis A., MacDonald L., Georgakopoulou M., Wojcik A., « A Model of the Cosmos in the
+    ancient Greek Antikythera Mechanism », Scientific Reports 11:5821 (2021) (relations de période des planètes,
+    anneaux du Cosmos, ligne des nœuds) ;
+  - Meeus J., Astronomical Algorithms, 2e éd., ch. 7, 25, 47, 54 (calage et écart au ciel réel).
+Glyphes d'éclipse du Saros calculés (syzygie proche d'un nœud), pas copiés de la plaque ; ère de Nabonassar
+(1er Thoth de l'an 1 = JD 1 448 638) pour le calendrier égyptien ; longitudes géocentriques des planètes par
+l'épicycle du modèle de 2021.
+
+
 Module « Animations » (coupole/modules/anim)
 --------------------------------------------
 Les animations de ce module sont refaites en Python d'après ClassAction, University of Nebraska-Lincoln Astronomy
@@ -17,7 +39,7 @@ Education, Apache License 2.0 (full text: LICENCES/Apache-2.0.txt).
               https://github.com/astroUNL/interactives-air-app
 
 Repris ou adaptés de ces sources / taken or adapted from these sources :
-  - le catalogue des 92 animations (identifiants, titres, descriptions anglaises : animations.xml) ;
+  - le catalogue des 92 animations ClassAction (identifiants, titres, descriptions anglaises : animations.xml) ;
   - les comportements, réglages et paramètres des animations (lus dans le code ActionScript d'origine) ;
   - (jusqu'en 0.4.0) le tracé des côtes du globe (shoreDemo/si100.xml, d'après les côtes GSHHS), remplacé en 0.4.1
     par Natural Earth (voir plus bas) ;
