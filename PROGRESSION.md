@@ -982,6 +982,9 @@ Demande : toutes les animations restantes des thèmes Lune (12), Renaissance (9)
 - [x] Aide F1, manifeste, manuels FR/EN (tableaux des 60 animations en quatre tableaux, 8 captures nouvelles
   via `outils/captures_anim.py`, calculs et résultats du lot 2), NOTICE (données reprises, SIMBAD), README, CHANGELOG
   FR puis EN, VERSION 0.3.1.
+- [x] Validation locale (image coupole-test, Python 3.12, offscreen) : **747 réussis, 22 sautés, code 0** (688 avant) ;
+  tests des animations sous Python 3.10 : 126 réussis.
+- [x] Commit `1df3eea` poussé : CI `tests.yml` **6/6** (Linux, Windows, macOS × 3.10, 3.12).
 - **Aucun tag ni Release.**
 
 ### Reste à faire — 32 animations « à venir »
