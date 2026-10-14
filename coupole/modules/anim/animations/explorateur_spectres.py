@@ -25,8 +25,9 @@ def courbes(classe: str) -> dict:
     if c is None:
         m = modele()
         c = {f: [] for f in FAMILLES + ('ch',)}
-        for k in range(277):
-            t = k / 4
+        # 8 points par type (comme la grille fine du modèle) : courbes lisses, sans cassure
+        for k in range(553):
+            t = k / 8
             it = m.intensites(t, classe)
             for f in c:
                 c[f].append((t, it[f]))
@@ -72,6 +73,8 @@ class ExplorateurSpectres(Animation):
         self.sp = self.curseur('type', 0.0, 69.0, 42.0, dec=0)
         self.classe = self.choix('classe', [('anim_spectroparallax_c_I', 'I'), ('anim_spectroparallax_c_III', 'III'),
                                             ('anim_spectroparallax_c_V', 'V')], 'V')
+        self.echelle = self.choix('echelle', [('anim_spectrum010_e_pedago', 'pedagogique'),
+                                              ('anim_spectrum010_e_realiste', 'realiste')], 'pedagogique')
         self.cases = {f: self.coche('f_' + f, True) for f in FAMILLES}
         self._etat()
 
@@ -98,6 +101,8 @@ class ExplorateurSpectres(Animation):
         t, cl = self.sp.value(), self._cl()
         e = modele().etalonnage(t, cl)
         out = [(tr('anim_spectrum010_mode_v'), tr('anim_spectrum010_' + mode)),
+               (tr('anim_spectrum010_echelle_v'), tr('anim_spectrum010_e_pedago_v' if self.echelle.currentData() ==
+                                                     'pedagogique' else 'anim_spectrum010_e_realiste_v')),
                (tr('anim_spectrum010_type_v'), '%s %s' % (hr.nom_type(t), cl)),
                (tr('anim_stellarlum_temperature'), '%s K' % nombre(e['teff'], 0)),
                (tr('anim_spectrum010_logg'), nombre(e['logg'], 2))]
@@ -126,7 +131,8 @@ class ExplorateurSpectres(Animation):
         haut_noms = fm.height() * 0.85 + 4 if mode == 'absorption' and r.height() > 90 else 0
         bande = QRectF(r.x() + 10, r.y() + 6 + haut_noms, r.width() - 20, max(24.0, r.height() - 34 - haut_noms - bas_note))
         fam = [] if mode == 'continu' else self.familles()
-        dessiner_bande(p, bande, t, cl, mode, None if mode == 'continu' else fam)
+        dessiner_bande(p, bande, t, cl, mode, None if mode == 'continu' else fam, True,
+                       self.echelle.currentData() == 'pedagogique')
         if haut_noms:
             self._noms_raies(p, bande, t, cl, fam)
         if rq:

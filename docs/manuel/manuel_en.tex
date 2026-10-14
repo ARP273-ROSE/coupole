@@ -1301,9 +1301,6 @@ their exact place; their credit, verbatim, is shown on the scene and as a link b
 at their temperature, CIE 1931), \emph{Enhanced colours} option. Everything is to scale except the size of the stars.
 Dragging turns the scene around the pivot; double-click: back; \emph{Play}: the scene turns slowly. A frame costs 5
 to 8~ms (QPainter, 720~pixels, loaded NAS), 0.4 to 1.1~ms in Coupole Web.
-\capture{img/anim_orion3d_ciel_en.png}{0.95}
-\capture{img/anim_orion3d_3d_en.png}{0.95}
-\capture{img/anim_orion3d_m42_en.png}{0.95}
 
 \paragraph{Hover data sheets.} In Orion in 3D, Big Dipper 3D, the Big Dipper clock, heliacal rising, the coordinate
 systems comparison and the HR diagram, hovering over a star or a nebula (or touching it, or reaching it with the
@@ -1325,6 +1322,55 @@ the 300 data sheets, Trapezium parallax (Gaia~DR3, 4 stars: 402 $\pm$ 4~pc, show
 388 $\pm$ 5~pc), ICRS $\to$ galactic matrix against its definition; colours (21 stars) and spectrum model (46
 comparisons) checked by the data sets. The numbers of Orion in 3D, the content of the sheets and their placement are
 identical to Coupole Web's (shared references).
+
+\subsection{Modules, questions and resources (0.6.0)}\label{sec:classe}
+\paragraph{Module navigation.} The \emph{Animations} module opens on the home page of the \textbf{22 ClassAction
+modules} (and two bonus modules): \emph{Modules}, \emph{Animations} (the catalogue), \emph{My modules}, \emph{My
+progress} buttons, a search and a breadcrumb (with back to the previous page). A module page has \emph{Questions}
+(Warm-up, General, Challenge, Discussion, numbered W1, G1, C1, D1, with their state $\circ$, $\bullet$, $\checkmark$, $\times$), \emph{Animations},
+\emph{Outlines}, \emph{Tables}, \emph{Images} tabs. Double-click or Enter opens an item; an outline, table or image
+opens in its own window (several at once, resizable, Escape closes them); hovering over an item shows a preview; right
+click: \emph{Add to\dots{}} a personal module.
+\capture{img/classe_accueil_en.png}{0.95}
+\capture{img/classe_module_en.png}{0.95}
+
+\paragraph{Questions.} The 517 ClassAction peer-instruction questions (Apache~2.0) are translated and rewritten as
+data (the same as in Coupole Web, same engine: the fingerprints of over 8,000 instances are identical). \emph{Adapt
+question} menus (variants), \emph{New draw}, vector figures, choices A, B, C\dots{} (keys A to H), \emph{Check} (Enter)
+records the attempt, \emph{Show answer} (R) makes the right answer flash orange then stay orange, \emph{Hint} (I),
+explanation, answer elements for discussion questions, “What changed from the original” panel, related resources $\star$ on
+the right, previous and next question (arrows, order W $\to$ G $\to$ C $\to$ D, looping), full screen (F).
+\capture{img/classe_question_en.png}{0.95}
+
+\paragraph{Outlines, tables, images.} 110 outlines, 14 tables and 109 diagrams written for Coupole (recomputed,
+sourced values): text and formulas by Coupole's formula engine, diagrams drawn by a QPainter engine that reads their
+description (real text width through \texttt{QFontMetricsF} for margins, overlap check), tables with right-aligned
+numeric columns (source in the tooltip), free photographs with their credit and licence (full list in
+\texttt{NOTICE}).
+\capture{img/classe_fiche_en.png}{0.7}
+
+\paragraph{My modules and backup.} \emph{My modules}: create, copy (including a ClassAction module), rename, delete
+(with \emph{Undo}), add or remove any question or resource, reorder (\emph{Organise} tab: drag, or Alt+$\uparrow$ and Alt+$\downarrow$).
+Everything is kept in \texttt{sauvegarde.json} in the configuration folder (atomic write, copy of the previous version):
+each animation's settings, answers, scores and attempts, progress, My modules, preferences, in the same format as
+Coupole Web. \emph{My progress}: summary per module, questions to review, \emph{Export} and \emph{Import} (merge or
+replace; Coupole Web files accepted), \emph{Reset} all or part (one animation, one module, settings, answers, My
+modules, preferences, everything), with confirmation, a copy kept in \texttt{sauvegardes/} and \emph{Undo}.
+\capture{img/classe_progression_en.png}{0.95}
+
+\paragraph{Orion in 3D, remade.} After the Big Dipper 3D: the Earth, the main stars (Betelgeuse, Bellatrix, Meissa,
+the Belt, Saiph, Rigel, the sword with Hatysa and the Trapezium) at their distances, the lines of sight and the figure on
+the celestial sphere; drag to turn the scene, \emph{Face-on (seen from the Earth)} and \emph{From the side} buttons.
+M42 (blister hollowed into the OMC-1 cloud, emitting layer, Trapezium, Veil, Bar) and IC~434 (red front lit by
+$\sigma$~Ori, Horsehead pillar, edge of Orion~B, NGC~2023) are drawn in volume after their published geometry, at their
+exact position, size enlarged $\times$12 (written in the scene). Still scene: nothing is redrawn while nothing moves.
+\capture{img/anim_orion3d_cote_en.png}{0.95}
+\capture{img/anim_orion3d_face_en.png}{0.95}
+
+\paragraph{Spectra.} The line-family intensities are computed every eighth of a type (same physics as the model,
+calibration interpolated monotonically and smoothly, PCHIP): no more plateaus or kinks. The spectrum band has a
+\emph{teaching contrast} by default (lines widened and deepened, stated below the band) or a \emph{realistic scale}.
+\capture{img/anim_spectrum010_g2_en.png}{0.95}
 
 \subsection{Available animations}
 \begin{center}

@@ -65,6 +65,28 @@ def test_moteur_spectres_reproduit_les_100_cas():
     assert err[:20] == [] and len(ref['cas']) == 100
 
 
+def test_spectres_types_entiers_comme_le_modele():
+    """Aux types entiers, l'étalonnage PCHIP est exactement celui du modèle et la grille fine des intensités retrouve
+    sa table (calculée par la même physique : écart ≤ 0,02 sur 100) ; entre deux types, plus de cassure."""
+    from coupole.modules.anim.spectre_physique import modele
+    m = modele()
+    with gzip.open(ICI / 'spectres_physiques_reference.json.gz', 'rt', encoding='utf-8') as f:
+        ref = json.load(f)
+    for c in ref['modele']:
+        if c['type'] != int(c['type']):
+            continue
+        e = m.etalonnage(c['type'], c['classe'])
+        assert abs(e['teff'] - c['etalonnage']['teff']) < 1e-6 * c['etalonnage']['teff']
+        for f, v in c['intensites'].items():
+            assert abs(m.intensites(c['type'], c['classe'])[f] - v) <= 0.02, (c['type'], c['classe'], f)
+    # He II de B0 à B1 (classe V) : décroissance monotone, sans palier ni cassure (pente continue)
+    xs = [10 + k / 32 for k in range(33)]
+    ys = [m.intensites(x, 'V')['he_ii'] for x in xs]
+    assert all(b <= a + 1e-9 for a, b in zip(ys, ys[1:]))
+    d = [b - a for a, b in zip(ys, ys[1:])]
+    assert max(abs(b - a) for a, b in zip(d, d[1:])) < 0.6
+
+
 def test_spectres_controles_physiques():
     from coupole.modules.anim.spectre_physique import modele, remarques
     m = modele()
@@ -195,7 +217,7 @@ def _anim(ident):
     return catalogue.PAR_ID[ident].charger()()
 
 
-@pytest.mark.parametrize('ident,mini', [('orion3d', 50), ('bigdipper', 7), ('dipperclock', 1), ('celhorcomp', 3),
+@pytest.mark.parametrize('ident,mini', [('orion3d', 18), ('bigdipper', 7), ('dipperclock', 1), ('celhorcomp', 3),
                                          ('hrexplorer', 1), ('heliacalrisingsim', 1)])
 def test_objets_a_fiche(app_qt, ident, mini):
     from coupole.modules.anim.fiches import toutes_les_fiches
@@ -253,19 +275,19 @@ def test_survol_toucher_clavier(app_qt):
     a.close()
 
 
-def test_orion_rendu_glissers_aberrants_et_transitions(app_qt):
+def test_orion_rendu_glissers_aberrants(app_qt):
+    """1 000 glissers (dont aberrants), tous les réglages : jamais d'angle ni de valeur non finis ; scène fixe."""
     from PyQt6.QtCore import QPointF
     a = _anim('orion3d')
+    assert not type(a).ANIMEE and not a.en_lecture
     g = random.Random(7)
     aberrants = (float('nan'), float('inf'), -float('inf'), 1e12, -1e12, 0.0)
-    for i in range(300):
-        img = a.image(820, 560)
-        assert not img.isNull()
-        if i % 25 == 0:
+    for i in range(1000):
+        if i % 40 == 0:
+            img = a.image(820, 560)
+            assert not img.isNull()
             for _, (w, _d) in list(a._defauts.items()):
-                if hasattr(w, 'mini'):
-                    w.setValue(w.mini + g.random() * (w.maxi - w.mini))
-                elif hasattr(w, 'setChecked'):
+                if hasattr(w, 'setChecked'):
                     w.setChecked(g.random() < 0.5)
                 elif hasattr(w, 'count'):
                     w.setCurrentIndex(int(g.random() * w.count()))
@@ -274,55 +296,58 @@ def test_orion_rendu_glissers_aberrants_et_transitions(app_qt):
         dy = aberrants[(i + 3) % 6] if i % 11 == 0 else (g.random() - 0.5) * 300
         a.glisser(QPointF(g.random() * 820, g.random() * 560), dx, dy)
         a.relacher(QPointF(0, 0))
-        a.pas(0.05 + g.random() * 0.3)
         assert math.isfinite(a.vue3d.az) and math.isfinite(a.vue3d.alt)
     for _, v in a.valeurs():
         assert 'nan' not in v.lower() and 'inf' not in v.lower()
-    # boutons « vue 3D » puis « vue du ciel »
-    a.reinitialiser()
-    a._aller(100)
-    for _ in range(40):
-        if not a.en_lecture:
-            break
-        a.avancer(0.1)
-    assert a.dep.value() == 100 and not a.en_lecture
-    a._aller(0)
-    for _ in range(40):
-        if not a.en_lecture:
-            break
-        a.avancer(0.1)
-    assert a.dep.value() == 0
     a.close()
 
 
-def test_orion_credits_et_images(app_qt):
-    """Plongée vers M42 : l'image est posée, son crédit est affiché mot pour mot avec un lien actif."""
+def test_orion_vues_et_scene_fixe(app_qt):
+    """Boutons « de face » et « de côté » : vue instantanée, aucune lecture ; rien ne redessine la scène au repos."""
+    from coupole.modules.anim.animations.orion3d import VUE_COTE, VUE_FACE
     a = _anim('orion3d')
-    a.cible.setCurrentIndex(1)
-    a._k = 1.0
-    a._de = a._vers = 'm42'
-    a.image(900, 640)
-    assert a.credits_visibles() and 'ESO/G. Beccari' in a.credits_visibles()[0][0]
-    a._maj_credits()
-    assert 'href="https://www.eso.org/public/images/eso1723a/"' in a.l_credits.text()
-    from coupole.modules.anim.animations.orion3d import texture
-    for f in ('m42_vst.webp', 'm42_hubble.webp', 'tete_de_cheval_vlt.webp', 'tete_de_cheval_hubble_ir.webp'):
-        assert texture(f) is not None and texture(f).width() >= 800, f
+    assert (a.vue3d.az, a.vue3d.alt) == VUE_COTE
+    a._regarder(VUE_FACE)
+    assert abs(a.vue3d.alt - VUE_FACE[1]) < 1e-9
+    assert not a.en_lecture and not a.minuteur.isActive()
+    a._regarder(VUE_COTE)
+    assert not a.en_lecture and not a.minuteur.isActive()
     a.close()
+
+
+def test_orion_nebuleuses_identiques_au_web_et_publiees():
+    """Volumes de M42 et d'IC 434 : mêmes particules que le web (référence commune), à la bonne place."""
+    from coupole.modules.anim import nebuleuses_orion as N
+    from coupole.modules.anim import orion3d_geo as O
+    ref = json.loads((Path(__file__).parent / 'nebuleuses_orion_reference.json').read_text('utf-8'))
+    assert ref['agrandi'] == N.AGRANDI
+    for n, r in zip(N.nebuleuses(), ref['nebuleuses']):
+        assert n['id'] == r['id'] and len(n['particules']) == len(r['particules'])
+        for q, x in zip(n['particules'], r['particules']):
+            assert max(abs(q['p'][i] - x[i]) for i in range(3)) < 1e-3 and q['genre'] == x[-1]
+    m42, ic = N.nebuleuses()
+    # centre de M42 = θ¹ Ori C (388 pc) ; front 0,2 pc derrière lui, agrandi ×AGRANDI
+    assert abs(O.norme(m42['centre']) - 388.0) < 0.5
+    rep = m42['reperes'][0]['p']
+    assert abs(O.norme([rep[i] - m42['centre'][i] for i in range(3)]) - 0.2 * N.AGRANDI) < 0.01
+    # σ Ori : 3,9 pc projetés de la Tête de Cheval (Gerin et al. 2009 : 3,5 pc à leur distance), agrandis
+    s = ic['etoiles'][0]['p']
+    assert 3.6 * N.AGRANDI < O.norme([s[i] - ic['centre'][i] for i in range(3)]) < 4.2 * N.AGRANDI
+    assert 300 < sum(len(n['particules']) for n in N.nebuleuses()) < 1200
 
 
 def test_rendu_rapide(app_qt):
     """Coût d'une image (hors écran, minimum de 8) : Orion dans ses vues, spectres ; NAS chargé : borne large."""
     mesures = {}
-    for ident, reglages in (('orion3d', {}), ('orion3d', {'depliement': 100}), ('orion3d', {'cible': 1}),
+    for ident, reglages in (('orion3d', {}), ('orion3d', {'nuages': True}), ('orion3d', {'face': True}),
                             ('spectrum010', {}), ('spectroparallax', {})):
         a = _anim(ident)
         for k, v in reglages.items():
-            w = a._defauts[k][0]
-            w.setValue(v) if hasattr(w, 'mini') else w.setCurrentIndex(v)
-        if ident == 'orion3d':
-            a._k = 1.0
-            a._de = a._vers = a.cible.currentData()
+            if k == 'face':
+                from coupole.modules.anim.animations.orion3d import VUE_FACE
+                a._regarder(VUE_FACE)
+            else:
+                a._defauts[k][0].setChecked(v)
         a.image(720, 470)
         ts = []
         for _ in range(8):

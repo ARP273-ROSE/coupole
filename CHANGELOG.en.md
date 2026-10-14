@@ -2,6 +2,35 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.6.0 — 14 October 2026
+
+**« Animations » module: navigation through the 22 ClassAction modules, 517 questions, outlines, tables and images,
+“My modules”, everything saved; Orion in 3D remade; smoothed spectra.**
+
+- **Module navigation**: the module opens on the home page of the 22 modules (and two bonus ones), with *Modules*,
+  *Animations*, *My modules*, *My progress*, a FR/EN search (questions, animations, outlines, tables, images) and a
+  breadcrumb. Module page with *Questions* (numbered W/G/C/D, state ○ ◐ ✓ ✗), *Animations*, *Outlines*, *Tables*,
+  *Images* tabs; resources in separate windows (several at once); hover preview; right click “Add to…”.
+- **517 questions** after ClassAction (Apache 2.0), same data and same engine as Coupole Web (identical fingerprints
+  of 8,000 instances): *Adapt question* menus, new draw, vector figures (QPainter), *Check*, *Show answer* (flashes
+  orange), hint, explanation, answer elements, “What changed”, related resources ★, previous / next, full screen; keys
+  A–H, Enter, R, I, N, F, ← →.
+- **110 outlines, 14 tables, 109 diagrams** written for Coupole (Qt widgets, formula engine, diagrams drawn by a
+  QPainter engine that reads their description with real text widths, overlap check), free photos with credit and
+  licence.
+- **My modules** (create, copy, rename, delete with undo, add, remove, reorder) and **everything saved** in
+  `sauvegarde.json` (configuration folder, atomic write, previous copy): each animation's settings, answers, scores,
+  attempts, progress, My modules, preferences, in Coupole Web's format (34 parity cases); JSON export / import shared
+  with the web; reset all or part with confirmation, kept copy and undo; *My progress* page.
+- **Orion in 3D remade after the Big Dipper 3D** (main stars at their distances, Earth, lines of sight, figure on the
+  celestial sphere, *Face-on* and *From the side* views), **M42 and IC 434 / Horsehead in volume** after their
+  published geometry, size enlarged ×12 and said so; no more unfolding or photographs; more legible labels; still
+  scene (no rendering at rest); data sheet notes translated into English.
+- **Spectrum Explorer**: intensities computed every 1/8 of a type (PCHIP calibration, checked against the model's
+  table: 0.01 out of 100), curves without plateaus or kinks; *teaching contrast* of the lines (default, stated on
+  screen) or *realistic scale*; also in the Spectroscopic Parallax.
+- FR and EN manuals: “Modules, questions and resources (0.6.0)” section, new screenshots; F1 help completed.
+
 ## 0.5.0 — 14 October 2026
 
 **« Animations » module: physically based spectra, “Orion in 3D” (94th animation), hover data sheets, true star

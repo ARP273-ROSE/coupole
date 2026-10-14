@@ -2,6 +2,37 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.6.0 — 14 octobre 2026
+
+**Module « Animations » : navigation par les 22 modules de ClassAction, 517 questions, fiches, tables et images,
+« Mes modules », sauvegarde de tout ; Orion en 3D refaite ; spectres lissés.**
+
+- **Navigation par modules** : le module s'ouvre sur l'accueil des 22 modules (et deux bonus), avec *Modules*,
+  *Animations*, *Mes modules*, *Ma progression*, une recherche FR/EN (questions, animations, fiches, tables, images) et
+  un fil d'Ariane. Page de module à onglets *Questions* (W/G/C/D numérotées, état ○ ◐ ✓ ✗), *Animations*, *Fiches*,
+  *Tables*, *Images* ; ressources dans des fenêtres séparées (plusieurs à la fois) ; aperçu au survol ; clic droit
+  « Ajouter à… ».
+- **517 questions** d'après ClassAction (Apache 2.0), mêmes données et même moteur que Coupole Web (empreintes de 8 000
+  instances identiques) : menus *Adapter la question*, nouveau tirage, figures vectorielles (QPainter), *Valider*,
+  *Montrer la réponse* (clignote en orange), indice, explication, éléments de réponse, « Ce qui a changé », ressources
+  liées ★, précédente / suivante, plein écran ; clavier A–H, Entrée, R, I, N, F, ← →.
+- **110 fiches, 14 tables, 109 schémas** écrits pour Coupole (widgets Qt, moteur de formules, schémas dessinés par un
+  moteur QPainter qui lit leur description avec la largeur réelle des textes, contrôle de non-chevauchement), photos
+  libres avec crédit et licence.
+- **Mes modules** (créer, copier, renommer, supprimer avec annulation, ajouter, retirer, réordonner) et **sauvegarde
+  de tout** dans `sauvegarde.json` (dossier de configuration, écriture atomique, copie précédente) : réglages de chaque
+  animation, réponses, scores, tentatives, progression, Mes modules, préférences, au format de Coupole Web (34 cas de
+  parité) ; export / import JSON croisé avec le web ; réinitialisation tout ou partie avec confirmation, copie gardée
+  et annulation ; page *Ma progression*.
+- **Orion en 3D refaite sur le modèle de la Grande Ourse 3D** (étoiles principales à leur distance, Terre, lignes de
+  visée, figure sur la sphère céleste, vues *De face* et *De côté*), **M42 et IC 434 / Tête de Cheval en volume**
+  d'après leur géométrie publiée, taille agrandie ×12 et signalée ; plus de dépliement ni de photographies ; étiquettes
+  plus lisibles ; scène fixe (aucun rendu au repos) ; notes des fiches traduites en anglais.
+- **Explorateur de spectres** : intensités calculées tous les 1/8 de type (étalonnage PCHIP, vérifié contre la table
+  du modèle : 0,01 sur 100), courbes sans paliers ni cassures ; *contraste pédagogique* des raies (par défaut, dit à
+  l'écran) ou *échelle réaliste* ; aussi dans la Parallaxe spectroscopique.
+- Manuels FR et EN : section « Modules, questions et ressources (0.6.0) », captures nouvelles ; aide F1 complétée.
+
 ## 0.5.0 — 14 octobre 2026
 
 **Module « Animations » : spectres sur bases physiques, « Orion en 3D » (94ᵉ animation), fiches au survol, couleur

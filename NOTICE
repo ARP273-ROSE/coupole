@@ -167,18 +167,9 @@ fiches cite sa source / data prepared for this project by its author; each value
     Foley et al. 2023, ApJ 947, 66 ; Pecaut & Mamajek 2013, ApJS 208, 9 ; noms d'étoiles : UAI, WGSN (2022-04-04).
   - Couleur des étoiles : corps noir à T_eff → CIE 1931 2° (CIE, CC BY-SA 4.0 ; table dérivée) → sRGB (W3C CSS
     Color 4), vérifiée par SageMath.
-  - Images posées sur le ciel (adaptées : recadrées, réorientées nord en haut et est à gauche, rééchantillonnées,
-    compressées en WebP), sous licence Creative Commons Attribution 4.0 International
-    (https://creativecommons.org/licenses/by/4.0/) ; crédits mot pour mot / images laid on the sky (adapted:
-    cropped, reoriented, resampled, WebP-compressed), CC BY 4.0; credits verbatim:
-      coupole/modules/anim/donnees/orion/m42_vst.webp — ESO eso1723a, https://www.eso.org/public/images/eso1723a/ — Crédit : ESO/G. Beccari
-      coupole/modules/anim/donnees/orion/m42_hubble.webp — ESA/Hubble heic0601a, https://esahubble.org/images/heic0601a/ — Crédit : NASA, ESA,
-        M. Robberto (Space Telescope Science Institute/ESA) and the Hubble Space Telescope Orion Treasury Project Team
-      coupole/modules/anim/donnees/orion/tete_de_cheval_vlt.webp — ESO eso0202a, https://www.eso.org/public/images/eso0202a/ — Crédit : ESO
-      coupole/modules/anim/donnees/orion/tete_de_cheval_hubble_ir.webp — ESA/Hubble heic1307a, https://esahubble.org/images/heic1307a/ —
-        Crédit : NASA, ESA, and the Hubble Heritage Team (AURA/STScI)
-    Le crédit est affiché avec l'image (sur la scène et en lien actif sous la scène) ; aucune approbation de l'ESO ou
-    de l'ESA n'est suggérée / the credit is shown with the image; no endorsement by ESO or ESA is implied.
+  - Orion en 3D n'emploie plus de photographies depuis 0.6.0 : M42 et IC 434 / la Tête de Cheval y sont
+    dessinées en volume d'après leur géométrie publiée (Wen & O'Dell 1995 ; O'Dell et al. 2009 ; Gerin et al.
+    2009 ; positions SIMBAD), taille agrandie et signalée à l'écran / Orion in 3D no longer uses photographs.
   - Distances de la Grande Ourse 3D : parallaxes adoptées par SIMBAD (Hipparcos 2007, Gaia), au lieu de celles de
     l'original.
 
@@ -186,3 +177,43 @@ Typographie / typography
 ------------------------
 Formateur commun aux ressources et aux applications (typographie : unités SI à exposants, nombres, notation
 scientifique, espaces fines, contrôle), écrit pour ce projet par son auteur.
+
+Modules, questions, fiches, tables et images (0.6.0) / Modules, questions, outlines, tables and images
+-------------------------------------------------------------------------------------------------
+Questions : les 517 questions d'instruction par les pairs sont adaptées de ClassAction (University of
+Nebraska-Lincoln Astronomy Education, https://github.com/astroUNL/classaction-flash-questions,
+https://github.com/astroUNL/classaction-air-app), sous licence Apache License, Version 2.0. Modifications :
+traduites en français et en anglais, réécrites en données déclaratives (énoncés, variantes, figures vectorielles),
+réponses vérifiées et parfois corrigées (champ « correction », affiché « Ce qui a changé par rapport à l'original »),
+éléments de réponse ajoutés aux questions de discussion, photographies remplacées par des images libres ou des
+schémas. Organisation en 22 modules (+ 2 modules bonus) reprise de ClassAction.
+Questions: the 517 peer-instruction questions are adapted from ClassAction (Apache License 2.0): translated into
+French and English, rewritten as declarative data, answers checked and sometimes corrected, answer elements added to
+discussion questions, photographs replaced by free images or diagrams; 22 modules (+ 2 bonus) as in ClassAction.
+
+Fiches, tables et schémas : 110 fiches, 14 tables et 109 schémas vectoriels écrits pour Coupole (aucun texte ni
+dessin repris de l'original, qui n'a pas de licence ; seules les notions et l'organisation par module sont reprises),
+valeurs recalculées (SageMath) et sourcées (sources citées dans chaque fiche : CODATA 2022, BIPM, UAI, NASA, JPL,
+articles) ; distribués sous la licence de ce dépôt.
+Outlines, tables and diagrams: written for Coupole (no text or drawing taken from the unlicensed original),
+values recomputed and sourced; distributed under this repository's licence.
+
+Photographies (fichiers coupole/modules/anim/classe/donnees/images/*.webp) : crédits et licences exacts, affichés sous chaque image ; images redimensionnées
+et converties en WebP, sans autre modification ; les images CC BY-SA restent sous CC BY-SA.
+Photographs: exact credits and licences, shown under each image; resized and converted to WebP only.
+      coupole/modules/anim/classe/donnees/images/startrails.webp — Filé d'étoiles autour du pôle Nord céleste — Benedikt Markus, CC BY-SA 4.0, via Wikimedia Commons — CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/) — https://commons.wikimedia.org/wiki/File:Circumpolar_star_trails_and_ISS_transit_over_the_Teide_volcano,_Tenerife,_Spain.jpg
+      coupole/modules/anim/classe/donnees/images/timezones.webp — Fuseaux horaires du monde — CIA, The World Factbook (2021), domaine public, via Wikimedia Commons — Public domain (https://commons.wikimedia.org/wiki/File:Standard_Time_Zones_of_the_World,_2021.svg) — https://commons.wikimedia.org/wiki/File:Standard_Time_Zones_of_the_World,_2021.svg
+      coupole/modules/anim/classe/donnees/images/hydrogenelectronclouds.webp — Nuages électroniques de l'hydrogène — PoorLeno, domaine public, via Wikimedia Commons — Public domain (https://commons.wikimedia.org/wiki/File:Hydrogen_Density_Plots.png) — https://commons.wikimedia.org/wiki/File:Hydrogen_Density_Plots.png
+      coupole/modules/anim/classe/donnees/images/solarspectrum.webp — Spectre du Soleil à haute résolution — N. A. Sharp / KPNO / NOIRLab / NSO / NSF / AURA, CC BY 4.0 — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/) — https://commons.wikimedia.org/wiki/File:High_resolution_solar_spectrum_(noao-sun).jpg
+      coupole/modules/anim/classe/donnees/images/lunareclipse2004.webp — Éclipse totale de Lune (2004) — David Ball, CC BY 2.5, via Wikimedia Commons — CC BY 2.5 (https://creativecommons.org/licenses/by/2.5/) — https://commons.wikimedia.org/wiki/File:Lunar-eclipse-2004.jpg
+      coupole/modules/anim/classe/donnees/images/lunareclipse2008.webp — Éclipse totale de Lune du 3 mars 2026 — Eclipse predictions by Fred Espenak, NASA/GSFC, domaine public — Public domain (https://www.nasa.gov/nasa-brand-center/images-and-media/) — https://eclipse.gsfc.nasa.gov/LEplot/LEplot2001/LE2026Mar03T.pdf
+      coupole/modules/anim/classe/donnees/images/seatlas2001.webp — Éclipses totales et annulaires de Soleil 2021-2040 — Eclipse predictions by Fred Espenak, NASA/GSFC, domaine public — Public domain (https://www.nasa.gov/nasa-brand-center/images-and-media/) — https://eclipse.gsfc.nasa.gov/SEatlas/SEatlas3/SEatlas2021.GIF
+      coupole/modules/anim/classe/donnees/images/solareclipse1994.webp — Éclipse annulaire de Soleil (2012) — Brocken Inaglory, CC BY-SA 3.0, via Wikimedia Commons — CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/) — https://commons.wikimedia.org/wiki/File:Solar_Eclipse_May_20,2012.jpg
+      coupole/modules/anim/classe/donnees/images/solareclipse1999.webp — Éclipse totale de Soleil (1999) — Luc Viatour (www.lucnix.be), CC BY-SA 3.0, via Wikimedia Commons — CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/) — https://commons.wikimedia.org/wiki/File:Solar_eclipse_1999_4.jpg
+      coupole/modules/anim/classe/donnees/images/solareclipse1999mir.webp — L'ombre de la Lune vue de l'espace (2017) — NASA, domaine public — Public domain (https://commons.wikimedia.org/wiki/File:ISS-52_Eclipse_2017_Umbra_Viewed_from_Space_(1).jpg) — https://commons.wikimedia.org/wiki/File:ISS-52_Eclipse_2017_Umbra_Viewed_from_Space_(1).jpg
+      coupole/modules/anim/classe/donnees/images/solareclipse2008.webp — Éclipse totale de Soleil du 12 août 2026 — Eclipse predictions by Fred Espenak, NASA/GSFC, domaine public — Public domain (https://www.nasa.gov/nasa-brand-center/images-and-media/) — https://eclipse.gsfc.nasa.gov/SEplot/SEplot2001/SE2026Aug12T.GIF
+      coupole/modules/anim/classe/donnees/images/quasar_artiste.webp — Un quasar (vue d'artiste) — ESO/M. Kornmesser, CC BY 4.0 — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/) — https://commons.wikimedia.org/wiki/File:Artist%27s_rendering_ULAS_J1120%2B0641.jpg
+      coupole/modules/anim/classe/donnees/images/hltau_alma.webp — Le disque protoplanétaire de HL Tauri — ALMA (ESO/NAOJ/NRAO), CC BY 4.0 — CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/) — https://commons.wikimedia.org/wiki/File:HL_Tau_protoplanetary_disk.jpg
+      coupole/modules/anim/classe/donnees/images/photo_andromede.webp — La galaxie d’Andromède (M31) — Adam Evans, CC BY 2.0, via Wikimedia Commons — CC BY 2.0 (https://creativecommons.org/licenses/by/2.0/) — https://commons.wikimedia.org/wiki/File:Andromeda_Galaxy_(with_h-alpha).jpg
+      coupole/modules/anim/classe/donnees/images/photo_crabe.webp — La nébuleuse du Crabe (M1) — NASA, ESA, J. Hester and A. Loll (Arizona State University), domaine public, via Wikimedia Commons — Public domain (https://commons.wikimedia.org/wiki/File:Crab_Nebula.jpg) — https://commons.wikimedia.org/wiki/File:Crab_Nebula.jpg
+      coupole/modules/anim/classe/donnees/images/photo_etacarinae.webp — Êta de la Carène et la nébuleuse de l’Homoncule — Jon Morse (University of Colorado) & NASA Hubble Space Telescope, domaine public, via Wikimedia Commons — Public domain (https://commons.wikimedia.org/wiki/File:Eta_Carinae.jpg) — https://commons.wikimedia.org/wiki/File:Eta_Carinae.jpg

@@ -37,6 +37,27 @@ def correspond(entree: catalogue.Entree, texte: str) -> bool:
     return all(m in foin for m in _sans_accents(texte).split())
 
 
+def appliquer_reglages(w, reglages: dict, tout: bool = False):
+    """Pose des réglages (clé → valeur) sur une animation ; `tout` : les autres reviennent à leur défaut."""
+    from PyQt6.QtWidgets import QCheckBox, QComboBox
+    from .base import Reglage
+    for cle, (wid, defaut) in w._defauts.items():
+        if cle not in reglages and not tout:
+            continue
+        v = reglages.get(cle, defaut)
+        try:
+            if isinstance(wid, Reglage) and isinstance(v, (int, float)) and not isinstance(v, bool):
+                wid.setValue(float(v))
+            elif isinstance(wid, QCheckBox) and isinstance(v, bool):
+                wid.setChecked(v)
+            elif isinstance(wid, QComboBox):
+                k = wid.findData(v)
+                if k >= 0:
+                    wid.setCurrentIndex(k)
+        except (TypeError, ValueError):
+            continue
+
+
 class Panneau(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -108,7 +129,28 @@ class Panneau(QWidget):
         sp.setStretchFactor(1, 4)
         sp.setSizes([280, 1000])
         sp.setChildrenCollapsible(False)
-        v.addWidget(sp, 1)
+        # navigation par modules (0.6.0) : pages des modules au-dessus du catalogue des animations
+        from .classe.gui import VueClasse
+        nav = QHBoxLayout()
+        self.b_vues = {}
+        for cle, texte in (('modules', 'classe_nav_modules'), ('animations', 'classe_nav_animations'),
+                           ('mes', 'classe_nav_mes_modules'), ('progression', 'classe_nav_progression')):
+            b = QPushButton(tr(texte))
+            b.setCheckable(True)
+            b.setAutoExclusive(True)
+            b.setToolTip(tr(texte))
+            b.clicked.connect(lambda _=False, c=cle: self.montrer(c))
+            nav.addWidget(b)
+            self.b_vues[cle] = b
+        nav.addStretch(1)
+        v.addLayout(nav)
+        self.vues = QStackedWidget()
+        self.classe = VueClasse(self)
+        self.classe.ouvrir_animation.connect(self.ouvrir)
+        self.vues.addWidget(self.classe)
+        self.vues.addWidget(sp)
+        v.addWidget(self.vues, 1)
+        self.montrer('modules')
         self._remplir()
         self._memoriser()
         self.recherche.textChanged.connect(lambda *_: self._remplir())
@@ -209,11 +251,30 @@ class Panneau(QWidget):
                    origine, html.escape(tr('anim_theme_de', theme=tr('anim_theme_' + e.theme)))))
 
     # ------------------------------------------------------------ animation
+    def montrer(self, vue: str):
+        """Vue du panneau : modules (accueil), animations (catalogue), Mes modules, Ma progression."""
+        if vue == 'animations':
+            self.vues.setCurrentIndex(1)
+        else:
+            self.vues.setCurrentIndex(0)
+            {'modules': self.classe.aller_accueil, 'mes': self.classe.aller_mes_modules,
+             'progression': self.classe.aller_progression}[vue]()
+        self.b_vues[vue].setChecked(True)
+
+    def appliquer_sauvegarde(self):
+        """Après un import ou une réinitialisation : réglages des animations ouvertes repris de la sauvegarde."""
+        from .classe.stockage import stockage
+        for ident, w in self.animations.items():
+            appliquer_reglages(w, stockage().reglages_animation(ident), tout=True)
+
     def ouvrir(self, ident: str):
         """Affiche l'animation `ident` (créée au premier affichage) ; arrête celle qu'on quitte."""
         e = catalogue.PAR_ID.get(ident)
         if e is None:
             return None
+        if hasattr(self, 'vues') and self.vues.currentIndex() != 1:
+            self.vues.setCurrentIndex(1)
+            self.b_vues['animations'].setChecked(True)
         if self.courante and self.courante in self.animations and self.courante != ident:
             self.animations[self.courante].arreter()
         self.courante = ident
@@ -235,6 +296,15 @@ class Panneau(QWidget):
                 return None
             from ...gui import adaptatif
             adaptatif.assouplir(w)
+            # sauvegarde commune (format de Coupole Web) : réglages repris, puis gardés à chaque changement
+            from .classe.stockage import stockage
+            appliquer_reglages(w, stockage().reglages_animation(ident))
+            origine = w.reglage_change
+
+            def reglage_change(w=w, origine=origine):
+                origine()
+                stockage().memoriser_reglages(w.ID, w.etat_reglages())
+            w.reglage_change = reglage_change
             self.animations[ident] = w
             self.pile.addWidget(w)
         self.pile.setCurrentWidget(w)
@@ -246,4 +316,4 @@ class Panneau(QWidget):
             w.arreter()
 
     def aide_html(self):
-        return tr('anim_aide_html')
+        return tr('anim_aide_html') + tr('classe_aide_html')

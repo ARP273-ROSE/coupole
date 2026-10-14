@@ -112,7 +112,7 @@ def test_toutes_les_ouvertures_sont_couvertes():
         if f.name == 'fichiers.py':
             continue
         n += len(re.findall(r'fichiers\.choisir_(?:dossier|fichier|enregistrement)\(', f.read_text(encoding='utf-8')))
-    assert n == 15
+    assert n == 17                     # + export et import de la sauvegarde (tests/test_classe.py)
 
 
 def _montrer(w, app):

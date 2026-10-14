@@ -1217,3 +1217,35 @@ ICRS → galactique y est calculée par astropy).
   survol (0.5.0) », tableau des animations, sources ; captures nouvelles ; CHANGELOG FR puis EN, README, NOTICE
   (sources des spectres, crédits exacts des images, CC0 Zucker, CC BY-SA Stellarium et CIE), VERSION 0.5.0.
 - **Aucun tag ni Release.**
+
+## 2026-10-14 — 0.6.0 : navigation par modules, questions, ressources, sauvegarde ; Orion en 3D refaite ; spectres lissés
+Fait dans Coupole Web d'abord (0.4.0), puis ici, avec les mêmes données et le même rendu (section « Choix graphiques »
+du PROGRESSION.md de Coupole Web, sous-sections « Modules, questions et ressources », « Sauvegarde », « Orion en 3D
+(0.4.0, refaite) », « Spectres (0.4.0) »).
+
+### Fait
+- [x] Contenus importés par `outils/importer_contenu.py DOSSIER` dans `coupole/modules/anim/classe/donnees/` (24
+  modules, 517 questions, 110 fiches, 14 tables, 109 schémas, 58 + 3 images, index de recherche, ressources liées) ;
+  moteur des questions (`classe/moteur_questions.py`) et sauvegarde (`classe/sauvegarde.py`) recopiés tels quels ;
+  références : `tests/classe_banque_empreintes.json` (8 370 instances, identiques au web), `tests/sauvegarde_cas.json`
+  (34 cas). Ajouter des questions = relancer le script.
+- [x] `classe/contenu.py` (données, recherche FR/EN pondérée comme le web), `classe/stockage.py` (JSON atomique dans le
+  dossier de configuration, copie `.prec`, écriture différée de 400 ms et à la fermeture, version future jamais
+  écrasée, reprise des réglages d'interface.json), `classe/schema_qt.py` (port de schema_svg.ts : QFontMetricsF, cadre
+  de vue, contrôle de recouvrement), `classe/figure_qt.py` (figures des questions), `classe/ressources_qt.py` (fiches,
+  tables, images avec crédit, fenêtres de ressources, aperçu), `classe/gui.py` (accueil, module, question, recherche,
+  Mes modules, progression, fil d'Ariane, export / import / réinitialisation avec copie et annulation).
+- [x] Panneau « Animations » : boutons Modules / Animations / Mes modules / Ma progression ; une animation ouverte
+  depuis un module bascule sur le catalogue ; réglages des animations repris de la sauvegarde et gardés à chaque
+  changement (`appliquer_reglages`).
+- [x] Orion en 3D refaite (`animations/orion3d.py`, `nebuleuses_orion.py` + `tests/nebuleuses_orion_reference.json`) ;
+  photographies retirées (`donnees/orion/`) ; `dessin.forcer_theme` (ciel nocturne) ; fiches : traduction des notes et
+  sources françaises en anglais (`fiche_texte.traduire_en`, même chose au web).
+- [x] Spectres : `outils/verif_anim/intensites_fines.py` (physique du modèle, 2 765 états, étalonnage PCHIP ; écart aux
+  types entiers 0,010 sur 100) → `donnees/intensites_fines.json.gz` ; `spectres_physiques.pchip` ; références
+  régénérées (`outils/verif_anim/references_spectres.py`) ; contraste pédagogique.
+- [x] Tests : `tests/test_classe.py` (données, moteur, sauvegarde, typographie, schémas, rendu des 517 questions, pages,
+  Mes modules, stockage, réglages), Orion et spectres dans `test_anim_etoiles_reelles.py`.
+- [x] Aide F1, manuels FR (92 p.) et EN, captures (`outils/captures_anim.py`), NOTICE (licences et crédits exacts),
+  CHANGELOG FR puis EN, README, VERSION 0.6.0.
+- **Aucun tag ni Release.**

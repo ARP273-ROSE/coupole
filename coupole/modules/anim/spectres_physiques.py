@@ -50,9 +50,37 @@ def _wien_x() -> float:
 WIEN_X = _wien_x()
 
 
+def pchip(ys, x: float):
+    """Interpolation cubique monotone et lisse (PCHIP de Fritsch–Carlson) d'une suite régulière ys (pas 1) en x : passe
+    par les nœuds, sans dépassement ni cassure.  Nœud absent (None) : repli comme l'interpolation linéaire."""
+    n = len(ys)
+    xx = min(max(float(x), 0.0), n - 1.0)
+    k = min(int(math.floor(xx)), n - 2)
+    s = xx - k
+    y0, y1 = ys[k], ys[k + 1]
+    if y0 is None or y1 is None:
+        return y0 if s == 0 else (y1 if s == 1 else None)
+    d = y1 - y0
+
+    def pente(dp, dn):
+        return dn if dp is None else (0.0 if dp * dn <= 0 else 2 * dp * dn / (dp + dn))
+
+    ym = ys[k - 1] if k > 0 else None
+    yp = ys[k + 2] if k + 2 < n else None
+    m0 = pente(None if ym is None else y0 - ym, d)
+    m1 = pente(None if yp is None else yp - y1, d)
+    h00 = 2 * s ** 3 - 3 * s ** 2 + 1
+    h10 = s ** 3 - 2 * s ** 2 + s
+    h01 = -2 * s ** 3 + 3 * s ** 2
+    h11 = s ** 3 - s ** 2
+    return h00 * y0 + h10 * m0 + h01 * y1 + h11 * m1
+
+
 class ModeleSpectres:
-    def __init__(self, donnees: dict):
+    def __init__(self, donnees: dict, fines: dict | None = None):
         self.d = donnees
+        # intensités des familles calculées tous les 1/pas de type (outils/verif_anim/intensites_fines.py)
+        self.fines = fines
         self.classes = donnees['classes']
         self.types = donnees['types']
         self._raies = {r['id']: r for r in donnees['raies']}
@@ -70,23 +98,27 @@ class ModeleSpectres:
         return i, j, t - i
 
     def etalonnage(self, t: float, classe: str) -> dict:
+        """Étalonnage au type t : interpolation monotone lisse (PCHIP) entre les types tabulés, T_eff en logarithme."""
         i, j, w = self._encadre(t)
-        a, b = self.d['etalonnage'][classe][i], self.d['etalonnage'][classe][j]
+        tab = self.d['etalonnage'][classe]
+        a, b = tab[i], tab[j]
+        tt = min(max(float(t), self.types[0]), self.types[-1])
         out = {}
         for k in ('teff', 'logg', 'bv', 'mv', 'rayon', 'logl'):
-            va, vb = a.get(k), b.get(k)
-            if va is None or vb is None:
-                out[k] = va if w == 0 else (vb if w == 1 else None)
-            elif k == 'teff':
-                out[k] = 10 ** ((1 - w) * math.log10(va) + w * math.log10(vb))
-            else:
-                out[k] = (1 - w) * va + w * vb
+            ys = [None if e.get(k) is None else (math.log10(e[k]) if k == 'teff' else e[k]) for e in tab]
+            v = pchip(ys, tt)
+            out[k] = None if v is None else (10 ** v if k == 'teff' else v)
         out['source'] = a['source'] if w < 0.5 else b['source']
         out['drapeaux'] = sorted(set(a['drapeaux']) | set(b['drapeaux'])) if 0 < w < 1 else list(
             (a if w == 0 else b)['drapeaux'])
         return out
 
     def intensites(self, t: float, classe: str) -> dict:
+        """Intensités des familles (0–100) : grille fine (1/8 de type) interpolée par PCHIP ; sinon table par type."""
+        if self.fines:
+            tab = self.fines['intensites'][classe]
+            x = min(max(float(t), self.types[0]), self.types[-1]) * self.fines['pas_par_type']
+            return {f: max(0.0, pchip(v, x)) for f, v in tab.items()}
         i, j, w = self._encadre(t)
         tab = self.d['intensites_familles'][classe]
         return {f: (1 - w) * v[i] + w * v[j] for f, v in tab.items()}

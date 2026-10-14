@@ -31,7 +31,35 @@ EXPRESSIONS_EN = (
     (r'naine de même sous-type', 'dwarf of the same subtype'),
     (r'table révisée', 'revised table'),
     (r'point zéro', 'zero point'),
+    # notes et commentaires des fiches d'Orion (âges, distances) : traduits plutôt que coupés
+    (r"Tête \(ISF\) ; la Queue s'étend jusqu'à ≈ 470 pc", "Head (ISF); the Tail extends to ≈ 470 pc"),
+    (r"squelette 3D \(plage ", "3D skeleton (range "),
+    (r"\(moyennes", "(means"),
+    (r"mesure propre peu fiable", "own measurement unreliable"),
+    (r", cité par ", ", cited by "),
+    (r"\(cité par ", "(cited by "),
+    (r" cité par ", " cited by "),
+    (r"\(intervalle 3σ\)", "(3σ interval)"),
+    (r"composante Aa", "component Aa"),
+    (r"distance photométrique", "photometric distance"),
+    (r"\(modèle, à prendre avec prudence pour une étoile brillante\)", "(model, to be taken with caution for a bright star)"),
+    (r"ONC dont le Trapèze", "ONC including the Trapezium"),
+    (r"distance de σ Ori AB", "distance of σ Ori AB"),
+    (r"même hypothèse que la Tête de Cheval", "same assumption as the Horsehead"),
+    (r"vestige de supernova possible", "possible supernova remnant"),
+    (r"rétroaction de l'amas ", "feedback from the cluster "),
+    (r" depuis ∼", " for ∼"),
+    (r"estimée de B−V de la composante ", "estimated from B−V of the component "),
+    (r" via la séquence des naines de ", " via the dwarf sequence of "),
 )
+
+
+def traduire_en(t: str) -> str:
+    """Texte de fiche en français → anglais (expressions connues, virgule décimale, « : » sans espace avant)."""
+    for motif, v in EXPRESSIONS_EN:
+        t = re.sub(motif, v, t)
+    t = re.sub(r'(\d),(\d)', r'\1.\2', t)
+    return re.sub(r' ([:;]) ', r'\1 ', t)
 
 
 def source_courte(s, lg: str | None = None) -> str:
@@ -41,8 +69,7 @@ def source_courte(s, lg: str | None = None) -> str:
     lg = lg or langue()
     t = s.strip()
     if lg == 'en':
-        for motif, v in EXPRESSIONS_EN:
-            t = re.sub(motif, v, t)
+        t = traduire_en(t)
         for sep in (' — ', ' ; ', ' (VizieR', ', voir', ' : «', ', résumé'):
             i = t.find(sep)
             if i > 0:
@@ -151,7 +178,9 @@ def contenu_fiche(f: dict, lg: str | None = None) -> dict:
                 nombre(age['valeur_Myr'], 1), ' ± %s' % nombre(err, 1) if isinstance(err, (int, float)) else '',
                 tr('anim_fiche_ma')), 'source': source_courte(age.get('ref'), lg)})
         elif age.get('note'):
-            L.append({'libelle': tr('anim_fiche_age'), 'valeur': source_courte(age['note'], 'fr'), 'source': ''})
+            note = traduire_en(age['note'].strip()) if lg == 'en' else age['note'].strip()
+            L.append({'libelle': tr('anim_fiche_age'), 'valeur': note[:149].rstrip() + '…' if len(note) > 150 else note,
+                      'source': ''})
     if f.get('etoiles_excitatrices'):
         L.append({'libelle': tr('anim_fiche_excitatrices'), 'valeur': ', '.join(
             re.sub(r'^\* ', '', s).split(' (')[0].split(' — ')[0].strip() for s in f['etoiles_excitatrices']), 'source': ''})

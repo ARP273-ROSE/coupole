@@ -963,3 +963,7 @@ for _v in TEXTES.values():
     for _lg in ('fr', 'en'):
         if isinstance(_v.get(_lg), str):
             _v[_lg] = _normaliser(_v[_lg])
+
+from .textes_classe import TEXTES_CLASSE  # noqa: E402
+
+TEXTES.update({k: _t(*v) for k, v in TEXTES_CLASSE.items()})

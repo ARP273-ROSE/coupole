@@ -57,6 +57,9 @@ class ParallaxeSpectro(Animation):
         self.classe = self.choix('classe', [('anim_spectroparallax_c_' + c, n) for c, n in CLASSES], 5)
         self.m = self.curseur('m', -5.0, 15.0, 1.0, dec=2)
         self.c_emission = self.coche('emission', False)
+        self.echelle = self.choix('echelle', [('anim_spectrum010_e_pedago', 'pedagogique'),
+                                              ('anim_spectrum010_e_realiste', 'realiste')], 'pedagogique',
+                                  cle_texte='anim_spectrum010_echelle')
         self._graphe = None
 
     def _cl(self) -> str:
@@ -82,6 +85,8 @@ class ParallaxeSpectro(Animation):
         rq = [x for x in remarques(self.sp.value(), self._cl()) if not r['ancien'] or x != tr('spectres_d_interpole')]
         if rq:
             out.append((tr('anim_spectrum010_remarque'), ' ; '.join(rq)))
+        out.append((tr('anim_spectrum010_echelle_v'), tr('anim_spectrum010_e_pedago_v' if self.echelle.currentData() ==
+                                                         'pedagogique' else 'anim_spectrum010_e_realiste_v')))
         return out
 
     def _description(self) -> str:
@@ -169,4 +174,4 @@ class ParallaxeSpectro(Animation):
     def _spectre(self, p, r):
         bande = QRectF(r.x() + 8, r.y() + 2, r.width() - 16, max(10.0, r.height() - 18))
         dessiner_bande(p, bande, self.sp.value(), self._cl(), 'emission' if self.c_emission.isChecked() else 'absorption',
-                       None)
+                       None, True, self.echelle.currentData() == 'pedagogique', note=False)

@@ -86,3 +86,12 @@ def interface_vierge():
     etat_interface.reinitialiser_pour_tests()
     i18n.choisir_langue('fr')        # en ordre aléatoire, un test de la CLI (`--lang en`) laissait l'anglais au suivant
     yield
+
+
+@pytest.fixture(autouse=True)
+def sauvegarde_vierge(tmp_path):
+    """Sauvegarde commune (modules, questions, Mes modules) : un fichier neuf par test."""
+    from coupole.modules.anim.classe import stockage
+    stockage.reinitialiser_pour_tests(tmp_path / 'sauvegarde.json')
+    yield
+    stockage.reinitialiser_pour_tests()

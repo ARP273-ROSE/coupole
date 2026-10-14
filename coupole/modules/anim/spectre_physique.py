@@ -26,7 +26,12 @@ def modele() -> ModeleSpectres:
     global _MODELE
     if _MODELE is None:
         with gzip.open(_DOSSIER / 'modele_spectres.json.gz', 'rt', encoding='utf-8') as f:
-            _MODELE = ModeleSpectres(json.load(f))
+            donnees = json.load(f)
+        fines = None
+        if (_DOSSIER / 'intensites_fines.json.gz').exists():
+            with gzip.open(_DOSSIER / 'intensites_fines.json.gz', 'rt', encoding='utf-8') as f:
+                fines = json.load(f)
+        _MODELE = ModeleSpectres(donnees, fines)
     return _MODELE
 
 
@@ -110,11 +115,16 @@ def couleur_etoile_teff(teff: float) -> QColor:
 _CACHE: list = []          # deux dernières bandes : (clé, QImage n × 1)
 
 
-def colonnes(t: float, classe: str, mode: str, familles, n: int) -> QImage:
+# contraste pédagogique de la bande : largeur minimale des raies (nm) et exposant appliqué à I/I_continu
+CONTRASTE_LARGEUR = 0.8
+CONTRASTE_GAMMA = 3
+
+
+def colonnes(t: float, classe: str, mode: str, familles, n: int, contraste: bool = False) -> QImage:
     """Image n × 1 des couleurs d'une bande de spectre (λ de LAMBDA_MIN à LAMBDA_MAX) : continu de Planck à T_eff,
     multiplié par I/I_continu (raies et bandes moléculaires des familles choisies) en absorption ; raies élargies à une
     colonne au moins (largeur équivalente conservée).  Mise en cache (deux dernières)."""
-    cle = (t, classe, mode, tuple(familles) if familles is not None else None, n)
+    cle = (t, classe, mode, tuple(familles) if familles is not None else None, n, contraste)
     for k, img in _CACHE:
         if k == cle:
             return img
@@ -122,8 +132,12 @@ def colonnes(t: float, classe: str, mode: str, familles, n: int) -> QImage:
     teff = m.etalonnage(t, classe)['teff']
     pas = (LAMBDA_MAX - LAMBDA_MIN) / n
     lams = [LAMBDA_MIN + (k + 0.5) * pas for k in range(n)]
-    res = m.spectre(t, classe, lams, list(familles) if familles is not None else None, max(0.25, 1.2 * pas)) \
+    # contraste pédagogique : raies élargies (résolution de CONTRASTE_LARGEUR nm) et approfondies (I/I_c)^CONTRASTE_GAMMA
+    resol = max(0.25, 1.2 * pas, CONTRASTE_LARGEUR) if contraste else max(0.25, 1.2 * pas)
+    res = m.spectre(t, classe, lams, list(familles) if familles is not None else None, resol) \
         if mode == 'absorption' else None
+    if res is not None and contraste:
+        res = [max(0.0, x) ** CONTRASTE_GAMMA for x in res]
     img = QImage(n, 1, QImage.Format.Format_RGB32)
     for k, lam in enumerate(lams):
         i = ModeleSpectres.continu_relatif(teff, lam) * (max(0.0, res[k]) if res is not None else 1.0)
@@ -133,7 +147,8 @@ def colonnes(t: float, classe: str, mode: str, familles, n: int) -> QImage:
     return img
 
 
-def dessiner_bande(p, r: QRectF, t: float, classe: str, mode: str, familles, graduer: bool = True):
+def dessiner_bande(p, r: QRectF, t: float, classe: str, mode: str, familles, graduer: bool = True,
+                   contraste: bool = False, note: bool = True):
     """Bande de spectre dans r : continu (« continu »), continu et raies d'absorption (« absorption ») ou raies
     d'émission sur fond noir (« emission ») ; graduations (nm) sous la bande si `graduer`."""
     if not (r.width() > 2 and r.height() > 2):
@@ -150,13 +165,13 @@ def dessiner_bande(p, r: QRectF, t: float, classe: str, mode: str, familles, gra
             if x['lambda'] < LAMBDA_MIN or x['lambda'] > LAMBDA_MAX:
                 continue
             a = min(1.0, max(0.12, x['profondeur'] / pmax))
-            largeur = max(1.6, (x['fwhm'] or 0) * kx)
+            largeur = max(1.6, (x['fwhm'] or 0) * kx, CONTRASTE_LARGEUR * kx if contraste else 0.0)
             col = couleur_eclairee(x['lambda'], 1.0)
             col.setAlphaF(a)
             p.fillRect(QRectF(r.left() + (x['lambda'] - LAMBDA_MIN) * kx - largeur / 2, r.top(), largeur, r.height()), col)
     else:
         n = max(60, min(720, int(math.floor(r.width() + 0.5))))
-        img = colonnes(t, classe, mode, familles, n)
+        img = colonnes(t, classe, mode, familles, n, contraste)
         p.setRenderHint(p.RenderHint.SmoothPixmapTransform, False)
         p.drawImage(r, img)
     p.setPen(dessin.stylo('grille', 1.0))
@@ -169,5 +184,11 @@ def dessiner_bande(p, r: QRectF, t: float, classe: str, mode: str, familles, gra
         for lam in range(400, 701, pas):
             dessin.texte(p, r.left() + r.width() * (lam - LAMBDA_MIN) / (LAMBDA_MAX - LAMBDA_MIN), r.bottom() + 10,
                          '%d nm' % lam, 'doux')
+        dessin.police(p, 1 / 0.8)
+    # le contraste pédagogique est dit à l'écran (jamais une échelle trompeuse sans le dire)
+    if contraste and note and mode != 'continu':
+        dessin.police(p, 0.8)
+        dessin.texte(p, r.left(), r.bottom() + (26 if graduer else 10), tr('anim_spectrum010_contraste_note'), 'accent1',
+                     centre=False)
         dessin.police(p, 1 / 0.8)
 

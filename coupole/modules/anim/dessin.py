@@ -38,7 +38,18 @@ PALETTES = {
 }
 
 
+_THEME_FORCE: str | None = None
+
+
+def forcer_theme(t: str | None):
+    """Thème imposé pendant un dessin (None : celui des réglages) ; ex. ciel nocturne d'« Orion en 3D »."""
+    global _THEME_FORCE
+    _THEME_FORCE = t if t in PALETTES else None
+
+
 def theme() -> str:
+    if _THEME_FORCE:
+        return _THEME_FORCE
     try:
         nom = config.reglages()['apparence']
     except Exception:

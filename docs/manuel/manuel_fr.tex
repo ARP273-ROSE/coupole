@@ -1347,9 +1347,6 @@ leur crédit, mot pour mot, est affiché sur la scène et en lien sous la scène
 leur température, CIE 1931), option \emph{Couleurs accentuées}. Tout est à l'échelle, sauf la taille des étoiles.
 Glisser fait tourner la scène autour du pivot ; double-clic : retour ; \emph{Lecture} : la scène tourne lentement.
 Une image coûte 5 à 8~ms (QPainter, 720~pixels, NAS chargé), 0,4 à 1,1~ms dans Coupole Web.
-\capture{img/anim_orion3d_ciel_fr.png}{0.95}
-\capture{img/anim_orion3d_3d_fr.png}{0.95}
-\capture{img/anim_orion3d_m42_fr.png}{0.95}
 
 \paragraph{Fiches au survol.} Dans Orion en 3D, la Grande Ourse 3D, l'horloge de la Grande Ourse, le lever
 héliaque, la comparaison des repères et le diagramme HR, survoler une étoile ou une nébuleuse (ou la toucher, ou y
@@ -1371,6 +1368,59 @@ et barres des 300 fiches, parallaxe du Trapèze (Gaia~DR3, 4 étoiles : 402 $\pm
 388 $\pm$ 5~pc du VLBA), matrice ICRS $\to$ galactique contre sa définition ; couleurs (21 étoiles) et modèle des spectres
 (46 comparaisons) vérifiés par les jeux de données. Les nombres d'Orion en 3D, le contenu des fiches et leur placement
 sont identiques à ceux de Coupole Web (références communes).
+
+\subsection{Modules, questions et ressources (0.6.0)}\label{sec:classe}
+\paragraph{Navigation par modules.} Le module \emph{Animations} s'ouvre sur l'accueil des \textbf{22 modules} de
+ClassAction (et deux modules bonus) : boutons \emph{Modules}, \emph{Animations} (le catalogue), \emph{Mes modules},
+\emph{Ma progression}, une recherche et un fil d'Ariane (avec retour à la page précédente). Une page de module a des
+onglets \emph{Questions} (Échauffement, Générales, Défis, Discussion, numérotées W1, G1, C1, D1, avec leur état
+$\circ$, $\bullet$, $\checkmark$, $\times$), \emph{Animations}, \emph{Fiches}, \emph{Tables}, \emph{Images}. Double-clic ou Entrée ouvre un élément ; une
+fiche, une table ou une image s'ouvre dans sa propre fenêtre (plusieurs à la fois, redimensionnables, Échap les
+ferme) ; survoler un élément montre un aperçu ; clic droit : \emph{Ajouter à\dots{}} un module personnel.
+\capture{img/classe_accueil_fr.png}{0.95}
+\capture{img/classe_module_fr.png}{0.95}
+
+\paragraph{Questions.} Les 517 questions d'instruction par les pairs de ClassAction (Apache~2.0) sont traduites et
+réécrites en données (les mêmes que dans Coupole Web, même moteur : les empreintes de plus de 8\,000 instances sont
+identiques). Menus \emph{Adapter la question} (variantes), \emph{Nouveau tirage}, figures vectorielles, choix A, B, C\dots{}
+(touches A à H), \emph{Valider} (Entrée) enregistre la tentative, \emph{Montrer la réponse} (R) fait clignoter la bonne
+réponse en orange puis la laisse orange, \emph{Indice} (I), explication, éléments de réponse des questions de
+discussion, volet « Ce qui a changé par rapport à l'original », ressources liées $\star$ à droite, question précédente et
+suivante (flèches, ordre W $\to$ G $\to$ C $\to$ D en boucle), plein écran (F).
+\capture{img/classe_question_fr.png}{0.95}
+
+\paragraph{Fiches, tables, images.} 110 fiches, 14 tables et 109 schémas écrits pour Coupole (valeurs recalculées et
+sourcées) : texte et formules par le moteur de formules de Coupole, schémas dessinés par un moteur QPainter qui lit leur
+description (largeur réelle des textes par \texttt{QFontMetricsF} pour les marges, contrôle de non-chevauchement),
+tables à colonnes numériques alignées à droite (source en info-bulle), photographies libres avec leur crédit et leur
+licence (liste complète dans \texttt{NOTICE}).
+\capture{img/classe_fiche_fr.png}{0.7}
+
+\paragraph{Mes modules et sauvegarde.} \emph{Mes modules} : créer, copier (y compris un module de ClassAction),
+renommer, supprimer (avec \emph{Annuler}), ajouter ou retirer n'importe quelle question ou ressource, réordonner
+(onglet \emph{Organiser} : glisser, ou Alt+$\uparrow$ et Alt+$\downarrow$). Tout est gardé dans \texttt{sauvegarde.json}, dans le dossier
+de configuration (écriture atomique, copie de la version précédente) : réglages de chaque animation, réponses, scores
+et tentatives, progression, Mes modules, préférences, au même format que Coupole Web. \emph{Ma progression} : bilan par
+module, questions à revoir, \emph{Exporter} et \emph{Importer} (fusionner ou remplacer ; fichiers de Coupole Web
+acceptés), \emph{Réinitialiser} tout ou partie (une animation, un module, les réglages, les réponses, Mes modules, les
+préférences, tout), avec confirmation, copie gardée dans \texttt{sauvegardes/} et \emph{Annuler}.
+\capture{img/classe_progression_fr.png}{0.95}
+
+\paragraph{Orion en 3D, refaite.} Sur le modèle de la Grande Ourse 3D : la Terre, les étoiles principales
+(Bételgeuse, Bellatrix, Meissa, la Ceinture, Saiph, Rigel, l'épée avec Hatysa et le Trapèze) à leur distance, les
+lignes de visée et la figure sur la sphère céleste ; on fait tourner la scène au glisser, boutons \emph{De face (vue de
+la Terre)} et \emph{De côté}. M42 (cloque creusée dans le nuage OMC-1, couche émissive, Trapèze, Voile, Barre) et
+IC~434 (front rouge éclairé par $\sigma$~Ori, pilier de la Tête de Cheval, bord d'Orion~B, NGC~2023) sont dessinées en
+volume d'après leur géométrie publiée, à leur position exacte, la taille agrandie $\times$12 (c'est écrit dans la scène).
+Scène fixe : rien n'est redessiné tant que rien ne bouge.
+\capture{img/anim_orion3d_cote_fr.png}{0.95}
+\capture{img/anim_orion3d_face_fr.png}{0.95}
+
+\paragraph{Spectres.} Les intensités des familles de raies sont calculées tous les huitièmes de type (même physique que
+le modèle, étalonnage interpolé de façon monotone et lisse, PCHIP) : plus de paliers ni de cassures. La bande de
+spectre a un \emph{contraste pédagogique} par défaut (raies élargies et approfondies, dit sous la bande) ou une
+\emph{échelle réaliste}.
+\capture{img/anim_spectrum010_g2_fr.png}{0.95}
 
 \subsection{Les animations disponibles}
 \begin{center}

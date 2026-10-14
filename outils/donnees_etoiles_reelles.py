@@ -123,9 +123,7 @@ def main(spectres: Path, orion: Path) -> None:
     scene = lire(orion / 'donnees' / 'orion3d_scene.json')
     scene['icrs_vers_gal'] = matrice_icrs_vers_gal()
     ecrire_gz(DONNEES / 'orion3d.json.gz', scene)
-    (DONNEES / 'orion').mkdir(exist_ok=True)
-    for t in scene['textures']:
-        shutil.copyfile(orion / 'images' / 'web' / t['fichier'], DONNEES / 'orion' / t['fichier'])
+    # (0.6.0) plus de photographies : M42 et IC 434 sont dessinées en volume (nebuleuses_orion.py)
 
     # ------------------------------------------------------------ fiches
     fiches: dict[str, dict] = {}

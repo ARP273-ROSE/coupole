@@ -36,12 +36,10 @@ VARIANTES = (('daylightsimulator_nord', 'daylightsimulator', {'projection': 'nor
              ('spectrum010', 'spectrum010', {}),
              ('spectrum010_m5', 'spectrum010', {'type': 65}),
              ('spectroparallax', 'spectroparallax', {}),
-             ('orion3d_ciel', 'orion3d', {}),
-             ('orion3d_3d', 'orion3d', {'depliement': 100}),
-             ('orion3d_m42', 'orion3d', {'cible': 'm42'}),
-             ('orion3d_m42_3d', 'orion3d', {'cible': 'm42', 'depliement': 100}),
-             ('orion3d_tete', 'orion3d', {'cible': 'tete', 'image': 'hubble'}),
-             ('orion3d_fiche', 'orion3d', {'depliement': 40}),
+             ('orion3d_cote', 'orion3d', {}),
+             ('spectrum010_g2', 'spectrum010', {'type': 42}),
+             ('orion3d_face', 'orion3d', {}),
+             ('orion3d_fiche', 'orion3d', {}),
              ('bigdipper_fiche', 'bigdipper', {}))
 
 
@@ -75,6 +73,30 @@ def main():
     w.heure.setValue(15.0)
     attendre(app, 1.0)
     f.grab().save(str(dossier / ('module_anim_%s.png' % langue)))
+    # navigation par modules (0.6.0) : accueil, module, question (réponse montrée), fiche, progression
+    v = p.classe
+    p.montrer('modules')
+    attendre(app, 0.4)
+    f.grab().save(str(dossier / ('classe_accueil_%s.png' % langue)))
+    v.aller_module('light', False, 'fiches')
+    attendre(app, 0.4)
+    f.grab().save(str(dossier / ('classe_module_%s.png' % langue)))
+    v.aller_question('intro', 'ca_intro_scale', False)
+    q = v.pile.currentWidget()
+    q.choisir(q.inst['choix'][1]['id'])
+    q.valider()
+    q.b_reponse.click()
+    attendre(app, 1.8)
+    f.grab().save(str(dossier / ('classe_question_%s.png' % langue)))
+    from coupole.modules.anim.classe.ressources_qt import fermer_toutes, ouvrir_ressource
+    fen = ouvrir_ressource('fiche', 'stellarprops_slide3')
+    fen.resize(760, 900)
+    attendre(app, 0.4)
+    fen.grab().save(str(dossier / ('classe_fiche_%s.png' % langue)))
+    fermer_toutes()
+    v.aller_progression()
+    attendre(app, 0.4)
+    f.grab().save(str(dossier / ('classe_progression_%s.png' % langue)))
     from coupole.modules.anim import catalogue
     for ident in RENDUS:
         a = catalogue.PAR_ID[ident].charger()()
@@ -116,10 +138,9 @@ def main():
                 w.setChecked(v)
             else:
                 w.setValue(v)
-        if ident == 'orion3d':
-            a.arreter()
-            a._k = 1.0
-            a._de = a._vers = a.cible.currentData()
+        if nom == 'orion3d_face':
+            from coupole.modules.anim.animations.orion3d import VUE_FACE
+            a._regarder(VUE_FACE)
         if ident == 'daylightsimulator':
             a.jour.setValue(172.0)
             a.heure.setValue(15.5)
