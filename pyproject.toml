@@ -55,6 +55,10 @@ coupole-gui = "coupole.gui.app:main"
 [tool.setuptools.dynamic]
 version = {file = "VERSION"}
 
+[tool.setuptools]
+# modules communs du kit (identiques au gabarit), à côté du paquet comme dans les paquets autonomes
+py-modules = ["updater", "reporting", "interface_kit"]
+
 [tool.setuptools.packages.find]
 include = ["coupole*"]
 

@@ -369,6 +369,13 @@ class DialogueAPropos(QDialog):
         super().__init__(parent)
         self.setWindowTitle(tr('apropos_titre'))
         v = QVBoxLayout(self)
+        # logo (une seule source : logo/coupole.svg, rendue en icônes par logo/generer_icones.py)
+        from .ressources import icone_application
+        logo = QLabel()
+        logo.setPixmap(icone_application().pixmap(96, 96))
+        logo.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        logo.setAccessibleName('Coupole')
+        v.addWidget(logo)
         from PyQt6.QtCore import QT_VERSION_STR, PYQT_VERSION_STR
         self._gabarit = '<h2>Coupole %s</h2><p>%s</p><p>%s</p><pre>%%s</pre><p>%s</p>' % (
             __version__, html.escape(tr('apropos_texte')), html.escape(tr('apropos_credits')),

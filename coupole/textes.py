@@ -163,6 +163,10 @@ TEXTES = {
     'cli_epilogue': {'fr': "Aide d'une commande : coupole <commande> --help. Manuel : coupole manuel.",
                      'en': 'Help on a command: coupole <command> --help. Manual: coupole manual.'},
     'cli_aide_version': {'fr': 'affiche la version et quitte', 'en': 'show the version and exit'},
+    'cli_aide_check': {'fr': "vérifie l'installation sans écran (fenêtre, modules, animations, données livrées) et "
+                             "quitte : code 0 si tout va bien",
+                       'en': 'check the installation without a screen (window, modules, animations, shipped data) and '
+                             'exit: code 0 if all is well'},
     'cli_aide_reinit_interface': {'fr': "efface la disposition gardée (fenêtre, colonnes, filtres, dossiers des "
                                         "dialogues) puis quitte ; les réglages ne changent pas",
                                   'en': 'erase the saved layout (window, columns, filters, file-dialog folders) and exit; '
@@ -541,15 +545,15 @@ TEXTES = {
     'reg_dialogues_fichiers_systeme': {'fr': 'Système (explorateur du bureau)', 'en': 'System (desktop file manager)'},
     'reg_dialogues_fichiers_qt': {'fr': 'Qt (dialogue intégré)', 'en': 'Qt (built-in dialog)'},
     'reg_dialogues_fichiers_aide': {
-        'fr': "Système (conseillé) : l'explorateur de votre bureau, avec ses emplacements, favoris et partages réseau "
-              "(Explorateur Windows, Finder, Dolphin ou Fichiers sous Linux, par le portail XDG). Qt : le dialogue "
-              "intégré à Coupole, en français, avec dossiers personnels, disques et partages montés dans la barre "
-              "latérale ; à choisir seulement si le dialogue du système ne s'ouvre pas ou fonctionne mal. Sous Linux, "
-              "repasser à « Système » prend effet au prochain lancement.",
-        'en': 'System (recommended): your desktop\'s file manager, with its places, bookmarks and network shares '
-              '(Windows Explorer, Finder, Dolphin or Files on Linux, through the XDG portal). Qt: the dialog built '
-              'into Coupole, with home folders, drives and mounted shares in the sidebar; pick it only if the system '
-              'dialog does not open or misbehaves. On Linux, switching back to “System” takes effect at next start.'},
+        'fr': "Système : l'explorateur de votre bureau (Explorateur Windows, Finder ; sous Linux, celui du portail XDG, "
+              "souvent réduit). Qt : la boîte de fichiers complète intégrée à Coupole (barre latérale avec dossiers "
+              "personnels, disques et partages montés, arborescence, création de dossier, champ de chemin). Par "
+              "défaut : Système sous Windows et macOS, Qt sous Linux. Sous Linux, un changement prend effet au "
+              "prochain lancement.",
+        'en': "System: your desktop's file manager (Windows Explorer, Finder; on Linux, the XDG portal's, often "
+              "reduced). Qt: the complete file dialog built into Coupole (sidebar with home folders, drives and "
+              "mounted shares, tree, new folder, path field). Default: System on Windows and macOS, Qt on Linux. On "
+              "Linux, a change takes effect at next start."},
     'aide_dossier_reseau': {
         'fr': "<p><b>Dossier sur un NAS ou un partage réseau.</b> Le dialogue « Parcourir » est l'explorateur du "
               "système : choisir le partage dans ses emplacements réseau. <i>Linux</i> : ouvrir d'abord le partage "

@@ -8,7 +8,10 @@
   "icone": "coupole.ico",
   "appid": "{{EBF5650E-E264-4F65-A851-3DCFCB799042}",
   "modules": [
-    "lancer.py"
+    "lancer.py",
+    "updater.py",
+    "reporting.py",
+    "interface_kit.py"
   ],
   "paquets": [
     "coupole"
@@ -28,7 +31,12 @@
   "essai_embarquees": "coupole.core.bibliotheques:essai_embarquees",
   "pip": [],
   "binaires": [],
-  "fichiers_proteges": [],
+  "fichiers_proteges": [
+    "reglages.json",
+    "_rapports",
+    "reglages_rapports.json",
+    "_crash_natif.log"
+  ],
   "verification_import": [
     "coupole.cli",
     "coupole.core.xisf",
@@ -44,7 +52,42 @@
     "reproject.mosaicking",
     "astropy_healpix",
     "psutil",
-    "lxml.etree"
+    "lxml.etree",
+    "updater",
+    "reporting",
+    "interface_kit",
+    "coupole.essai_fumee",
+    "PyQt6.QtSvg"
   ],
-  "_note": "Dépôt de distribution à créer (public) : ARP273-ROSE/coupole. appid tiré au hasard pour Coupole (GUID de l'installeur Windows)."
+  "icone_png": "coupole/ressources/coupole_256.png",
+  "icone_grande": "logo/coupole_512.png",
+  "icone_icns": "logo/coupole.icns",
+  "nom_affiche_fr": "Coupole",
+  "nom_affiche_en": "Coupole",
+  "description_fr": "Boîte à outils du DU « Explorer et Comprendre l'Univers » (Observatoire de Paris)",
+  "description_en": "Toolbox for the DU ECU students (Observatoire de Paris)",
+  "categories_linux": "Science;Astronomy;Education;",
+  "journal_technique": "CHANGELOG.md",
+  "langue_principale": "fr",
+  "paquet_deb": "build_deb.py",
+  "tests_ci": [
+    "tests/test_confidentialite.py",
+    "tests/test_kit.py"
+  ],
+  "qt_attendus": {
+    "windows": [
+      "plugins/imageformats/qwebp.dll",
+      "plugins/imageformats/qsvg.dll"
+    ],
+    "linux": [
+      "plugins/platformthemes/libqxdgdesktopportal.so",
+      "plugins/platformthemes/libqgtk3.so",
+      "plugins/imageformats/libqwebp.so",
+      "plugins/imageformats/libqsvg.so"
+    ],
+    "macos": [
+      "plugins/imageformats/libqwebp.dylib",
+      "plugins/imageformats/libqsvg.dylib"
+    ]
+  }
 }

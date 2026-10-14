@@ -66,8 +66,8 @@ def test_anonymisation(monkeypatch):
 
 def test_rien_ne_part_sans_accord(monkeypatch, tmp_path):
     envoyes = []
-    monkeypatch.setattr(rapports, '_poster', lambda charge: envoyes.append(charge) or True)
     rapports.init(tmp_path)
+    monkeypatch.setattr(maj.kit('reporting'), '_poster', lambda charge: envoyes.append(charge) or True)
     rapports.definir_consentement(False)
     rapports.envoyer('plantage', traceback='x')
     assert not envoyes and list((tmp_path / '_rapports').glob('*.json'))
@@ -97,8 +97,9 @@ def test_archive_piegee_refusee(tmp_path, monkeypatch):
 
         def __exit__(self, *a):
             return False
-    monkeypatch.setattr(maj, '_ouvrir', lambda url: Rep(z.read_bytes()))
+    monkeypatch.setattr(maj.kit('updater'), '_open', lambda url: Rep(z.read_bytes()))
     monkeypatch.setattr(maj, 'dossier_app', lambda: tmp_path / 'app')
+    monkeypatch.setattr(maj.kit('updater'), 'app_dir', lambda: tmp_path / 'app')
     (tmp_path / 'app').mkdir()
     with pytest.raises(RuntimeError):
         maj.appliquer({'url': 'https://github.com/x.zip', 'version': '9'})
@@ -184,7 +185,7 @@ def test_verifier_retient_le_deb_de_l_architecture(monkeypatch):
 
         def __exit__(self, *a):
             return False
-    monkeypatch.setattr(maj, '_ouvrir', lambda url: Rep(json.dumps(release).encode()))
+    monkeypatch.setattr(maj.kit('updater'), '_open', lambda url: Rep(json.dumps(release).encode()))
     monkeypatch.setattr(maj, 'depot', lambda: 'x/y')
     monkeypatch.setattr(maj, '_architecture_deb', lambda: 'amd64')
     m = maj.verifier('0.1.0')

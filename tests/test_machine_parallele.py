@@ -100,5 +100,7 @@ def test_paquets_embarquent_reproject_et_sep():
     kit = json.loads((racine / 'kit.json').read_text(encoding='utf-8'))
     assert {'sep', 'reproject', 'astropy_healpix', 'psutil'} <= set(kit['verification_import'])
     assert kit['essai_embarquees'] == 'coupole.core.bibliotheques:essai_embarquees'
+    # kit commun (0.7.0) : essayées dans le paquet Windows (workflow) et dans les paquets macOS/Linux (build_unix.py)
     wf = (racine / '.github' / 'workflows' / 'release.yml').read_text(encoding='utf-8')
-    assert wf.count('essai_embarquees') >= 3
+    assert wf.count('essai_embarquees') >= 1
+    assert 'essai_embarquees' in (racine / 'build_unix.py').read_text(encoding='utf-8')

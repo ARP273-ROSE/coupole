@@ -17,6 +17,8 @@ import traceback
 
 def main() -> int:
     os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
+    from .cli import console_tolerante
+    console_tolerante()                            # console Windows (cp1252) : jamais d'erreur d'encodage
     os.environ['COUPOLE_HOME'] = tempfile.mkdtemp(prefix='coupole-fumee-')
     os.environ['COUPOLE_SANS_RESEAU'] = '1'
     defauts: list[str] = []
@@ -55,6 +57,26 @@ def main() -> int:
         verifier(ch.exists() and not QImage(str(ch)).isNull(), 'image illisible (WebP) : %s' % ch.name)
     verifier('STIX' in formule.famille(), 'police mathématique non chargée : %r' % formule.famille())
     verifier(len(catalogue.ENTREES) >= 94, 'animations manquantes')
+    # kit commun : mise à jour et rapports importables, paquet reconnu, style figé, logo, manuels FR et EN
+    from .core import maj, rapports
+    u = maj.kit('updater')
+    maj.kit('reporting')
+    maj.kit('interface_kit')
+    verifier(bool(maj.depot()), 'dépôt de distribution inconnu')
+    if maj.est_paquet():
+        verifier(u.is_packaged() and bool(u.REPO), 'paquet non reconnu par la mise à jour (kit.json ?)')
+    rapports.init()
+    verifier(str(app.property('coupole_style')).lower() == 'fusion', 'style Qt non figé : %r' % app.property('coupole_style'))
+    from PyQt6.QtSvg import QSvgRenderer
+    from .gui.ressources import DOSSIER as RESSOURCES
+    verifier(QSvgRenderer(str(RESSOURCES / 'coupole.svg')).isValid(), 'logo SVG illisible')
+    from .cli import chemin_manuel
+    from .core import i18n
+    for lg in ('fr', 'en'):
+        i18n.choisir_langue(lg)
+        ch = chemin_manuel()
+        verifier(bool(ch) and os.path.getsize(ch) > 100_000 and ch.endswith('_%s.pdf' % lg), 'manuel %s absent' % lg)
+    i18n.choisir_langue('fr')
     # fenêtre principale, modules, animations
     from .gui.fenetre import FenetrePrincipale
     f = FenetrePrincipale()
@@ -93,6 +115,11 @@ def main() -> int:
     for nom in ('clair', 'sombre'):
         f.changer_apparence(nom)
         tourner(0.05)
+    from .gui import dialogues
+    d = dialogues.DialogueAPropos(f)
+    d.show()
+    tourner(0.2)
+    d.close()
     f.changer_langue('en')
     tourner(0.2)
     f.changer_langue('fr')

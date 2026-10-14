@@ -1,4 +1,4 @@
-; ---------------------------------------------------------------------------
+﻿; ---------------------------------------------------------------------------
 ; Installeur Windows — gabarit commun du kit.
 ;
 ; Rien ici n'est propre a une application : toutes les valeurs arrivent en
@@ -86,7 +86,8 @@ CloseApplications=yes
 RestartApplications=no
 
 [Languages]
-; Français d'abord (public francophone), anglais ensuite ; Inno choisit d'après la langue de Windows.
+; Bilingue (standard du kit) : Inno choisit d'apres la langue de Windows ;
+; le francais d'abord, l'anglais ensuite (et pour toute autre langue).
 Name: "french"; MessagesFile: "compiler:Languages\French.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
@@ -95,10 +96,10 @@ french.CreerRaccourci=Créer un raccourci sur le Bureau
 english.CreerRaccourci=Create a desktop shortcut
 french.Raccourcis=Raccourcis :
 english.Raccourcis=Shortcuts:
-french.Demarrer=Démarrer Coupole
-english.Demarrer=Start Coupole
-french.Desinstaller=Désinstaller Coupole
-english.Desinstaller=Uninstall Coupole
+french.Demarrer=Démarrer {#AppDisplayName}
+english.Demarrer=Start {#AppDisplayName}
+french.Desinstaller=Désinstaller {#AppDisplayName}
+english.Desinstaller=Uninstall {#AppDisplayName}
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreerRaccourci}"; \

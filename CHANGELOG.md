@@ -41,6 +41,15 @@ automatiquement, plusieurs plantages et gels corrigés, paquets vérifiés en vr
   Coupole Web, langue et thème à chaud, fenêtres rouvertes, effacement puis changement de thème, fermeture et
   réouverture ; suite stable en ordre aléatoire ; essai « fumée » de l'application construite (`python -m
   coupole.essai_fumee`) dans chaque paquet (Windows, macOS, Linux) ; construction d'essai sans publication.
+- **Kit commun des applications de bureau** (standard de l'auteur) : mise à jour et rapports d'incident par les
+  modules communs `updater.py` et `reporting.py`, identiques au gabarit et réglés par `kit.json` (Coupole n'en garde
+  que l'adaptation : paquet `.deb`, pip, lanceur) ; accord des rapports et identifiant d'installation repris sans
+  perte ; aucun nom de machine envoyé ; faulthandler armé avant de relever la trace du plantage précédent ;
+  `coupole --check` (essai complet sans écran) lancé sur chaque paquet ; installeur Windows bilingue et lien
+  permanent `Coupole-Setup.exe` ; paquets Linux `Coupole-X-linux-x86_64.tar.gz` / `-arm64` (installation dans le
+  profil, commande `coupole`) ; boîte de fichiers complète de Qt par défaut sous Linux ; logo dans « À propos »
+  (une seule source SVG). Mise à jour réelle essayée sous Linux : paquet 0.4.1 publié → 0.7.0 par son ancien module,
+  puis 0.7.0 → 0.7.1 par le nouveau, données intactes ; paquet `.deb` installé, vérifié et retiré dans un Ubuntu nu.
 - Banque de questions : corrections de la contre-expertise recopiées.
 
 ## 0.6.0 — 14 octobre 2026

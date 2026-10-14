@@ -1323,3 +1323,26 @@ module, question, recherche, Mes modules, Ma progression, fiche, table, image, p
   test_adaptatif) ; deux fragilités de plus trouvées et corrigées à la racine : une fenêtre de test laissée visible
   recevait les déplacements de souris du test suivant (`test_dialogue_dossier_natif_ou_qt_selon_le_reglage`), et une
   minuterie anonyme survivait à sa page (voir CHANGELOG).
+
+## 2026-10-15 — 0.7.0 (suite) : passage au standard du kit commun des applications de bureau
+Demande confirmée par l'utilisateur : standard de `_kit_windows` (modèle Anticythere3D 1.4.0), posé par
+`poser_le_kit.py Coupole --multiplateforme --confidentialite`.
+- **Gabarits enrichis de ce que Coupole avait de plus** (commit du dépôt local `_kit_windows`, options génériques) :
+  entrée `essai` du workflow (rien publié), `qt_attendus`, `essai_embarquees`, `paquet_deb` (script du dépôt + essai
+  dans un Ubuntu nu), `--check` sous Windows, installeur bilingue, lien `~/.local/bin/<tech>` + avis PATH ;
+  `updater.verifier_archive` (liens, bombes de décompression, sans plafond fixe), `page`/`actifs` ; `reporting` :
+  identifiant aléatoire au lieu du nom de la machine (que le gabarit envoyait !), masquage hôte/utilisateur, champs
+  bornés.  Tests du kit : 298 réussis.
+- **Coupole** : `updater.py`, `reporting.py`, `interface_kit.py` à la racine (identiques au gabarit ; `py-modules`
+  pour pip) ; `core/maj.py` et `core/rapports.py` réduits à l'adaptation (paquet `.deb`, pip, lanceur ; dossier de
+  données, accord et identifiant repris des réglages ≤ 0.6, borne de 64 ko, crochets, faulthandler armé avant le relevé
+  de la trace précédente mise de côté, point de collecte factice pendant les essais) ; `coupole --check`
+  (`essai_fumee` + kit, style, logo, manuels) ; boîte de fichiers Qt complète par défaut sous Linux (migration une
+  fois) ; logo dans « À propos », `generer_icones.py` recopie la source unique ; `kit.json` complet.
+- **Essais réels** : paquet Linux construit localement (`build_unix.py` du kit : 186 Mo, archive de MAJ 24 Mo sans
+  aucune donnée utilisateur) ; mise à jour réelle dans un Ubuntu nu : paquet 0.4.1 PUBLIÉ installé par son
+  installer.sh → 0.7.0 par l'ancien `maj.py` de la 0.4.1 → `--check` OK avec le python/ de la 0.4.1 → 0.7.1 par le
+  nouveau module commun, interpréteur toujours exécutable ; `.deb` 0.7.0 installé par apt, `--version`, `--check`,
+  désinstallation propre.  `tests/test_kit.py` (10).
+- Aucun rapport n'est parti vers le vrai serveur pendant les essais (COUPOLE_SANS_RESEAU → point de collecte
+  factice ; accord jamais donné dans les essais).

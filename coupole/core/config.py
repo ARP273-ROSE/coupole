@@ -77,7 +77,10 @@ DEFAUTS = {
     'langue_noms': 'auto',             # langue des noms de dossiers et d'objets
     'maj_auto': True,
     'apparence': 'sombre',             # thème de Coupole (sombre par défaut, ou clair), indépendant de celui du système
-    'dialogues_fichiers': 'systeme',   # systeme : explorateur du système (portail XDG sous Linux) ; qt : dialogue de Qt
+    # qt : boîte de fichiers complète de Qt (barre latérale avec les emplacements du système, partages compris) ;
+    # systeme : explorateur du système.  Standard du kit (0.7.0) : sous Linux, la boîte du portail est souvent réduite
+    # → Qt par défaut ; sous Windows et macOS, la boîte native est complète.
+    'dialogues_fichiers': 'qt' if sys.platform.startswith('linux') else 'systeme',
     'pixinsight_instance': 'nouvelle', # PixInsight déjà ouvert : nouvelle (-n, sûr) | envoyer (céder à l'instance)
     'services_en_ligne': True,         # fiches SIMBAD / JPL et redshift par nom (une requête par objet, cache)
     'ohp_verifier_nouveautes': True,   # Banque OHP : comparer l'inventaire TAP à la copie locale au démarrage
@@ -163,14 +166,22 @@ def _migrer(lu: dict, valeurs: dict) -> bool:
     valeur choisie par l'utilisateur est conservée.  Faite une seule fois (marqueur `debit_sans_plafond_023`) :
     un plafond de 8 Mo/s choisi ensuite reste en place.
     """
-    if lu.get('debit_sans_plafond_023'):
-        return False
-    for cle in ('debit_max_mo_s', 'archives_debit_mo_s'):
-        v = lu.get(cle)
-        if isinstance(v, (int, float)) and not isinstance(v, bool) and float(v) == ANCIEN_DEBIT_DEFAUT:
-            valeurs[cle] = 0.0
-    valeurs['debit_sans_plafond_023'] = True
-    return True
+    change = False
+    if not lu.get('debit_sans_plafond_023'):
+        for cle in ('debit_max_mo_s', 'archives_debit_mo_s'):
+            v = lu.get(cle)
+            if isinstance(v, (int, float)) and not isinstance(v, bool) and float(v) == ANCIEN_DEBIT_DEFAUT:
+                valeurs[cle] = 0.0
+        valeurs['debit_sans_plafond_023'] = True
+        change = True
+    # 0.7.0 (standard du kit) : sous Linux, l'ancien défaut « systeme » (recopié dans le fichier comme tous les
+    # réglages) passe une fois à la boîte complète de Qt ; un choix fait ensuite reste en place.
+    if not lu.get('dialogues_qt_linux_070'):
+        if sys.platform.startswith('linux') and lu.get('dialogues_fichiers') == 'systeme':
+            valeurs['dialogues_fichiers'] = 'qt'
+        valeurs['dialogues_qt_linux_070'] = True
+        change = True
+    return change
 
 
 class Reglages:

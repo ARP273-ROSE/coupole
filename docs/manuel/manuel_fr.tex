@@ -1438,6 +1438,16 @@ du fil graphique, la sauvegarde fait l'aller-retour export $\to$ effacement $\to
 export de Coupole Web), la langue et le thème changent à chaud, les réglages reviennent à la réouverture. Chaque paquet
 construit (Windows, macOS, Linux) passe un essai « fumée » sans écran : \texttt{python -m coupole.essai\_fumee}.
 
+\paragraph{Kit commun.} Coupole suit désormais le standard des applications de bureau de l'auteur : la mise à jour et
+les rapports d'incident sont les modules communs \texttt{updater.py} et \texttt{reporting.py}, identiques d'une
+application à l'autre et réglés par \texttt{kit.json} ; réglages, rapports et données vivent hors du dossier
+d'installation (l'accord donné aux versions précédentes est repris) ; aucun nom de machine n'est envoyé (identifiant
+aléatoire). \texttt{coupole -{}-check} vérifie une installation sans écran (fenêtre, modules, animations, données,
+manuels, logo, style) et rend le code 0 si tout va bien. L'installeur Windows est bilingue ; le dernier installeur a
+un lien permanent (\texttt{releases/latest/download/Coupole-Setup.exe}) ; sous Linux, l'archive
+\texttt{Coupole-X-linux-x86\_64.tar.gz} (ou \texttt{-arm64}) s'installe dans le profil par \texttt{installer.sh}
+(commande \texttt{coupole}), et la boîte de fichiers est par défaut celle, complète, de Qt.
+
 \subsection{Les animations disponibles}
 \begin{center}
 \small

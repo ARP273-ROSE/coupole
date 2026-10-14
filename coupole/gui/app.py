@@ -10,9 +10,6 @@ T0 = time.perf_counter()
 
 
 def main() -> int:
-    from PyQt6.QtCore import QTimer
-    from PyQt6.QtWidgets import QApplication
-
     from ..cli import initialiser
     from ..core import config, rapports
     initialiser()
@@ -25,8 +22,12 @@ def main() -> int:
         logging.getLogger().setLevel(logging.INFO)
     except OSError:                              # dossier en lecture seule : l'application démarre quand même
         logging.basicConfig(level=logging.WARNING)
+    # rapports (module commun du kit) et faulthandler AVANT Qt : un plantage natif au chargement de Qt ou des
+    # greffons laisse lui aussi sa trace ; celle du lancement précédent est relevée après l'armement
     rapports.init()
     rapports.installer_crochets(config.dossier_config() / '_crash_natif.log')
+    from PyQt6.QtCore import QTimer
+    from PyQt6.QtWidgets import QApplication
     from PyQt6.QtCore import Qt
     from PyQt6.QtGui import QGuiApplication
     from . import plateforme

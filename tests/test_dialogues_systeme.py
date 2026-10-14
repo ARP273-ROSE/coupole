@@ -253,8 +253,7 @@ def test_le_paquet_garde_greffons_et_traductions(tmp_path, monkeypatch):
     assert build_unix.controler_qt(pkg, 'linux') == []
     (sp / 'plugins/platformthemes/libqxdgdesktopportal.so').unlink()
     assert build_unix.controler_qt(pkg, 'linux') == ['plugins/platformthemes/libqxdgdesktopportal.so']
-    # 0.7.0 : greffon WebP (photographies des modules) gardé, PDF retiré
-    assert not (sp / 'plugins/imageformats/libqpdf.so').exists()
+    # 0.7.0 : greffon WebP (photographies des modules) exigé (kit.json « qt_attendus »)
     (sp / 'plugins/imageformats/libqwebp.so').unlink()
     assert 'plugins/imageformats/libqwebp.so' in build_unix.controler_qt(pkg, 'linux')
     # paquet Windows : même contrôle dans build_package.py
@@ -265,7 +264,7 @@ def test_le_paquet_garde_greffons_et_traductions(tmp_path, monkeypatch):
         sys.path.remove(str(RACINE))
     win = tmp_path / 'win'
     qtw = win / 'python' / 'Lib' / 'site-packages' / 'PyQt6' / 'Qt6'
-    for f in build_package.QT_ATTENDUS:
+    for f in build_package.qt_attendus():
         (qtw / f).parent.mkdir(parents=True, exist_ok=True)
         (qtw / f).write_bytes(b'x')
     assert build_package.controler_qt(win) == []
@@ -393,8 +392,10 @@ def test_lanceur_ancien_repare(tmp_path):
 def test_installer_pose_le_lien_et_signale_le_path(tmp_path):
     from coupole import __version__
     build_unix, pkg, lanceur = _paquet_simule(tmp_path)
-    (pkg / 'installer.sh').write_text(build_unix.texte_installeur(), encoding='utf-8')
-    (pkg / 'coupole.desktop').write_text('[Desktop Entry]\nExec=__ICI__/Coupole.sh\n__ICONE__Name=Coupole\n')
+    # installer.sh du kit commun (0.7.0) : lien ~/.local/bin/coupole et avis sur le PATH, repris de Coupole
+    (pkg / 'installer.sh').write_text(build_unix.INSTALLER_SH.replace('__NOM__', 'Coupole').replace('__TECH__', 'coupole'),
+                                      encoding='utf-8')
+    (pkg / 'coupole.desktop').write_text('[Desktop Entry]\nExec="__ICI__/Coupole.sh"\nName=Coupole\n')
     # le paquet simulé pointe sur le dépôt par liens : on le rend autonome pour la copie
     (pkg / 'app').unlink()
     (pkg / 'app').mkdir()

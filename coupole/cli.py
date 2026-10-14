@@ -62,6 +62,7 @@ def construire_parseur(mods) -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog='coupole', description=tr('cli_description'), formatter_class=Formateur,
                                 epilog=tr('cli_epilogue'))
     p.add_argument('--version', action='version', version='Coupole %s' % __version__, help=tr('cli_aide_version'))
+    p.add_argument('--check', '--verifier', action='store_true', help=tr('cli_aide_check'))
     p.add_argument('--lang', '--langue', choices=['auto', 'fr', 'en'], help=tr('cli_aide_langue'))
     p.add_argument('-v', '--verbeux', '--verbose', action='store_true', help=tr('cli_aide_verbeux'))
     p.add_argument('--reinitialiser-interface', '--reset-interface', action='store_true',
@@ -317,6 +318,9 @@ def main(argv=None) -> int:
     logging.basicConfig(level=logging.INFO if a.verbeux else logging.WARNING, format='%(levelname)s %(message)s')
     if a.lang:
         i18n.choisir_langue(a.lang)
+    if a.check:                                  # paquets construits (kit commun) : essai complet sans écran
+        from .essai_fumee import main as essai
+        return essai()
     if a.reinitialiser_interface:
         from .core import etat_interface
         if etat_interface.effacer_fichier():

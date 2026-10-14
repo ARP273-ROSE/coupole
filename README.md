@@ -32,7 +32,9 @@ anglais, sur Windows, macOS et Linux. Architecture **modulaire** : d'autres modu
 
 ### Installer
 
-**Paquets tout compris** (rien d'autre à installer, mise à jour automatique) — page *Releases* du dépôt :
+**Paquets tout compris** (rien d'autre à installer, mise à jour automatique) — page *Releases* du dépôt ; lien
+permanent vers le dernier installeur Windows :
+[Coupole-Setup.exe](https://github.com/ARP273-ROSE/coupole/releases/latest/download/Coupole-Setup.exe).
 
 | Système | Fichier | Installation |
 |---|---|---|
@@ -129,7 +131,10 @@ d'utilisateur ni d'image). Sans accord, rien ne part. Audit complet (performance
 sécurité, multiplateforme, bilinguisme) : [docs/AUDIT_2026-10.md](docs/AUDIT_2026-10.md). Les paquets se mettent à jour d'eux-mêmes depuis les Releases GitHub (archive
 du code seulement, aucun exécutable téléchargé) ; une installation par pip/pipx indique la commande à lancer ; une
 installation par le paquet `.deb` (fichiers sous `/opt/coupole`, gérés par dpkg) signale la nouvelle version et
-pointe vers le `.deb` à installer.
+pointe vers le `.deb` à installer. Depuis 0.7.0, la mise à jour et les rapports sont ceux du kit commun des
+applications de l'auteur (`updater.py`, `reporting.py`, identiques d'une application à l'autre, réglés par
+`kit.json`) ; réglages, rapports et données vivent hors du dossier d'installation ; `coupole --check` vérifie une
+installation sans écran.
 
 ### Évolutif
 
@@ -186,7 +191,9 @@ English, on Windows, macOS and Linux. **Modular** architecture: more modules wil
 
 ### Installing
 
-**All-inclusive packages** (nothing else to install, automatic updates) — repository *Releases* page:
+**All-inclusive packages** (nothing else to install, automatic updates) — repository *Releases* page; permanent link
+to the latest Windows installer:
+[Coupole-Setup.exe](https://github.com/ARP273-ROSE/coupole/releases/latest/download/Coupole-Setup.exe).
 `Coupole-Setup-x.y.z.exe` (Windows 10/11 64-bit; « More info » then « Run anyway » on first launch; no
 administrator password), `Coupole-x.y.z-macos-arm64.dmg` / `-x86_64.dmg` (first launch: right click, « Open »),
 `coupole_x.y.z_amd64.deb` / `_arm64.deb` (Ubuntu 22.04+, Debian 12+: `sudo apt install ./coupole_x.y.z_amd64.deb`,
@@ -256,7 +263,9 @@ name); without consent nothing is sent. Full audit (performance, parallelism, ro
 bilingualism): [docs/AUDIT_2026-10.md](docs/AUDIT_2026-10.md) (French).
 Packages update themselves from GitHub Releases (code archive only, no executable downloaded); a pip/pipx installation
 shows the command to run; a `.deb` installation (files under `/opt/coupole`, managed by dpkg) announces the new
-version and points to the `.deb` to install.
+version and points to the `.deb` to install. Since 0.7.0, updates and reports come from the author's common
+application kit (`updater.py`, `reporting.py`, identical across applications, configured by `kit.json`); settings,
+reports and data live outside the installation folder; `coupole --check` checks an installation without a screen.
 
 ### Documentation, sources, credits
 

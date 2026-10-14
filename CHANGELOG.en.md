@@ -39,6 +39,15 @@ automatically, several crashes and freezes fixed, packages checked for real.**
   live, windows reopened, erase then theme change, close and reopen; suite stable in random order; “smoke” test of the
   built application (`python -m coupole.essai_fumee`) in every package (Windows, macOS, Linux); trial build without
   publishing.
+- **Common desktop application kit** (the author's standard): updates and incident reports through the common
+  modules `updater.py` and `reporting.py`, identical to the template and configured by `kit.json` (Coupole keeps only
+  its adaptation: `.deb` package, pip, launcher); report consent and installation identifier carried over without
+  loss; no computer name sent; faulthandler armed before reading the previous crash trace; `coupole --check` (full
+  headless test) run on every package; bilingual Windows installer and permanent `Coupole-Setup.exe` link; Linux
+  packages `Coupole-X-linux-x86_64.tar.gz` / `-arm64` (installed in the user profile, `coupole` command); complete Qt
+  file dialog by default on Linux; logo in “About” (single SVG source). Real update tried on Linux: published 0.4.1
+  package → 0.7.0 through its old module, then 0.7.0 → 0.7.1 through the new one, data intact; `.deb` package
+  installed, checked and removed in a bare Ubuntu.
 - Question bank: corrections from the second review copied in.
 
 ## 0.6.0 — 14 October 2026

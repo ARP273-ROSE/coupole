@@ -74,25 +74,29 @@ def _zip(tmp_path, membres):
 def test_archive_zip_slip_refusee(tmp_path, membre):
     z = _zip(tmp_path, [(membre, 'x'), ('lancer.py', 'x')])
     with zipfile.ZipFile(z) as f, pytest.raises(RuntimeError):
-        maj.verifier_archive(f, tmp_path / 'ext')
+        maj.kit('updater').verifier_archive(f, tmp_path / 'ext')
 
 
-def test_archive_lien_symbolique_et_bombe_refuses(tmp_path):
+def test_archive_lien_symbolique_et_bombe_refuses(tmp_path, monkeypatch):
+    """Garde-fous du module commun du kit (repris de Coupole) : lien symbolique, bombe de décompression (jugée par
+    rapport à la taille de l'archive, sans plafond fixe : seuil abaissé ici pour l'essai)."""
+    u = maj.kit('updater')
     z = tmp_path / 'l.zip'
     with zipfile.ZipFile(z, 'w') as f:
         info = zipfile.ZipInfo('lien')
         info.external_attr = (0o120777 << 16)
         f.writestr(info, '/etc/passwd')
-    with zipfile.ZipFile(z) as f, pytest.raises(RuntimeError, match='symbolic'):
-        maj.verifier_archive(f, tmp_path / 'ext')
+    with zipfile.ZipFile(z) as f, pytest.raises(RuntimeError, match='lien symbolique'):
+        u.verifier_archive(f, tmp_path / 'ext')
+    monkeypatch.setattr(u, 'DEPLIE_TOUJOURS_ADMIS', 1_000_000)
     z2 = tmp_path / 'b.zip'
     with zipfile.ZipFile(z2, 'w', zipfile.ZIP_DEFLATED) as f:
-        f.writestr('gros.bin', b'\0' * (maj.CONTENU_MAX + 1))
-    with zipfile.ZipFile(z2) as f, pytest.raises(RuntimeError, match='unpacked'):
-        maj.verifier_archive(f, tmp_path / 'ext')
+        f.writestr('gros.bin', b'\0' * 3_000_000)                          # 3 Mo dépliés pour ~3 ko compressés
+    with zipfile.ZipFile(z2) as f, pytest.raises(RuntimeError, match='depliee'):
+        u.verifier_archive(f, tmp_path / 'ext')
     z3 = _zip(tmp_path, [('coupole/__init__.py', ''), ('lancer.py', 'x'), ('sous/dossier/f.py', 'y')])
     with zipfile.ZipFile(z3) as f:
-        maj.verifier_archive(f, tmp_path / 'ext')                             # archive honnête : acceptée
+        u.verifier_archive(f, tmp_path / 'ext')                               # archive honnête : acceptée
 
 
 # ---------------------------------------------------------------- sources : HTTPS, taille
@@ -253,7 +257,7 @@ def test_rapport_borne_et_anonyme(monkeypatch, tmp_path):
 
 def test_vigie_detecte_un_gel(monkeypatch):
     envoyes = []
-    monkeypatch.setattr(rapports, 'envoyer', lambda genre, **c: envoyes.append((genre, c)) or {})
+    monkeypatch.setattr(maj.kit('reporting'), 'envoyer', lambda genre, **c: envoyes.append((genre, c)) or {})
     v = rapports.Vigie(seuil=0.4, periode=0.1)
     v.battre()
     v.demarrer()
@@ -262,7 +266,7 @@ def test_vigie_detecte_un_gel(monkeypatch):
         while not envoyes and time.monotonic() - t0 < 15:  # attente scrutée : un serveur de CI chargé peut tarder
             time.sleep(0.05)
         assert [g for g, _ in envoyes] == ['gel'] and envoyes[0][1]['phase'] == 'debut'
-        assert 'GUI' in envoyes[0][1]['piles']            # la pile du fil surveillé est jointe
+        assert 'FIL GRAPHIQUE' in envoyes[0][1]['piles']  # la pile du fil surveillé est jointe
         v.battre()
         assert [g for g, _ in envoyes] == ['gel', 'gel'] and envoyes[1][1]['phase'] == 'fin'
     finally:
@@ -277,7 +281,7 @@ def test_crash_natif_releve_par_faulthandler(tmp_path, monkeypatch):
     r = subprocess.run([sys.executable, '-c', code, str(journal)], capture_output=True)
     assert r.returncode != 0 and journal.stat().st_size > 0
     envoyes = []
-    monkeypatch.setattr(rapports, 'envoyer', lambda genre, **c: envoyes.append((genre, c)) or {})
+    monkeypatch.setattr(maj.kit('reporting'), 'envoyer', lambda genre, **c: envoyes.append((genre, c)) or {})
     assert rapports.relever_crash_natif(journal) is True
     assert envoyes[0][0] == 'crash_natif' and 'fatal' in envoyes[0][1]['trace'].lower()   # « Windows fatal exception » aussi
     assert not journal.exists() and rapports.relever_crash_natif(journal) is False

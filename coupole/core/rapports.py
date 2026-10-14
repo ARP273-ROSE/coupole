@@ -1,241 +1,171 @@
-"""Rapports d'incident, d'après le gabarit commun « reporting.py » du kit.
+"""Rapports d'incident : le module commun du kit (`reporting.py`, identique au gabarit), branché sur Coupole.
 
-Trois règles :
-1. **Rien ne part sans accord.**  Le consentement est demandé au premier
-   lancement (interface graphique) et peut être retiré à tout moment ; sans
-   lui, les rapports restent dans un dossier local que l'utilisateur peut
-   consulter ou envoyer lui-même.
-2. **Aucune donnée personnelle.**  Ni nom de machine, ni nom d'utilisateur, ni
-   chemin complet : le dossier personnel devient « ~ », les chemins profonds
-   sont tronqués.  La machine est décrite par son système, son processeur, sa
-   mémoire ; l'installation par un identifiant aléatoire tiré au premier
-   lancement, qui ne dit rien de la personne.
-3. **Rien ne bloque l'application.**  Envoi dans un fil de fond, délai court ;
-   un envoi raté est mis en file et repart au démarrage suivant.
+Le kit fait le travail (installation, preuve de vie, plantage, crash natif, gel, signalement écrit ; accord demandé
+au premier lancement ; file d'attente locale ; anonymisation : ni nom de machine, ni nom d'utilisateur, ni chemin
+complet ; identifiant aléatoire de l'installation).  Ce module ajoute ce qui est propre à Coupole :
 
-Point de collecte : le même que les autres applications de l'auteur ; il range
-les rapports par application d'après l'en-tête X-App (« coupole/x.y.z »).
+- le dossier de données de Coupole (hors du dossier d'installation) et l'en-tête « coupole/x.y.z » ;
+- la reprise sans perte de l'accord donné aux versions ≤ 0.6 (réglage « rapports_autorises ») ;
+- un rapport jamais plus gros que RAPPORT_MAX ;
+- les crochets d'exceptions (fil principal et fils secondaires) et faulthandler, armé AVANT de relever la trace du
+  crash précédent (mise de côté sous un autre nom) : un plantage pendant le relevé lui-même laisse aussi sa trace ;
+- aucun envoi vers le vrai point de collecte pendant les essais (COUPOLE_SANS_RESEAU, COUPOLE_RAPPORTS_URL).
 """
 from __future__ import annotations
 
 import json
 import logging
 import os
-import platform
-import re
 import sys
 import threading
-import time
 import traceback
-import urllib.error
-import urllib.request
 from pathlib import Path
 
 from .. import __version__
 from . import config
+from .maj import kit
 
 log = logging.getLogger(__name__)
 
 APPLICATION = 'coupole'
-DELAI = 8
-FILE_MAX = 50
-AGE_MAX = 30 * 86400
-CHAMP_MAX = 8000           # caractères par champ texte
 RAPPORT_MAX = 64_000       # octets : un rapport ne dépasse jamais cette taille (charge réseau, vie privée)
 GENRES = ('installation', 'demarrage', 'plantage', 'crash_natif', 'gel', 'manuel')
+#: point de collecte factice des essais : rien ne part vers le vrai serveur
+COLLECTE_DESACTIVEE = 'https://127.0.0.1:9/rapports-desactives'
 
-_dossier: Path | None = None
+
+def _r():
+    return kit('reporting')
 
 
 def init(dossier: Path | None = None) -> None:
-    global _dossier
-    _dossier = (dossier or config.dossier_config()) / '_rapports'
-    try:
-        _dossier.mkdir(parents=True, exist_ok=True)
-    except OSError:
-        log.warning('report queue unavailable', exc_info=True)
+    """Prépare le module commun : dossier de données de Coupole, nom et version, accord repris des anciennes
+    versions, point de collecte des essais."""
+    r = _r()
+    base = Path(dossier or config.dossier_config())
+    r.init(base, application=APPLICATION, version=__version__)
+    url = os.environ.get('COUPOLE_RAPPORTS_URL')
+    if url:
+        r.ENDPOINT = url
+    elif os.environ.get('COUPOLE_SANS_RESEAU'):
+        r.ENDPOINT = COLLECTE_DESACTIVEE
+    # Accord donné à Coupole ≤ 0.6 (config, « rapports_autorises ») : repris tel quel, une seule fois.
+    reglages = config.reglages()
+    if r.consentement() is None:
+        ancien = reglages['rapports_autorises']
+        if ancien is not None:
+            r.definir_consentement(bool(ancien))
+            log.info('report consent carried over from settings: %s', bool(ancien))
+    # même identifiant aléatoire d'installation qu'avant (continuité des rapports d'un même poste)
+    if not r._reglages.get('id_installation') and reglages['id_installation']:
+        r._reglages['id_installation'] = 'install-' + str(reglages['id_installation'])
+        for cle in ('installee_le', 'dernier_demarrage'):
+            if reglages.get(cle) and not r._reglages.get(cle):
+                r._reglages[cle] = reglages.get(cle)
+        r._ecrire_reglages()
 
 
 def dossier_rapports() -> Path | None:
-    return _dossier
+    return getattr(_r(), '_dossier', None)
 
 
 def consentement():
     """True, False, ou None tant que la question n'a pas été posée."""
-    return config.reglages()['rapports_autorises']
+    return _r().consentement()
 
 
 def definir_consentement(accepte: bool) -> None:
-    r = config.reglages()
-    r['rapports_autorises'] = bool(accepte)
-    r['consentement_date'] = time.strftime('%Y-%m-%d %H:%M:%S')
-
-
-# ---------------------------------------------------------------- anonymisation
-def anonymiser(texte) -> str:
-    if not texte:
-        return ''
-    texte = str(texte)
-    try:                                           # nom de la machine : jamais transmis
-        hote = platform.node()
-        if hote and len(hote) > 2:
-            texte = re.sub(r'(?<![A-Za-z0-9])%s(?![A-Za-z0-9])' % re.escape(hote), '<host>', texte)
+    _r().definir_consentement(bool(accepte))
+    try:                                            # le réglage visible dans les Préférences suit
+        config.reglages()['rapports_autorises'] = bool(accepte)
     except Exception:
         pass
-    home = str(Path.home())
-    for v in {home, home.replace('\\', '/'), home.lower()}:
-        if v and len(v) > 1:
-            texte = texte.replace(v, '~')
-    for var in ('USERNAME', 'USER', 'LOGNAME'):
-        u = os.environ.get(var)
-        if u and len(u) > 2:
-            texte = re.sub(r'(?<![A-Za-z0-9])%s(?![A-Za-z0-9])' % re.escape(u), '<user>', texte)
-    texte = re.sub(r'([A-Za-z]:\\[^\\\n"\']{1,30})(\\[^\\\n"\']{1,60}){2,}\\', r'\1\\…\\', texte)
-    texte = re.sub(r'(/(?:home|Users|mnt|media|Volumes)/[^/\n"\']{1,30})(/[^/\n"\']{1,60}){2,}/', r'\1/…/', texte)
-    return texte
 
 
-def _anonymiser_valeur(v, profondeur=0):
-    """Applique `anonymiser` à toute chaîne d'une structure (dict, liste), en bornant chaque texte."""
-    if isinstance(v, str):
-        return anonymiser(v[-CHAMP_MAX:] if len(v) > CHAMP_MAX else v)
-    if profondeur > 4:
-        return str(v)[:200]
-    if isinstance(v, dict):
-        return {str(k)[:80]: _anonymiser_valeur(x, profondeur + 1) for k, x in list(v.items())[:100]}
-    if isinstance(v, (list, tuple)):
-        return [_anonymiser_valeur(x, profondeur + 1) for x in list(v)[:200]]
-    if isinstance(v, (int, float, bool)) or v is None:
-        return v
-    return anonymiser(str(v)[:CHAMP_MAX])
+def anonymiser(texte) -> str:
+    return _r().anonymiser(texte if isinstance(texte, str) or texte is None else str(texte))
 
 
 def machine() -> dict:
-    """Le strict nécessaire pour reproduire un problème, sans rien de personnel."""
-    from . import machine as m
-    try:
-        mm = m.detecter()
-        d = {'os': '%s %s' % (mm.nom_systeme, mm.version_systeme), 'arch': mm.architecture,
-             'processeur': mm.processeur[:60], 'coeurs': mm.coeurs_logiques,
-             'memoire_go': round(mm.memoire_totale_mo / 1024, 1),
-             'gpu': ', '.join(c.nom for c in mm.cartes)[:80]}
-    except Exception:
-        d = {'os': '%s %s' % (platform.system(), platform.release()), 'arch': platform.machine()}
-    d.update({'poste': 'install-' + str(config.reglages()['id_installation']),
-              'python': platform.python_version(), 'application': APPLICATION, 'version': __version__,
-              'paquet': _type_installation()})
-    return d
+    """Ce que le module commun joint à chaque rapport (identifiant aléatoire, jamais le nom de la machine)."""
+    return _r()._machine()
 
 
 def _type_installation() -> str:
-    app = Path(__file__).resolve().parents[2]
-    if (app.parent / 'python').is_dir():
-        return 'paquet'
-    if (app / '.git').exists():
-        return 'source'
-    return 'pip'
-
-
-# ---------------------------------------------------------------- envoi
-def _poster(charge: bytes) -> bool:
-    from . import sources
-    req = urllib.request.Request(sources.valeur('rapports.collecte'), data=charge, method='POST', headers={
-        'Content-Type': 'application/json; charset=utf-8',
-        'X-App': '%s/%s' % (APPLICATION, __version__),
-        'User-Agent': 'Coupole/%s' % __version__})
+    from . import maj
     try:
-        with urllib.request.urlopen(req, timeout=DELAI) as r:
-            return 200 <= r.status < 300
-    except urllib.error.HTTPError as e:
-        return not (e.code == 429 or e.code >= 500)     # 4xx : inutile de réessayer
+        return maj.type_installation()
     except Exception:
-        return False
-
-
-def _mettre_en_file(rapport: dict) -> Path | None:
-    if _dossier is None:
-        return None
-    try:
-        nom = '%s-%s-%d-%d.json' % (time.strftime('%Y%m%dT%H%M%S'), rapport.get('genre', 'autre'), os.getpid(),
-                                    threading.get_ident() % 10000)
-        p = _dossier / nom
-        config.ecrire_json_atomique(p, rapport)
-        return p
-    except OSError:
-        return None
+        return '?'
 
 
 def envoyer(genre: str, **champs) -> dict:
-    """Constitue un rapport et le transmet en fond si l'utilisateur l'a accepté."""
-    rapport = machine()
-    rapport['genre'] = genre if genre in GENRES else 'autre'
-    rapport['horodatage'] = time.strftime('%Y-%m-%d %H:%M:%S')
-    for cle, valeur in champs.items():
-        rapport[cle] = _anonymiser_valeur(valeur)
-    charge = json.dumps(rapport, ensure_ascii=False).encode('utf-8')
-    if len(charge) > RAPPORT_MAX:                   # on tronque les plus longs champs jusqu'à tenir
-        for cle in sorted(rapport, key=lambda k: -len(str(rapport[k]))):
-            if isinstance(rapport[cle], str) and len(charge) > RAPPORT_MAX:
-                rapport[cle] = rapport[cle][-(len(rapport[cle]) // 2):] + ' […]'
-                charge = json.dumps(rapport, ensure_ascii=False).encode('utf-8')
-    if consentement() is not True:
-        _mettre_en_file(rapport)
-        return rapport
-
-    def tache():
-        if not _poster(charge):
-            _mettre_en_file(rapport)
-    threading.Thread(target=tache, name='rapport', daemon=True).start()
-    return rapport
+    """Constitue un rapport et le transmet en fond si l'utilisateur l'a accepté (sinon il reste en file locale)."""
+    genre = genre if genre in GENRES else 'autre'
+    champs.setdefault('paquet', _type_installation())
+    # borne de taille : les plus longs textes sont raccourcis (par le début : le bas d'une trace compte) jusqu'à tenir
+    for _ in range(12):
+        if len(json.dumps(champs, ensure_ascii=False, default=str).encode('utf-8')) <= RAPPORT_MAX - 4000:
+            break
+        cle = max((k for k, v in champs.items() if isinstance(v, str)), key=lambda k: len(champs[k]), default=None)
+        if cle is None:
+            break
+        champs[cle] = '[…] ' + champs[cle][-(len(champs[cle]) // 2):]
+    return _r().envoyer(genre, **champs)
 
 
 def vider_file() -> int:
-    if _dossier is None or consentement() is not True:
-        return 0
-    try:
-        fichiers = sorted(_dossier.glob('*.json'))
-    except OSError:
-        return 0
-    for vieux in fichiers[:-FILE_MAX] if len(fichiers) > FILE_MAX else []:
-        vieux.unlink(missing_ok=True)
-    limite = time.time() - AGE_MAX
-    n = 0
-    for f in sorted(_dossier.glob('*.json')):
-        try:
-            if f.stat().st_mtime < limite:
-                f.unlink(missing_ok=True)
-                continue
-            charge = f.read_bytes()
-        except OSError:
-            continue
-        if _poster(charge):
-            f.unlink(missing_ok=True)
-            n += 1
-        else:
-            break
-    return n
+    return _r().vider_file()
 
 
 def reprendre_file_en_fond() -> None:
-    threading.Thread(target=vider_file, name='rapports-file', daemon=True).start()
+    _r().reprendre_file_en_fond()
 
 
 def signaler_demarrage() -> None:
     """Preuve de vie, au plus une fois par jour (installation la première fois)."""
-    r = config.reglages()
-    jour = time.strftime('%Y-%m-%d')
-    if not r.get('installee_le'):
-        r['installee_le'] = jour
-        r['dernier_demarrage'] = jour
-        envoyer('installation')
-    elif r.get('dernier_demarrage') != jour:
-        r['dernier_demarrage'] = jour
-        envoyer('demarrage')
+    r = _r()
+    r.signaler_demarrage(premier=not r._reglages.get('installee_le'), paquet=_type_installation())
 
 
 def signaler_plantage(tb_texte: str, **champs) -> dict:
-    resume = next((l.strip()[:200] for l in reversed(tb_texte.strip().splitlines()) if l.strip()), '')
-    return envoyer('plantage', traceback=tb_texte[-8000:], resume=resume, **champs)
+    return _r().signaler_plantage(tb_texte[-8000:], **champs)
+
+
+def relever_crash_natif(chemin) -> bool:
+    return _r().relever_crash_natif(chemin)
+
+
+def Vigie(seuil=10.0, periode=2.0):
+    """Vigie du module commun : le fil graphique appelle battre() régulièrement."""
+    return _r().Vigie(seuil=seuil, periode=periode)
+
+
+_fichier_faulthandler = None
+
+
+def armer_faulthandler(chemin: Path) -> None:
+    """faulthandler armé AVANT de relever la trace du crash précédent : celle-ci est d'abord mise de côté sous un
+    autre nom (l'ouverture du fichier en écriture la viderait), puis relevée ; un plantage pendant le relevé (ou
+    n'importe quand ensuite) écrit sa trace dans le fichier armé."""
+    global _fichier_faulthandler
+    chemin = Path(chemin)
+    precedent = chemin.with_name(chemin.stem + '.precedent' + chemin.suffix)
+    try:
+        if chemin.exists() and chemin.stat().st_size > 0:
+            os.replace(chemin, precedent)
+    except OSError:
+        pass
+    try:
+        import faulthandler
+        _fichier_faulthandler = open(chemin, 'w', encoding='utf-8')
+        faulthandler.enable(file=_fichier_faulthandler, all_threads=True)
+    except Exception:
+        pass
+    try:
+        relever_crash_natif(precedent)
+    except Exception:
+        pass
 
 
 def installer_crochets(chemin_faulthandler: Path | None = None) -> None:
@@ -256,77 +186,4 @@ def installer_crochets(chemin_faulthandler: Path | None = None) -> None:
         crochet(args.exc_type, args.exc_value, args.exc_traceback)
     threading.excepthook = crochet_fil
     if chemin_faulthandler is not None:
-        try:
-            import faulthandler
-            relever_crash_natif(chemin_faulthandler)
-            f = open(chemin_faulthandler, 'w', encoding='utf-8')
-            faulthandler.enable(f)
-            installer_crochets._fichier = f  # garder ouvert
-        except Exception:
-            pass
-
-
-def relever_crash_natif(chemin) -> bool:
-    p = Path(chemin)
-    try:
-        if not p.exists() or p.stat().st_size == 0:
-            return False
-        texte = p.read_text(encoding='utf-8', errors='replace')
-        p.unlink(missing_ok=True)
-    except OSError:
-        return False
-    if not texte.strip():
-        return False
-    envoyer('crash_natif', trace=anonymiser(texte)[:8000], resume=texte.strip().splitlines()[0][:200])
-    return True
-
-
-class Vigie:
-    """Détecte une interface figée (le fil graphique doit appeler battre() régulièrement)."""
-
-    def __init__(self, seuil=10.0, periode=2.0):
-        self.seuil, self.periode = seuil, periode
-        self._dernier = time.monotonic()
-        self._signale = False
-        self._debut = 0.0
-        self._actif = False
-        self._deja_battu = False
-        self._fil_gui = threading.get_ident()
-
-    def battre(self):
-        t = time.monotonic()
-        self._deja_battu = True
-        if self._signale:
-            envoyer('gel', resume='end of freeze after %.0f s' % (t - self._debut), phase='fin')
-            self._signale = False
-        self._dernier = t
-
-    def demarrer(self):
-        self._fil_gui = threading.get_ident()
-        self._actif = True
-        threading.Thread(target=self._boucle, name='vigie', daemon=True).start()
-
-    def arreter(self):
-        self._actif = False
-
-    def _boucle(self):
-        while self._actif:
-            time.sleep(self.periode)
-            if not self._deja_battu:
-                continue
-            retard = time.monotonic() - self._dernier
-            if retard >= self.seuil and not self._signale:
-                self._signale = True
-                self._debut = self._dernier
-                envoyer('gel', resume='GUI frozen for %.0f s' % retard, phase='debut', piles=self._piles())
-
-    def _piles(self) -> str:
-        morceaux = []
-        try:
-            cadres = sys._current_frames()
-        except Exception:
-            return ''
-        for ident in sorted(cadres, key=lambda i: i != self._fil_gui):
-            pile = ''.join(traceback.format_stack(cadres[ident])[-12:])
-            morceaux.append('--- %s ---\n%s' % ('GUI' if ident == self._fil_gui else ident, pile))
-        return anonymiser('\n'.join(morceaux))[:8000]
+        armer_faulthandler(chemin_faulthandler)

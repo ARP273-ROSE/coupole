@@ -1388,6 +1388,16 @@ thread, the backup makes the round trip export $\to$ erase $\to$ import identica
 language and theme change live, settings come back on reopening. Every built package (Windows, macOS, Linux) passes a
 headless « smoke » test: \texttt{python -m coupole.essai\_fumee}.
 
+\paragraph{Common kit.} Coupole now follows the author's standard for desktop applications: updates and incident
+reports are the common modules \texttt{updater.py} and \texttt{reporting.py}, identical across applications and
+configured by \texttt{kit.json}; settings, reports and data live outside the installation folder (consent given to
+earlier versions is carried over); no computer name is sent (random identifier). \texttt{coupole -{}-check} checks an
+installation without a screen (window, modules, animations, data, manuals, logo, style) and returns code 0 when all
+is well. The Windows installer is bilingual; the latest installer has a permanent link
+(\texttt{releases/latest/download/Coupole-Setup.exe}); on Linux, the \texttt{Coupole-X-linux-x86\_64.tar.gz} (or
+\texttt{-arm64}) archive installs into the user profile through \texttt{installer.sh} (\texttt{coupole} command), and
+the file dialog is Qt's complete one by default.
+
 \subsection{Available animations}
 \begin{center}
 \small

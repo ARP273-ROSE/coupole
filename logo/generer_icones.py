@@ -35,6 +35,11 @@ def main():
     grand = Image.open(ICI / 'coupole_256.png')
     grand.save(ICI / 'coupole.ico', sizes=[(t, t) for t in (16, 24, 32, 48, 64, 128, 256)])
     Image.open(ICI / 'coupole_1024.png').save(ICI / 'coupole.icns')
+    # une seule source : la copie de l'application (fenêtres, À propos) et l'icône de l'installeur Windows en
+    # dérivent (tests/test_kit.py vérifie qu'elles sont identiques)
+    import shutil
+    shutil.copyfile(ICI / 'coupole.svg', RES / 'coupole.svg')
+    shutil.copyfile(ICI / 'coupole.ico', ICI.parent / 'coupole.ico')
     print('icônes écrites dans', ICI)
 
 
