@@ -22,6 +22,11 @@ requested fixes.**
   or the tropics, rotating Earth or terminator; 3D globe seen from space rotated freely, with inertia, wheel to zoom,
   double-click to go back to the subsolar point, right click for the observer) with an exact terminator, twilights,
   polar day and night.
+- **Milky Way rotation curve**: no more break at the 5 kpc junction; smooth curve from a published mass model
+  (McMillan 2017, computed with galpy: bulge, discs, gas, dark-matter halo, components can be shown), real
+  measurements with error bars (Eilers et al. 2019, galkin compilation), Keplerian curve from the model's mass within
+  the sphere, the Galaxy seen from the North Galactic Pole to scale (Wegg et al. 2015 bar, Reid et al. 2019 arms, Sun
+  at 8.21 kpc, direction of rotation, circle of the chosen radius).
 - **Eclipses**: the Sun of the shadow simulator is no longer cut; “Replay an eclipse” shows each of the 133 eclipses
   of the 2015–2044 table to true scale, with an instant slider.
 - **Fixes**: the globe turned against the drag (longitude/latitude and every sphere); Sun's rays overflowing the

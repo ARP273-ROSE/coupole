@@ -766,10 +766,12 @@ ANIM_LOT3.update({
                                                    'Radius of the circle considered (0.5 to 25 kpc); one can also '
                                                    'click or drag on the curve.'),
     'anim_milkywayrotationalvelocity_kepler': ('Courbe képlérienne', 'Keplerian curve'),
-    'anim_milkywayrotationalvelocity_kepler_aide': ('Tracer la vitesse qu’on aurait au-delà si toute la masse était '
-                                                    'contenue dans le cercle choisi (v ∝ 1/√R).',
-                                                    'Draw the speed one would get beyond if all the mass were inside '
-                                                    'the chosen circle (v ∝ 1/√R).'),
+    'anim_milkywayrotationalvelocity_kepler_aide': ('Tracer la vitesse qu’on aurait au-delà si toute la masse que le '
+                                                    'modèle contient dans la sphère de rayon R était au centre '
+                                                    '(v = √(G M / r), donc v ∝ 1/√R).',
+                                                    'Draw the speed one would get beyond if all the mass the model '
+                                                    'holds within the sphere of radius R were at the centre '
+                                                    '(v = √(G M / r), so v ∝ 1/√R).'),
     'anim_milkywayrotationalvelocity_r': ('Rayon', 'Radius'),
     'anim_milkywayrotationalvelocity_v': ('Vitesse de rotation', 'Rotation speed'),
     'anim_milkywayrotationalvelocity_m': ('Masse contenue (v² R / G)', 'Mass inside (v² R / G)'),
@@ -779,7 +781,38 @@ ANIM_LOT3.update({
     'anim_milkywayrotationalvelocity_soleil': ('Soleil', 'Sun'),
     'anim_milkywayrotationalvelocity_titre_courbe': ('Courbe de rotation de la Voie lactée',
                                                      'Rotation curve of the Milky Way'),
-    'anim_milkywayrotationalvelocity_titre_galaxie': ('La Galaxie vue de face (schéma)', 'The Galaxy seen face-on (sketch)'),
+    'anim_milkywayrotationalvelocity_titre_galaxie': ('La Galaxie vue du pôle Nord galactique (bras : Reid et al. 2019)',
+                                                       'The Galaxy seen from the North Galactic Pole (arms: Reid et al. '
+                                                       '2019)'),
+    'anim_milkywayrotationalvelocity_composantes': ('Composantes du modèle', 'Model components'),
+    'anim_milkywayrotationalvelocity_composantes_aide': ('Montrer la part du bulbe, des disques (étoiles et gaz) et du '
+                                                         'halo de matière noire dans la vitesse (v² = somme des v² des '
+                                                         'composantes).', 'Show the share of the bulge, the discs (stars '
+                                                         'and gas) and the dark-matter halo in the speed (v² = sum of the '
+                                                         'components’ v²).'),
+    'anim_milkywayrotationalvelocity_mesures': ('Mesures', 'Measurements'),
+    'anim_milkywayrotationalvelocity_mesures_aide': ('Montrer les mesures avec leurs barres d’erreur : Eilers et al. 2019 '
+                                                     '(étoiles géantes rouges, 5 à 25 kpc) et la compilation galkin (gaz, '
+                                                     'régions HII, masers…, 2 à 5 kpc).', 'Show the measurements with '
+                                                     'their error bars: Eilers et al. 2019 (red giant stars, 5 to 25 kpc) '
+                                                     'and the galkin compilation (gas, HII regions, masers…, 2 to 5 '
+                                                     'kpc).'),
+    'anim_milkywayrotationalvelocity_masse_sphere': ('Masse dans la sphère de rayon R (modèle)',
+                                                     'Mass within the sphere of radius R (model)'),
+    'anim_milkywayrotationalvelocity_modele': ('modèle de McMillan (2017)', 'McMillan (2017) model'),
+    'anim_milkywayrotationalvelocity_bulbe': ('bulbe', 'bulge'),
+    'anim_milkywayrotationalvelocity_disques': ('disques', 'discs'),
+    'anim_milkywayrotationalvelocity_halo': ('halo de matière noire', 'dark-matter halo'),
+    'anim_milkywayrotationalvelocity_eilers': ('Eilers et al. 2019', 'Eilers et al. 2019'),
+    'anim_milkywayrotationalvelocity_galkin': ('compilation galkin', 'galkin compilation'),
+    'anim_milkywayrotationalvelocity_barre': ('barre', 'bar'),
+    'anim_milkywayrotationalvelocity_bras_norma': ('Norma', 'Norma'),
+    'anim_milkywayrotationalvelocity_bras_outer': ('bras extérieur', 'Outer arm'),
+    'anim_milkywayrotationalvelocity_bras_sctcen': ('Scutum–Centaure', 'Scutum–Centaurus'),
+    'anim_milkywayrotationalvelocity_bras_sgrcar': ('Sagittaire–Carène', 'Sagittarius–Carina'),
+    'anim_milkywayrotationalvelocity_bras_perseus': ('Persée', 'Perseus'),
+    'anim_milkywayrotationalvelocity_bras_local': ('bras local', 'Local arm'),
+    'anim_milkywayrotationalvelocity_bras_3kpc': ('bras de 3 kpc', '3-kpc arm'),
     'anim_milkywayrotationalvelocity_axe_r': ('distance au centre (kpc)', 'distance from the center (kpc)'),
     'anim_milkywayrotationalvelocity_axe_v': ('vitesse (km/s)', 'speed (km/s)'),
 })

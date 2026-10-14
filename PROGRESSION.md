@@ -1087,6 +1087,17 @@ route : bouton « Version web », projections polaires et globe 3D du simulateur
   est coupé au limbe.
 - Garde-fous : orientation du globe toujours finie et orthonormée (sinon l'ancienne est gardée), `Vue3D` ignore les
   valeurs non finies ; test « fuzz » de 1 000 glissers pendant la lecture.
+- Courbe de rotation de la Voie lactée (mêmes données que le web, `donnees/voie_lactee.json.gz`, copie compressée
+  de son `voie_lactee.json` ; `outils/verif_anim/voie_lactee.py` et `voie_lactee_verif.sage`) : modèle de McMillan
+  (2017) par galpy de 0,05 à 25 kpc (total `accent1` 2,6 px ; bulbe `accent3`, disques `equateur`, halo `arc1` en
+  tirets), R0 = 8,21 kpc, v0 = 233,1 km/s ; mesures avec barres d'erreur : Eilers et al. 2019 (table 1, `texte`) et
+  galkin (Pato & Iocco 2017, 2 à 5,25 kpc par intervalles de 0,25 kpc, `accent2`) ; képlérienne depuis M(<R) du
+  modèle (galpy) ; masse dynamique v²R/G et masse du modèle dans les valeurs ; Galaxie vue du pôle Nord galactique à
+  l'échelle (lueur exponentielle, anneaux de 5 kpc, barre de Wegg et al. 2015 à 30,5°, bras de Reid et al. 2019
+  mesurés puis prolongés estompés, Soleil en haut avec le sens de rotation, cercle du rayon choisi).  Bureau : le fond
+  de la Galaxie (disque, barre, bras) est rendu une fois par taille dans une image (les bras larges et transparents
+  coûtaient 20 ms par image) ; points de mesure tracés sans réservation pour le placeur.  SageMath (conteneur
+  `sagemath`) : vitesse du halo NFW à 1,2–1,3 × 10⁻⁴, masse du bulbe à 2,8 × 10⁻⁵ et 5,0 × 10⁻⁵ de galpy.
 - Ombres d'éclipse : Soleil entier (centre à r + 8 px) ; « Rejouer une éclipse » : 133 éclipses, y = D sin 5,145° sin F
   ramené dans le domaine du type, curseur « instant ».
 - Ordre des thèmes : Introduction, Coordonnées et mouvements, Lune, Astronomie antique, Renaissance, Système solaire,
@@ -1118,7 +1129,7 @@ route : bouton « Version web », projections polaires et globe 3D du simulateur
   souris du globe, fuzz 1 000 glissers × 5 animations, rendu rapide).
 - [x] Performances (`QImage` prémultipliée, comme l'écran ; NAS chargé, charge 9 à 30) : médiane des 92 animations à
   720 × 470 ≈ 1,5 ms par image, avant ≈ 1,4–1,5 ms (mêmes conditions) ; les plus lentes 5–7 ms avant comme après
-  (zodiaque, Grande Ourse, longitude/latitude) ; jour-nuit : équirectangulaire 1,4 ms, polaire 3,8 ms, globe 4,7 ms
+  (zodiaque, Grande Ourse, longitude/latitude ; Voie lactée ≈ 7 ms, au lieu de 25 ms avant le cache du fond) ; jour-nuit : équirectangulaire 1,4 ms, polaire 3,8 ms, globe 4,7 ms
   (minimum de 20 rendus).
 - [x] Aide F1, manuels FR (80 p.) et EN (77 p.) : section « Rendu, formules et cartes (0.4.1) », captures nouvelles
   (jour-nuit pôle Nord et globe, éclipse rejouée, calculateur de Newton, lanceur de marteau, Grande Ourse) et toutes

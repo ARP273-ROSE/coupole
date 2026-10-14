@@ -763,9 +763,23 @@ def test_fusion_bilans():
 def test_voie_lactee_et_formation():
     from coupole.modules.anim.animations import rotation_galaxie as G, temperatures_formation as T
     assert G.G_KPC == pytest.approx(REF['galaxie']['g_kpc'], rel=1e-12)
-    assert G.vitesse(G.R_SOLEIL_KPC) == pytest.approx(229.0)
-    assert G.masse(G.R_SOLEIL_KPC) == pytest.approx(REF['galaxie']['masse_soleil'], rel=1e-9)
-    assert abs(G.vitesse(4.0) - G.v_interne(4.0)) < 1e-9 and abs(G.vitesse(5.0) - G.v_eilers(5.0)) < 1e-9
+    # 0.4.1 : modèle de McMillan (2017) par galpy (R0 = 8,21 kpc, v0 = 233,1 km/s) ; mesures d'Eilers et al. 2019
+    assert G.R_SOLEIL_KPC == 8.21 and G.vitesse(G.R_SOLEIL_KPC) == pytest.approx(233.1, abs=0.2)
+    assert G.masse(G.R_SOLEIL_KPC) == pytest.approx(G.vitesse(G.R_SOLEIL_KPC) ** 2 * 8.21 / G.G_KPC, rel=1e-12)
+    # courbe lisse : plus de cassure (dérivée seconde partout petite au-delà de 1,5 kpc)
+    vs = [G.vitesse(0.05 * i) for i in range(30, 501)]
+    assert max(abs(vs[i + 1] - 2 * vs[i] + vs[i - 1]) for i in range(1, len(vs) - 1)) < 0.1
+    # v² = somme des v² des composantes
+    for r in (1.0, 5.0, 8.21, 20.0):
+        assert G.vitesse(r) ** 2 == pytest.approx(sum(G.vitesse(r, c) ** 2 for c in ('bulbe', 'disques', 'halo')),
+                                                  rel=2e-3)
+    ms = [G.masse_sphere(r) for r in (1, 5, 10, 25)]
+    assert ms == sorted(ms) and 2.5e11 < ms[-1] < 3e11
+    d = G.donnees()
+    assert len(d['eilers']) == 38 and d['eilers'][0][:2] == [5.27, 226.83] and len(d['galkin']) == 13
+    # les mesures d'Eilers sont proches du modèle (ajusté sur d'autres données) jusqu'à 13 kpc : moins de 5 % d'écart
+    # (au-delà, la courbe mesurée descend plus vite que le modèle : jusqu'à 25 % à 22 kpc)
+    assert all(abs(v - G.vitesse(r)) / v < 0.05 for r, v, _, _ in d['eilers'] if r < 13)
     f = REF['formation']
     assert T.PENTE == pytest.approx(f['pente'], rel=1e-12)
     assert T.distance(175.0) == pytest.approx(f['d_175'], rel=1e-12)

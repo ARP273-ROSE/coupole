@@ -24,6 +24,11 @@ précises, et les corrections demandées.**
   l'équateur ou aux tropiques, Terre ou terminateur tournant ; globe 3D vu de l'espace à tourner librement, avec
   inertie, molette pour zoomer, double-clic pour revenir au point subsolaire, clic droit pour l'observateur) avec un
   terminateur exact, les crépuscules, le jour et la nuit polaires.
+- **Courbe de rotation de la Voie lactée** : plus de cassure au raccord de 5 kpc ; courbe lisse d'un modèle de masse
+  publié (McMillan 2017, calculé avec galpy : bulbe, disques, gaz, halo de matière noire, composantes affichables),
+  mesures réelles avec barres d'erreur (Eilers et al. 2019, compilation galkin), courbe képlérienne tirée de la
+  masse du modèle dans la sphère, Galaxie vue du pôle Nord galactique à l'échelle (barre de Wegg et al. 2015, bras de
+  Reid et al. 2019, Soleil à 8,21 kpc, sens de rotation, cercle du rayon choisi).
 - **Éclipses** : le Soleil du simulateur des ombres n'est plus tronqué ; « Rejouer une éclipse » montre chacune des
   133 éclipses de la table 2015–2044 en proportions réelles, avec un curseur d'instant.
 - **Corrections** : le globe tournait à l'envers du glisser (longitude/latitude et toutes les sphères) ; rayons du

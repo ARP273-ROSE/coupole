@@ -151,6 +151,12 @@ class Axes:
         else:
             ay, by = -r.height() / (self.y1 - self.y0), r.bottom() + r.height() * self.y0 / (self.y1 - self.y0)
             fy = lambda y: ay * y + by
+        if not self.xlog and not self.ylog and len(pts) > 32:
+            # grandes séries : conversion vectorielle numpy, copie directe dans le polygone
+            import numpy as np
+            a = np.asarray(pts, dtype=float).reshape(-1, 2)
+            a = a[np.isfinite(a[:, 1])]
+            return dessin.polygone(ax_ * a[:, 0] + bx, ay * a[:, 1] + by)
         return QPolygonF([QPointF(fx(x), fy(y)) for x, y in pts if math.isfinite(y)])
 
     def courbe(self, pts, cle='accent1', epaisseur: float = 2.0, alpha: float = 1.0, pointille: bool = False,

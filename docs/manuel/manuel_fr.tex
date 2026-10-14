@@ -1235,6 +1235,16 @@ lignes coupées exactement au limbe, nuit et crépuscules exacts (parties visibl
 au Soleil), axe des pôles et flèche « vers le Soleil ». Au pôle Nord et au pôle Sud, le jour ou la nuit polaire
 s'affiche avec les valeurs.
 
+\paragraph{Voie lactée.} La courbe de rotation n'est plus faite de deux morceaux raccordés à 5~kpc : c'est celle d'un
+modèle de masse publié, McMillan (2017), calculée avec galpy (bulbe, disques d'étoiles mince et épais, gaz HI et H2,
+halo NFW de matière noire ; composantes affichables, $v^2$ étant la somme des $v^2$ des composantes), avec
+$R_0 = 8{,}21$~kpc et $v_0 = 233{,}1$~km/s. Les mesures réelles s'y superposent avec leurs barres d'erreur : Eilers et
+al. (2019) de 5 à 25~kpc et la compilation galkin (Pato \& Iocco 2017) de 2 à 5~kpc. La courbe képlérienne part de la
+masse que le modèle contient dans la sphère de rayon $R$. La Galaxie est vue du pôle Nord galactique, à l'échelle :
+barre longue (Wegg et al. 2015), bras spiraux log-périodiques (Reid et al. 2019), Soleil à 8,21~kpc avec son sens de
+rotation, cercle du rayon choisi. SageMath retrouve la vitesse du halo et la masse du bulbe du modèle à
+$1{,}3\times10^{-4}$ et $5\times10^{-5}$ près.
+
 \paragraph{Éclipses.} Dans le simulateur des ombres d'éclipse, le Soleil est dessiné en entier, et \emph{Rejouer une
 éclipse} montre chacune des 133 éclipses de la table 2015–2044 en proportions réelles : la Lune traverse l'ombre et la
 pénombre de la Terre, ou l'ombre de la Lune balaie la Terre ; l'écart à l'axe vient de l'argument de latitude moyen de
@@ -1398,7 +1408,7 @@ Propriétés des planètes & histogrammes : distance, période, masse, rayon, sa
 Températures de formation & $T=600~\text{K}\,(d/1~\text{ua})^{-0{,}747}$ ; état (gaz ou solide) de neuf substances, ligne des glaces\\
 La neige vue d'une voiture & les flocons semblent jaillir d'un point : radiant à $\arctan(v_\text{neige}/v_\text{voiture})$, comme une pluie d'étoiles filantes\\
 Chaîne proton-proton, cycle CNO & au lieu des films : chaque réaction, énergie libérée (AME 2020), bilan 26,731~MeV, part des neutrinos\\
-Rotation de la Voie lactée & courbe de rotation (Gaia, Eilers et al. 2019, au-delà de 5~kpc), $M=v^2R/G$, courbe képlérienne ; galaxie vue de face\\
+Rotation de la Voie lactée & modèle de McMillan (2017) et ses composantes, mesures d'Eilers et al. (2019) et galkin, $M=v^2R/G$, courbe képlérienne ; Galaxie vue du pôle (barre, bras de Reid et al. 2019)\\
 Ondes de densité & tracteur et voitures : $n_\text{bouchon}/n=(v-v_t)/(v_\text{lente}-v_t)$, analogie des bras spiraux\\
 Univers-ballon & au lieu du film : galaxies sur un ballon qui gonfle, $v=Hd$, $H=\dot a/a$ ; le ballon se tourne à la souris\\
 Décalage vers le rouge & spectre de M32 décalé de $1+z$, raies, lumière reçue dans U, B, V, R ; vitesse par l'effet Doppler relativiste\\
@@ -1638,5 +1648,5 @@ Barbary (2016), Bertin \& Arnouts (1996). Moments adaptatifs : Bernstein \& Jarv
 © OpenStreetMap contributors. SIMBAD et Sesame : CDS, Strasbourg (Wenger et al. 2000) ; Aladin Lite (CDS) ;
 NED (NASA/IPAC) ; JPL Small-Body Database (NASA/JPL). Cosmologie : Planck Collaboration (2020, A\&A 641, A6) ;
 Hinshaw et al. (2013, WMAP 9) ; Riess et al. (2022, SH0ES) ; Hogg (1999, astro-ph/9905116) ; Komatsu et al. (2011)
-pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur). Archives : MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), Astro Data Archive de NOIRLab, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS du nœud Anneaux et Lunes, Imaging Node) ; reproject (Astropy) ; Rector et al. (2007, AJ 133, 598) pour l'ordre chromatique ; pratiques des amateurs : voir \texttt{docs/archives\_methode.md}. Animations : ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0) ; Meeus (1998, \emph{Astronomical Algorithms}, 2\textsuperscript{e} éd.) ; obliquité P03 / IAU 2006 ; limites des constellations de l'UAI (données livrées avec astropy) ; côtes Natural Earth 1:50m (domaine public) ; police STIX Two Math (SIL OFL 1.1) ; NASA Exoplanet Archive, NASA Planetary Fact Sheet, éphéméride JPL DE440 et éléments de Standish, AME 2020, filtres de Landolt (1992), spectre de M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, courbe de rotation d'Eilers et al. (2019).
+pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur). Archives : MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), Astro Data Archive de NOIRLab, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS du nœud Anneaux et Lunes, Imaging Node) ; reproject (Astropy) ; Rector et al. (2007, AJ 133, 598) pour l'ordre chromatique ; pratiques des amateurs : voir \texttt{docs/archives\_methode.md}. Animations : ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0) ; Meeus (1998, \emph{Astronomical Algorithms}, 2\textsuperscript{e} éd.) ; obliquité P03 / IAU 2006 ; limites des constellations de l'UAI (données livrées avec astropy) ; côtes Natural Earth 1:50m (domaine public) ; police STIX Two Math (SIL OFL 1.1) ; NASA Exoplanet Archive, NASA Planetary Fact Sheet, éphéméride JPL DE440 et éléments de Standish, AME 2020, filtres de Landolt (1992), spectre de M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, courbe de rotation : modèle de McMillan (2017) par galpy, mesures d'Eilers et al. (2019) et compilation galkin (Pato \& Iocco 2017), bras de Reid et al. (2019), barre de Wegg et al. (2015).
 \end{document}
