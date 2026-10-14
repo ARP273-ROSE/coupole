@@ -45,7 +45,8 @@ _INTERDITS = (
 
 def typo(s: str) -> str:
     """Le texte selon la règle typographique : unités SI, signe moins, puissances de dix."""
-    if not s:
+    # chemin rapide (appelé pour chaque texte de la toile) : rien à corriger sans « - », « / » ni « ^ »
+    if not s or ('-' not in s and '/' not in s and '^' not in s):
         return s
     s = _RE_UNITES.sub(lambda m: _TABLE_UNITES[m.group(1)], s)
     s = _RE_PUISSANCE.sub(lambda m: '10' + m.group(1).translate(EXPOSANTS), s)
