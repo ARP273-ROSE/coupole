@@ -1138,3 +1138,7 @@ route : bouton « Version web », projections polaires et globe 3D du simulateur
 - [x] Validation locale (image coupole-test, Python 3.12, offscreen) : **944 réussis**,
   22 sautés, code 0 ; tests des animations sous Python 3.10 : réussis.
 - **Aucun tag ni Release.**
+- [x] Commits `890de27` (rendu, formules, étiquettes, cartes, éclipses, aide, thèmes, version web) puis le suivant
+  (jour-nuit aligné sur le web, garde-fous, Voie lactée) poussés : CI `tests.yml` **6/6** (Linux, Windows, macOS ×
+  3.10, 3.12) ; au premier, macOS 3.12 rouge sur `test_qualite_inventaire::test_annulation_pendant_l_inventaire`
+  (sensible au temps, sans rapport), vert à la relance.
