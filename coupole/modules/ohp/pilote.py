@@ -36,7 +36,7 @@ import traceback
 
 from ... import __version__
 from ...core import base_partagee, reseau
-from ...core.i18n import bilingue, tr
+from ...core.i18n import bilingue, decimal, tr
 from ...core.parallele import Plan
 from . import formats, lots
 from .astrometrie import attentes, attentes_pour
@@ -705,7 +705,7 @@ def phrase_duree(octets: float, plafond_octets_s: float | None, duree_lisible) -
     debit, genre = reseau.debit_estime(plafond_octets_s)
     if genre == 'inconnu':
         return tr('ohp_duree_inconnue')
-    return tr('ohp_duree_au_' + genre, debit='%.1f' % (debit / 1e6),
+    return tr('ohp_duree_au_' + genre, debit=decimal(debit / 1e6, 1),
               temps=duree_lisible(estimation_temps(octets, debit)))
 
 

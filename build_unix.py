@@ -394,8 +394,10 @@ def step_elaguer():
 # standard restaient en anglais.
 QT_ATTENDUS = {
     'linux': ('plugins/platforms/libqxcb.so', 'plugins/platformthemes/libqxdgdesktopportal.so',
-              'plugins/platformthemes/libqgtk3.so', 'translations/qtbase_fr.qm', 'translations/qt_fr.qm'),
-    'macos': ('plugins/platforms/libqcocoa.dylib', 'translations/qtbase_fr.qm', 'translations/qt_fr.qm'),
+              'plugins/platformthemes/libqgtk3.so', 'translations/qtbase_fr.qm', 'translations/qt_fr.qm',
+              'plugins/imageformats/libqwebp.so', 'plugins/imageformats/libqsvg.so'),
+    'macos': ('plugins/platforms/libqcocoa.dylib', 'translations/qtbase_fr.qm', 'translations/qt_fr.qm',
+              'plugins/imageformats/libqwebp.dylib', 'plugins/imageformats/libqsvg.dylib'),
 }
 
 

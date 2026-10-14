@@ -15,6 +15,8 @@ from PyQt6.QtWidgets import QSizePolicy, QWidget
 from .. import formule
 from . import contenu
 
+CONTRASTE_MIN = 3.0          # seuil WCAG des grands textes : en dessous, couleur de repli (figure_svg.ts : même seuil)
+
 _COTES = None
 
 
@@ -42,6 +44,55 @@ class Peintre:
         self.reponse, self.indice, self.bonnes = reponse, indice, set(bonnes)
         self.jetons = contenu.jetons()
         self._images = {}
+        self.fonds = []          # (chemin en coordonnées de l'appareil, couleur) des remplissages opaques déjà peints
+
+    # ------------------------------------------------------------ contraste des textes (0.7.0)
+    def noter_fond(self, chemin: QPainterPath, brosse):
+        """Retient un remplissage opaque (pour choisir la couleur des textes posés dessus)."""
+        if isinstance(brosse, QBrush) and brosse.style() != Qt.BrushStyle.NoBrush and brosse.color().alphaF() * self.p.opacity() > 0.5:
+            self.fonds.append((self.p.transform().map(chemin), brosse.color()))
+
+    def dessous(self, pt: QPointF) -> QColor:
+        """Couleur du dernier remplissage opaque sous le point (coordonnées locales), sinon le fond de la figure."""
+        q = self.p.transform().map(pt)
+        for chemin, c in reversed(self.fonds):
+            if chemin.contains(q):
+                return c
+        return self.fond
+
+    @staticmethod
+    def luminance(c: QColor) -> float:
+        f = lambda v: v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4
+        return 0.2126 * f(c.redF()) + 0.7152 * f(c.greenF()) + 0.0722 * f(c.blueF())
+
+    @classmethod
+    def contraste(cls, a: QColor, b: QColor) -> float:
+        la, lb = sorted((cls.luminance(a), cls.luminance(b)), reverse=True)
+        return (la + 0.05) / (lb + 0.05)
+
+    def candidats(self):
+        """Couleurs de texte de repli : le texte courant des deux thèmes (comme Coupole Web, figure_svg.ts)."""
+        a = self.jetons.get('avant', {})
+        return [QColor(a.get('sombre', '#f2f2f2')), QColor(a.get('clair', '#1a1a1a'))]
+
+    def lisible(self, jeton, pt: QPointF) -> QColor:
+        """Couleur du texte : celle demandée si elle se lit (contraste ≥ 3, WCAG grands textes) sur la surface peinte
+        dessous ; sinon la plus lisible du texte courant des deux thèmes (un texte posé sur un ciel nocturne dessiné en
+        dur dans le thème clair devient clair).  Même règle que Coupole Web."""
+        c = self.coul(jeton)
+        fond = self.dessous(pt)
+        k = self.contraste(c, fond)
+        if k >= CONTRASTE_MIN:
+            return c
+        meilleur = max(self.candidats(), key=lambda x: self.contraste(x, fond))
+        return meilleur if self.contraste(meilleur, fond) > k else c
+
+    def halo(self, couleur: QColor, pt: QPointF):
+        """Liseré d'un texte de réponse (orange imposé) peu lisible sur la surface dessous : la couleur la plus
+        contrastée avec l'orange (comme le web), sinon None."""
+        if self.contraste(couleur, self.dessous(pt)) >= CONTRASTE_MIN:
+            return None
+        return max(self.candidats(), key=lambda x: self.contraste(couleur, x))
 
     def coul(self, c, alpha=None) -> QColor:
         if c is None or c == 'aucune':
@@ -84,6 +135,7 @@ class Peintre:
             e = dict(e)
             if t == 'texte':
                 e['couleur'] = 'accent'
+                e['_reponse'] = True
             else:
                 e['trait'] = 'accent'
                 e['epaisseur'] = max(3.0, e.get('epaisseur', 1.5))
@@ -110,15 +162,24 @@ class Peintre:
             else:
                 p.setBrush(self.brosse(e))
                 p.drawPolygon(poly)
+                ch = QPainterPath()
+                ch.addPolygon(poly)
+                self.noter_fond(ch, p.brush())
         elif t == 'rect':
             p.setPen(self.stylo(e))
             p.setBrush(self.brosse(e))
             r = e.get('rayon', 0)
             p.drawRoundedRect(QRectF(e['x'], e['y'], e['l'], e['h']), r, r)
+            ch = QPainterPath()
+            ch.addRect(QRectF(e['x'], e['y'], e['l'], e['h']))
+            self.noter_fond(ch, p.brush())
         elif t == 'cercle':
             p.setPen(self.stylo(e))
             p.setBrush(self.brosse(e))
             p.drawEllipse(QPointF(e['cx'], e['cy']), e['r'], e['r'])
+            ch = QPainterPath()
+            ch.addEllipse(QPointF(e['cx'], e['cy']), e['r'], e['r'])
+            self.noter_fond(ch, p.brush())
         elif t == 'ellipse':
             p.setPen(self.stylo(e))
             p.setBrush(self.brosse(e))
@@ -126,6 +187,9 @@ class Peintre:
             p.translate(e['cx'], e['cy'])
             p.rotate(-e.get('rotation', 0))
             p.drawEllipse(QPointF(0, 0), e['rx'], e['ry'])
+            ch = QPainterPath()
+            ch.addEllipse(QPointF(0, 0), e['rx'], e['ry'])
+            self.noter_fond(ch, p.brush())
             p.restore()
         elif t == 'arc':
             cx, cy, r, a1, a2 = e['cx'], e['cy'], e['r'], e['debut'], e['fin']
@@ -140,6 +204,7 @@ class Peintre:
                 path.arcTo(rect, a1, ecart)
                 path.closeSubpath()
                 p.drawPath(path)
+                self.noter_fond(path, p.brush())
             else:
                 p.setBrush(Qt.BrushStyle.NoBrush)
                 p.drawArc(rect, int(round(a1 * 16)), int(round(ecart * 16)))
@@ -160,7 +225,13 @@ class Peintre:
             if img is not None and not img.isNull():
                 s = min(r.width() / img.width(), r.height() / img.height())
                 w, h = img.width() * s, img.height() * s
-                p.drawImage(QRectF(r.center().x() - w / 2, r.center().y() - h / 2, w, h), img)
+                ri = QRectF(r.center().x() - w / 2, r.center().y() - h / 2, w, h)
+                p.drawImage(ri, img)
+                ch = QPainterPath()
+                ch.addRect(ri)
+                moy = img.scaled(1, 1, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation).pixelColor(0, 0)
+                moy.setAlpha(255)
+                self.noter_fond(ch, QBrush(moy))
             else:
                 p.fillRect(r, self.coul('gris_fonce'))
         elif t == 'groupe':
@@ -194,7 +265,7 @@ class Peintre:
         f.setPixelSize(max(1, int(round(taille))))
         f.setBold(bool(e.get('gras')))
         f.setItalic(bool(e.get('italique')))
-        couleur = self.coul(e.get('couleur', 'avant'))
+        jeton = e.get('couleur', 'avant')
         p.save()
         p.translate(e['x'], e['y'])
         if e.get('rotation'):
@@ -218,13 +289,27 @@ class Peintre:
             total = sum(larg)
             x0 = {'debut': 0.0, 'milieu': -total / 2, 'fin': -total}.get(anc, 0.0)
             y = dy0 + k * taille * 1.2
+            milieu = QPointF(x0 + total / 2, y - taille * 0.35)
+            if e.get('_reponse'):                       # bonne réponse montrée : orange gardé, lisere si besoin
+                couleur = valeur = self.coul(jeton)
+                lisere = self.halo(couleur, milieu)
+            else:
+                couleur = self.lisible(jeton, milieu)
+                valeur = self.lisible('valeur', milieu)
+                lisere = None
             for (g, x, gras), w in zip(morceaux, larg):
                 f2 = QFont(f)
                 f2.setBold(f.bold() or gras)
                 p.setFont(f2)
-                c = self.coul('valeur') if gras else couleur
+                c = valeur if gras else couleur
                 if g == 'formule':
                     formule.dessiner(p, x0, y, x, couleur=c)
+                elif lisere is not None:
+                    ch = QPainterPath()
+                    ch.addText(QPointF(x0, y), f2, x)
+                    p.strokePath(ch, QPen(lisere, max(2.5, taille * 0.22), Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap,
+                                          Qt.PenJoinStyle.RoundJoin))
+                    p.fillPath(ch, c)
                 else:
                     p.setPen(c)
                     p.drawText(QPointF(x0, y), x)
@@ -240,6 +325,9 @@ class Peintre:
         p.save()
         p.setClipRect(QRectF(x0, y0, l, h), Qt.ClipOperation.IntersectClip)
         p.fillRect(QRectF(x0, y0, l, h), self.coul(e.get('remplissage', 'mer')))
+        ch = QPainterPath()
+        ch.addRect(QRectF(x0, y0, l, h))
+        self.noter_fond(ch, QBrush(self.coul(e.get('remplissage', 'mer'))))
         p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(self.coul(e.get('terre', 'sol')))
         for poly in cotes():
@@ -254,6 +342,9 @@ class Peintre:
         p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(self.coul('mer'))
         p.drawEllipse(QPointF(cx, cy), r, r)
+        ch = QPainterPath()
+        ch.addEllipse(QPointF(cx, cy), r, r)
+        self.noter_fond(ch, QBrush(self.coul('mer')))
         p.setBrush(self.coul('sol'))
         c0, s0 = math.cos(p0), math.sin(p0)
         for poly in cotes():
@@ -283,7 +374,8 @@ def peindre(p: QPainter, fig: dict, cible: QRectF, theme='sombre', reponse=False
     p.translate(cible.x() + (cible.width() - w * k) / 2, cible.y() + (cible.height() - h * k) / 2)
     p.scale(k, k)
     p.setClipRect(QRectF(0, 0, w, h))
-    p.fillRect(QRectF(0, 0, w, h), pe.coul(fig.get('fond', 'fond')))
+    pe.fond = pe.coul(fig.get('fond', 'fond'))
+    p.fillRect(QRectF(0, 0, w, h), pe.fond)
     for e in fig.get('elements', []):
         pe.elt(e)
     p.restore()

@@ -13,6 +13,13 @@ on:
       version:
         description: "Version a construire (sans le v), ex. 1.2.3"
         required: true
+      # 0.7.0 : construire et essayer les paquets (Windows, macOS x86/arm, Linux x86/arm) SANS publier : ni tag, ni
+      # Release, ni suppression des precedentes ; les paquets restent en artefacts de construction.
+      essai:
+        description: "Essai : construire et verifier les paquets sans rien publier"
+        type: boolean
+        required: false
+        default: false
   # Appelable depuis un autre workflow du depot. C'est indispensable quand une
   # CI cree elle-meme le tag : GitHub ne declenche aucun workflow sur un
   # evenement produit par le jeton d'un workflow (protection anti-boucle), si
@@ -190,6 +197,16 @@ jobs:
           print('paquet fonctionnel, version', vue)
           "
 
+      # 0.7.0 : l'application construite tourne vraiment (sans ecran) : fenetre, chaque module, les 94 animations,
+      # questions, fiches, tables, images WebP, police mathematique, theme et langue changes a chaud
+      - name: Essai fumee de l'application construite
+        shell: bash
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          PKG="$RUNNER_TEMP/build/${{ steps.kit.outputs.nom_fichier }}"
+          "$PKG/python/python.exe" -B -c "import sys; sys.path.insert(0, r'$PKG/app'); from coupole.essai_fumee import main; sys.exit(main())"
+
       - name: Preparer l'archive de mise a jour
         shell: bash
         run: |
@@ -345,6 +362,17 @@ jobs:
       # 0.1.8 : le lanceur suit les liens symboliques (~/.local/bin/coupole -> Coupole.sh, lien de lien) ;
       # installer.sh pose lui-meme ~/.local/bin/coupole. Sous macOS, `readlink -f` n'existe pas avant 12.3 :
       # le lanceur n'en depend pas, ce qu'on verifie ici sur le .app.
+      # 0.7.0 : l'application construite tourne vraiment (sans ecran) : voir coupole/essai_fumee.py
+      - name: Essai fumee de l'application construite
+        shell: bash
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          NOM="${{ steps.kit.outputs.nom_fichier }}"
+          if [ "${{ matrix.plateforme }}" = macos ]; then R="dist/$NOM.app/Contents/Resources"; else R="dist/$NOM"; fi
+          cd "$R"
+          ./python/bin/python3 -B -c "import sys; sys.path.insert(0, 'app'); from coupole.essai_fumee import main; sys.exit(main())"
+
       - name: Essai du lanceur par lien symbolique
         shell: bash
         run: |
@@ -464,6 +492,9 @@ jobs:
   # ──────────────────────────────────────────────────────────────────────
   publier:
     needs: [build, build-unix]
+    # essai (workflow_dispatch, essai coche) : rien n'est publie, donc rien n'est nettoye non plus (« nettoyer »
+    # depend de ce job)
+    if: ${{ !inputs.essai }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

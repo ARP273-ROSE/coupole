@@ -220,12 +220,21 @@ def _complement(app, table: dict):
     return Complement(app)
 
 
+def appliquer_locale(langue: str) -> None:
+    """Nombres des champs (virgule décimale en français, point en anglais) : les champs créés ensuite suivent la
+    langue de Coupole, pas celle du système (0.7.0 : « 3.0 arcmin », « 8.0 Mo/s » s'affichaient en français)."""
+    from PyQt6.QtCore import QLocale
+    QLocale.setDefault(QLocale(QLocale.Language.French, QLocale.Country.France) if langue == 'fr'
+                       else QLocale(QLocale.Language.English, QLocale.Country.UnitedKingdom))
+
+
 def installer_traductions(app, langue: str) -> bool:
     """Charge les textes de Qt (boutons standard, dialogue de fichiers de repli, menus des champs) dans `langue`.
 
     Rappelée à chaque changement de langue : les traducteurs précédents sont retirés. Retourne True si un catalogue
     a été chargé (l'anglais n'en a pas besoin : c'est la langue des textes source de Qt)."""
     from PyQt6.QtCore import QCoreApplication, QTranslator
+    appliquer_locale(langue)
     for t in _traducteurs:
         QCoreApplication.removeTranslator(t)
     _traducteurs.clear()

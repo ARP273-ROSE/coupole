@@ -1249,3 +1249,77 @@ du PROGRESSION.md de Coupole Web, sous-sections « Modules, questions et ressour
 - [x] Aide F1, manuels FR (92 p.) et EN, captures (`outils/captures_anim.py`), NOTICE (licences et crédits exacts),
   CHANGELOG FR puis EN, README, VERSION 0.6.0.
 - **Aucun tag ni Release.**
+
+## 2026-10-14 — 0.7.0 : passe finale avant publication (présentation, audit automatisé, paquets)
+Consigne : « tout joliment moderne, mais léger et fonctionnel, tu testes tout ».  Captures hors écran avant/après de
+toutes les vues (modules OHP, archives, qualité, données, cosmologie, sites, machine, animations, accueil des modules,
+module, question, recherche, Mes modules, Ma progression, fiche, table, image, préférences, aide F1) à 1024 × 600 et
+1600 × 1000 dans les deux thèmes, puis à 1920 × 1080 × 2 (4K à 200 %) et 1280 × 720 × 1,5 ; regardées une à une.
+
+### Défauts trouvés et corrigés
+- Accueil : cartes de largeurs inégales, « 1 tables », « 0 images », texte coupé à droite → grille à colonnes égales
+  (`GrilleCartes`), carte dessinée d'un seul tenant (`Carte`, un widget au lieu de cinq), zéros omis, singulier.
+- Bouton de la vue courante non distingué (états cochés invisibles) ; onglets vides cliquables ; en-tête de module
+  sur trois rangées ; « Ma progression » à double ascenseur ; pourcentage sans espace fine.
+- Question : panneau « Ressources liées » de 25 % de large même vide, texte coupé avec ascenseur horizontal → panneau
+  (≥ 980 px), menu « ★ n » sinon, rien s'il n'y en a pas ; figure de 420 px qui cachait les choix en 1024 × 600 →
+  45 % de la hauteur ; icône plein écran sombre sur sombre ; choix sélectionné en bleu plein (texte peu lisible dans
+  le thème clair) → encadré.
+- Figures : 100 questions avec un texte noir sur un fond dessiné sombre dans le thème clair (« (B) Voie lactée »
+  illisible) → couleur lisible choisie selon la surface peinte dessous (contraste ≥ 3, mêmes candidats que
+  `figure_svg.ts` du web, liseré pour l'orange de la réponse).
+- Schémas : recouvrements avec la police réelle (fragilité Windows) → texte resserré au dessin s'il dépasse la chasse
+  estimée (`mesure_affichee`) : zéro recouvrement quelle que soit la police (test ×1,4).
+- Animations à 1024 × 600 : la scène (250 px minimum) passait sous les réglages (rangées en flux non comptées dans la
+  hauteur minimale) → `Animation._hauteur_minimale`, la page défile.
+- Nombres : « 3.0 arcmin », « 8.0 Mo/s », « 30.4 Go » en français → `QLocale.setDefault` selon la langue de Coupole,
+  `i18n.decimal` ; « −0,300 » en Cosmologie.
+- Fenêtres de ressources sans titre visible, table étirée sur la dernière colonne → en-tête, taille au contenu.
+- Plantages trouvés par l'audit : configurations planétaires à orbites égales (ZeroDivisionError dans un slot) ;
+  molette énorme sur le globe (OverflowError) ; module dont le panneau échoue en construction (le panneau à moitié
+  construit recevait showEvent : arrêt de l'application) ; fenêtre de ressource fermée puis rouverte aussitôt (le
+  `destroyed` de l'ancienne retirait la nouvelle du registre).
+- Thème : `setStyle(Fusion)` refait à chaque changement (ligne des plantages natifs de la 0.6.0 sous Windows/macOS) →
+  posé une fois ; feuille de style seulement si elle change.  Coût restant d'un changement de thème : le repolissage
+  de ~1 200 widgets par Qt (0,6–0,8 s de processeur sur le NAS très chargé) ; c'est la seule opération qui dépasse
+  100 ms, documentée.
+- Explorateur de spectres / parallaxe : `spectre()` 67 → 16 ms (raies voisines par dichotomie, constantes de profil
+  précalculées ; résultat identique au bit sur 18 000 valeurs).
+
+### Tests
+- `tests/test_passe_finale.py` : 517 questions notées (bonne/mauvaise, réponse vue), lisibilité des textes de figures,
+  94 animations × chaque réglage/bouton (aucune exception ; temps processeur du fil graphique ≤ 100 ms, 300 ms en CI,
+  deux passages), glissers aléatoires sur les 94, export → effacement → import identique, import d'un export web,
+  langue/thème à chaud, ressources rouvertes, effacement puis thème (plantage 0.6.0), fermeture/réouverture, module
+  défectueux.
+- Fragilités d'ordre : `test_fiche_en_ligne_vers_cosmologie` (sélection perdue quand la liste des objets OHP est
+  reconstruite par un chargement en fond : l'application garde désormais la sélection, le test attend la fin des
+  chargements et resélectionne) ; `test_schemas_sans_recouvrement` (police du système : voir plus haut).  Suite
+  complète en ordre aléatoire (pytest-randomly, plusieurs graines).
+- `coupole/essai_fumee.py` (`python -m coupole.essai_fumee`) : fenêtre, modules, 94 animations, questions, ressources,
+  WebP, police mathématique, thème, langue ; appelé dans release.yml pour Windows, macOS et Linux ;
+  `QT_ATTENDUS` : greffons WebP et SVG.  release.yml : entrée `essai` du workflow_dispatch (rien publié).
+
+### Données
+- Banque de questions : corrections de la contre-expertise recopiées (commit séparé), empreintes recalculées.
+
+### Mesures (NAS peu chargé, charge 3, temps processeur du fil graphique, `time.thread_time`)
+| Opération | Avant | Après |
+|---|---|---|
+| Changement de thème, fenêtre neuve | 0,63–0,74 s (NAS chargé) | 0,20–0,26 s |
+| Changement de thème, animation et 3 fenêtres ouvertes | 2,7 s (NAS chargé) | 0,29–0,33 s |
+| Changement de langue (tout reconstruit) | 0,52 s (NAS chargé) | 0,24–0,25 s |
+| Pages des modules (accueil, module, question, progression, Mes modules) | — | 3–56 ms |
+| Fiche, table, image (fenêtre) | — | 6–43 ms |
+| Explorateur de spectres : changement de classe | 87–99 ms | 21–62 ms (bande 67 → 16 ms) |
+| Première ouverture des animations (avec import et lecture des données, sans cache de bytecode) | jusqu'à 205 ms | ≤ 160 ms (spectrum010), médiane ~60 ms |
+| Réglages, boutons, pas des 94 animations | — | tous ≤ 100 ms (test, deux passages) |
+- Le changement de thème et de langue reste au-dessus de 100 ms : Qt repolit ~930 widgets avec la feuille de style ;
+  opérations volontaires et rares, mesurées et bornées par le test `test_langue_et_theme_a_chaud_partout`.
+- Fausse fuite repérée en mesurant : sans boucle d'événements, `deleteLater` ne détruit rien (les panneaux remplacés
+  par un changement de langue semblaient s'accumuler) ; l'application (boucle `exec`) n'est pas touchée, les tests
+  appellent désormais `sendPostedEvents(DeferredDelete)`.
+- Ordre aléatoire : suite complète verte avec pytest-randomly, graines 11, 22, 33 (et 2 pour test_interface +
+  test_adaptatif) ; deux fragilités de plus trouvées et corrigées à la racine : une fenêtre de test laissée visible
+  recevait les déplacements de souris du test suivant (`test_dialogue_dossier_natif_ou_qt_selon_le_reglage`), et une
+  minuterie anonyme survivait à sa page (voir CHANGELOG).

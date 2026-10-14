@@ -116,3 +116,11 @@ def bilingue(cle: str, sep: str = ' / ', **valeurs) -> str:
     """« texte FR / texte EN » : pour les fichiers partagés (LOT.txt, CSV)."""
     fr, en = tr(cle, 'fr', **valeurs), tr(cle, 'en', **valeurs)
     return fr if fr == en else fr + sep + en
+
+
+def decimal(x: float, chiffres: int = 1) -> str:
+    """Nombre à virgule dans la langue courante : « 30,4 » en français, « 30.4 » en anglais (moins typographique)."""
+    t = '%.*f' % (chiffres, x)
+    if _courante == 'fr':
+        t = t.replace('.', ',')
+    return t.replace('-', '\u2212')

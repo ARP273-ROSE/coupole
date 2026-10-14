@@ -23,6 +23,8 @@ import json
 import math
 from pathlib import Path
 
+LN2 = math.log(2)
+
 # constantes CODATA 2022 (exactes dans le SI) : h, c, k → c₂ = hc/k
 H_SI = 6.62607015e-34
 C_SI = 299792458.0
@@ -183,6 +185,17 @@ class ModeleSpectres:
         x = 2 * dl / f
         return d * ((1 - m) * math.exp(-math.log(2) * x * x) + m / (1 + x * x))
 
+    @staticmethod
+    def _constantes_profil(d0, W, fwhm, resolution):
+        """(d, m, f) de _profil() pour une raie (mêmes opérations, donc mêmes valeurs) ; None si le profil est nul."""
+        if fwhm is None or fwhm <= 0 or d0 <= 0:
+            return None
+        m = (W / (d0 * fwhm) - AIRE_GAUSS) / (AIRE_LORENTZ - AIRE_GAUSS)
+        m = min(1.0, max(0.0, m))
+        f = math.sqrt(fwhm * fwhm + resolution * resolution) if resolution > 0 else fwhm
+        d = W / (f * ((1 - m) * AIRE_GAUSS + m * AIRE_LORENTZ)) if resolution > 0 else d0
+        return d, m, f
+
     def residu(self, t: float, classe: str, lam: float, familles=None, resolution: float = 0.0) -> float:
         return self.spectre(t, classe, [lam], familles, resolution)[0]
 
@@ -191,6 +204,15 @@ class ModeleSpectres:
         raies = [r for r in self.raies(t, classe) if familles is None or r['famille'] in familles]
         bandes = self.bandes(t, classe) if familles is None or FAM_BANDES in familles else []
         out = []
+        # 0.7.0 (bureau) : seules les raies dont la fenêtre peut contenir λ sont examinées (recherche dichotomique
+        # sur les λ triées, fenêtre la plus large), puis dans leur ordre d'origine : produit identique au bit près,
+        # 10 à 20 fois moins de travail pour une bande de spectre (67 ms → quelques ms par changement de type)
+        fen = [60 * max(r['fwhm'] or 0, resolution, 0.01) for r in raies]
+        tri = sorted(range(len(raies)), key=lambda k: raies[k]['lambda'])
+        cles = [raies[k]['lambda'] for k in tri]
+        large = max(fen, default=0.0)
+        consts = [self._constantes_profil(r['profondeur'], r['W'], r['fwhm'], resolution) for r in raies]
+        from bisect import bisect_left, bisect_right
         for lam in lams:
             eta = 0.0
             for b in bandes:
@@ -199,10 +221,16 @@ class ModeleSpectres:
                     eta += b['eta_tete'] * math.exp(-dl / b['d0'])
             bp = self.beta_prime(teff, lam)
             res = 1 - bp * eta / ((1 + bp) * (1 + eta))
-            for r in raies:
-                dl = lam - r['lambda']
-                if abs(dl) < 60 * max(r['fwhm'] or 0, resolution, 0.01):
-                    res *= 1 - self._profil(dl, r['profondeur'], r['W'], r['fwhm'], resolution)
+            proches = sorted(tri[bisect_left(cles, lam - large):bisect_right(cles, lam + large)])
+            for k in proches:
+                dl = lam - raies[k]['lambda']
+                if abs(dl) < fen[k]:
+                    c = consts[k]
+                    if c is None:                   # _profil() = 0 : facteur 1 exact
+                        continue
+                    d, m, f = c
+                    x = 2 * dl / f
+                    res *= 1 - d * ((1 - m) * math.exp(-LN2 * x * x) + m / (1 + x * x))
             out.append(res)
         return out
 

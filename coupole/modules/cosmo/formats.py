@@ -4,6 +4,8 @@ from __future__ import annotations
 import csv
 import math
 
+MOINS = '\u2212'             # signe moins typographique (règle typographique de Coupole)
+
 from ...core.i18n import langue, tr
 from . import calcul
 
@@ -14,7 +16,7 @@ def nombre(x: float, dec: int = 3) -> str:
     if x is None or not math.isfinite(x):
         return '—'
     s = '{:,.{d}f}'.format(x, d=dec).replace(',', ESPACE)
-    return s.replace('.', ',') if langue() == 'fr' else s
+    return (s.replace('.', ',') if langue() == 'fr' else s).replace('-', MOINS)
 
 
 def chiffres(x: float, n: int = 4) -> str:
@@ -27,7 +29,7 @@ def chiffres(x: float, n: int = 4) -> str:
     if -4 <= e < 9:
         return nombre(x, max(0, n - 1 - e))
     s = '%.*e' % (n - 1, x)
-    return s.replace('.', ',') if langue() == 'fr' else s
+    return (s.replace('.', ',') if langue() == 'fr' else s).replace('-', MOINS)
 
 
 def court(x: float) -> str:
@@ -35,7 +37,7 @@ def court(x: float) -> str:
     if x is None or not math.isfinite(x):
         return '—'
     s = '%.6g' % x
-    return s.replace('.', ',') if langue() == 'fr' else s
+    return (s.replace('.', ',') if langue() == 'fr' else s).replace('-', MOINS)
 
 
 def annees_lumiere(mpc: float) -> str:

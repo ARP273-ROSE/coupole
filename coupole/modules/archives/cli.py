@@ -7,14 +7,15 @@ import os
 import sys
 import threading
 
+from ...core.i18n import decimal as _dec
 from ...core import config
 from ...core.i18n import tr
 
 
 def _taille(o: float) -> str:
     if o >= 1e9:
-        return tr('taille_go', v='%.2f' % (o / 1e9))
-    return tr('taille_mo', v='%.1f' % (o / 1e6))
+        return tr('taille_go', v=_dec(o / 1e9, 2))
+    return tr('taille_mo', v=_dec(o / 1e6, 1))
 
 
 def _recherche_args(p):

@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 
 from ...core import config
-from ...core.i18n import tr
+from ...core.i18n import decimal, tr
 
 
 def rapport() -> dict:
@@ -32,9 +32,9 @@ def lignes(d: dict) -> list[tuple[str, str]]:
     out = [(tr('mach_systeme'), '%s %s (%s)' % (m['nom_systeme'], m['version_systeme'], m['architecture'])),
            (tr('mach_processeur'), m['processeur']),
            (tr('mach_coeurs'), tr('mach_coeurs_val', p=m['coeurs_physiques'], l=m['coeurs_logiques'])),
-           (tr('mach_memoire'), tr('mach_memoire_val', t='%.1f' % (m['memoire_totale_mo'] / 1024),
-                                   d='%.1f' % (m['memoire_disponible_mo'] / 1024))),
-           (tr('mach_disque'), tr('mach_disque_val', g=d['disque_libre_go'], dest=d['destination'])),
+           (tr('mach_memoire'), tr('mach_memoire_val', t=decimal(m['memoire_totale_mo'] / 1024),
+                                   d=decimal(m['memoire_disponible_mo'] / 1024))),
+           (tr('mach_disque'), tr('mach_disque_val', g=decimal(d['disque_libre_go']) if isinstance(d['disque_libre_go'], (int, float)) else d['disque_libre_go'], dest=d['destination'])),
            (tr('mach_python'), m['python'])]
     if 'bibliotheques' in d:
         from ...core.bibliotheques import resume

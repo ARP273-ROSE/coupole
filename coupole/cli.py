@@ -271,7 +271,7 @@ def _gui():
 
 
 _EXPOSANTS = str.maketrans('⁰¹²³⁴⁵⁶⁷⁸⁹', '0123456789')
-_ESPACES_FINES = {'\u202f': ' ', '\u2009': ' ', '\u00a0': ' ', **{chr(0x2080 + k): str(k) for k in range(10)}}
+_ESPACES_FINES = {'\u2212': '-', '\u202f': ' ', '\u2009': ' ', '\u00a0': ' ', **{chr(0x2080 + k): str(k) for k in range(10)}}
 
 
 def _repli_ascii(err):

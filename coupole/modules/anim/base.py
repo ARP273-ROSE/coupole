@@ -695,7 +695,25 @@ class Animation(QWidget):
 
     def resizeEvent(self, ev):
         super().resizeEvent(ev)
+        self._hauteur_minimale()
         self.rafraichir()
+
+    def _hauteur_minimale(self):
+        """Hauteur minimale réelle à cette largeur (0.7.0) : les rangées de réglages (dispositions en flux) et les
+        textes à la ligne ont une hauteur qui dépend de la largeur, que Qt ne compte pas dans la taille minimale.  En
+        petite fenêtre (1024 × 600), la scène gardait ses 250 px et passait sous les boutons ; la page défile
+        désormais."""
+        lay = self.layout()
+        if lay is None:
+            return
+        w = max(1, self.width())
+        m = lay.contentsMargins()
+        visibles = [lay.itemAt(i) for i in range(lay.count()) if not lay.itemAt(i).isEmpty()]
+        h = m.top() + m.bottom() + max(0, len(visibles) - 1) * max(0, lay.spacing())
+        for it in visibles:
+            h += it.heightForWidth(w) if it.hasHeightForWidth() else it.minimumSize().height()
+        if abs(self.minimumHeight() - h) > 1:
+            self.setMinimumHeight(h)
 
     def showEvent(self, ev):
         super().showEvent(ev)

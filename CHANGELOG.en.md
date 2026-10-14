@@ -2,6 +2,45 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.7.0 — 14 October 2026
+
+**Final pass before release: a more modern and lighter look, from 1024 × 600 to 4K, everything tested
+automatically, several crashes and freezes fixed, packages checked for real.**
+
+- **Module home page**: equal-width cards in a grid (number, title, contents without zeros and in the singular for 1,
+  thin progress bar), each drawn as a single widget (one widget per card instead of five).
+- **Navigation**: the current view (*Modules*, *Animations*, *My modules*, *My progress*) is highlighted; more compact
+  module page (original title, progress and actions on one row); empty tabs greyed out.
+- **Questions**: related resources on the right in a wide window, in a “★ n” menu in a narrow one, nothing when there
+  are none; figure limited to 45 % of the height (choices stay visible at 1024 × 600); selected choice outlined;
+  verdict in the theme colours; full-screen icon readable in both themes.
+- **Question figures readable in both themes**: a text drawn on a painted background (night sky, dark blue oval…)
+  takes a contrasting colour; 100 questions were affected in the light theme.
+- **Diagrams**: a text wider than planned in the system font is condensed when drawn; no overlap any more, whatever
+  the font (Windows, macOS, Linux).
+- **Outline, table and image windows**: header (kind, title), size fitted to the content; tables with alternating
+  rows, the name column takes the free space. *My progress*: a single table (no more double scroll bar).
+- **Animations in a small window**: the scene no longer slides under the controls (the page scrolls); thin scroll
+  bars, hover on lists, F1 help starting with the modules.
+- **Numbers**: decimal comma in every field in French (rate, search radius…), in sizes and rates (“78,03 Go”,
+  “66,6 Mo”) of the OHP bank and the archives, in *My computer* and *About*; typographic minus sign in *Cosmology*.
+- **Crashes and freezes fixed**: planetary configurations simulator with two equal orbits (division by zero); very
+  fast wheel on the day-night globe; resource window closed then reopened at once (lost from the registry); a module
+  whose construction fails no longer stops the application; OHP bank selection kept when the list is rebuilt;
+  interface style set only once (shorter theme change, no useless re-polishing).
+- **Performance**: spectrum band of the Spectrum Explorer and of Spectroscopic Parallax 4 times faster (bit-identical),
+  temperature axis computed once; layouts of control rows and cards memoised: theme change down to 0.2–0.3 s, page
+  navigation under 60 ms.
+- **Reliability**: the “Erased — Undo” notice and the answer flashing use timers attached to their page (a timer
+  outlived a language change and targeted a destroyed label).
+- **Tests**: end-to-end automated audit (`tests/test_passe_finale.py`): the 517 questions scored, figure texts
+  readable, the 94 animations (every control, every button: no exception, time budget in the GUI thread), random drags
+  on every animation, export → erase → import identical, import of a Coupole Web export, language and theme switched
+  live, windows reopened, erase then theme change, close and reopen; suite stable in random order; “smoke” test of the
+  built application (`python -m coupole.essai_fumee`) in every package (Windows, macOS, Linux); trial build without
+  publishing.
+- Question bank: corrections from the second review copied in.
+
 ## 0.6.0 — 14 October 2026
 
 **« Animations » module: navigation through the 22 ClassAction modules, 517 questions, outlines, tables and images,

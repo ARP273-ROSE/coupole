@@ -67,6 +67,13 @@ def mesure_reelle(t: str, taille: float, gras: bool = False) -> float:
     return fm.horizontalAdvance(t) * (taille / max(1, int(round(taille))))
 
 
+def mesure_affichee(t: str, taille: float, gras: bool = False) -> float:
+    """Largeur à l'écran : la mesure réelle, jamais plus large que la chasse estimée (0.7.0).  Un texte plus large
+    dans la police du système (Segoe UI, SF Pro, DejaVu…) que la table de chasses est resserré horizontalement au
+    dessin : la mise en page, vérifiée sans recouvrement avec la table, le reste sur tous les systèmes."""
+    return min(mesure_reelle(t, taille, gras), largeur_estimee(t, taille, gras))
+
+
 def _texte(v, lg):
     return str(v.get(lg, '')) if isinstance(v, dict) else ('' if v is None else str(v))
 
@@ -307,7 +314,7 @@ def couleur_onde(nm: float) -> QColor:
 def peindre(p: QPainter, s: dict, cible: QRectF, theme: str = 'sombre', lg: str | None = None):
     """Dessine le schéma dans `cible` (mise à l'échelle uniforme, centrée)."""
     pal = PALETTE['clair' if theme == 'clair' else 'sombre']
-    ops, _, (vx, vy, vl, vh) = rendre(s, lg, mesure_reelle)
+    ops, _, (vx, vy, vl, vh) = rendre(s, lg, mesure_affichee)
     k = min(cible.width() / max(vl, 1e-6), cible.height() / max(vh, 1e-6))
     ox = cible.x() + (cible.width() - vl * k) / 2
     oy = cible.y() + (cible.height() - vh * k) / 2
@@ -406,10 +413,18 @@ def peindre(p: QPainter, s: dict, cible: QRectF, theme: str = 'sombre', lg: str 
             y0 = -dy * (len(lignes) - 1) / 2 if base == 'milieu' else 0
             for i, li in enumerate(lignes):
                 w = fm.horizontalAdvance(li)
-                xx = {'g': 0, 'm': -w / 2, 'd': -w}[ancre]
+                k = min(1.0, largeur_estimee(li, taille, gras) / w) if w > 0 else 1.0   # voir mesure_affichee()
+                xx = {'g': 0, 'm': -w * k / 2, 'd': -w * k}[ancre]
                 yb = y0 + i * dy
                 yy = {'haut': yb + fm.ascent(), 'milieu': yb + (fm.ascent() - fm.descent()) / 2, 'bas': yb}[base]
-                p.drawText(QPointF(xx, yy), li)
+                if k < 1.0:
+                    p.save()
+                    p.translate(xx, yy)
+                    p.scale(k, 1.0)
+                    p.drawText(QPointF(0, 0), li)
+                    p.restore()
+                else:
+                    p.drawText(QPointF(xx, yy), li)
             p.restore()
         elif g == 'formule':
             _, x, y, src, ta, an, ba, c = op
@@ -448,7 +463,7 @@ class SchemaWidget(QWidget):
         super().__init__(parent)
         self.schema = schema
         self.theme = theme
-        _, _, (_, _, self._vl, self._vh) = rendre(schema, None, mesure_reelle)
+        _, _, (_, _, self._vl, self._vh) = rendre(schema, None, mesure_affichee)
         self.setAccessibleName(_texte(schema.get('titre'), langue()))
         self.setAccessibleDescription(_texte(schema.get('alt'), langue()))
         self.setToolTip(_texte(schema.get('alt'), langue()))

@@ -16,6 +16,7 @@ from PyQt6.QtGui import QKeySequence, QShortcut
 from PyQt6.QtWidgets import (QDialog, QFormLayout, QFrame, QGridLayout, QGroupBox, QHBoxLayout, QLabel,
                              QMessageBox, QPlainTextEdit, QProgressBar, QSplitter, QTabWidget, QVBoxLayout, QWidget)
 
+from ...core.i18n import decimal as _dec
 from ...core import base_partagee, config, i18n
 from ...core.i18n import tr
 from ...gui.adaptatif import Flux, coupable
@@ -31,7 +32,7 @@ from .possession import Possession
 
 
 def _taille(o: float) -> str:
-    return tr('taille_go', v='%.2f' % (o / 1e9)) if o >= 1e8 else tr('taille_mo', v='%.1f' % (o / 1e6))
+    return tr('taille_go', v=_dec(o / 1e9, 2)) if o >= 1e8 else tr('taille_mo', v=_dec(o / 1e6, 1))
 
 
 def _entier(n) -> str:
@@ -732,7 +733,20 @@ class Panneau(QWidget):
                            ', '.join(sorted(o['tel'])), ', '.join(sorted(o['filtres'])), ', '.join(etat), ''))
             donnees.append(o)
             bulles.append(tr('ohp_bulle_objet', noms=', '.join(sorted(o['noms'])), doublons=o['doublons']))
+        # objets choisis gardés quand la liste est reconstruite (inventaire rechargé en fond, possession, langue) :
+        # la sélection faite entre-temps n'est plus perdue (0.7.0)
+        choisis = {o['objet'] for o in lignes_choisies(self.v_obj, self.p_obj, self.m_obj)} if self.m_obj.donnees else set()
         self.m_obj.remplir(lignes, donnees, bulles)
+        if choisis:
+            from PyQt6.QtCore import QItemSelection, QItemSelectionModel
+            sel = QItemSelection()
+            for r, o in enumerate(donnees):
+                if o['objet'] in choisis:
+                    i = self.p_obj.mapFromSource(self.m_obj.index(r, 0))
+                    if i.isValid():
+                        sel.select(i, i)
+            self.v_obj.selectionModel().select(sel, QItemSelectionModel.SelectionFlag.ClearAndSelect |
+                                               QItemSelectionModel.SelectionFlag.Rows)
         self._appliquer_possession_objets()
         memoire.ajuster_colonnes(self.v_obj)
         if not self.v_obj.property(memoire.PROPRIETE_LARGEURS):

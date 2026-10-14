@@ -21,6 +21,7 @@ from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import (QComboBox, QCompleter, QDoubleSpinBox, QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
                              QMenu, QMessageBox, QProgressBar, QSplitter, QTabWidget, QTextBrowser, QVBoxLayout, QWidget)
 
+from ...core.i18n import decimal as _dec
 from ...core.i18n import tr
 from ...gui import fichiers, memoire, ouvrir
 from ...gui.adaptatif import Flux, coupable, texte_reel
@@ -38,7 +39,7 @@ CLE = 'modules.archives.'
 def _taille(o) -> str:
     if not o:
         return ''
-    return tr('taille_go', v='%.2f' % (o / 1e9)) if o >= 1e9 else tr('taille_mo', v='%.1f' % (o / 1e6))
+    return tr('taille_go', v=_dec(o / 1e9, 2)) if o >= 1e9 else tr('taille_mo', v=_dec(o / 1e6, 1))
 
 
 def telecharger_vignette(url: str) -> str:

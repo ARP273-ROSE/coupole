@@ -359,7 +359,7 @@ def texte_configuration() -> str:
     presentes, absentes = bibliotheques.resume()
     return tr('apropos_config', os='%s %s (%s)' % (m.nom_systeme, m.version_systeme, m.architecture),
               cpu=m.processeur, p=m.coeurs_physiques, l=m.coeurs_logiques,
-              ram='%.1f' % (m.memoire_totale_mo / 1024), gpu=gpu, python=platform.python_version(),
+              ram=i18n.decimal(m.memoire_totale_mo / 1024, 1), gpu=gpu, python=platform.python_version(),
               astap=tr(a.message_cle()) + ((' — ' + a.executable) if a.executable else ''),
               biblio=tr('apropos_biblio', presentes=presentes or '—', absentes=absentes or '—'))
 

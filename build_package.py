@@ -313,7 +313,9 @@ def step_prune():
 
 # Ce que le Qt du paquet doit garder (0.1.8) : greffon de la plateforme (dialogues natifs de Windows) et
 # traductions de Qt (boutons standard, menus des champs de texte, dialogue de repli en francais).
-QT_ATTENDUS = ('plugins/platforms/qwindows.dll', 'translations/qtbase_fr.qm', 'translations/qt_fr.qm')
+# 0.7.0 : greffon WebP (photographies des modules) et SVG (icônes des modules) gardés aussi.
+QT_ATTENDUS = ('plugins/platforms/qwindows.dll', 'translations/qtbase_fr.qm', 'translations/qt_fr.qm',
+               'plugins/imageformats/qwebp.dll', 'plugins/imageformats/qsvg.dll')
 
 
 def controler_qt(pkg=None) -> list:

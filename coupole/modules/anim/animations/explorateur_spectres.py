@@ -46,12 +46,25 @@ def type_de_temperature(T: float, classe: str):
     return _TYPES_T[cle]
 
 
+_TEFFS: dict = {}
+
+
+def _teffs(classe: str) -> list:
+    """T_eff tous les dixièmes de type (0 à 69), calculées une fois par classe (0.7.0 : l'axe des températures
+    recalculait l'étalonnage complet pour chacune de ses 12 graduations, 70 ms à la première ouverture)."""
+    v = _TEFFS.get(classe)
+    if v is None:
+        m = modele()
+        v = _TEFFS[classe] = [m.etalonnage(k / 10, classe)['teff'] for k in range(691)]
+    return v
+
+
 def _type_de_temperature(T: float, classe: str):
-    m = modele()
-    avant = m.etalonnage(0, classe)['teff']
+    teffs = _teffs(classe)
+    avant = teffs[0]
     for k in range(1, 691):
         t = k / 10
-        v = m.etalonnage(t, classe)['teff']
+        v = teffs[k]
         if (avant - T) * (v - T) <= 0 and avant != v:
             return t - 0.1 + 0.1 * (avant - T) / (avant - v)
         avant = v

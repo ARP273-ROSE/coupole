@@ -157,7 +157,12 @@ def test_dialogue_dossier_natif_ou_qt_selon_le_reglage(app_qt, dialogue_simule, 
     if reglage == 'qt':                       # barre latérale : dossier personnel et emplacements du système
         lieux = [u.toLocalFile() for u in d.sidebarUrls()]
         assert os.path.expanduser('~').replace(os.sep, '/') in [x.rstrip('/') for x in lieux]
+    # fenêtre fermée et détruite tout de suite : restée visible jusqu'au test suivant, elle recevait ses déplacements
+    # de souris (fragilité d'ordre, 0.7.0)
+    parent.close()
     parent.deleteLater()
+    from PyQt6.QtCore import QCoreApplication, QEvent
+    QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete.value)
 
 
 def test_emplacements_reseau_dans_la_barre_laterale(tmp_path):
@@ -235,7 +240,8 @@ def test_le_paquet_garde_greffons_et_traductions(tmp_path, monkeypatch):
                 'plugins/platformthemes/libqxdgdesktopportal.so', 'plugins/platformthemes/libqgtk3.so',
                 'plugins/sqldrivers/libqsqlite.so', 'translations/qtbase_fr.qm', 'translations/qt_fr.qm',
                 'translations/qtbase_en.qm', 'translations/qtbase_de.qm', 'lib/libQt6Core.so.6',
-                'lib/libQt6Quick.so.6']
+                'lib/libQt6Quick.so.6', 'plugins/imageformats/libqwebp.so', 'plugins/imageformats/libqsvg.so',
+                'plugins/imageformats/libqpdf.so']
     for f in fichiers:
         (sp / f).parent.mkdir(parents=True, exist_ok=True)
         (sp / f).write_bytes(b'x')
@@ -247,6 +253,10 @@ def test_le_paquet_garde_greffons_et_traductions(tmp_path, monkeypatch):
     assert build_unix.controler_qt(pkg, 'linux') == []
     (sp / 'plugins/platformthemes/libqxdgdesktopportal.so').unlink()
     assert build_unix.controler_qt(pkg, 'linux') == ['plugins/platformthemes/libqxdgdesktopportal.so']
+    # 0.7.0 : greffon WebP (photographies des modules) gardé, PDF retiré
+    assert not (sp / 'plugins/imageformats/libqpdf.so').exists()
+    (sp / 'plugins/imageformats/libqwebp.so').unlink()
+    assert 'plugins/imageformats/libqwebp.so' in build_unix.controler_qt(pkg, 'linux')
     # paquet Windows : même contrôle dans build_package.py
     sys.path.insert(0, str(RACINE))
     try:

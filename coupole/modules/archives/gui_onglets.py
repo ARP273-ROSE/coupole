@@ -9,6 +9,7 @@ import html
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QListWidget, QListWidgetItem, QTextBrowser, QVBoxLayout, QWidget)
 
+from ...core.i18n import decimal as _dec
 from ...core.i18n import langue, tr
 from ...gui.adaptatif import Flux
 from ...gui.modele import ModeleParesseux, vue_tableau
@@ -24,7 +25,7 @@ COLONNES_CAT = ('cible', 'categorie', 'n', 'exposition', 'position')
 def _taille(o) -> str:
     if not o:
         return ''
-    return tr('taille_go', v='%.2f' % (o / 1e9)) if o >= 1e9 else tr('taille_mo', v='%.1f' % (o / 1e6))
+    return tr('taille_go', v=_dec(o / 1e9, 2)) if o >= 1e9 else tr('taille_mo', v=_dec(o / 1e6, 1))
 
 
 class OngletCatalogue(QWidget):

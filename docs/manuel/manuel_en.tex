@@ -1372,6 +1372,22 @@ calibration interpolated monotonically and smoothly, PCHIP): no more plateaus or
 \emph{teaching contrast} by default (lines widened and deepened, stated below the band) or a \emph{realistic scale}.
 \capture{img/anim_spectrum010_g2_en.png}{0.95}
 
+\subsection{Look and checks (0.7.0)}\label{sec:finale}
+\paragraph{Look.} The home page shows the modules as equal-width cards (number, title, contents, thin progress bar);
+the current view is highlighted in the \emph{Modules}, \emph{Animations}, \emph{My modules}, \emph{My progress} bar.
+On a question, related resources are on the right in a wide window and in the « $\star$~n » menu of the header in a
+narrow one; the figure takes at most 45~\% of the height, so the choices stay visible at 1024~$\times$~600. Texts of
+figures and diagrams stay readable in both themes and never overlap, whatever the system font. The interface adapts
+from 1024~$\times$~600 to 4K and from 100 to 200~\% scaling; in a small window, an animation page scrolls instead of
+squeezing the scene.
+\capture{img/classe_question_etroite_en.png}{0.8}
+
+\paragraph{Automatic checks.} The 517 questions are scored one by one (right and wrong answer), the 94 animations are
+handled (every control at its limits, every button, random drags) without exception and without freezing the GUI
+thread, the backup makes the round trip export $\to$ erase $\to$ import identically (and accepts a Coupole Web export),
+language and theme change live, settings come back on reopening. Every built package (Windows, macOS, Linux) passes a
+headless « smoke » test: \texttt{python -m coupole.essai\_fumee}.
+
 \subsection{Available animations}
 \begin{center}
 \small

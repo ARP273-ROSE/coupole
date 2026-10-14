@@ -131,11 +131,12 @@ def test_phrase_de_duree_ohp():
     ancien = r.get('debit_mesure_mo_s')
     try:
         r['debit_mesure_mo_s'] = 0.0
-        assert '8.0' in phrase_duree(78e9, 8e6, duree_lisible)
+        from coupole.core.i18n import decimal                 # « 8,0 » en français, « 8.0 » en anglais (0.7.0)
+        assert decimal(8.0) in phrase_duree(78e9, 8e6, duree_lisible)
         sans = phrase_duree(78e9, 0, duree_lisible)
         assert '{' not in sans and sans
         r['debit_mesure_mo_s'] = 50.0
-        assert '50.0' in phrase_duree(78e9, 0, duree_lisible)
+        assert decimal(50.0) in phrase_duree(78e9, 0, duree_lisible)
     finally:
         r['debit_mesure_mo_s'] = ancien or 0.0
 

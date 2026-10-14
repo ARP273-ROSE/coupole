@@ -319,12 +319,22 @@ def test_fiche_en_ligne_vers_cosmologie(app_qt, fenetre, monkeypatch):
     monkeypatch.setattr(enligne, 'fiche_objet', fiche)
     ohp = fenetre.ouvrir_module('ohp')
     attendre(app_qt, lambda: ohp.inv is not None and ohp.m_obj.rowCount() > 0)
-    for r, o in enumerate(ohp.m_obj.donnees):
-        if o['objet'] == 'M31':
-            ohp.v_obj.selectRow(ohp.p_obj.mapFromSource(ohp.m_obj.index(r, 0)).row())
+    from coupole.gui.modele import lignes_choisies
+    from coupole.gui.outils import attendre_taches
+    attendre_taches()                                       # chargements en fond terminés (possession, ciel…)
+    ohp.onglets.setCurrentIndex(0)
+
+    def choisir_m31():
+        if [o['objet'] for o in lignes_choisies(ohp.v_obj, ohp.p_obj, ohp.m_obj)] != ['M31']:
+            ohp.v_obj.clearSelection()
+            for r, o in enumerate(ohp.m_obj.donnees):
+                if o['objet'] == 'M31':
+                    ohp.v_obj.selectRow(ohp.p_obj.mapFromSource(ohp.m_obj.index(r, 0)).row())
+        return [o['objet'] for o in lignes_choisies(ohp.v_obj, ohp.p_obj, ohp.m_obj)] == ['M31']
+    attendre(app_qt, choisir_m31, 10)
     assert demandes == []                                   # onglet caché : aucune requête
     ohp.onglets.setCurrentIndex(ohp.onglet_fiche)
-    attendre(app_qt, lambda: ohp.fiche.resultat() is not None, 10)
+    attendre(app_qt, lambda: (choisir_m31() or True) and ohp.fiche.resultat() is not None, 15)
     assert demandes == ['M31'] and 'M 31' in ohp.fiche.vue.toPlainText()
     assert ohp.fiche.b_cosmo.isEnabled()
     ohp.fiche.b_cosmo.click()

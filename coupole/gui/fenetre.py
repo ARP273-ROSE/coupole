@@ -32,6 +32,7 @@ class FenetrePrincipale(QMainWindow):
     def construire(self, capturer: bool = True):
         """(Re)construit menus et panneaux.  `capturer` : l'état des panneaux actuels (filtres, colonnes…) est
         relu avant d'être rétabli dans les nouveaux (changement de langue) ; False après une réinitialisation."""
+        plateforme.appliquer_locale(i18n.langue())    # champs numériques créés ci-dessous : virgule en français
         m = memoire.memoire()
         if capturer:
             m.capturer()
@@ -56,12 +57,21 @@ class FenetrePrincipale(QMainWindow):
                 p.arreter()
         self.panneaux = []
         for mod in modules.decouvrir():
+            classe = None
             try:
                 classe = mod.classe_gui()
                 if classe is None:
                     continue
                 panneau = classe(self)
             except Exception as e:  # un module défectueux ne bloque pas l'application
+                # 0.7.0 : le panneau à moitié construit (enfant de la fenêtre) recevait ensuite showEvent/resizeEvent
+                # et son exception y arrêtait toute l'application : il est détaché et détruit tout de suite
+                if classe is not None:
+                    for w in self.findChildren(classe):
+                        if w not in self.panneaux:
+                            w.hide()
+                            w.setParent(None)
+                            w.deleteLater()
                 panneau = QLabel(tr('fen_module_erreur', module=mod.nom_local(), erreur=str(e)))
                 panneau.setWordWrap(True)
             panneau.module = mod

@@ -438,7 +438,10 @@ class JourNuit(Animation):
     def molette(self, pos, delta):
         if self.projection.currentData() != 'globe':
             return False
-        self._zoom = max(0.6, min(4.0, self._zoom * (1.0015 ** delta)))
+        if not math.isfinite(delta):
+            return True
+        # molette ou pavé tactile très rapides (delta énorme) : borné avant la puissance (OverflowError sinon)
+        self._zoom = max(0.6, min(4.0, self._zoom * (1.0015 ** max(-2400.0, min(2400.0, delta)))))
         self.toile.update()
         return True
 

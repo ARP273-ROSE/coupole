@@ -145,15 +145,23 @@ def test_regle_typographique_ressources_et_questions():
 
 
 def test_schemas_sans_recouvrement(app_qt):
-    from coupole.modules.anim.classe.schema_qt import mesure_reelle, recouvrements
+    from coupole.modules.anim.classe.schema_qt import mesure_affichee, recouvrements
     pb = []
     for i, s in contenu._lire('schemas').items():
         for lg in ('fr', 'en'):
             pb += ['%s (%s) : %s' % (i, lg, x) for x in recouvrements(s, lg)]
     assert pb == []
-    # avec la mesure réelle des polices Qt : au plus quelques frôlements tolérés par la marge de 4 du cadre de vue
-    reels = [i for i, s in contenu._lire('schemas').items() for lg in ('fr', 'en') if recouvrements(s, lg, mesure_reelle)]
-    assert len(reels) <= 5, reels
+    # à l'écran (0.7.0) : mesure réelle bornée par la chasse estimée (texte resserré au dessin s'il est plus large dans
+    # la police du système) → aucun recouvrement, quels que soient le système et sa police (Windows, macOS, Linux)
+    reels = ['%s (%s) : %s' % (i, lg, x) for i, s in contenu._lire('schemas').items() for lg in ('fr', 'en')
+             for x in recouvrements(s, lg, mesure_affichee)]
+    assert reels == []
+    # une police système nettement plus large (×1,4) : toujours aucun recouvrement
+    from coupole.modules.anim.classe import schema_qt
+    import unittest.mock as um
+    with um.patch.object(schema_qt, 'mesure_reelle', lambda t, ta, g=False: 1.4 * schema_qt.largeur_estimee(t, ta, g)):
+        assert not [i for i, s in contenu._lire('schemas').items() for lg in ('fr', 'en')
+                    if recouvrements(s, lg, schema_qt.mesure_affichee)]
 
 
 def test_rendu_de_toutes_les_questions_et_ressources(app_qt):

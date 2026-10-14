@@ -9,13 +9,13 @@ from __future__ import annotations
 import html as _html
 import random
 
-from PyQt6.QtCore import QPoint, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QPoint, QRect, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QKeySequence, QShortcut
 from PyQt6.QtWidgets import (QAbstractItemView, QComboBox, QFileDialog, QFrame, QGridLayout, QHBoxLayout, QLabel,
                              QLineEdit, QListWidget, QListWidgetItem, QMenu, QMessageBox, QCheckBox, QProgressBar, QAbstractButton, QAbstractSpinBox,
                              QPushButton, QScrollArea, QSizePolicy, QStackedWidget, QTabWidget, QTableWidget,
                              QTableWidgetItem, QToolButton, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget,
-                             QInputDialog)
+                             QInputDialog, QLayout, QHeaderView)
 
 from ....core.i18n import langue, tr
 from .. import catalogue
@@ -149,17 +149,210 @@ class ListeRessources(QListWidget):
 
 
 # ================================================================== pages
-class Carte(QPushButton):
-    """Carte d'un module (bouton à deux lignes) : largeur minimale réduite, les cartes passent à la ligne."""
+class GrilleCartes(QLayout):
+    """Grille de cartes de même largeur : autant de colonnes que la largeur en permet (largeur minimale `lmin`),
+    toutes les cartes d'une rangée à la même hauteur ; hauteur dépendante de la largeur (défilement vertical)."""
 
-    def minimumSizeHint(self):
+    def __init__(self, parent=None, lmin=250, espace=8):
+        super().__init__(parent)
+        self.items, self.lmin, self.espace = [], lmin, espace
+        self._hauteurs = {}
+        self.setContentsMargins(0, 0, 0, 0)
+
+    def invalidate(self):
+        self._hauteurs = {}
+        super().invalidate()
+
+    def addItem(self, it):
+        self.items.append(it)
+
+    def count(self):
+        return len(self.items)
+
+    def itemAt(self, i):
+        return self.items[i] if 0 <= i < len(self.items) else None
+
+    def takeAt(self, i):
+        return self.items.pop(i) if 0 <= i < len(self.items) else None
+
+    def expandingDirections(self):
+        return Qt.Orientation(0)
+
+    def hasHeightForWidth(self):
+        return True
+
+    def heightForWidth(self, w):
+        h = self._hauteurs.get(w)
+        if h is None:
+            h = self._hauteurs[w] = self._placer(QRect(0, 0, w, 0), False)
+        return h
+
+    def setGeometry(self, r):
+        super().setGeometry(r)
+        self._placer(r, True)
+
+    def sizeHint(self):
+        return self.minimumSize()
+
+    def minimumSize(self):
         from PyQt6.QtCore import QSize
-        return QSize(200, 54)
+        return QSize(min(self.lmin, 200), max((it.minimumSize().height() for it in self.items), default=0))
+
+    def colonnes(self, w):
+        return max(1, (w + self.espace) // (self.lmin + self.espace))
+
+    def _placer(self, r, poser):
+        if not self.items:
+            return 0
+        n = min(self.colonnes(r.width()), len(self.items))
+        lc = (r.width() - (n - 1) * self.espace) / n
+        y = r.y()
+        for k in range(0, len(self.items), n):
+            rang = self.items[k:k + n]
+            h = max(it.widget().heightForWidth(int(lc)) if it.widget() and it.widget().hasHeightForWidth()
+                    else it.sizeHint().height() for it in rang)
+            if poser:
+                for j, it in enumerate(rang):
+                    x = r.x() + j * (lc + self.espace)
+                    it.setGeometry(QRect(int(round(x)), y, int(round(x + lc)) - int(round(x)), h))
+            y += h + self.espace
+        return y - self.espace - r.y()
+
+
+class Carte(QAbstractButton):
+    """Carte d'un module, dessinée d'un seul tenant (un widget au lieu de cinq : la page d'accueil reste légère et un
+    changement de thème n'a rien à repolir) : numéro, titre en gras, contenu (comptes sans les zéros, au singulier ou
+    au pluriel), barre de progression fine.  Couleurs du thème lues au dessin ; survol, focus clavier, accessible."""
+
+    MARGE_X, MARGE_Y = 12, 9
+
+    def __init__(self, titre: str, details: str = '', n=None, progres=None, parent=None):
+        super().__init__(parent)
+        self.titre, self.details, self.n, self.progres = titre, details, n, progres
+        self.setObjectName('carteModule')
+        self.setText(titre)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setAttribute(Qt.WidgetAttribute.WA_Hover, True)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setAccessibleName(titre + (' — ' + details if details else ''))
+        pol = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        pol.setHeightForWidth(True)
+        self.setSizePolicy(pol)
+
+    def _polices(self):
+        from PyQt6.QtGui import QFont
+        ft = QFont(self.font())
+        ft.setBold(True)
+        return ft, self.font()
+
+    def _decalage(self) -> int:
+        from PyQt6.QtGui import QFontMetrics
+        return QFontMetrics(self._polices()[0]).horizontalAdvance('00') + 8 if self.n else 0
+
+    def changeEvent(self, ev):
+        self.__dict__.pop('_memo', None)              # police ou style changés : mesures à refaire
+        super().changeEvent(ev)
+
+    def _rects(self, w: int):
+        memo = self.__dict__.setdefault('_memo', {})
+        if w not in memo:
+            memo[w] = self._mesurer(w)
+        return memo[w]
+
+    def _mesurer(self, w: int):
+        from PyQt6.QtGui import QFontMetrics
+        ft, fd = self._polices()
+        x0 = self.MARGE_X + self._decalage()
+        larg = max(40, w - x0 - self.MARGE_X)
+        drap = int(Qt.TextFlag.TextWordWrap)
+        rt = QFontMetrics(ft).boundingRect(QRect(0, 0, larg, 10000), drap, self.titre)
+        rd = QFontMetrics(fd).boundingRect(QRect(0, 0, w - 2 * self.MARGE_X, 10000), drap, self.details) \
+            if self.details else QRect()
+        return x0, larg, rt.height(), rd.height()
+
+    def hasHeightForWidth(self):
+        return True
+
+    def heightForWidth(self, w):
+        _, _, ht, hd = self._rects(w)
+        return 2 * self.MARGE_Y + ht + (3 + hd if hd else 0) + (10 if self.progres is not None else 0)
 
     def sizeHint(self):
         from PyQt6.QtCore import QSize
-        h = super().sizeHint()
-        return QSize(min(max(h.width(), 260), 380), max(54, h.height()))
+        return QSize(280, self.heightForWidth(280))
+
+    def minimumSizeHint(self):
+        from PyQt6.QtCore import QSize
+        return QSize(180, 48)
+
+    def paintEvent(self, _):
+        from PyQt6.QtCore import QRectF
+        from PyQt6.QtGui import QColor, QPainter, QPen
+        from ....gui.theme import THEMES
+        c = THEMES.get(theme_courant(), THEMES['sombre'])
+        p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        actif = self.underMouse() or self.isDown()
+        r = QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5)
+        p.setPen(QPen(QColor(c['selection'] if (actif or self.hasFocus()) else c['bordure']), 1.4 if self.hasFocus() else 1))
+        p.setBrush(QColor(c['survol'] if actif else c['base']))
+        p.drawRoundedRect(r, 10, 10)
+        x0, larg, ht, hd = self._rects(self.width())
+        ft, fd = self._polices()
+        drap = int(Qt.TextFlag.TextWordWrap)
+        y = self.MARGE_Y
+        if self.n:
+            p.setFont(ft)
+            p.setPen(QColor(c['lien']))
+            p.drawText(QRect(self.MARGE_X, y, x0 - self.MARGE_X, ht), int(Qt.AlignmentFlag.AlignTop), '%02d' % self.n)
+        p.setFont(ft)
+        p.setPen(QColor(c['texte']))
+        p.drawText(QRect(x0, y, larg, ht), drap, self.titre)
+        y += ht
+        if hd:
+            y += 3
+            p.setFont(fd)
+            p.setPen(QColor(c['texte_doux']))
+            p.drawText(QRect(self.MARGE_X, y, self.width() - 2 * self.MARGE_X, hd), drap, self.details)
+            y += hd
+        if self.progres is not None:
+            fait, total = self.progres
+            yb = self.height() - self.MARGE_Y - 4
+            lb = self.width() - 2 * self.MARGE_X
+            p.setPen(Qt.PenStyle.NoPen)
+            p.setBrush(QColor(c['bordure']))
+            p.drawRoundedRect(QRectF(self.MARGE_X, yb, lb, 4), 2, 2)
+            if total and fait:
+                p.setBrush(QColor(c['statut_ok']))
+                p.drawRoundedRect(QRectF(self.MARGE_X, yb, max(4.0, lb * fait / total), 4), 2, 2)
+        p.end()
+
+
+def icone_plein_ecran(couleur) -> 'QIcon':
+    """Quatre coins (plein écran), à la couleur du texte du thème : l'icône standard du style était sombre sur fond
+    sombre."""
+    from PyQt6.QtCore import QPointF
+    from PyQt6.QtGui import QIcon, QPainter, QPen, QPixmap
+    pm = QPixmap(32, 32)
+    pm.fill(Qt.GlobalColor.transparent)
+    p = QPainter(pm)
+    p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+    p.setPen(QPen(couleur, 3, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
+    for sx, sy in ((1, 1), (-1, 1), (1, -1), (-1, -1)):
+        cx, cy = 16 - sx * 11, 16 - sy * 11
+        p.drawPolyline([QPointF(cx, cy + sy * 8), QPointF(cx, cy), QPointF(cx + sx * 8, cy)])
+    p.end()
+    return QIcon(pm)
+
+
+def comptes(m: dict) -> str:
+    """« 18 questions · 1 anim. · 5 fiches » : les zéros omis, singulier pour 1 (comme Coupole Web)."""
+    out = []
+    for g, c in (('questions', 'q'), ('animations', 'a'), ('fiches', 'f'), ('tables', 't'), ('images', 'i')):
+        n = len(m.get(g) or ())
+        if n:
+            out.append('%d\u00a0%s' % (n, tr('classe_%s_court%s' % (c, '1' if n == 1 and c != 'a' else ''))))
+    return ' · '.join(out)
 
 
 def bulles(racine):
@@ -192,12 +385,9 @@ class PageAccueil(QWidget):
         v.addWidget(zone, 1)
         self.remplir()
 
-    def _carte(self, texte: str, rappel, n=None, progres=0, total=0) -> QPushButton:
-        b = Carte((('%02d  ' % n if n else '') + texte).replace('&', '&&'))
-        b.setMinimumHeight(54)
-        b.setStyleSheet('text-align:left; padding:6px 12px;')
-        b.setAccessibleName(texte)
-        b.setToolTip(texte.split('\n')[0] + ('\n' + tr('classe_progres_texte', r=progres, n=total) if total else ''))
+    def _carte(self, titre: str, details: str, rappel, n=None, progres=None) -> QPushButton:
+        b = Carte(titre, details, n, progres)
+        b.setToolTip(titre + ('\n' + tr('classe_progres_texte', r=progres[0], n=progres[1]) if progres and progres[1] else ''))
         b.clicked.connect(rappel)
         return b
 
@@ -207,25 +397,22 @@ class PageAccueil(QWidget):
         for titre_cle, liste in (('classe_modules', [m for m in contenu.modules() if m['affiche']]),
                                  ('classe_modules_bonus', [m for m in contenu.modules() if not m['affiche']])):
             self.grille.addWidget(_titre(tr(titre_cle), 1.15))
-            from ....gui.adaptatif import Flux
-            g = Flux()
+            g = GrilleCartes()
             for k, m in enumerate(liste):
                 ids = [q['id'] for q in m['questions'] if q['ok']]
                 b = S.bilan(s, ids)
-                details = '%d %s · %d %s · %d %s · %d %s · %d %s' % (
-                    len(m['questions']), tr('classe_q_court'), len(m['animations']), tr('classe_a_court'),
-                    len(m['fiches']), tr('classe_f_court'), len(m['tables']), tr('classe_t_court'), len(m['images']), tr('classe_i_court'))
-                carte = self._carte('%s\n%s%s' % (bi(m['titre']), details, ('  ·  ' + tr('classe_progres_texte', r=b['reussies'], n=b['total'])) if b['essayees'] else ''),
-                                    lambda _=False, c=m['cle']: self.vue.aller_module(c, False), k + 1 if m['affiche'] else None)
-                g.addWidget(carte)
+                details = comptes(m) + (('  ·  ' + tr('classe_progres_texte', r=b['reussies'], n=b['total'])) if b['essayees'] else '')
+                g.addWidget(self._carte(bi(m['titre']), details, lambda _=False, c=m['cle']: self.vue.aller_module(c, False),
+                                        k + 1 if m['affiche'] else None, (b['reussies'], b['total'])))
             self.grille.addLayout(g)
+            self.grille.addSpacing(6)
         self.grille.addWidget(_titre(tr('classe_mes_modules'), 1.15))
-        from ....gui.adaptatif import Flux
-        g = Flux()
+        g = GrilleCartes()
         for mm in s['mes_modules']:
-            g.addWidget(self._carte('%s\n%s' % (mm['nom'], tr('classe_n_elements', n=len(mm['elements']))),
+            n = len(mm['elements'])
+            g.addWidget(self._carte(mm['nom'], tr('classe_n_elements1') if n == 1 else tr('classe_n_elements', n=n),
                                     lambda _=False, i=mm['id']: self.vue.aller_module(i, True)))
-        g.addWidget(self._carte('+ ' + tr('classe_creer_module'), self.vue.creer_module))
+        g.addWidget(self._carte('+ ' + tr('classe_creer_module'), '', self.vue.creer_module))
         self.grille.addLayout(g)
         self.grille.addStretch(1)
         vus = sorted(((k, v) for k, v in s['modules'].items() if v.get('derniere_question')), key=lambda x: x[1]['visite'], reverse=True)
@@ -252,18 +439,29 @@ class PageModule(QWidget):
         v = QVBoxLayout(self)
         self.titre = _titre(self.mm['nom'] if perso else bi(self.m['titre']))
         v.addWidget(self.titre)
+        # une seule rangée sous le titre : titre d'origine, progression (texte + barre fine), actions
+        actions = QHBoxLayout()
+        actions.setSpacing(8)
         if not perso and self.m['original'] and self.m['original'] != bi(self.m['titre']):
-            v.addWidget(QLabel(tr('classe_titre_origine', titre=self.m['original'])))
+            orig = QLabel(tr('classe_titre_origine', titre=self.m['original']))
+            orig.setStyleSheet('color: palette(placeholder-text);')
+            actions.addWidget(orig)
+            actions.addSpacing(10)
         self.qs = questions_de(cle, self.mm)
         b = S.bilan(s, [q['id'] for q in self.qs if q['ok']])
         if self.qs:
             barre = QProgressBar()
+            barre.setObjectName('progresFin')
+            barre.setTextVisible(False)
+            barre.setFixedWidth(140)
             barre.setRange(0, max(1, b['total']))
             barre.setValue(b['reussies'])
             barre.setFormat(tr('classe_progres_texte', r=b['reussies'], n=b['total']))
             barre.setAccessibleName(barre.format())
-            v.addWidget(barre)
-        actions = QHBoxLayout()
+            self.l_progres = QLabel(barre.format())
+            actions.addWidget(self.l_progres)
+            actions.addWidget(barre)
+        actions.addStretch(1)
         if not perso:
             actions.addWidget(self._bouton('classe_copier_module', self._copier))
         else:
@@ -272,7 +470,6 @@ class PageModule(QWidget):
             actions.addWidget(self._bouton('classe_supprimer', self._supprimer))
         if self.qs:
             actions.addWidget(self._bouton('classe_reinit_progression', self._raz))
-        actions.addStretch(1)
         v.addLayout(actions)
         self.onglets = QTabWidget()
         self.onglets.setAccessibleName(tr('classe_contenu_module'))
@@ -334,7 +531,8 @@ class PageModule(QWidget):
                 vide.setFlags(Qt.ItemFlag.NoItemFlags)
                 liste.addItem(vide)
             liste.ouvrir.connect(self.vue.ouvrir_ressource)
-            self.onglets.addTab(liste, '%s (%d)' % (tr('classe_onglet_' + g + 's'), len(ids)))
+            k = self.onglets.addTab(liste, '%s (%d)' % (tr('classe_onglet_' + g + 's'), len(ids)))
+            self.onglets.setTabEnabled(k, bool(ids))            # onglet vide : visible (le compte 0 informe) mais grisé
         if self.perso:
             self.onglets.addTab(self._organiser(), '%s (%d)' % (tr('classe_onglet_organiser'), len(self.mm['elements'])))
         noms = ['questions', 'animations', 'fiches', 'tables', 'images', 'organiser']
@@ -441,6 +639,7 @@ class PageModule(QWidget):
 class BoutonChoix(QPushButton):
     def __init__(self, lettre: str, texte_riche: str, fig, parent):
         super().__init__(parent)
+        self.setObjectName('choix')
         self.setCheckable(True)
         self.setMinimumHeight(48)
         lay = QHBoxLayout(self)
@@ -486,7 +685,8 @@ class PageQuestion(QWidget):
         self.v = QVBoxLayout(self.carte)
         gauche.setWidget(self.carte)
         racine.addWidget(gauche, 3)
-        racine.addWidget(self._liees(), 1)
+        self.panneau_liees = self._liees()
+        racine.addWidget(self.panneau_liees, 1)
         tete = QHBoxLayout()
         self.b_prec = QToolButton()
         self.b_prec.setArrowType(Qt.ArrowType.LeftArrow)
@@ -504,6 +704,18 @@ class PageQuestion(QWidget):
             st = QLabel('<i>%s</i>' % tr('classe_statut_' + self.q['statut_reponse']))
             tete.addWidget(st)
         tete.addStretch(1)
+        # ressources liées : panneau à droite en fenêtre large, menu « ★ n » en fenêtre étroite, rien s'il n'y en a pas
+        self.b_liees = QToolButton()
+        self.b_liees.setText('★ %d' % len(self.liees))
+        self.b_liees.setToolTip(tr('classe_ressources_liees'))
+        self.b_liees.setAccessibleName(tr('classe_ressources_liees'))
+        self.b_liees.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+        menu = QMenu(self.b_liees)
+        for g, i, texte in self.liees:
+            menu.addAction(texte).triggered.connect(lambda _=False, g=g, i=i: self.vue.ouvrir_ressource(g, i))
+        self.b_liees.setMenu(menu)
+        self.b_liees.setVisible(False)
+        tete.addWidget(self.b_liees)
         self.b_ajouter = QToolButton()
         self.b_ajouter.setText('+')
         self.b_ajouter.setToolTip(tr('classe_ajouter_a'))
@@ -511,7 +723,7 @@ class PageQuestion(QWidget):
         self.b_ajouter.clicked.connect(lambda: menu_ajouter(self, 'question', qid, bi(self.q['titre'])).exec(self.b_ajouter.mapToGlobal(QPoint(0, self.b_ajouter.height()))))
         tete.addWidget(self.b_ajouter)
         self.b_plein = QToolButton()
-        self.b_plein.setIcon(self.style().standardIcon(self.style().StandardPixmap.SP_TitleBarMaxButton))
+        self.b_plein.setIcon(icone_plein_ecran(self.palette().color(self.palette().ColorRole.WindowText)))
         self.b_plein.setToolTip(tr('classe_presentation'))
         self.b_plein.setAccessibleName(tr('classe_presentation'))
         self.b_plein.clicked.connect(self.vue.basculer_plein_ecran)
@@ -584,6 +796,26 @@ class PageQuestion(QWidget):
         self.calculer()
         self.remplir()
 
+    LARGEUR_PANNEAU = 980          # en dessous, les ressources liées passent dans le menu « ★ n » de l'en-tête
+
+    def resizeEvent(self, ev):
+        super().resizeEvent(ev)
+        if hasattr(self, 'b_liees') and hasattr(self, 'fig'):
+            self._adapter()
+
+    def _hauteur_figure(self) -> int:
+        """Figure bornée à ~45 % de la hauteur visible (160 à 420 px) : les choix restent en vue en petite fenêtre."""
+        return int(max(160, min(420, 0.45 * max(1, self.height()))))
+
+    def _adapter(self):
+        large = self.width() >= self.LARGEUR_PANNEAU
+        self.panneau_liees.setVisible(large and bool(self.liees))
+        self.b_liees.setVisible(not large and bool(self.liees))
+        for f in [getattr(self, 'fig', None)]:
+            if f is not None and f.hauteur_max != self._hauteur_figure():
+                f.hauteur_max = self._hauteur_figure()
+                f.updateGeometry()
+
     # ------------------------------------------------------------ état
     def calculer(self):
         try:
@@ -614,7 +846,7 @@ class PageQuestion(QWidget):
         _vider(self.zone_fig)
         self.fig = None
         if self.inst['figure']:
-            self.fig = FigureWidget(self.inst['figure'], theme_courant(), bi(self.q['figure'].get('alt')) if isinstance(self.q.get('figure'), dict) and self.q['figure'].get('alt') else tr('classe_figure_question'), hauteur_max=420)
+            self.fig = FigureWidget(self.inst['figure'], theme_courant(), bi(self.q['figure'].get('alt')) if isinstance(self.q.get('figure'), dict) and self.q['figure'].get('alt') else tr('classe_figure_question'), hauteur_max=self._hauteur_figure())
             self.zone_fig.addWidget(self.fig)
             cr = self._credits(self.inst['figure'])
             if cr:
@@ -724,7 +956,9 @@ class PageQuestion(QWidget):
         s['modules'][self.cle] = {'derniere_question': self.qid, 'visite': S.maintenant()}
         stockage().modifie()
         self.valide = True
-        self.l_retour.setText('<b style="color:%s">%s</b>' % ('#2e9d63' if juste else '#d0453a', _html.escape(
+        from ....gui.theme import THEMES
+        c = THEMES.get(theme_courant(), THEMES['sombre'])
+        self.l_retour.setText('<b style="color:%s">%s</b>' % (c['statut_ok'] if juste else c['statut_echec'], _html.escape(
             tr('classe_juste') if juste else tr('classe_faux', lettres=', '.join(self.inst['bonnes_lettres'])))))
         self.b_revoir.setChecked(bool(s['questions'][self.qid].get('a_revoir')))
         self.maj()
@@ -746,7 +980,15 @@ class PageQuestion(QWidget):
             b = self.boutons.get(i)
             if b:
                 b.setStyleSheet('QPushButton{border:2px solid #ff9900; background: rgba(255,153,0,%d);}' % (110 if n % 2 else 20))
-        QTimer.singleShot(200, lambda: self._clignoter(n - 1))
+        if not hasattr(self, '_minuterie_clignotement'):        # enfant de la page : rien ne survit à la page
+            self._minuterie_clignotement = QTimer(self)
+            self._minuterie_clignotement.setSingleShot(True)
+            self._minuterie_clignotement.timeout.connect(self._clignoter_suite)   # méthode liée, pas de lambda
+        self._reste_clignotements = n - 1
+        self._minuterie_clignotement.start(200)
+
+    def _clignoter_suite(self):
+        self._clignoter(self._reste_clignotements)
 
     def basculer_indice(self):
         self.indice = self.b_indice.isChecked()
@@ -765,20 +1007,25 @@ class PageQuestion(QWidget):
 
     def _liees(self) -> QWidget:
         w = QFrame()
+        w.setObjectName('panneauLiees')
         w.setFrameShape(QFrame.Shape.StyledPanel)
+        w.setMinimumWidth(220)
+        w.setMaximumWidth(340)
         v = QVBoxLayout(w)
         v.addWidget(_titre('★ ' + tr('classe_ressources_liees'), 1.05))
         l = contenu.liees(self.qid)
         liste = ListeRessources()
-        n = 0
+        liste.setWordWrap(True)
+        liste.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.liees = []
         for g in ('animations', 'fiches', 'tables', 'images'):
             for i, lien in l.get(g, []):
                 if g == 'animations' and i not in catalogue.PAR_ID:
                     continue
                 liste.ajouter(g[:-1], i, contenu.titre(g[:-1], i), etoile=lien != 'mots-clés',
                               sous=tr('classe_genre_' + g[:-1]) + (' · ' + tr('classe_lien_mots_cles') if lien == 'mots-clés' else ''))
-                n += 1
-        if not n:
+                self.liees.append((g[:-1], i, ('★ ' if lien != 'mots-clés' else '') + contenu.titre(g[:-1], i) + '  —  ' + tr('classe_genre_' + g[:-1])))
+        if not self.liees:
             liste.addItem(QListWidgetItem(tr('classe_aucune_liee')))
         liste.ouvrir.connect(self.vue.ouvrir_ressource)
         v.addWidget(liste, 1)
@@ -935,14 +1182,19 @@ class PageProgression(QWidget):
         tab.setAccessibleName(tr('classe_par_module'))
         for k, m in enumerate(mods):
             x = S.bilan(s, [q['id'] for q in m['questions'] if q['ok']])
-            for j, val in enumerate((bi(m['titre']), x['reussies'], x['ratees'], ('%d %%' % x['score']) if x['essayees'] else '—')):
+            for j, val in enumerate((bi(m['titre']), x['reussies'], x['ratees'], ('%d\u202f%%' % x['score']) if x['essayees'] else '—')):
                 it = QTableWidgetItem(str(val))
                 if j:
                     it.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
                 tab.setItem(k, j, it)
         tab.resizeColumnsToContents()
-        tab.horizontalHeader().setStretchLastSection(True)
-        tab.setMinimumHeight(min(460, 30 + 26 * len(mods)))
+        tab.verticalHeader().setVisible(False)
+        tab.setAlternatingRowColors(True)
+        tab.setShowGrid(False)
+        tab.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        # toute la table d'un bloc : la page défile, pas un second ascenseur dans la table
+        tab.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        tab.setFixedHeight(tab.horizontalHeader().sizeHint().height() + sum(tab.rowHeight(r) for r in range(len(mods))) + 4)
         tab.cellDoubleClicked.connect(lambda r, _c: vue.aller_module(mods[r]['cle'], False))
         v.addWidget(tab)
         v.addWidget(_titre(tr('classe_a_revoir_titre'), 1.1))
@@ -1201,7 +1453,16 @@ class VueClasse(QWidget):
         self.annonce.setText(_html.escape(texte) + (' — <a href="annuler">%s</a>' % _html.escape(tr('classe_defaire')) if annuler else ''))
         self.annonce.setVisible(True)
         self.annonce.setAccessibleName(texte)
-        QTimer.singleShot(duree_ms, lambda: self.annonce.setVisible(False))
+        # minuterie enfant de la vue : détruite avec elle (une lambda survivait à un changement de langue et visait une
+        # étiquette détruite, 0.7.0)
+        if not hasattr(self, '_minuterie_annonce'):
+            self._minuterie_annonce = QTimer(self)
+            self._minuterie_annonce.setSingleShot(True)
+            self._minuterie_annonce.timeout.connect(self._cacher_annonce)   # méthode liée : déconnectée à la destruction
+        self._minuterie_annonce.start(duree_ms)
+
+    def _cacher_annonce(self):
+        self.annonce.setVisible(False)
 
     def _annuler(self):
         f, self._annulation = self._annulation, None

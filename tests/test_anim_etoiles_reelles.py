@@ -250,6 +250,10 @@ def test_survol_toucher_clavier(app_qt):
     app_qt.processEvents()
     assert a.survolables
     o = min(a.survolables, key=lambda u: u['ordre'])
+    # passer d'abord ailleurs : le curseur peut déjà être sur cette étoile (test précédent, même géométrie) et Qt
+    # n'enverrait alors aucun déplacement (fragilité d'ordre, 0.7.0)
+    QTest.mouseMove(t, QPoint(2, 2))
+    app_qt.processEvents()
     QTest.mouseMove(t, QPoint(int(round(o['x'])), int(round(o['y']))))
     app_qt.processEvents()
     f = t._fiche

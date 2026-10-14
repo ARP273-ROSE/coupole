@@ -1422,6 +1422,22 @@ spectre a un \emph{contraste pédagogique} par défaut (raies élargies et appro
 \emph{échelle réaliste}.
 \capture{img/anim_spectrum010_g2_fr.png}{0.95}
 
+\subsection{Présentation et vérifications (0.7.0)}\label{sec:finale}
+\paragraph{Présentation.} L'accueil montre les modules en cartes de même largeur (numéro, titre, contenu, barre de
+progression fine) ; la vue courante est mise en évidence dans la barre \emph{Modules}, \emph{Animations},
+\emph{Mes modules}, \emph{Ma progression}. Sur une question, les ressources liées sont à droite en fenêtre large et
+dans le menu « $\star$~n » de l'en-tête en fenêtre étroite ; la figure ne dépasse pas 45~\% de la hauteur, si bien que les
+choix restent visibles en 1024~$\times$~600. Les textes des figures et des schémas restent lisibles dans les deux thèmes
+et ne se recouvrent jamais, quelle que soit la police du système. L'interface s'adapte de 1024~$\times$~600 à la 4K et
+de 100 à 200~\% de mise à l'échelle ; en petite fenêtre, la page d'une animation défile au lieu de tasser la scène.
+\capture{img/classe_question_etroite_fr.png}{0.8}
+
+\paragraph{Vérifications automatiques.} Les 517 questions sont notées une à une (bonne et mauvaise réponse), les 94
+animations sont manipulées (chaque réglage aux bornes, chaque bouton, glissers aléatoires) sans exception et sans gel
+du fil graphique, la sauvegarde fait l'aller-retour export $\to$ effacement $\to$ import à l'identique (et accepte un
+export de Coupole Web), la langue et le thème changent à chaud, les réglages reviennent à la réouverture. Chaque paquet
+construit (Windows, macOS, Linux) passe un essai « fumée » sans écran : \texttt{python -m coupole.essai\_fumee}.
+
 \subsection{Les animations disponibles}
 \begin{center}
 \small

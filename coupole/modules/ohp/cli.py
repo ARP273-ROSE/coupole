@@ -9,12 +9,13 @@ import sys
 import threading
 import time
 
+from ...core.i18n import decimal as _dec
 from ...core import config, i18n
 from ...core.i18n import tr
 
 
 def _taille(o: float) -> str:
-    return tr('taille_go', v='%.2f' % (o / 1e9)) if o >= 1e8 else tr('taille_mo', v='%.1f' % (o / 1e6))
+    return tr('taille_go', v=_dec(o / 1e9, 2)) if o >= 1e8 else tr('taille_mo', v=_dec(o / 1e6, 1))
 
 
 def _selection_args(p, objet=True):
@@ -512,7 +513,7 @@ def _traiter(a, inv, sel, confirmer_gros=True):
     fmt = a.format or r['format_sortie']
     dest = _dest(a)
     m, plan = _plan(a)
-    print(tr('ohp_machine', cpu=m.coeurs_physiques, log=m.coeurs_logiques, ram='%.1f' % (m.memoire_disponible_mo / 1024),
+    print(tr('ohp_machine', cpu=m.coeurs_physiques, log=m.coeurs_logiques, ram=_dec(m.memoire_disponible_mo / 1024, 1),
              dl=plan.telechargements, conv=plan.conversions, raison=tr(plan.raison)))
     est = estimer(sel, fmt)
     assez = _afficher_estimation(est, fmt, dest, plan)

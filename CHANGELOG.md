@@ -2,6 +2,47 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.7.0 — 14 octobre 2026
+
+**Passe finale avant publication : présentation plus moderne et plus légère, de 1024 × 600 à la 4K, tout essayé
+automatiquement, plusieurs plantages et gels corrigés, paquets vérifiés en vrai.**
+
+- **Accueil des modules** : cartes de même largeur en grille (numéro, titre, contenu sans les zéros et au singulier
+  pour 1, barre de progression fine), dessinées d'un seul tenant (un widget par carte au lieu de cinq).
+- **Navigation** : la vue courante (*Modules*, *Animations*, *Mes modules*, *Ma progression*) est mise en évidence ;
+  page de module plus compacte (titre d'origine, progression et actions sur une rangée) ; onglets vides grisés.
+- **Questions** : ressources liées à droite en fenêtre large, dans un menu « ★ n » en fenêtre étroite, plus rien
+  quand il n'y en a pas ; figure bornée à 45 % de la hauteur (les choix restent visibles en 1024 × 600) ; choix
+  sélectionné encadré ; verdict aux couleurs du thème ; icône plein écran lisible dans les deux thèmes.
+- **Figures des questions lisibles dans les deux thèmes** : un texte posé sur un fond dessiné (ciel nocturne, ovale
+  bleu nuit…) prend une couleur contrastée ; 100 questions étaient touchées dans le thème clair.
+- **Schémas** : un texte plus large dans la police du système que prévu est resserré au dessin ; plus aucun
+  recouvrement, quelle que soit la police (Windows, macOS, Linux).
+- **Fenêtres de fiches, tables et images** : en-tête (genre, titre), taille ajustée au contenu ; tables à lignes
+  alternées, la colonne des noms prend la place libre. *Ma progression* : une seule table (plus de double ascenseur).
+- **Animations en petite fenêtre** : la scène ne passe plus sous les réglages (la page défile) ; barres de défilement
+  fines, survol des listes, aide F1 qui commence par les modules.
+- **Nombres** : virgule décimale dans tous les champs en français (débit, rayon de recherche…), dans les tailles et
+  les débits (« 78,03 Go », « 66,6 Mo ») de la banque OHP et des archives, dans *Ma machine* et *À propos* ; signe moins
+  typographique en *Cosmologie*.
+- **Plantages et gels corrigés** : simulateur des configurations planétaires avec deux orbites égales (division par
+  zéro) ; molette très rapide sur le globe du jour-nuit ; fenêtre de ressource fermée puis rouverte aussitôt (perdue
+  du registre) ; un module dont la construction échoue n'arrête plus l'application ; sélection de la banque OHP
+  gardée quand la liste se reconstruit ; style de l'interface posé une seule fois (changement de thème plus court et
+  sans repolissage inutile).
+- **Performances** : bande de spectre de l'Explorateur de spectres et de la Parallaxe spectroscopique 4 fois plus
+  rapide (identique au bit près), axe des températures calculé une fois ; mises en page des rangées de réglages et des
+  cartes mémorisées : changement de thème ramené à 0,2–0,3 s, navigation entre pages sous 60 ms.
+- **Fiabilité** : l'annonce « Effacé — Annuler » et le clignotement de la réponse utilisent des minuteries rattachées à
+  leur page (une minuterie survivait à un changement de langue et visait une étiquette détruite).
+- **Tests** : audit automatisé de bout en bout (`tests/test_passe_finale.py`) : les 517 questions notées, textes des
+  figures lisibles, les 94 animations (chaque réglage, chaque bouton : aucune exception, budget de temps dans le fil
+  graphique), glissers aléatoires sur chaque animation, export → effacement → import identique, import d'un export de
+  Coupole Web, langue et thème à chaud, fenêtres rouvertes, effacement puis changement de thème, fermeture et
+  réouverture ; suite stable en ordre aléatoire ; essai « fumée » de l'application construite (`python -m
+  coupole.essai_fumee`) dans chaque paquet (Windows, macOS, Linux) ; construction d'essai sans publication.
+- Banque de questions : corrections de la contre-expertise recopiées.
+
 ## 0.6.0 — 14 octobre 2026
 
 **Module « Animations » : navigation par les 22 modules de ClassAction, 517 questions, fiches, tables et images,

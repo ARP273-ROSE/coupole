@@ -169,10 +169,18 @@ def bloc_table(t: dict, parent=None, lignes_max=None) -> QWidget:
                 it.setToolTip(info)
             tab.setItem(i, j, it)
     tab.resizeColumnsToContents()
-    tab.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
-    tab.horizontalHeader().setStretchLastSection(True)
+    tab.setAlternatingRowColors(True)
+    tab.setShowGrid(False)
+    hh = tab.horizontalHeader()
+    hh.setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+    hh.setStretchLastSection(False)
+    if len(cols) > 1:
+        hh.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)   # la place libre va aux noms, pas à la dernière colonne
+    else:
+        hh.setStretchLastSection(True)
     h = tab.horizontalHeader().height() + sum(tab.rowHeight(i) for i in range(len(lignes))) + 6
     tab.setMinimumHeight(min(h, 420))
+    tab.setMaximumHeight(max(h, 120) if len(lignes) <= 30 else 16777215)   # pas de grand vide sous une courte table
     v.addWidget(tab)
     if lignes_max is None:
         for f in t.get('formules', []):
@@ -276,11 +284,27 @@ class FenetreRessource(QWidget):
         self.setAccessibleName(titre)
         zone = QScrollArea(self)
         zone.setWidgetResizable(True)
+        zone.setFrameShape(QFrame.Shape.NoFrame)
         zone.setWidget(w)
         v = QVBoxLayout(self)
-        v.setContentsMargins(6, 6, 6, 6)
-        v.addWidget(zone)
-        self.resize(620, 680)
+        v.setContentsMargins(14, 10, 14, 10)
+        v.setSpacing(6)
+        # en-tête : genre (discret) puis titre (0.7.0 : la fenêtre commençait directement par le texte)
+        g = QLabel(tr('classe_genre_' + genre).upper())
+        g.setStyleSheet('color: palette(placeholder-text); font-size: 8pt; letter-spacing: 1px;')
+        v.addWidget(g)
+        t = QLabel(titre)
+        t.setWordWrap(True)
+        f = t.font()
+        f.setPointSizeF(f.pointSizeF() * 1.3)
+        f.setBold(True)
+        t.setFont(f)
+        t.setAccessibleName(titre)
+        v.addWidget(t)
+        v.addWidget(zone, 1)
+        # taille au contenu (bornée) : une petite table n'ouvre plus une grande fenêtre vide
+        hc = w.sizeHint().height() + t.sizeHint().height() + g.sizeHint().height() + 50
+        self.resize(620, int(max(260, min(680, hc))))
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
 
     def keyPressEvent(self, ev):
@@ -308,7 +332,9 @@ def ouvrir_ressource(genre: str, i: str) -> QWidget:
         pass
     f = FenetreRessource(genre, i)
     _FENETRES[cle] = f
-    f.destroyed.connect(lambda *_: _FENETRES.pop(cle, None))
+    # seulement si c'est encore elle : fermée puis rouverte aussitôt, l'ancienne fenêtre est détruite après
+    # l'ouverture de la nouvelle et retirait la nouvelle du registre (0.7.0)
+    f.destroyed.connect(lambda *_, f=f: _FENETRES.pop(cle, None) if _FENETRES.get(cle) is f else None)
     n = len(_FENETRES)
     ecran = QApplication.primaryScreen()
     if ecran is not None:

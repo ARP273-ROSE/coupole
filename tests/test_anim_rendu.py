@@ -639,6 +639,10 @@ def test_titre_abrege_infobulle_et_nom_accessible(appli):
     assert t and all(u['complet'] in a.toile.accessibleName() for u in t)
     # info-bulle : seulement au-dessus d'un titre abrégé (titre factice posé sur la toile déjà dessinée)
     a.toile._titres = [{'boite': (20.0, 10.0, 120.0, 16.0), 'abrege': True, 'complet': 'Titre complet (long)'}]
+    # le curseur peut déjà être à cet endroit (test précédent, fenêtre de même géométrie) : sans déplacement réel, Qt
+    # n'envoie aucun événement → on passe d'abord ailleurs (fragilité d'ordre, 0.7.0)
+    QTest.mouseMove(a.toile, QPoint(5, a.toile.height() - 5))
+    appli.processEvents()
     QTest.mouseMove(a.toile, QPoint(60, 18))
     appli.processEvents()
     assert a.toile.toolTip() == 'Titre complet (long)'

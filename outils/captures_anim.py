@@ -43,6 +43,11 @@ VARIANTES = (('daylightsimulator_nord', 'daylightsimulator', {'projection': 'nor
              ('bigdipper_fiche', 'bigdipper', {}))
 
 
+def contenu_question(qid):
+    from coupole.modules.anim.classe import contenu
+    return contenu.question(qid)
+
+
 def attendre(app, s):
     t0 = time.time()
     while time.time() - t0 < s:
@@ -88,6 +93,14 @@ def main():
     q.b_reponse.click()
     attendre(app, 1.8)
     f.grab().save(str(dossier / ('classe_question_%s.png' % langue)))
+    # 0.7.0 : la même question en petite fenêtre (1024 × 600) : ressources liées dans le menu « ★ n »
+    taille = f.size()
+    f.resize(1024, 600)
+    v.aller_question('light', 'ca_light_emparams', False) if contenu_question('ca_light_emparams') \
+        else v.aller_question('intro', 'ca_intro_scale', False)
+    attendre(app, 0.6)
+    f.grab().save(str(dossier / ('classe_question_etroite_%s.png' % langue)))
+    f.resize(taille)
     from coupole.modules.anim.classe.ressources_qt import fermer_toutes, ouvrir_ressource
     fen = ouvrir_ressource('fiche', 'stellarprops_slide3')
     fen.resize(760, 900)

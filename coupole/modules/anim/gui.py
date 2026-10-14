@@ -316,4 +316,4 @@ class Panneau(QWidget):
             w.arreter()
 
     def aide_html(self):
-        return tr('anim_aide_html') + tr('classe_aide_html')
+        return tr('classe_aide_html') + tr('anim_aide_html')

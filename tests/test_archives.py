@@ -1064,7 +1064,7 @@ def test_panneau_variantes_corps_progression_etat_final(app_qt, tmp_path, monkey
     p._evenements([{'genre': 'fin', 'bilan': {'ok': 1, 'deja': 0, 'echec': 1, 'octets': 2_000_000_000,
                                                'octets_gardes': 5_000_000, 'secondes': 75}}])
     assert p.barre.value() == 1000 and tr('arc_phase_termine') in p.barre.format()
-    assert p.l_etat.text().startswith(tr('arc_termine', n=1, telecharge='2.00 Go', garde='5.0 Mo', erreurs=1,
+    assert p.l_etat.text().startswith(tr('arc_termine', n=1, telecharge='2,00 Go', garde='5,0 Mo', erreurs=1,
                                          s='1 min 15 s')[:10])
     p.arreter()
     p.close()

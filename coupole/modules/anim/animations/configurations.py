@@ -25,7 +25,8 @@ def configurations(a_obs: float, a_cible: float) -> dict:
     p_obs, p_cible = astro.periode_annees(a_obs), astro.periode_annees(a_cible)
     s = astro.periode_synodique(p_obs, p_cible)
     a_int, a_ext = min(a_obs, a_cible), max(a_obs, a_cible)
-    t1 = math.acos(a_int / a_ext) / (2 * math.pi / s)
+    # deux orbites égales (curseurs au même rayon) : aucune configuration ne revient (S infinie), pas de division par 0
+    t1 = math.acos(min(1.0, a_int / a_ext)) / (2 * math.pi / s) if math.isfinite(s) and a_ext > 0 else math.inf
     superieure = a_cible > a_obs
     noms = (('opposition', 'quadrature_est', 'conjonction', 'quadrature_ouest') if superieure else
             ('conj_inf', 'elong_ouest', 'conj_sup', 'elong_est'))

@@ -286,7 +286,8 @@ class Panneau(QWidget):
 
     def resizeEvent(self, ev):
         super().resizeEvent(ev)
-        self._disposer()
+        if hasattr(self, 'splitter'):          # un redimensionnement peut arriver pendant la construction
+            self._disposer()
 
     def eventFilter(self, obj, ev):
         if ev.type() == QEvent.Type.Resize and obj is getattr(self, '_viewport_surveille', None):

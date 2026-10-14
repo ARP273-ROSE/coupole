@@ -103,8 +103,13 @@ class Flux(QLayout):
     def __init__(self, parent=None, marge: int = 0, espace: int = 6):
         super().__init__(parent)
         self._elements = []
+        self._hauteurs = {}                    # largeur → hauteur (mémo vidé à chaque invalidation de Qt)
         self.setContentsMargins(marge, marge, marge, marge)
         self.setSpacing(espace)
+
+    def invalidate(self):
+        self._hauteurs = {}
+        super().invalidate()
 
     def addItem(self, element):
         self._elements.append(element)
@@ -125,7 +130,11 @@ class Flux(QLayout):
         return True
 
     def heightForWidth(self, largeur):
-        return self._placer(QRect(0, 0, largeur, 0), simuler=True)
+        # mémorisée : Qt la redemande des centaines de fois pendant un repolissage (changement de thème, 0.7.0)
+        h = self._hauteurs.get(largeur)
+        if h is None:
+            h = self._hauteurs[largeur] = self._placer(QRect(0, 0, largeur, 0), simuler=True)
+        return h
 
     def setGeometry(self, rect):
         super().setGeometry(rect)
