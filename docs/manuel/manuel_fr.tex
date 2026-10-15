@@ -1371,7 +1371,7 @@ sont identiques à ceux de Coupole Web (références communes).
 
 \subsection{Modules, questions et ressources (0.6.0)}\label{sec:classe}
 \paragraph{Navigation par modules.} Le module \emph{Animations} s'ouvre sur l'accueil des \textbf{22 modules} de
-ClassAction (et deux modules bonus) : boutons \emph{Modules}, \emph{Animations} (le catalogue), \emph{Mes modules},
+ClassAction (et deux modules bonus) : boutons \emph{Modules}, \emph{Bibliothèque}, \emph{Animations} (le catalogue), \emph{Mes favoris},
 \emph{Ma progression}, une recherche et un fil d'Ariane (avec retour à la page précédente). Une page de module a des
 onglets \emph{Questions} (Échauffement, Générales, Défis, Discussion, numérotées W1, G1, C1, D1, avec leur état
 $\circ$, $\bullet$, $\checkmark$, $\times$), \emph{Animations}, \emph{Fiches}, \emph{Tables}, \emph{Images}. Double-clic ou Entrée ouvre un élément ; une
@@ -1447,6 +1447,47 @@ manuels, logo, style) et rend le code 0 si tout va bien. L'installeur Windows es
 un lien permanent (\texttt{releases/latest/download/Coupole-Setup.exe}) ; sous Linux, l'archive
 \texttt{Coupole-X-linux-x86\_64.tar.gz} (ou \texttt{-arm64}) s'installe dans le profil par \texttt{installer.sh}
 (commande \texttt{coupole}), et la boîte de fichiers est par défaut celle, complète, de Qt.
+
+\subsection{Recherche, favoris, bibliothèque, « Maintenant » (0.7.1)}\label{sec:favoris}
+\paragraph{Recherche bilingue.} En français ou en anglais, quelle que soit la langue de l'interface, la recherche
+trouve le même contenu (modules, animations, questions, fiches, tables, images) et l'affiche dans la langue de
+l'interface : « seasons » donne « Simulateur des saisons (NAAP) », « Kepler's third law » la troisième loi de Kepler.
+L'index réunit les titres, les mots-clés, les textes et les titres d'origine de ClassAction dans les deux langues ; il
+ignore les accents et la casse, ramène les pluriels simples (saisons, galaxies, planètes) et tolère une faute (deux
+pour les mots longs). Les résultats sont groupés par type, les mots trouvés en gras ; quand seul le titre de l'autre
+langue correspond, il est rappelé (« En anglais : \dots{} »). Le moteur est le même, ligne pour ligne, que celui de
+Coupole Web, avec les mêmes cas de référence.
+\capture{img/classe_recherche_fr.png}{0.95}
+
+\paragraph{Favoris et collections.} L'étoile $\star$ d'une page (module, question, fiche, table, image, animation),
+le clic droit ou Ctrl+D dans une liste marquent un favori ; « Mes favoris » (barre du haut et accueil) les regroupe
+par type, avec un filtre et un tri. Les collections (les « Mes modules » d'avant : vos propres séquences dans l'ordre
+choisi) passent au second plan : bouton « Organiser en collections\dots{} ». Favoris et collections sont dans la
+sauvegarde commune (format version 2), échangée avec Coupole Web.
+\capture{img/classe_favoris_fr.png}{0.95}
+
+\paragraph{Bibliothèque.} La présentation d'origine de ClassAction : un onglet par type (Questions, Animations, Fiches,
+Tables, Images) montre tout le contenu de ce type, rangé par module dans l'ordre d'origine, avec des vignettes (les
+animations dessinent elles-mêmes la leur) ; filtres par module et « favoris seulement ».
+\capture{img/classe_bibliotheque_fr.png}{0.95}
+
+\paragraph{Maintenant et en direct.} Les 19 animations qui dépendent de la date ou de l'heure ont les boutons
+\emph{Maintenant} (instant présent de l'ordinateur, en temps universel, affiché dans votre fuseau : « 09:20 heure de
+Paris (UTC+2) · 07:20 TU », sans erreur d'heure d'été), \emph{En direct} (l'heure suit l'horloge, sans redessiner
+sans cesse ; s'arrête dès qu'on change la date ou qu'on relance la lecture) et \emph{Ma position} (un des sites
+connus). Une animation réglée en heure solaire reçoit l'heure solaire moyenne au méridien du fuseau (hors heure
+d'été), ou à la longitude du site choisi.
+\capture{img/anim_maintenant_fr.png}{0.95}
+
+\paragraph{Ombres d'éclipse en vraie géométrie.} Le type d'éclipse est calculé avec les tailles réelles et la distance
+de la Lune telle qu'elle est placée : en l'approchant, bien alignée, on passe d'aucune éclipse à une partielle
+(pénombre seule), une annulaire (antombre), puis une totale (ombre), avec la largeur de la bande ; la distance est
+comparée au périgée et à l'apogée extrêmes (356\,375 et 406\,712~km, éphéméride DE440, 1900--2100). La vue de côté
+trace les cônes de la Terre et de la Lune (tailles et écarts agrandis $\times$6, indiqué) ; la vue 3D montre l'orbite
+inclinée de 5,1° et la ligne des nœuds, et pourquoi il n'y a pas d'éclipse à chaque nouvelle lune. « Rejouer une
+éclipse » replace la Lune selon la géométrie réelle (JPL DE440 : distance, gamma, trajectoire) ; les 133 éclipses de
+la table retrouvent leur type.
+\capture{img/anim_shadowsim_fr.png}{0.95}
 
 \subsection{Les animations disponibles}
 \begin{center}

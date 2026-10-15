@@ -23,7 +23,9 @@ RENDUS = ('eclipticsimulator', 'lunar_applet', 'shadowsim', 'celhorcomp', 'keple
           'bbexplorer', 'hydrogenatom', 'threeviewsspectra', 'transitsimulator', 'ca_extrasolarplanets_starwobble',
           'eclipsingbinarysim', 'galacticredshift', 'milkywayrotationalvelocity', 'telescope10', 'fusion02',
           # 0.4.1 : formules, étiquettes, sphères
-          'gravcalc', 'hammerthrower', 'bigdipper')
+          'gravcalc', 'hammerthrower', 'bigdipper',
+          # 0.7.1 : chaîne proton-proton lisible
+          'fusion01')
 # 0.4.1 : variantes (nom du fichier, identifiant, réglages)
 VARIANTES = (('daylightsimulator_nord', 'daylightsimulator', {'projection': 'nord', 'crepuscule': True}),
              ('daylightsimulator_globe', 'daylightsimulator', {'projection': 'globe', 'crepuscule': True}),
@@ -110,6 +112,27 @@ def main():
     v.aller_progression()
     attendre(app, 0.4)
     f.grab().save(str(dossier / ('classe_progression_%s.png' % langue)))
+    # 0.7.1 : recherche bilingue, favoris, bibliothèque, « Maintenant »
+    from coupole.modules.anim.classe import sauvegarde as S
+    from coupole.modules.anim.classe.stockage import stockage
+    for g, i in (('module', 'lunarcycles'), ('animation', 'shadowsim'), ('question', 'ca_intro_scale'),
+                 ('fiche', 'intro_density'), ('image', 'lunareclipse')):
+        S.ajouter_favori(stockage().doc, g, i)
+    stockage().modifie()
+    v.aller_recherche('seasons' if langue == 'fr' else 'saisons')
+    attendre(app, 0.6)
+    f.grab().save(str(dossier / ('classe_recherche_%s.png' % langue)))
+    v.aller_favoris()
+    attendre(app, 0.4)
+    f.grab().save(str(dossier / ('classe_favoris_%s.png' % langue)))
+    v.aller_bibliotheque('images')
+    attendre(app, 2.5)
+    f.grab().save(str(dossier / ('classe_bibliotheque_%s.png' % langue)))
+    p.montrer('animations')
+    w = p.ouvrir('daylightsimulator')
+    w.b_maintenant.click()
+    attendre(app, 0.6)
+    f.grab().save(str(dossier / ('anim_maintenant_%s.png' % langue)))
     from coupole.modules.anim import catalogue
     for ident in RENDUS:
         a = catalogue.PAR_ID[ident].charger()()

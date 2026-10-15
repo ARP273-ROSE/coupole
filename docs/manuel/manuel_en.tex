@@ -1398,6 +1398,41 @@ is well. The Windows installer is bilingual; the latest installer has a permanen
 \texttt{-arm64}) archive installs into the user profile through \texttt{installer.sh} (\texttt{coupole} command), and
 the file dialog is Qt's complete one by default.
 
+\subsection{Search, favourites, library, “Now” (0.7.1)}\label{sec:favoris}
+\paragraph{Bilingual search.} In English or in French, whatever the interface language, search finds the same content
+(modules, animations, questions, outlines, tables, images) and shows it in the interface language. The index gathers
+titles, keywords, texts and the original ClassAction titles in both languages; it ignores accents and case, reduces
+simple plurals and tolerates one typo (two for long words). Results are grouped by type, matches in bold; when only the
+other language's title matches, it is recalled. The engine is the same, line for line, as Coupole Web's.
+\capture{img/classe_recherche_en.png}{0.95}
+
+\paragraph{Favourites and collections.} The $\star$ star of a page (module, question, outline, table, image,
+animation), right click or Ctrl+D in a list mark a favourite; “My favourites” (top bar and home page) groups them by
+type, with a filter and a sort. Collections (the former “My modules”: your own sequences in the chosen order) move to
+the background: “Organise into collections\dots{}” button. Favourites and collections are in the shared backup (format
+version 2), exchanged with Coupole Web.
+\capture{img/classe_favoris_en.png}{0.95}
+
+\paragraph{Library.} ClassAction's original presentation: one tab per type (Questions, Animations, Outlines, Tables,
+Images) shows all the content of that type, grouped by module in the original order, with thumbnails; module and
+“favourites only” filters.
+\capture{img/classe_bibliotheque_en.png}{0.95}
+
+\paragraph{Now and live.} The 19 date- or time-dependent animations have the \emph{Now} (the computer's present instant,
+in universal time, shown in your time zone, no daylight-saving error), \emph{Live} (the time follows the clock; stops as
+soon as the date is changed or playback restarted) and \emph{My location} (one of the known sites) buttons. An
+animation set in solar time receives the mean solar time at the time zone meridian (without daylight saving), or at the
+chosen site's longitude.
+\capture{img/anim_maintenant_en.png}{0.95}
+
+\paragraph{Eclipse shadows in true geometry.} The eclipse type is computed with real sizes and the Moon's distance as
+placed: bringing it closer, well aligned, goes from no eclipse to a partial one (penumbra only), an annular one
+(antumbra), then a total one (umbra), with the path width; the distance is compared with the extreme perigee and apogee
+(356,375 and 406,712~km, DE440 ephemeris, 1900--2100). The side view draws the cones of the Earth and the Moon (sizes
+and offsets enlarged $\times$6, stated); the 3D view shows the orbit tilted by 5.1° and the line of nodes. “Replay an
+eclipse” places the Moon with the real geometry (JPL DE440); the 133 table eclipses get their type back.
+\capture{img/anim_shadowsim_en.png}{0.95}
+
 \subsection{Available animations}
 \begin{center}
 \small

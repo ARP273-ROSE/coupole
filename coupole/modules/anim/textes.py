@@ -55,6 +55,21 @@ TEXTES = {
     'anim_aide_deplacer': _t('Glisser avec la souris : déplacer les objets de la scène.',
                              'Drag with the mouse: move the objects in the scene.'),
     'anim_lecture': _t('▶ Lecture', '▶ Play'),
+    'anim_maintenant': _t('Maintenant', 'Now'),
+    'anim_maintenant_aide': _t('Régler la date et l’heure sur l’instant présent de l’ordinateur (temps universel, '
+                               'affiché dans votre fuseau).', 'Set the date and time to the computer’s present '
+                               'instant (universal time, shown in your time zone).'),
+    'anim_en_direct': _t('En direct', 'Live'),
+    'anim_en_direct_aide': _t('Suivre l’heure de l’ordinateur ; s’arrête dès qu’on change la date ou l’heure, ou qu’on '
+                              'relance la lecture.', 'Follow the computer’s clock; stops as soon as the date or time is '
+                              'changed, or playback is restarted.'),
+    'anim_ma_position': _t('Ma position', 'My location'),
+    'anim_ma_position_aide': _t('Choisir son lieu parmi les sites connus (Préférences → Sites) : latitude et longitude '
+                                'de l’observateur, heure solaire exacte.', 'Choose your place among the known sites '
+                                '(Preferences → Sites): observer’s latitude and longitude, exact solar time.'),
+    'anim_position_retenue': _t('position : {lat}, {lon}', 'location: {lat}, {lon}'),
+    'anim_heure_solaire_fuseau': _t('heure solaire moyenne au méridien du fuseau ({lon})',
+                                    'mean solar time at the time zone meridian ({lon})'),
     'anim_lecture_aide': _t('Lancer ou mettre en pause l’animation.', 'Start or pause the animation.'),
     'anim_pause': _t('⏸ Pause', '⏸ Pause'),
     'anim_vitesse': _t('Vitesse', 'Speed'),
@@ -93,8 +108,17 @@ TEXTES = {
         "formules mises en forme (fractions, exposants, indices, radicaux ; police STIX Two Math), étiquettes placées "
         "sans se chevaucher. Simulateur jour-nuit : côtes Natural Earth, projection équirectangulaire, polaire (pôle "
         "Nord ou Sud) ou globe 3D à tourner à la souris (molette : zoom ; double-clic : face au point subsolaire). "
-        "Simulateur des ombres d’éclipse : « Rejouer une éclipse » montre chacune des 133 éclipses de la table "
-        "2015–2044 en proportions réelles.</p><h4>Calculs</h4><p>Temps sidéral (IAU 1982), obliquité (IAU 2006), position du Soleil et "
+        "Simulateur des ombres d’éclipse : type d’éclipse calculé en vraie géométrie (tailles réelles, distance de la "
+        "Lune telle que placée : aucune, partielle, annulaire, totale), cônes de la Terre et de la Lune, vue 3D de "
+        "l’orbite inclinée et de la ligne des nœuds ; « Rejouer une éclipse » replace la Lune selon chacune des 133 "
+        "éclipses de la table 2015–2044 (géométrie JPL DE440).</p>"
+        "<h4>Maintenant et en direct</h4><p>Les animations qui dépendent de la date ou de l’heure (jour-nuit, "
+        "mouvements du Soleil, saisons, temps sidéral, phases de la Lune, horloge de la Grande Ourse, Anticythère…) ont "
+        "les boutons « Maintenant » (instant présent de l’ordinateur, en temps universel, affiché dans votre fuseau : "
+        "« 09:20 heure de Paris (UTC+2) · 07:20 TU », sans erreur d’heure d’été), « En direct » (l’heure suit "
+        "l’horloge ; s’arrête dès qu’on change la date ou qu’on relance la lecture) et « Ma position » (un des sites "
+        "connus : latitude, longitude et heure solaire exacte ; sinon l’heure solaire est celle du méridien du "
+        "fuseau).</p><h4>Calculs</h4><p>Temps sidéral (IAU 1982), obliquité (IAU 2006), position du Soleil et "
         "équation du temps (Meeus, précision 0,01°), changements de repère, équation de Kepler, module de distance, "
         "cônes d’ombre, phases moyennes de la Lune et nœuds de son orbite (saisons d’éclipses), précession, marées "
         "d’équilibre, périodes synodiques, gravitation de Newton, loi de Stefan-Boltzmann et constantes solaires de "
@@ -114,6 +138,14 @@ TEXTES = {
         "application: github.com/ARP273-ROSE/Anticythere3D), and, in “Interstellar Medium and Star Formation”, Orion "
         "in 3D: the constellation unfolded to its true distances, with its clouds, the Orion Nebula and the Horsehead, "
         "and a dive with ESO and Hubble images.</p>"
+        "<h4>Now and live</h4><p>Date- or time-dependent animations (day-night, Sun motions, seasons, sidereal time, "
+        "lunar phases, Big Dipper clock, Antikythera…) have the “Now” (the computer’s present instant, in universal "
+        "time, shown in your time zone: “09:20 Paris time (UTC+2) · 07:20 UT”, no daylight-saving error), “Live” (the "
+        "time follows the clock; stops as soon as the date is changed or playback restarted) and “My location” (one of "
+        "the known sites: latitude, longitude and exact solar time; otherwise solar time is that of the time zone "
+        "meridian) buttons. The Eclipse Shadow Simulator computes the eclipse type in true geometry, draws the cones "
+        "of the Earth and the Moon, shows the tilted orbit in 3D and replays the 133 table eclipses with their JPL "
+        "DE440 geometry.</p>"
         "<h4>Hover data sheets</h4><p>In Orion in 3D, Big Dipper 3D, the Big Dipper clock, heliacal rising, the "
         "coordinate systems comparison and the HR diagram, hovering over (or touching) a star or a nebula opens its "
         "data sheet, laid next to it: name, type, magnitudes, distance and its uncertainty, temperature, radius, "
@@ -562,19 +594,76 @@ _ANIM = {
     'anim_siderealsolartime_horloges': ('Horloges de 24 h', '24-hour clocks'),
     'anim_siderealsolartime_etoile': ('vers une étoile lointaine', 'toward a distant star'),
     # ------------------------------------------------------------ ombres
-    'anim_shadowsim_reel': ('Proportions réelles', 'Real proportions'),
+    'anim_shadowsim_reel': ('Encart en proportions réelles', 'Real-proportion inset'),
     'anim_shadowsim_reel_aide': ('Encart : traversée de l’ombre de la Terre par la Lune avec les vraies dimensions '
                                  '(méthode d’Aristarque).',
                                  'Inset: the Moon crossing the Earth’s shadow with true dimensions (Aristarchus’ '
                                  'method).'),
+    'anim_shadowsim_vue3d': ('Vue 3D de l’orbite', '3D view of the orbit'),
+    'anim_shadowsim_vue3d_aide': ('Orbite de la Lune inclinée de 5,1° sur le plan Terre–Soleil, ligne des nœuds, Lune '
+                                  'au-dessus ou au-dessous de l’axe : glisser pour tourner la vue.',
+                                  'The Moon’s orbit tilted by 5.1° to the Earth–Sun plane, line of nodes, Moon above '
+                                  'or below the axis: drag to rotate the view.'),
+    'anim_shadowsim_position': ('Position de la Lune sur son orbite', 'Moon’s position on its orbit'),
+    'anim_shadowsim_position_aide': ('Angle compté depuis la direction du Soleil : 0° nouvelle lune, 180° pleine lune.',
+                                     'Angle from the direction of the Sun: 0° new moon, 180° full moon.'),
+    'anim_shadowsim_noeuds': ('Angle Soleil – ligne des nœuds', 'Sun – line of nodes angle'),
+    'anim_shadowsim_noeuds_aide': ('Direction du nœud ascendant par rapport au Soleil : près de 0° ou de 180°, la '
+                                   'nouvelle et la pleine lune tombent près du plan Terre–Soleil (saison d’éclipses) ; '
+                                   'vers 90°, la Lune passe au-dessus ou au-dessous de l’ombre.',
+                                   'Direction of the ascending node relative to the Sun: near 0° or 180°, new and full '
+                                   'moon fall close to the Earth–Sun plane (eclipse season); around 90°, the Moon passes '
+                                   'above or below the shadow.'),
     'anim_shadowsim_terre': ('Terre', 'Earth'), 'anim_shadowsim_lune': ('Lune', 'Moon'),
-    'anim_shadowsim_aide_souris': ('Glisser la Terre ou la Lune pour les déplacer.', 'Drag the Earth or the Moon to move '
-                                                                                     'them.'),
+    'anim_shadowsim_aide_souris': ('Glisser la Lune (ou la Terre) : le type d’éclipse suit, en vraie géométrie.',
+                                   'Drag the Moon (or the Earth): the eclipse type follows, in true geometry.'),
     'anim_shadowsim_lunaire': ('Éclipse de Lune', 'Lunar eclipse'),
     'anim_shadowsim_solaire': ('Éclipse de Soleil', 'Solar eclipse'),
     'anim_shadowsim_aucune': ('aucune', 'none'), 'anim_shadowsim_totale': ('totale', 'total'),
     'anim_shadowsim_annulaire': ('annulaire', 'annular'), 'anim_shadowsim_partielle': ('partielle', 'partial'),
-    'anim_shadowsim_penombre': ('par la pénombre', 'penumbral'),
+    'anim_shadowsim_hybride': ('hybride', 'hybrid'), 'anim_shadowsim_penombrale': ('pénombrale', 'penumbral'),
+    'anim_shadowsim_s_totale': ('totale — bande de totalité ≈ {l} km de large ; hors de la bande : partielle',
+                                'total — path of totality ≈ {l} km wide; outside it: partial'),
+    'anim_shadowsim_s_annulaire': ('annulaire — bande d’annularité ≈ {l} km de large ; hors de la bande : partielle',
+                                   'annular — annular path ≈ {l} km wide; outside it: partial'),
+    'anim_shadowsim_s_hybride': ('hybride (totale ou annulaire selon le lieu) — bande ≈ {l} km ; hors de la bande : '
+                                 'partielle', 'hybrid (total or annular depending on the place) — path ≈ {l} km wide; '
+                                 'outside it: partial'),
+    'anim_shadowsim_s_partielle': ('partielle seulement (seule la pénombre de la Lune touche la Terre)',
+                                   'partial only (only the Moon’s penumbra reaches the Earth)'),
+    'anim_shadowsim_l_totale': ('totale (toute la Lune dans l’ombre de la Terre)',
+                                'total (the whole Moon inside the Earth’s umbra)'),
+    'anim_shadowsim_l_partielle': ('partielle (la Lune entre en partie dans l’ombre)',
+                                   'partial (the Moon partly enters the umbra)'),
+    'anim_shadowsim_l_penombrale': ('pénombrale (la Lune ne traverse que la pénombre)',
+                                    'penumbral (the Moon only crosses the penumbra)'),
+    'anim_shadowsim_distance': ('Distance Terre–Lune', 'Earth–Moon distance'),
+    'anim_shadowsim_dist_dans': ('{d} km (en vrai, de {p} km au plus proche des périgées à {a} km au plus lointain '
+                                 'des apogées)', '{d} km (in reality, from {p} km at the closest perigee to {a} km at '
+                                 'the farthest apogee)'),
+    'anim_shadowsim_dist_moins': ('{d} km : plus proche que le plus proche des périgées réels ({p} km)',
+                                  '{d} km: closer than the closest real perigee ({p} km)'),
+    'anim_shadowsim_dist_plus': ('{d} km : plus loin que le plus lointain des apogées réels ({a} km)',
+                                 '{d} km: farther than the farthest real apogee ({a} km)'),
+    'anim_shadowsim_ecart': ('Écart à l’axe Soleil–Terre', 'Offset from the Sun–Earth axis'),
+    'anim_shadowsim_ecart_val': ('{r} R⊕ ({km} km) {dir}', '{r} R⊕ ({km} km) {dir}'),
+    'anim_shadowsim_nord': ('au nord', 'north'), 'anim_shadowsim_sud': ('au sud', 'south'),
+    'anim_shadowsim_hors_plan': ('Hors du plan de la vue de côté', 'Out of the side view’s plane'),
+    'anim_shadowsim_echelle': ('Échelle de la vue de côté', 'Side view scale'),
+    'anim_shadowsim_echelle_val': ('distances le long de l’axe à l’échelle de la figure ; tailles et écarts en travers '
+                                   'agrandis × {k}', 'distances along the axis to the figure’s scale; sizes and offsets '
+                                   'across enlarged × {k}'),
+    'anim_shadowsim_titre_cote': ('Vue de côté (Soleil à gauche, à l’infini)', 'Side view (Sun on the left, at '
+                                                                              'infinity)'),
+    'anim_shadowsim_soleil_loin': ('Soleil, à 150 millions de km (hors échelle)', 'Sun, 150 million km away (off '
+                                                                                  'scale)'),
+    'anim_shadowsim_titre_3d': ('Orbite de la Lune (glisser pour tourner)', 'Moon’s orbit (drag to rotate)'),
+    'anim_shadowsim_vers_soleil': ('vers le Soleil', 'toward the Sun'),
+    'anim_shadowsim_noeud_asc': ('nœud ascendant', 'ascending node'),
+    'anim_shadowsim_orbite_lune': ('Orbite de la Lune inclinée de 5,1° sur le plan Terre–Soleil',
+                                   'Moon’s orbit tilted by 5.1° to the Earth–Sun plane'),
+    'anim_shadowsim_decalage_3d': ('Lune : {r} R⊕ {dir} de l’axe Soleil–Terre', 'Moon: {r} R⊕ {dir} of the Sun–Earth '
+                                                                               'axis'),
     'anim_shadowsim_rayon_ombre': ('Ombre de la Terre à la distance de la Lune (rayon)',
                                    'Earth’s shadow at the Moon’s distance (radius)'),
     'anim_shadowsim_diam_lune': ('le rayon lunaire', 'the lunar radius'),
@@ -585,10 +674,10 @@ _ANIM = {
                                                                                    'proportions'),
     'anim_shadowsim_rapport': ('Ombre ≈ {x} diamètres lunaires', 'Shadow ≈ {x} lunar diameters'),
     'anim_shadowsim_rejouer': ('Rejouer une éclipse', 'Replay an eclipse'),
-    'anim_shadowsim_rejouer_aide': ('Rejouer une éclipse de la table 2015–2044 : passage de la Lune dans l’ombre de la '
-                                    'Terre, ou de l’ombre de la Lune sur la Terre, en proportions réelles.',
-                                    'Replay an eclipse from the 2015–2044 table: the Moon crossing the Earth’s shadow, '
-                                    'or the Moon’s shadow crossing the Earth, to true scale.'),
+    'anim_shadowsim_rejouer_aide': ('Rejouer une éclipse de la table 2015–2044 avec sa géométrie réelle (JPL DE440) : la '
+                                    'Lune est replacée dans les trois vues, l’instant la fait avancer.',
+                                    'Replay an eclipse from the 2015–2044 table with its real geometry (JPL DE440): the '
+                                    'Moon is placed in all three views, the moment moves it along.'),
     'anim_shadowsim_libre': ('— aucune (placement libre) —', '— none (free placement) —'),
     'anim_shadowsim_soleil': ('Soleil', 'Sun'), 'anim_shadowsim_lune_t': ('Lune', 'Moon'),
     'anim_shadowsim_instant': ('Instant de l’éclipse', 'Moment of the eclipse'),
@@ -596,15 +685,17 @@ _ANIM = {
                                     'de l’éclipse.', 'Move the Moon (or its shadow) along its path, from the start to '
                                     'the end of the eclipse.'),
     'anim_shadowsim_rejouee': ('Éclipse rejouée', 'Replayed eclipse'),
-    'anim_shadowsim_ecart': ('Écart à l’axe de l’ombre', 'Distance from the shadow axis'),
+    'anim_shadowsim_instant_ut': ('Instant', 'Time'), 'anim_shadowsim_tu': ('TU', 'UT'),
+    'anim_shadowsim_gamma': ('Gamma (écart de l’axe au maximum, en rayons terrestres)',
+                             'Gamma (axis offset at maximum, in Earth radii)'),
     'anim_shadowsim_titre_lune': ('Éclipse de Lune du {date} : la Lune traverse l’ombre de la Terre (proportions '
                                   'réelles, nord en haut)', 'Lunar eclipse of {date}: the Moon crosses the Earth’s '
                                   'shadow (true scale, north up)'),
     'anim_shadowsim_titre_soleil': ('Éclipse de Soleil du {date} : l’ombre de la Lune balaie la Terre (proportions '
                                     'réelles, nord en haut)', 'Solar eclipse of {date}: the Moon’s shadow sweeps the '
                                     'Earth (true scale, north up)'),
-    'anim_shadowsim_note': ('Trajectoire approchée (éléments moyens, Meeus).', 'Approximate path (mean elements, '
-                            'Meeus).'),
+    'anim_shadowsim_note': ('Géométrie réelle (JPL DE440) : distance, gamma, trajectoire.',
+                            'Real geometry (JPL DE440): distance, gamma, path.'),
     'anim_shadowsim_duree_tot': ('Totalité : {d}', 'Totality: {d}'),
     # ------------------------------------------------------------ Mars de Ptolémée
     'anim_marsorbit_soleil': ('Soleil', 'Sun'),

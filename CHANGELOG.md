@@ -2,6 +2,41 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.7.1 — 15 octobre 2026
+
+**Recherche bilingue, favoris, bibliothèque ; « Maintenant » et « En direct » ; ombres d'éclipse en vraie géométrie ;
+fusion lisible.** Fait dans Coupole Web 0.6.0, avec le même moteur de recherche, la même sauvegarde et les mêmes
+calculs (cas de référence communs).
+
+- **Recherche bilingue** : en français ou en anglais, quelle que soit la langue de l'interface, la recherche trouve
+  le même contenu (modules, animations, questions, fiches, tables, images), affiché dans la langue de l'interface
+  (« seasons » → « Simulateur des saisons (NAAP) ») ; accents, casse, pluriels simples et petites fautes tolérés ;
+  classement titre > mots-clés > texte ; mots trouvés en gras ; titre de l'autre langue quand c'est lui qui
+  correspond ; résultats groupés par type ; « favoris seulement ». Moteur `classe/recherche.py`, identique ligne pour
+  ligne à celui du web (`tests/recherche_cas.json`, dont 97 recherches sur les vrais contenus). Le catalogue des
+  animations s'en sert aussi.
+- **Favoris** : bouton étoile dans les pages (module, question, fiche, table, image, animation), clic droit ou Ctrl+D
+  dans les listes, étoile dorée devant les favoris ; section « Mes favoris » de l'accueil ; page « Mes favoris »
+  (groupés par type, filtre, tri, Suppr pour retirer). Sauvegarde commune **version 2** (une version 1 se lit telle
+  quelle ; export / import avec Coupole Web ; réinitialisation partielle « tous les favoris »).
+- **« Mes modules » devient « Collections »**, au second plan (« Mes favoris → Organiser en collections… ») ; la barre
+  propose *Modules*, *Bibliothèque*, *Animations*, *Mes favoris*, *Ma progression*.
+- **Bibliothèque** : la présentation d'origine de ClassAction, un onglet par type montrant tout le contenu, rangé par
+  module dans l'ordre d'origine ; vignettes des images et des animations ; filtres module et favoris.
+- **« Maintenant », « En direct », « Ma position »** dans les 19 animations datées : instant de l'ordinateur
+  (`datetime.now(timezone.utc)`), affiché dans le fuseau du système (zoneinfo ; « 09:20 heure de Paris (UTC+2) ·
+  07:20 TU ») ; heure solaire au méridien du fuseau hors heure d'été, ou à la longitude d'un site choisi ; « En direct »
+  s'arrête dès qu'on touche la date ou qu'on relance la lecture. Les anciens boutons « Maintenant » de l'horloge de
+  la Grande Ourse (qui prenait l'heure d'été pour l'heure solaire) et « Aujourd'hui » d'Anticythère sont remplacés.
+- **Simulateur des ombres d'éclipse** refait : type d'éclipse en vraie géométrie (distance de la Lune telle que placée :
+  aucune, partielle, annulaire, hybride, totale ; largeur de la bande ; Lune : règle de Danjon), cônes de la Terre et
+  de la Lune, vue 3D de l'orbite inclinée et de la ligne des nœuds, curseurs position et angle aux nœuds, éclipses
+  rejouées avec leur géométrie JPL DE440 (`outils/verif_anim/geometrie_eclipses.py`) ; les 133 éclipses de la table
+  retrouvent leur type ; distances extrêmes de la Lune 1900–2100 : 356 375 km et 406 712 km.
+- **Chaîne proton-proton, cycle CNO** : neutrino νₑ, particules légères reconnaissables et agrandies, étiquettes
+  placées sans chevauchement, légende.
+- **Glisser** : si rien n'est saisi à l'appui, la saisie est retentée au mouvement ; la toile prend le focus à l'appui.
+
 ## 0.7.0 — 14 octobre 2026
 
 **Passe finale avant publication : présentation plus moderne et plus légère, de 1024 × 600 à la 4K, tout essayé

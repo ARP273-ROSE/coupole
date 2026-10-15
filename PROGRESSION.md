@@ -1346,3 +1346,38 @@ Demande confirmée par l'utilisateur : standard de `_kit_windows` (modèle Antic
   désinstallation propre.  `tests/test_kit.py` (10).
 - Aucun rapport n'est parti vers le vrai serveur pendant les essais (COUPOLE_SANS_RESEAU → point de collecte
   factice ; accord jamais donné dans les essais).
+
+## 2026-10-15 — 0.7.1 : recherche bilingue, favoris, bibliothèque, « Maintenant », ombres d'éclipse, fusion
+Fait dans Coupole Web d'abord (0.6.0), puis ici, avec les mêmes moteurs et les mêmes cas de référence (section « Choix
+graphiques » du PROGRESSION.md de Coupole Web, sous-sections « Recherche, favoris, bibliothèque, installation »,
+« Simulateur des ombres d'éclipse », « Chaîne proton-proton, cycle CNO »).
+
+### Fait
+- [x] **Recherche bilingue** : `classe/recherche.py` (= `src/contenu/recherche.ts`) ; `classe/contenu.documents()` et
+  `index()` ; cas `tests/recherche_cas.json` produits par `outils/cas_recherche.py CHEMIN_WEB` (unitaires, petit
+  corpus, 97 recherches sur les 817 documents réels : mêmes 8 premiers résultats et mêmes points qu'au web) ;
+  page de recherche en `QTextBrowser` (groupes dans l'ordre du meilleur résultat, mots en gras surlignés, titre de
+  l'autre langue, lien ☆/★, « favoris seulement ») ; catalogue des animations par le même moteur.
+- [x] **Sauvegarde version 2** (favoris) : `classe/sauvegarde.py` et le dossier de référence
+  (`_sources_externes/contenu_coupole/questions/progression` : `sauvegarde.py`, `generer_cas.py`, schéma,
+  `SAUVEGARDE.md`) ; 39 cas recopiés ici et au web.
+- [x] **Favoris** : `classe/favoris_qt.py` (bouton étoile accessible, action de menu Ctrl+D, icône) ; abonnements
+  faibles à la sauvegarde (`Stockage.abonner_faible`, `weakref.WeakMethod` : un widget détruit est oublié — un
+  rappel branché sur `destroyed` faisait planter la suite de tests dans un autre fichier) ; accueil, page « Mes
+  favoris », collections au second plan, réinitialisation partielle, import qui compte les favoris.
+- [x] **Bibliothèque** : `PageBibliotheque` (onglets, arbres par module, grilles d'icônes, vignettes aux moments
+  creux : photos, schémas peints par `schema_qt.peindre`, animations par `Animation.image`).
+- [x] **Maintenant** : `anim/maintenant.py` (= `src/calc/maintenant.ts`, 165 cas zoneinfo par
+  `outils/cas_maintenant.py`) ; `Animation.maintenant(m)` dans les 19 animations datées ; boutons de la barre,
+  « Ma position » = menu des sites connus (`core/sites.py`), « En direct » (QTimer, arrêté si l'on touche la date ou
+  relance la lecture).
+- [x] **Ombres d'éclipse** : `anim/eclipses_geo.py` (= `eclipses_geo.ts`, cas `tests/eclipses_geo_cas.json` par
+  `outils/cas_eclipses_geo.py`) ; `animations/ombres.py` refait (vue de côté à deux échelles, agrandissement × 6
+  indiqué, vue 3D, rejeu DE440) ; données `donnees/eclipses_geometrie.json.gz` par
+  `outils/verif_anim/geometrie_eclipses.py` (python-lab, skyfield 1.54, de440s.bsp ; positions astrométriques pour le
+  Soleil, apparentes pour la Lune, comme les tables de la NASA : gamma retrouvés à 10⁻⁴ près) ; 133 / 133 types.
+- [x] **Fusion** : νₑ, particules agrandies (≥ 10 px), étiquettes par le placeur, légende.
+- [x] **Glisser** : saisie retentée au mouvement si rien n'a été saisi à l'appui ; focus pris à l'appui.
+- [x] Aide F1, manuels FR et EN (section « Recherche, favoris, bibliothèque, Maintenant (0.7.1) », captures nouvelles
+  par `outils/captures_anim.py`), CHANGELOG FR puis EN, README, VERSION 0.7.1.
+- **Aucun tag ni Release.**

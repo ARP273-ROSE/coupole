@@ -2,6 +2,34 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.7.1 — 15 October 2026
+
+**Bilingual search, favourites, library; “Now” and “Live”; eclipse shadows in true geometry; readable fusion.** Done in
+Coupole Web 0.6.0 first, with the same search engine, backup and computations (shared reference cases).
+
+- **Bilingual search**: in English or in French, whatever the interface language, search finds the same content
+  (modules, animations, questions, outlines, tables, images), shown in the interface language; accents, case, simple
+  plurals and small typos tolerated; ranking title > keywords > text; matches in bold; results grouped by type;
+  “favourites only”. Engine `classe/recherche.py`, identical line for line to the web one. The animation catalogue
+  uses it too.
+- **Favourites**: star button in pages (module, question, outline, table, image, animation), right click or Ctrl+D in
+  lists, golden star in front of favourites; “My favourites” on the home page and as a page (grouped by type, filter,
+  sort, Delete to remove). Shared backup **version 2** (version 1 read as is; export/import with Coupole Web; partial
+  reset “all favourites”).
+- **“My modules” becomes “Collections”**, in the background; the bar offers *Modules*, *Library*, *Animations*, *My
+  favourites*, *My progress*.
+- **Library**: ClassAction's original presentation, one tab per type showing all the content, grouped by module in
+  the original order; thumbnails; module and favourites filters.
+- **“Now”, “Live”, “My location”** in the 19 date-dependent animations: the computer's instant, shown in the system time
+  zone (zoneinfo); solar time at the time zone meridian without daylight saving, or at a chosen site's longitude;
+  “Live” stops as soon as the date is touched or playback restarted.
+- **Eclipse Shadow Simulator** remade: eclipse type in true geometry, cones of the Earth and the Moon, 3D view of the
+  tilted orbit and the line of nodes, eclipses replayed with their JPL DE440 geometry; the 133 table eclipses get their
+  type back.
+- **Proton-proton chain, CNO cycle**: neutrino νₑ, recognisable enlarged light particles, labels without overlap,
+  legend.
+- **Dragging**: when nothing is grabbed on press, grabbing is retried on move; the canvas takes the focus on press.
+
 ## 0.7.0 — 14 October 2026
 
 **Final pass before release: a more modern and lighter look, from 1024 × 600 to 4K, everything tested
