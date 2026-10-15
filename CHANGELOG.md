@@ -60,7 +60,8 @@ même rendu.
   Lune vue du Soleil, masses du Soleil, de la Terre et de la Lune ; Pas, Retour, Effacer les trajectoires ; glisser
   un astre (satellites compris), tirer une flèche de vitesse, glisser le ruban.
 - **Lune vue du Soleil** : vraie trajectoire (jamais de boucle) et rapport des courbures Lune / Terre, toujours
-  positif.
+  positif, dans un panneau à côté de la scène (fenêtre large) ou dessous (fenêtre haute), jamais par-dessus le
+  mouvement ; astres de 5 px au moins en vue « Modèle ».
 - Thème « Renaissance », module « L'astronomie de la Renaissance » (`ANIMATIONS_AJOUTEES` de
   `outils/importer_contenu.py`) ; recherche « gravity and orbits » / « gravité et orbites » en premier (cas
   régénérés) ; aide F1 ; manuels FR et EN (section « Gravité et orbites (0.7.2) », captures nouvelles) ; NOTICE.

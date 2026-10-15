@@ -55,7 +55,9 @@ rendering.
 - **Settings**: gravity force (blue), velocity vector (green), paths, grid, measuring tape, gravity, Moon seen from the
   Sun, masses of the Sun, the Earth and the Moon; Step, Rewind, Clear paths; drag a body (satellites included), pull a
   velocity arrow, drag the tape.
-- **Moon seen from the Sun**: real path (never loops) and Moon / Earth curvature ratio, always positive.
+- **Moon seen from the Sun**: real path (never loops) and Moon / Earth curvature ratio, always positive, in a panel
+  beside the scene (wide window) or below it (tall window), never over the motion; bodies at least 5 px in the
+  “Model” view.
 - “Renaissance” topic, “Renaissance Astronomy” module (`ANIMATIONS_AJOUTEES` in `outils/importer_contenu.py`); search
   “gravity and orbits” / “gravité et orbites” first (cases regenerated); F1 help; FR and EN manuals (“Gravity and
   Orbits (0.7.2)” section, new screenshots); NOTICE.

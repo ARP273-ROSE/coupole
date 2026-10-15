@@ -247,3 +247,21 @@ def test_rendu_rapide_tous_scenarios(app_qt):
         a.close()
     print(mesures)
     assert max(mesures.values()) < (40 if os.environ.get('CI') else 20)
+
+
+def test_panneau_lune_soleil_jamais_par_dessus(app_qt):
+    """Le panneau « Lune vue du Soleil » est à côté de la scène (paysage) ou dessous (portrait), jamais par-dessus."""
+    from coupole.modules.anim import dessin
+    for sc in ('soleil_terre_lune', 'libre'):
+        a = _anim(scenario=sc, lune_soleil=True)
+        for _ in range(20):
+            a.avancer(0.2)
+        for w, h in ((900, 600), (1800, 760), (390, 700), (300, 640)):
+            a.image(w, h)
+            t = dessin.titres_poses()
+            assert len(t) == 2, (sc, w, h)
+            u, v = (x['panneau'] if isinstance(x, dict) else x.panneau for x in t)
+            ww = min(u[0] + u[2], v[0] + v[2]) - max(u[0], v[0])
+            hh = min(u[1] + u[3], v[1] + v[3]) - max(u[1], v[1])
+            assert not (ww > 2 and hh > 2), (sc, w, h)
+        a.close()

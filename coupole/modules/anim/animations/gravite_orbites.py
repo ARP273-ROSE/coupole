@@ -251,7 +251,7 @@ class GraviteOrbites(Animation):
         c = self.sys.corps[i]
         v = self._cam
         reel = c.rayon * v['s']
-        mod = CONF[self.sc]['rmod'].get(c.nom, 0.03) * v['L']
+        mod = max(5.0, CONF[self.sc]['rmod'].get(c.nom, 0.03) * v['L'])   # 5 px au moins (petite fenêtre)
         t = self._lisse()
         return max(1.5, math.exp((1 - t) * math.log(max(reel, 1e-9)) + t * math.log(mod)))
 
@@ -433,7 +433,19 @@ class GraviteOrbites(Animation):
     # ------------------------------------------------------------ dessin
     def dessiner(self, p, rect):
         titre = tr('anim_gravityorbits_titre_modele' if self.t_cible == 1 else 'anim_gravityorbits_titre_echelle')
-        r = dessin.cadre(p, rect, titre)
+        # l'encart « Lune vue du Soleil » a son propre panneau, à côté (paysage) ou dessous (portrait) : jamais
+        # par-dessus le mouvement
+        principal, r_encart = rect, None
+        if self.c_lune_soleil.isChecked() and self.sys.trio:
+            if rect.width() >= rect.height() * 1.15:
+                lw = rect.width() * 0.6
+                principal = QRectF(rect.x(), rect.y(), lw, rect.height())
+                r_encart = QRectF(rect.x() + lw, rect.y(), rect.width() - lw, rect.height())
+            else:
+                lh = rect.height() * 0.6
+                principal = QRectF(rect.x(), rect.y(), rect.width(), lh)
+                r_encart = QRectF(rect.x(), rect.y() + lh, rect.width(), rect.height() - lh)
+        r = dessin.cadre(p, principal, titre)
         cf = CONF[self.sc]
         L = 0.44 * min(r.width(), r.height())
         self._cam = dict(cx=r.center().x(), cy=r.center().y(), s=L / cf['D'], L=L, ox=cf['ox'])
@@ -461,8 +473,8 @@ class GraviteOrbites(Animation):
             wm = p.fontMetrics().horizontalAdvance(m)
             dessin.texte(p, r.right() - wm - 6, r.top() + 34, m, 'doux', centre=False)
             dessin.police(p, 1 / 0.85)
-        if self.c_lune_soleil.isChecked() and sys_.trio:
-            self._encart(p, r)
+        if r_encart is not None:
+            self._encart(p, r_encart)
 
     def _grille(self, p, r):
         cf = CONF[self.sc]
@@ -626,22 +638,14 @@ class GraviteOrbites(Animation):
         dessin.texte(p, (A[0] + B[0]) / 2, (A[1] + B[1]) / 2 - 12, self._distance(norme(x1 - x0, y1 - y0)), 'accent1',
                      fond=True)
 
-    def _encart(self, p, r):
-        """Encart « Lune vue du Soleil » : vraie trajectoire héliocentrique de la Lune et de la Terre sur les 60
-        derniers jours (même échelle en x et en y : les deux chemins se confondent, sans boucle), et le rapport des
-        courbures Lune / Terre au cours du temps : toujours positif, donc toujours tourné vers le Soleil."""
+    def _encart(self, p, R):
+        """Panneau « Lune vue du Soleil » (à côté ou sous la scène) : vraie trajectoire héliocentrique de la Lune et de
+        la Terre sur les 60 derniers jours (même échelle en x et en y : les deux chemins se confondent, sans boucle), et
+        le rapport des courbures Lune / Terre au cours du temps : toujours positif, donc toujours tourné vers le
+        Soleil."""
         sys_ = self.sys
         i_s, i_t, i_l = sys_.trio
         ts, tt, tl = sys_.traces[i_s], sys_.traces[i_t], sys_.traces[i_l]
-        etroit = r.width() < 420
-        w = r.width() if etroit else max(200.0, 0.42 * r.width())
-        h = max(130.0, (0.46 if etroit else 0.44) * r.height())
-        R = QRectF(r.right() - w, r.bottom() - h, w, h)
-        p.save()
-        p.setPen(Qt.PenStyle.NoPen)
-        p.setBrush(QBrush(dessin.c('fond', 0.94)))
-        p.drawRoundedRect(R.adjusted(3, 3, -3, -3), 10, 10)
-        p.restore()
         ri = dessin.cadre(p, R, tr('anim_gravityorbits_titre_lune_soleil'))
         n = min(len(ts.x), len(tt.x), len(tl.x))
         N = min(n, math.ceil(60 * g.JOUR / sys_.pas_trace) + 1)
