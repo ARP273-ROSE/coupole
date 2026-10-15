@@ -37,6 +37,15 @@ def bouton(cle: str, rappel=None, cle_aide: str | None = None, parent=None) -> Q
     return b
 
 
+def bouton_principal(cle: str, rappel=None, cle_aide: str | None = None, parent=None) -> QPushButton:
+    """Le geste principal d'un écran (« Télécharger ») : couleur d'accent du thème (`QPushButton#principal`)."""
+    b = bouton(cle, rappel, cle_aide, parent)
+    b.setObjectName('principal')
+    b.setDefault(False)
+    b.setAutoDefault(False)
+    return b
+
+
 def bouton_outil(cle: str, rappel=None, cle_aide: str | None = None, parent=None) -> QToolButton:
     b = QToolButton(parent)
     b.setText(tr(cle))

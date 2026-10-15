@@ -204,7 +204,7 @@ Coupole retrouve à chaque lancement l'écran tel qu'on l'a laissé. Sont conser
   colonnes, colonne et sens du tri de chaque tableau ;
 \item \textbf{Banque OHP} : recherche, type, télescope, cases \emph{Nouveaux}, \emph{À vérifier}, \emph{À télécharger
   seulement}, \emph{Sans dates douteuses}, nuit et filtre, objets choisis (rétablis dès que l'inventaire est chargé),
-  filtres des anomalies et de la carte du ciel ; onglet Traitement : dossier de sortie \emph{dès qu'il est modifié},
+  filtres des anomalies et de la carte du ciel ; onglet Téléchargement : dossier de sortie \emph{dès qu'il est modifié},
   format, langue des noms, \emph{Garder les doublons}, \emph{Garder les FITS}, mode ASTAP, \emph{Vérifier la qualité} ;
 \item \textbf{Qualité des images} : dossier analysé, mode échantillon et nombre d'images par lot ;
 \item \textbf{Spectres et séries} : dossier du dialogue d'ouverture et menu \emph{Récents} (10 derniers fichiers ;
@@ -238,6 +238,38 @@ dossier de sortie et les autres réglages ne changent pas), ou \cmd{coupole --re
 2048 pixels de 0,68″ ou 4096 pixels de 0,46″, champs de 23′ et 31′). Les images sont déjà calibrées (dark, flat) et
 résolues astrométriquement : \textbf{elles ne doivent pas être recalibrées}.
 
+\subsection{Télécharger en trois gestes (0.7.2)}\label{sec:trois-gestes}
+\capture{img/ohp_guide_fr.png}{1.0}
+Au premier lancement, un bandeau en tête du catalogue guide pas à pas ; chaque étape faite est cochée.
+\begin{enumerate}[leftmargin=*,itemsep=1pt]
+\item \textbf{Choisir une cible} : un clic sur une ligne de la liste de gauche (Ctrl+clic ou Maj+clic pour
+  plusieurs ; la recherche et la liste des types aident à la trouver). Tant que rien n'est choisi, la liste des
+  images le dit : « Aucune cible choisie : cliquez sur une cible dans la liste de gauche ».
+\item \textbf{Voir ses images} : elles s'affichent à droite, filtrables par nuit, filtre et dates douteuses.
+\item \textbf{Télécharger} : le bouton bleu sous la liste des images annonce ce qu'il va faire,
+  « Télécharger (840 images · 7,15 Go → ≈ 2,64 Go en XISF) ». La première fois, Coupole demande le dossier où
+  ranger les images (dialogue de fichiers complet du système ; il y crée \texttt{OHP\_DU\_ECU}) ; ensuite il
+  reprend le même dossier et le même format. La progression s'affiche sous le bouton, avec \emph{Arrêter} ; à la
+  fin, la pastille de chaque image devient une coche verte et la barre d'état le dit (« Téléchargement terminé :
+  … Double-clic sur une image pour l'ouvrir »).
+\end{enumerate}
+Le bouton est grisé, avec la raison au survol, tant qu'aucune cible n'est choisie ; il affiche « Déjà téléchargé ✓ »
+quand tout est là, « Téléchargement en cours… » pendant un téléchargement. \emph{Compris, masquer} ferme le
+bandeau ; \emph{Aide > Guide de démarrage (Banque OHP)} le réaffiche. Les réglages (dossier, format XISF ou FITS,
+doublons, FITS d'origine, astrométrie, parallélisme) sont dans l'onglet \emph{Téléchargement}, sous
+\emph{Options} (bouton \emph{Options du téléchargement →} du catalogue).
+
+\capture{img/ohp_menu_fr.png}{1.0}
+\textbf{Clic droit et double-clic.} Le menu d'une image commence par \emph{Télécharger cette image} (ou
+\emph{Télécharger ces N images} si plusieurs lignes sont choisies), puis \emph{Ouvrir}, \emph{Ouvrir avec},
+\emph{Ouvrir l'emplacement du fichier}, grisés avec leur raison (« pas encore téléchargée ») tant que le fichier
+n'existe pas ; celui d'une cible commence par \emph{Télécharger toutes les images de NGC 6888}. Un double-clic sur
+une image (ou une cible) pas encore téléchargée propose de la télécharger ; sur une image téléchargée, il l'ouvre.
+
+\paragraph{À donner aux étudiants.} « Dans Coupole, module \emph{Banque OHP} : 1) cliquez sur une cible dans la
+liste de gauche ; 2) ses images s'affichent à droite ; 3) cliquez sur le bouton bleu \emph{Télécharger} sous la
+liste des images et choisissez votre dossier la première fois. Ensuite, double-clic sur une image pour l'ouvrir. »
+
 \subsection{Catalogue}
 \capture{img/catalogue_fr.png}{1.0}
 L'inventaire vient du service TAP public de l'Observatoire (\texttt{http://tap-ufe.obspm.fr/tap}, table
@@ -246,7 +278,9 @@ ligne. \emph{Rafraîchir l'inventaire} (Ctrl+R) réinterroge le service et signa
 (« nouveau depuis le … »). Les noms de la base sont regroupés en objets canoniques ; la sélection d'un ou plusieurs
 objets affiche leurs images à droite, filtrables par nuit, filtre et dates douteuses ; cette liste est la sélection
 à traiter. L'estimation donne le volume à télécharger, le volume attendu en sortie et la place libre. Les heures
-sont affichées en UTC et à l'heure du site (survol : également l'heure de l'utilisateur).
+sont affichées en UTC et à l'heure du site (survol : également l'heure de l'utilisateur). Chaque en-tête de colonne
+s'explique au survol ; les colonnes clés (état, date, télescope, filtre, pose ; objet, possédé, volume) viennent en
+premier et restent visibles sans défiler en 1366~×~768.
 
 \paragraph{Ce qu'on possède déjà.} D'après le dossier de sortie (\texttt{\_traitement/etat.sqlite}, relu en fond à
 l'ouverture, après chaque traitement et à chaque changement de dossier, jamais bloquant), la liste des images
@@ -263,16 +297,22 @@ partie, complet). La légende, sous les deux listes, vaut pour les deux. La lign
 possession globale (« 7 989 images (144 doublons), 166 objets, 60 nuits, 78,03 Go — possédées : 7 625 (+ 220
 doublons écartés), échecs : 0, à télécharger : 0 »). La case \emph{À télécharger seulement} cache les objets
 entièrement possédés et, dans la liste, les images déjà traitées ; une liste vidée l'explique au centre (« Tout est
-déjà téléchargé dans … »), comme la liste des images tant qu'aucun objet n'est choisi (« Choisissez un ou plusieurs
-objets… » ; au premier lancement, le premier objet est choisi d'office). L'estimation ne compte que ce qui manque
+déjà téléchargé dans … »), comme la liste des images tant qu'aucun objet n'est choisi (« Aucune cible choisie : cliquez sur une cible dans
+la liste de gauche » ; au premier lancement, aucune cible n'est choisie : le guide et cette liste disent quoi faire). L'estimation ne compte que ce qui manque
 (« 180 images manquantes sur 300 : 1,5 Go »). Changer de dossier de sortie (Préférences, champ ou \emph{Parcourir}
-de l'onglet Traitement) relit aussitôt sa possession en fond : pastilles, colonne et résumé suivent, et la barre
+de l'onglet Téléchargement) relit aussitôt sa possession en fond : pastilles, colonne et résumé suivent, et la barre
 d'état l'annonce (« Possession recalculée : 7 625 images trouvées dans … »).
 Ligne de commande : \cmd{coupole ohp inventaire --manquantes [--dest DOSSIER] [--json]}, et
 colonnes \texttt{possedee}, \texttt{statut\_local}, \texttt{fichier\_local} dans le CSV de \cmd{coupole ohp images}.
 
-\subsection{Traitement}
+\subsection{Téléchargement (onglet et options)}
 \capture{img/traitement_fr.png}{1.0}
+L'onglet \emph{Téléchargement} (anciennement \emph{Traitement}) montre la sélection, le même bouton
+\emph{Télécharger}, \emph{Tout télécharger…}, \emph{Pause}, \emph{Arrêter}, la progression et le journal ; il réunit
+sous \emph{Options} le dossier et le format, la langue des noms, \emph{Garder les doublons}, \emph{Garder les FITS
+d'origine}, \emph{Vérifier la qualité des images}, la vérification astrométrique (ASTAP) et le parallélisme. Les noms
+de fichiers et de dossiers internes ne changent pas (\texttt{\_traitement/etat.sqlite}…), ni la ligne de commande
+(\cmd{coupole ohp traiter}) : les dossiers déjà remplis restent compatibles.
 Pour chaque image, hors doublons :
 \begin{enumerate}[leftmargin=*,itemsep=1pt]
 \item téléchargement : au plus 4 simultanés (3 par défaut), débit libre par défaut (plafond total réglable dans les Préférences), User-Agent
@@ -284,7 +324,7 @@ Pour chaque image, hors doublons :
 \item écriture au format choisi, relecture et comparaison pixel à pixel ;
 \item à la fin : tri en lots, \texttt{LOT.txt}, \texttt{INDEX\_LOTS.csv}, \texttt{\_traitement/journal.csv}.
 \end{enumerate}
-L'état est gardé dans \texttt{\_traitement/etat.sqlite} : \emph{Arrêter} puis \emph{Lancer} (ou relancer la même
+L'état est gardé dans \texttt{\_traitement/etat.sqlite} : \emph{Arrêter} puis \emph{Télécharger} (ou relancer la même
 commande) reprend sans rien refaire. Un dossier garde la langue de noms et le format de son premier traitement.
 \emph{Garder les doublons} traite aussi ce qui serait écarté ; \emph{Garder les FITS d'origine} les conserve dans
 \texttt{\_traitement/fits\_origine}.
@@ -509,8 +549,9 @@ sélectionné : Explorateur \texttt{/select}, Finder \texttt{open -R}, gestionna
 logiciels d'astronomie trouvés sur la machine (PixInsight, Siril, ASTAP, Aladin, N.I.N.A. : PATH, emplacements
 usuels, flatpak, \texttt{/Applications}, Program Files) \emph{et} capables de lire ce fichier d'après la table
 vérifiée de la section~\ref{sec:compat} ; les autres apparaissent grisés avec la raison (« ASTAP ne lit que le XISF
-non compressé : choisir le format FITS dans le Traitement »). Une image pas encore téléchargée : la barre d'état le
-dit. Une entrée désactivée porte son motif dans son libellé (« Ouvrir avec (rien de téléchargé) ») et le motif
+non compressé : choisir le format FITS dans les options du téléchargement »). Une image pas encore téléchargée : le menu commence par
+\emph{Télécharger cette image}, et le double-clic propose de la télécharger (0.7.2). Une entrée désactivée porte
+son motif dans son libellé (« Ouvrir avec (pas encore téléchargée) ») et le motif
 complet s'affiche dans la barre d'état au survol : plus d'info-bulle par-dessus le menu (sous KDE, elle en captait
 la souris).
 
@@ -728,7 +769,11 @@ pixels, fond blanc là où il n'y a pas de données) ; à défaut une vignette g
 sinon la raison (« l'archive ne fournit pas de vignette… »).
 
 \subsection{Télécharger et préparer}
-Choisir des lignes, puis \emph{Télécharger la sélection}. Au-delà de 2~Go (réglage \texttt{archives\_seuil\_go}),
+Choisir des lignes (Ctrl+clic, Maj+clic), puis le bouton bleu \emph{Télécharger la sélection (N · taille)}, juste sous
+le tableau (0.7.2 : grisé avec la raison au survol tant que rien n'est choisi, « Déjà téléchargé ✓ » si tout est là).
+Le clic droit commence par \emph{Télécharger cette observation} (ou \emph{ces N observations}), puis \emph{Ouvrir},
+\emph{Ouvrir avec}, \emph{Ouvrir l'emplacement du fichier} et la page de l'archive ; un double-clic sur une ligne pas
+encore téléchargée propose de la télécharger. Au-delà de 2~Go (réglage \texttt{archives\_seuil\_go}),
 confirmation. Débit libre par défaut (plafond : Préférences, ou réglage \texttt{archives\_debit\_mo\_s}), deux fichiers à la fois, reprise
 d'un fichier interrompu. La barre avance en \textbf{deux phases} : téléchargement (jusqu'à 70~\%, d'après les octets
 reçus), puis préparation (jusqu'à 100~\%) ; dessous : fichiers téléchargés et préparés, octets reçus sur le total,
@@ -1851,7 +1896,7 @@ Qualité : colonnes vides sur ses propres poses & mettre à jour (0.1.11) : lect
 \texttt{\textasciitilde/.local/bin/coupole} introuvable & ajouter \texttt{\textasciitilde/.local/bin} au \texttt{PATH} (ligne donnée par l'installeur).\\
 Fichier \texttt{.part} ou \texttt{.tmp} dans \texttt{\_traitement} & reste d'une coupure : la reprise le réutilise (\texttt{.part}) ou le remplace ; rien à faire.\\
 WBPP ne trouve pas focale et pixel & saisir les valeurs de l'encadré \emph{Pour PixInsight / N.I.N.A.} (onglet Lots) dans le panneau \emph{Astrometric solution} ; fichiers anciens : \cmd{coupole ohp metadonnees DOSSIER --reecrire}.\\
-Image blanche dans N.I.N.A. ou Siril & format XISF compatible (onglet Traitement), section~\ref{sec:compat}.\\
+Image blanche dans N.I.N.A. ou Siril & format XISF compatible (options du téléchargement), section~\ref{sec:compat}.\\
 « database is locked » vers un NAS (0.1.9 et avant) & mettre à jour : la base de travail locale règle le problème (section~\ref{sec:partage}).\\
 « Deux versions de la base d'état » & deux ordinateurs (ou le NAS) ont traité vers le même dossier : accepter la fusion, ou \cmd{coupole ohp fusionner --dest DOSSIER} ; les deux bases d'origine sont gardées.\\
 Tout « à télécharger » sous Windows alors que le dossier (lecteur réseau) est complet & 0.2.0 et avant : mettre à jour (section~\ref{sec:partage}) ; la ligne « Dossier de suivi » dit ce qui est lu.\\

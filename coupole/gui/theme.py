@@ -130,6 +130,14 @@ QToolButton:checked { background: %(selection)s; color: %(texte_selection)s; }
 QTabBar::tab:disabled { color: %(desactive)s; background: %(fenetre)s; }
 QTreeView::item, QListView::item { padding: 2px 4px; }
 QTreeView::item:hover:!selected, QListView::item:hover:!selected { background: %(survol)s; }
+QPushButton#principal { background: %(selection)s; color: %(texte_selection)s; border: 1px solid %(selection)s;
+                        font-weight: bold; padding: 7px 16px; }
+QPushButton#principal:hover { border: 1px solid %(texte)s; }
+QPushButton#principal:pressed { border: 2px solid %(texte)s; }
+QPushButton#principal:disabled { background: %(bouton)s; color: %(texte_doux)s; border: 1px solid %(bordure)s;
+                                 font-weight: normal; }
+QFrame#guideDebutant { background: %(survol)s; border: 1px solid %(selection)s; border-radius: 10px; }
+QFrame#guideDebutant QLabel { background: transparent; }
 QPushButton#choix { text-align: left; background: %(base)s; border-radius: 10px; }
 QPushButton#choix:hover { background: %(survol)s; }
 QPushButton#choix:checked { background: %(survol)s; color: %(texte)s; border: 2px solid %(selection)s; }

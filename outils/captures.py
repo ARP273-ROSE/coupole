@@ -3,7 +3,8 @@
     QT_QPA_PLATFORM=offscreen python outils/captures.py fr docs/manuel/img [DOSSIER_QUALITE] [DESTINATION]
 
 DESTINATION : un dossier de sortie (INDEX_LOTS.csv et quelques images par lot) pour l'onglet Lots et son encadré
-« Pour PixInsight / N.I.N.A. ».  COUPOLE_CAPTURES=archives : seulement les captures du module Archives.
+« Pour PixInsight / N.I.N.A. ».  COUPOLE_CAPTURES=archives : seulement les captures du module Archives ;
+COUPOLE_CAPTURES=ohp : seulement le guide, le catalogue, son menu contextuel et l'onglet Téléchargement.
 """
 import os
 import sys
@@ -104,6 +105,14 @@ def main():
             statuts[ident(l[0])] = 'echec'
     poss = Possession(ohp._dest_courante(), statuts)
     ohp._possession_prete((poss, [], poss.compte_objets(ohp.inv.images), ohp.inv.images))
+    seules = os.environ.get('COUPOLE_CAPTURES', '')
+
+    def capture(nom):
+        attendre(app, lambda: False, 0.4)
+        f.grab().save(str(dossier / ('%s_%s.png' % (nom, langue))))
+
+    if seules in ('', 'ohp'):                      # premier lancement : guide en trois étapes, rien de choisi (0.7.2)
+        capture('ohp_guide')
     # sélection : NGC 6888 (exemple du manuel)
     for r, o in enumerate(ohp.m_obj.donnees):
         if o['objet'] == 'NGC 6888':
@@ -114,22 +123,38 @@ def main():
     ohp.f_nuit.setCurrentIndex(max(0, ohp.f_nuit.findData('2025-07-16')))
     attendre(app, lambda: False, 0.5)
 
-    def capture(nom):
-        attendre(app, lambda: False, 0.4)
-        f.grab().save(str(dossier / ('%s_%s.png' % (nom, langue))))
-
-    seules = os.environ.get('COUPOLE_CAPTURES', '')
-    if seules:
+    if seules and seules != 'ohp':
         return _modules(app, f, capture, dossier, langue, seules)
+    ohp.v_img.selectRow(0)
     capture('catalogue')
+    # clic droit sur une image : « Télécharger cette image » d'abord (0.7.2), dessiné sur la capture
+    from PyQt6.QtGui import QPainter
+    k = next((k for k, x in enumerate(ohp.m_img.donnees) if ohp.possession.statut(x) == 'absente'), 0)
+    ohp.v_img.clearSelection()
+    r = ohp.v_img.visualRect(ohp.p_img.mapFromSource(ohp.m_img.index(k, 1)))
+    ohp._menu_image(r.center())
+    attendre(app, lambda: False, 0.4)
+    menu = getattr(ohp, '_menu_contextuel', None)
+    if menu is not None:
+        img = f.grab()
+        p = QPainter(img)
+        pm = menu.grab()
+        pt = ohp.v_img.viewport().mapTo(f, r.center())
+        pt.setX(min(pt.x(), f.width() - pm.width() - 4))          # menu entier dans l'image
+        p.drawPixmap(pt, pm)
+        p.end()
+        img.save(str(dossier / ('ohp_menu_%s.png' % langue)))
+        menu.close()
     ohp.vers_traitement()
     capture('traitement')
-    ohp.onglets.setCurrentIndex(3)
+    if seules == 'ohp':
+        return
+    ohp.onglets.setCurrentIndex(ohp.ONGLET_ANOMALIES)
     attendre(app, lambda: ohp.m_anom.rowCount() > 0, 20)
     capture('anomalies')
-    ohp.onglets.setCurrentIndex(4)
+    ohp.onglets.setCurrentIndex(ohp.ONGLET_CIEL)
     capture('ciel')
-    ohp.onglets.setCurrentIndex(2)
+    ohp.onglets.setCurrentIndex(ohp.ONGLET_LOTS)
     if len(sys.argv) > 4:                          # vraie destination : lots, focale, pixel, échelle
         ohp.dest.setText(sys.argv[4])
         ohp._remplir_lots()

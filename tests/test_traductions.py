@@ -34,7 +34,7 @@ def test_en_tetes_fits_en_ascii():
 
 
 def _cles_utilisees():
-    pref = re.compile(r"""(?:\btr|\bbouton|\bbouton_outil|\betiquette|\bcase|\bbilingue)\(\s*['"]([a-z][a-z0-9_]*)['"]""")
+    pref = re.compile(r"""(?:\btr|\bbouton|\bbouton_principal|\bbouton_outil|\betiquette|\bcase|\bbilingue)\(\s*['"]([a-z][a-z0-9_]*)['"]""")
     act = re.compile(r"""\baction\(\s*self\s*,\s*['"]([a-z][a-z0-9_]*)['"]""")
     aid = re.compile(r"""(?:aide|liste|champ|nombre|decimal|vue_tableau)\([^'"\n]*?['"]([a-z][a-z0-9_]*_aide)['"]""")
     cle_aide = re.compile(r"""cle_aide=['"]([a-z][a-z0-9_]*)['"]""")
@@ -46,7 +46,7 @@ def _cles_utilisees():
         out |= {'hdr_' + k for k in re.findall(r"""\bH\(\s*['"]([a-z][a-z0-9_]*)['"]""", t)}
         out |= {'lot_' + k for k in re.findall(r"""\bT\(\s*['"]([a-z][a-z0-9_]*)['"]""", t)}
         # les boutons, cases et actions ont une info-bulle « <clé>_aide »
-        for k in re.findall(r"""\b(?:bouton|bouton_outil|case)\(\s*['"]([a-z][a-z0-9_]*)['"]\s*[,)]""", t):
+        for k in re.findall(r"""\b(?:bouton|bouton_principal|bouton_outil|case)\(\s*['"]([a-z][a-z0-9_]*)['"]\s*[,)]""", t):
             if 'cle_aide=' not in t[t.find(k):t.find(k) + 120]:
                 out.add(k + '_aide')
         for k in act.findall(t):

@@ -204,6 +204,8 @@ class FenetrePrincipale(QMainWindow):
         m = mb.addMenu(tr('menu_aide'))
         m.addAction(action(self, 'act_aide_ecran', self.aide_ecran, QKeySequence('F1')))
         m.addAction(action(self, 'act_manuel', self.manuel, QKeySequence('Shift+F1')))
+        if hasattr(self.panneau_module('ohp'), 'montrer_guide'):     # guide du premier lancement (0.7.2)
+            m.addAction(action(self, 'act_guide_ohp', lambda: self.ouvrir_module('ohp').montrer_guide()))
         m.addAction(action(self, 'act_raccourcis', lambda: dialogues.afficher_raccourcis(self)))
         m.addSeparator()
         m.addAction(action(self, 'act_signaler', lambda: dialogues.DialogueSignaler(self).exec()))

@@ -178,16 +178,17 @@ def test_message_quand_aucun_objet_n_est_choisi(panneau, app_qt):
     p._objets_choisis()
     app_qt.processEvents()
     assert attendre(app_qt, lambda: p.m_img.rowCount() == 0, 5)   # objets cachés → plus d'objet choisi
-    assert p.v_img.texte_vide() == 'Choisissez un ou plusieurs objets dans la liste de gauche pour voir leurs images.'
+    assert p.v_img.texte_vide() == ('Aucune cible choisie : cliquez sur une cible dans la liste de gauche '
+                                    '(Ctrl+clic pour en choisir plusieurs).')
     p.v_img.viewport().grab()                                 # dessiné dans la zone même, sans erreur
-    # premier lancement (rien de gardé) : le premier objet est choisi
-    p._objets_attendus, p._premier_objet_par_defaut = None, True
+    # le bouton Télécharger dit pourquoi il est grisé
+    assert attendre(app_qt, lambda: not p.b_telecharger.isEnabled(), 5)
+    assert 'cible' in p.b_telecharger.toolTip()
+    # premier lancement (rien de gardé) : aucun objet choisi d'office (0.7.2 : le guide dit « choisissez une cible »)
+    p._objets_attendus = None
     p._restaurer_selection()
-    p._minuteur_choix.stop()
-    p._objets_choisis()
     app_qt.processEvents()
-    assert len(p.v_obj.selectionModel().selectedRows()) == 1 and p.m_img.rowCount() > 0
-    assert p.v_img.texte_vide() == ''
+    assert not p.v_obj.selectionModel().selectedRows() and p.m_img.rowCount() == 0
 
 
 def test_tout_deja_telecharge(panneau, app_qt):

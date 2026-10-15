@@ -24,8 +24,8 @@ from ...gui.dialogues import DialogueASTAP, ouvrir_fichier
 from ...gui import fichiers, memoire, pastilles
 from ...gui.modele import (DelegueProgression, ModeleParesseux, ModeleTableau, Nombre, Progression, lignes_choisies,
                            vue_tableau)
-from ...gui.outils import (ChampDebit, FileEvenements, Tache, aide, bouton, case, champ, enregistrer_arret, est_detruit,
-                           lancer_fil, liste, nombre)
+from ...gui.outils import (ChampDebit, FileEvenements, Tache, aide, bouton, bouton_principal, case, champ,
+                           enregistrer_arret, est_detruit, lancer_fil, liste, nombre)
 from . import cibles
 from .conversion import ident
 from .possession import Possession
@@ -142,6 +142,11 @@ def cles_de_tri_images(images) -> tuple[dict, dict, list]:
 
 
 class Panneau(QWidget):
+    # ordre d'affichage par défaut des colonnes (indices logiques) ; l'ordre logique, lui, ne change jamais
+    ORDRE_OBJETS = (0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 10)      # type, objet, possédé, volume, remarque, images…
+    ORDRE_OBJETS_V2 = (0, 1, 4, 2, 3, 5, 6, 7, 8, 9, 10)   # défaut de 0.1.8 à 0.7.1
+    ORDRE_IMAGES = (0, 1, 4, 5, 6, 3, 2, 7, 8)             # possédé, date, tél., filtre, pose, nuit, heure du site…
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.inv = None
@@ -165,16 +170,21 @@ class Panneau(QWidget):
         self.onglets = QTabWidget()                 # aide sur la barre et sur chaque onglet, pas sur tout le contenu
         aide(self.onglets.tabBar(), 'ohp_onglets_aide')
         v.addWidget(self.onglets)
+        # onglets dans l'ordre de l'usage (0.7.2) : choisir, télécharger, empiler ; puis la carte, la fiche, et ce qui
+        # a été mis de côté.  Le contenu de « Téléchargement » défile seul : sa hauteur (options, journal) n'impose
+        # plus sa taille minimale au Catalogue, dont le bouton « Télécharger » reste visible en 1366 × 768.
+        from ...gui.adaptatif import defilable
         self.onglets.addTab(self._onglet_catalogue(), tr('ohp_onglet_catalogue'))
-        self.onglets.addTab(self._onglet_traitement(), tr('ohp_onglet_traitement'))
-        self.onglets.addTab(self._onglet_lots(), tr('ohp_onglet_lots'))
-        self.onglets.addTab(self._onglet_anomalies(), tr('ohp_onglet_anomalies'))
-        self.onglets.addTab(self._onglet_ciel(), tr('ohp_onglet_ciel'))
+        self.ONGLET_TELECHARGEMENT = self.onglets.addTab(defilable(self._onglet_traitement()),
+                                                         tr('ohp_onglet_traitement'))
+        self.ONGLET_LOTS = self.onglets.addTab(defilable(self._onglet_lots()), tr('ohp_onglet_lots'))   # idem
+        self.ONGLET_CIEL = self.onglets.addTab(self._onglet_ciel(), tr('ohp_onglet_ciel'))
         from ...gui.fiche import FicheEnLigne
         self.fiche = FicheEnLigne()
         self.onglet_fiche = self.onglets.addTab(self.fiche, tr('fiche_titre'))
+        self.ONGLET_ANOMALIES = self.onglets.addTab(self._onglet_anomalies(), tr('ohp_onglet_anomalies'))
         for k, cle in enumerate(('ohp_onglet_catalogue_aide', 'ohp_onglet_traitement_aide', 'ohp_onglet_lots_aide',
-                                 'ohp_onglet_anomalies_aide', 'ohp_onglet_ciel_aide', 'ohp_onglet_fiche_aide')):
+                                 'ohp_onglet_ciel_aide', 'ohp_onglet_fiche_aide', 'ohp_onglet_anomalies_aide')):
             self.onglets.setTabToolTip(k, tr(cle))
         self.onglets.currentChanged.connect(self._maj_fiche)
         self._remplir_lots()
@@ -200,11 +210,11 @@ class Panneau(QWidget):
         memoire.case(self.f_anom_nouv, k + 'anomalies_nouvelles')
         memoire.liste(self.ciel_cat, k + 'ciel_type')
         memoire.separateur(self.sp_catalogue, k + 'separateur')
-        memoire.entete(self.v_obj, k + 'colonnes_objets', version=2)
-        memoire.entete(self.v_img, k + 'colonnes_images')
+        memoire.entete(self.v_obj, k + 'colonnes_objets', version=3, defauts_anterieurs=(self.ORDRE_OBJETS_V2,))
+        memoire.entete(self.v_img, k + 'colonnes_images', version=2)
         memoire.entete(self.v_lots, k + 'colonnes_lots')
         memoire.entete(self.v_anom, k + 'colonnes_anomalies')
-        memoire.onglets(self.onglets, k + 'onglet')
+        memoire.onglets(self.onglets, k + 'onglet2')         # 0.7.2 : ordre des onglets changé
         # listes remplies plus tard (nuits et filtres des objets choisis, genres d'anomalies), objets choisis
         # (après le chargement de l'inventaire) : valeur « attendue », appliquée une fois, gardée en attendant
         self._nuit_attendue = e.lire(k + 'nuit', None, str) or None
@@ -212,8 +222,8 @@ class Panneau(QWidget):
         self._genre_attendu = e.lire(k + 'genre_anomalie', None, str) or None
         objets = e.lire(k + 'objets', None, list)
         self._objets_attendus = [o for o in objets if isinstance(o, str)][:200] if objets else None
-        # premier lancement (rien de gardé) : le premier objet est choisi, la liste des images n'est pas vide
-        self._premier_objet_par_defaut = objets is None
+        # premier lancement (rien de gardé) : AUCUN objet choisi d'office (0.7.2) — le guide dit « ① choisissez
+        # une cible » et la liste des images, vide, le répète ; un objet choisi au hasard brouillait ce premier pas
         m.suivre(k + 'nuit', lambda: self._nuit_attendue or self.f_nuit.currentData() or '', self.f_nuit,
                  self.f_nuit.currentIndexChanged)
         m.suivre(k + 'filtre', lambda: self._filtre_attendu or self.f_filtre.currentData() or '', self.f_filtre,
@@ -231,15 +241,7 @@ class Panneau(QWidget):
         if not self.m_obj.donnees:
             return
         if not voulus:
-            if getattr(self, '_premier_objet_par_defaut', False):
-                self._premier_objet_par_defaut = False
-                idx = self.p_obj.index(0, 0)
-                if idx.isValid() and not self.v_obj.selectionModel().hasSelection():
-                    self.v_obj.selectionModel().select(idx, QItemSelectionModel.SelectionFlag.ClearAndSelect |
-                                                       QItemSelectionModel.SelectionFlag.Rows)
-                    self.v_obj.setCurrentIndex(idx)
             return
-        self._premier_objet_par_defaut = False
         self._objets_attendus = None
         voulus = set(voulus)
         sel = QItemSelection()
@@ -364,7 +366,7 @@ class Panneau(QWidget):
 
         def fini(r):
             evts.arreter()
-            self.b_lancer.setEnabled(True)
+            self._fin_autre_travail()
             self.b_arreter.setEnabled(False)
             self.b_reconnaitre.setEnabled(True)
             if 'divergence' in r:
@@ -379,11 +381,11 @@ class Panneau(QWidget):
 
         def erreur(e):
             evts.arreter()
-            self.b_lancer.setEnabled(True)
+            self._fin_autre_travail()
             self.b_arreter.setEnabled(False)
             self.b_reconnaitre.setEnabled(True)
             QMessageBox.warning(self, tr('ohp_reconnaitre'), e)
-        self.b_lancer.setEnabled(False)
+        self._debut_autre_travail()
         self.b_arreter.setEnabled(True)
         self.b_reconnaitre.setEnabled(False)
         self._t_reconnaitre = Tache(travail, parent=self)
@@ -460,13 +462,159 @@ class Panneau(QWidget):
         self.selection = list(n['images'])
         self.l_sel.setText(tr('ohp_selection_courante', n=len(self.selection),
                               objets=', '.join(cibles.nom_affiche(o) for o in n['objets'])[:300]))
-        self.onglets.setCurrentIndex(1)
+        self.onglets.setCurrentIndex(self.ONGLET_TELECHARGEMENT)
         self.lancer(confirmer=True, apres_succes='nouveautes')
+
+    # ================================================================ guide du premier lancement (0.7.2)
+    def _guide_debutant(self):
+        """Bandeau en trois étapes en tête du catalogue : ① choisir une cible, ② ses images à droite,
+        ③ « Télécharger ».  Chaque étape faite est cochée ; « Compris » le ferme pour de bon (interface.json),
+        Aide > Guide de démarrage le rouvre."""
+        from ...core.etat_interface import etat
+        w = QFrame()
+        w.setObjectName('guideDebutant')
+        aide(w, 'ohp_guide_aide')
+        v = QVBoxLayout(w)
+        v.setContentsMargins(10, 6, 10, 6)
+        v.setSpacing(2)
+        h = Flux(espace=14)
+        titre = QLabel('<b>%s</b>' % html.escape(tr('ohp_guide_titre')))
+        h.addWidget(titre)
+        self.l_etapes = []
+        for k in (1, 2, 3):
+            lab = QLabel()
+            lab.setTextFormat(Qt.TextFormat.RichText)
+            self.l_etapes.append(lab)
+            h.addWidget(lab)
+        v.addLayout(h)
+        h2 = QHBoxLayout()
+        self.l_guide_suite = QLabel(tr('ohp_guide_suite'))
+        self.l_guide_suite.setWordWrap(True)
+        h2.addWidget(self.l_guide_suite, 1)
+        self.b_guide_fermer = bouton('ohp_guide_fermer', self.masquer_guide)
+        h2.addWidget(self.b_guide_fermer, 0, Qt.AlignmentFlag.AlignVCenter)
+        v.addLayout(h2)
+        w.setVisible(not etat().lire('modules.ohp.guide_masque', False, bool))
+        self._etapes_faites = (False, False, False)
+        self._maj_guide(force=True)
+        return w
+
+    def _maj_guide(self, force=False):
+        """Étapes cochées d'après l'état réel : cible choisie, images listées, au moins une image téléchargée."""
+        if not hasattr(self, 'l_etapes'):
+            return
+        objs = getattr(self, '_objets', set())
+        faites = (bool(objs), bool(objs) and bool(self.selection),
+                  any(self.possession.possedee(x) for x in self.selection[:5000]) if self.selection else False)
+        if not force and faites == self._etapes_faites:
+            return
+        self._etapes_faites = faites
+        courante = next((k for k, f in enumerate(faites) if not f), None)
+        for k, lab in enumerate(self.l_etapes):
+            marque = '&#10004;' if faites[k] else '%d' % (k + 1)
+            texte = html.escape(tr('ohp_guide_etape%d' % (k + 1)))
+            if k == courante:
+                texte = '<b>%s</b>' % texte
+            couleur = pastilles.couleur_statut('ok' if faites[k] else 'partiel').name()
+            lab.setText('<span style="font-weight:bold; color:%s">%s</span>&nbsp; %s' % (couleur, marque, texte))
+
+    def masquer_guide(self):
+        from ...core.etat_interface import etat
+        self.guide.setVisible(False)
+        etat().ecrire('modules.ohp.guide_masque', True)
+        memoire.memoire().signaler()
+        self._statut(tr('ohp_guide_masque'))
+
+    def montrer_guide(self):
+        """Aide > Guide de démarrage : bandeau réaffiché, catalogue au premier plan."""
+        from ...core.etat_interface import etat
+        etat().ecrire('modules.ohp.guide_masque', False)
+        memoire.memoire().signaler()
+        self.onglets.setCurrentIndex(0)
+        self._maj_guide(force=True)
+        self.guide.setVisible(True)
+
+    # ================================================================ télécharger (0.7.2)
+    NOMS_FORMAT = {'xisf': 'XISF', 'xisf16': 'XISF 16 bits', 'fz': 'FITS .fz', 'fits': 'FITS'}
+
+    def _maj_bouton_telecharger(self, info=None):
+        """Libellé et état des deux boutons « Télécharger » (catalogue, onglet Téléchargement) : nombre d'images
+        qui manquent, volume à télécharger, volume attendu dans le format choisi.  `info` : résultat de
+        `estimation_complete` pour la sélection courante (None : pas encore calculé)."""
+        boutons = [b for b in (getattr(self, 'b_telecharger', None), getattr(self, 'b_lancer', None)) if b is not None]
+        if not boutons:
+            return
+        if self.occupe():
+            texte, actif, bulle = tr('ohp_telechargement_en_cours'), False, tr('ohp_telechargement_en_cours_aide')
+        elif not self.selection:
+            texte, actif = tr('ohp_telecharger'), False
+            bulle = tr('ohp_telecharger_rien_choisi' if not getattr(self, '_objets', None) else 'ohp_telecharger_vide')
+        elif info is None:
+            texte, actif, bulle = tr('ohp_telecharger'), True, tr('ohp_telecharger_aide')
+        elif info['n'] == 0:
+            texte, actif, bulle = tr('ohp_deja_telecharge'), False, tr('ohp_deja_telecharge_aide')
+        else:
+            texte = tr('ohp_telecharger_n' if info['n'] > 1 else 'ohp_telecharger_1', n=_entier(info['n']),
+                       fits=_taille(info['fits']), sortie=_taille(info['sortie']),
+                       format=self.NOMS_FORMAT.get(info['fmt'], info['fmt'].upper()))
+            actif, bulle = True, tr('ohp_telecharger_aide')
+        for b in boutons:
+            b.setText(texte)
+            b.setEnabled(actif)
+            b.setToolTip(bulle)
+            b.setStatusTip(bulle)
+        self._maj_guide()
+
+    def telecharger_selection(self):
+        """Bouton « Télécharger » : les images listées à droite, avec le dossier et le format mémorisés (le dossier
+        est demandé la première fois) ; progression sous le bouton, détail dans l'onglet Téléchargement."""
+        self.telecharger_images(list(self.selection))
+
+    def telecharger_images(self, images, confirmer=False) -> bool:
+        """Télécharge (et convertit, range) `images` ; rend True si le téléchargement est lancé."""
+        if self.occupe() or not self.inv:
+            return False
+        if not images:
+            QMessageBox.information(self, tr('ohp_telecharger'), tr('ohp_telecharger_rien_choisi'))
+            return False
+        if not self.possession.manquantes(images) and not self.garder_doublons.isChecked():
+            self._statut(tr('ohp_deja_telecharge_aide'))
+            return False
+        dest = self._choisir_dest_si_besoin()
+        if not dest:
+            return False
+        objets = sorted({cibles.nom_affiche(x['objet']) for x in images})
+        self.l_sel.setText(tr('ohp_selection_courante', n=len([x for x in images if not x['doublon']]),
+                              objets=', '.join(objets)[:300]))
+        return self.lancer(confirmer=confirmer, images=images)
+
+    def images_objet(self, o) -> list:
+        """Toutes les images d'un objet (ordre date, adresse), doublons de la base compris (le pilote les écarte)."""
+        if not self.inv or not o:
+            return []
+        return list(self._index_inventaire()[2].get(o['objet'], ()))
+
+    def _images_choisies(self, pos=None) -> list:
+        """Images visées par un clic droit : la sélection si la ligne cliquée en fait partie, sinon cette ligne."""
+        x = self._image_sous(pos)
+        if x is None:
+            return []
+        choisies = lignes_choisies(self.v_img, self.p_img, self.m_img)
+        return choisies if any(y is x for y in choisies) else [x]
+
+    def _objets_choisis_menu(self, pos=None) -> list:
+        o = self._objet_sous(pos)
+        if o is None:
+            return []
+        choisis = lignes_choisies(self.v_obj, self.p_obj, self.m_obj)
+        return choisis if any(c is o for c in choisis) else [o]
 
     # ================================================================ catalogue
     def _onglet_catalogue(self):
         w = QWidget()
         v = QVBoxLayout(w)
+        self.guide = self._guide_debutant()
+        v.addWidget(self.guide)
         h = Flux()                                 # filtres : passent à la ligne sur un écran étroit
         self.recherche = champ('ohp_recherche_aide', '', 'ohp_recherche_indice')
         self.recherche.textChanged.connect(self._filtrer_objets)
@@ -507,11 +655,16 @@ class Panneau(QWidget):
         # « possédé » juste après « objet » (0.1.8) : visible sans défiler ; l'ordre logique ne change pas, si bien
         # que largeurs et tri gardés restent valables (memoire.entete migre un ordre d'origine jamais modifié)
         h_obj = self.v_obj.horizontalHeader()
-        h_obj.moveSection(h_obj.visualIndex(self.COL_POSSEDE), h_obj.visualIndex(self.COL_OBJET) + 1)
+        # 0.7.2 : puis « volume » (ce que coûte le téléchargement) ; « images » est déjà dans « possédé » (n / total)
+        for visuel, logique in enumerate(self.ORDRE_OBJETS):
+            h_obj.moveSection(h_obj.visualIndex(logique), visuel)
+        self.m_obj.bulles_entetes = [tr(c) for c in ('ohp_col_type_aide', 'ohp_col_objet_aide', 'ohp_col_remarque_aide',
+                                                      'ohp_col_images_aide', 'ohp_col_possede_aide', 'ohp_col_volume_aide',
+                                                      'ohp_col_nuits_aide', 'ohp_col_telescopes_aide',
+                                                      'ohp_col_filtres_aide', 'ohp_col_etat_aide', 'ohp_col_lots_aide')]
         h_obj.sectionMoved.connect(lambda *_: self._appliquer_possession_objets())
         self.v_obj.message_vide = self._message_objets_vide
         self.v_obj.setItemDelegateForColumn(self.COL_POSSEDE, DelegueProgression(self.v_obj, lambda: pastilles.couleur_statut('ok')))
-        self.v_obj.horizontalHeader().setToolTip(tr('ohp_legende_aide'))
         # sélection à la souris (glisser, Maj+clic) : une rafale de signaux → un seul remplissage, 40 ms après
         self._minuteur_choix = QTimer(self)
         self._minuteur_choix.setSingleShot(True)
@@ -538,7 +691,14 @@ class Panneau(QWidget):
                                       tr('ohp_col_pose'), tr('ohp_col_drapeaux'), tr('ohp_col_noms')],
                                      self._ligne_image, self._style_image, self._bulle_image, self._cle_image)
         self.v_img, self.p_img = vue_tableau(self.m_img, 'ohp_table_images_aide')
-        self.v_img.horizontalHeader().setToolTip(tr('ohp_legende_aide'))
+        # colonnes clés d'abord (0.7.2) : état, date, télescope, filtre, pose — visibles sans défiler en 1366 × 768
+        h_img = self.v_img.horizontalHeader()
+        for visuel, logique in enumerate(self.ORDRE_IMAGES):
+            h_img.moveSection(h_img.visualIndex(logique), visuel)
+        self.m_img.bulles_entetes = [tr(c) for c in ('ohp_col_possede_img_aide', 'ohp_col_date_aide',
+                                                      'ohp_col_heure_site_aide', 'ohp_col_nuit_aide', 'ohp_col_tel_aide',
+                                                      'ohp_col_filtre_aide', 'ohp_col_pose_aide', 'ohp_col_drapeaux_aide',
+                                                      'ohp_col_noms_aide')]
         self.v_img.message_vide = self._message_images_vide
         self._raison_vide_images = 'choisir'
         # double-clic : l'image possédée avec l'application du système ; clic droit : ouvrir, ouvrir avec, emplacement
@@ -548,10 +708,33 @@ class Panneau(QWidget):
         self.v_obj.doubleClicked.connect(lambda *_: self._ouvrir_dossier_objet())
         self.v_obj.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.v_obj.customContextMenuRequested.connect(self._menu_objet)
-        vd.addWidget(self.v_img)
+        vd.addWidget(self.v_img, 1)
+        # sous la liste des images : ce que coûte la sélection, puis LE geste du module (0.7.2) : « Télécharger
+        # (N images · X Go → ≈ Y Go en XISF) », en couleur d'accent ; pendant le téléchargement, sa progression
+        self.l_estimation = QLabel(tr('ohp_aucune_selection'))
+        self.l_estimation.setWordWrap(True)
+        aide(self.l_estimation, 'ohp_estimation_aide')
+        vd.addWidget(self.l_estimation)
+        hb = Flux()
+        self.b_telecharger = bouton_principal('ohp_telecharger', self.telecharger_selection)
+        hb.addWidget(self.b_telecharger)
+        self.barre_cat = aide(QProgressBar(), 'ohp_barre_aide')
+        self.barre_cat.setMinimumWidth(160)
+        self.barre_cat.setVisible(False)
+        hb.addWidget(self.barre_cat)
+        self.b_arreter_cat = bouton('ohp_arreter', self.arreter_traitement)
+        self.b_arreter_cat.setVisible(False)
+        hb.addWidget(self.b_arreter_cat)
+        vd.addLayout(hb)
         sp.addWidget(droite)
         sp.setSizes([560, 620])
         self.sp_catalogue = sp
+        # hauteur « souhaitée » des tableaux ignorée (0.7.2) : la page défilante prend la hauteur souhaitée de tout
+        # le contenu comme minimum ; les deux tableaux la faisaient déborder et le bouton « Télécharger » passait
+        # sous le bord de la fenêtre en 1366 × 768 à 125 %.  Ils prennent la place qui reste, 8 lignes au moins.
+        from PyQt6.QtWidgets import QSizePolicy
+        sp.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Ignored)
+        sp.setMinimumHeight(self.v_img.verticalHeader().defaultSectionSize() * 8)
         v.addWidget(sp, 1)
         # légende compacte des pastilles (FR/EN, couleurs du thème), sous les DEUX tableaux : elle vaut pour les
         # images (à droite) comme pour les objets (à gauche)
@@ -560,15 +743,13 @@ class Panneau(QWidget):
         aide(self.l_legende, 'ohp_legende_aide')
         self._maj_legende()
         v.addWidget(self.l_legende)
-        self.l_estimation = QLabel(tr('ohp_aucune_selection'))
-        self.l_estimation.setWordWrap(True)
-        v.addWidget(self.l_estimation)
-        h = Flux()                                 # boutons : passent à la ligne sur un écran étroit
-        h.addWidget(bouton('ohp_corriger', self.corriger))
-        h.addWidget(bouton('ohp_voir_fiche', lambda: self.onglets.setCurrentIndex(self.onglet_fiche)))
+        h = Flux()                                 # actions secondaires : passent à la ligne sur un écran étroit
         self.b_vers_traitement = bouton('ohp_vers_traitement', self.vers_traitement)
         h.addWidget(self.b_vers_traitement)
+        h.addWidget(bouton('ohp_voir_fiche', lambda: self.onglets.setCurrentIndex(self.onglet_fiche)))
+        h.addWidget(bouton('ohp_corriger', self.corriger))
         v.addLayout(h)
+        self._maj_bouton_telecharger()
         return w
 
     def charger(self, rafraichir):
@@ -702,6 +883,10 @@ class Panneau(QWidget):
         if n and not n.get('premiere') and (n.get('images') or n.get('noms')):
             texte += ' — ' + tr('ohp_nouveautes', images=len(n['images']), noms=len(n['noms']),
                                 depuis=n.get('depuis') or '?').rstrip(' :')
+        # date et adresse du service en info-bulle (0.7.2) : la ligne visible dit ce qu'il y a et ce qu'on a
+        self.l_inventaire.setToolTip(texte)
+        morceaux = texte.split(' — ')                # [résumé, « Inventaire du … », « source : … », nouveautés]
+        texte = ' — '.join(morceaux[:1] + morceaux[3:])
         self._texte_inventaire = texte
         self._maj_resume()
         self._remplir_objets()
@@ -826,9 +1011,8 @@ class Panneau(QWidget):
         faites = self.__dict__.setdefault('_migrations_faites', set())
         if not poss.a_migrer or not poss.dest or poss.dest in faites:
             return
-        b = getattr(self, 'b_lancer', None)
-        if b is not None and not b.isEnabled():
-            return                                   # traitement en cours : retenté à la relecture de fin
+        if self.occupe():
+            return                                   # téléchargement en cours : retenté à la relecture de fin
         faites.add(poss.dest)
         from . import emplacements
         self._t_migration = Tache(emplacements.migrer, poss.dest, list(poss.a_migrer), parent=self)
@@ -908,7 +1092,7 @@ class Panneau(QWidget):
 
     def _message_objets_vide(self) -> str:
         if not self.inv:
-            return ''
+            return tr('ohp_chargement')
         if getattr(self, '_tout_possede', False):
             return tr('ohp_vide_tout_possede', dest=coupable(self._dest_courante()))
         return tr('ohp_vide_aucun_objet')
@@ -1132,6 +1316,10 @@ class Panneau(QWidget):
             memoire.ajuster_colonnes(self.v_img)     # une fois : ensuite l'utilisateur garde ses largeurs
             self._colonnes_images_ajustees = bool(imgs)
         self.selection = imgs
+        if not self.occupe():                        # l'onglet Téléchargement dit ce que le bouton prendra
+            noms = sorted(cibles.nom_affiche(o) for o in {x['objet'] for x in imgs})
+            self.l_sel.setText(tr('ohp_selection_courante', n=sum(1 for x in imgs if not x['doublon']),
+                                  objets=', '.join(noms[:40])[:300]) if imgs else tr('ohp_aucune_selection'))
         self._estimer()
 
     def _raison_vide(self) -> str:
@@ -1158,45 +1346,59 @@ class Panneau(QWidget):
             self._minuteur_estimation.setInterval(120)
             self._minuteur_estimation.timeout.connect(self._estimer_maintenant)
         self._gen_estimation = getattr(self, '_gen_estimation', 0) + 1      # un résultat en route est périmé
+        if not self.selection:
+            self._maj_bouton_telecharger()           # « choisissez une cible » tout de suite
         self._minuteur_estimation.start()
 
     def _estimer_maintenant(self):
         if not self.selection:
             self.l_estimation.setText(tr('ohp_aucune_selection'))
+            self._maj_bouton_telecharger()
             return
         fmt = self.format.currentData() if hasattr(self, 'format') else 'xisf'
         dest = self.dest.text() if hasattr(self, 'dest') else ''
         sel, poss = list(self.selection), self.possession
         gen = self._gen_estimation
-        self._t_est = Tache(self.texte_estimation, sel, poss, fmt, dest, parent=self)
-        self._t_est.quand_fini(lambda t, g=gen: g == self._gen_estimation and self.l_estimation.setText(t))
+        self._t_est = Tache(self.estimation_complete, sel, poss, fmt, dest, parent=self)
+        self._t_est.quand_fini(lambda r, g=gen: g == self._gen_estimation and self._estimation_prete(*r))
         self._t_est.start()
+
+    def _estimation_prete(self, texte, info):
+        self.l_estimation.setText(texte)
+        self._maj_bouton_telecharger(info)
 
     @staticmethod
     def texte_estimation(selection, possession, fmt, dest) -> str:
+        return Panneau.estimation_complete(selection, possession, fmt, dest)[0]
+
+    @staticmethod
+    def estimation_complete(selection, possession, fmt, dest) -> tuple:
+        """(texte de l'estimation, {'n', 'fits', 'sortie', 'fmt'} de ce qui reste à télécharger) — fil de fond."""
         from ...core.machine import disque_libre_go
         from .selection import estimer
         manquantes = possession.manquantes(selection)
         utiles = [x for x in selection if not x['doublon']]
+        em = estimer(manquantes, fmt)
         if len(manquantes) < len(utiles):            # une partie est déjà là : on n'estime que ce qui manque
-            e = estimer(manquantes, fmt)
             texte = tr('ohp_estimation_manquantes', manquantes=len(manquantes), total=len(utiles),
-                       possedees=len(utiles) - len(manquantes), fits=_taille(e['octets_fits']),
-                       sortie=_taille(e['octets_sortie']), format=fmt.upper())
+                       possedees=len(utiles) - len(manquantes), fits=_taille(em['octets_fits']),
+                       sortie=_taille(em['octets_sortie']), format=fmt.upper())
         else:
             e = estimer(selection, fmt)
             texte = tr('ohp_estimation', images=e['images'], objets=e['objets'], nuits=e['nuits'],
                        doublons=e['doublons'], fits=_taille(e['octets_fits']),
                        sortie=_taille(e['octets_sortie']), format=fmt.upper())
-        return texte + '  ' + tr('ohp_libre', libre=_taille(disque_libre_go(dest or '.') * 1e9))
+        info = {'n': len(manquantes), 'fits': em['octets_fits'], 'sortie': em['octets_sortie'], 'fmt': fmt}
+        return texte + '  ' + tr('ohp_libre', libre=_taille(disque_libre_go(dest or '.') * 1e9)), info
 
     def vers_traitement(self):
-        if not self.selection:
-            QMessageBox.information(self, tr('ohp_onglet_traitement'), tr('ohp_aucune_selection'))
-            return
-        self.l_sel.setText(tr('ohp_selection_courante', n=len([x for x in self.selection if not x['doublon']]),
-                              objets=', '.join(sorted({cibles.nom_affiche(x['objet']) for x in self.selection}))[:300]))
-        self.onglets.setCurrentIndex(1)
+        """« Options du téléchargement → » : l'onglet Téléchargement (dossier, format, doublons, astrométrie,
+        parallélisme), avec la sélection courante."""
+        if self.selection and not self.occupe():
+            self.l_sel.setText(tr('ohp_selection_courante', n=len([x for x in self.selection if not x['doublon']]),
+                                  objets=', '.join(sorted({cibles.nom_affiche(x['objet'])
+                                                           for x in self.selection}))[:300]))
+        self.onglets.setCurrentIndex(self.ONGLET_TELECHARGEMENT)
 
     def corriger(self):
         objs = lignes_choisies(self.v_obj, self.p_obj, self.m_obj)
@@ -1215,6 +1417,34 @@ class Panneau(QWidget):
         self.l_sel = QLabel(tr('ohp_aucune_selection'))
         self.l_sel.setWordWrap(True)
         v.addWidget(self.l_sel)
+        h = Flux()
+        self.b_lancer = bouton_principal('ohp_telecharger', self.telecharger_selection)
+        self.b_tout = bouton('ohp_tout', self.tout_telecharger)
+        self.b_pause = bouton('ohp_pause', self.basculer_pause)
+        self.b_pause.setEnabled(False)
+        self.b_arreter = bouton('ohp_arreter', self.arreter_traitement)
+        self.b_arreter.setEnabled(False)
+        h.addWidget(self.b_lancer)
+        h.addWidget(self.b_tout)
+        h.addWidget(self.b_pause)
+        h.addWidget(self.b_arreter)
+        h.addWidget(bouton('ohp_ouvrir_journal', self.ouvrir_journal))
+        h.addWidget(bouton('ohp_reorganiser', self.reorganiser))
+        h.addWidget(bouton('ohp_nouv_verifier', lambda: self.verifier_nouveautes(True)))
+        v.addLayout(h)
+        self.barre = aide(QProgressBar(), 'ohp_barre_aide')
+        v.addWidget(self.barre)
+        self.l_stats = QLabel('')
+        v.addWidget(self.l_stats)
+        self.journal = aide(QPlainTextEdit(), 'ohp_journal_aide')
+        self.journal.setReadOnly(True)
+        self.journal.setMaximumBlockCount(5000)
+        self.journal.setMinimumHeight(110)
+        v.addWidget(self.journal, 1)
+        # tous les réglages sous « Options » (0.7.2) : le geste et sa progression d'abord
+        go = QGroupBox(tr('ohp_groupe_options'))
+        vo = QVBoxLayout(go)
+        v.addWidget(go)
         g = QGroupBox(tr('ohp_groupe_sortie'))
         f = QFormLayout(g)
         h = QHBoxLayout()
@@ -1253,7 +1483,7 @@ class Panneau(QWidget):
         for cle, c in (('ohp_garder_doublons', self.garder_doublons), ('ohp_garder_fits', self.garder_fits),
                        ('ohp_verifier_qualite', self.qualite)):
             c.toggled.connect(lambda oui, k=cle: memoire.reglage_differe(k, bool(oui)))
-        v.addWidget(g)
+        vo.addWidget(g)
         g = QGroupBox(tr('ohp_groupe_astrometrie'))
         vg = QVBoxLayout(g)                        # texte au-dessus, réglages dessous : tient sur un écran étroit
         self.l_astap = QLabel()
@@ -1269,7 +1499,7 @@ class Panneau(QWidget):
             lambda *_: memoire.reglage_differe('ohp_mode_astap', self.mode_astap.currentData()))
         hg.addWidget(self.mode_astap)
         hg.addWidget(bouton('ohp_assistant_astap', self._astap))
-        v.addWidget(g)
+        vo.addWidget(g)
         g = QGroupBox(tr('ohp_groupe_machine'))
         gl = QGridLayout(g)
         self.l_plan = QLabel()
@@ -1291,30 +1521,7 @@ class Panneau(QWidget):
         gl.addWidget(self.eco, 2, 0, 1, 3)
         for wid in (self.n_dl, self.n_conv, self.eco):
             (wid.valueChanged if hasattr(wid, 'valueChanged') else wid.toggled).connect(self._maj_plan)
-        v.addWidget(g)
-        h = Flux()
-        self.b_lancer = bouton('ohp_lancer', self.lancer)
-        self.b_tout = bouton('ohp_tout', self.tout_telecharger)
-        self.b_pause = bouton('ohp_pause', self.basculer_pause)
-        self.b_pause.setEnabled(False)
-        self.b_arreter = bouton('ohp_arreter', self.arreter_traitement)
-        self.b_arreter.setEnabled(False)
-        h.addWidget(self.b_lancer)
-        h.addWidget(self.b_tout)
-        h.addWidget(self.b_pause)
-        h.addWidget(self.b_arreter)
-        h.addWidget(bouton('ohp_ouvrir_journal', self.ouvrir_journal))
-        h.addWidget(bouton('ohp_reorganiser', self.reorganiser))
-        h.addWidget(bouton('ohp_nouv_verifier', lambda: self.verifier_nouveautes(True)))
-        v.addLayout(h)
-        self.barre = aide(QProgressBar(), 'ohp_barre_aide')
-        v.addWidget(self.barre)
-        self.l_stats = QLabel('')
-        v.addWidget(self.l_stats)
-        self.journal = aide(QPlainTextEdit(), 'ohp_journal_aide')
-        self.journal.setReadOnly(True)
-        self.journal.setMaximumBlockCount(5000)
-        v.addWidget(self.journal, 1)
+        vo.addWidget(g)
         self.reglages_changes()
         return w
 
@@ -1393,18 +1600,29 @@ class Panneau(QWidget):
                                conv=p.conversions, raison=tr(p.raison)))
 
     def occupe(self):
-        return self._fil is not None and self._fil.is_alive()
+        """Un téléchargement (ou une reconnaissance, une réorganisation) est en cours : un seul à la fois."""
+        return (self._fil is not None and self._fil.is_alive()) or getattr(self, '_autre_travail', False)
+
+    def _debut_autre_travail(self):
+        self._autre_travail = True
+        self._maj_bouton_telecharger()
+
+    def _fin_autre_travail(self):
+        self._autre_travail = False
+        self._estimer()
 
     # ---------------------------------------------------------------- tout télécharger, journal, réorganiser
     def _choisir_dest_si_besoin(self) -> str | None:
-        """Premier « Tout télécharger » (ou dossier non défini) : dialogue natif, défaut sensé selon le système."""
+        """Premier « Télécharger » (ou dossier non défini) : dialogue de fichiers complet, défaut sensé selon le
+        système ; un sous-dossier OHP_DU_ECU est créé dans le dossier choisi (sauf dossier déjà traité)."""
         from .pilote import dossier_sortie_propose
         r = config.reglages()
         actuel = self.dest.text().strip()
         if r['dossier_sortie'] and actuel:
             return os.path.abspath(os.path.expanduser(actuel))
         propose = actuel or dossier_sortie_propose()
-        QMessageBox.information(self, tr('ohp_choisir_dest_titre'), tr('ohp_choisir_dest_texte', dest=propose))
+        # la boîte de dialogue complète du système (lecteurs réseau, NAS) ; son titre dit ce qui sera créé
+        self._statut(tr('ohp_choisir_dest_texte', dest=propose))
         d = fichiers.choisir_dossier(self, tr('ohp_choisir_dest_titre'), os.path.dirname(propose) or propose)
         if not d:
             return None
@@ -1471,7 +1689,7 @@ class Panneau(QWidget):
 
         def fini(r):
             evts.arreter()
-            self.b_lancer.setEnabled(True)
+            self._fin_autre_travail()
             self.b_arreter.setEnabled(False)
             if 'divergence' in r:
                 self.proposer_fusion(*r['divergence'])
@@ -1482,10 +1700,10 @@ class Panneau(QWidget):
 
         def erreur(e):
             evts.arreter()
-            self.b_lancer.setEnabled(True)
+            self._fin_autre_travail()
             self.b_arreter.setEnabled(False)
             QMessageBox.warning(self, tr('ohp_reorganiser'), e)
-        self.b_lancer.setEnabled(False)
+        self._debut_autre_travail()
         self.b_arreter.setEnabled(True)               # arrêt immédiat : ce qui est rattaché est rangé
         self._t_reorg = Tache(travail, parent=self)
         self._t_reorg.quand_fini(fini)
@@ -1517,16 +1735,18 @@ class Panneau(QWidget):
             self.pause.set()
             self.b_pause.setText(tr('ohp_reprendre'))
 
-    def lancer(self, confirmer=False, apres_succes=None):
+    def lancer(self, confirmer=False, apres_succes=None, images=None) -> bool:
+        """Télécharge, convertit et range `images` (défaut : la sélection, la liste de droite du catalogue) dans le
+        dossier et le format de l'onglet Téléchargement ; rend True si c'est parti."""
         from .pilote import Traitement
         from .selection import estimer, place_necessaire
         from ...core.machine import disque_libre_go
         if self.occupe():
-            return
-        sel = list(self.selection)
+            return False
+        sel = list(self.selection if images is None else images)
         if not sel:
             QMessageBox.information(self, tr('ohp_onglet_traitement'), tr('ohp_aucune_selection'))
-            return
+            return False
         dest = os.path.abspath(os.path.expanduser(self.dest.text().strip()))
         fmt = self.format.currentData()
         m, plan = self._plan()
@@ -1537,17 +1757,17 @@ class Panneau(QWidget):
         if libre < besoin:
             QMessageBox.warning(self, tr('ohp_onglet_traitement'),
                                 tr('ohp_place_manque', besoin=_taille(besoin), libre=_taille(libre), dest=dest))
-            return
+            return False
         if confirmer or self._mode_tout:
             texte = tr('ohp_tout_question', estimation=self._estimation_tout(est, fmt, plan), dest=dest,
                        place=tr('ohp_place', besoin=_taille(besoin), libre=_taille(libre), dest=dest))
             if QMessageBox.question(self, tr('ohp_tout_titre'), texte) != QMessageBox.StandardButton.Yes:
                 self._mode_tout = False
-                return
+                return False
         elif est['octets_fits'] > 5e9 and QMessageBox.question(
                 self, tr('ohp_onglet_traitement'), tr('ohp_confirmer_gros_gui', taille=_taille(est['octets_fits']))) \
                 != QMessageBox.StandardButton.Yes:
-            return
+            return False
         self._mode_tout = False
         self._apres_succes = apres_succes
         r = config.reglages()
@@ -1588,11 +1808,19 @@ class Panneau(QWidget):
                 if t is not None:
                     t.fermer()
                 evts({'type': 'termine'})
-        self.b_lancer.setEnabled(False)
         self.b_tout.setEnabled(False)
         self.b_pause.setEnabled(True)
         self.b_arreter.setEnabled(True)
         self._fil = lancer_fil(travail)
+        # progression aussi sous le bouton du catalogue : on reste où l'on est
+        self.barre_cat.setValue(0)
+        self.barre_cat.setMaximum(max(1, est['images']))
+        self.barre_cat.setVisible(True)
+        self.b_arreter_cat.setVisible(True)
+        self.b_arreter_cat.setEnabled(True)
+        self._maj_bouton_telecharger()
+        self._statut(tr('ohp_telechargement_lance', n=_entier(est['images']), dest=dest))
+        return True
 
     def proposer_fusion(self, partage, dossier):
         """Base d'état du partage et base de travail locale modifiées chacune de leur côté : rien n'a été écrasé ;
@@ -1651,7 +1879,9 @@ class Panneau(QWidget):
             if self.pause is not None:
                 self.pause.clear()
             self._log(tr('ohp_arret_demande'))
+            self._statut(tr('ohp_arret_demande'))
             self.b_arreter.setEnabled(False)
+            self.b_arreter_cat.setEnabled(False)
             self.b_pause.setEnabled(False)
 
     def arreter(self):
@@ -1683,9 +1913,11 @@ class Panneau(QWidget):
             elif t == 'debut':
                 self._total = ev['total']
                 self.barre.setMaximum(max(1, ev['total']))
+                self.barre_cat.setMaximum(max(1, ev['total']))
                 self._log(tr('ohp_debut', total=ev['total'], deja=ev['deja']))
             elif t == 'image':
                 self.barre.setValue(ev['n'])
+                self.barre_cat.setValue(ev['n'])
                 self._log(tr('ohp_ligne_image', n=ev['n'], total=ev['total'], statut=tr('ohp_statut_' + ev['statut']),
                              wcs=tr('ohp_wcs_' + (ev.get('wcs') or 'aucune')), source=(ev.get('source') or '')[:60],
                              debit='%.1f' % (self._octets / max(1e-6, time.time() - self._t0) / 1e6)))
@@ -1725,6 +1957,8 @@ class Panneau(QWidget):
                 if b.get('echecs'):
                     self._log(tr('ohp_rapport_echecs', liste='; '.join(
                         '%s (%s)' % (e['source'].rsplit('/', 1)[-1], e['erreur'][:60]) for e in b['echecs'][:10])))
+                self._statut(tr('ohp_telechargement_fini', ok=_entier(c.get('ok', 0)), echecs=_entier(c.get('echec', 0)),
+                                dest=self.dest.text()) if not b.get('annule') else tr('interrompu_reprise'))
                 if b.get('annule'):
                     self._log(tr('interrompu_reprise'))
                 elif not c.get('echec') and getattr(self, '_apres_succes', None) == 'nouveautes':
@@ -1732,7 +1966,8 @@ class Panneau(QWidget):
                     marquer_reference()
                     self._nouveautes = None
             elif t == 'termine':
-                self.b_lancer.setEnabled(True)
+                self.barre_cat.setVisible(False)
+                self.b_arreter_cat.setVisible(False)
                 self.b_tout.setEnabled(True)
                 self.b_pause.setEnabled(False)
                 self.b_arreter.setEnabled(False)
@@ -1747,6 +1982,9 @@ class Panneau(QWidget):
     def _onglet_lots(self):
         w = QWidget()
         v = QVBoxLayout(w)
+        intro = QLabel(tr('ohp_lots_intro'))          # « Lots » expliqué en une ligne (0.7.2)
+        intro.setWordWrap(True)
+        v.addWidget(intro)
         h = Flux()                                 # rangée souple (écrans étroits)
         h.addWidget(bouton('ohp_lots_actualiser', self._remplir_lots))
         h.addWidget(bouton('ohp_lots_ouvrir', self._ouvrir_lot))
@@ -1965,6 +2203,8 @@ class Panneau(QWidget):
         return ch[0] if ch else None
 
     def _ouvrir_image(self):
+        """Double-clic : l'image téléchargée s'ouvre avec l'application du système ; pas encore téléchargée,
+        Coupole propose de la télécharger (0.7.2)."""
         x = self._image_sous()
         if x is None:
             return
@@ -1972,18 +2212,72 @@ class Panneau(QWidget):
         if p and os.path.exists(p):
             from ...gui import ouvrir
             ouvrir.ouvrir_defaut(p)
+        elif self.occupe():
+            self._statut(tr('ohp_attendre_fin'))
         else:
-            self._statut(tr('lg_pas_telechargee'))
+            self.proposer_telechargement([x])
+
+    def proposer_telechargement(self, images, nom: str = '') -> bool:
+        """« Cette image n'est pas encore téléchargée. La télécharger maintenant ? » → Télécharger."""
+        manquantes = self.possession.manquantes(images)
+        if not manquantes:
+            self._statut(tr('ohp_deja_telecharge_aide'))
+            return False
+        from .selection import estimer
+        fmt = self.format.currentData() or 'xisf'
+        e = estimer(manquantes, fmt)
+        if nom:
+            texte = tr('ohp_proposer_objet', nom=nom, n=_entier(len(manquantes)), fits=_taille(e['octets_fits']))
+        elif len(manquantes) == 1:
+            texte = tr('ohp_proposer_image', fits=_taille(e['octets_fits']))
+        else:
+            texte = tr('ohp_proposer_images', n=_entier(len(manquantes)), fits=_taille(e['octets_fits']))
+        if not self._confirmer_telechargement(texte):
+            return False
+        return self.telecharger_images(images)
+
+    def _confirmer_telechargement(self, texte) -> bool:
+        """Question à deux boutons nommés « Télécharger » / « Annuler » (pas « Oui » / « Non »)."""
+        boite = QMessageBox(QMessageBox.Icon.Question, tr('ohp_telecharger'), texte, parent=self)
+        oui = boite.addButton(tr('ohp_telecharger'), QMessageBox.ButtonRole.AcceptRole)
+        boite.addButton(tr('dlg_annuler'), QMessageBox.ButtonRole.RejectRole)
+        boite.setDefaultButton(oui)
+        boite.exec()
+        return boite.clickedButton() is oui
+
+    def _action_telecharger(self, m, images, texte):
+        """Première entrée des menus contextuels : « Télécharger … », grisée avec la raison si rien ne manque ou si
+        un téléchargement tourne déjà."""
+        from ...gui import ouvrir
+        manquantes = self.possession.manquantes(images)
+        if self.occupe():
+            a = ouvrir.action(m, texte, False, '', tr('ohp_attendre_fin'), tr('ohp_motif_en_cours'))
+        elif not manquantes:
+            a = ouvrir.action(m, texte, False, '', tr('ohp_deja_telecharge_aide'), tr('ohp_motif_deja'))
+        else:
+            a = ouvrir.action(m, texte, True, tr('ohp_telecharger_aide'))
+            a.triggered.connect(lambda: self.telecharger_images(images))
+        f = a.font()
+        f.setBold(a.isEnabled())
+        a.setFont(f)
+        return a
 
     def _menu_image(self, pos):
-        x = self._image_sous(pos)
-        if x is None:
+        images = self._images_choisies(pos)
+        if not images:
             return
+        x = self._image_sous(pos)
         from PyQt6.QtWidgets import QMenu
         from ...gui import ouvrir
         m = QMenu(self)
+        if len(images) == 1:
+            self._action_telecharger(m, images, tr('ohp_menu_telecharger_image'))
+        else:
+            self._action_telecharger(m, images, tr('ohp_menu_telecharger_images', n=_entier(len(images))))
+        m.addSeparator()
         p = self.chemin_image(x, verifier=True)
-        ouvrir.remplir_menu(m, p, existe=bool(p) and os.path.exists(p))
+        ouvrir.remplir_menu(m, p, existe=bool(p) and os.path.exists(p), raison_absent='ohp_pas_telechargee',
+                            motif_court='ohp_motif_pas_telechargee')
         ouvrir.montrer_menu(m, self.v_img.viewport().mapToGlobal(pos))
 
     def dossier_objet(self, o) -> str:
@@ -2021,20 +2315,34 @@ class Panneau(QWidget):
         return ch[0] if ch else None
 
     def _ouvrir_dossier_objet(self):
-        d = self.dossier_objet(self._objet_sous())
+        """Double-clic sur une cible : son dossier s'il existe ; rien de téléchargé : proposer de tout télécharger."""
+        o = self._objet_sous()
+        d = self.dossier_objet(o)
         if d and os.path.isdir(d):
             from ...gui import ouvrir
             ouvrir.montrer_emplacement(d)
+        elif o is None:
+            return
+        elif self.occupe():
+            self._statut(tr('ohp_attendre_fin'))
         else:
-            self._statut(tr('ohp_objet_rien'))
+            self.proposer_telechargement(self.images_objet(o), cibles.nom_affiche(o['objet']))
 
     def _menu_objet(self, pos):
-        o = self._objet_sous(pos)
-        if o is None:
+        objs = self._objets_choisis_menu(pos)
+        if not objs:
             return
+        o = self._objet_sous(pos)
         from PyQt6.QtWidgets import QMenu
         from ...gui import ouvrir
         m = QMenu(self)
+        images = [x for c in objs for x in self.images_objet(c)]
+        if len(objs) == 1:
+            texte = tr('ohp_menu_telecharger_objet', nom=cibles.nom_affiche(o['objet']))
+        else:
+            texte = tr('ohp_menu_telecharger_objets', n=_entier(len(objs)))
+        self._action_telecharger(m, images, texte)
+        m.addSeparator()
         d = self.dossier_objet(o)
         a = ouvrir.action(m, tr('ohp_objet_dossier'), bool(d) and os.path.isdir(d), tr('ohp_objet_dossier_aide'),
                           tr('ohp_objet_rien'), tr('lg_motif_rien'))
@@ -2050,7 +2358,7 @@ class Panneau(QWidget):
         self._filtre_lots_objet = None if o is None else {o['objet'], cibles.nom_affiche(o['objet'])}
         self._filtrer_lots()
         if o is not None:
-            self.onglets.setCurrentIndex(2)
+            self.onglets.setCurrentIndex(self.ONGLET_LOTS)
 
     def _filtrer_lots(self):
         f = getattr(self, '_filtre_lots_objet', None)

@@ -199,7 +199,7 @@ Each time it starts, Coupole shows the screen as it was left. Kept:
   column and direction of every table;
 \item \textbf{OHP bank}: search, type, telescope, \emph{New}, \emph{To check}, \emph{Missing only} and \emph{Without
   doubtful dates} boxes, night and filter, chosen objects (restored as soon as the inventory is loaded), anomaly and
-  sky-map filters; Processing tab: output folder \emph{as soon as it is changed}, format, language of names,
+  sky-map filters; Download tab: output folder \emph{as soon as it is changed}, format, language of names,
   \emph{Keep duplicates}, \emph{Keep FITS}, ASTAP mode, \emph{Check quality};
 \item \textbf{Image quality}: analysed folder, sample mode and number of images per batch;
 \item \textbf{Spectra and series}: folder of the open dialog and \emph{Recent} menu (last 10 files; a file that has
@@ -232,15 +232,47 @@ Haute-Provence: 7,989 FITS images on 8 October 2026, 166 objects under 194 names
 telescope (570 images, 2048 pixels of 0.68″ or 4096 pixels of 0.46″, 23′ and 31′ fields). The images are already
 calibrated (dark, flat) and astrometrically solved: \textbf{they must not be recalibrated}.
 
+\subsection{Download in three steps (0.7.2)}\label{sec:trois-gestes}
+\capture{img/ohp_guide_en.png}{1.0}
+At first start, a banner at the top of the catalogue guides step by step; each step done is ticked.
+\begin{enumerate}[leftmargin=*,itemsep=1pt]
+\item \textbf{Pick a target}: click a row of the left-hand list (Ctrl+click or Shift+click for several; the search
+  box and the type list help find it). While nothing is selected, the image list says so: « No target selected:
+  click a target in the list on the left ».
+\item \textbf{See its images}: they appear on the right, filterable by night, filter and doubtful dates.
+\item \textbf{Download}: the blue button under the image list says what it will do, « Download (840 images ·
+  7.15 GB → ≈ 2.64 GB as XISF) ». The first time, Coupole asks for the folder to put the images in (the system's full
+  file dialog; it creates \texttt{OHP\_DU\_ECU} there); afterwards it reuses the same folder and format. Progress
+  shows under the button, with \emph{Stop}; at the end, each image's badge turns into a green check and the status bar
+  says so (« Download finished: … Double-click an image to open it »).
+\end{enumerate}
+The button is greyed out, with the reason on hover, while no target is selected; it reads « Already downloaded ✓ »
+when everything is there, « Downloading… » during a download. \emph{Got it, hide} closes the banner;
+\emph{Help > Getting started (OHP bank)} shows it again. The settings (folder, XISF or FITS format, duplicates,
+original FITS, astrometry, parallelism) are in the \emph{Download} tab, under \emph{Options} (catalogue button
+\emph{Download options →}).
+
+\capture{img/ohp_menu_en.png}{1.0}
+\textbf{Right-click and double-click.} An image's menu starts with \emph{Download this image} (or \emph{Download
+these N images} when several rows are selected), then \emph{Open}, \emph{Open with}, \emph{Open file location},
+greyed out with their reason (« not downloaded yet ») while the file does not exist; a target's menu starts with
+\emph{Download all the images of NGC 6888}. Double-clicking an image (or a target) not downloaded yet offers to
+download it; on a downloaded image, it opens it.
+
+\paragraph{For students.} « In Coupole, \emph{OHP image bank} module: 1) click a target in the left-hand list;
+2) its images appear on the right; 3) click the blue \emph{Download} button under the image list and choose your
+folder the first time. Then double-click an image to open it. »
+
 \subsection{Catalogue}
 \capture{img/catalogue_en.png}{1.0}
 The inventory comes from the Observatory's public TAP service (\texttt{http://tap-ufe.obspm.fr/tap}, table
 \texttt{ivoa.obscore}, one synchronous ADQL query), kept in a cache; a snapshot is shipped for offline work.
 \emph{Refresh the inventory} (Ctrl+R) queries the service again and flags new images and names (« new since … »).
 Database names are grouped into canonical objects; selecting one or several objects lists their images on the
-right, filtered by night, filter and doubtful dates; this list is the selection to process. The estimate gives the
+right, filtered by night, filter and doubtful dates; this list is what \emph{Download} fetches. The estimate gives the
 volume to download, the expected output volume and the free space. Times are shown in UTC and in site time (hover:
-also the user's time).
+also the user's time). Each column header explains itself on hover; key columns (state, date, telescope, filter,
+exposure; object, owned, volume) come first and stay visible without scrolling at 1366~×~768.
 
 \paragraph{What you already own.} According to the output folder (\texttt{\_traitement/etat.sqlite}, read again in
 the background when opening, after each run and whenever the folder changes, never blocking), the image list tells
@@ -256,17 +288,24 @@ orders objects by state (failed, nothing, partly, complete). The legend, below b
 inventory summary line adds the overall ownership (« 7,989 images (144 duplicates), 166 objects, 60 nights,
 78.03 GB — owned: 7,625 (+ 220 duplicates left out), failed: 0, to download: 0 »). The \emph{To download only} box
 hides fully owned objects and, in the list, the images already processed; an emptied list explains itself in its
-centre (« Everything is already downloaded in … »), as does the image list while no object is selected (« Pick one
-or more objects… »; at first start, the first object is selected). The estimate counts only what is missing
+centre (« Everything is already downloaded in … »), as does the image list while no object is selected (« No target
+selected: click a target in the list on the left »; at first start, no target is selected: the guide and this list
+say what to do). The estimate counts only what is missing
 (« 180 missing images out of 300: 1.5 GB »). Changing the output folder (Preferences, field or \emph{Browse} in the
-Processing tab) re-reads its ownership in the background at once: markers, column and summary follow, and the status
+Download tab) re-reads its ownership in the background at once: markers, column and summary follow, and the status
 bar says so (« Ownership recomputed: 7,625 images found in … »).
 Command line: \cmd{coupole ohp inventory --missing [--dest FOLDER]
 [--json]}, and \texttt{possedee}, \texttt{statut\_local}, \texttt{fichier\_local} columns in the CSV of \cmd{coupole
 ohp list}.
 
-\subsection{Processing}
+\subsection{Download (tab and options)}
 \capture{img/traitement_en.png}{1.0}
+The \emph{Download} tab (formerly \emph{Processing}) shows the selection, the same \emph{Download} button,
+\emph{Download everything…}, \emph{Pause}, \emph{Stop}, progress and the log; it gathers under \emph{Options} the
+folder and format, the language of names, \emph{Keep duplicates}, \emph{Keep the original FITS}, \emph{Check image
+quality}, the astrometric check (ASTAP) and parallelism. Internal file and folder names do not change
+(\texttt{\_traitement/etat.sqlite}…), nor does the command line (\cmd{coupole ohp process}): folders already filled
+stay compatible.
 For each image, duplicates excluded:
 \begin{enumerate}[leftmargin=*,itemsep=1pt]
 \item download: at most 4 at once (3 by default), full rate by default (total cap available in the Preferences), User-Agent naming Coupole,
@@ -278,7 +317,7 @@ For each image, duplicates excluded:
 \item writing in the chosen format, reading back and pixel-by-pixel comparison;
 \item at the end: sorting into stacks, \texttt{LOT.txt}, \texttt{INDEX\_LOTS.csv}, \texttt{\_traitement/journal.csv}.
 \end{enumerate}
-The state is kept in \texttt{\_traitement/etat.sqlite}: \emph{Stop} then \emph{Start} (or running the same command
+The state is kept in \texttt{\_traitement/etat.sqlite}: \emph{Stop} then \emph{Download} (or running the same command
 again) resumes without redoing anything. A folder keeps the name language and format of its first run.
 \emph{Keep duplicates} also processes what would be left out; \emph{Keep the original FITS} stores them in
 \texttt{\_traitement/fits\_origine}.
@@ -494,8 +533,9 @@ Double-click an owned image (image list, Quality table): the system's associated
 otherwise the folder). \emph{Open with} only offers the astronomy programs found on the computer (PixInsight, Siril,
 ASTAP, Aladin, N.I.N.A.: PATH, usual locations, flatpak, \texttt{/Applications}, Program Files) \emph{and} able to
 read this file according to the checked table of section~\ref{sec:compat}; the others are greyed with the reason
-(« ASTAP only reads uncompressed XISF: choose the FITS format in Processing »). An image not downloaded yet: the
-status bar says so. A disabled entry carries its reason in its label (« Open with (nothing downloaded) ») and the
+(« ASTAP only reads uncompressed XISF: choose the FITS format in the download options »). An image not downloaded
+yet: the menu starts with \emph{Download this image}, and double-click offers to download it (0.7.2). A disabled entry
+carries its reason in its label (« Open with (not downloaded yet) ») and the
 full reason shows in the status bar on hover: no more tooltip over the menu (on KDE it grabbed the mouse).
 
 \paragraph{How each program is started (0.1.12).} Always the detected program, with a \emph{list} of arguments
@@ -705,7 +745,11 @@ useful area (MAST JPEGs are full resolution, up to 19,806 × 15,741 pixels, whit
 that, a thumbnail made from the prepared file; otherwise the reason (``the archive gives no thumbnail…'').
 
 \subsection{Downloading and preparing}
-Select rows, then \emph{Download the selection}. Beyond 2~GB (setting \texttt{archives\_seuil\_go}), confirmation.
+Select rows (Ctrl+click, Shift+click), then the blue \emph{Download the selection (N · size)} button, right under the
+table (0.7.2: greyed out with the reason on hover while nothing is selected, « Already downloaded ✓ » when everything
+is there). Right-click starts with \emph{Download this observation} (or \emph{these N observations}), then
+\emph{Open}, \emph{Open with}, \emph{Open file location} and the archive page; double-clicking a row not downloaded
+yet offers to download it. Beyond 2~GB (setting \texttt{archives\_seuil\_go}), confirmation.
 Full rate by default (cap: Preferences, or setting \texttt{archives\_debit\_mo\_s}), two files at a time, an interrupted file resumes. The
 bar moves in \textbf{two phases}: download (up to 70~\%, from bytes received), then preparation (up to 100~\%); below
 it: files downloaded and prepared, bytes received out of the total, rate, time left in all and for the current file.
@@ -1790,7 +1834,7 @@ Quality: empty columns on your own frames & update (0.1.11): tolerant XISF reade
 \texttt{\textasciitilde/.local/bin/coupole} not found & add \texttt{\textasciitilde/.local/bin} to the \texttt{PATH} (line given by the installer).\\
 \texttt{.part} or \texttt{.tmp} file in \texttt{\_traitement} & left by a cut: resuming reuses it (\texttt{.part}) or replaces it; nothing to do.\\
 WBPP does not find focal length and pixel & enter the values of the \emph{For PixInsight / N.I.N.A.} box (Stacks tab) in the \emph{Astrometric solution} panel; older files: \cmd{coupole ohp metadata FOLDER --rewrite}.\\
-White image in N.I.N.A. or Siril & compatible XISF format (Processing tab), section~\ref{sec:compat}.\\
+White image in N.I.N.A. or Siril & compatible XISF format (download options), section~\ref{sec:compat}.\\
 « database is locked » towards a NAS (0.1.9 and earlier) & update: the local working database solves it (section~\ref{sec:partage}).\\
 « Two versions of the state database » & two computers (or the NAS) processed into the same folder: accept the merge, or \cmd{coupole ohp merge --dest FOLDER}; both original databases are kept.\\
 Everything « to download » on Windows although the folder (network drive) is complete & 0.2.0 and earlier: update (section~\ref{sec:partage}); the « Tracking folder » line says what is read.\\

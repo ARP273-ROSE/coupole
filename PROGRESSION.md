@@ -1381,3 +1381,25 @@ graphiques » du PROGRESSION.md de Coupole Web, sous-sections « Recherche, favo
 - [x] Aide F1, manuels FR et EN (section « Recherche, favoris, bibliothèque, Maintenant (0.7.1) », captures nouvelles
   par `outils/captures_anim.py`), CHANGELOG FR puis EN, README, VERSION 0.7.1.
 - **Aucun tag ni Release.**
+
+## 2026-10-15 — version 0.7.2 : Banque OHP, télécharger sans manuel
+Retour d'un étudiant (0.4.1, Windows) : clic droit sur une image → seulement « Ouvrir (rien de téléchargé) » ; le
+chemin réel (objets → « Traiter cette sélection → » → onglet Traitement → Lancer) introuvable. Cause aggravante
+mesurée : en 1366 × 768, le bouton « Traiter cette sélection → » était SOUS le bord de la fenêtre (la page du module
+défilait : l'onglet Traitement imposait sa hauteur minimale à tout le QTabWidget, et la zone défilante prenait la
+hauteur « souhaitée » des tableaux comme minimum).
+- Bouton principal « Télécharger (N images · X Go → ≈ Y Go en XISF) » (style `QPushButton#principal`) sous la liste
+  des images ; dossier demandé la première fois ; progression + Arrêter sous le bouton. « Traiter » → « Télécharger »
+  partout (onglet *Téléchargement*, réglages sous *Options*) ; noms internes et CLI inchangés.
+- Menus contextuels (images, cibles) qui commencent par « Télécharger … » ; double-clic qui propose de télécharger.
+- Guide en trois étapes au premier lancement (Aide > Guide de démarrage), plus d'objet choisi d'office, listes vides
+  explicites, info-bulle par en-tête de colonne (`ModeleTableau.bulles_entetes`), colonnes clés d'abord
+  (`memoire.entete(..., defauts_anterieurs=)` migre l'ancien ordre par défaut), onglets dans l'ordre de l'usage.
+- Mise en page : onglets Téléchargement et Lots dans leur propre zone défilante, séparateur du catalogue en hauteur
+  « Ignored » (8 lignes au moins) → bouton visible en 1366 × 768 à 100 % et 125 % (test).
+- Archives : bouton « Télécharger la sélection (N · taille) » principal sous le tableau, menu multi-sélection qui
+  commence par « Télécharger … », double-clic qui propose.
+- Tests : `tests/test_parcours_debutant.py` (9, serveur local seulement). Captures avant/après : scratchpad
+  `captures/ergonomie_ohp_*` ; manuel : `ohp_guide_*.png`, `ohp_menu_*.png`, catalogue et Téléchargement refaites.
+- Travail fait dans un worktree séparé (`Coupole-ergo`) : une autre tâche modifiait le module Animations dans le
+  dossier principal.

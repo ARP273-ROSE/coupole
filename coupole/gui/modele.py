@@ -112,6 +112,7 @@ class ModeleTableau(QAbstractTableModel):
     def __init__(self, entetes: list[str], parent=None):
         super().__init__(parent)
         self.entetes = entetes
+        self.bulles_entetes: list[str] | None = None   # explication d'une ligne par colonne (info-bulle de l'en-tête)
         self.lignes: list[tuple] = []
         self.donnees: list = []
         self.infobulles: list = []
@@ -247,9 +248,12 @@ class ModeleTableau(QAbstractTableModel):
         return None
 
     def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
-        if orientation == Qt.Orientation.Horizontal and role in (Qt.ItemDataRole.DisplayRole,
-                                                                  Qt.ItemDataRole.ToolTipRole):
-            return self.entetes[section]          # info-bulle : le titre entier, même si l'on a rétréci la vue
+        if orientation == Qt.Orientation.Horizontal and role == Qt.ItemDataRole.ToolTipRole:
+            b = self.bulles_entetes[section] if self.bulles_entetes and section < len(self.bulles_entetes) else ''
+            # info-bulle : le titre entier (même si l'on a rétréci la vue), puis ce que dit la colonne
+            return '%s\n%s' % (self.entetes[section], b) if b else self.entetes[section]
+        if orientation == Qt.Orientation.Horizontal and role == Qt.ItemDataRole.DisplayRole:
+            return self.entetes[section]
         return None
 
     # accès par ligne (redéfinis par ModeleParesseux)

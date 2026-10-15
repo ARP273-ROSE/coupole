@@ -123,7 +123,7 @@ def _pages_affichees(app_qt, f):
 def test_entetes_de_tableaux_jamais_tronques(app_qt, fenetre_adaptative, largeur):
     """Retour d'utilisateur (Qualité, 0.1.8) : « étoiles mesurées » affiché « toiles mesurée ».  Chaque section visible
     de chaque tableau visible est au moins aussi large que son titre (police de l'en-tête, échelle comprise :
-    lancé aussi à QT_SCALE_FACTOR = 1,5 et 2), et le titre entier est en info-bulle."""
+    lancé aussi à QT_SCALE_FACTOR = 1,5 et 2), et le titre entier est en tête de l'info-bulle."""
     from PyQt6.QtCore import Qt
     from PyQt6.QtWidgets import QTableView
     f = fenetre_adaptative
@@ -146,7 +146,9 @@ def test_entetes_de_tableaux_jamais_tronques(app_qt, fenetre_adaptative, largeur
                 besoin = fm.horizontalAdvance(texte)
                 if h.sectionSize(c) < besoin:
                     fautes.append((nom, texte, h.sectionSize(c), besoin))
-                assert v.model().headerData(c, Qt.Orientation.Horizontal, Qt.ItemDataRole.ToolTipRole) == texte
+                # le titre entier, puis (0.7.2, Banque OHP) une ligne qui explique la colonne
+                bulle = v.model().headerData(c, Qt.Orientation.Horizontal, Qt.ItemDataRole.ToolTipRole)
+                assert bulle == texte or bulle.startswith(texte + '\n')
     assert vus > 20 and not fautes, fautes
 
 

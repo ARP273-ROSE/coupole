@@ -141,11 +141,12 @@ def montrer_menu(menu: QMenu, pos_global) -> QMenu:
     return menu
 
 
-def remplir_menu(menu: QMenu, chemin, existe: bool | None = None, raison_absent: str = 'lg_pas_telechargee'):
-    """Ajoute à `menu` les actions d'ouverture du fichier `chemin` (désactivées, motif dans le libellé, s'il
-    n'existe pas)."""
+def remplir_menu(menu: QMenu, chemin, existe: bool | None = None, raison_absent: str = 'lg_pas_telechargee',
+                 motif_court: str = 'lg_motif_rien'):
+    """Ajoute à `menu` les actions d'ouverture du fichier `chemin` (désactivées, motif court `motif_court` dans le
+    libellé et motif complet `raison_absent` dans la barre d'état, s'il n'existe pas)."""
     existe = bool(chemin) and os.path.exists(chemin) if existe is None else existe
-    court = tr('lg_motif_rien')
+    court = tr(motif_court)
     a = action(menu, tr('lg_ouvrir'), existe, tr('lg_ouvrir_aide'), tr(raison_absent), court)
     a.triggered.connect(lambda: ouvrir_defaut(chemin))
     sm = menu.addMenu(tr('lg_ouvrir_avec') if existe else '%s  (%s)' % (tr('lg_ouvrir_avec'), court))

@@ -2,6 +2,39 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.7.2 — 15 October 2026
+
+**OHP image bank: download without the manual.** Feedback from a student (0.4.1, Windows): he saw the catalogue,
+right-clicked an image and only found “Open (nothing downloaded)”; the real path (“Process this selection →”,
+Processing tab, Start) could not be found — and, at 1366 × 768, that button was below the window's edge.
+
+- **A visible “Download” button, in the accent colour**, under the image list: “Download (840 images · 7.15 GB →
+  ≈ 2.64 GB as XISF)”. It downloads, checks, converts and sorts right away, with the remembered folder and format; the
+  folder is asked the first time (the system's full file dialog). Progress and “Stop” under the button; at the end,
+  the status bar says where the images are and how to open them. Greyed out with the reason on hover (“First pick a
+  target…”), “Already downloaded ✓” when everything is there.
+- **“Process” becomes “Download” everywhere**: the *Processing* tab → *Download*, which keeps progress and the log
+  and gathers every setting under *Options* (folder, XISF or FITS format, language of names, duplicates, original
+  FITS, quality, astrometry, parallelism); “Process this selection →” → “Download options →”; messages, status bar,
+  log, F1 help and manuals follow. Unchanged to stay compatible: internal names (`_traitement/etat.sqlite`…) and the
+  command line (`coupole ohp process`).
+- **Context menus**: an image's menu starts with “Download this image” (or “these N images”), then Open / Open with /
+  Open file location, greyed out with their reason (“not downloaded yet”); a target's menu starts with “Download all
+  the images of NGC 6888”. **Double-click** on an image or a target not downloaded yet: Coupole offers to download it.
+- **First start**: a three-step guide banner (① pick a target on the left, ② its images on the right, ③ Download),
+  each step done ticked, closable (“Got it, hide”), shown again by *Help > Getting started (OHP bank)*; no target
+  selected by default any more; explicit empty lists (“No target selected: click a target in the list on the left”).
+- **Readability**: a one-line tooltip on every column header; key columns first (images: state, date, telescope,
+  filter, exposure; targets: object, owned, volume); “Stacks” and “Anomalies” explained in one line; tabs in order of
+  use (Catalogue, Download, Stacks, Sky map, Online record, Anomalies); date and address of the inventory service
+  moved to a tooltip. **At 1366 × 768, at 100 % as at 125 %, the Download button is on screen without scrolling**:
+  the Download and Stacks tabs scroll on their own and no longer impose their height on the catalogue.
+- **Observatory archives**, same logic: “Download the selection (N · size)” in the accent colour right under the
+  table, greyed out with the reason; right-click starting with “Download this observation / these N observations”
+  (multiple selection); double-click on a missing row offers to download it.
+- Tests: `tests/test_parcours_debutant.py` (first start, pick a target, Download from a local server, file present,
+  Open available, menus, double-click, 1366 × 768 and 125 %, archives).
+
 ## 0.7.1 — 15 October 2026
 
 **Bilingual search, favourites, library; “Now” and “Live”; eclipse shadows in true geometry; readable fusion.** Done in

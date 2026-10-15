@@ -26,7 +26,8 @@ from ...core.i18n import tr
 from ...gui import fichiers, memoire, ouvrir
 from ...gui.adaptatif import Flux, coupable, texte_reel
 from ...gui.modele import ModeleParesseux, vue_tableau
-from ...gui.outils import FileEvenements, Tache, aide, bouton, case, champ, enregistrer_arret, lancer_fil, liste
+from ...gui.outils import (FileEvenements, Tache, aide, bouton, bouton_principal, case, champ, enregistrer_arret,
+                           lancer_fil, liste)
 from . import telechargement as T
 from .services import ARCHIVES, PAR_DEFAUT
 
@@ -102,6 +103,7 @@ class Panneau(QWidget):
         v.addWidget(self.l_etat)
         self._evts = FileEvenements(self, self._evenements, 150)
         self._memoriser()
+        self._maj_bouton()
         self.rafraichir_possession()
 
     # ================================================================================================ construction
@@ -188,8 +190,19 @@ class Panneau(QWidget):
         sp.setSizes([900, 360])
         self.sp = sp
         v.addWidget(sp, 1)
+        # sous le tableau (0.7.2) : ce qui est choisi et LE geste, en couleur d'accent ; puis dossier et options
+        f = Flux()
+        self.b_telecharger = bouton_principal('arc_telecharger', self.telecharger)
+        self.b_pause = bouton('arc_pause', self.pause)
+        self.b_annuler = bouton('arc_annuler', self.annuler)
+        self.b_ouvrir_dossier = bouton('arc_ouvrir_dossier', self.ouvrir_dossier)
+        for b in (self.b_telecharger, self.b_pause, self.b_annuler, self.b_ouvrir_dossier):
+            f.addWidget(b)
         self.l_selection = aide(QLabel(''), 'arc_selection_aide')
-        v.addWidget(self.l_selection)
+        f.addWidget(self.l_selection)
+        self.b_pause.setEnabled(False)
+        self.b_annuler.setEnabled(False)
+        v.addLayout(f)
         f = Flux()
         f.addWidget(QLabel(tr('arc_dossier')))
         self.l_dossier = aide(QLabel(coupable(T.sortie_par_defaut())), 'arc_dossier_aide')
@@ -205,21 +218,11 @@ class Panneau(QWidget):
         self.b_reorganiser = bouton('arc_reorganiser', self.reorganiser)
         f.addWidget(self.b_reorganiser)
         v.addLayout(f)
-        f = Flux()
-        self.b_telecharger = bouton('arc_telecharger', self.telecharger)
-        self.b_pause = bouton('arc_pause', self.pause)
-        self.b_annuler = bouton('arc_annuler', self.annuler)
-        self.b_ouvrir_dossier = bouton('arc_ouvrir_dossier', self.ouvrir_dossier)
-        for b in (self.b_telecharger, self.b_pause, self.b_annuler, self.b_ouvrir_dossier):
-            f.addWidget(b)
-        self.b_pause.setEnabled(False)
-        self.b_annuler.setEnabled(False)
         self.barre = aide(QProgressBar(), 'arc_barre_aide')
         self.barre.setRange(0, 1000)
         self.barre.setValue(0)
         self.barre.setTextVisible(True)
         self.barre.setFormat('')
-        v.addLayout(f)
         v.addWidget(self.barre)
         self.l_progres = aide(QLabel(''), 'arc_progres_aide')
         self.l_progres.setWordWrap(True)
@@ -537,7 +540,37 @@ class Panneau(QWidget):
         """(Compatibilité) estimation des lignes choisies, désormais automatique."""
         self.estimer_auto(self.choisies())
 
+    def _maj_bouton(self):
+        """« Télécharger la sélection (N · taille) » : grisé, avec la raison, s'il n'y a rien à prendre."""
+        sel = self.choisies()
+        a_prendre = [o for o in sel if self._statut(o) != 'ok']
+        if getattr(self, '_dl_actif', False):
+            texte, actif, bulle = tr('arc_en_cours'), False, tr('arc_en_cours_aide')
+        elif not sel:
+            texte, actif, bulle = tr('arc_telecharger'), False, tr('arc_telecharger_rien')
+        elif not a_prendre:
+            texte, actif, bulle = tr('arc_bouton_deja'), False, tr('arc_deja_aide')
+        else:
+            tot = sum(o.get('taille') or 0 for o in a_prendre)
+            approx = any(o.get('taille_estimee') or not o.get('taille') for o in a_prendre)
+            texte = tr('arc_telecharger_n', n=len(a_prendre),
+                       taille=('≈ ' if approx else '') + (_taille(tot) or '?'))
+            actif, bulle = True, tr('arc_telecharger_aide')
+        self.b_telecharger.setText(texte)
+        self.b_telecharger.setEnabled(actif)
+        self.b_telecharger.setToolTip(bulle)
+        self.b_telecharger.setStatusTip(bulle)
+
+    def _debut_dl(self):
+        self._dl_actif = True
+        self._maj_bouton()
+
+    def _fin_dl(self):
+        self._dl_actif = False
+        self._maj_bouton()
+
     def _maj_selection(self):
+        self._maj_bouton()
         sel = self.choisies()
         if not sel:
             vis = self.modele.donnees
@@ -655,6 +688,7 @@ class Panneau(QWidget):
     def _possession(self, p):
         self.possession = p or {}
         self.modele.invalider()
+        self._maj_bouton()
         self._remplir_fichiers()
 
     def _remplir_fichiers(self):
@@ -729,11 +763,11 @@ class Panneau(QWidget):
             return
         if self._fil_dl is not None and self._fil_dl.is_alive():
             return
-        self.b_telecharger.setEnabled(False)
+        self._debut_dl()
         self.l_etat.setText(tr('arc_estimation_en_cours', n=len(obs)))
         t = Tache(T.estimer, obs, parent=self)
         t.quand_fini(lambda e: self._confirmer(obs, e, cible))
-        t.quand_erreur(lambda e: (self.b_telecharger.setEnabled(True), self.l_etat.setText(e)))
+        t.quand_erreur(lambda e: (self._fin_dl(), self.l_etat.setText(e)))
         self._taches.append(t)
         t.start()
 
@@ -744,7 +778,7 @@ class Panneau(QWidget):
                                      tr('arc_confirmer', n=e['n'], taille=_taille(e['octets']),
                                         seuil=_taille(T.seuil_octets())))
             if r != QMessageBox.StandardButton.Yes:
-                self.b_telecharger.setEnabled(True)
+                self._fin_dl()
                 self.l_etat.setText(tr('arc_pret'))
                 return
         self._lancer(obs, e['octets'], cible)
@@ -877,7 +911,7 @@ class Panneau(QWidget):
                 b = ev['bilan']
                 self.b_pause.setEnabled(False)
                 self.b_annuler.setEnabled(False)
-                self.b_telecharger.setEnabled(True)
+                self._fin_dl()
                 self.b_pause.setText(tr('arc_pause'))
                 self.barre.setValue(1000)
                 cle = 'arc_termine_annule' if b.get('annule') else 'arc_termine'
@@ -934,21 +968,66 @@ class Panneau(QWidget):
         return os.path.join(T.dossier_archives(self.dossier()), p['prepare']) if p.get('prepare') else ''
 
     def _ouvrir_prepare(self):
-        sel = self.choisies()
-        if len(sel) == 1 and self._prepare(sel[0]) and os.path.exists(self._prepare(sel[0])):
-            ouvrir.ouvrir_defaut(self._prepare(sel[0]))
-
-    def _menu(self, pos):
+        """Double-clic : le fichier préparé s'ouvre ; pas encore téléchargé : proposer de le télécharger (0.7.2)."""
         sel = self.choisies()
         if len(sel) != 1:
             return
+        p = self._prepare(sel[0])
+        if p and os.path.exists(p):
+            ouvrir.ouvrir_defaut(p)
+        elif getattr(self, '_dl_actif', False):
+            self.l_etat.setText(tr('arc_attendre_fin'))
+        else:
+            o = sel[0]
+            taille = (('≈ ' if o.get('taille_estimee') else '') + _taille(o['taille'])) if o.get('taille') else '?'
+            if self._confirmer_telechargement(tr('arc_proposer', taille=taille)):
+                self.telecharger([o])
+
+    def _confirmer_telechargement(self, texte) -> bool:
+        boite = QMessageBox(QMessageBox.Icon.Question, tr('arc_telecharger'), texte, parent=self)
+        oui = boite.addButton(tr('arc_telecharger'), QMessageBox.ButtonRole.AcceptRole)
+        boite.addButton(tr('dlg_annuler'), QMessageBox.ButtonRole.RejectRole)
+        boite.setDefaultButton(oui)
+        boite.exec()
+        return boite.clickedButton() is oui
+
+    def _ligne_sous(self, pos):
+        i = self.vue.indexAt(pos)
+        if not i.isValid():
+            return None
+        r = self.proxy.mapToSource(i).row()
+        return self.modele.donnees[r] if 0 <= r < len(self.modele.donnees) else None
+
+    def _menu(self, pos):
+        """Clic droit : d'abord « Télécharger cette observation / ces N observations » (grisé avec la raison),
+        puis Ouvrir, Ouvrir avec, Ouvrir l'emplacement, page de l'archive."""
+        o = self._ligne_sous(pos)
+        sel = self.choisies()
+        if o is None:
+            if len(sel) != 1:
+                return
+            o = sel[0]
+        cibles = sel if any(x is o for x in sel) else [o]
         m = QMenu(self.vue)
-        ouvrir.remplir_menu(m, self._prepare(sel[0]))
-        if sel[0]['page']:
+        texte = tr('arc_menu_telecharger_1') if len(cibles) == 1 else tr('arc_menu_telecharger_n', n=len(cibles))
+        a_prendre = [x for x in cibles if self._statut(x) != 'ok']
+        if getattr(self, '_dl_actif', False):
+            a = ouvrir.action(m, texte, False, '', tr('arc_attendre_fin'), tr('arc_motif_en_cours'))
+        elif not a_prendre:
+            a = ouvrir.action(m, texte, False, '', tr('arc_deja_aide'), tr('arc_motif_deja'))
+        else:
+            a = ouvrir.action(m, texte, True, tr('arc_telecharger_aide'))
+            a.triggered.connect(lambda: self.telecharger(a_prendre))
+        f = a.font()
+        f.setBold(a.isEnabled())
+        a.setFont(f)
+        m.addSeparator()
+        ouvrir.remplir_menu(m, self._prepare(o), raison_absent='arc_pas_telecharge', motif_court='arc_motif_pas_telecharge')
+        if o['page']:
             from PyQt6.QtCore import QUrl
             from PyQt6.QtGui import QDesktopServices
-            a = ouvrir.action(m, tr('arc_f_page'), True, tr('arc_f_page'))
-            a.triggered.connect(lambda: QDesktopServices.openUrl(QUrl(sel[0]['page'])))
+            b = ouvrir.action(m, tr('arc_f_page'), True, tr('arc_f_page'))
+            b.triggered.connect(lambda: QDesktopServices.openUrl(QUrl(o['page'])))
         ouvrir.montrer_menu(m, self.vue.viewport().mapToGlobal(pos))
 
     def ouvrir_dossier(self):

@@ -2,6 +2,43 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.7.2 — 15 octobre 2026
+
+**Banque OHP : télécharger sans manuel.** Retour d'un étudiant (0.4.1, Windows) : il voyait le catalogue, faisait un
+clic droit sur une image et ne trouvait que « Ouvrir (rien de téléchargé) » ; le vrai chemin (« Traiter cette
+sélection → », onglet Traitement, Lancer) était introuvable — et, en 1366 × 768, ce bouton était sous le bord de la
+fenêtre.
+
+- **Un bouton « Télécharger » visible, en couleur d'accent**, sous la liste des images : « Télécharger (840 images ·
+  7,15 Go → ≈ 2,64 Go en XISF) ». Il télécharge, vérifie, convertit et range tout de suite, avec le dossier et le
+  format mémorisés ; le dossier est demandé la première fois (dialogue de fichiers complet du système). Progression
+  et « Arrêter » sous le bouton ; à la fin, la barre d'état dit où sont les images et comment les ouvrir. Grisé
+  avec la raison au survol (« Choisissez d'abord une cible… »), « Déjà téléchargé ✓ » quand tout est là.
+- **« Traiter » devient « Télécharger » partout** : onglet *Traitement* → *Téléchargement*, qui garde la progression,
+  le journal et réunit tous les réglages sous *Options* (dossier, format XISF ou FITS, langue des noms, doublons,
+  FITS d'origine, qualité, astrométrie, parallélisme) ; « Traiter cette sélection → » → « Options du téléchargement
+  → » ; messages, barre d'état, journal, aide F1 et manuels suivent. Inchangés pour rester compatibles : les noms
+  internes (`_traitement/etat.sqlite`…) et la ligne de commande (`coupole ohp traiter`).
+- **Menus contextuels** : le menu d'une image commence par « Télécharger cette image » (ou « ces N images »), puis
+  Ouvrir / Ouvrir avec / Ouvrir l'emplacement, grisés avec leur raison (« pas encore téléchargée ») ; celui d'une
+  cible par « Télécharger toutes les images de NGC 6888 ». **Double-clic** sur une image ou une cible pas encore
+  téléchargée : Coupole propose de la télécharger.
+- **Premier lancement** : bandeau de guidage en trois étapes (① choisir une cible à gauche, ② ses images à droite,
+  ③ Télécharger), chaque étape faite cochée, fermable (« Compris, masquer »), réaffichable par *Aide > Guide de
+  démarrage (Banque OHP)* ; plus aucune cible choisie d'office ; listes vides explicites (« Aucune cible choisie :
+  cliquez sur une cible dans la liste de gauche »).
+- **Lisibilité** : info-bulle d'une ligne sur chaque en-tête de colonne ; colonnes clés d'abord (images : état, date,
+  télescope, filtre, pose ; cibles : objet, possédé, volume) ; « Lots » et « Anomalies » expliqués en une ligne ;
+  onglets dans l'ordre de l'usage (Catalogue, Téléchargement, Lots, Carte du ciel, Fiche en ligne, Anomalies) ; date
+  et adresse du service d'inventaire passées en info-bulle. **En 1366 × 768, à 100 % comme à 125 %, le bouton
+  Télécharger est à l'écran sans défiler** : les onglets Téléchargement et Lots défilent seuls et n'imposent plus
+  leur hauteur au catalogue.
+- **Archives des observatoires**, même logique : « Télécharger la sélection (N · taille) » en couleur d'accent juste
+  sous le tableau, grisé avec la raison ; clic droit qui commence par « Télécharger cette observation / ces N
+  observations » (sélection multiple) ; double-clic sur une ligne absente qui propose de la télécharger.
+- Tests : `tests/test_parcours_debutant.py` (premier lancement, choisir une cible, Télécharger sur un serveur local,
+  fichier présent, Ouvrir disponible, menus, double-clic, 1366 × 768 et 125 %, Archives).
+
 ## 0.7.1 — 15 octobre 2026
 
 **Recherche bilingue, favoris, bibliothèque ; « Maintenant » et « En direct » ; ombres d'éclipse en vraie géométrie ;

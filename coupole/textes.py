@@ -22,22 +22,22 @@ TEXTES = {
     'lg_emplacement': {'fr': "Ouvrir l'emplacement du fichier", 'en': 'Open file location'},
     'lg_emplacement_aide': {'fr': 'Ouvre le dossier dans le gestionnaire de fichiers, le fichier sélectionné.',
                             'en': 'Opens the folder in the file manager, with the file selected.'},
-    'lg_pas_telechargee': {'fr': "Pas encore téléchargée : lancer le traitement de cette image d'abord.",
-                           'en': 'Not downloaded yet: process this image first.'},
+    'lg_pas_telechargee': {'fr': "Pas encore téléchargée : la télécharger d'abord.",
+                           'en': 'Not downloaded yet: download it first.'},
     'lg_raison_siril_flottant': {'fr': "Siril (≥ 1.4) lit ce XISF mais garde les flottants en ADU hors de sa plage "
-                                       "[0, 1] : image fausse. Choisir « XISF compatible » ou FITS dans le Traitement.",
+                                       "[0, 1] : image fausse. Choisir « XISF compatible » ou FITS dans les options du téléchargement.",
                                  'en': 'Siril (≥ 1.4) reads this XISF but keeps ADU floats outside its [0, 1] range: '
-                                       'wrong image. Choose « compatible XISF » or FITS in Processing.'},
+                                       'wrong image. Choose « compatible XISF » or FITS in the download options.'},
     'lg_raison_nina_flottant': {'fr': "N.I.N.A. suppose des flottants dans [0, 1] (bounds ignoré) : image blanche. "
-                                      "Choisir « XISF compatible » (entiers 16 bits) dans le Traitement.",
+                                      "Choisir « XISF compatible » (entiers 16 bits) dans les options du téléchargement.",
                                 'en': 'N.I.N.A. assumes floats in [0, 1] (bounds ignored): white image. Choose '
-                                      '« compatible XISF » (16-bit integers) in Processing.'},
+                                      '« compatible XISF » (16-bit integers) in the download options.'},
     'lg_raison_nina_zstd': {'fr': "N.I.N.A. 3.2 ne décompresse pas zstd (ajouté en 2026 dans sa version de "
                                   "développement) : choisir « XISF compatible » (zlib).",
                             'en': 'N.I.N.A. 3.2 does not decompress zstd (added in 2026 to its development version): '
                                   'choose « compatible XISF » (zlib).'},
-    'lg_raison_astap_xisf': {'fr': "ASTAP ne lit que le XISF non compressé : choisir le format FITS dans le Traitement.",
-                             'en': 'ASTAP only reads uncompressed XISF: choose the FITS format in Processing.'},
+    'lg_raison_astap_xisf': {'fr': "ASTAP ne lit que le XISF non compressé : choisir le format FITS dans les options du téléchargement.",
+                             'en': 'ASTAP only reads uncompressed XISF: choose the FITS format in the download options.'},
     'lg_raison_astap_gzip': {'fr': "ASTAP lit le .fits.fz Rice (entiers) mais pas GZIP (flottants) : choisir FITS.",
                              'en': 'ASTAP reads Rice .fits.fz (integers) but not GZIP (floats): choose FITS.'},
     # ------------------------------------------------------------ lancements journalisés (0.1.12)
@@ -443,6 +443,9 @@ TEXTES = {
     'act_aide_ecran': {'fr': 'Aide de cet écran', 'en': 'Help on this screen'},
     'act_aide_ecran_aide': {'fr': "Explique l'écran affiché.", 'en': 'Explain the screen shown.'},
     'act_manuel': {'fr': 'Manuel (PDF)', 'en': 'Manual (PDF)'},
+    'act_guide_ohp': {'fr': 'Guide de démarrage (Banque OHP)', 'en': 'Getting started (OHP bank)'},
+    'act_guide_ohp_aide': {'fr': 'Réaffiche le guide en trois étapes du catalogue : choisir une cible, voir ses images, Télécharger.',
+                           'en': 'Shows the three-step catalogue guide again: pick a target, see its images, Download.'},
     'act_manuel_aide': {'fr': 'Ouvre le manuel de référence.', 'en': 'Open the reference manual.'},
     'act_raccourcis': {'fr': 'Raccourcis clavier', 'en': 'Keyboard shortcuts'},
     'act_raccourcis_aide': {'fr': 'Liste des raccourcis clavier.', 'en': 'List of keyboard shortcuts.'},
