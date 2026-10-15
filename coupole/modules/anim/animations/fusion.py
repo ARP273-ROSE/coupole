@@ -37,7 +37,9 @@ ETAPES_CNO = (
 NOYAUX = {'p': ('¹H', 1, 1), 'd': ('²H', 1, 2), 'he3': ('³He', 2, 3), 'he4': ('⁴He', 2, 4), 'c12': ('¹²C', 6, 12),
           'n13': ('¹³N', 7, 13), 'c13': ('¹³C', 6, 13), 'n14': ('¹⁴N', 7, 14), 'o15': ('¹⁵O', 8, 15),
           'n15': ('¹⁵N', 7, 15)}
-LEPTONS = {'e+': 'e⁺', 'nu': 'ν', 'gamma': 'γ'}
+# neutrino : la lettre grecque nu (U+03BD), avec l'indice e (neutrino électronique), jamais la lettre latine v
+LEPTONS = {'e+': 'e⁺', 'nu': 'νₑ', 'gamma': 'γ'}
+RAYON_MIN_LEPTON = 10.0        # rayon minimal (px) des particules légères à l'écran : agrandies, la légende le dit
 
 
 def energie_totale(etapes) -> float:
@@ -64,6 +66,7 @@ class _Fusion(Animation):
 
     def etat_initial(self):
         self.t = 0.0
+        self.leptons = []          # particules légères de la dernière image : (genre, x, y, rayon) (tests)
 
     def suivante(self):
         self.t = (math.floor(self.t / DUREE_ETAPE) + 1) * DUREE_ETAPE % (len(self.ETAPES) * DUREE_ETAPE)
@@ -97,30 +100,73 @@ class _Fusion(Animation):
         dessin.texte(p, x, y, sym, 'fond')
 
     def _lepton(self, p, x, y, k, s, dx, dy):
+        """Particule légère, reconnaissable et agrandie (rayon ≥ RAYON_MIN_LEPTON) : positon = petite sphère marquée
+        « + », neutrino = flèche fine en pointillé, photon γ = flèche ondulée jaune ; étiquette à taille normale, posée
+        par le placeur anti-collision (trait de rappel s'il l'éloigne)."""
+        n = math.hypot(dx, dy) or 1.0
+        ux, uy = dx / n, dy / n
+        r = max(RAYON_MIN_LEPTON, s * 0.45)
+        self.leptons.append((k, x, y, r))
         if k == 'gamma':
+            longueur = r * 4.2
             pts = []
-            n = math.hypot(dx, dy) or 1.0
-            ux, uy = dx / n, dy / n
-            for i in range(25):
-                d = -i * 1.4
-                a = 4 * math.sin(i * 0.9)
+            for i in range(41):
+                d = -(i / 40) * longueur
+                a = r * 0.45 * math.sin((i / 40) * math.pi * 6)
                 pts.append(QPointF(x + ux * d - uy * a, y + uy * d + ux * a))
-            p.setPen(dessin.stylo('accent1', 2.0))
+            p.setPen(dessin.stylo('soleil', 2.2))
             p.drawPolyline(QPolygonF(pts))
-            dessin.texte(p, x + 10, y - 10, 'γ', 'accent1')
+            dessin.fleche(p, x - ux * 2, y - uy * 2, x + ux * r * 0.6, y + uy * r * 0.6, dessin.stylo('soleil', 2.2), 9)
+            dessin.etiquette(p, x, y, 'γ', 'soleil', r)
         elif k == 'e+':
-            dessin.disque(p, x, y, s * 0.35, 'accent2', bord='texte')
-            dessin.texte(p, x + 12, y - 8, 'e⁺', 'accent2')
+            dessin.disque(p, x, y, r, 'accent2', bord='texte')
+            dessin.police(p, 1.15, True)
+            dessin.texte(p, x, y + 1, '+', 'fond')
+            dessin.police(p, 1 / 1.15)
+            dessin.etiquette(p, x, y, 'e⁺', 'accent2', r)
         else:
-            dessin.disque(p, x, y, s * 0.25, 'doux')
-            dessin.texte(p, x + 10, y - 8, 'ν', 'doux')
+            p.setPen(dessin.stylo('doux', 1.4, 0.95, True))
+            p.drawLine(QPointF(x - ux * r * 3.6, y - uy * r * 3.6), QPointF(x, y))
+            dessin.fleche(p, x - ux * 2, y - uy * 2, x + ux * r * 0.5, y + uy * r * 0.5, dessin.stylo('doux', 1.4), 8)
+            dessin.etiquette(p, x, y, 'νₑ', 'doux', r)
+
+    def _legende(self, p, r):
+        """Légende des symboles (coin haut gauche) ; rappel que les particules légères ne sont pas à l'échelle."""
+        dessin.police(p, 0.82)
+        fm = p.fontMetrics()
+        h = fm.height() + 4
+        x, y = r.left() + 8, r.top() + 6
+
+        def positon(cx, cy):
+            dessin.disque(p, cx, cy, 6, 'accent2', bord='texte')
+
+        def neutrino(cx, cy):
+            p.setPen(dessin.stylo('doux', 1.3, 0.95, True))
+            p.drawLine(QPointF(cx - 9, cy), QPointF(cx + 6, cy))
+            dessin.fleche(p, cx + 2, cy, cx + 8, cy, dessin.stylo('doux', 1.3), 5)
+
+        def gamma(cx, cy):
+            p.setPen(dessin.stylo('soleil', 1.6))
+            p.drawPolyline(QPolygonF([QPointF(cx - 9 + i / 16 * 15, cy + 2.5 * math.sin(i / 16 * math.pi * 4))
+                                      for i in range(17)]))
+
+        for f, cle in ((positon, 'anim_fusion_legende_positon'), (neutrino, 'anim_fusion_legende_neutrino'),
+                       (gamma, 'anim_fusion_legende_gamma')):
+            f(x + 9, y + h / 2)
+            dessin.texte(p, x + 24, y + h / 2 + fm.ascent() / 2 - 1, tr(cle), 'texte', centre=False)
+            y += h
+        dessin.texte(p, x, y + h / 2 + fm.ascent() / 2 - 1, tr('anim_fusion_echelle'), 'doux', centre=False)
+        dessin.police(p, 1 / 0.82)
 
     def _scene(self, p, r):
         k, f = self.etape()
         reac, prod = self.ETAPES[k][0], self.ETAPES[k][1]
-        cx, cy = r.center().x(), r.center().y()
-        s = min(r.width(), r.height()) / 14
-        L = min(r.width(), r.height()) * 0.42
+        self.leptons = []
+        self._legende(p, r)
+        # la réaction, centrée et grande (l'équation est écrite en bas)
+        cx, cy = r.center().x(), r.center().y() - 8
+        s = min(r.width(), r.height()) / 10.5
+        L = min(r.width() * 0.36, r.height() * 0.32)
         if f < 0.45:                                    # approche des réactifs
             u = 1 - f / 0.45
             for i, n in enumerate(reac):

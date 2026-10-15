@@ -756,6 +756,10 @@ ANIM_LOT3.update({
     'anim_fusion_titre_scene': ('La réaction', 'The reaction'),
     'anim_fusion_titre_etapes': ('Les étapes', 'The steps'),
     'anim_fusion_bilan': ('Bilan : 4 ¹H → ⁴He + {e} MeV', 'Net: 4 ¹H → ⁴He + {e} MeV'),
+    'anim_fusion_legende_positon': ('e⁺ : positon (antiélectron)', 'e⁺: positron (antielectron)'),
+    'anim_fusion_legende_neutrino': ('νₑ : neutrino électronique', 'νₑ: electron neutrino'),
+    'anim_fusion_legende_gamma': ('γ : photon gamma', 'γ: gamma-ray photon'),
+    'anim_fusion_echelle': ('particules légères agrandies (pas à l’échelle)', 'light particles enlarged (not to scale)'),
 })
 
 ANIM_LOT3.update({
