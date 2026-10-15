@@ -1,0 +1,9254 @@
+{
+ "format": "coupole-recherche-cas",
+ "version": 1,
+ "moteur": "coupole-recherche/1",
+ "unitaires": {
+  "normaliser": [
+   [
+    "Saisons",
+    "saisons"
+   ],
+   [
+    "seasons",
+    "seasons"
+   ],
+   [
+    "Galaxies",
+    "galaxies"
+   ],
+   [
+    "galaxie",
+    "galaxie"
+   ],
+   [
+    "galaxy",
+    "galaxy"
+   ],
+   [
+    "Planètes",
+    "planetes"
+   ],
+   [
+    "planets",
+    "planets"
+   ],
+   [
+    "masses",
+    "masses"
+   ],
+   [
+    "Masse",
+    "masse"
+   ],
+   [
+    "classes",
+    "classes"
+   ],
+   [
+    "spectraux",
+    "spectraux"
+   ],
+   [
+    "cieux",
+    "cieux"
+   ],
+   [
+    "Vénus",
+    "venus"
+   ],
+   [
+    "axis",
+    "axis"
+   ],
+   [
+    "lois",
+    "lois"
+   ],
+   [
+    "Éclipses",
+    "eclipses"
+   ],
+   [
+    "série",
+    "serie"
+   ],
+   [
+    "series",
+    "series"
+   ],
+   [
+    "bodies",
+    "bodies"
+   ],
+   [
+    "Kepler’s",
+    "kepler’s"
+   ],
+   [
+    "œil",
+    "oeil"
+   ],
+   [
+    "Straße",
+    "strasse"
+   ],
+   [
+    "H₂O",
+    "h₂o"
+   ],
+   [
+    "2026",
+    "2026"
+   ],
+   [
+    "phase",
+    "phase"
+   ],
+   [
+    "des",
+    "des"
+   ],
+   [
+    "Lune",
+    "lune"
+   ],
+   [
+    "eaux",
+    "eaux"
+   ]
+  ],
+  "mots": [
+   [
+    "La troisième loi de Kepler relie la période et le demi-grand axe.",
+    [
+     "la",
+     "troisieme",
+     "loi",
+     "de",
+     "kepler",
+     "relie",
+     "la",
+     "periode",
+     "et",
+     "le",
+     "demi",
+     "grand",
+     "axe"
+    ]
+   ],
+   [
+    "Simulateur des saisons",
+    [
+     "simulateur",
+     "des",
+     "saisons"
+    ]
+   ],
+   [
+    "Kepler’s third law: P² ∝ a³ — Œuvres complètes",
+    [
+     "kepler",
+     "s",
+     "third",
+     "law",
+     "p²",
+     "a³",
+     "oeuvres",
+     "completes"
+    ]
+   ],
+   [
+    "Éclipses de Lune et de Soleil",
+    [
+     "eclipses",
+     "de",
+     "lune",
+     "et",
+     "de",
+     "soleil"
+    ]
+   ]
+  ],
+  "racine": [
+   [
+    "saisons",
+    "saison"
+   ],
+   [
+    "seasons",
+    "season"
+   ],
+   [
+    "galaxies",
+    "galaxi"
+   ],
+   [
+    "galaxie",
+    "galaxi"
+   ],
+   [
+    "galaxy",
+    "galaxi"
+   ],
+   [
+    "planetes",
+    "planet"
+   ],
+   [
+    "planets",
+    "planet"
+   ],
+   [
+    "masses",
+    "mass"
+   ],
+   [
+    "masse",
+    "mass"
+   ],
+   [
+    "classes",
+    "class"
+   ],
+   [
+    "spectraux",
+    "spectral"
+   ],
+   [
+    "cieux",
+    "cieu"
+   ],
+   [
+    "venus",
+    "venus"
+   ],
+   [
+    "axis",
+    "axis"
+   ],
+   [
+    "lois",
+    "lois"
+   ],
+   [
+    "eclipses",
+    "eclips"
+   ],
+   [
+    "serie",
+    "seri"
+   ],
+   [
+    "series",
+    "seri"
+   ],
+   [
+    "bodies",
+    "bodi"
+   ],
+   [
+    "kepler",
+    "kepler"
+   ],
+   [
+    "s",
+    "s"
+   ],
+   [
+    "oeil",
+    "oeil"
+   ],
+   [
+    "strasse",
+    "strass"
+   ],
+   [
+    "h₂o",
+    "h₂o"
+   ],
+   [
+    "2026",
+    "2026"
+   ],
+   [
+    "phase",
+    "phas"
+   ],
+   [
+    "des",
+    "des"
+   ],
+   [
+    "lune",
+    "lun"
+   ],
+   [
+    "eaux",
+    "eaux"
+   ]
+  ],
+  "termes": [
+   [
+    "seasons",
+    [
+     "seasons"
+    ]
+   ],
+   [
+    "saisons",
+    [
+     "saisons"
+    ]
+   ],
+   [
+    "Saison",
+    [
+     "saison"
+    ]
+   ],
+   [
+    "SAISONS",
+    [
+     "saisons"
+    ]
+   ],
+   [
+    "Kepler’s third law",
+    [
+     "kepler",
+     "third",
+     "law"
+    ]
+   ],
+   [
+    "troisieme loi de kepler",
+    [
+     "troisieme",
+     "loi",
+     "kepler"
+    ]
+   ],
+   [
+    "kepler",
+    [
+     "kepler"
+    ]
+   ],
+   [
+    "kelper",
+    [
+     "kelper"
+    ]
+   ],
+   [
+    "keplr",
+    [
+     "keplr"
+    ]
+   ],
+   [
+    "galaxy",
+    [
+     "galaxy"
+    ]
+   ],
+   [
+    "galaxies",
+    [
+     "galaxies"
+    ]
+   ],
+   [
+    "Andromede",
+    [
+     "andromede"
+    ]
+   ],
+   [
+    "andromeda galaxy",
+    [
+     "andromeda",
+     "galaxy"
+    ]
+   ],
+   [
+    "lunar eclipse",
+    [
+     "lunar",
+     "eclipse"
+    ]
+   ],
+   [
+    "éclipse lune",
+    [
+     "eclipse",
+     "lune"
+    ]
+   ],
+   [
+    "eclipe",
+    [
+     "eclipe"
+    ]
+   ],
+   [
+    "parallax",
+    [
+     "parallax"
+    ]
+   ],
+   [
+    "paralaxe",
+    [
+     "paralaxe"
+    ]
+   ],
+   [
+    "parsec",
+    [
+     "parsec"
+    ]
+   ],
+   [
+    "spectral classes",
+    [
+     "spectral",
+     "classes"
+    ]
+   ],
+   [
+    "classe spectrale",
+    [
+     "classe",
+     "spectrale"
+    ]
+   ],
+   [
+    "sai",
+    [
+     "sai"
+    ]
+   ],
+   [
+    "or",
+    [
+     "or"
+    ]
+   ],
+   [
+    "the",
+    [
+     "the"
+    ]
+   ],
+   [
+    "de la",
+    [
+     "de",
+     "la"
+    ]
+   ],
+   [
+    "m31",
+    [
+     "m31"
+    ]
+   ],
+   [
+    "2,5",
+    [
+     "2",
+     "5"
+    ]
+   ],
+   [
+    "xyzzy",
+    [
+     "xyzzy"
+    ]
+   ],
+   [
+    "",
+    []
+   ],
+   [
+    "   ",
+    []
+   ]
+  ],
+  "distance": [
+   [
+    "kepler",
+    "kelper",
+    2,
+    1
+   ],
+   [
+    "saison",
+    "season",
+    2,
+    2
+   ],
+   [
+    "saison",
+    "season",
+    1,
+    2
+   ],
+   [
+    "parallaxe",
+    "paralax",
+    2,
+    2
+   ],
+   [
+    "orbit",
+    "orbite",
+    1,
+    1
+   ],
+   [
+    "abc",
+    "xyz",
+    1,
+    2
+   ],
+   [
+    "spectre",
+    "specter",
+    2,
+    1
+   ],
+   [
+    "lune",
+    "lnue",
+    1,
+    1
+   ],
+   [
+    "",
+    "abc",
+    3,
+    3
+   ]
+  ],
+  "surligner": [
+   [
+    "La troisième loi de Kepler relie la période et le demi-grand axe.",
+    [
+     "la",
+     "loi",
+     "troisieme"
+    ],
+    [
+     [
+      "La",
+      true
+     ],
+     [
+      " ",
+      false
+     ],
+     [
+      "troisième",
+      true
+     ],
+     [
+      " ",
+      false
+     ],
+     [
+      "loi",
+      true
+     ],
+     [
+      " de Kepler relie ",
+      false
+     ],
+     [
+      "la",
+      true
+     ],
+     [
+      " période et le demi-grand axe.",
+      false
+     ]
+    ]
+   ],
+   [
+    "Simulateur des saisons",
+    [
+     "des",
+     "saisons",
+     "simulateur"
+    ],
+    [
+     [
+      "Simulateur",
+      true
+     ],
+     [
+      " ",
+      false
+     ],
+     [
+      "des",
+      true
+     ],
+     [
+      " ",
+      false
+     ],
+     [
+      "saisons",
+      true
+     ]
+    ]
+   ],
+   [
+    "Kepler’s third law: P² ∝ a³ — Œuvres complètes",
+    [
+     "kepler",
+     "s",
+     "third"
+    ],
+    [
+     [
+      "Kepler",
+      true
+     ],
+     [
+      "’",
+      false
+     ],
+     [
+      "s",
+      true
+     ],
+     [
+      " ",
+      false
+     ],
+     [
+      "third",
+      true
+     ],
+     [
+      " law: P² ∝ a³ — Œuvres complètes",
+      false
+     ]
+    ]
+   ],
+   [
+    "Éclipses de Lune et de Soleil",
+    [
+     "de",
+     "eclipses",
+     "lune"
+    ],
+    [
+     [
+      "Éclipses",
+      true
+     ],
+     [
+      " ",
+      false
+     ],
+     [
+      "de",
+      true
+     ],
+     [
+      " ",
+      false
+     ],
+     [
+      "Lune",
+      true
+     ],
+     [
+      " et ",
+      false
+     ],
+     [
+      "de",
+      true
+     ],
+     [
+      " Soleil",
+      false
+     ]
+    ]
+   ]
+  ],
+  "extrait": [
+   [
+    "La troisième loi de Kepler relie la période et le demi-grand axe.La troisième loi de Kepler relie la période et le demi-grand axe.La troisième loi de Kepler relie la période et le demi-grand axe.La troisième loi de Kepler relie la période et le demi-grand axe.",
+    [
+     "saisons",
+     "kepler"
+    ],
+    60,
+    "La troisième loi de Kepler relie la période et le…"
+   ],
+   [
+    "Simulateur des saisonsSimulateur des saisonsSimulateur des saisonsSimulateur des saisons",
+    [
+     "saisons",
+     "kepler"
+    ],
+    60,
+    "…des saisons"
+   ],
+   [
+    "Kepler’s third law: P² ∝ a³ — Œuvres complètesKepler’s third law: P² ∝ a³ — Œuvres complètesKepler’s third law: P² ∝ a³ — Œuvres complètesKepler’s third law: P² ∝ a³ — Œuvres complètes",
+    [
+     "saisons",
+     "kepler"
+    ],
+    60,
+    "Kepler’s third law: P² ∝ a³ — Œuvres complètesKepler’s…"
+   ],
+   [
+    "Éclipses de Lune et de SoleilÉclipses de Lune et de SoleilÉclipses de Lune et de SoleilÉclipses de Lune et de Soleil",
+    [
+     "saisons",
+     "kepler"
+    ],
+    60,
+    "Éclipses de Lune et de SoleilÉclipses de Lune et de…"
+   ]
+  ]
+ },
+ "corpus": {
+  "documents": [
+   {
+    "g": "animation",
+    "id": "seasons",
+    "t": {
+     "fr": "Simulateur des saisons",
+     "en": "Seasons Simulator"
+    },
+    "o": "Seasons and Ecliptic Simulator",
+    "k": {
+     "fr": "seasons Le Soleil",
+     "en": "The Sun"
+    },
+    "r": {
+     "fr": "Inclinaison de l’axe de la Terre et durée du jour.",
+     "en": "Tilt of Earth’s axis and length of day."
+    }
+   },
+   {
+    "g": "fiche",
+    "id": "kepler3",
+    "t": {
+     "fr": "Troisième loi de Kepler",
+     "en": "Kepler’s third law"
+    },
+    "k": {
+     "fr": "période demi-grand axe orbite",
+     "en": "period semi-major axis orbit"
+    },
+    "r": {
+     "fr": "Le carré de la période est proportionnel au cube du demi-grand axe.",
+     "en": "The square of the period is proportional to the cube of the semi-major axis."
+    }
+   },
+   {
+    "g": "animation",
+    "id": "keplerslaws",
+    "t": {
+     "fr": "Lois de Kepler",
+     "en": "Kepler’s Laws"
+    },
+    "o": "Planetary Orbit Simulator",
+    "k": {
+     "fr": "keplerslaws Orbites",
+     "en": "Orbits"
+    },
+    "r": {
+     "fr": "Les trois lois des orbites.",
+     "en": "The three laws of orbits."
+    }
+   },
+   {
+    "g": "question",
+    "id": "q_eclipse",
+    "t": {
+     "fr": "Éclipse de Lune",
+     "en": "Lunar Eclipse"
+    },
+    "m": [
+     "lunarcycles"
+    ],
+    "k": {
+     "fr": "",
+     "en": ""
+    },
+    "r": {
+     "fr": "Pourquoi la Lune devient-elle rouge pendant une éclipse totale ?",
+     "en": "Why does the Moon turn red during a total eclipse?"
+    }
+   },
+   {
+    "g": "table",
+    "id": "galaxies",
+    "t": {
+     "fr": "Galaxies proches",
+     "en": "Nearby galaxies"
+    },
+    "k": {
+     "fr": "Voie lactée Andromède",
+     "en": "Milky Way Andromeda"
+    },
+    "r": {
+     "fr": "Distances et masses des galaxies du Groupe local.",
+     "en": "Distances and masses of Local Group galaxies."
+    }
+   },
+   {
+    "g": "image",
+    "id": "m31",
+    "t": {
+     "fr": "La galaxie d’Andromède",
+     "en": "The Andromeda Galaxy"
+    },
+    "k": {
+     "fr": "M31 spirale",
+     "en": "M31 spiral"
+    },
+    "r": {
+     "fr": "Une galaxie spirale à 2,5 millions d’années-lumière.",
+     "en": "A spiral galaxy 2.5 million light-years away."
+    }
+   },
+   {
+    "g": "module",
+    "id": "lunarcycles",
+    "t": {
+     "fr": "Les cycles de la Lune",
+     "en": "Lunar Cycles"
+    },
+    "o": "Lunar Cycles",
+    "k": {
+     "fr": "lunarcycles",
+     "en": ""
+    }
+   },
+   {
+    "g": "module",
+    "id": "galaxies",
+    "t": {
+     "fr": "Galaxies",
+     "en": "Galaxies"
+    },
+    "o": "Galaxies",
+    "k": {
+     "fr": "galaxies",
+     "en": ""
+    }
+   },
+   {
+    "g": "fiche",
+    "id": "parallaxe",
+    "t": {
+     "fr": "Parallaxe",
+     "en": "Parallax"
+    },
+    "k": {
+     "fr": "distance étoiles parsec",
+     "en": "distance stars parsec"
+    },
+    "r": {
+     "fr": "Le déplacement apparent d’une étoile proche quand la Terre tourne autour du Soleil.",
+     "en": "The apparent shift of a nearby star as Earth orbits the Sun."
+    }
+   },
+   {
+    "g": "question",
+    "id": "q_spectre",
+    "t": {
+     "fr": "Spectres des étoiles",
+     "en": "Stellar Spectra"
+    },
+    "m": [
+     "light"
+    ],
+    "k": {
+     "fr": "raies classes spectrales",
+     "en": "lines spectral classes"
+    },
+    "r": {
+     "fr": "Quelle étoile est la plus chaude ?",
+     "en": "Which star is hottest?"
+    }
+   }
+  ],
+  "requetes": [
+   [
+    "seasons",
+    [
+     {
+      "g": "animation",
+      "id": "seasons",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "seasons"
+      ]
+     }
+    ]
+   ],
+   [
+    "saisons",
+    [
+     {
+      "g": "animation",
+      "id": "seasons",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "saisons"
+      ]
+     }
+    ]
+   ],
+   [
+    "Saison",
+    [
+     {
+      "g": "animation",
+      "id": "seasons",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "saisons"
+      ]
+     }
+    ]
+   ],
+   [
+    "SAISONS",
+    [
+     {
+      "g": "animation",
+      "id": "seasons",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "saisons"
+      ]
+     }
+    ]
+   ],
+   [
+    "Kepler’s third law",
+    [
+     {
+      "g": "fiche",
+      "id": "kepler3",
+      "n": 3,
+      "score": 106,
+      "mots": [
+       "kepler",
+       "law",
+       "third"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "keplerslaws",
+      "n": 2,
+      "score": 64,
+      "mots": [
+       "kepler",
+       "keplerslaws",
+       "laws"
+      ]
+     }
+    ]
+   ],
+   [
+    "troisieme loi de kepler",
+    [
+     {
+      "g": "fiche",
+      "id": "kepler3",
+      "n": 3,
+      "score": 106,
+      "mots": [
+       "kepler",
+       "loi",
+       "troisieme"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "keplerslaws",
+      "n": 2,
+      "score": 58,
+      "mots": [
+       "kepler",
+       "keplerslaws",
+       "lois"
+      ]
+     }
+    ]
+   ],
+   [
+    "kepler",
+    [
+     {
+      "g": "animation",
+      "id": "keplerslaws",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "kepler",
+       "keplerslaws"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "kepler3",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "kepler"
+      ]
+     }
+    ]
+   ],
+   [
+    "kelper",
+    [
+     {
+      "g": "animation",
+      "id": "keplerslaws",
+      "n": 1,
+      "score": 23,
+      "mots": [
+       "kepler"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "kepler3",
+      "n": 1,
+      "score": 22,
+      "mots": [
+       "kepler"
+      ]
+     }
+    ]
+   ],
+   [
+    "keplr",
+    [
+     {
+      "g": "animation",
+      "id": "keplerslaws",
+      "n": 1,
+      "score": 23,
+      "mots": [
+       "kepler"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "kepler3",
+      "n": 1,
+      "score": 22,
+      "mots": [
+       "kepler"
+      ]
+     }
+    ]
+   ],
+   [
+    "galaxy",
+    [
+     {
+      "g": "image",
+      "id": "m31",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "galaxie",
+       "galaxy"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "galaxies",
+      "n": 1,
+      "score": 36,
+      "mots": [
+       "galaxies"
+      ]
+     },
+     {
+      "g": "table",
+      "id": "galaxies",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "galaxies"
+      ]
+     }
+    ]
+   ],
+   [
+    "galaxies",
+    [
+     {
+      "g": "module",
+      "id": "galaxies",
+      "n": 1,
+      "score": 48,
+      "mots": [
+       "galaxies"
+      ]
+     },
+     {
+      "g": "table",
+      "id": "galaxies",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "galaxies"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "m31",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "galaxie",
+       "galaxy"
+      ]
+     }
+    ]
+   ],
+   [
+    "Andromede",
+    [
+     {
+      "g": "image",
+      "id": "m31",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "andromeda",
+       "andromede"
+      ]
+     },
+     {
+      "g": "table",
+      "id": "galaxies",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "andromeda",
+       "andromede"
+      ]
+     }
+    ]
+   ],
+   [
+    "andromeda galaxy",
+    [
+     {
+      "g": "image",
+      "id": "m31",
+      "n": 2,
+      "score": 70,
+      "mots": [
+       "andromeda",
+       "andromede",
+       "galaxie",
+       "galaxy"
+      ]
+     },
+     {
+      "g": "table",
+      "id": "galaxies",
+      "n": 2,
+      "score": 53,
+      "mots": [
+       "andromeda",
+       "andromede",
+       "galaxies"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "galaxies",
+      "n": 1,
+      "score": 36,
+      "mots": [
+       "galaxies"
+      ]
+     }
+    ]
+   ],
+   [
+    "lunar eclipse",
+    [
+     {
+      "g": "question",
+      "id": "q_eclipse",
+      "n": 2,
+      "score": 78,
+      "mots": [
+       "eclipse",
+       "lunar"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "lunarcycles",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "lunar",
+       "lunarcycles"
+      ]
+     }
+    ]
+   ],
+   [
+    "éclipse lune",
+    [
+     {
+      "g": "question",
+      "id": "q_eclipse",
+      "n": 2,
+      "score": 64,
+      "mots": [
+       "eclipse",
+       "lune"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "lunarcycles",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "lune"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "seasons",
+      "n": 1,
+      "score": 14,
+      "mots": [
+       "sun"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "q_spectre",
+      "n": 1,
+      "score": 14,
+      "mots": [
+       "lines"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "parallaxe",
+      "n": 1,
+      "score": 7,
+      "mots": [
+       "sun"
+      ]
+     }
+    ]
+   ],
+   [
+    "eclipe",
+    [
+     {
+      "g": "question",
+      "id": "q_eclipse",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "eclipse"
+      ]
+     }
+    ]
+   ],
+   [
+    "parallax",
+    [
+     {
+      "g": "fiche",
+      "id": "parallaxe",
+      "n": 1,
+      "score": 48,
+      "mots": [
+       "parallax",
+       "parallaxe"
+      ]
+     }
+    ]
+   ],
+   [
+    "paralaxe",
+    [
+     {
+      "g": "fiche",
+      "id": "parallaxe",
+      "n": 1,
+      "score": 27,
+      "mots": [
+       "parallax",
+       "parallaxe"
+      ]
+     }
+    ]
+   ],
+   [
+    "parsec",
+    [
+     {
+      "g": "fiche",
+      "id": "parallaxe",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "parsec"
+      ]
+     }
+    ]
+   ],
+   [
+    "spectral classes",
+    [
+     {
+      "g": "question",
+      "id": "q_spectre",
+      "n": 2,
+      "score": 44,
+      "mots": [
+       "classes",
+       "spectra",
+       "spectral",
+       "spectrales",
+       "spectres"
+      ]
+     }
+    ]
+   ],
+   [
+    "classe spectrale",
+    [
+     {
+      "g": "question",
+      "id": "q_spectre",
+      "n": 2,
+      "score": 44,
+      "mots": [
+       "classes",
+       "spectra",
+       "spectral",
+       "spectrales",
+       "spectres"
+      ]
+     }
+    ]
+   ],
+   [
+    "sai",
+    [
+     {
+      "g": "animation",
+      "id": "seasons",
+      "n": 1,
+      "score": 26,
+      "mots": [
+       "saisons"
+      ]
+     }
+    ]
+   ],
+   [
+    "or",
+    [
+     {
+      "g": "animation",
+      "id": "keplerslaws",
+      "n": 1,
+      "score": 26,
+      "mots": [
+       "orbit",
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "kepler3",
+      "n": 1,
+      "score": 16,
+      "mots": [
+       "orbit",
+       "orbite"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "parallaxe",
+      "n": 1,
+      "score": 8,
+      "mots": [
+       "orbits"
+      ]
+     }
+    ]
+   ],
+   [
+    "the",
+    [
+     {
+      "g": "image",
+      "id": "m31",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "the"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "seasons",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "the"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "keplerslaws",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "the"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "q_eclipse",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "the"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "kepler3",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "the"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "parallaxe",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "the"
+      ]
+     }
+    ]
+   ],
+   [
+    "de la",
+    [
+     {
+      "g": "module",
+      "id": "lunarcycles",
+      "n": 2,
+      "score": 68,
+      "mots": [
+       "de",
+       "la"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "keplerslaws",
+      "n": 2,
+      "score": 56,
+      "mots": [
+       "de",
+       "des",
+       "laws"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "kepler3",
+      "n": 2,
+      "score": 55,
+      "mots": [
+       "de",
+       "demi",
+       "la",
+       "law"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "q_eclipse",
+      "n": 2,
+      "score": 42,
+      "mots": [
+       "de",
+       "devient",
+       "la"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "seasons",
+      "n": 2,
+      "score": 36,
+      "mots": [
+       "de",
+       "des",
+       "la"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "q_spectre",
+      "n": 2,
+      "score": 36,
+      "mots": [
+       "des",
+       "la"
+      ]
+     },
+     {
+      "g": "table",
+      "id": "galaxies",
+      "n": 2,
+      "score": 24,
+      "mots": [
+       "des",
+       "lactee"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "parallaxe",
+      "n": 2,
+      "score": 18,
+      "mots": [
+       "deplacement",
+       "la"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "m31",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "la"
+      ]
+     }
+    ]
+   ],
+   [
+    "m31",
+    [
+     {
+      "g": "image",
+      "id": "m31",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "m31"
+      ]
+     }
+    ]
+   ],
+   [
+    "2,5",
+    [
+     {
+      "g": "image",
+      "id": "m31",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "2",
+       "5"
+      ]
+     }
+    ]
+   ],
+   [
+    "xyzzy",
+    []
+   ],
+   [
+    "",
+    []
+   ],
+   [
+    "   ",
+    []
+   ],
+   [
+    "orbits laws",
+    [
+     {
+      "g": "animation",
+      "id": "keplerslaws",
+      "n": 2,
+      "score": 62,
+      "mots": [
+       "laws",
+       "orbit",
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "kepler3",
+      "n": 2,
+      "score": 51,
+      "mots": [
+       "la",
+       "law",
+       "orbit",
+       "orbite"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "parallaxe",
+      "n": 2,
+      "score": 17,
+      "mots": [
+       "la",
+       "orbits"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "lunarcycles",
+      "n": 1,
+      "score": 22,
+      "mots": [
+       "la"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "m31",
+      "n": 1,
+      "score": 22,
+      "mots": [
+       "la"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "seasons",
+      "n": 1,
+      "score": 7,
+      "mots": [
+       "la"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "q_eclipse",
+      "n": 1,
+      "score": 7,
+      "mots": [
+       "la"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "q_spectre",
+      "n": 1,
+      "score": 7,
+      "mots": [
+       "la"
+      ]
+     }
+    ]
+   ],
+   [
+    "Lunar Cycles",
+    [
+     {
+      "g": "module",
+      "id": "lunarcycles",
+      "n": 2,
+      "score": 78,
+      "mots": [
+       "cycles",
+       "lunar",
+       "lunarcycles"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "q_eclipse",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "lunar"
+      ]
+     }
+    ]
+   ],
+   [
+    "cycles lune",
+    [
+     {
+      "g": "module",
+      "id": "lunarcycles",
+      "n": 2,
+      "score": 63,
+      "mots": [
+       "cycles",
+       "lune"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "q_eclipse",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "lune"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "seasons",
+      "n": 1,
+      "score": 14,
+      "mots": [
+       "sun"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "q_spectre",
+      "n": 1,
+      "score": 14,
+      "mots": [
+       "lines"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "parallaxe",
+      "n": 1,
+      "score": 7,
+      "mots": [
+       "sun"
+      ]
+     }
+    ]
+   ],
+   [
+    "étoile chaude",
+    [
+     {
+      "g": "question",
+      "id": "q_spectre",
+      "n": 2,
+      "score": 42,
+      "mots": [
+       "chaude",
+       "etoile",
+       "etoiles"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "parallaxe",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "etoile",
+       "etoiles"
+      ]
+     }
+    ]
+   ],
+   [
+    "hottest star",
+    [
+     {
+      "g": "question",
+      "id": "q_spectre",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "hottest",
+       "star"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "parallaxe",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "star",
+       "stars"
+      ]
+     }
+    ]
+   ],
+   [
+    "demi grand axe",
+    [
+     {
+      "g": "fiche",
+      "id": "kepler3",
+      "n": 3,
+      "score": 60,
+      "mots": [
+       "axe",
+       "demi",
+       "grand",
+       "semi"
+      ]
+     }
+    ]
+   ],
+   [
+    "semi major axis",
+    [
+     {
+      "g": "fiche",
+      "id": "kepler3",
+      "n": 3,
+      "score": 60,
+      "mots": [
+       "axis",
+       "demi",
+       "major",
+       "semi"
+      ]
+     }
+    ]
+   ],
+   [
+    "seasons simulator",
+    [
+     {
+      "g": "animation",
+      "id": "seasons",
+      "n": 2,
+      "score": 78,
+      "mots": [
+       "seasons",
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "keplerslaws",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "simulator"
+      ]
+     }
+    ]
+   ]
+  ]
+ },
+ "reel": {
+  "documents": 817,
+  "vocabulaire": 5434,
+  "requetes": [
+   [
+    "seasons",
+    [
+     {
+      "g": "question",
+      "id": "ca_jovianplanets_saturnseasons",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "seasons"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "eclipticsimulator",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "seasons"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "transitmovie",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "seasons"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_seasonscontrib",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "seasons"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_uranus",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "seasons"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_earthchanges",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "seasons"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_unionseasons",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "seasons"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "nodes",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "seasons"
+      ]
+     }
+    ]
+   ],
+   [
+    "saisons",
+    [
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_seasonscontrib",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "saisons"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "eclipticsimulator",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "saisons"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_ancientastro_seasonalsky",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "saisons"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_unionseasons",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "saisons"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_uranus",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "saisons"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_jovianplanets_saturnseasons",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "saisons"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "transitmovie",
+      "n": 1,
+      "score": 36,
+      "mots": [
+       "saisons"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_jovianplanets_jovianalignments",
+      "n": 1,
+      "score": 36,
+      "mots": [
+       "saisons"
+      ]
+     }
+    ]
+   ],
+   [
+    "Kepler’s third law",
+    [
+     {
+      "g": "animation",
+      "id": "keplers_third",
+      "n": 3,
+      "score": 106,
+      "mots": [
+       "kepler",
+       "keplers",
+       "law",
+       "third"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "renaissance_slide1",
+      "n": 2,
+      "score": 64,
+      "mots": [
+       "kepler",
+       "law",
+       "laws"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_kepler2nd",
+      "n": 2,
+      "score": 63,
+      "mots": [
+       "kepler",
+       "law"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_Kepler3Law",
+      "n": 2,
+      "score": 62,
+      "mots": [
+       "kepler",
+       "law"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_asteroidtime",
+      "n": 2,
+      "score": 62,
+      "mots": [
+       "kepler",
+       "laws"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_kepler3rd",
+      "n": 2,
+      "score": 62,
+      "mots": [
+       "kepler",
+       "law"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_kepler3rdgraphs",
+      "n": 2,
+      "score": 62,
+      "mots": [
+       "kepler",
+       "law"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "galaxies_galactic_orbits",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "kepler",
+       "law"
+      ]
+     }
+    ]
+   ],
+   [
+    "troisième loi de Kepler",
+    [
+     {
+      "g": "animation",
+      "id": "keplers_third",
+      "n": 3,
+      "score": 106,
+      "mots": [
+       "kepler",
+       "keplers",
+       "loi",
+       "troisieme"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_kepler3rd",
+      "n": 3,
+      "score": 99,
+      "mots": [
+       "kepler",
+       "loi",
+       "troisieme"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_kepler3rdgraphs",
+      "n": 3,
+      "score": 99,
+      "mots": [
+       "kepler",
+       "loi",
+       "troisieme"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_Kepler3Law",
+      "n": 3,
+      "score": 98,
+      "mots": [
+       "kepler",
+       "loi",
+       "troisieme"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_asteroidtime",
+      "n": 3,
+      "score": 87,
+      "mots": [
+       "kepler",
+       "lois",
+       "troisieme"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_kepler2nd",
+      "n": 2,
+      "score": 63,
+      "mots": [
+       "kepler",
+       "loi"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "renaissance_slide1",
+      "n": 2,
+      "score": 57,
+      "mots": [
+       "kepler",
+       "loi",
+       "lois"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "galaxies_galactic_orbits",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "kepler",
+       "loi"
+      ]
+     }
+    ]
+   ],
+   [
+    "kepler",
+    [
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_keplertelescope",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "kepler"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_keplertransitdetection",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "kepler"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "renaissance_slide1",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "kepler"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "keplers_third",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "kepler",
+       "keplers"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_Kepler3Law",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "kepler"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_asteroidtime",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "kepler"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_kepler2nd",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "kepler"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_kepler3rd",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "kepler"
+      ]
+     }
+    ]
+   ],
+   [
+    "kelper",
+    [
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_keplertelescope",
+      "n": 1,
+      "score": 23,
+      "mots": [
+       "kepler"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_keplertransitdetection",
+      "n": 1,
+      "score": 23,
+      "mots": [
+       "kepler"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "renaissance_slide1",
+      "n": 1,
+      "score": 23,
+      "mots": [
+       "kepler"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "keplers_third",
+      "n": 1,
+      "score": 22,
+      "mots": [
+       "kepler",
+       "keplers"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_Kepler3Law",
+      "n": 1,
+      "score": 22,
+      "mots": [
+       "kepler"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_asteroidtime",
+      "n": 1,
+      "score": 22,
+      "mots": [
+       "kepler"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_kepler2nd",
+      "n": 1,
+      "score": 22,
+      "mots": [
+       "kepler"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_kepler3rd",
+      "n": 1,
+      "score": 22,
+      "mots": [
+       "kepler"
+      ]
+     }
+    ]
+   ],
+   [
+    "parallax",
+    [
+     {
+      "g": "animation",
+      "id": "parallaxdiag",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "parallax",
+       "parallaxdiag",
+       "parallaxe"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops_slide6",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "parallax",
+       "parallaxe"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "parallax",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "parallax",
+       "parallaxe"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "spectroparallax",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "parallax",
+       "parallaxe"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_miscparallax",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "parallax",
+       "parallaxe"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_parallaxdistmod",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "parallax",
+       "parallaxes"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_parallaxjup",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "parallax",
+       "parallaxes"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_spectroparallax",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "parallax",
+       "parallaxe"
+      ]
+     }
+    ]
+   ],
+   [
+    "paralaxe",
+    [
+     {
+      "g": "animation",
+      "id": "parallaxdiag",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "parallax",
+       "parallaxe"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops_slide6",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "parallax",
+       "parallaxe"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "parallax",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "parallax",
+       "parallaxe"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "spectroparallax",
+      "n": 1,
+      "score": 23,
+      "mots": [
+       "parallax",
+       "parallaxe"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_miscparallax",
+      "n": 1,
+      "score": 23,
+      "mots": [
+       "parallax",
+       "parallaxe"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_parallaxdistmod",
+      "n": 1,
+      "score": 23,
+      "mots": [
+       "parallax",
+       "parallaxes"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_parallaxjup",
+      "n": 1,
+      "score": 23,
+      "mots": [
+       "parallax",
+       "parallaxes"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_spectroparallax",
+      "n": 1,
+      "score": 22,
+      "mots": [
+       "parallax",
+       "parallaxe"
+      ]
+     }
+    ]
+   ],
+   [
+    "parallaxe spectroscopique",
+    [
+     {
+      "g": "animation",
+      "id": "spectroparallax",
+      "n": 2,
+      "score": 70,
+      "mots": [
+       "parallax",
+       "parallaxe",
+       "spectroscopic",
+       "spectroscopique"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_spectroparallax",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "parallax",
+       "parallaxe",
+       "spectroscopic",
+       "spectroscopique"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops_slide9",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "parallax",
+       "parallaxe",
+       "spectroscopic",
+       "spectroscopique"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops2_spectro_parallax",
+      "n": 2,
+      "score": 68,
+      "mots": [
+       "parallax",
+       "parallaxe",
+       "spectroscopic",
+       "spectroscopique"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "cosmology_distance_ladder1",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "parallax",
+       "parallaxe",
+       "spectroscopic",
+       "spectroscopique"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "distancescale",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "parallax",
+       "parallaxe",
+       "spectroscopic",
+       "spectroscopique"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "parallaxdiag",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "parallax",
+       "parallaxe"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_spectroscopic",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "spectroscopic",
+       "spectroscopique",
+       "spectroscopiques"
+      ]
+     }
+    ]
+   ],
+   [
+    "spectroscopic parallax",
+    [
+     {
+      "g": "animation",
+      "id": "spectroparallax",
+      "n": 2,
+      "score": 70,
+      "mots": [
+       "parallax",
+       "parallaxe",
+       "spectroscopic",
+       "spectroscopique"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_spectroparallax",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "parallax",
+       "parallaxe",
+       "spectroscopic",
+       "spectroscopique"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops_slide9",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "parallax",
+       "parallaxe",
+       "spectroscopic",
+       "spectroscopique"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops2_spectro_parallax",
+      "n": 2,
+      "score": 68,
+      "mots": [
+       "parallax",
+       "parallaxe",
+       "spectroscopic",
+       "spectroscopique"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "cosmology_distance_ladder1",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "parallax",
+       "parallaxe",
+       "spectroscopic",
+       "spectroscopique"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "distancescale",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "parallax",
+       "parallaxe",
+       "spectroscopic",
+       "spectroscopique"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "parallaxdiag",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "parallax",
+       "parallaxdiag",
+       "parallaxe"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_spectroscopic",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "spectroscopic",
+       "spectroscopique",
+       "spectroscopiques"
+      ]
+     }
+    ]
+   ],
+   [
+    "phases of the moon",
+    [
+     {
+      "g": "fiche",
+      "id": "lunarcycles_slide1",
+      "n": 2,
+      "score": 75,
+      "mots": [
+       "moon",
+       "phases"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "moonbisector",
+      "n": 2,
+      "score": 63,
+      "mots": [
+       "moon",
+       "moonbisector",
+       "phase",
+       "phases"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "lunarcycles",
+      "n": 2,
+      "score": 63,
+      "mots": [
+       "has",
+       "moon",
+       "phases"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "positionsdemonstrator",
+      "n": 2,
+      "score": 62,
+      "mots": [
+       "moon",
+       "phase",
+       "phases"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "mooninc",
+      "n": 2,
+      "score": 53,
+      "mots": [
+       "moon",
+       "mooninc",
+       "phases"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "fullmoondec",
+      "n": 2,
+      "score": 51,
+      "mots": [
+       "moon",
+       "phases"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "lunarcycles_slide2",
+      "n": 2,
+      "score": 46,
+      "mots": [
+       "has",
+       "moon",
+       "moonrise",
+       "moonset",
+       "phase",
+       "phases"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_phaseevolution",
+      "n": 2,
+      "score": 43,
+      "mots": [
+       "moon",
+       "phase"
+      ]
+     }
+    ]
+   ],
+   [
+    "phases de la lune",
+    [
+     {
+      "g": "animation",
+      "id": "lunar_phaser",
+      "n": 2,
+      "score": 68,
+      "mots": [
+       "lune",
+       "phase",
+       "phases"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "lunarphasequizzer",
+      "n": 2,
+      "score": 68,
+      "mots": [
+       "lune",
+       "phase",
+       "phases",
+       "sun"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "lunarcycles_slide1",
+      "n": 2,
+      "score": 68,
+      "mots": [
+       "lune",
+       "phases",
+       "sun"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "lunar_applet",
+      "n": 2,
+      "score": 67,
+      "mots": [
+       "lune",
+       "phase",
+       "phases",
+       "un"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "moonbisector",
+      "n": 2,
+      "score": 67,
+      "mots": [
+       "lune",
+       "phase",
+       "phases"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "positionsdemonstrator",
+      "n": 2,
+      "score": 67,
+      "mots": [
+       "lune",
+       "phase",
+       "phases"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "lunarcycles",
+      "n": 2,
+      "score": 62,
+      "mots": [
+       "has",
+       "lune",
+       "phases",
+       "sun"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_idlunarpos",
+      "n": 2,
+      "score": 61,
+      "mots": [
+       "lune",
+       "phase"
+      ]
+     }
+    ]
+   ],
+   [
+    "lunar phases",
+    [
+     {
+      "g": "animation",
+      "id": "lunar_applet",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "lunar",
+       "phase",
+       "phases"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "lunar_phaser",
+      "n": 2,
+      "score": 64,
+      "mots": [
+       "lunar",
+       "phase",
+       "phases"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "lunarphasequizzer",
+      "n": 2,
+      "score": 64,
+      "mots": [
+       "lunar",
+       "lunarphasequizzer",
+       "phase",
+       "phases"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_idlunarpos",
+      "n": 2,
+      "score": 62,
+      "mots": [
+       "lunar",
+       "phase"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "basketball",
+      "n": 2,
+      "score": 52,
+      "mots": [
+       "lunar",
+       "phases"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "phaseDemonstrator",
+      "n": 2,
+      "score": 52,
+      "mots": [
+       "lunar",
+       "phase",
+       "phases"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "moonbisector",
+      "n": 2,
+      "score": 51,
+      "mots": [
+       "lunar",
+       "phase",
+       "phases"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "positionsdemonstrator",
+      "n": 2,
+      "score": 51,
+      "mots": [
+       "lunar",
+       "phase",
+       "phases"
+      ]
+     }
+    ]
+   ],
+   [
+    "eclipse",
+    [
+     {
+      "g": "animation",
+      "id": "eclipsetable",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "eclipse",
+       "eclipses",
+       "eclipsetable"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "lunareclipse",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "eclipse"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "shadowsim",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "eclipse",
+       "eclipses"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "solareclipse",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "eclipse"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "solareclipse2",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "eclipse"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "lunareclipse2004",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "eclipse"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "nodes",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "eclipse",
+       "eclipses"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "solareclipse1994",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "eclipse"
+      ]
+     }
+    ]
+   ],
+   [
+    "éclipses",
+    [
+     {
+      "g": "animation",
+      "id": "eclipsetable",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "eclipse",
+       "eclipses"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "lunarcycles_slide4",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "eclipse",
+       "eclipses"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "lunarcycles_slide5",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "eclipse",
+       "eclipses"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_eclipsefreq",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "eclipses"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "eclipsingbinarysim",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "eclipses"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_eclipseVariables",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "eclipses"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_eclipsetypes",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "eclipse",
+       "eclipses"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_phaseseclipsestides",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "eclipses"
+      ]
+     }
+    ]
+   ],
+   [
+    "galaxies",
+    [
+     {
+      "g": "module",
+      "id": "galaxies",
+      "n": 1,
+      "score": 48,
+      "mots": [
+       "galaxies"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_galaxies_colors",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "galaxies",
+       "galaxy"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_galaxies_galaxyabundances",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "galaxies",
+       "galaxy"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_galaxies_galaxychars",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "galaxies",
+       "galaxy"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_galaxies_galaxycollisions",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "galaxies",
+       "galaxy"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_galaxies_typecomponents",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "galaxies",
+       "galaxy"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_galaxies_ellipticalcalculations",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "galaxie",
+       "galaxies",
+       "galaxy"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_galaxies_galaxiesinclusters",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "galaxie",
+       "galaxies",
+       "galaxy"
+      ]
+     }
+    ]
+   ],
+   [
+    "galaxy rotation",
+    [
+     {
+      "g": "fiche",
+      "id": "milkyway_galaxy_rotation",
+      "n": 2,
+      "score": 62,
+      "mots": [
+       "galaxie",
+       "galaxy",
+       "rotation"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_galaxies_spiralarms",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "galaxies",
+       "rotation"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_milkyway_galacticdopplershift",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "galaxie",
+       "galaxy",
+       "rotation"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_hubblelaw",
+      "n": 2,
+      "score": 15,
+      "mots": [
+       "galaxies",
+       "relation"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "galaxies",
+      "n": 1,
+      "score": 36,
+      "mots": [
+       "galaxies"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_galaxies_colors",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "galaxies",
+       "galaxy"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_galaxies_galaxyabundances",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "galaxies",
+       "galaxy"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_galaxies_galaxychars",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "galaxies",
+       "galaxy"
+      ]
+     }
+    ]
+   ],
+   [
+    "rotation galaxie",
+    [
+     {
+      "g": "fiche",
+      "id": "milkyway_galaxy_rotation",
+      "n": 2,
+      "score": 62,
+      "mots": [
+       "galaxie",
+       "galaxy",
+       "rotation"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_galaxies_spiralarms",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "galaxies",
+       "rotation"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_milkyway_galacticdopplershift",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "galaxie",
+       "galaxy",
+       "rotation"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_hubblelaw",
+      "n": 2,
+      "score": 15,
+      "mots": [
+       "galaxies",
+       "relation"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "galaxies",
+      "n": 1,
+      "score": 36,
+      "mots": [
+       "galaxies"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_galaxies_colors",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "galaxies",
+       "galaxy"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_galaxies_galaxyabundances",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "galaxies",
+       "galaxy"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_galaxies_galaxychars",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "galaxies",
+       "galaxy"
+      ]
+     }
+    ]
+   ],
+   [
+    "black body",
+    [
+     {
+      "g": "fiche",
+      "id": "light_blackbody_wien",
+      "n": 2,
+      "score": 35,
+      "mots": [
+       "blackbody",
+       "body"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarevolution_bhplots",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "black"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_milkyway_bhstarorbit",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "black"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "solarsystemdebris_ss_debris",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "bodies"
+      ]
+     },
+     {
+      "g": "table",
+      "id": "gravite_surface",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "bodies"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "bbexplorer",
+      "n": 1,
+      "score": 26,
+      "mots": [
+       "blackbody"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_areaunderbbc",
+      "n": 1,
+      "score": 26,
+      "mots": [
+       "blackbody"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_bbdescriptions",
+      "n": 1,
+      "score": 26,
+      "mots": [
+       "blackbodies",
+       "blackbody"
+      ]
+     }
+    ]
+   ],
+   [
+    "corps noir",
+    [
+     {
+      "g": "question",
+      "id": "ca_light_areaunderbbc",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "corps",
+       "noir"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "bbexplorer",
+      "n": 2,
+      "score": 68,
+      "mots": [
+       "corps",
+       "noir"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_bbunits",
+      "n": 2,
+      "score": 68,
+      "mots": [
+       "corps",
+       "noir"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_blackbodycolors",
+      "n": 2,
+      "score": 68,
+      "mots": [
+       "corps",
+       "noir"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_sunsolarenergy_sunbbcurves",
+      "n": 2,
+      "score": 68,
+      "mots": [
+       "corps",
+       "noir"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "meltednail",
+      "n": 2,
+      "score": 67,
+      "mots": [
+       "corps",
+       "noir"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_blackbodytemperatures",
+      "n": 2,
+      "score": 67,
+      "mots": [
+       "corps",
+       "noir"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "light_blackbody_wien",
+      "n": 2,
+      "score": 67,
+      "mots": [
+       "corps",
+       "noir"
+      ]
+     }
+    ]
+   ],
+   [
+    "wien",
+    [
+     {
+      "g": "fiche",
+      "id": "light_blackbody_wien",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "wien"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "light_slide3",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "wien"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "celestialhorizon",
+      "n": 1,
+      "score": 7,
+      "mots": [
+       "lien"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "heliacalrisingsim",
+      "n": 1,
+      "score": 7,
+      "mots": [
+       "when"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "pathtracer",
+      "n": 1,
+      "score": 7,
+      "mots": [
+       "when"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "siderealTimeAndHourAngleDemo",
+      "n": 1,
+      "score": 7,
+      "mots": [
+       "lien"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "snellslaw",
+      "n": 1,
+      "score": 7,
+      "mots": [
+       "when"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_200level_lstatnoon",
+      "n": 1,
+      "score": 7,
+      "mots": [
+       "when"
+      ]
+     }
+    ]
+   ],
+   [
+    "doppler",
+    [
+     {
+      "g": "image",
+      "id": "radargun",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "doppler"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "dopplershift",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "doppler",
+       "dopplershift"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_dopplersign",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "doppler"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_espdopplershift",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "doppler"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_dopplershift",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "doppler"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_hdopplershift",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "doppler"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_spaceshipshifts",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "doppler"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_milkyway_galacticdopplershift",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "doppler"
+      ]
+     }
+    ]
+   ],
+   [
+    "redshift",
+    [
+     {
+      "g": "animation",
+      "id": "galacticredshift",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "redshift"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "cosmology_hubble_law",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "redshift"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "galaxies_quasars",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "redshift"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "light_doppler",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "redshift"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "light_slide5",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "redshift"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "dopplereffect",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "redshift"
+      ]
+     }
+    ]
+   ],
+   [
+    "décalage vers le rouge",
+    [
+     {
+      "g": "animation",
+      "id": "galacticredshift",
+      "n": 3,
+      "score": 98,
+      "mots": [
+       "decalage",
+       "rouge",
+       "vers"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "cosmology_hubble_law",
+      "n": 3,
+      "score": 60,
+      "mots": [
+       "decalage",
+       "rouge",
+       "vers"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "galaxies_quasars",
+      "n": 3,
+      "score": 60,
+      "mots": [
+       "decalage",
+       "rouge",
+       "vers"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "light_doppler",
+      "n": 3,
+      "score": 60,
+      "mots": [
+       "decalage",
+       "decale",
+       "rouge",
+       "vers"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "light_slide5",
+      "n": 3,
+      "score": 60,
+      "mots": [
+       "decalage",
+       "rouge",
+       "vers"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "dopplereffect",
+      "n": 3,
+      "score": 30,
+      "mots": [
+       "decalage",
+       "rouge",
+       "vers"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_demolitionderby",
+      "n": 2,
+      "score": 17,
+      "mots": [
+       "rouge",
+       "verte"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops_radtanvelocity",
+      "n": 2,
+      "score": 17,
+      "mots": [
+       "route",
+       "vers"
+      ]
+     }
+    ]
+   ],
+   [
+    "hubble",
+    [
+     {
+      "g": "question",
+      "id": "ca_cosmology_hconst",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "hubble"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_hduncertainties",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "hubble"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_hubbleconstant1",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "hubble"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_hubbleconstant2",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "hubble"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_hubblelaw",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "hubble"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_galaxies_tuningfork",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "hubble"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_telescopes_hubbletelescope",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "hubble"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_hdage",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "hubble"
+      ]
+     }
+    ]
+   ],
+   [
+    "exoplanets",
+    [
+     {
+      "g": "module",
+      "id": "extrasolarplanets",
+      "n": 1,
+      "score": 36,
+      "mots": [
+       "exoplanetes"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_densitydet",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "exoplanet",
+       "exoplanete"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_esporbitanim",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "exoplanete"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "extrasolarplanets_planet_hunting",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "exoplanet",
+       "exoplanete"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "radialvelocitydemo",
+      "n": 1,
+      "score": 30,
+      "mots": [
+       "exoplanete",
+       "exoplanetes"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_evidence",
+      "n": 1,
+      "score": 30,
+      "mots": [
+       "exoplanete"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "ca_extrasolarplanets_graph",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "exoplanetes"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "ca_extrasolarplanets_starwobble",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "exoplanetes"
+      ]
+     }
+    ]
+   ],
+   [
+    "exoplanètes",
+    [
+     {
+      "g": "module",
+      "id": "extrasolarplanets",
+      "n": 1,
+      "score": 48,
+      "mots": [
+       "exoplanetes"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_densitydet",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "exoplanet",
+       "exoplanete"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_esporbitanim",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "exoplanete"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "extrasolarplanets_planet_hunting",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "exoplanet",
+       "exoplanete"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "radialvelocitydemo",
+      "n": 1,
+      "score": 30,
+      "mots": [
+       "exoplanete",
+       "exoplanetes"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_evidence",
+      "n": 1,
+      "score": 30,
+      "mots": [
+       "exoplanete"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "ca_extrasolarplanets_graph",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "exoplanetes"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "ca_extrasolarplanets_starwobble",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "exoplanetes"
+      ]
+     }
+    ]
+   ],
+   [
+    "transit",
+    [
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_transitdetection",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "transit"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_transittimes",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "transit"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_jovianplanets_joviantransit",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "transit"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "transitsimulator",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "transit",
+       "transitsimulator"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_keplertransitdetection",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "transit"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "lunarcycles_slide2",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "transit"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_transdescriptions",
+      "n": 1,
+      "score": 27,
+      "mots": [
+       "transitions"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_transranking",
+      "n": 1,
+      "score": 26,
+      "mots": [
+       "transition",
+       "transitions"
+      ]
+     }
+    ]
+   ],
+   [
+    "retrograde",
+    [
+     {
+      "g": "animation",
+      "id": "retrograde",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "retrograde"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "retrograde",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "retrograde"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "coordsmotion_basic_motions",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "retrograde"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "coordsmotion_basic_motions_exp",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "retrograde"
+      ]
+     }
+    ]
+   ],
+   [
+    "rétrograde",
+    [
+     {
+      "g": "animation",
+      "id": "retrograde",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "retrograde"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "retrograde",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "retrograde"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "coordsmotion_basic_motions",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "retrograde"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "coordsmotion_basic_motions_exp",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "retrograde"
+      ]
+     }
+    ]
+   ],
+   [
+    "sun",
+    [
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_sunglare",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "sun"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_sunmovement",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "sun"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_sunshadow",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "sun"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarevolution_sunstages",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "sun"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "sunmotions",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "sun",
+       "sunmotions"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "sunmotionsoverview",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "sun",
+       "sunmotionsoverview"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_incorrectsunanimation",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "sun"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_sunpaths1",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "sun"
+      ]
+     }
+    ]
+   ],
+   [
+    "Soleil",
+    [
+     {
+      "g": "animation",
+      "id": "sunpaths",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "soleil"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_sunmovement",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "soleil"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_sunrays",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "soleil"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_sunsolarenergy_spectra",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "soleil"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_sunsolarenergy_sunchangesovertime",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "soleil"
+      ]
+     },
+     {
+      "g": "table",
+      "id": "solar_props",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "soleil"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "sunsolarenergy",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "soleil"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "ca_extrasolarplanets_starwobble",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "soleil"
+      ]
+     }
+    ]
+   ],
+   [
+    "hr diagram",
+    [
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_conceptualhr",
+      "n": 2,
+      "score": 70,
+      "mots": [
+       "diagram",
+       "diagramme",
+       "hr"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_hrdiaga",
+      "n": 2,
+      "score": 70,
+      "mots": [
+       "diagram",
+       "diagramme",
+       "hr"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_lrtrelationwithhr",
+      "n": 2,
+      "score": 67,
+      "mots": [
+       "diagram",
+       "diagramme",
+       "hr"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops2_hr_diagram2",
+      "n": 2,
+      "score": 67,
+      "mots": [
+       "diagram",
+       "diagramme",
+       "hr"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarevolution_hrmovement",
+      "n": 2,
+      "score": 57,
+      "mots": [
+       "diagram",
+       "diagramme",
+       "hr"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarevolution_sunchanges",
+      "n": 2,
+      "score": 57,
+      "mots": [
+       "diagramme",
+       "hr"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_hrgroups",
+      "n": 2,
+      "score": 57,
+      "mots": [
+       "diagram",
+       "diagramme",
+       "hr"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "hrexplorer",
+      "n": 2,
+      "score": 56,
+      "mots": [
+       "diagram",
+       "diagramme",
+       "hr",
+       "hrexplorer"
+      ]
+     }
+    ]
+   ],
+   [
+    "diagramme HR",
+    [
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_conceptualhr",
+      "n": 2,
+      "score": 70,
+      "mots": [
+       "diagram",
+       "diagramme",
+       "hr"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_hrdiaga",
+      "n": 2,
+      "score": 70,
+      "mots": [
+       "diagram",
+       "diagramme",
+       "hr"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarevolution_hrmovement",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "diagram",
+       "diagramme",
+       "hr"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarevolution_sunchanges",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "diagramme",
+       "hr"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_hrgroups",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "diagram",
+       "diagramme",
+       "hr"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "hrexplorer",
+      "n": 2,
+      "score": 68,
+      "mots": [
+       "diagram",
+       "diagramme",
+       "hr",
+       "hrexplorer"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_lrtrelationwithhr",
+      "n": 2,
+      "score": 67,
+      "mots": [
+       "diagram",
+       "diagramme",
+       "hr"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_stellarparams",
+      "n": 2,
+      "score": 67,
+      "mots": [
+       "diagramme",
+       "hr"
+      ]
+     }
+    ]
+   ],
+   [
+    "binary stars",
+    [
+     {
+      "g": "fiche",
+      "id": "binaryvariablestars_binary_types",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "binaire",
+       "binary",
+       "star",
+       "stars"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_binaryproperties",
+      "n": 2,
+      "score": 64,
+      "mots": [
+       "binary",
+       "star",
+       "stars"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarevolution_binaryendstates",
+      "n": 2,
+      "score": 64,
+      "mots": [
+       "binary",
+       "star",
+       "states"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "binaryvariablestars",
+      "n": 2,
+      "score": 63,
+      "mots": [
+       "binary",
+       "binaryvariablestars",
+       "stars"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "binarystarseesaw",
+      "n": 2,
+      "score": 61,
+      "mots": [
+       "binary",
+       "star",
+       "stars"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "eclipsingbinarysim",
+      "n": 2,
+      "score": 52,
+      "mots": [
+       "binaires",
+       "binary",
+       "stars"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_binarytypes",
+      "n": 2,
+      "score": 43,
+      "mots": [
+       "binary",
+       "star",
+       "stars"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_spectroscopic",
+      "n": 2,
+      "score": 43,
+      "mots": [
+       "binaries",
+       "binary",
+       "stars"
+      ]
+     }
+    ]
+   ],
+   [
+    "étoiles binaires",
+    [
+     {
+      "g": "animation",
+      "id": "eclipsingbinarysim",
+      "n": 2,
+      "score": 68,
+      "mots": [
+       "binaires",
+       "binary",
+       "etoiles"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_binarytypes",
+      "n": 2,
+      "score": 54,
+      "mots": [
+       "binary",
+       "etoile",
+       "etoiles"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_spectroscopic",
+      "n": 2,
+      "score": 54,
+      "mots": [
+       "binaries",
+       "binary",
+       "etoile",
+       "etoiles"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_binaryproperties",
+      "n": 2,
+      "score": 53,
+      "mots": [
+       "binary",
+       "etoile",
+       "etoiles"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "binaryvariablestars",
+      "n": 2,
+      "score": 52,
+      "mots": [
+       "binary",
+       "etoiles"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_200level_etacarbinary",
+      "n": 2,
+      "score": 52,
+      "mots": [
+       "binary",
+       "etoile"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_Kepler3Law",
+      "n": 2,
+      "score": 52,
+      "mots": [
+       "binary",
+       "etoiles"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_binaryCenterofMass",
+      "n": 2,
+      "score": 52,
+      "mots": [
+       "binary",
+       "etoile"
+      ]
+     }
+    ]
+   ],
+   [
+    "tides",
+    [
+     {
+      "g": "fiche",
+      "id": "lunarcycles_slide6",
+      "n": 1,
+      "score": 48,
+      "mots": [
+       "side",
+       "tide",
+       "tides"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_futuretides",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "tides"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_phaseseclipsestides",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "tides"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_transittimes",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "time",
+       "times"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_sunsolarenergy_tirecheck",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "tire"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "lookbacktimesim",
+      "n": 1,
+      "score": 23,
+      "mots": [
+       "time"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_magnitudevstime",
+      "n": 1,
+      "score": 23,
+      "mots": [
+       "time"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_intro_lookbacktime",
+      "n": 1,
+      "score": 23,
+      "mots": [
+       "time"
+      ]
+     }
+    ]
+   ],
+   [
+    "marées",
+    [
+     {
+      "g": "fiche",
+      "id": "lunarcycles_slide6",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "maree",
+       "marees"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_jovianplanets_tidalheating",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "marees"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_futuretides",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "maree",
+       "marees"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_phaseseclipsestides",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "marees"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_tidallylocked",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "are",
+       "marees"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "tidesim",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "maree",
+       "marees"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "tides",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "maree"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_marselongation",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "mars"
+      ]
+     }
+    ]
+   ],
+   [
+    "antikythera",
+    [
+     {
+      "g": "animation",
+      "id": "antikythera",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "anticythere",
+       "antikythera"
+      ]
+     }
+    ]
+   ],
+   [
+    "anticythère",
+    [
+     {
+      "g": "animation",
+      "id": "antikythera",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "anticythere",
+       "anticythere3d",
+       "antikythera"
+      ]
+     }
+    ]
+   ],
+   [
+    "orion",
+    [
+     {
+      "g": "animation",
+      "id": "orion3d",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "orion",
+       "orion3d"
+      ]
+     }
+    ]
+   ],
+   [
+    "telescope",
+    [
+     {
+      "g": "animation",
+      "id": "telescope10",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "telescope",
+       "telescope10",
+       "telescopes"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_hrtelescope",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "telescope"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_telescopes_teleshop",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "telescope"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_keplertelescope",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "telescope"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_telescopes_hubbletelescope",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "telescope",
+       "telescopes"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_telescopes_jameswebb",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "telescope"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_telescopes_simplerefracting",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "telescope"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "telescopes",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "telescopes"
+      ]
+     }
+    ]
+   ],
+   [
+    "télescope",
+    [
+     {
+      "g": "animation",
+      "id": "telescope10",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "telescope",
+       "telescope10",
+       "telescopes"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_hrtelescope",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "telescope"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_telescopes_teleshop",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "telescope"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_keplertelescope",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "telescope"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_telescopes_hubbletelescope",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "telescope",
+       "telescopes"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_telescopes_jameswebb",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "telescope"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_telescopes_simplerefracting",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "telescope"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "telescopes",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "telescopes"
+      ]
+     }
+    ]
+   ],
+   [
+    "light",
+    [
+     {
+      "g": "module",
+      "id": "light",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "light"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_terrplanets_lightintensity",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "light"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_lightCurveLocations",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "light"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_lightCurveShape",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "light"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_intro_lttime",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "light"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_distantstarlight",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "light"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_telescopes_lightgatheringpower",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "light"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "telescopes_light_gathering_power",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "light"
+      ]
+     }
+    ]
+   ],
+   [
+    "lumière",
+    [
+     {
+      "g": "module",
+      "id": "light",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "lumiere"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "lightAndSpectra",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "lumiere"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "lightcurve",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "lumiere"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_lightCurveLocations",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "lumiere"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_lightCurveShape",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "lumiere"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_intro_lttime",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "lumiere"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_distantstarlight",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "lumiere"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "intro_special_units",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "lumiere"
+      ]
+     }
+    ]
+   ],
+   [
+    "cosmology",
+    [
+     {
+      "g": "module",
+      "id": "cosmology",
+      "n": 1,
+      "score": 48,
+      "mots": [
+       "cosmologie",
+       "cosmology"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "balloon",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "cosmologie",
+       "cosmology"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "galacticredshift",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "cosmologie",
+       "cosmology"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_cosmologicalprinciple",
+      "n": 1,
+      "score": 17,
+      "mots": [
+       "cosmologique"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "cosmology_fond_diffus",
+      "n": 1,
+      "score": 16,
+      "mots": [
+       "cosmologique"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "cosmology_dark_matter_energy",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "cosmologique"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_distantgalaxy",
+      "n": 1,
+      "score": 5,
+      "mots": [
+       "cosmologique"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_unicomp",
+      "n": 1,
+      "score": 5,
+      "mots": [
+       "cosmologique"
+      ]
+     }
+    ]
+   ],
+   [
+    "cosmologie",
+    [
+     {
+      "g": "module",
+      "id": "cosmology",
+      "n": 1,
+      "score": 48,
+      "mots": [
+       "cosmologie",
+       "cosmology"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "balloon",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "cosmologie",
+       "cosmology"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "galacticredshift",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "cosmologie",
+       "cosmology"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_cosmologicalprinciple",
+      "n": 1,
+      "score": 17,
+      "mots": [
+       "cosmologique"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "cosmology_fond_diffus",
+      "n": 1,
+      "score": 16,
+      "mots": [
+       "cosmologique"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "cosmology_dark_matter_energy",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "cosmologique"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_distantgalaxy",
+      "n": 1,
+      "score": 5,
+      "mots": [
+       "cosmologique"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_unicomp",
+      "n": 1,
+      "score": 5,
+      "mots": [
+       "cosmologique"
+      ]
+     }
+    ]
+   ],
+   [
+    "big bang",
+    [
+     {
+      "g": "table",
+      "id": "eres_univers",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "bang",
+       "big"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "bigdipper",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "big",
+       "bigdipper"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "dipperclock",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "big"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_decranges",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "ranges"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_propertyranges",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "range",
+       "ranges"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "latsim",
+      "n": 1,
+      "score": 23,
+      "mots": [
+       "ranges"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_embands",
+      "n": 1,
+      "score": 22,
+      "mots": [
+       "bandes",
+       "bands"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "coordsmotion_slide6",
+      "n": 1,
+      "score": 22,
+      "mots": [
+       "ranges"
+      ]
+     }
+    ]
+   ],
+   [
+    "dark matter",
+    [
+     {
+      "g": "fiche",
+      "id": "cosmology_dark_matter_energy",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "dark",
+       "matiere",
+       "matter"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "milkyway_galaxy_rotation",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "dark",
+       "matiere",
+       "matter"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "cosmology_universe_fate",
+      "n": 2,
+      "score": 30,
+      "mots": [
+       "dark",
+       "matiere",
+       "matter"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "milkyway_structure",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "dark",
+       "matiere",
+       "matter"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_lightCurveShape",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "dark"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_eclipsetypes",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "dark"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_lumfuncnumvisible",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "dark"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_sunsolarenergy_sunspotcause",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "dark"
+      ]
+     }
+    ]
+   ],
+   [
+    "matière noire",
+    [
+     {
+      "g": "fiche",
+      "id": "cosmology_dark_matter_energy",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "matiere",
+       "matter",
+       "noire"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "milkyway_galaxy_rotation",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "matiere",
+       "matter",
+       "noire"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "cosmology_universe_fate",
+      "n": 2,
+      "score": 30,
+      "mots": [
+       "matiere",
+       "matter",
+       "noire"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "milkyway_structure",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "matiere",
+       "matter",
+       "noire"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "bbexplorer",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "noir"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_areaunderbbc",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "noir"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_bbdescriptions",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "noirs"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_bbunits",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "noir"
+      ]
+     }
+    ]
+   ],
+   [
+    "scale",
+    [
+     {
+      "g": "question",
+      "id": "ca_intro_scale",
+      "n": 1,
+      "score": 48,
+      "mots": [
+       "scale"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_intro_underworld",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "scales"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops_slide2",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "scale"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "balloon",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "scale"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_hdage",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "scales"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_universefuture",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "scale"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_ampperiod",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "scales"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_espdopplershift",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "scale"
+      ]
+     }
+    ]
+   ],
+   [
+    "échelle",
+    [
+     {
+      "g": "question",
+      "id": "ca_intro_scale",
+      "n": 1,
+      "score": 48,
+      "mots": [
+       "echelle"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "distancescale",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "echelle"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "cosmology_distance_ladder1",
+      "n": 1,
+      "score": 36,
+      "mots": [
+       "echelle"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "cosmology_distance_ladder2",
+      "n": 1,
+      "score": 36,
+      "mots": [
+       "echelle"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_intro_underworld",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "echelles"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops_slide2",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "echelle"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_hdage",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "echelles"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_cosmology_universefuture",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "echelle"
+      ]
+     }
+    ]
+   ],
+   [
+    "sidereal day",
+    [
+     {
+      "g": "fiche",
+      "id": "lunarcycles_slide3",
+      "n": 2,
+      "score": 41,
+      "mots": [
+       "days",
+       "sideral",
+       "sidereal"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "sidereal",
+      "n": 2,
+      "score": 41,
+      "mots": [
+       "days",
+       "sideral",
+       "sidereal"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "synodic",
+      "n": 2,
+      "score": 41,
+      "mots": [
+       "days",
+       "sideral",
+       "sidereal"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "ancientastro_lever_heliaque",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "day",
+       "sideral",
+       "sidereal"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "synodiclag",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "day",
+       "sideral",
+       "sidereal"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_bestday",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "day"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_missingday",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "day"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "siderealSolarTime",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "sideral",
+       "sidereal",
+       "siderealsolartime"
+      ]
+     }
+    ]
+   ],
+   [
+    "jour sidéral",
+    [
+     {
+      "g": "animation",
+      "id": "siderealTimeAndHourAngleDemo",
+      "n": 2,
+      "score": 53,
+      "mots": [
+       "hour",
+       "sideral",
+       "sidereal"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "siderealSolarTime",
+      "n": 2,
+      "score": 41,
+      "mots": [
+       "jour",
+       "sideral",
+       "sidereal"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "lunarcycles_slide3",
+      "n": 2,
+      "score": 41,
+      "mots": [
+       "jours",
+       "pour",
+       "sideral",
+       "sidereal",
+       "tour"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "sidereal",
+      "n": 2,
+      "score": 41,
+      "mots": [
+       "jours",
+       "pour",
+       "sideral",
+       "sidereal",
+       "tour"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "synodic",
+      "n": 2,
+      "score": 41,
+      "mots": [
+       "jours",
+       "pour",
+       "sideral",
+       "sidereal",
+       "tour"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "ancientastro_lever_heliaque",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "jour",
+       "sideral",
+       "sidereal"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "synodiclag",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "jour",
+       "sideral",
+       "sidereal"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "daylighthoursexplorer",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "hours",
+       "jour",
+       "pour"
+      ]
+     }
+    ]
+   ],
+   [
+    "celestial sphere",
+    [
+     {
+      "g": "image",
+      "id": "ecliptic",
+      "n": 2,
+      "score": 68,
+      "mots": [
+       "celestial",
+       "sphere"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "coordsmotion_slide3",
+      "n": 2,
+      "score": 52,
+      "mots": [
+       "celestial",
+       "sphere"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "celestialhorizon",
+      "n": 2,
+      "score": 41,
+      "mots": [
+       "celestial",
+       "celestialhorizon",
+       "sphere"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "radecdemo",
+      "n": 2,
+      "score": 41,
+      "mots": [
+       "celestial",
+       "sphere"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "bigdipper",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "celestial",
+       "sphere"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "celhorcomp",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "celestial",
+       "sphere"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "eclipticsimulator",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "celestial",
+       "sphere"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "heliacalrisingsim",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "celestial",
+       "sphere"
+      ]
+     }
+    ]
+   ],
+   [
+    "sphère céleste",
+    [
+     {
+      "g": "image",
+      "id": "ecliptic",
+      "n": 2,
+      "score": 68,
+      "mots": [
+       "celeste",
+       "sphere"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "coordsmotion_slide3",
+      "n": 2,
+      "score": 52,
+      "mots": [
+       "celeste",
+       "celestes",
+       "sphere"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "celestialhorizon",
+      "n": 2,
+      "score": 41,
+      "mots": [
+       "celeste",
+       "sphere"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "bigdipper",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "celeste",
+       "sphere"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "celhorcomp",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "celeste",
+       "sphere"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "eclipticsimulator",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "celeste",
+       "sphere"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "heliacalrisingsim",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "celeste",
+       "sphere"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "orion3d",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "celeste",
+       "sphere"
+      ]
+     }
+    ]
+   ],
+   [
+    "equinox",
+    [
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_sunrisesetequinox",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "equinox",
+       "equinoxe"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "coordsmotion_slide3",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "equinox"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "coordsmotion_slide4",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "equinox",
+       "equinoxe",
+       "equinoxes"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_incorrectsunanimation",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "equinox",
+       "equinoxe"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "ecliptic",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "equinoxes"
+      ]
+     }
+    ]
+   ],
+   [
+    "équinoxe",
+    [
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_sunrisesetequinox",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "equinox",
+       "equinoxe"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "coordsmotion_slide3",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "equinox"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "coordsmotion_slide4",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "equinox",
+       "equinoxe",
+       "equinoxes"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_incorrectsunanimation",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "equinox",
+       "equinoxe"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "ecliptic",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "equinoxes"
+      ]
+     }
+    ]
+   ],
+   [
+    "solstice",
+    [
+     {
+      "g": "fiche",
+      "id": "ancientastro_eratosthene",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "solstice"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "coordsmotion_slide4",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "solstice",
+       "solstices"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_ancientastro_eratosthenes",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "solstice"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_jovianplanets_saturnseasons",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "solstice"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "solararchitecture",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "solstice"
+      ]
+     }
+    ]
+   ],
+   [
+    "zodiac",
+    [
+     {
+      "g": "animation",
+      "id": "zodiac",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "zodiac"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "coordsmotion_ecliptic",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "zodiac"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "antikythera",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "zodiac"
+      ]
+     }
+    ]
+   ],
+   [
+    "constellations",
+    [
+     {
+      "g": "animation",
+      "id": "orion3d",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "constellation"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "zodiac",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "constellations"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_milkyway_campfire",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "constellation",
+       "constellations"
+      ]
+     }
+    ]
+   ],
+   [
+    "neutron star",
+    [
+     {
+      "g": "question",
+      "id": "ca_stellarevolution_fastneutronstars",
+      "n": 2,
+      "score": 64,
+      "mots": [
+       "neutron",
+       "neutrons",
+       "stars"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarevolution_stellar_evol",
+      "n": 2,
+      "score": 50,
+      "mots": [
+       "neutron",
+       "neutrons",
+       "star"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarevolution_pulsars",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "neutron",
+       "neutrons",
+       "star",
+       "stars"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarevolution_supernovae",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "neutron",
+       "neutrons",
+       "star"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarevolution_pulsars",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "neutron",
+       "neutrons",
+       "stars"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_startrails",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "star"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_massivestars",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "stars"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_pulsestar",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "star"
+      ]
+     }
+    ]
+   ],
+   [
+    "étoile à neutrons",
+    [
+     {
+      "g": "question",
+      "id": "ca_stellarevolution_fastneutronstars",
+      "n": 2,
+      "score": 62,
+      "mots": [
+       "etoiles",
+       "neutron",
+       "neutrons"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarevolution_stellar_evol",
+      "n": 2,
+      "score": 50,
+      "mots": [
+       "etoile",
+       "neutron",
+       "neutrons"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarevolution_pulsars",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "etoile",
+       "etoiles",
+       "neutron",
+       "neutrons"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarevolution_supernovae",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "etoile",
+       "neutron",
+       "neutrons"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "sunsolarenergy_fusion",
+      "n": 2,
+      "score": 30,
+      "mots": [
+       "etoiles",
+       "neutrinos"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarevolution_pulsars",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "etoiles",
+       "neutron",
+       "neutrons"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "spectralclassification",
+      "n": 2,
+      "score": 15,
+      "mots": [
+       "etoiles",
+       "neutral",
+       "neutre",
+       "neutres"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "stellarevolution",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "etoiles"
+      ]
+     }
+    ]
+   ],
+   [
+    "supernova",
+    [
+     {
+      "g": "question",
+      "id": "ca_stellarevolution_sndanger",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "supernova",
+       "supernovae"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarevolution_snvenn",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "supernova",
+       "supernovae"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarevolution_supernovae",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "supernova",
+       "supernovae"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "cosmology_distance_ladder2",
+      "n": 1,
+      "score": 30,
+      "mots": [
+       "supernova",
+       "supernovae"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarevolution_stellar_evol",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "supernova"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "distancescale",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "supernovae"
+      ]
+     }
+    ]
+   ],
+   [
+    "stellar evolution",
+    [
+     {
+      "g": "module",
+      "id": "stellarevolution",
+      "n": 2,
+      "score": 78,
+      "mots": [
+       "evolution",
+       "stellar",
+       "stellarevolution"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarevolution_stellar_evol",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "evolution",
+       "stellaire",
+       "stellar"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "stellarprops",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "stellar",
+       "stellarprops"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_jovianplanets_stellaroccultations",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "stellar"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_phaseevolution",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "evolution"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_stellarparams",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "stellar"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops_slide7",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "stellar"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops_slide8",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "stellar"
+      ]
+     }
+    ]
+   ],
+   [
+    "évolution stellaire",
+    [
+     {
+      "g": "module",
+      "id": "stellarevolution",
+      "n": 2,
+      "score": 57,
+      "mots": [
+       "evolution",
+       "stellar"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarevolution_stellar_evol",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "evolution",
+       "stellaire",
+       "stellar"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_phaseevolution",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "evolution"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "stellarlum",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "stellaire",
+       "stellaires",
+       "stellar"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "stellarvel",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "stellaire",
+       "stellaires",
+       "stellar"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops_motionranking",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "stellaires",
+       "stellar"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops_velocityranking",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "stellaires",
+       "stellar"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solar_solarnebulachanges",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "evolution"
+      ]
+     }
+    ]
+   ],
+   [
+    "mars",
+    [
+     {
+      "g": "question",
+      "id": "ca_renaissance_marselongation",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "mars"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "marsorbit",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "mars",
+       "marsorbit"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "retrograde",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "mars"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_earthphases",
+      "n": 1,
+      "score": 36,
+      "mots": [
+       "mars"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "lunareclipse2008",
+      "n": 1,
+      "score": 36,
+      "mots": [
+       "mars"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_jovianplanets_tidalheating",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "marees",
+       "par"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "lunarcycles_slide6",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "far",
+       "maree",
+       "marees",
+       "par"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_demolitionderby",
+      "n": 1,
+      "score": 23,
+      "mots": [
+       "car",
+       "cars",
+       "far"
+      ]
+     }
+    ]
+   ],
+   [
+    "jupiter",
+    [
+     {
+      "g": "question",
+      "id": "ca_jovianplanets_jupiterformation",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "jupiter"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_jovianplanets_jupiterrotation",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "jupiter"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_parallaxjup",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "jupiter"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_asteroidresonances",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "jupiter"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "jovianplanets_geantes",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "jupiter"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "jovianplanets_romer",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "jupiter"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "renaissance_slide6",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "jupiter"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_detectionconfirmation",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "jupiter",
+       "jupiters"
+      ]
+     }
+    ]
+   ],
+   [
+    "comets",
+    [
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_cometdistgraphs",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "cometes",
+       "comets"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_cometspectra",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "comet",
+       "comete"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_comettrajectory",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "comet",
+       "comete"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_chiron",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "comete"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_cometasteroidorbits",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "comet",
+       "cometes"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "comettrajectory",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "comet",
+       "comete"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "solar_cratering",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "comet",
+       "comete"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "solarsystemdebris_ss_debris",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "cometes",
+       "comets"
+      ]
+     }
+    ]
+   ],
+   [
+    "comètes",
+    [
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_cometasteroidorbits",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "comet",
+       "cometes"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_cometdistgraphs",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "cometes",
+       "comets"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_cometspectra",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "comet",
+       "comete"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_comettrajectory",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "comet",
+       "comete"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_chiron",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "comete"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "comettrajectory",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "comet",
+       "comete"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "solar_cratering",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "comet",
+       "comete"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "solarsystemdebris_ss_debris",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "cometes",
+       "comets"
+      ]
+     }
+    ]
+   ],
+   [
+    "atmosphere",
+    [
+     {
+      "g": "question",
+      "id": "ca_terrplanets_atmosphereplot",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "atmosphere",
+       "atmospheres"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_terrplanets_earthearlyatmosphere",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "atmosphere"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_terrplanets_magfieldatmosphere",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "atmosphere",
+       "atmospheres"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "terrplanets_atmo_reten2",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "atmosphere"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "terrplanets_atmo_reten1",
+      "n": 1,
+      "score": 36,
+      "mots": [
+       "atmosphere"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "light_rayleigh",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "atmosphere"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_atmosphericwindows",
+      "n": 1,
+      "score": 18,
+      "mots": [
+       "atmospheric"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_jovianplanets_titanaltimeter",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "atmosphere"
+      ]
+     }
+    ]
+   ],
+   [
+    "greenhouse",
+    [
+     {
+      "g": "fiche",
+      "id": "extrasolarplanets_zone_habitable",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "greenhouse"
+      ]
+     }
+    ]
+   ],
+   [
+    "effet de serre",
+    [
+     {
+      "g": "fiche",
+      "id": "extrasolarplanets_zone_habitable",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "effect",
+       "effet",
+       "serre"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_TiltEffects",
+      "n": 2,
+      "score": 39,
+      "mots": [
+       "effects",
+       "effets",
+       "terre"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_futuretides",
+      "n": 2,
+      "score": 17,
+      "mots": [
+       "effets",
+       "terre"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_strobe",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "effet"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "light_doppler",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "effect",
+       "effet"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "dopplereffect",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "effect",
+       "effet"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "dopplershift",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "effet"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_dopplershift",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "effet"
+      ]
+     }
+    ]
+   ],
+   [
+    "density",
+    [
+     {
+      "g": "fiche",
+      "id": "intro_density",
+      "n": 1,
+      "score": 48,
+      "mots": [
+       "densite",
+       "density"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_densitydet",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "densite",
+       "density"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_intro_trashdensity",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "density"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_jovianplanets_joviandensity",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "densite",
+       "density"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_asteroiddensity",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "density"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "trafficdensity",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "densite",
+       "density"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_intro_densityandvolume",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "density"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_intro_propertiesofdensity",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "density"
+      ]
+     }
+    ]
+   ],
+   [
+    "masse volumique",
+    [
+     {
+      "g": "fiche",
+      "id": "intro_density",
+      "n": 2,
+      "score": 78,
+      "mots": [
+       "mass",
+       "masse",
+       "volumique"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_intro_densityandvolume",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "masse",
+       "volumique"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_intro_trashdensity",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "masse",
+       "volumique"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "density_determination",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "mass",
+       "masse",
+       "passe",
+       "volumique"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "saturnbathtub",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "masse",
+       "masses",
+       "volumique",
+       "volumiques"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_intro_densitycombinedobject",
+      "n": 2,
+      "score": 68,
+      "mots": [
+       "masse",
+       "volumique"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_intro_propertiesofdensity",
+      "n": 2,
+      "score": 68,
+      "mots": [
+       "masse",
+       "volumique"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_characteristicsofdebris",
+      "n": 2,
+      "score": 67,
+      "mots": [
+       "masse",
+       "volumique"
+      ]
+     }
+    ]
+   ],
+   [
+    "scientific notation",
+    [
+     {
+      "g": "question",
+      "id": "ca_intro_scientnot",
+      "n": 2,
+      "score": 78,
+      "mots": [
+       "notation",
+       "scientific",
+       "scientifique"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "intro_sci_not",
+      "n": 2,
+      "score": 78,
+      "mots": [
+       "notation",
+       "scientific",
+       "scientifique"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_intro_calcscientnot",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "notation",
+       "scientific",
+       "scientifique"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "intro_math_in_sci_not",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "notation",
+       "scientific",
+       "scientifique"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_intro_earthrotations",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "rotations"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_jovianplanets_jupiterrotation",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "rotation"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_syncrot",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "rotation"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_milkyway_rotationcurves",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "rotation"
+      ]
+     }
+    ]
+   ],
+   [
+    "notation scientifique",
+    [
+     {
+      "g": "question",
+      "id": "ca_intro_scientnot",
+      "n": 2,
+      "score": 78,
+      "mots": [
+       "notation",
+       "scientific",
+       "scientifique"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "intro_sci_not",
+      "n": 2,
+      "score": 78,
+      "mots": [
+       "notation",
+       "scientific",
+       "scientifique"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_intro_calcscientnot",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "notation",
+       "scientific",
+       "scientifique"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "intro_math_in_sci_not",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "notation",
+       "scientific",
+       "scientifique"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_intro_earthrotations",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "rotations"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_jovianplanets_jupiterrotation",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "rotation"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_syncrot",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "rotation"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_milkyway_rotationcurves",
+      "n": 1,
+      "score": 24,
+      "mots": [
+       "rotation"
+      ]
+     }
+    ]
+   ],
+   [
+    "spectre",
+    [
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_cometspectra",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "spectra",
+       "spectre"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "emspectrum",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "spectra",
+       "spectre",
+       "spectres"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_paramrelationships",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "spectre"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarevolution_pnspectra",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "spectra",
+       "spectre"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "electromagneticspectrum",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "spectre"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "threeviewsspectra",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "spectra",
+       "spectre",
+       "spectres"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_dischargetubespectrum",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "spectre"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_emparams",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "spectre"
+      ]
+     }
+    ]
+   ],
+   [
+    "spectrum",
+    [
+     {
+      "g": "animation",
+      "id": "spectrum010",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "spectra",
+       "spectral",
+       "spectres",
+       "spectrum",
+       "spectrum010"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_spectrumanalogies",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "spectres",
+       "spectrum"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "emspectrum",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "emspectrum",
+       "spectra",
+       "spectre",
+       "spectres",
+       "spectrum"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_dischargetubespectrum",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "spectre",
+       "spectrum"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_emparams",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "spectre",
+       "spectrum"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_paramrelationships",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "spectre",
+       "spectrum"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "electromagneticspectrum",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "spectre",
+       "spectrum"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "threeviewsspectra",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "spectra",
+       "spectre",
+       "spectres",
+       "spectrum"
+      ]
+     }
+    ]
+   ],
+   [
+    "spectra",
+    [
+     {
+      "g": "question",
+      "id": "ca_sunsolarenergy_spectra",
+      "n": 1,
+      "score": 48,
+      "mots": [
+       "spectra",
+       "spectres"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "light",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "spectra",
+       "spectres"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_cometspectra",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "spectra",
+       "spectre"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_atomicspectra",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "spectra",
+       "spectre",
+       "spectres"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_starspecanalogy",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "spectra",
+       "spectre",
+       "spectres"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarevolution_pnspectra",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "spectra",
+       "spectre"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "lightAndSpectra",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "spectra",
+       "spectres"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_typesvenn",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "spectra",
+       "spectres"
+      ]
+     }
+    ]
+   ],
+   [
+    "kirchoff",
+    [
+     {
+      "g": "fiche",
+      "id": "light_slide2",
+      "n": 1,
+      "score": 23,
+      "mots": [
+       "kirchhoff"
+      ]
+     }
+    ]
+   ],
+   [
+    "kirchhoff",
+    [
+     {
+      "g": "fiche",
+      "id": "light_slide2",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "kirchhoff"
+      ]
+     }
+    ]
+   ],
+   [
+    "ccd",
+    [
+     {
+      "g": "animation",
+      "id": "buckets",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "ccd"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_ccdcounts",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "ccd"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_telescopes_ccdresponsefunction",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "ccd"
+      ]
+     }
+    ]
+   ],
+   [
+    "magnitude",
+    [
+     {
+      "g": "fiche",
+      "id": "stellarprops_slide2",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "magnitude",
+       "magnitudes"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops_slide4",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "magnitude"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_magnitudevstime",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "magnitude"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops_absolutemag",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "magnitude"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops_apparantmagnitude",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "magnitude"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops_magdist",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "magnitude",
+       "magnitudes"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops_appmagbright",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "magnitude"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops_etacarmag",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "magnitude"
+      ]
+     }
+    ]
+   ],
+   [
+    "luminosity",
+    [
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_luminosity",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "luminosite",
+       "luminosity"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_lumtable",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "luminosites",
+       "luminosities",
+       "luminosity"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops_luminosity_class",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "luminosite",
+       "luminosity"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops_slide8",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "luminosite",
+       "luminosity"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "stellarlum",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "luminosite",
+       "luminosity"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_massLuminosityRelation",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "luminosite",
+       "luminosity"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_lumcomp",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "luminosites",
+       "luminosity"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_lumfuncsun",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "luminosite",
+       "luminosity"
+      ]
+     }
+    ]
+   ],
+   [
+    "luminosité",
+    [
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_luminosity",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "luminosite",
+       "luminosity"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops_luminosity_class",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "luminosite",
+       "luminosity"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops_slide8",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "luminosite",
+       "luminosity"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "stellarlum",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "luminosite",
+       "luminosity"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_binaryvariablestars_massLuminosityRelation",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "luminosite",
+       "luminosity"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "stellarprops2_mass_luminosity",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "luminosite",
+       "luminosity"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_lumtable",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "luminosites",
+       "luminosities",
+       "luminosity"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops2_lumcomp",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "luminosites",
+       "luminosity"
+      ]
+     }
+    ]
+   ],
+   [
+    "orbits",
+    [
+     {
+      "g": "question",
+      "id": "ca_renaissance_realisticorbit",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_satelliteorbits",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_debrisorbits",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_jovianplanets_galileanmoonorbits",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solar_planetorbits",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_permittedorbits1",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_permittedorbits2",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_milkyway_orbits",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "orbites",
+       "orbits"
+      ]
+     }
+    ]
+   ],
+   [
+    "orbite",
+    [
+     {
+      "g": "question",
+      "id": "ca_extrasolarplanets_esporbitanim",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "orbit",
+       "orbite"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_sednasorbit",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "orbit",
+       "orbite",
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "kepler",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "orbit",
+       "orbite",
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "marsorbit",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "orbit",
+       "orbite",
+       "orbites"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "mooninc",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "orbit",
+       "orbite"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_coordsmotion_earthchanges",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "orbite"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_moonplane",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "orbit",
+       "orbite"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_asteroid",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "orbit",
+       "orbite"
+      ]
+     }
+    ]
+   ],
+   [
+    "gravity",
+    [
+     {
+      "g": "animation",
+      "id": "gravalgebra",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "gravity"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_200level_gravityforces",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "gravity"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravitydirection",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "gravity"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravityformula",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "gravity"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravityfundamentals",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "gravity"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravity",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "gravity"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravitycalcs1",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "gravity"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravitycalcs2",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "gravity"
+      ]
+     }
+    ]
+   ],
+   [
+    "gravitation",
+    [
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravityfundamentals",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "gravitation"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "gravalgebra",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "gravitation"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravity",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "gravitation",
+       "gravitational"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravitycalcs1",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "gravitation",
+       "gravitational"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravitycalcs2",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "gravitation",
+       "gravitational"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravitycalcs3",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "gravitation",
+       "gravitational"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravitydirection",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "gravitation"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravityformula",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "gravitation"
+      ]
+     }
+    ]
+   ],
+   [
+    "moon",
+    [
+     {
+      "g": "animation",
+      "id": "mooninc",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "moon",
+       "mooninc"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_ancientastro_moonstacking",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "moon",
+       "moons"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_terrplanets_moonaltimeter",
+      "n": 1,
+      "score": 39,
+      "mots": [
+       "moon"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_jovianplanets_galileanmoonorbits",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "moon"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "fullmoondec",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "moon"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "moonbisector",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "moon",
+       "moonbisector"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "positionsdemonstrator",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "moon"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_crescentmoonloc",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "moon"
+      ]
+     }
+    ]
+   ],
+   [
+    "lune",
+    [
+     {
+      "g": "image",
+      "id": "lunareclipse",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "lune"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "lunarcycles",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "lune"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "fullmoondec",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "lune",
+       "un"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "lunar_phaser",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "lune"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_earthrise",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "lune"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_eclipsetypes",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "lune",
+       "sun"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_limbmoon",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "lune",
+       "un"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_lunarcycles_lunarperiods",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "lune",
+       "un"
+      ]
+     }
+    ]
+   ],
+   [
+    "introductory concepts",
+    [
+     {
+      "g": "module",
+      "id": "intro",
+      "n": 2,
+      "score": 78,
+      "mots": [
+       "concepts",
+       "introductory"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_terrplanets_earthinteriorconceptmap",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "concept"
+      ]
+     },
+     {
+      "g": "module",
+      "id": "lightAndSpectra",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "concepts"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarevolution_massivestarconceptmap",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "concept"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_dischargetubespectrum",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "introductory"
+      ]
+     }
+    ]
+   ],
+   [
+    "notions de base",
+    [
+     {
+      "g": "module",
+      "id": "intro",
+      "n": 2,
+      "score": 76,
+      "mots": [
+       "base",
+       "notions"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "coordsmotion_basic_motions",
+      "n": 2,
+      "score": 52,
+      "mots": [
+       "base",
+       "motion",
+       "motions"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_planetmotionwrtstars",
+      "n": 2,
+      "score": 31,
+      "mots": [
+       "as",
+       "motion"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops_units",
+      "n": 2,
+      "score": 31,
+      "mots": [
+       "as",
+       "motion"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_forcesmotion",
+      "n": 2,
+      "score": 30,
+      "mots": [
+       "motion",
+       "pas"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops_motionranking",
+      "n": 2,
+      "score": 30,
+      "mots": [
+       "has",
+       "motions"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops_motiontypes",
+      "n": 2,
+      "score": 30,
+      "mots": [
+       "has",
+       "motion"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_stellarprops_barnards",
+      "n": 2,
+      "score": 29,
+      "mots": [
+       "has",
+       "motion"
+      ]
+     }
+    ]
+   ],
+   [
+    "planetary orbit simulator",
+    [
+     {
+      "g": "animation",
+      "id": "kepler",
+      "n": 3,
+      "score": 100,
+      "mots": [
+       "orbit",
+       "orbite",
+       "orbites",
+       "orbits",
+       "planetaire",
+       "planetary",
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "configurationssimulator",
+      "n": 3,
+      "score": 83,
+      "mots": [
+       "orbites",
+       "planetaires",
+       "planetary",
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "obliquity",
+      "n": 2,
+      "score": 43,
+      "mots": [
+       "orbite",
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "eclipsingbinarysim",
+      "n": 2,
+      "score": 42,
+      "mots": [
+       "orbit",
+       "orbite",
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "lunar_applet",
+      "n": 2,
+      "score": 41,
+      "mots": [
+       "orbit",
+       "orbite",
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "eclipticsimulator",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "orbital",
+       "orbitale",
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_asteroid",
+      "n": 2,
+      "score": 36,
+      "mots": [
+       "orbit",
+       "orbite",
+       "simulations"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "ptolemaic",
+      "n": 2,
+      "score": 25,
+      "mots": [
+       "orbites",
+       "simulation"
+      ]
+     }
+    ]
+   ],
+   [
+    "seasons and ecliptic simulator",
+    [
+     {
+      "g": "animation",
+      "id": "seasonsim",
+      "n": 3,
+      "score": 82,
+      "mots": [
+       "ecliptic",
+       "ecliptique",
+       "seasonsim",
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "eclipticsimulator",
+      "n": 3,
+      "score": 80,
+      "mots": [
+       "eclipticsimulator",
+       "seasons",
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "zodiac",
+      "n": 2,
+      "score": 64,
+      "mots": [
+       "ecliptic",
+       "ecliptique",
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "coordsmotion_slide4",
+      "n": 2,
+      "score": 50,
+      "mots": [
+       "ecliptic",
+       "ecliptique",
+       "seasons"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "sunsrays",
+      "n": 2,
+      "score": 41,
+      "mots": [
+       "seasons",
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "image",
+      "id": "nodes",
+      "n": 2,
+      "score": 41,
+      "mots": [
+       "ecliptic",
+       "ecliptique",
+       "seasons"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "transitmovie",
+      "n": 2,
+      "score": 37,
+      "mots": [
+       "seasons",
+       "simulated",
+       "simulation"
+      ]
+     }
+    ]
+   ],
+   [
+    "simulateur des saisons",
+    [
+     {
+      "g": "animation",
+      "id": "eclipticsimulator",
+      "n": 2,
+      "score": 69,
+      "mots": [
+       "saisons",
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "sunsrays",
+      "n": 2,
+      "score": 41,
+      "mots": [
+       "saisons",
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "transitmovie",
+      "n": 2,
+      "score": 35,
+      "mots": [
+       "saisons",
+       "simulated"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "buckets",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "daylightsimulator",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "lightcurve",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "lightdetector",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "simulateur",
+       "simulator"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "obliquity",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "simulateur",
+       "simulator"
+      ]
+     }
+    ]
+   ]
+  ]
+ }
+}

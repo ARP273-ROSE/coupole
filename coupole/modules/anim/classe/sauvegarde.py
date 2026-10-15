@@ -1,4 +1,7 @@
-"""Sauvegarde de la progression — format commun à Coupole Web et à Coupole (bureau), version 1.
+"""Sauvegarde de la progression — format commun à Coupole Web et à Coupole (bureau), version 2.
+
+Version 2 (Coupole Web 0.6.0, Coupole 0.7.1) : ajout des favoris (`favoris`, liste de {genre, id, ajoute}) ; une
+version 1 se lit telle quelle (favoris vides).
 
 Portage Python, fonction pour fonction, de `coupole-web/src/contenu/sauvegarde.ts` (même logique, mêmes noms en
 snake_case) ; destiné à `coupole/modules/anim/classe/sauvegarde.py`.  Sans dépendance, sans entrée-sortie : le
@@ -21,10 +24,12 @@ import time
 from datetime import datetime, timezone
 
 FORMAT = 'coupole-sauvegarde'
-VERSION = 1
+VERSION = 2
 MAX_TENTATIVES = 50
 GENRES = ('question', 'animation', 'fiche', 'table', 'image')
-PARTIES = ('animation', 'module', 'reglages', 'reponses', 'mes_modules', 'preferences', 'tout')
+GENRES_FAVORIS = GENRES + ('module',)
+MAX_FAVORIS = 5000
+PARTIES = ('animation', 'module', 'reglages', 'reponses', 'mes_modules', 'favoris', 'preferences', 'tout')
 
 _CLE = re.compile(r'[A-Za-z0-9_:.\-]{1,80}')
 _CLE_REGLAGE = re.compile(r'[A-Za-z0-9_]{1,40}')
@@ -143,7 +148,7 @@ def maintenant() -> str:
 
 def vide(application: str = '', date: str = _EPOQUE) -> dict:
     return {'format': FORMAT, 'version': VERSION, 'application': application, 'modifie': date, 'preferences': {},
-            'animations': {}, 'questions': {}, 'modules': {}, 'mes_modules': []}
+            'animations': {}, 'questions': {}, 'modules': {}, 'mes_modules': [], 'favoris': []}
 
 
 def _date(v, defaut: str = _EPOQUE) -> str:
@@ -212,6 +217,17 @@ def _element_valide(v):
     return {'genre': g, 'id': i}
 
 
+def _favori_valide(v):
+    o = _objet(v)
+    if o is None:
+        return None
+    g = o.get('genre')
+    i = _texte(o.get('id'), 80)
+    if not i or not _CLE.fullmatch(i) or not isinstance(g, str) or g not in GENRES_FAVORIS:
+        return None
+    return {'genre': g, 'id': i, 'ajoute': _date(o.get('ajoute'))}
+
+
 def _mon_module_valide(v):
     o = _objet(v)
     if o is None:
@@ -234,7 +250,8 @@ def _mon_module_valide(v):
 
 
 def migrer(brut, application: str = ''):
-    """Toute sauvegarde (version 0 ou 1, éventuellement abîmée) → sauvegarde version 1 valide, sans jamais d'erreur.
+    """Toute sauvegarde (version 0, 1 ou 2, éventuellement abîmée) → sauvegarde version 2 valide, sans jamais
+    d'erreur (version 1 → 2 : rien à convertir, favoris vides).
     Une version future rend None (pour ne rien écraser)."""
     o = _objet(brut)
     if o is None:
@@ -295,6 +312,13 @@ def migrer(brut, application: str = ''):
         if mm is not None and mm['id'] not in vus:
             vus.add(mm['id'])
             s['mes_modules'].append(mm)
+    vus = set()
+    for x in (o['favoris'] if isinstance(o.get('favoris'), list) else []):
+        f = _favori_valide(x)
+        if f is not None and f['genre'] + ':' + f['id'] not in vus:
+            vus.add(f['genre'] + ':' + f['id'])
+            s['favoris'].append(f)
+    s['favoris'] = s['favoris'][:MAX_FAVORIS]
     return s
 
 
@@ -340,6 +364,9 @@ def fusionner(a: dict, b: dict) -> dict:
             s['mes_modules'].append(_clone(m))
         elif not _plus_recent(m['modifie'], s['mes_modules'][k]['modifie']):
             s['mes_modules'][k] = _clone(m)
+    for f in b['favoris']:
+        if not est_favori(s, f['genre'], f['id']) and len(s['favoris']) < MAX_FAVORIS:
+            s['favoris'].append(dict(f))
     s['modifie'] = a['modifie'] if a['modifie'] > b['modifie'] else b['modifie']
     return s
 
@@ -347,7 +374,7 @@ def fusionner(a: dict, b: dict) -> dict:
 # ------------------------------------------------------------------ réinitialisation « tout ou partie »
 def reinitialiser(s: dict, p: dict) -> dict:
     """p = {partie: animation, id} | {partie: module, id, questions[]} | {partie: reglages | reponses | mes_modules |
-    preferences | tout}."""
+    favoris | preferences | tout}."""
     n = migrer(_clone(s))
     partie = p['partie']
     if partie == 'animation':
@@ -363,6 +390,8 @@ def reinitialiser(s: dict, p: dict) -> dict:
         n['modules'] = {}
     elif partie == 'mes_modules':
         n['mes_modules'] = []
+    elif partie == 'favoris':
+        n['favoris'] = []
     elif partie == 'preferences':
         n['preferences'] = {}
     elif partie == 'tout':
@@ -522,6 +551,35 @@ def nom_libre(s: dict, base: str, numeroter: bool = False) -> str:
     while f'{base} ({i})' in pris:
         i += 1
     return f'{base} ({i})'
+
+
+# ------------------------------------------------------------------ favoris
+def est_favori(s: dict, genre: str, id: str) -> bool:
+    return any(f['genre'] == genre and f['id'] == id for f in s['favoris'])
+
+
+def ajouter_favori(s: dict, genre: str, id: str, quand: str | None = None) -> bool:
+    """Ajoute (à la fin) ; False si déjà là, invalide ou au-delà de MAX_FAVORIS."""
+    f = _favori_valide({'genre': genre, 'id': id, 'ajoute': quand or maintenant()})
+    if f is None or est_favori(s, genre, id) or len(s['favoris']) >= MAX_FAVORIS:
+        return False
+    s['favoris'].append(f)
+    return True
+
+
+def retirer_favori(s: dict, genre: str, id: str) -> bool:
+    for k, f in enumerate(s['favoris']):
+        if f['genre'] == genre and f['id'] == id:
+            del s['favoris'][k]
+            return True
+    return False
+
+
+def basculer_favori(s: dict, genre: str, id: str, quand: str | None = None) -> bool:
+    """Ajoute ou retire ; rend le nouvel état (True = favori)."""
+    if retirer_favori(s, genre, id):
+        return False
+    return ajouter_favori(s, genre, id, quand)
 
 
 # ------------------------------------------------------------------ export / import

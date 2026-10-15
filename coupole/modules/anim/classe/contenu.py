@@ -120,58 +120,39 @@ def titre(genre: str, i: str) -> str:
     return bi(o['titre']) if o else i
 
 
-# ------------------------------------------------------------------ recherche (même règle que Coupole Web)
-def normaliser(s: str) -> str:
-    return ''.join(c for c in unicodedata.normalize('NFD', s.lower()) if unicodedata.category(c) != 'Mn')
-
-
-def mots(s: str) -> list:
-    return [m for m in re.split(r'[^\w]+', normaliser(s)) if m and m != '_']
-
-
-def noter(e: dict, cherches: list) -> tuple:
-    """(nombre de mots trouvés, score) : préfixe d'un mot du titre (1,5), des mots-clés (1,3), du résumé (1)."""
-    n, score = 0, 0.0
-    for c in cherches:
-        s = (1.5 if any(w.startswith(c) for w in e['titres']) else 0) + \
-            (1.3 if any(w.startswith(c) for w in e['cles']) else 0) + \
-            (1.0 if any(w.startswith(c) for w in e['resume']) else 0)
-        if s:
-            n += 1
-        score += s
-    return n, score
-
-
-@functools.lru_cache(maxsize=None)
-def _index() -> list:
+# ------------------------------------------------------------------ recherche (moteur commun avec Coupole Web)
+def documents() -> list:
+    """Documents de la recherche, construits comme au web (`src/app/page_recherche.ts`, `documents()`) : questions,
+    fiches, tables, images (index importé), animations (noms, descriptions, titres d'origine, thèmes), modules."""
     from .. import catalogue
-    from ....core import i18n
+    from ....core import i18n, modules as M
+    M.decouvrir()                                      # textes des animations enregistrés (noms, descriptions)
     genre = {'q': 'question', 'f': 'fiche', 't': 'table', 'i': 'image'}
     out = []
     for e in _lire('recherche')['entrees']:
-        out.append({'g': genre[e['g']], 'id': e['id'], 'm': e['m'], 't': e['t'],
-                    'titres': mots(e['t']['fr'] + ' ' + e['t']['en']), 'cles': mots(e['k']['fr'] + ' ' + e['k']['en']),
-                    'resume': mots(e['r']['fr'] + ' ' + e['r']['en'])})
+        out.append({'g': genre[e['g']], 'id': e['id'], 'm': e['m'], 't': e['t'], 'k': e['k'], 'r': e['r']})
     T = i18n.toutes_les_cles()
     for a in catalogue.ENTREES:
         if not a.faite:
             continue
         t = {lg: T.get('anim_nom_' + a.cle, {}).get(lg, a.titre) for lg in ('fr', 'en')}
-        d = ' '.join(T.get('anim_desc_' + a.cle, {}).get(lg, '') for lg in ('fr', 'en'))
-        th = ' '.join(T.get('anim_theme_' + a.theme, {}).get(lg, '') for lg in ('fr', 'en'))
-        out.append({'g': 'animation', 'id': a.id, 'm': [], 't': t, 'titres': mots(t['fr'] + ' ' + t['en'] + ' ' + a.titre),
-                    'cles': mots(a.id + ' ' + th), 'resume': mots(d)})
+        th = {lg: T.get('anim_theme_' + a.theme, {}).get(lg, '') for lg in ('fr', 'en')}
+        out.append({'g': 'animation', 'id': a.id, 'm': [], 't': t, 'o': a.titre,
+                    'k': {'fr': a.id + ' ' + th['fr'], 'en': th['en']},
+                    'r': {lg: T.get('anim_desc_' + a.cle, {}).get(lg, '') for lg in ('fr', 'en')}})
+    for m in modules():
+        out.append({'g': 'module', 'id': m['cle'], 'm': [m['cle']], 't': m['titre'], 'o': m.get('original') or '',
+                    'k': {'fr': m['cle'], 'en': ''}, 'r': {'fr': '', 'en': ''}})
     return out
 
 
+@functools.lru_cache(maxsize=None)
+def index():
+    from .recherche import Index
+    return Index(documents())
+
+
 def chercher(texte: str) -> list:
-    cherches = mots(texte)
-    if not cherches:
-        return []
-    res = []
-    for e in _index():
-        n, s = noter(e, cherches)
-        if n:
-            res.append((n, s, e))
-    res.sort(key=lambda x: (-x[0], -x[1]))
-    return [e for _, _, e in res]
+    """Résultats du moteur commun : [{doc, n, score, mots}] (questions absentes de tout module écartées)."""
+    info = info_questions()
+    return [r for r in index().chercher(texte) if r['doc']['g'] != 'question' or (r['doc']['id'] in info and info[r['doc']['id']]['ok'])]
