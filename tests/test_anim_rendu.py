@@ -251,45 +251,35 @@ def test_terminateur_exact_du_simulateur_jour_nuit():
 
 
 # ------------------------------------------------------------------ éclipses
-def test_soleil_entier_dans_le_simulateur_d_ombres(appli):
-    from coupole.modules.anim.animations import ombres
-    assert ombres.MARGE_SOLEIL > 0
+def test_soleil_a_gauche_dans_le_simulateur_d_ombres(appli):
+    """Le Soleil, à l'infini, est un bord de disque lumineux à gauche de la vue de côté (rayons parallèles)."""
     a = catalogue.PAR_ID['shadowsim'].charger()()
-    img = a.image(600, 420)
+    img = a.image(900, 600)
     from PyQt6.QtGui import QColor
     from coupole.modules.anim import dessin
-    # le disque du Soleil (pas seulement son halo) tient entier dans la toile : au bord, on n'a que le halo pâle
-    cy = int(round(img.height() * 0.72 / 2))
-    centre = QColor(img.pixel(int(ombres.R_SOLEIL + ombres.MARGE_SOLEIL), cy)).lightness()
-    bord = QColor(img.pixel(1, cy)).lightness()
+    r = a._cote
+    cy = int(r.center().y())
+    bord = QColor(img.pixel(int(r.x()) + 4, cy)).lightness()
     fond = QColor(dessin.c('fond')).lightness()
-    assert centre > bord + 60 and bord < fond + 40
+    assert abs(bord - fond) > 30
     a.close()
 
 
 def test_eclipses_rejouees_compatibles_avec_la_table():
-    """Chaque éclipse de la table 2015–2044 a une trajectoire compatible avec son type (mêmes bornes que le web)."""
-    from coupole.modules.anim import astro
+    """Chaque éclipse de la table 2015–2044, rejouée à son maximum avec sa géométrie DE440, a le type de la table ;
+    aux deux bouts du trajet montré, plus d'éclipse (mêmes règles que le web)."""
     from coupole.modules.anim.animations import ombres
     from coupole.modules.anim.donnees_eclipses import LUNE, SOLEIL
-    RL, RT = astro.R_LUNE_KM, astro.R_TERRE_KM
+    T = {'total': 'totale', 'annular': 'annulaire', 'hybrid': 'hybride', 'partial': 'partielle', 'penumbral': 'penombrale'}
     assert len(SOLEIL) + len(LUNE) == 133
-    for i, e in enumerate(LUNE):
-        r = ombres.rejeu('L%d' % i)
-        y = abs(r['y_km'])
-        if e[3] == 'total':
-            assert y < r['ru_km'] - RL
-        elif e[3] == 'partial':
-            assert r['ru_km'] - RL < y < r['ru_km'] + RL
-        else:
-            assert r['ru_km'] + RL < y < r['rp_km'] + RL
-    for i, e in enumerate(SOLEIL):
-        r = ombres.rejeu('S%d' % i)
-        y = abs(r['y_km'])
-        if e[3] == 'partial':
-            assert RT < y < RT + r['rp_km']
-        else:
-            assert y < RT
+    for pre, table in (('S', SOLEIL), ('L', LUNE)):
+        for i, e in enumerate(table):
+            r = ombres.rejeu('%s%d' % (pre, i))
+            t = ombres.types(*ombres.lune_rejeu(r, 0.0), r['g']['s_km'])
+            assert (t['soleil'] if pre == 'S' else t['lune'])['type'] == T[e[3]], (pre, i)
+            for u in (-1.0, 1.0):
+                t = ombres.types(*ombres.lune_rejeu(r, u), r['g']['s_km'])
+                assert (t['soleil'] if pre == 'S' else t['lune'])['type'] == 'aucune', (pre, i, u)
 
 
 def test_mode_rejouer_dans_l_interface(appli):
