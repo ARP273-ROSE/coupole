@@ -16,6 +16,7 @@ lancement (aucune base de travail) et base de travail ancienne d'un essai antér
 import json
 import os
 import shutil
+import time
 import sqlite3
 from pathlib import Path, PureWindowsPath
 
@@ -215,8 +216,20 @@ def test_bandeau_base_illisible_et_reconnaissance(app_qt, tmp_path, monkeypatch,
         assert "La base de suivi de ce dossier n'a pas pu être lue" in p.l_bandeau_base.text()
         assert not p.b_reconnaitre.isVisibleTo(p)
         assert 'Dossier de suivi : %s — base illisible' % dest in p.l_inventaire.text()
-        # base retirée, fichiers rangés : proposition de reconnaissance, puis possession reconnue
-        shutil.rmtree(dest)
+        # base retirée, fichiers rangés : proposition de reconnaissance, puis possession reconnue.  Une lecture
+        # en tâche de fond (anomalies du traitement) peut tenir la base un instant : Windows refuse alors de
+        # l'effacer (WinError 32) → on laisse finir les tâches, puis on réessaie.
+        from coupole.gui.outils import attendre_taches as _attendre
+        _attendre(30000)
+        for essai in range(20):
+            try:
+                shutil.rmtree(dest)
+                break
+            except PermissionError:
+                if essai == 19:
+                    raise
+                app_qt.processEvents()
+                time.sleep(0.25)
         _copie_sans_base_avec_entetes(tmp_path)
         p._charger_possession()
         assert attendre(app_qt, lambda: p.b_reconnaitre.isVisibleTo(p))

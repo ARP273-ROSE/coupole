@@ -111,6 +111,12 @@ class OmbresEclipse(Animation):
         self.instant.valueChanged.connect(self._instant_change)
         self._cote = None
         self._echelle = (G.D_LUNE_KM / 186.0, G.D_LUNE_KM / 186.0 / AGRANDISSEMENT)   # avant le premier dessin
+        # réglages repris (mémoire, préréglage) : posés sans signal → on place la Lune d'après eux
+        rj = self.rejeu()
+        if rj:
+            self.lune = lune_rejeu(rj, self.instant.value())
+        elif self.position.value() != 180.0 or self.noeuds.value() != 0.0:
+            self.lune = G.position_orbite(G.D_LUNE_KM, self.position.value(), self.noeuds.value(), INCLINAISON_LUNE)
 
     def _orbite(self, *_):
         if self.rejeu():
