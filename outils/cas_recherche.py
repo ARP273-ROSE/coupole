@@ -6,7 +6,7 @@
 Trois familles de cas, rejouées par tests/test_recherche.py (ici) et tests/unit/recherche.test.ts (Coupole Web) :
 - « unitaires » : normaliser, mots, racine, termes, distance, surligner, extrait ;
 - « corpus » : un petit corpus inventé, des recherches, les résultats complets (genre, id, mots trouvés, points) ;
-- « reel » : les vrais contenus (questions, fiches, tables, images, 94 animations, 24 modules) ; pour chaque
+- « reel » : les vrais contenus (questions, fiches, tables, images, 95 animations, 24 modules) ; pour chaque
   recherche, les 8 premiers résultats et les points : le web, qui construit son index de son côté avec les mêmes
   données, doit trouver exactement les mêmes.
 Avec le chemin de Coupole Web, le fichier y est aussi recopié (tests/references/recherche_cas.json).
@@ -64,7 +64,7 @@ REQUETES_REELLES = ['seasons', 'saisons', 'Kepler’s third law', 'troisième lo
                     'rotation galaxie', 'black body', 'corps noir', 'wien', 'doppler', 'redshift', 'décalage vers le rouge',
                     'hubble', 'exoplanets', 'exoplanètes', 'transit', 'retrograde', 'rétrograde', 'sun', 'Soleil',
                     'hr diagram', 'diagramme HR', 'binary stars', 'étoiles binaires', 'tides', 'marées', 'antikythera',
-                    'anticythère', 'orion', 'telescope', 'télescope', 'light', 'lumière', 'cosmology', 'cosmologie',
+                    'anticythère', 'orion', 'gravity and orbits', 'gravité et orbites', 'gravite orbite', 'phet', 'telescope', 'télescope', 'light', 'lumière', 'cosmology', 'cosmologie',
                     'big bang', 'dark matter', 'matière noire', 'scale', 'échelle', 'sidereal day', 'jour sidéral',
                     'celestial sphere', 'sphère céleste', 'equinox', 'équinoxe', 'solstice', 'zodiac', 'constellations',
                     'neutron star', 'étoile à neutrons', 'supernova', 'stellar evolution', 'évolution stellaire',

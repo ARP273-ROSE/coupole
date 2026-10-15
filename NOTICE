@@ -173,6 +173,37 @@ fiches cite sa source / data prepared for this project by its author; each value
   - Distances de la Grande Ourse 3D : parallaxes adoptées par SIMBAD (Hipparcos 2007, Gaia), au lieu de celles de
     l'original.
 
+Gravité et orbites / Gravity and Orbits (0.7.2 ; coupole/modules/anim/gravite_meca.py, animations/gravite_orbites.py)
+----------------------------------------------------------------------------------------------------------------
+D'après la simulation « Gravity and Orbits » du projet PhET Interactive Simulations de l'University of Colorado
+Boulder (https://phet.colorado.edu/sims/html/gravity-and-orbits/latest/gravity-and-orbits_fr.html), montrée en
+cours : seules l'idée et la liste des fonctions sont reprises (scénarios, vues « modèle » et « à l'échelle »,
+flèches de force et de vitesse, trajectoires, grille, ruban de mesure, gravité coupable, masses, glisser). Le code,
+les dessins et les textes sont propres à Coupole ; aucun fichier, code, image, icône ni texte de PhET n'est repris,
+et le logo PhET n'est pas utilisé. PhET n'a ni écrit ni approuvé cette animation.
+Licences de PhET (vérifiées le 15/10/2026 sur https://phet.colorado.edu/en/licensing) : simulations publiées à
+partir du 29/03/2026 sous CC BY-NC 4.0, versions antérieures sous CC BY 4.0 ; leur code source (anciens dépôts
+github.com/phetsims, MIT ou GPL selon les fichiers ; le dépôt actuel n'est pas public). Aucune de ces licences ne
+s'applique ici puisque rien n'est copié ; « PhET » est une marque des Regents of the University of Colorado, citée
+seulement pour désigner l'origine de l'idée.
+After the “Gravity and Orbits” simulation of the PhET Interactive Simulations project at the University of Colorado
+Boulder: only the idea and the list of features are taken up. The code, drawings and texts are Coupole's own; no
+PhET file, code, image, icon or text is reused and the PhET logo is not used. PhET neither wrote nor endorsed this
+animation. PhET licences (checked on 15 October 2026): simulations published from 29 March 2026 under CC BY-NC 4.0,
+earlier versions under CC BY 4.0; source code under MIT or GPL. None applies here since nothing is copied; “PhET” is
+a trademark of the Regents of the University of Colorado, named only to credit the origin of the idea.
+Constantes et données / constants and data:
+  - G = 6,67430 × 10⁻¹¹ m³·kg⁻¹·s⁻² (CODATA 2018, inchangée en 2022) ;
+  - GM☉ = 1,3271244 × 10²⁰ m³·s⁻², GM⊕ = 3,986004 × 10¹⁴ m³·s⁻², R☉ = 6,957 × 10⁸ m, R⊕ = 6,3781 × 10⁶ m
+    (UAI 2015, résolution B3, valeurs nominales) ; 1 ua = 149 597 870 700 m (UAI 2012, résolution B2) ;
+  - GM☾ = 4,902800118 × 10¹² m³·s⁻² (éphéméride JPL DE440, Park et al., AJ 161:105, 2021) ; R☾ = 1 737,4 km,
+    demi-grand axe 384 400 km, année sidérale 365,256363 j, mois sidéral 27,321661 j (NASA, Earth et Moon Fact Sheets) ;
+  - ISS : 419 725 kg, altitude 415 km, envergure 109 m (NASA, International Space Station Facts and Figures) ;
+  - positions et vitesses réelles du Soleil, de la Terre et de la Lune le 1er janvier 2026 à 0 h TDB : DE440
+    (de440s.bsp, NASA JPL, domaine public), lues avec skyfield (MIT) par outils/verif_anim/etat_initial_gravite.py ;
+  - schéma d'intégration : H. Yoshida, « Construction of higher order symplectic integrators », Phys. Lett. A 150
+    (1990) 262-268 ; vérification indépendante sous SageMath (DOP853 de SciPy).
+
 Typographie / typography
 ------------------------
 Formateur commun aux ressources et aux applications (typographie : unités SI à exposants, nombres, notation

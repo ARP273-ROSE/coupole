@@ -1,4 +1,4 @@
-"""Noms et descriptions FR/EN des 93 animations : les 92 du catalogue ClassAction et la machine d'Anticythère
+"""Noms et descriptions FR/EN des 95 animations : les 92 du catalogue ClassAction et la machine d'Anticythère
 (adaptée d'Anticythere3D, du même auteur).
 
 Descriptions anglaises : celles du catalogue d'origine (animations.xml de ClassAction, University of Nebraska-Lincoln
@@ -194,6 +194,9 @@ NOMS_DESCRIPTIONS = {
     'orion3d': ('Orion en 3D', 'Orion in 3D',
         "Comme la Grande Ourse 3D, pour Orion : Bételgeuse, Bellatrix, Meissa, la Ceinture (Mintaka, Alnilam, Alnitak), Saiph, Rigel et l’épée (Hatysa, le Trapèze de M42) à leur distance mesurée, avec la Terre, les lignes de visée et la figure sur la sphère céleste. De face on retrouve la constellation ; en la faisant tourner, on voit ses étoiles s’étager de 77 à 400 parsecs. M42 et la Tête de Cheval à leur place ; couleur vraie et fiche de chaque objet au survol.",
         'Like the Big Dipper 3D, for Orion: Betelgeuse, Bellatrix, Meissa, the Belt (Mintaka, Alnilam, Alnitak), Saiph, Rigel and the sword (Hatysa, the Trapezium of M42) at their measured distances, with the Earth, the lines of sight and the figure on the celestial sphere. Face-on we find the constellation; turning it, we see its stars spread from 77 to 400 parsecs. M42 and the Horsehead in place; true colours and a data sheet for each object on hover.'),
+    'gravityorbits': ('Gravité et orbites', 'Gravity and Orbits',
+        "Le Soleil, la Terre, la Lune ou la station spatiale en gravitation, calculés pas à pas : forces et vitesses en flèches, trajectoires, grille et ruban de mesure, gravité qu’on peut couper, masses qu’on peut changer, astres qu’on déplace et vitesses qu’on tire. Vue « modèle » ou à l’échelle (la Terre et la Lune n’y font qu’un point), périodes mesurées comparées aux vraies, énergie conservée, trajectoire de la Lune vue du Soleil. D’après la simulation PhET « Gravity and Orbits » (University of Colorado Boulder).",
+        'The Sun, the Earth, the Moon or the space station under gravity, computed step by step: forces and velocities as arrows, paths, grid and measuring tape, gravity that can be turned off, masses that can be changed, bodies to move and velocities to pull. “Model” or to-scale view (where the Earth and the Moon are a single dot), measured periods compared with the true ones, energy conserved, the Moon’s path seen from the Sun. After the PhET simulation “Gravity and Orbits” (University of Colorado Boulder).'),
     'venusphases': ('Phases de Vénus', 'Phases of Venus',
         'Aspect de Vénus au télescope pendant que les planètes parcourent leurs orbites ; à comparer au modèle de Ptolémée.',
         'Shows what Venus looks like through a telescope as the planets go around in their orbits. Compare with the Ptolemaic Phases of Venus simulation.'),

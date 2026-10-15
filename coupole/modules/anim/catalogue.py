@@ -1,6 +1,7 @@
-"""Catalogue des 94 animations : les 92 de ClassAction (University of Nebraska-Lincoln Astronomy Education, Apache 2.0),
-la machine d'Anticythère, adaptée d'Anticythere3D (du même auteur ; fichier d'origine « Anticythere3D »), et
-« Orion en 3D », propre à Coupole.
+"""Catalogue des 95 animations : les 92 de ClassAction (University of Nebraska-Lincoln Astronomy Education, Apache 2.0),
+la machine d'Anticythère, adaptée d'Anticythere3D (du même auteur ; fichier d'origine « Anticythere3D »),
+« Orion en 3D », propre à Coupole, et « Gravité et orbites », d'après la simulation PhET Gravity and Orbits
+(University of Colorado Boulder ; code, dessins et textes propres à Coupole).
 
 Chaque entrée : identifiant ClassAction, thème, titre d'origine (anglais), fichier Flash d'origine, et la classe
 Python qui la refait (« module:Classe » dans ``animations/``) ou None si elle est encore à venir.  Les noms et
@@ -39,6 +40,7 @@ ANIMATIONS = (
      '200level/siderealTimeAndHourAngleDemo.swf', 'angle_horaire:AngleHoraire'),
     ('antikythera', 'ancientastro', 'Antikythera Mechanism', 'Anticythere3D', 'anticythere:Anticythere'),
     ('orion3d', 'ismstarformation', 'Orion in 3D', 'Coupole', 'orion3d:Orion3D'),
+    ('gravityorbits', 'renaissance', 'Gravity and Orbits', 'PhET', 'gravite_orbites:GraviteOrbites'),
     ('smallangledemo', 'ancientastro', 'Small-Angle Approximation Demonstrator', 'ancientastro/smallangledemo.swf',
      'petits_angles:PetitsAngles'),
     ('dipperclock', 'ancientastro', 'Big Dipper Clock', 'ancientastro/dipperclock.swf',
@@ -195,10 +197,16 @@ LOT3 = ('meltednail', 'bbexplorer', 'spectrum010', 'emspectrum', 'dopplershift',
 LOT4 = ('antikythera',)
 # 0.5.0 : Orion en 3D (propre à Coupole ; thème « Milieu interstellaire et formation des étoiles »)
 LOT5 = ('orion3d',)
+# 0.7.2 : Gravité et orbites, d'après la simulation PhET Gravity and Orbits (University of Colorado Boulder ; code,
+# dessins et textes propres à Coupole) ; thème « Renaissance » (lois de Kepler et de Newton)
+LOT6 = ('gravityorbits',)
 #: animations qui ne viennent pas de ClassAction : identifiant → (application d'origine, adresse de son dépôt)
 HORS_CLASSACTION = {'antikythera': ('Anticythere3D', 'https://github.com/ARP273-ROSE/Anticythere3D'),
-                    'orion3d': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE')}
-ORDRE = LOT1 + LOT1_BIS + LOT2 + LOT2_BIS + LOT3 + LOT4 + LOT5
+                    'orion3d': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
+                    'gravityorbits': ('PhET Gravity and Orbits',
+                                      'https://phet.colorado.edu/sims/html/gravity-and-orbits/latest/'
+                                      'gravity-and-orbits_fr.html')}
+ORDRE = LOT1 + LOT1_BIS + LOT2 + LOT2_BIS + LOT3 + LOT4 + LOT5 + LOT6
 
 
 class Entree:

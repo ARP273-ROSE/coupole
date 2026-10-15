@@ -118,7 +118,8 @@ _FR_DANS_EN = re.compile(r"(?<![\w'’-])(le|la|les|des|du|et|ou|est|sont|avec|p
 _EN_DANS_FR = re.compile(r"(?<![\w'’-])(the|and|with|this|these|without|from|into|only|when|which|already|also|then|"
                          r"again|never|always|each|every|about)(?![\w'’-])")
 # noms propres et citations qui gardent légitimement leur langue
-_TOLERES_EN = ("Explorer et Comprendre l'Univers", 'et al.', 'Observatoire de Paris', 'Haute-Provence', 'Pôle', 'Centre de')
+_TOLERES_EN = ("Explorer et Comprendre l'Univers", 'et al.', 'Observatoire de Paris', 'Haute-Provence', 'Pôle', 'Centre de',
+               'Gravity and Orbits')
 
 
 def _nettoyer(texte):

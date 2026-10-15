@@ -1886,8 +1886,8 @@
   ]
  },
  "reel": {
-  "documents": 817,
-  "vocabulaire": 5434,
+  "documents": 818,
+  "vocabulaire": 5451,
   "requetes": [
    [
     "seasons",
@@ -5049,6 +5049,297 @@
     ]
    ],
    [
+    "gravity and orbits",
+    [
+     {
+      "g": "animation",
+      "id": "gravityorbits",
+      "n": 2,
+      "score": 76,
+      "mots": [
+       "gravite",
+       "gravity",
+       "gravityorbits",
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "gravalgebra",
+      "n": 2,
+      "score": 53,
+      "mots": [
+       "gravity",
+       "orbites"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "gravcalc",
+      "n": 2,
+      "score": 51,
+      "mots": [
+       "gravity",
+       "orbites"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravity",
+      "n": 2,
+      "score": 42,
+      "mots": [
+       "gravity",
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_plutostability",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "gravite",
+       "gravity",
+       "orbit",
+       "orbite"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_200level_gravityforces",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "gravity"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravitydirection",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "gravity"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravityformula",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "gravity"
+      ]
+     }
+    ]
+   ],
+   [
+    "gravité et orbites",
+    [
+     {
+      "g": "animation",
+      "id": "gravityorbits",
+      "n": 2,
+      "score": 76,
+      "mots": [
+       "gravite",
+       "gravity",
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "gravalgebra",
+      "n": 2,
+      "score": 44,
+      "mots": [
+       "gravity",
+       "orbites"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "gravcalc",
+      "n": 2,
+      "score": 42,
+      "mots": [
+       "gravity",
+       "orbites"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravity",
+      "n": 2,
+      "score": 33,
+      "mots": [
+       "gravity",
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_plutostability",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "gravite",
+       "gravity",
+       "orbit",
+       "orbite"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_realisticorbit",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_satelliteorbits",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_debrisorbits",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "orbites",
+       "orbits"
+      ]
+     }
+    ]
+   ],
+   [
+    "gravite orbite",
+    [
+     {
+      "g": "animation",
+      "id": "gravityorbits",
+      "n": 2,
+      "score": 64,
+      "mots": [
+       "gravite",
+       "gravity",
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "gravalgebra",
+      "n": 2,
+      "score": 44,
+      "mots": [
+       "gravity",
+       "orbites"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "gravcalc",
+      "n": 2,
+      "score": 42,
+      "mots": [
+       "gravity",
+       "orbites"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_gravity",
+      "n": 2,
+      "score": 33,
+      "mots": [
+       "gravity",
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_plutostability",
+      "n": 2,
+      "score": 20,
+      "mots": [
+       "gravite",
+       "gravity",
+       "orbit",
+       "orbite"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_realisticorbit",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_satelliteorbits",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_solarsystemdebris_debrisorbits",
+      "n": 1,
+      "score": 33,
+      "mots": [
+       "orbites",
+       "orbits"
+      ]
+     }
+    ]
+   ],
+   [
+    "phet",
+    [
+     {
+      "g": "animation",
+      "id": "gravityorbits",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "phet"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_telescopes_teleshop",
+      "n": 1,
+      "score": 7,
+      "mots": [
+       "pet"
+      ]
+     }
+    ]
+   ],
+   [
     "telescope",
     [
      {
@@ -5813,6 +6104,15 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "gravityorbits",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "scale"
+      ]
+     },
+     {
       "g": "question",
       "id": "ca_cosmology_hdage",
       "n": 1,
@@ -5837,15 +6137,6 @@
       "score": 10,
       "mots": [
        "scales"
-      ]
-     },
-     {
-      "g": "question",
-      "id": "ca_extrasolarplanets_espdopplershift",
-      "n": 1,
-      "score": 10,
-      "mots": [
-       "scale"
       ]
      }
     ]
@@ -5908,21 +6199,21 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "gravityorbits",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "echelle"
+      ]
+     },
+     {
       "g": "question",
       "id": "ca_cosmology_hdage",
       "n": 1,
       "score": 10,
       "mots": [
        "echelles"
-      ]
-     },
-     {
-      "g": "question",
-      "id": "ca_cosmology_universefuture",
-      "n": 1,
-      "score": 10,
-      "mots": [
-       "echelle"
       ]
      }
     ]
@@ -8378,6 +8669,16 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "gravityorbits",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "orbites",
+       "orbits"
+      ]
+     },
+     {
       "g": "question",
       "id": "ca_jovianplanets_galileanmoonorbits",
       "n": 1,
@@ -8410,16 +8711,6 @@
      {
       "g": "question",
       "id": "ca_light_permittedorbits2",
-      "n": 1,
-      "score": 37,
-      "mots": [
-       "orbites",
-       "orbits"
-      ]
-     },
-     {
-      "g": "question",
-      "id": "ca_milkyway_orbits",
       "n": 1,
       "score": 37,
       "mots": [
@@ -8567,6 +8858,17 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "gravityorbits",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "gravite",
+       "gravity",
+       "gravityorbits"
+      ]
+     },
+     {
       "g": "question",
       "id": "ca_renaissance_gravity",
       "n": 1,
@@ -8578,15 +8880,6 @@
      {
       "g": "question",
       "id": "ca_renaissance_gravitycalcs1",
-      "n": 1,
-      "score": 38,
-      "mots": [
-       "gravity"
-      ]
-     },
-     {
-      "g": "question",
-      "id": "ca_renaissance_gravitycalcs2",
       "n": 1,
       "score": 38,
       "mots": [
@@ -9054,6 +9347,17 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "gravityorbits",
+      "n": 2,
+      "score": 37,
+      "mots": [
+       "orbites",
+       "orbits",
+       "simulation"
+      ]
+     },
+     {
       "g": "question",
       "id": "ca_renaissance_asteroid",
       "n": 2,
@@ -9062,16 +9366,6 @@
        "orbit",
        "orbite",
        "simulations"
-      ]
-     },
-     {
-      "g": "animation",
-      "id": "ptolemaic",
-      "n": 2,
-      "score": 25,
-      "mots": [
-       "orbites",
-       "simulation"
       ]
      }
     ]

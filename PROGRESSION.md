@@ -1403,3 +1403,38 @@ hauteur « souhaitée » des tableaux comme minimum).
   `captures/ergonomie_ohp_*` ; manuel : `ohp_guide_*.png`, `ohp_menu_*.png`, catalogue et Téléchargement refaites.
 - Travail fait dans un worktree séparé (`Coupole-ergo`) : une autre tâche modifiait le module Animations dans le
   dossier principal.
+
+## 2026-10-15 — 0.7.2 : « Gravité et orbites » (95ᵉ animation, d'après PhET)
+Demande : une animation inspirée de la simulation PhET « Gravity and Orbits » (University of Colorado Boulder), montrée
+en cours, d'abord dans Coupole Web (0.6.1) puis ici, avec le même rendu et les mêmes nombres (section « Choix
+graphiques » du PROGRESSION.md de Coupole Web, sous-section « Gravité et orbites (0.6.1) »).
+
+### Licence
+- Vérifiée en ligne le 15/10/2026 (pages « Licensing » et « Historical Software Agreement » de phet.colorado.edu,
+  rendues par Playwright) : simulations CC BY-NC 4.0 depuis le 29/03/2026, CC BY 4.0 avant ; code MIT ou GPL (anciens
+  dépôts phetsims ; le dépôt actuel n'est pas public) ; « PhET » marque des Regents of the University of Colorado.
+- Rien n'est repris (ni code, ni image, ni texte, ni logo) : idée et liste des fonctions seulement ; crédit « D'après
+  la simulation PhET « Gravity and Orbits » (University of Colorado Boulder) » dans la fiche, l'aide F1, les manuels,
+  le README et `NOTICE` (licences citées, sans s'appliquer).
+
+### Fait
+- [x] `anim/gravite_meca.py` (sans Qt, jumeau de `src/calc/gravite.ts` : Yoshida 4, pas adaptatif, collisions,
+  périodes par passages, traces, courbure de la Lune vue du Soleil) ; cas communs `tests/gravite_cas.json` par
+  `outils/cas_gravite.py CHEMIN_WEB` (nombres identiques au bit près dans les deux langages : seulement + − × ÷ √).
+- [x] État réel du 1/01/2026 (DE440) : `outils/verif_anim/etat_initial_gravite.py` (python-lab, skyfield 1.54,
+  de440s.bsp) ; orbites ramenées dans l'écliptique par rotation autour de la ligne des nœuds (la projection z = 0
+  donnait une Lune à 26,99 j ; un cercle de Kepler, 27,05 à 27,81 j selon la phase).
+- [x] SageMath : `outils/verif_anim/gravite_orbites_verif.sage` (120 bits pour les conditions initiales, DOP853 à
+  10⁻¹³) → `tests/gravite_orbites_sage.json` : Terre 365,2563 / 365,2571 j, Lune 27,3382 j (S–T–L) et 27,2846 j (T–L),
+  ISS 92,867 min, comète 670,97 j ; rapport des accélérations de la Lune Soleil / Terre 2,198.
+- [x] `animations/gravite_orbites.py` (QPainter ; même mise en page, mêmes couleurs, mêmes valeurs que le web :
+  références `tests/references/animations.json` de Coupole Web régénérées et rejouées), `textes_gravite.py` (textes
+  FR/EN, exportés vers le web), catalogue (`LOT6`, `HORS_CLASSACTION`, thème `renaissance`), module Renaissance
+  (`ANIMATIONS_AJOUTEES` de `outils/importer_contenu.py`), recherche (cas régénérés, 101 recherches).
+- [x] Rendu : traces en traits de 1 px (600 points au plus, encart 240) — un trait de 1,2 px faisait remplir par Qt le
+  contour de la trace qui se recoupe (Lune en vue « Modèle ») : 73 → 8 ms pour l'image la plus chargée (NAS à charge
+  40) ; même choix au web.
+- [x] Tests `tests/test_anim_gravite.py` (20) ; aide F1 ; manuels FR (101 p.) et EN (100 p.) : section « Gravité et
+  orbites (0.7.2) », 8 captures (`CAPTURES_SEULEMENT=gravite outils/captures_anim.py`) ; CHANGELOG FR puis EN, README,
+  NOTICE, manifeste, VERSION 0.7.2.
+- **Aucun tag ni Release.**

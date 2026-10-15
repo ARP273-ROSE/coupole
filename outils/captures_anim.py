@@ -42,7 +42,14 @@ VARIANTES = (('daylightsimulator_nord', 'daylightsimulator', {'projection': 'nor
              ('spectrum010_g2', 'spectrum010', {'type': 42}),
              ('orion3d_face', 'orion3d', {}),
              ('orion3d_fiche', 'orion3d', {}),
-             ('bigdipper_fiche', 'bigdipper', {}))
+             ('bigdipper_fiche', 'bigdipper', {}),
+             # 0.7.2 : Gravité et orbites (d'après PhET) : modèle après 400 jours, à l'échelle, station spatiale
+             ('gravite_modele', 'gravityorbits', {'scenario': 'soleil_terre_lune', 'lune_soleil': True,
+                                                  'vecteurs_vitesse': True}),
+             ('gravite_echelle', 'gravityorbits', {'scenario': 'soleil_terre_lune', 'mode': 'echelle'}),
+             ('gravite_iss', 'gravityorbits', {'scenario': 'terre_iss', 'grille': True, 'ruban': True,
+                                               'vecteurs_vitesse': True}),
+             ('gravite_libre', 'gravityorbits', {'scenario': 'libre', 'grille': True}))
 
 
 def contenu_question(qid):
@@ -75,6 +82,23 @@ def main():
     f.resize(1400, 900)
     f.show()
     p = f.ouvrir_module('anim')
+    # CAPTURES_SEULEMENT=gravite : seulement les variantes dont le nom commence ainsi (et la fenêtre de l'animation)
+    seul = os.environ.get('CAPTURES_SEULEMENT')
+    if seul:
+        from coupole.modules.anim import catalogue
+        if seul == 'gravite':
+            p.montrer('animations')
+            w = p.ouvrir('gravityorbits')
+            w.c_scenario.setCurrentIndex(w.c_scenario.findData('soleil_terre_lune'))
+            w.c_lune_soleil.setChecked(True)
+            for _ in range(80):
+                w.avancer(1.0)
+            w.rafraichir()
+            attendre(app, 0.6)
+            f.grab().save(str(dossier / ('module_gravite_%s.png' % langue)))
+        variantes(app, dossier, langue, catalogue, seul)
+        f.close()
+        return
     w = p.ouvrir('sunmotions')
     w.c_analemme.setChecked(True)
     w.heure.setValue(15.0)
@@ -164,7 +188,14 @@ def main():
         attendre(app, 0.2)
         a.grab().save(str(dossier / ('anim_%s_%s.png' % (ident.lower(), langue))))
         a.close()
+    variantes(app, dossier, langue, catalogue)
+    f.close()
+
+
+def variantes(app, dossier, langue, catalogue, seul=''):
     for nom, ident, reglages in VARIANTES:
+        if not nom.startswith(seul):
+            continue
         a = catalogue.PAR_ID[ident].charger()()
         for cle, v in reglages.items():
             w = a._defauts[cle][0]
@@ -183,6 +214,9 @@ def main():
             if reglages.get('projection') == 'globe':
                 a.recentrer()
                 a.tourner_globe(-140, 110, 250)
+        if ident == 'gravityorbits':                    # trajectoires tracées (400 jours, ou 15 tours de l'ISS)
+            for _ in range(80):
+                a.avancer(1.0 if reglages['scenario'] != 'terre_iss' else 4.0)
         a.resize(1100, 760)
         a.show()
         attendre(app, 0.2)
@@ -193,7 +227,6 @@ def main():
             attendre(app, 0.2)
         a.grab().save(str(dossier / ('anim_%s_%s.png' % (nom, langue))))
         a.close()
-    f.close()
 
 
 if __name__ == '__main__':

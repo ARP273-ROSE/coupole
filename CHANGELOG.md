@@ -39,6 +39,36 @@ fenêtre.
 - Tests : `tests/test_parcours_debutant.py` (premier lancement, choisir une cible, Télécharger sur un serveur local,
   fichier présent, Ouvrir disponible, menus, double-clic, 1366 × 768 et 125 %, Archives).
 
+**Nouvelle animation « Gravité et orbites » (95ᵉ)**, d'après la simulation PhET « Gravity and Orbits » du projet PhET
+Interactive Simulations de l'University of Colorado Boulder : idée et fonctions reprises, code, dessins et textes
+propres à Coupole (rien de PhET n'est copié ; licences vérifiées et citées dans `NOTICE`). Faite dans Coupole Web
+0.6.1 d'abord, avec la même mécanique (nombres identiques au bit près, cas communs `tests/gravite_cas.json`) et le
+même rendu.
+
+- **Scénarios** : Soleil et Terre ; Soleil, Terre et Lune ; Terre et Lune ; Terre et station spatiale (ISS) ; libre
+  (Soleil, Terre, Lune et une comète d'aphélie 2,4 ua). Le Soleil, la Terre et la Lune ensemble partent de leur état
+  **réel du 1ᵉʳ janvier 2026** (DE440, orbites ramenées dans l'écliptique autour de leur ligne des nœuds,
+  `outils/verif_anim/etat_initial_gravite.py`) : une Lune lancée sur un cercle de Kepler prendrait, dans le champ de
+  marée du Soleil, une période de 27,05 à 27,81 j selon la phase de départ.
+- **Vues « Modèle »** (astres agrandis, distance Terre–Lune ×78) **et « À l'échelle »** (la Terre et la Lune vues du
+  Soleil : un seul point), passage en douceur (QTimer arrêté à l'arrivée).
+- **Mécanique** `gravite_meca.py` : Yoshida d'ordre 4, pas adaptatif, constantes CODATA 2018, UAI 2015 et 2012, DE440,
+  NASA ; collisions ; périodes mesurées (Terre 365,26 j, Lune 27,34 j, ISS 92,87 min, comète 671,0 j), énergie et
+  moment cinétique conservés à 10⁻¹⁴ près ; intégration indépendante sous SageMath
+  (`outils/verif_anim/gravite_orbites_verif.sage` → `tests/gravite_orbites_sage.json`) : mêmes périodes à 2 × 10⁻⁶.
+- **Réglages** : force de gravité (bleu), vecteur vitesse (vert), trajectoires, grille, ruban de mesure, gravité,
+  Lune vue du Soleil, masses du Soleil, de la Terre et de la Lune ; Pas, Retour, Effacer les trajectoires ; glisser
+  un astre (satellites compris), tirer une flèche de vitesse, glisser le ruban.
+- **Lune vue du Soleil** : vraie trajectoire (jamais de boucle) et rapport des courbures Lune / Terre, toujours
+  positif.
+- Thème « Renaissance », module « L'astronomie de la Renaissance » (`ANIMATIONS_AJOUTEES` de
+  `outils/importer_contenu.py`) ; recherche « gravity and orbits » / « gravité et orbites » en premier (cas
+  régénérés) ; aide F1 ; manuels FR et EN (section « Gravité et orbites (0.7.2) », captures nouvelles) ; NOTICE.
+- Traces dessinées en traits de 1 px (600 points au plus) : la voie rapide de QPainter (un trait plus épais faisait
+  remplir le contour de la trace qui se recoupe, 20 fois plus lent).
+- Tests : `tests/test_anim_gravite.py` (cas communs au bit, physique, SageMath, glisser, flèche, ruban, vues et
+  passage, valeurs, durée d'une image).
+
 ## 0.7.1 — 15 octobre 2026
 
 **Recherche bilingue, favoris, bibliothèque ; « Maintenant » et « En direct » ; ombres d'éclipse en vraie géométrie ;

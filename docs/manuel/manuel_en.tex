@@ -1189,7 +1189,7 @@ now run on Windows, macOS and Linux, in French and English, in the Coupole theme
 checked reference formulas. After ClassAction, University of Nebraska-Lincoln Astronomy Education, Apache License 2.0
 (\texttt{NOTICE} and \texttt{LICENCES/Apache-2.0.txt} files).
 
-\paragraph{Catalogue.} On the left, the 92 animations of the original catalogue, plus two (the Antikythera Mechanism, section~\ref{sec:anticythere}, and Orion in 3D, section~\ref{sec:orion}), sorted by topic (coordinates and
+\paragraph{Catalogue.} On the left, the 92 animations of the original catalogue, plus three (the Antikythera Mechanism, section~\ref{sec:anticythere}, Orion in 3D, section~\ref{sec:orion}, and Gravity and Orbits, section~\ref{sec:gravite}), sorted by topic (coordinates and
 motions, Moon, Renaissance and orbits, stellar properties, light and spectra, extrasolar planets…), with a search
 (French or English, accents ignored) and filters by topic and status. Topics follow a teaching order, from the
 introduction and the sky seen from the Earth to cosmology. Each has its name and description in both
@@ -1426,7 +1426,7 @@ from 1024~$\times$~600 to 4K and from 100 to 200~\% scaling; in a small window, 
 squeezing the scene.
 \capture{img/classe_question_etroite_en.png}{0.8}
 
-\paragraph{Automatic checks.} The 517 questions are scored one by one (right and wrong answer), the 94 animations are
+\paragraph{Automatic checks.} The 517 questions are scored one by one (right and wrong answer), the 95 animations are
 handled (every control at its limits, every button, random drags) without exception and without freezing the GUI
 thread, the backup makes the round trip export $\to$ erase $\to$ import identically (and accepts a Coupole Web export),
 language and theme change live, settings come back on reopening. Every built package (Windows, macOS, Linux) passes a
@@ -1476,6 +1476,53 @@ placed: bringing it closer, well aligned, goes from no eclipse to a partial one 
 and offsets enlarged $\times$6, stated); the 3D view shows the orbit tilted by 5.1° and the line of nodes. “Replay an
 eclipse” places the Moon with the real geometry (JPL DE440); the 133 table eclipses get their type back.
 \capture{img/anim_shadowsim_en.png}{0.95}
+
+\subsection{Gravity and Orbits (0.7.2)}\label{sec:gravite}
+A 95\textsuperscript{th} animation, in the “Renaissance” topic and the “Renaissance Astronomy” module, after the PhET
+simulation “Gravity and Orbits” of the PhET Interactive Simulations project at the University of Colorado Boulder,
+shown in class. Only the idea and the list of features are taken up: the code, drawings and texts are Coupole's own,
+no PhET file or logo is used (PhET licences checked on 15~October~2026 and cited in \texttt{NOTICE}).
+
+\paragraph{Scenarios.} Sun and Earth; Sun, Earth and Moon; Earth and Moon; Earth and space station (ISS); free (Sun,
+Earth, Moon and a comet with a 2.4~au aphelion). Pairs start on circular orbits; the Sun, the Earth and the Moon
+together start from their \emph{real} positions and velocities on 1~January 2026 (JPL DE440 ephemeris, each orbit
+brought into the ecliptic by a rotation about its line of nodes): a Moon launched on a Keplerian circle would, in the
+Sun's tidal field, take a distorted orbit whose period depends on the starting phase (27.05 to 27.81~d).
+
+\paragraph{Two views.} “Model”: bodies enlarged and the Earth--Moon distance enlarged 78 times, to be readable (the
+ratios are written on the canvas). “To scale”: true sizes and distances; seen from the Sun, the Earth and the Moon are
+a single dot (circled by a faint ring), the Sun is only a small disc, and the ISS skims the Earth. The view moves
+smoothly from one to the other (radii and gap interpolated on a log scale, 0.9~s), then nothing is redrawn.
+\capture{img/anim_gravite_modele_en.png}{0.95}
+\capture{img/anim_gravite_echelle_en.png}{0.95}
+
+\paragraph{Computation.} N bodies under Newtonian gravity, 4th-order Yoshida symplectic scheme (three composed
+velocity-Verlet steps), adaptive step ($0.01\sqrt{r^3/G(m_1+m_2)}$ for the tightest pair); constants: $G$ (CODATA
+2018), nominal $GM_\odot$ and $GM_\oplus$ (IAU 2015), $GM_{\mathrm{Moon}}$ (DE440), radii (IAU 2015, NASA), astronomical unit (IAU
+2012), ISS (NASA: 419,725~kg at 415~km). Collisions at the real radii: the lighter body crashes, momentum is kept.
+The numbers are the same, bit for bit, as in Coupole Web.
+
+\paragraph{Settings and mouse.} Boxes: gravity force (blue arrows, length relative to the start for each body),
+velocity vector (green arrows, same scale for all), paths, grid (square size written), measuring tape (real distance),
+gravity (without it, each body moves off in a straight line), Moon seen from the Sun; masses of the Sun, the Earth and
+the Moon (0.5 to 2 times the real ones); \emph{Step}, \emph{Rewind} (positions and velocities of the last start),
+\emph{Clear paths} buttons. Dragging a body moves it (its satellites follow; time is paused while it is held), pulling
+the tip of a green arrow changes the velocity, dragging the ends of the tape measures.
+\capture{img/anim_gravite_iss_en.png}{0.95}
+
+\paragraph{Moon seen from the Sun.} The inset shows the Moon's real path around the Sun over the last 60 days, at the
+same scale in width and height: it merges with the Earth's and never loops (the loops of the “Model” view come from
+the enlarged Earth--Moon distance). Below, the Moon~/ Earth curvature ratio always stays positive (0.49 to 1.41): the
+Moon's path always curves towards the Sun, which pulls it 2.2 times harder than the Earth ($GM_\odot/d_\odot^2$ versus
+$GM_\oplus/d_{\mathrm{Moon}}^2$).
+
+\paragraph{Values and checks.} Distances, relative speeds (km·s$^{-1}$), measured periods (successive passages
+through the starting direction seen from the central body) compared with the true ones or with Kepler, total energy
+and angular momentum with their relative change (about $10^{-14}$). Measurements: Earth 365.26~d (sidereal year
+365.256~d), Moon 27.34~d (sidereal month 27.322~d), ISS 92.87~min, comet 671.0~d; an independent SageMath integration
+(DOP853, tolerance $10^{-13}$, same initial conditions) gives the same periods to within $2\times10^{-6}$
+(\texttt{outils/verif\_anim/gravite\_orbites\_verif.sage}).
+\capture{img/anim_gravite_libre_en.png}{0.95}
 
 \subsection{Available animations}
 \begin{center}
@@ -1556,6 +1603,7 @@ Eccentricity & $e=c/a$, $b=\sqrt{a^2-c^2}$, sum of the distances to the foci $=2
 Gravity algebra & factors $\frac13$ to 3 on $M_1$, $M_2$, $d$: force multiplied by $ab/c^2$ (exact fraction)\\
 Law of gravity & $F=GM_1M_2/R^2$ from the electron to the Milky Way, accelerations, presets, stored results\\
 Earth orbits & $P=2\pi\sqrt{r^3/GM}$: Space Station, GPS, geostationary (42,164~km), Moon\\
+Gravity and Orbits & after PhET: Sun, Earth, Moon, ISS, comet under gravity (4th-order Yoshida, real DE440 state on 1/01/2026); model and to-scale views, forces, velocities, paths, tape, gravity on/off, measured periods, Moon seen from the Sun\\
 \midrule
 Small angles & $\alpha\approx206\,265''\,d/D$ against the exact value $2\arcsin(d/2D)$\\
 Big Dipper clock & northern sky in stereographic projection; one turn per sidereal day, about 1$^\circ$ per day at a fixed time\\
@@ -1857,5 +1905,5 @@ Astrophoto). ASTAP: \url{https://www.hnsky.org/astap.htm}. Observatory codes: Mi
 contributors. SIMBAD and Sesame: CDS, Strasbourg (Wenger et al. 2000); Aladin Lite (CDS); NED (NASA/IPAC); JPL
 Small-Body Database (NASA/JPL). Cosmology: Planck Collaboration (2020, A\&A 641, A6); Hinshaw et al. (2013, WMAP 9);
 Riess et al. (2022, SH0ES); Hogg (1999, astro-ph/9905116); Komatsu et al. (2011) for the massive-neutrino density;
-astropy.cosmology; « cosmologie-redshift » calculator (same author). Archives: MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), NOIRLab Astro Data Archive, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS of the Ring-Moon Systems Node, Imaging Node); reproject (Astropy); Rector et al. (2007, AJ 133, 598) for chromatic ordering; amateur practices: see \texttt{docs/archives\_methode.md}. Animations: ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0); Meeus (1998, \emph{Astronomical Algorithms}, 2nd ed.); P03 / IAU 2006 obliquity; IAU constellation boundaries (data shipped with astropy); Natural Earth 1:50m coastlines (public domain); STIX Two Math font (SIL OFL 1.1); NASA Exoplanet Archive, NASA Planetary Fact Sheet, JPL DE440 ephemeris and Standish elements, AME 2020, Landolt filters (1992), spectrum of M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, rotation curve: McMillan (2017) model through galpy, Eilers et al. (2019) measurements and galkin compilation (Pato \& Iocco 2017), Reid et al. (2019) arms, Wegg et al. (2015) bar; Antikythera Mechanism: adapted from Anticythere3D (same author), after Freeth et al. (\emph{Nature} 444, 2006; \emph{Nature} 454, 2008; \emph{Scientific Reports} 11:5821, 2021); physical spectra: CODATA 2022, NIST ASD, Mamajek (2022), Malkov et al. (2020), van Belle et al. (2021), Martins et al. (2005), Castelli \& Kurucz (2003, ATLAS9), NIST-JANAF, Allard et al. (2000), CIE 1931; Orion in 3D and hover data sheets: SIMBAD (CDS, Strasbourg), Gaia DR3 (ESA/DPAC), Hipparcos (van Leeuwen 2007), Zucker et al. (2021, CC0), Großschedl et al. (2018), Kounkel et al. (2017, 2018), Foley et al. (2023), O'Dell et al. (2009), Stellarium (figure, CC BY-SA 4.0); images ESO/G. Beccari, ESO, and NASA, ESA, M. Robberto (STScI/ESA) and the Hubble Space Telescope Orion Treasury Project Team, NASA, ESA, and the Hubble Heritage Team (AURA/STScI), under the CC BY 4.0 licence (details in \texttt{NOTICE}).
+astropy.cosmology; « cosmologie-redshift » calculator (same author). Archives: MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), NOIRLab Astro Data Archive, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS of the Ring-Moon Systems Node, Imaging Node); reproject (Astropy); Rector et al. (2007, AJ 133, 598) for chromatic ordering; amateur practices: see \texttt{docs/archives\_methode.md}. Animations: ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0); Meeus (1998, \emph{Astronomical Algorithms}, 2nd ed.); P03 / IAU 2006 obliquity; IAU constellation boundaries (data shipped with astropy); Natural Earth 1:50m coastlines (public domain); STIX Two Math font (SIL OFL 1.1); NASA Exoplanet Archive, NASA Planetary Fact Sheet, JPL DE440 ephemeris and Standish elements, AME 2020, Landolt filters (1992), spectrum of M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, rotation curve: McMillan (2017) model through galpy, Eilers et al. (2019) measurements and galkin compilation (Pato \& Iocco 2017), Reid et al. (2019) arms, Wegg et al. (2015) bar; Antikythera Mechanism: adapted from Anticythere3D (same author), after Freeth et al. (\emph{Nature} 444, 2006; \emph{Nature} 454, 2008; \emph{Scientific Reports} 11:5821, 2021); physical spectra: CODATA 2022, NIST ASD, Mamajek (2022), Malkov et al. (2020), van Belle et al. (2021), Martins et al. (2005), Castelli \& Kurucz (2003, ATLAS9), NIST-JANAF, Allard et al. (2000), CIE 1931; Gravity and Orbits: after the PhET simulation “Gravity and Orbits” (PhET Interactive Simulations, University of Colorado Boulder; nothing reused), CODATA 2018, IAU 2015 (B3) and 2012 (B2), DE440 (Park et al. 2021), NASA (Earth, Moon, ISS fact sheets), Yoshida (1990); Orion in 3D and hover data sheets: SIMBAD (CDS, Strasbourg), Gaia DR3 (ESA/DPAC), Hipparcos (van Leeuwen 2007), Zucker et al. (2021, CC0), Großschedl et al. (2018), Kounkel et al. (2017, 2018), Foley et al. (2023), O'Dell et al. (2009), Stellarium (figure, CC BY-SA 4.0); images ESO/G. Beccari, ESO, and NASA, ESA, M. Robberto (STScI/ESA) and the Hubble Space Telescope Orion Treasury Project Team, NASA, ESA, and the Hubble Heritage Team (AURA/STScI), under the CC BY 4.0 licence (details in \texttt{NOTICE}).
 \end{document}

@@ -2,7 +2,7 @@
 
     QT_QPA_PLATFORM=offscreen python -m coupole.essai_fumee
 
-Ouvre la fenêtre principale et chaque module, les 94 animations, une page de chaque sorte (accueil des modules,
+Ouvre la fenêtre principale et chaque module, les 95 animations, une page de chaque sorte (accueil des modules,
 module, question notée, recherche, Mes modules, progression), une fiche, une table et une image, vérifie que toutes
 les données livrées se lisent (JSON compressés, images WebP, police mathématique), change de thème et de langue.
 Code de sortie 0 si tout va bien ; sinon 1 et la liste des défauts.  Rien n'est écrit hors d'un dossier temporaire."""
@@ -56,7 +56,7 @@ def main() -> int:
         ch = contenu.chemin_image(i.get('fichier') or i['id'])
         verifier(ch.exists() and not QImage(str(ch)).isNull(), 'image illisible (WebP) : %s' % ch.name)
     verifier('STIX' in formule.famille(), 'police mathématique non chargée : %r' % formule.famille())
-    verifier(len(catalogue.ENTREES) >= 94, 'animations manquantes')
+    verifier(len(catalogue.ENTREES) >= 95, 'animations manquantes')
     # kit commun : mise à jour et rapports importables, paquet reconnu, style figé, logo, manuels FR et EN
     from .core import maj, rapports
     u = maj.kit('updater')

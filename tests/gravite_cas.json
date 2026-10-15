@@ -1,0 +1,5339 @@
+{
+"libre": {
+"depart": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.b4c90cb49bd0fp+18",
+"0x1.db819c51cf92dp+2",
+"0x1.316f5fbde3193p-14",
+"-0x1.79278b08b85e8p-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.12003d2392d98p+37",
+"0x1.db81acf095f3bp+2",
+"-0x1.f26337ede2190p+4",
+"0x1.d90694f7ea1f8p+14",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.128f34571841ep+37",
+"-0x1.7f98d09e54f4ep+27",
+"0x1.18a264e69819dp+9",
+"0x1.e74d6128fe88dp+14",
+true
+],
+[
+"comete",
+"0x1.6bcc41e900000p+46",
+"-0x1.4e60969740000p+36",
+"0x1.15a3967c85759p-37",
+"-0x1.e1f6a6981668cp-60",
+"-0x1.7bfc656b81a8fp+15",
+true
+]
+],
+"etapes": [
+{
+"courbure": "0x1.4c2009c245d2ap-1",
+"derives": [
+"0x1.6444202352d1bp-47",
+"0x1.02be6138ad5f8p-49"
+],
+"duree": "0x1.07ac000000000p+22",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.15aed7cd0c297p+18",
+"-0x1.543841fa03bcfp+18",
+"0x1.1fb4be22b93f4p-4",
+"-0x1.e1802ae29ed9fp-5",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.5c6627175d981p+36",
+"0x1.aae02ccbbde7fp+36",
+"-0x1.692b7606c5bf6p+14",
+"0x1.2e14b30c788dbp+14",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.5c34443775374p+36",
+"0x1.a97cdaf1e726fp+36",
+"-0x1.58e7aafd85073p+14",
+"0x1.2c45c48a8275dp+14",
+true
+],
+[
+"comete",
+"0x1.6bcc41e900000p+46",
+"0x1.5d28f84cbe03dp+32",
+"-0x1.11d41ec9b09ddp+37",
+"0x1.da9bffb9b3322p+14",
+"-0x1.0a12b4b6d937fp+14",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+500,
+500,
+500,
+500
+],
+"pas": 1148,
+"periodes": [
+null,
+null,
+"0x1.20548d468abe0p+21",
+null
+],
+"t": "0x1.07abffffffffbp+22"
+},
+{
+"courbure": "0x1.e84e5fa336589p-1",
+"derives": [
+"0x1.4928ae636b205p-46",
+"0x1.367e0e44033f7p-49"
+],
+"duree": "0x1.07ac000000000p+22",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"0x1.45e7c7ce231ffp+16",
+"-0x1.b588b1883ba7ep+18",
+"0x1.6d03319632654p-4",
+"0x1.ede7856a9e637p-7",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.98d4d73fac4fbp+34",
+"0x1.127af67cc1f9ep+37",
+"-0x1.ca093c3ce8d81p+14",
+"-0x1.3525cca1fe4bdp+12",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.9e6966a0887d7p+34",
+"0x1.123c23fa97b1fp+37",
+"-0x1.c4330c718741dp+14",
+"-0x1.6e22b372c8a51p+12",
+true
+],
+[
+"comete",
+"0x1.6bcc41e900000p+46",
+"0x1.d87d2e225a319p+36",
+"-0x1.4e2af51530cf6p+37",
+"0x1.83d9ae08e2669p+14",
+"-0x1.593cfc07d302bp+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+1000,
+1000,
+1000,
+1000
+],
+"pas": 1151,
+"periodes": [
+null,
+null,
+"0x1.1f9ca3035d740p+21",
+null
+],
+"t": "0x1.07abffffffff8p+23"
+},
+{
+"courbure": "0x1.54c6d22ffb918p+0",
+"derives": [
+"0x1.6444202352d1bp-46",
+"0x1.9dfd685aaeff3p-52"
+],
+"duree": "0x1.07ac000000000p+22",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"0x1.8201bb536e5eap+18",
+"-0x1.cfbde9d6e5253p+17",
+"0x1.7eaa3aca128b2p-5",
+"0x1.37d636a666279p-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.e44a6c531f1bcp+36",
+"0x1.22e862e65d5a5p+36",
+"-0x1.dfe5fb622d9e4p+13",
+"-0x1.8718fcde3787bp+14",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.e587a1b0088c7p+36",
+"0x1.23c6363abfe2bp+36",
+"-0x1.f18f1e559f846p+13",
+"-0x1.93782059c3577p+14",
+true
+],
+[
+"comete",
+"0x1.6bcc41e900000p+46",
+"0x1.9947b486543f4p+37",
+"-0x1.3563c8eb731d9p+37",
+"0x1.1e6dc7d1c3dffp+14",
+"0x1.77af79a793b59p+12",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+1500,
+1500,
+1500,
+1500
+],
+"pas": 1162,
+"periodes": [
+null,
+null,
+"0x1.2003a40584ee6p+21",
+null
+],
+"t": "0x1.8b81fffffffe9p+23"
+},
+{
+"courbure": "0x1.cc84ac8f56e60p-1",
+"derives": [
+"0x1.833eeb47c9534p-47",
+"0x1.d1bd156604df2p-50"
+],
+"duree": "0x1.07ac000000000p+22",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"0x1.b037261d1f15ep+18",
+"0x1.0420e2fbd1aafp+17",
+"-0x1.aa62c96386e84p-6",
+"0x1.5d10916484b42p-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.0f2411ab965c9p+37",
+"-0x1.46682b7cebd42p+35",
+"0x1.0bddc825db840p+13",
+"-0x1.b5f82251fa09bp+14",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.0f23af02f75fcp+37",
+"-0x1.4384029d7bb75p+35",
+"0x1.d8c61d6765dbfp+12",
+"-0x1.b4e4c98ee6bccp+14",
+true
+],
+[
+"comete",
+"0x1.6bcc41e900000p+46",
+"0x1.0adafeb34cb3ap+38",
+"-0x1.ec3386f83addfp+36",
+"0x1.8dca3490d269dp+13",
+"0x1.24b4b2adb6434p+13",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+2000,
+2000,
+2000,
+2000
+],
+"pas": 1161,
+"periodes": [
+null,
+null,
+"0x1.206368478689bp+21",
+null
+],
+"t": "0x1.07abffffffff7p+24"
+},
+{
+"courbure": "0x1.574a5589fae50p-1",
+"derives": [
+"0x1.d0b1e722f1971p-49",
+"0x1.367e0e44033f7p-49"
+],
+"duree": "0x1.07ac000000000p+22",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"0x1.7d2a08ab9e22fp+17",
+"0x1.94f56c34c02c3p+18",
+"-0x1.4f5bd92e90058p-4",
+"0x1.2f963008ca3d3p-5",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.de42b69224a7ep+35",
+"-0x1.fc1730e319acap+36",
+"0x1.a4d6cc6348068p+14",
+"-0x1.7d450aeef284dp+13",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.dbbe458c5f366p+35",
+"-0x1.fb8a7e4448fcdp+36",
+"0x1.9e547d35dbd7bp+14",
+"-0x1.5e9664075a89bp+13",
+true
+],
+[
+"comete",
+"0x1.6bcc41e900000p+46",
+"0x1.33ecf641c5802p+38",
+"-0x1.45906312e6e2bp+36",
+"0x1.e584ebcebbbdbp+12",
+"0x1.5c75dffe058e5p+13",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+2501,
+2501,
+2501,
+2501
+],
+"pas": 1146,
+"periodes": [
+null,
+null,
+"0x1.203f77cb97e4dp+21",
+null
+],
+"t": "0x1.4997000000007p+24"
+},
+{
+"courbure": "0x1.5edef5cf3a9e4p+0",
+"derives": [
+"0x1.54c6ba911790fp-49",
+"0x1.9dfd685aaeff3p-51"
+],
+"duree": "0x1.07ac000000000p+22",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.6713820014ef2p+17",
+"0x1.933c8320fb323p+18",
+"-0x1.5299434125970p-4",
+"-0x1.3a245ff6ffa2ep-5",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.c27e0932433c3p+35",
+"-0x1.f9e9812fdbbb2p+36",
+"0x1.a8b10f79d3a27p+14",
+"0x1.89d43e5a758f9p+13",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.c489897c37402p+35",
+"-0x1.facec5cd01b5dp+36",
+"0x1.b3a93fc2bf653p+14",
+"0x1.a371a82fa5bccp+13",
+true
+],
+[
+"comete",
+"0x1.6bcc41e900000p+46",
+"0x1.49d88d4814bdep+38",
+"-0x1.148f980771ea6p+35",
+"0x1.8c15ed25b4834p+11",
+"0x1.76d3ba86b681bp+13",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+3000,
+3000,
+3000,
+3000
+],
+"pas": 1148,
+"periodes": [
+null,
+null,
+"0x1.2023ed0b3ab1bp+21",
+null
+],
+"t": "0x1.8b81ffffffffep+24"
+},
+{
+"courbure": "0x1.e42508b7572e4p-1",
+"derives": [
+"0x1.68a732aaf14bep+0",
+"0x1.1da79f719746dp-19"
+],
+"duree": "0x1.07ac000000000p+22",
+"etat": [
+[
+"soleil",
+"0x1.55529fb0a1aa2p+101",
+"-0x1.9482252f99005p+18",
+"0x1.b9f821cd531aap+16",
+"-0x1.59e20c2ae7224p-8",
+"-0x1.788195b541c3bp-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.8ed19319fb8b3p+36",
+"-0x1.7971ea9194ab4p+32",
+"-0x1.f6de5c10065b9p+13",
+"0x1.4c94542f0d545p+15",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.8e4238722c970p+36",
+"-0x1.90919f10a82a0p+32",
+"-0x1.db9e8f9800b01p+13",
+"0x1.4a701ff28cf2ap+15",
+true
+],
+[
+"comete",
+"0x1.6bcc41e900000p+46",
+"0x1.47389e177e3e6p+38",
+"0x1.d1131a0f96d1bp+33",
+"-0x1.19f1634552693p+12",
+"0x1.7e08a33142a0ep+13",
+true
+]
+],
+"gravite": true,
+"masse": 1.7,
+"n_traces": [
+3501,
+3501,
+3501,
+3501
+],
+"pas": 1143,
+"periodes": [
+null,
+null,
+"0x1.202ee3a3380ebp+21",
+null
+],
+"t": "0x1.cd6d000000017p+24"
+},
+{
+"courbure": "0x1.105a45217896dp+0",
+"derives": [
+"0x1.68a7329535f7ap+0",
+"0x1.1da79f6cbd4e9p-19"
+],
+"duree": "0x1.07ac000000000p+22",
+"etat": [
+[
+"soleil",
+"0x1.55529fb0a1aa2p+101",
+"-0x1.b86ad1fd7a6b4p+17",
+"0x1.22e3566648e68p+16",
+"-0x1.932ded87d0d7ap-6",
+"0x1.5ec29bb11dcb7p-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.2cafc3514b101p+36",
+"-0x1.545ce0764a304p+34",
+"-0x1.4b6579a963c74p+12",
+"-0x1.bb094277efbfdp+15",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.235ca66cedc52p+36",
+"-0x1.615e03f86c63ap+34",
+"-0x1.68e1f6fb2789ap+11",
+"-0x1.bbcd4eb5a5743p+15",
+true
+],
+[
+"comete",
+"0x1.6bcc41e900000p+46",
+"0x1.248e7ccb2cfc0p+38",
+"0x1.f0b5f89b06fe8p+35",
+"-0x1.9495872994e31p+13",
+"0x1.5c70755dab08dp+13",
+true
+]
+],
+"gravite": true,
+"masse": 1.7,
+"n_traces": [
+3955,
+3955,
+3955,
+3955
+],
+"pas": 880,
+"periodes": [
+null,
+"0x1.cfb14f3527b75p+24",
+"0x1.222a664304d63p+21",
+null
+],
+"t": "0x1.07ac00000000bp+25"
+},
+{
+"courbure": "0x1.13832000b9195p+0",
+"derives": [
+"0x1.68a7327209462p+0",
+"0x1.1da79f68b2551p-19"
+],
+"duree": "0x1.07ac000000000p+22",
+"etat": [
+[
+"soleil",
+"0x1.55529fb0a1aa2p+101",
+"-0x1.0d678afa12d39p+19",
+"0x1.b3331cadd5ac6p+17",
+"-0x1.6f4656ff5009dp-4",
+"-0x1.c069ee4b9cdd4p-7",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.2021f0d78db13p+34",
+"-0x1.0c6b0eaa2e0adp+37",
+"0x1.e5ce559ce812ep+14",
+"-0x1.3ace30f162ac4p+10",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.f6b0ff28c0134p+34",
+"-0x1.e690859584ab3p+36",
+"0x1.f4d56b55a56ddp+14",
+"0x1.569e60ecf698ep+12",
+true
+],
+[
+"comete",
+"0x1.6bcc41e900000p+46",
+"0x1.b7d704f51fa4cp+37",
+"0x1.9425315e3c242p+36",
+"-0x1.73c12e87c0accp+14",
+"0x1.d85395b806070p+12",
+true
+]
+],
+"gravite": true,
+"masse": 1.7,
+"n_traces": [
+4129,
+4129,
+4129,
+4129
+],
+"pas": 174,
+"periodes": [
+null,
+"0x1.cfb14f3527b75p+24",
+"0x1.222a664304d63p+21",
+null
+],
+"t": "0x1.28a180000000ap+25"
+},
+{
+"courbure": "0x1.026bb1f6145f1p+0",
+"derives": [
+"0x1.68a7327506ea9p+0",
+"0x1.1da79f684ad5cp-19"
+],
+"duree": "0x1.07ac000000000p+22",
+"etat": [
+[
+"soleil",
+"0x1.55529fb0a1aa2p+101",
+"-0x1.a70f480a4ea0bp+19",
+"0x1.fd70f60e18fd3p+12",
+"-0x1.62f24fb7e4681p-5",
+"-0x1.4b6476415561cp-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.a6563c033d753p+36",
+"-0x1.d2f2049ef9fdap+35",
+"0x1.51ec825e862f1p+12",
+"0x1.1bb9d54f28736p+15",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.7f5276e9dc075p+36",
+"-0x1.5c3aaa3937014p+33",
+"-0x1.79ff635e660d0p+13",
+"0x1.569de6349e020p+15",
+true
+],
+[
+"comete",
+"0x1.6bcc41e900000p+46",
+"0x1.6f0a03f7c32c7p+36",
+"0x1.bb4da5175e552p+36",
+"-0x1.484e5ca1067d9p+15",
+"-0x1.92ccecdc5cd1cp+12",
+true
+]
+],
+"gravite": true,
+"masse": 1.7,
+"n_traces": [
+4275,
+4275,
+4275,
+4275
+],
+"pas": 146,
+"periodes": [
+null,
+"0x1.cfb14f3527b75p+24",
+"0x1.222a664304d63p+21",
+null
+],
+"t": "0x1.499700000000ap+25"
+}
+],
+"pas_trace": "0x1.0e00000000000p+13"
+},
+"soleil_terre": {
+"depart": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.b6c890c0790adp+18",
+"0x0.0p+0",
+"0x0.0p+0",
+"-0x1.6e6b6036c04c6p-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.16a59bfa4de7fp+37",
+"0x0.0p+0",
+"0x0.0p+0",
+"0x1.d16296a195ed7p+14",
+true
+]
+],
+"etapes": [
+{
+"courbure": null,
+"derives": [
+"0x1.68a712d027670p-48",
+"0x1.6ea581b07c839p-49"
+],
+"duree": "0x1.07ac000000000p+25",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.6ab8a3b91aaefp+18",
+"-0x1.edd1946ee672fp+17",
+"0x1.9c60d58ea603ep-5",
+"-0x1.2ee6c0e4679a0p-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.ccb02647a8d3ep+36",
+"0x1.3998c1befb9b3p+36",
+"-0x1.05e0e17fe5e24p+14",
+"0x1.80b628b6e9a2ap+14",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+689,
+689
+],
+"pas": 689,
+"periodes": [
+null,
+"0x1.e18a04f321b3bp+24"
+],
+"t": "0x1.07abfffffffffp+25"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.97b1bc3937ac1p-48",
+"0x1.88d5e661a9fabp-49"
+],
+"duree": "0x1.3830000000000p+18",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.5a483b2468454p+18",
+"-0x1.0d7af069ef630p+18",
+"0x1.c213458d025a9p-5",
+"-0x1.212c64f0f5dc2p-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.b7cf19299063dp+36",
+"0x1.56438484ab462p+36",
+"-0x1.1dd155edd42f7p+14",
+"0x1.6f469ca3ec8e8p+14",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+696,
+696
+],
+"pas": 7,
+"periodes": [
+null,
+"0x1.e18a04f321b3bp+24"
+],
+"t": "0x1.0a1c600000000p+25"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.c6bc65a247f12p-48",
+"0x1.a3064b12d771cp-49"
+],
+"duree": "0x1.3830000000000p+18",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.4870d345bcb5ep+18",
+"-0x1.22f5b68da4a07p+18",
+"0x1.e5f31b8e82003p-5",
+"-0x1.12463e5c8d27ep-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.a12616bc20f46p+36",
+"0x1.718b727cedca0p+36",
+"-0x1.34997a54b4964p+14",
+"0x1.5c5a4d8e5325ap+14",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+703,
+703
+],
+"pas": 7,
+"periodes": [
+null,
+"0x1.e18a04f321b3bp+24"
+],
+"t": "0x1.0c8cc00000000p+25"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.d66a9e1aa2b2ep-48",
+"0x1.bd36afc404e8ep-49"
+],
+"duree": "0x1.3830000000000p+18",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.3544eb3aa999fp+18",
+"-0x1.3742d7f3e092dp+18",
+"0x1.03ed9342782cdp-4",
+"-0x1.0243bf5adc76bp-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.88cc9d0360cccp+36",
+"0x1.8b544348c02a4p+36",
+"-0x1.4a21b069e6368p+14",
+"0x1.4804d9a5d0580p+14",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+710,
+710
+],
+"pas": 7,
+"periodes": [
+null,
+"0x1.e18a04f321b3bp+24"
+],
+"t": "0x1.0efd200000000p+25"
+}
+],
+"pas_trace": "0x1.0e00000000000p+13"
+},
+"soleil_terre_lune": {
+"depart": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.b4c90cb4aebffp+18",
+"0x1.db819c51cf92dp+2",
+"0x1.316f5fbde3193p-14",
+"-0x1.79278b08e366ap-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.12003d2392d98p+37",
+"0x1.db81acf095f3bp+2",
+"-0x1.f26337ede2190p+4",
+"0x1.d90694f7ea1f7p+14",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.128f34571841ep+37",
+"-0x1.7f98d09e54f4ep+27",
+"0x1.18a264e69819dp+9",
+"0x1.e74d6128fe88cp+14",
+true
+]
+],
+"etapes": [
+{
+"courbure": "0x1.5b4ca51ca1422p+0",
+"derives": [
+"0x1.0753beb5fbc5bp-47",
+"0x1.505de4c9c59a0p-49"
+],
+"duree": "0x1.3c68000000000p+21",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.78e5e8b639967p+18",
+"-0x1.bcb597f43b197p+17",
+"0x1.799d0c013f28ep-5",
+"-0x1.45b1b0c9a7388p-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.d8dc68927d761p+36",
+"0x1.16fa2fba495f9p+36",
+"-0x1.d9bf3b2f4bff1p+13",
+"0x1.986e3ccb49feap+14",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.da38ccba19ad8p+36",
+"0x1.171729fa0450fp+36",
+"-0x1.dc0e9a28157fcp+13",
+"0x1.a92dd80f291cap+14",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+301,
+301,
+301
+],
+"pas": 696,
+"periodes": [
+null,
+null,
+"0x1.20548d468ab30p+21"
+],
+"t": "0x1.3c6800000000bp+21"
+},
+{
+"courbure": "0x1.5af60d479ef73p+0",
+"derives": [
+"0x1.6444202363b12p-46",
+"0x1.c4cd2a234eecep-48"
+],
+"duree": "0x1.3c68000000000p+21",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.acf99019ac0e4p+17",
+"-0x1.8060913ba4321p+18",
+"0x1.444239c784257p-4",
+"-0x1.75e51ea9cbf44p-5",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.0d186786960a1p+36",
+"0x1.e23ff09992774p+36",
+"-0x1.96b46d29e9ee0p+14",
+"0x1.d4ce894313a21p+13",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.0e22d70de7323p+36",
+"0x1.e331dfc116bfep+36",
+"-0x1.a1454f25211a1p+14",
+"0x1.edbc0ff9f77ebp+13",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+601,
+601,
+601
+],
+"pas": 695,
+"periodes": [
+null,
+null,
+"0x1.1fcd9035b9739p+21"
+],
+"t": "0x1.3c6800000000ap+22"
+},
+{
+"courbure": "0x1.58555ab543bbfp+0",
+"derives": [
+"0x1.05641203b4462p-45",
+"0x1.1c9e37be6c1fep-47"
+],
+"duree": "0x1.3c68000000000p+21",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"0x1.5d3dff90ace8ep+12",
+"-0x1.bbc045bf54893p+18",
+"0x1.734105f41f016p-4",
+"-0x1.9d7e5e45bca14p-12",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.b669e90915c96p+30",
+"0x1.165e6eaf1ff7ap+37",
+"-0x1.d19c12b5afef9p+14",
+"0x1.faadcb8e985a2p+6",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.a315ce2776fd7p+30",
+"0x1.1714432db0663p+37",
+"-0x1.e0f4954c1628fp+14",
+"0x1.77e7d12958ab4p+8",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+901,
+901,
+901
+],
+"pas": 692,
+"periodes": [
+null,
+null,
+"0x1.1f9ca2f968d9fp+21"
+],
+"t": "0x1.da9c00000000cp+22"
+},
+{
+"courbure": "0x1.55d224502d0fap+0",
+"derives": [
+"0x1.71d1d903582e2p-45",
+"0x1.9dfd685acbd14p-47"
+],
+"duree": "0x1.3c68000000000p+21",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"0x1.c074df3e186ecp+17",
+"-0x1.833d44419ad35p+18",
+"0x1.41584a1040345p-4",
+"0x1.677054ac57e9bp-5",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.195293b674b30p+36",
+"0x1.e5d5de0538899p+36",
+"-0x1.9300725bb4f4fp+14",
+"-0x1.c2d76c7602badp+13",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.19e218ec6f19cp+36",
+"0x1.e73796e9be41ep+36",
+"-0x1.a17403cf227aap+14",
+"-0x1.cd970f19f0b56p+13",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+1201,
+1201,
+1201
+],
+"pas": 690,
+"periodes": [
+null,
+null,
+"0x1.1fbd152769731p+21"
+],
+"t": "0x1.3c6800000000ap+23"
+},
+{
+"courbure": "0x1.54c6d23038752p+0",
+"derives": [
+"0x1.2c1d8ff14a3d9p-45",
+"0x1.b7dd3ee0788e5p-48"
+],
+"duree": "0x1.3c68000000000p+21",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"0x1.8201bb539cb97p+18",
+"-0x1.cfbde9d72b497p+17",
+"0x1.7eaa3aca33076p-5",
+"0x1.37d636a66b6ffp-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.e44a6c531f1d1p+36",
+"0x1.22e862e65d6d8p+36",
+"-0x1.dfe5fb622e0cap+13",
+"-0x1.8718fcde374a8p+14",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.e587a1b0093b8p+36",
+"0x1.23c6363abe31ep+36",
+"-0x1.f18f1e5583a68p+13",
+"-0x1.93782059d2aacp+14",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+1501,
+1501,
+1501
+],
+"pas": 689,
+"periodes": [
+null,
+null,
+"0x1.2003a40555073p+21"
+],
+"t": "0x1.8b82000000005p+23"
+},
+{
+"courbure": "0x1.55ad4fd672c38p+0",
+"derives": [
+"0x1.3d8aa235cdb9bp-45",
+"0x1.dead00a8fba9fp-48"
+],
+"duree": "0x1.3c68000000000p+21",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"0x1.c32eefa65ed71p+18",
+"-0x1.2524e1b7e5513p+14",
+"0x1.eb690a2ae27ccp-9",
+"0x1.6c7ec8d40e636p-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.1b07e3cb2edd9p+37",
+"0x1.6fc86701fb8b0p+32",
+"-0x1.3431443180b55p+10",
+"-0x1.c9219f2260680p+14",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.1bc8fcd5f6626p+37",
+"0x1.70c956bdd72aep+32",
+"-0x1.3b06eba0b19a1p+10",
+"-0x1.d858f0c64f255p+14",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+1800,
+1800,
+1800
+],
+"pas": 688,
+"periodes": [
+null,
+null,
+"0x1.2043e1c8e24ecp+21"
+],
+"t": "0x1.da9bffffffffep+23"
+},
+{
+"courbure": "0x1.586a9be62e105p+0",
+"derives": [
+"0x1.1ab07dacc6c16p-45",
+"0x1.b7dd3ee0788e5p-48"
+],
+"duree": "0x1.3c68000000000p+21",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"0x1.94467fed984a1p+18",
+"0x1.8f99c1ce6695dp+17",
+"-0x1.481f996f83719p-5",
+"0x1.4666b32cc74bcp-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.fb360a3ada03bp+36",
+"-0x1.f557cc7ecf634p+35",
+"0x1.9b7ad0dcecfd4p+13",
+"-0x1.995cd73510cd7p+14",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.fc7d0ae69dcedp+36",
+"-0x1.f6dbc05719334p+35",
+"0x1.ac2200f10f45ep+13",
+"-0x1.a66a18d22b567p+14",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+2100,
+2100,
+2100
+],
+"pas": 689,
+"periodes": [
+null,
+null,
+"0x1.206368451e98ap+21"
+],
+"t": "0x1.14dafffffffffp+24"
+},
+{
+"courbure": "0x1.5c3a477f7970ap+0",
+"derives": [
+"0x1.16d1244837c24p-45",
+"0x1.298e2301427e6p-47"
+],
+"duree": "0x1.3c68000000000p+21",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"0x1.0096ecc4abebbp+18",
+"0x1.700302917a4efp+18",
+"-0x1.3001e92ac2fedp-4",
+"0x1.9bff8c5dc9dbap-5",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.41ec9b23702bap+36",
+"-0x1.cdb65b19ea364p+36",
+"0x1.7d3f10f985942p+14",
+"-0x1.02622537c1855p+14",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.4288f930b8780p+36",
+"-0x1.cf054b673be77p+36",
+"0x1.8befa714f5659p+14",
+"-0x1.0887ad9c7bd93p+14",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+2401,
+2401,
+2401
+],
+"pas": 690,
+"periodes": [
+null,
+null,
+"0x1.205d2f2608bbap+21"
+],
+"t": "0x1.3c68000000005p+24"
+},
+{
+"courbure": "0x1.5f4e16a22a1ddp+0",
+"derives": [
+"0x1.35cbef6cafbb6p-46",
+"0x1.0fae4c7b95c15p-48"
+],
+"duree": "0x1.3c68000000000p+21",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"0x1.60e62f91f75afp+15",
+"0x1.baf7029c1fac2p+18",
+"-0x1.70d8e3fb07e59p-4",
+"0x1.e95bb48457544p-8",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.bacb06d7ed693p+33",
+"-0x1.15e04054fabd1p+37",
+"0x1.ce94efede9b48p+14",
+"-0x1.33587649b59ebp+11",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.b8a81c31cc9fep+33",
+"-0x1.168fcb17823fep+37",
+"0x1.de9a5fa0e600dp+14",
+"-0x1.15ee7f06b9f94p+11",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+2701,
+2701,
+2701
+],
+"pas": 693,
+"periodes": [
+null,
+null,
+"0x1.203f77cb6e460p+21"
+],
+"t": "0x1.63f5000000001p+24"
+},
+{
+"courbure": "0x1.5edef5ce90d00p+0",
+"derives": [
+"0x1.73c185b59fadbp-49",
+"0x1.9dfd685acbd14p-51"
+],
+"duree": "0x1.3c68000000000p+21",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.671381ff7f2f8p+17",
+"0x1.933c8320f3896p+18",
+"-0x1.5299434122d6ep-4",
+"-0x1.3a245ff6ea0bdp-5",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.c27e0932429e2p+35",
+"-0x1.f9e9812fdbf6dp+36",
+"0x1.a8b10f79d484cp+14",
+"0x1.89d43e5a73a0cp+13",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.c489897c40ba4p+35",
+"-0x1.facec5ccfbafbp+36",
+"0x1.b3a93fc27c698p+14",
+"0x1.a371a8301fa4fp+13",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+3001,
+3001,
+3001
+],
+"pas": 695,
+"periodes": [
+null,
+null,
+"0x1.2023ed0c603e5p+21"
+],
+"t": "0x1.8b82000000004p+24"
+},
+{
+"courbure": "0x1.58d715281a351p+0",
+"derives": [
+"0x1.efacb2477f924p-50",
+"0x1.9dfd685acbd14p-52"
+],
+"duree": "0x1.3c68000000000p+21",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.635a6c6e190edp+18",
+"0x1.00a9fe0ad2efbp+18",
+"-0x1.b1d2387a9a88cp-5",
+"-0x1.32e9a355c447dp-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.bdd46e6e02788p+36",
+"-0x1.42063fbae3644p+36",
+"0x1.10229aac3509fp+14",
+"0x1.80dcf96e91692p+14",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.bf2bd1b112584p+36",
+"-0x1.4215133b75a6ap+36",
+"0x1.11353dae7d6cep+14",
+"0x1.91df450bb92d4p+14",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+3301,
+3301,
+3301
+],
+"pas": 696,
+"periodes": [
+null,
+null,
+"0x1.2035261a5b465p+21"
+],
+"t": "0x1.b30f00000000dp+24"
+},
+{
+"courbure": "0x1.4e30786a04c1ep+0",
+"derives": [
+"0x1.16d1244837c24p-48",
+"0x1.9dfd685acbd14p-50"
+],
+"duree": "0x1.3c68000000000p+21",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.b2f0cd4315058p+18",
+"0x1.465a779c79cfcp+15",
+"-0x1.12b51c2d15486p-7",
+"-0x1.77888d0c61b71p-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.10d8051c0e1f8p+37",
+"-0x1.9989df8f06779p+33",
+"0x1.599028703a391p+11",
+"0x1.d6fe4ceebb47fp+14",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.1164112b98ebdp+37",
+"-0x1.932dc98a26ec1p+33",
+"0x1.0f845692ef839p+11",
+"0x1.e524ea07d4656p+14",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+3601,
+3601,
+3601
+],
+"pas": 696,
+"periodes": [
+null,
+null,
+"0x1.2054323c663f6p+21"
+],
+"t": "0x1.da9c00000000bp+24"
+},
+{
+"courbure": "0x1.427a4958f55adp+0",
+"derives": [
+"0x1.6444202363b12p-46",
+"0x1.9dfd685acbd14p-47"
+],
+"duree": "0x1.3c68000000000p+21",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.8bb4626c5a98ap+18",
+"-0x1.745d05d729287p+17",
+"0x1.3c7c85a440449p-5",
+"-0x1.55dad9369ae5bp-4",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.f077e67823c25p+36",
+"0x1.d327e3dbdfa0fp+35",
+"-0x1.8cb4c688114f7p+13",
+"0x1.acd6d63a68941p+14",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.f0deffbf9f868p+36",
+"0x1.d5cdec871592cp+35",
+"-0x1.ab9bbcf457c9bp+13",
+"0x1.b2b163edd7d64p+14",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+3901,
+3901,
+3901
+],
+"pas": 694,
+"periodes": [
+null,
+"0x1.e18b46152dcc5p+24",
+"0x1.20677043e45bdp+21"
+],
+"t": "0x1.0114800000008p+25"
+},
+{
+"courbure": "0x1.38c38516bed28p+0",
+"derives": [
+"0x1.d0b1e72307991p-47",
+"0x1.7da59c33b3e4ep-47"
+],
+"duree": "0x1.3c68000000000p+21",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.f14e7176d1fe1p+17",
+"-0x1.6a8b0e05cd779p+18",
+"0x1.323d667a2f5e4p-4",
+"-0x1.b002a3e5c6825p-5",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.37facf3023180p+36",
+"0x1.c6d9bfaab138cp+36",
+"-0x1.80097f537a2f5p+14",
+"0x1.0f0f7f334cee6p+14",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.3788367f82e91p+36",
+"0x1.c83497c149986p+36",
+"-0x1.8f8f631e395d3p+14",
+"0x1.0b1537a465136p+14",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+4200,
+4200,
+4200
+],
+"pas": 692,
+"periodes": [
+null,
+"0x1.e18b46152dcc5p+24",
+"0x1.20642973dad12p+21"
+],
+"t": "0x1.14daffffffff3p+25"
+},
+{
+"courbure": "0x1.320d0366e4f29p+0",
+"derives": [
+"0x1.efacb2477f924p-47",
+"0x1.d8350b07907abp-47"
+],
+"duree": "0x1.3c68000000000p+21",
+"etat": [
+[
+"soleil",
+"0x1.918e618481f55p+100",
+"-0x1.15bc2acd31eabp+15",
+"-0x1.b9c159a7f896cp+18",
+"0x1.722447e3e5a31p-4",
+"-0x1.19ef39c86919ap-7",
+true
+],
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.5c92f4143a0ccp+33",
+"0x1.151eb648d98a8p+37",
+"-0x1.d04698f433252p+14",
+"0x1.62dddeb478816p+11",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.5359c9462fe7bp+33",
+"0x1.159311419f38bp+37",
+"-0x1.da8c8c90c7afcp+14",
+"0x1.0562bd06e7775p+11",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+4500,
+4500,
+4500
+],
+"pas": 689,
+"periodes": [
+null,
+"0x1.e18b46152dcc5p+24",
+"0x1.2051d92195d7fp+21"
+],
+"t": "0x1.28a17fffffff5p+25"
+}
+],
+"pas_trace": "0x1.0e00000000000p+13"
+},
+"terre_iss": {
+"depart": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.0cc38276ec92ap-41",
+"0x0.0p+0",
+"0x0.0p+0",
+"-0x1.3656fb4ae5851p-51",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"0x1.9e9e300000000p+22",
+"0x0.0p+0",
+"0x0.0p+0",
+"0x1.dec1b81584b5ap+12",
+true
+]
+],
+"etapes": [
+{
+"courbure": null,
+"derives": [
+"0x1.4002818339b42p-50",
+"0x1.a64d089d778b5p-52"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.a31ee63079e09p-42",
+"-0x1.508fb6e4314e0p-42",
+"0x1.84a01506dd641p-52",
+"-0x1.e3f4bf80b9c6ep-52",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"0x1.434926ab50b4fp+22",
+"0x1.039aad87bcdcep+22",
+"-0x1.2bc36b30a0fe1p+12",
+"0x1.754bc862f467ep+12",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+61,
+61
+],
+"pas": 68,
+"periodes": [
+null,
+null
+],
+"t": "0x1.2c00000000000p+9"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.124b4a707a9a6p-49",
+"0x1.07f025626ab71p-50"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.d04377aad268cp-44",
+"-0x1.066c6c81d7d93p-41",
+"0x1.2f04d06b6b350p-51",
+"-0x1.0c0a85f16a15fp-53",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"0x1.661b3a2435f60p+20",
+"0x1.94d646bf8872dp+22",
+"-0x1.d37677c1a3316p+12",
+"0x1.9d80cfc600cd2p+10",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+121,
+121
+],
+"pas": 68,
+"periodes": [
+null,
+null
+],
+"t": "0x1.2c00000000003p+10"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.4002818339b42p-49",
+"0x1.3cb9c67619a88p-50"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.dc3ef8bef2367p-43",
+"-0x1.e1e7e0778a41cp-42",
+"0x1.163a0e839c313p-51",
+"0x1.12f58907ee22dp-52",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"-0x1.6f595311ef619p+21",
+"0x1.73b6ed5644755p+22",
+"-0x1.ad376a86b159ap+12",
+"-0x1.a82ced309f112p+11",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+181,
+181
+],
+"pas": 68,
+"periodes": [
+null,
+null
+],
+"t": "0x1.c200000000006p+10"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.4002818339b42p-50",
+"0x1.a64d089d778b5p-51"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.e7677cbafe275p-42",
+"-0x1.c54fbec9432e4p-43",
+"0x1.05b7cd34b1d09p-52",
+"0x1.1966bc59a5fcep-51",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"-0x1.77f4ad62cae37p+22",
+"0x1.5da8989a8e928p+21",
+"-0x1.93bfa20a886c9p+11",
+"-0x1.b21d1fda868c6p+12",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+241,
+241
+],
+"pas": 68,
+"periodes": [
+null,
+null
+],
+"t": "0x1.2c00000000001p+11"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.2926e5f9da274p-49",
+"0x1.71836789c899ep-50"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.04fa28aeaededp-41",
+"0x1.00e6558f8b9fap-43",
+"-0x1.28a3f93004242p-53",
+"0x1.2d59455b03bd8p-51",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"-0x1.929b12ee25eabp+22",
+"-0x1.8c50c7d2e8ebap+20",
+"0x1.c99f81fea5daap+10",
+"-0x1.d0e2e72b6c7aap+12",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+301,
+301
+],
+"pas": 68,
+"periodes": [
+null,
+null
+],
+"t": "0x1.7700000000001p+11"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.9b70efa8b7e79p-50",
+"0x1.a64d089d778b5p-51"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.468d4b1437956p-42",
+"0x1.aaf72d5638006p-42",
+"-0x1.ed03b15a72d8ap-52",
+"0x1.791144fae22c4p-52",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"-0x1.f7c45869811a2p+21",
+"-0x1.495638c967edfp+22",
+"0x1.7c487bf109923p+12",
+"-0x1.22d928e66c860p+12",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+361,
+361
+],
+"pas": 68,
+"periodes": [
+null,
+null
+],
+"t": "0x1.c200000000000p+11"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.e003c244d68e3p-49",
+"0x1.07f025626ab71p-49"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.96ed1e14d23b1p-47",
+"0x1.0cb040ed8f66ep-41",
+"-0x1.3640bf0b1bc43p-51",
+"-0x1.d5e01053747c2p-57",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"0x1.39e12fe8c7235p+17",
+"-0x1.9e807b464da4ap+22",
+"0x1.de9f6abb9f366p+12",
+"0x1.6a6f55dbe921ep+7",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+420,
+420
+],
+"pas": 68,
+"periodes": [
+null,
+null
+],
+"t": "0x1.067ffffffffffp+12"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.e003c244d68e3p-48",
+"0x1.db16a9b1267ccp-49"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.5a61e853522a5p-42",
+"0x1.9b0a9090f83b1p-42",
+"-0x1.daa0745ff3d57p-52",
+"-0x1.8ff734a71b116p-52",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"0x1.0b2dfb90636dcp+22",
+"-0x1.3d0dc18f6472fp+22",
+"0x1.6e1996f7dcc0cp+12",
+"0x1.3482b8e44e8edp+12",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+480,
+480
+],
+"pas": 68,
+"periodes": [
+null,
+null
+],
+"t": "0x1.2bffffffffffdp+12"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.9b70efa8b7e79p-48",
+"0x1.a64d089d778b5p-49"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.07b915af22ef0p-41",
+"0x1.9e77bf5573b16p-44",
+"-0x1.de95550379e6ep-54",
+"-0x1.3084efa004c1bp-51",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"0x1.96d777aca6465p+22",
+"-0x1.3fb25d5ae7b41p+20",
+"0x1.7126dd92315a6p+10",
+"0x1.d5c70c1148cc5p+12",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+540,
+540
+],
+"pas": 68,
+"periodes": [
+null,
+null
+],
+"t": "0x1.517fffffffff6p+12"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.2eddccdc320a8p-47",
+"0x1.2254f5ec422fcp-48"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.dc23364a93dc0p-42",
+"-0x1.f2e9f36b3ac7dp-43",
+"0x1.200bde3769c26p-52",
+"-0x1.12e582726b574p-51",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"0x1.6f43e98eaaab1p+22",
+"0x1.80d5692f45bd7p+21",
+"-0x1.bc5d6fd30a2e4p+11",
+"0x1.a81434314069dp+12",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+600,
+600
+],
+"pas": 68,
+"periodes": [
+null,
+"0x1.5c406470f5c0dp+12"
+],
+"t": "0x1.76ffffffffff7p+12"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.4002818339b42p-47",
+"0x1.3cb9c67619a88p-48"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.ae1f8ff01ba84p-43",
+"-0x1.eca140fbbc108p-42",
+"0x1.1c6b177b5d2f0p-51",
+"-0x1.f0a921b4337c6p-53",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"0x1.4bc5c3903ff7ap+21",
+"0x1.7bfc8dd11f7c9p+22",
+"-0x1.b6c4a07e3abbdp+12",
+"0x1.7f187c4b5b481p+11",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+660,
+660
+],
+"pas": 68,
+"periodes": [
+null,
+"0x1.5c406470f5c0dp+12"
+],
+"t": "0x1.9c7fffffffff7p+12"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.bdba58f6c73aep-48",
+"0x1.db16a9b1267ccp-49"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.19861f6a1b7b8p-43",
+"-0x1.03627f27e6466p-41",
+"0x1.2b828be0eeddfp-51",
+"0x1.4512eadeda600p-53",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"-0x1.b24d8b6e9b80dp+20",
+"0x1.90262de66e75ep+22",
+"-0x1.ce0cb91948d5fp+12",
+"-0x1.f57ca1631296dp+10",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+720,
+720
+],
+"pas": 68,
+"periodes": [
+null,
+"0x1.5c406470f5c0dp+12"
+],
+"t": "0x1.c1ffffffffff7p+12"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.c92826bb77015p-48",
+"0x1.db16a9b1267ccp-49"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.b29245ff6705ep-42",
+"-0x1.3c5c13c6b04d8p-42",
+"0x1.6d4c6cb13dca7p-52",
+"0x1.f5cbfdf610d6bp-52",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"-0x1.4f3419c1f1c9bp+22",
+"0x1.e80b252cfb587p+21",
+"-0x1.19c53935df05bp+12",
+"-0x1.830eb1930a402p+12",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+780,
+780
+],
+"pas": 68,
+"periodes": [
+null,
+"0x1.5c406470f5c0dp+12"
+],
+"t": "0x1.e77fffffffff6p+12"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.8495541f585abp-48",
+"0x1.8be83813a012ap-49"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.0c767ef216d4ep-41",
+"0x1.96cffe5830767p-46",
+"-0x1.d5be6a700d625p-56",
+"0x1.35fe0d9d34b67p-51",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"-0x1.9e276126db190p+22",
+"-0x1.39cab8faeb1b8p+18",
+"0x1.6a5561991a9ddp+8",
+"-0x1.de3887cc62946p+12",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+840,
+840
+],
+"pas": 68,
+"periodes": [
+null,
+"0x1.5c406470f5c0dp+12"
+],
+"t": "0x1.067fffffffff9p+13"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.d495f48026c7cp-48",
+"0x1.db16a9b1267ccp-49"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.92bb54610f0eep-42",
+"0x1.640277a0a60bap-42",
+"-0x1.9b15042c0a68fp-52",
+"0x1.d10825fc1c5a1p-52",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"-0x1.36a4edb572b04p+22",
+"-0x1.129b00d0612c2p+22",
+"0x1.3d15d15e930edp+12",
+"-0x1.66b2ef7f70609p+12",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+900,
+900
+],
+"pas": 68,
+"periodes": [
+null,
+"0x1.5c406470f5c0dp+12"
+],
+"t": "0x1.193fffffffff8p+13"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.5c9503eef1243p-47",
+"0x1.571e96fff1213p-48"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.6c70a2ae4f5fep-44",
+"0x1.08dff4b44335bp-41",
+"-0x1.31d96bdbb1228p-51",
+"0x1.a4d1099837146p-54",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"-0x1.191bb0d3748bep+20",
+"-0x1.989e5c6ae434ap+22",
+"0x1.d7d44f146c935p+12",
+"-0x1.449805409f10dp+10",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+960,
+960
+],
+"pas": 68,
+"periodes": [
+null,
+"0x1.5c406470f5c0dp+12"
+],
+"t": "0x1.2bffffffffff9p+13"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.5c9503eef1243p-47",
+"0x1.571e96fff1213p-48"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.04a6b7fbd30fbp-42",
+"0x1.d61a52050993ep-42",
+"-0x1.0f699220029ecp-51",
+"-0x1.2cf8ec9d36f5fp-52",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"0x1.921a5a16381afp+21",
+"-0x1.6a9c456e00cf3p+22",
+"0x1.a2b4390600d07p+12",
+"0x1.d04e453a0ffb7p+11",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+1020,
+1020
+],
+"pas": 68,
+"periodes": [
+null,
+"0x1.5c406470f5c0dp+12"
+],
+"t": "0x1.3ebfffffffff6p+13"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.e5baa9272e716p-47",
+"0x1.e84911f612391p-48"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.f1946dbddb616p-42",
+"0x1.96b1bf927e812p-43",
+"-0x1.d59b7e1b9fd0fp-53",
+"-0x1.1f46b10addeebp-51",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"0x1.7fcdfaee1a8c2p+22",
+"-0x1.39b364a5f6d8ap+21",
+"0x1.6a3a7189edfffp+11",
+"0x1.bb2d41697834bp+12",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+1080,
+1080
+],
+"pas": 68,
+"periodes": [
+null,
+"0x1.5c406470f5c0dp+12"
+],
+"t": "0x1.517fffffffff9p+13"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.cedf0d9dcee49p-47",
+"0x1.db16a9b1267ccp-48"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.01a5aa829ffdbp-41",
+"-0x1.31fd910219c8ep-43",
+"0x1.61534736d09d7p-53",
+"-0x1.2980e763aecf6p-51",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"0x1.8d77f2083e8d2p+22",
+"0x1.d80c11c818a21p+20",
+"-0x1.1088f1dd59affp+11",
+"0x1.caf4558580b32p+12",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+1140,
+1140
+],
+"pas": 68,
+"periodes": [
+null,
+"0x1.5c406461efa0cp+12"
+],
+"t": "0x1.643fffffffffcp+13"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.0f6fd6ff4ea8cp-46",
+"0x1.0e895984e0954p-47"
+],
+"duree": "0x1.2c00000000000p+9",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.31fd876570e05p-42",
+"-0x1.b9ef18b3bed66p-42",
+"0x1.fe4c62f9609ecp-52",
+"-0x1.61533c3a8e8d9p-52",
+true
+],
+[
+"iss",
+"0x1.99e3400000000p+18",
+"0x1.d80c02f4125d2p+21",
+"0x1.54e1f203c2fc7p+22",
+"-0x1.899d70a40e39bp+12",
+"0x1.1088e96422996p+12",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+1200,
+1200
+],
+"pas": 68,
+"periodes": [
+null,
+"0x1.5c406461efa0cp+12"
+],
+"t": "0x1.76ffffffffffdp+13"
+}
+],
+"pas_trace": "0x1.4000000000000p+3"
+},
+"terre_lune": {
+"depart": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.1d13743596796p+22",
+"0x0.0p+0",
+"0x0.0p+0",
+"-0x1.8e5ced0249a8cp+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.6a235a2f29a62p+28",
+"0x0.0p+0",
+"0x0.0p+0",
+"0x1.fa0c89ea4ecf0p+9",
+true
+]
+],
+"etapes": [
+{
+"courbure": null,
+"derives": [
+"0x1.8f68bd05a077fp-52",
+"0x1.741666100b69cp-52"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.10658cb1040bap+22",
+"-0x1.504b5f0bf6482p+20",
+"0x1.d5ef6adf6c44bp+1",
+"-0x1.7ca51fc510e07p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.5a0802ccf1757p+28",
+"0x1.ab33b31fa229fp+26",
+"-0x1.2a7bfea87e05fp+8",
+"0x1.e38a9d04f16eep+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+14,
+14
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.b6c0000000000p+16"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.0a45d35915a55p-53",
+"0x1.1710cc8c088f5p-51"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.d6f925126dd02p+21",
+"-0x1.415649e634b2dp+21",
+"0x1.c108afdbda4e8p+2",
+"-0x1.49113242492afp+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.2b24c638d00c9p+28",
+"0x1.983388de0d75ep+27",
+"-0x1.1d356bdf28d80p+9",
+"0x1.a2056213cebbdp+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+26,
+26
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.b6bfffffffffep+17"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.0a45d35915a55p-52",
+"0x1.1710cc8c088f5p-51"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.634217910affcp+21",
+"-0x1.bdf156a254963p+21",
+"0x1.379416185d078p+3",
+"-0x1.f06f5e0d07551p+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.c34ac13715c0ep+27",
+"0x1.1b3ec9b6541c3p+28",
+"-0x1.8bce03daacafep+9",
+"0x1.3b50e48694bc8p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+40,
+40
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.4910000000001p+18"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.0a45d35915a55p-53",
+"0x1.741666100b69cp-53"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.9fe20e28ae593p+20",
+"-0x1.0970a50743f67p+22",
+"0x1.72ec802fb4f90p+3",
+"-0x1.22936c214a3afp+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.08270c0b9510dp+27",
+"0x1.5131b08510bc1p+28",
+"-0x1.d731431d3828bp+9",
+"0x1.711fecae2fb5ep+8",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+52,
+52
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.b6bffffffffffp+18"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.d1fa31dbe5e14p-50",
+"0x1.4593994e09fc8p-50"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.510569bedb57bp+18",
+"-0x1.1c4bf73e315b7p+22",
+"0x1.8d462972de47dp+3",
+"-0x1.d6f3657526490p-1",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.ac200854f51e8p+24",
+"0x1.6925f030b2993p+28",
+"-0x1.f8aa6b44625d8p+9",
+"0x1.2b211f82aa1bep+6",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+65,
+65
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.1237fffffffffp+19"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.4cd7482f5b0eap-49",
+"0x1.741666100b69cp-50"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.fdbc0e00f0774p+19",
+"-0x1.15dd393917380p+22",
+"0x1.8449045279273p+3",
+"0x1.64264b0046cdcp+1",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.43c36a80d0906p+26",
+"0x1.60fa0be90b594p+28",
+"-0x1.ed3f39bdbd03dp+9",
+"-0x1.c46ca4aa46d0ep+7",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+79,
+79
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.4910000000000p+19"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.5d7ba564ec68fp-49",
+"0x1.a29932d20cd6fp-50"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.1da8c24c2a08ep+21",
+"-0x1.ed6dcdd962e19p+21",
+"0x1.58c1c2f70bef6p+3",
+"0x1.8f2d8fd635b83p+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.6ae1048402996p+27",
+"0x1.396818abf1241p+28",
+"-0x1.b5f3b61cbf9d9p+9",
+"-0x1.fb1592d35dc43p+8",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+91,
+91
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.7fe7ffffffffep+19"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.8f68bd05a077fp-50",
+"0x1.d11bff940e443p-51"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.a2796a14a63cap+21",
+"-0x1.833cb27471acbp+21",
+"0x1.0e8fa1df1b3eep+3",
+"0x1.2462e84bcf0b4p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.09cc62f9647dfp+28",
+"0x1.ebea5f8ac15e0p+27",
+"-0x1.57b310a6bf9a1p+9",
+"-0x1.736cb30cd90a1p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+104,
+104
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.b6bfffffffffcp+19"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.0a45d35915a55p-53",
+"0x1.741666100b69cp-53"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.01083e7f9eb3ap+22",
+"-0x1.ed32b223bfc08p+20",
+"0x1.589876771e8eep+2",
+"0x1.672cc0899a427p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.4683730b81639p+28",
+"0x1.39428d9aff1c5p+27",
+"-0x1.b5bf3fa41de3ap+8",
+"-0x1.c8447482cfe06p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+117,
+117
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.ed97ffffffffbp+19"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.b0b17770c32c9p-50",
+"0x1.741666100b69cp-51"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.19f6976243b29p+22",
+"-0x1.50199537d90f0p+19",
+"0x1.d5a9d7bbbe832p+0",
+"0x1.8a03650c1fe9ep+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.662f14adc2012p+28",
+"0x1.aaf473d394ba9p+25",
+"-0x1.2a4fcdb93f3c0p+7",
+"-0x1.f485ff1a55d2dp+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+130,
+130
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.1237ffffffffcp+20"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.f342ec470895ep-50",
+"0x1.741666100b69cp-51"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.19d003960c2ebp+22",
+"0x1.5817f64e7c039p+19",
+"-0x1.e0d56ff0b0c5ap+0",
+"0x1.89cd7caf1c511p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.65fe133e2d85dp+28",
+"-0x1.b51c02f37b111p+25",
+"0x1.31681b01d2ff3p+7",
+"-0x1.f441843536070p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+143,
+143
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.2da3ffffffffdp+20"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.3c32eaf9c9b44p-49",
+"0x1.741666100b69cp-51"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.0097f198a4f69p+22",
+"0x1.f0d6de66b029cp+20",
+"-0x1.5b23c4b321dbap+2",
+"0x1.668fd30b3bd26p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.45f4cab3fbb7cp+28",
+"-0x1.3b92a1f6db698p+27",
+"0x1.b8fa9daf4b793p+8",
+"-0x1.c77d1b44896bep+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+156,
+156
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.490fffffffffcp+20"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.f342ec470895ep-50",
+"0x1.d11bff940e443p-51"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.a11958b8e2ee1p+21",
+"0x1.84b7d0a0eadc5p+21",
+"-0x1.0f98853f87e38p+3",
+"0x1.236ceb43090cep+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.08ecc45a9601cp+28",
+"-0x1.edcbf985d5c57p+27",
+"0x1.59038ee29a4d6p+9",
+"-0x1.72343710cb6d7p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+169,
+169
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.647bffffffffdp+20"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.0a45d35915a55p-49",
+"0x1.741666100b69cp-51"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.1be88abeb11e5p+21",
+"0x1.ee703ab7682eep+21",
+"-0x1.5976528362bbbp+3",
+"0x1.8cbb3a1550804p+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.68a7a35737b02p+27",
+"-0x1.3a0c3ce8c9402p+28",
+"0x1.b6d914de589fcp+9",
+"-0x1.f7f9ed4954929p+8",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+182,
+182
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.7fe7ffffffffdp+20"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.0a45d35915a55p-49",
+"0x1.741666100b69cp-51"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.f5da12927476ap+19",
+"0x1.1616988c04c34p+22",
+"-0x1.84993046a038fp+3",
+"0x1.5ea4562dda8a8p+1",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.3ec1ac57396adp+26",
+"-0x1.6142ed87bf0fcp+28",
+"0x1.eda511c18b0b2p+9",
+"-0x1.bd6d8bb36c6b7p+7",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+195,
+195
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.9b53ffffffffap+20"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.e29e8f11773b9p-49",
+"0x1.741666100b69cp-50"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.6124973f9f8b0p+18",
+"0x1.1c3864f646eb7p+22",
+"-0x1.8d2ad01f1ed1cp+3",
+"-0x1.ed7aaec0d5eaep-1",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.c09adfcbca7d6p+24",
+"-0x1.690d138619723p+28",
+"0x1.f887ad55166f4p+9",
+"0x1.397046bc3f5d4p+6",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+208,
+208
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.b6bfffffffffbp+20"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.1aea308ea6ffap-48",
+"0x1.ff9ecc560fb16p-50"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.a3a4def60ad2bp+20",
+"0x1.0911ded39edb6p+22",
+"-0x1.7268105fa6ffap+3",
+"-0x1.25342350b78a7p+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.0a8a96f290544p+27",
+"-0x1.50b94bba9dfa6p+28",
+"0x1.d68906613f248p+9",
+"0x1.74767d4ae015bp+8",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+221,
+221
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.d22bffffffffcp+20"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.e29e8f11773b9p-49",
+"0x1.d11bff940e443p-50"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.64d62ff6b7914p+21",
+"0x1.bcae3ed329308p+21",
+"-0x1.36b257ac8089ap+3",
+"-0x1.f2a40c0b0048dp+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.c54c15e9f9c53p+27",
+"-0x1.1a71926d57d64p+28",
+"0x1.8aaf3f73fa741p+9",
+"0x1.3cb78e1248928p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+234,
+234
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.ed97ffffffffcp+20"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.d1fa31dbe5e14p-49",
+"0x1.d11bff940e443p-50"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.d81bfb530bb0dp+21",
+"0x1.3faa6439565f2p+21",
+"-0x1.beb2bf2b06ff0p+2",
+"-0x1.49dc672870f07p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.2bdd80a1ca460p+28",
+"-0x1.9613f7bf73301p+27",
+"0x1.1bb9a21fe77b7p+9",
+"0x1.a3078554e8b14p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+247,
+247
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.0481ffffffffep+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.0a45d35915a55p-49",
+"0x1.d11bff940e443p-51"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.10b1673f0fc23p+22",
+"0x1.4c6e18499ad15p+20",
+"-0x1.d08902a0c086dp+1",
+"-0x1.7d0f1f1bcee9bp+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.5a685e9a8f574p+28",
+"-0x1.a64b0037a6168p+26",
+"0x1.270df1b206310p+8",
+"0x1.e411439e05f3dp+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+260,
+260
+],
+"pas": 30,
+"periodes": [
+null,
+null
+],
+"t": "0x1.1237ffffffffcp+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.4cd7482f5b0eap-49",
+"0x1.1710cc8c088f5p-50"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.1d12fed610b87p+22",
+"-0x1.02b08a77bac11p+14",
+"0x1.697da97fad83cp-5",
+"-0x1.8e5c48fe1c87fp+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.6a22c51527eb0p+28",
+"0x1.489e714d34ceep+20",
+"-0x1.cb35a42ccd0d4p+1",
+"0x1.fa0bb98fd5a9bp+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+273,
+273
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.1fedffffffffbp+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.3c32eaf9c9b44p-49",
+"0x1.1710cc8c088f5p-50"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.1018d1d4c24e6p+22",
+"-0x1.542790e23ec24p+20",
+"0x1.db54502614e37p+1",
+"-0x1.7c39e6fcff6dfp+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.59a68a0eabb3ap+28",
+"0x1.b01b063fe8a54p+26",
+"-0x1.2de915d566533p+8",
+"0x1.e302683f99b41p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+286,
+286
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.2da3ffffffffcp+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.a00d1a3b31d24p-49",
+"0x1.741666100b69cp-50"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.d5d4cafeea2edp+21",
+"-0x1.430126f80ffafp+21",
+"0x1.c35d2ecac119cp+2",
+"-0x1.4844ee639ae1dp+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.2a6b157b3f4f5p+28",
+"0x1.9a51c9da59120p+27",
+"-0x1.1eb04ac36d93ep+9",
+"0x1.a101e69a64a4ep+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+299,
+299
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.3b59ffffffffdp+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.4cd7482f5b0eap-49",
+"0x1.1710cc8c088f5p-50"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.61acdaa1972c4p+21",
+"-0x1.bf32ff3b28781p+21",
+"0x1.3874d3f267e33p+3",
+"-0x1.ee391744c96d1p+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.c147f8e61dc97p+27",
+"0x1.1c0b17c22fba4p+28",
+"-0x1.8ceb82545c086p+9",
+"0x1.39e9375525b10p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+312,
+312
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.490fffffffffdp+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.4cd7482f5b0eap-49",
+"0x1.1710cc8c088f5p-50"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.9c1de6e57648bp+20",
+"-0x1.09ce90a72f690p+22",
+"0x1.736fbe8fbd13cp+3",
+"-0x1.1ff1c5ab66c12p+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.05c2a7a02894dp+27",
+"0x1.51a8ffa5c416ep+28",
+"-0x1.d7d7fbd833dbbp+9",
+"0x1.6dc82c1ca6fc3p+8",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+325,
+325
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.56c5ffffffffep+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.e29e8f11773b9p-49",
+"0x1.a29932d20cd6fp-50"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.40e526b7b696ep+18",
+"-0x1.1c5e9f6b4d57ap+22",
+"0x1.8d603ba3ddf40p+3",
+"-0x1.c06a985aaec8ep-1",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.97a3d052669cdp+24",
+"0x1.693da377eb045p+28",
+"-0x1.f8cb89a2678b0p+9",
+"0x1.1cd101f71bc16p+6",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+339,
+339
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.647c000000000p+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.33e0bc5f01072p-48",
+"0x1.4593994e09fc8p-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.02ce32d915209p+20",
+"-0x1.15a2f51758919p+22",
+"0x1.83f798a26f254p+3",
+"0x1.69a71a8d5de54p+1",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.48c41e105342ap+26",
+"0x1.60b007a181c6dp+28",
+"-0x1.ecd7cb8fbdd5bp+9",
+"-0x1.cb6a4914cc215p+7",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+351,
+351
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.7231fffffffffp+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.6e20029a7dc34p-48",
+"0x1.5cd4ffaf0ab32p-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.1f680e9fcdaefp+21",
+"-0x1.ec69caaa9cc3ap+21",
+"0x1.580c1786b7d9cp+3",
+"0x1.919e9ce3203a3p+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.6d193ae0cf0c9p+27",
+"0x1.38c2f25bc045bp+28",
+"-0x1.b50ceeb94bc7fp+9",
+"-0x1.fe2f96ce6f3fbp+8",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+364,
+364
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.7fe7ffffffffep+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.97baeba069251p-48",
+"0x1.5cd4ffaf0ab32p-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.a3d822d8aa4ddp+21",
+"-0x1.81c05568c813ep+21",
+"0x1.0d85dfb365ac0p+3",
+"0x1.2557f490923f9p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.0aab26b90786cp+28",
+"0x1.ea07307dd71dbp+27",
+"-0x1.56617765c2489p+9",
+"-0x1.74a3fd2f5d97fp+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+377,
+377
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.8d9dffffffffcp+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.eaf0bdac3fe8cp-48",
+"0x1.b9da99330d8d9p-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.0177b7bf5421ep+22",
+"-0x1.e98cefc05ecd9p+20",
+"0x1.560c0c78f8b7cp+2",
+"0x1.67c88644b0f1cp+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.47110e84df199p+28",
+"0x1.36f1774a79e86p+27",
+"-0x1.b2827922170d7p+8",
+"-0x1.c90a560a5b467p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+390,
+390
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.9b53ffffffffep+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.fb951ae1d1431p-48",
+"0x1.e85d65f50efacp-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.1a1c42ffa1ac4p+22",
+"-0x1.481a1f5cfe878p+19",
+"0x1.ca7cbcc74595cp+0",
+"0x1.8a3808f5bfee1p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.665eef2ae7290p+28",
+"0x1.a0cb851e9a84dp+25",
+"-0x1.23368acafcb92p+7",
+"-0x1.f4c8ddd759f06p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+403,
+403
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.a909ffffffffdp+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.f342ec470895ep-48",
+"0x1.d11bff940e443p-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.19a887bab71f6p+22",
+"0x1.60153c0e18b18p+19",
+"-0x1.ebff7c34f137ep+0",
+"0x1.8996500b0d98dp+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.65cbeb0479cebp+28",
+"-0x1.bf422a24988d8p+25",
+"0x1.387f6cce14068p+7",
+"-0x1.f3fb6d604fd1dp+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+416,
+416
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.b6bfffffffffep+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.eaf0bdac3fe8cp-48",
+"0x1.d11bff940e443p-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.0026d166c8f56p+22",
+"0x1.f479718aa2063p+20",
+"-0x1.5dadf514ffbb9p+2",
+"0x1.65f1be4aaf212p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.456515f3a93efp+28",
+"-0x1.3de1b2772c189p+27",
+"0x1.bc34909ab7acdp+8",
+"-0x1.c6b44af387669p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+429,
+429
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.c475ffffffffep+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.061cbc0bb14ebp-47",
+"0x1.ff9ecc560fb16p-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.9fb7efe704c55p+21",
+"0x1.8631aeb673540p+21",
+"-0x1.10a088faa1035p+3",
+"0x1.2275fe40a42b4p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.080c4b94943a2p+28",
+"-0x1.efabfce30e150p+27",
+"0x1.5a52f10456d1fp+9",
+"-0x1.70fa8a3c4e86ep+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+442,
+442
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.d22bffffffffap+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.e29e8f11773b9p-48",
+"0x1.d11bff940e443p-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.1a27696828a00p+21",
+"0x1.ef71107032ea0p+21",
+"-0x1.5a29c5970d4c2p+3",
+"0x1.8a479da3d8cf4p+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.666d192ee3eb9p+27",
+"-0x1.3aaf5e8b53cd0p+28",
+"0x1.b7bd0a41369d5p+9",
+"-0x1.f4dca8bf0f3e6p+8",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+455,
+455
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.dfe1ffffffffbp+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.7ec45fd00f1dap-48",
+"0x1.8b57cc710c205p-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.edf679e32bcf4p+19",
+"0x1.164f12e0fe89fp+22",
+"-0x1.84e81c3cce414p+3",
+"0x1.5921409e8fb7bp+1",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.39bee7b236723p+26",
+"-0x1.618aac41bc59fp+28",
+"0x1.ee095347347d3p+9",
+"-0x1.b66d03f2663f7p+7",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+468,
+468
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.ed97ffffffffdp+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.a00d1a3b31d24p-48",
+"0x1.8b57cc710c205p-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.7142a1f5b28bdp+18",
+"0x1.1c23e8a3bb989p+22",
+"-0x1.8d0e2fbf094cbp+3",
+"-0x1.020030d902ccbp+0",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.d51445dc7d0f9p+24",
+"-0x1.68f30d8caca74p+28",
+"0x1.f8634ff0fc800p+9",
+"0x1.47be6bdc4b02ap+6",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+481,
+481
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.fb4dffffffffdp+21"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.8f68bd05a077fp-48",
+"0x1.741666100b69cp-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.a766563527046p+20",
+"0x1.08b23e5a52521p+22",
+"-0x1.71e26f8c84f08p+3",
+"-0x1.27d3e90fc8807p+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.0ced465dce474p+27",
+"-0x1.503fd1a998b97p+28",
+"0x1.d5df462eadca3p+9",
+"0x1.77cbdb3316d91p+8",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+494,
+494
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.0481ffffffffcp+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.c9a803411d341p-48",
+"0x1.a29932d20cd6fp-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.6669228603d04p+21",
+"0x1.bb69b8d7b8cabp+21",
+"-0x1.35cf9968a03f3p+3",
+"-0x1.f4d71f6dad93dp+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.c74bf55848313p+27",
+"-0x1.19a372903a8bap+28",
+"0x1.898f360c4d376p+9",
+"0x1.3e1d32d0e369bp+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+507,
+507
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.0b5cffffffff9p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.f342ec470895ep-48",
+"0x1.b9da99330d8d9p-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.d93d4cd15eb0ap+21",
+"0x1.3dfd7751d0859p+21",
+"-0x1.bc5b5ea48f8bfp+2",
+"-0x1.4aa68c6eb3f48p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.2c95441e200ecp+28",
+"-0x1.93f3183e25a84p+27",
+"0x1.1a3ceebe5734fp+9",
+"0x1.a4084f891605dp+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+520,
+520
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.1237ffffffffap+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.1f1347dc0b563p-47",
+"0x1.0b70195b88340p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.10fc614074dccp+22",
+"0x1.488fbfc9cbdadp+20",
+"-0x1.cb211bdc5d388p+1",
+"-0x1.7d77e4a9e9fa1p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.5ac79d2833c41p+28",
+"-0x1.a160f192c9931p+26",
+"0x1.239ef1c4fee16p+8",
+"0x1.e4965b9bed966p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+533,
+533
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707c42493p+21"
+],
+"t": "0x1.1912ffffffffap+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.48ae30e1f6b80p-47",
+"0x1.39f2e61d89a13p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.1d119eb7e0161p+22",
+"-0x1.02b01ff556fdap+15",
+"0x1.697d14a9d7fb8p-4",
+"-0x1.8e5a5cf21c45dp+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.6a2105c79d723p+28",
+"0x1.489dea0023d13p+21",
+"-0x1.cb34e71b3c2b8p+2",
+"0x1.fa09488115e01p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+546,
+546
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.1fedffffffffap+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.48ae30e1f6b80p-47",
+"0x1.39f2e61d89a13p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.0fcb36e97c547p+22",
+"-0x1.5802aa9eb90bfp+20",
+"0x1.e0b7ae0399c34p+1",
+"-0x1.7bcd751be1eb9p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.5943f4b005072p+28",
+"0x1.b500f58ec65c1p+26",
+"-0x1.315534667ceabp+8",
+"0x1.e278a5be232fdp+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+559,
+559
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.26c8ffffffffap+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.724919e7e219ep-47",
+"0x1.6875b2df8b0e7p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.d4aeee0949decp+21",
+"-0x1.44aafa0f6847cp+21",
+"0x1.c5b03a0c7ffa0p+2",
+"-0x1.47779c3495366p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.29b06f020801bp+28",
+"0x1.9c6eb8f5d186cp+27",
+"-0x1.202a3d94b2cfap+9",
+"0x1.9ffd13be5042dp+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+572,
+572
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.2da3ffffffff9p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.a85f48d5fa7f7p-47",
+"0x1.a29932d20cd6fp-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.60167a7621aadp+21",
+"-0x1.c0733794c88e9p+21",
+"0x1.3954908185d60p+3",
+"-0x1.ec0139848ebfap+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.bf43be9f11237p+27",
+"0x1.1cd67be8b0176p+28",
+"-0x1.8e07b9f5e3707p+9",
+"0x1.388087a62566fp+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+585,
+585
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.347effffffff8p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.c57eebf3b8dd8p-47",
+"0x1.b9da99330d8d9p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.98586c468a0a2p+20",
+"-0x1.0a2ba1660e1c8p+22",
+"0x1.73f1cb139e775p+3",
+"-0x1.1d4f3219cb7e9p+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.035d6ba8b5217p+27",
+"0x1.521f38ba7dedep+28",
+"-0x1.d87d3008d6afbp+9",
+"0x1.6a6f3e56f9c83p+8",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+598,
+598
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.3b59ffffffff6p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.b903a60b8bd9cp-47",
+"0x1.a29932d20cd6fp-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.30c3db72ba8d6p+18",
+"-0x1.1c705d6e45cb8p+22",
+"0x1.8d79069c982ecp+3",
+"-0x1.a9e05a0072e08p-1",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.832648a3e4619p+24",
+"0x1.69542d4848969p+28",
+"-0x1.f8eb0853cef11p+9",
+"0x1.0e7ff9e33c5e4p+6",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+611,
+611
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.4234ffffffff8p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.97baeba069251p-47",
+"0x1.7fb719408bc50p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.06bd8994925e0p+20",
+"-0x1.1567cc56d14f0p+22",
+"0x1.83a4ed7985249p+3",
+"0x1.6f26c04cc0891p+1",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.4dc3c2e6c30adp+26",
+"0x1.6064e0ee26d6ep+28",
+"-0x1.ec6ec78cadcb5p+9",
+"-0x1.d2667330f0c0fp+7",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+624,
+624
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.490fffffffff7p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.51005f7cbf653p-47",
+"0x1.4593994e09fc8p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.21266e491fcabp+21",
+"-0x1.eb6432015af8dp+21",
+"0x1.575550c7ff0c3p+3",
+"0x1.940e5f3930288p+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.6f50449984d3ep+27",
+"0x1.381cca804f2f3p+28",
+"-0x1.b424bf72060e6p+9",
+"-0x1.00a3fb563d593p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+637,
+637
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.4feaffffffffap+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.1f1347dc0b563p-47",
+"0x1.0b70195b88340p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.a53581e3ff272p+21",
+"-0x1.8042bab75b9ffp+21",
+"0x1.0c7b3f97486b6p+3",
+"0x1.264c0f4773eb1p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.0b890ee1f9999p+28",
+"0x1.e8226ded3e747p+27",
+"-0x1.550ec435ae903p+9",
+"-0x1.75da1477e87e4p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+650,
+650
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.56c5ffffffffcp+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.c9a803411d341p-48",
+"0x1.a29932d20cd6fp-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.01e65cfbee7aap+22",
+"-0x1.e5e59a3dfaf99p+20",
+"0x1.537e88d212fa5p+2",
+"0x1.686323bc2ab0bp+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.479d9cab6aa44p+28",
+"0x1.349f60ee01ad4p+27",
+"-0x1.af444cd3ddd40p+8",
+"-0x1.c9cebf3825868p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+663,
+663
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.5da0ffffffffcp+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.48ae30e1f6b80p-47",
+"0x1.2e5232ed0945ep-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.1a41064f1cdacp+22",
+"-0x1.40199b550d9a8p+19",
+"0x1.bf4e28480ab1ep+0",
+"0x1.8a6b68409dc9bp+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.668da28e2fff0p+28",
+"0x1.96a13f33be9c5p+25",
+"-0x1.1c1c580ff8884p+7",
+"-0x1.f50a20352a886p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+676,
+676
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.647bffffffffdp+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.59528e1788126p-47",
+"0x1.51344c7e8a57dp-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.198023f0cbe94p+22",
+"0x1.68115fe15afb1p+19",
+"-0x1.f727f3563f67cp+0",
+"0x1.895ddf4d6864cp+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.65989c29f9577p+28",
+"-0x1.c966e10a04b55p+25",
+"0x1.3f95bd46ae75cp+7",
+"-0x1.f3b3bad561784p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+689,
+689
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.6b56ffffffffcp+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.27657676d4036p-47",
+"0x1.1710cc8c088f5p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.ff69bc8e7b3aap+21",
+"0x1.f81a6890c6c5fp+20",
+"-0x1.603705852a6c4p+2",
+"0x1.655282ca2ff07p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.44d45540ee7d7p+28",
+"-0x1.402fbd34e58a7p+27",
+"0x1.bf6d15be0f447p+8",
+"-0x1.c5ea04353a020p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+702,
+702
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.7231ffffffffdp+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.1aea308ea6ffap-47",
+"0x1.0b70195b88340p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.9e5530c2321f5p+21",
+"0x1.87aa4b7dab823p+21",
+"-0x1.11a7ac36f4e23p+3",
+"0x1.217e22100af3fp+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.072af9604c724p+28",
+"-0x1.f18a6816df09cp+27",
+"0x1.5ba135f7bbcffp+9",
+"-0x1.6fbfad91c9be8p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+715,
+715
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.790cfffffffffp+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.129801f3de527p-47",
+"0x1.ff9ecc560fb16p-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.18655fba8ee69p+21",
+"0x1.f0704e301b951p+21",
+"-0x1.5adc1b9e46fa8p+3",
+"0x1.87d2bc86ca2cbp+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.643167e10a041p+27",
+"-0x1.3b517d0d21973p+28",
+"0x1.b89f9589a312dp+9",
+"-0x1.f1bdc7c549a96p+8",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+729,
+729
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.7fe8000000001p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.97baeba069251p-48",
+"0x1.5cd4ffaf0ab32p-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.e6114a72c133dp+19",
+"0x1.1686a80974eb4p+22",
+"-0x1.8535c7f40f064p+3",
+"0x1.539d0edca4f5ep+1",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.34bb20b279b72p+26",
+"-0x1.61d147dbdd7c7p+28",
+"0x1.ee6bfdfc362ddp+9",
+"-0x1.af6b132ba0d75p+7",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+742,
+742
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.86c3000000001p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.1f1347dc0b563p-47",
+"0x1.0b70195b88340p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.815f7c9a5f66ap+18",
+"0x1.1c0e825765da4p+22",
+"-0x1.8cf0486a3e092p+3",
+"-0x1.0d4235de1fb81p+0",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.e98c29a999e0ep+24",
+"-0x1.68d7de59cfee3p+28",
+"0x1.f83d533617e25p+9",
+"0x1.560b831ac4171p+6",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+755,
+755
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.8d9e000000002p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.1aea308ea6ffap-47",
+"0x1.0b70195b88340p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.ab2670ce121abp+20",
+"0x1.0851c3ea190e6p+22",
+"-0x1.715b9e2466509p+3",
+"-0x1.2a72bb354a936p+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.0f4f18564c7bcp+27",
+"-0x1.4fc542b603f5ap+28",
+"0x1.d53403115e3e1p+9",
+"0x1.7b2003a816f83p+8",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+768,
+768
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.9479000000002p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.129801f3de527p-47",
+"0x1.ff9ecc560fb16p-49"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.67faedf30d02dp+21",
+"0x1.ba23c5bb3b5d1p+21",
+"-0x1.34ebdc077d620p+3",
+"-0x1.f708966569d62p+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.c94a5ddc6718dp+27",
+"-0x1.18d46ac8b6511p+28",
+"0x1.886de890e2112p+9",
+"0x1.3f81d19be7e87p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+781,
+781
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.9b54000000004p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.51005f7cbf653p-47",
+"0x1.39f2e61d89a13p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.da5d189f1d345p+21",
+"0x1.3c4f8490d581ep+21",
+"-0x1.ba0290360eaddp+2",
+"-0x1.4b6fa16ea1f67p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.2d4c1016779a2p+28",
+"-0x1.91d0ec1ad14bep+27",
+"0x1.18bf52f3fca8cp+9",
+"0x1.a507bfdce8902p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+794,
+794
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.a22f000000005p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.82ed771d73743p-47",
+"0x1.741666100b69cp-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.11467a7773283p+22",
+"0x1.44b058bc098b4p+20",
+"-0x1.c5b7bb05dc4e0p+1",
+"-0x1.7ddf70191f4c7p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.5b25be276d42cp+28",
+"-0x1.9c758b3cff5afp+26",
+"0x1.202f01b53c961p+8",
+"0x1.e519e49114237p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+807,
+807
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4708742548p+21"
+],
+"t": "0x1.a90a000000003p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.b0b17770c32c9p-47",
+"0x1.ae39e6028d324p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.1d0f53dc26800p+22",
+"-0x1.840725aa71b36p+15",
+"0x1.0f1d15745d2a8p-3",
+"-0x1.8e5728dfde0e7p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.6a1e1c47fa8e8p+28",
+"0x1.eceb8cc00aab4p+21",
+"-0x1.5866c0fecf868p+3",
+"0x1.fa0536c012281p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+820,
+820
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707ec1fa7p+21"
+],
+"t": "0x1.afe5000000000p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.b0b17770c32c9p-47",
+"0x1.a29932d20cd6fp-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.0f7cbc2f1986ap+22",
+"-0x1.5bdca9149100ep+20",
+"0x1.e619800823a1ap+1",
+"-0x1.7b5fca7b04e3ap+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.58e043022b2b8p+28",
+"0x1.b9e57d03ad816p+26",
+"-0x1.34c0578a50c4ap+8",
+"0x1.e1ed55f1fe20dp+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+832,
+832
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707ec1fa7p+21"
+],
+"t": "0x1.b6bffffffffffp+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.a00d1a3b31d24p-47",
+"0x1.96f87fa18c7bap-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.d3878f23882ffp+21",
+"-0x1.4653c1cd98558p+21",
+"0x1.c801cfb7199e4p+2",
+"-0x1.46a93c5e4a885p+3",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.28f4d366dca97p+28",
+"0x1.9e8a54730810ep+27",
+"-0x1.21a3431bbfae5p+9",
+"0x1.9ef6ea56581eep+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+846,
+846
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707ec1fa7p+21"
+],
+"t": "0x1.bd9b000000000p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.c57eebf3b8dd8p-47",
+"0x1.b9da99330d8d9p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.5e7ef85d4bd44p+21",
+"-0x1.c1b1fea7855f1p+21",
+"0x1.3a334b0d7a71ep+3",
+"-0x1.e9c7c69ff3725p+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.bd3e140b06605p+27",
+"0x1.1da0f58259a0ep+28",
+"-0x1.8f22a9d538e71p+9",
+"0x1.3716d6a295c82p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+858,
+858
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707ec1fa7p+21"
+],
+"t": "0x1.c475fffffffffp+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.da4c6076ae8e7p-47",
+"0x1.d11bff940e443p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.9491a166efd24p+20",
+"-0x1.0a87d6f73d90ap+22",
+"0x1.7472a55042656p+3",
+"-0x1.1aabb397f37a8p+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.00f75a1e329d1p+27",
+"0x1.52945b61e4709p+28",
+"-0x1.d920df2717163p+9",
+"0x1.6715261ecba6ap+8",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+872,
+872
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707ec1fa7p+21"
+],
+"t": "0x1.cb51000000000p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.e29e8f11773b9p-47",
+"0x1.d11bff940e443p-48"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"-0x1.20a195382c3d7p+18",
+"-0x1.1c8131387e985p+22",
+"0x1.8d908a48a28e1p+3",
+"-0x1.9354bcf5f5b21p-1",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"0x1.6ea78228de550p+24",
+"0x1.69698d8f3c27bp+28",
+"-0x1.f908e73ea951cp+9",
+"0x1.002e1311053cbp+6",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+885,
+885
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707ec1fa7p+21"
+],
+"t": "0x1.d22c000000001p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.1aea308ea6ffap-46",
+"0x1.114072f3c861ap-47"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.0aac07f571917p+20",
+"-0x1.152bbf2838665p+22",
+"0x1.8351031bcdf9bp+3",
+"0x1.74a537b74dd10p+1",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.52c254e66688ep+26",
+"0x1.6018980cdcaafp+28",
+"-0x1.ec042e0b068ebp+9",
+"-0x1.d9611d3e3d733p+7",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+898,
+898
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707ec1fa7p+21"
+],
+"t": "0x1.d907000000004p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.2da3196aea854p-46",
+"0x1.2881d954c9184p-47"
+],
+"duree": "0x1.b6c0000000000p+16",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.22e3dfd88f4e7p+21",
+"-0x1.ea5d04b506e5dp+21",
+"0x1.569d6f51636aap+3",
+"0x1.967cd4d6c2f4ap+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.71861fdb365bap+27",
+"0x1.3775a1a27013dp+28",
+"-0x1.b33b29061fc7bp+9",
+"-0x1.022f57f0826c6p+9",
+true
+]
+],
+"gravite": true,
+"masse": 1.0,
+"n_traces": [
+911,
+911
+],
+"pas": 30,
+"periodes": [
+null,
+"0x1.1fc4707ec1fa7p+21"
+],
+"t": "0x1.dfe2000000002p+22"
+},
+{
+"courbure": null,
+"derives": [
+"0x1.779f9798f843cp-3",
+"0x1.741666100b666p-50"
+],
+"duree": "0x1.5180000000000p+17",
+"etat": [
+[
+"terre",
+"0x1.3c29f79affb24p+82",
+"0x1.025e137cbacbfp+22",
+"-0x1.6463a00ebe63ep+21",
+"0x1.569d6f51636aap+3",
+"0x1.967cd4d6c2f4ap+2",
+true
+],
+[
+"lune",
+"0x1.f1c5216e1950ap+75",
+"-0x1.4835af92ffe67p+28",
+"0x1.c4ba8e0d162e8p+27",
+"-0x1.b33b29061fc7bp+9",
+"-0x1.022f57f0826c6p+9",
+true
+]
+],
+"gravite": false,
+"masse": 1.0,
+"n_traces": [
+931,
+931
+],
+"pas": 20,
+"periodes": [
+null,
+null
+],
+"t": "0x1.ea6e000000002p+22"
+}
+],
+"pas_trace": "0x1.0e00000000000p+13"
+}
+}

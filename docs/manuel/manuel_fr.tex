@@ -1224,7 +1224,7 @@ tournent désormais sous Windows, macOS et Linux, en français et en anglais, da
 reposent sur des formules de référence vérifiées. D'après ClassAction, University of Nebraska-Lincoln Astronomy
 Education, licence Apache 2.0 (fichiers \texttt{NOTICE} et \texttt{LICENCES/Apache-2.0.txt}).
 
-\paragraph{Catalogue.} À gauche, les 92 animations du catalogue d'origine, plus deux (la machine d'Anticythère, section~\ref{sec:anticythere}, et Orion en 3D, section~\ref{sec:orion}), classées par thème (coordonnées et
+\paragraph{Catalogue.} À gauche, les 92 animations du catalogue d'origine, plus trois (la machine d'Anticythère, section~\ref{sec:anticythere}, Orion en 3D, section~\ref{sec:orion}, et Gravité et orbites, section~\ref{sec:gravite}), classées par thème (coordonnées et
 mouvements, Lune, Renaissance et orbites, propriétés stellaires, lumière et spectres, exoplanètes…), avec une recherche
 (française ou anglaise, sans accents), un filtre par thème et par état. Les thèmes suivent un ordre pédagogique, de
 l'introduction et du ciel vu de la Terre jusqu'à la cosmologie. Chacune a son nom et sa description dans les
@@ -1477,7 +1477,7 @@ et ne se recouvrent jamais, quelle que soit la police du système. L'interface s
 de 100 à 200~\% de mise à l'échelle ; en petite fenêtre, la page d'une animation défile au lieu de tasser la scène.
 \capture{img/classe_question_etroite_fr.png}{0.8}
 
-\paragraph{Vérifications automatiques.} Les 517 questions sont notées une à une (bonne et mauvaise réponse), les 94
+\paragraph{Vérifications automatiques.} Les 517 questions sont notées une à une (bonne et mauvaise réponse), les 95
 animations sont manipulées (chaque réglage aux bornes, chaque bouton, glissers aléatoires) sans exception et sans gel
 du fil graphique, la sauvegarde fait l'aller-retour export $\to$ effacement $\to$ import à l'identique (et accepte un
 export de Coupole Web), la langue et le thème changent à chaud, les réglages reviennent à la réouverture. Chaque paquet
@@ -1533,6 +1533,56 @@ inclinée de 5,1° et la ligne des nœuds, et pourquoi il n'y a pas d'éclipse �
 éclipse » replace la Lune selon la géométrie réelle (JPL DE440 : distance, gamma, trajectoire) ; les 133 éclipses de
 la table retrouvent leur type.
 \capture{img/anim_shadowsim_fr.png}{0.95}
+
+\subsection{Gravité et orbites (0.7.2)}\label{sec:gravite}
+Une 95\textsuperscript{e} animation, dans le thème « Renaissance » et le module « L'astronomie de la Renaissance »,
+d'après la simulation PhET « Gravity and Orbits » du projet PhET Interactive Simulations de l'University of Colorado
+Boulder, montrée en cours. Seules l'idée et la liste des fonctions sont reprises : le code, les dessins et les textes
+sont propres à Coupole, aucun fichier ni logo de PhET n'est utilisé (licences de PhET vérifiées le 15~octobre~2026 et
+citées dans \texttt{NOTICE}).
+
+\paragraph{Scénarios.} Soleil et Terre ; Soleil, Terre et Lune ; Terre et Lune ; Terre et station spatiale (ISS) ;
+libre (Soleil, Terre, Lune et une comète d'aphélie 2,4~ua). Les couples partent sur des orbites circulaires ; le
+Soleil, la Terre et la Lune ensemble partent de leurs positions et vitesses \emph{réelles} du 1\textsuperscript{er}
+janvier 2026 (éphéméride JPL DE440, chaque orbite ramenée dans l'écliptique par une rotation autour de sa ligne des
+nœuds) : une Lune lancée sur un cercle de Kepler prendrait, dans le champ de marée du Soleil, une orbite déformée dont
+la période dépend de la phase de départ (27,05 à 27,81~j).
+
+\paragraph{Deux vues.} « Modèle » : astres agrandis et distance Terre--Lune agrandie 78 fois, pour lire (les rapports
+sont écrits sur la toile). « À l'échelle » : tailles et distances vraies ; vus du Soleil, la Terre et la Lune ne font
+qu'un point (entouré d'un anneau discret), le Soleil n'est qu'un petit disque, et l'ISS rase la Terre. Le passage de
+l'une à l'autre se fait en douceur (rayons et écart interpolés en logarithme, 0,9~s), puis plus rien n'est redessiné.
+\capture{img/anim_gravite_modele_fr.png}{0.95}
+\capture{img/anim_gravite_echelle_fr.png}{0.95}
+
+\paragraph{Calcul.} N corps en gravitation newtonienne, schéma symplectique de Yoshida d'ordre~4 (trois pas de Verlet
+de vitesse composés), pas adaptatif ($0{,}01\sqrt{r^3/G(m_1+m_2)}$ pour la paire la plus serrée) ; constantes : $G$
+(CODATA 2018), $GM_\odot$ et $GM_\oplus$ nominaux (UAI 2015), $GM_{\mathrm{Lune}}$ (DE440), rayons (UAI 2015, NASA), unité
+astronomique (UAI 2012), ISS (NASA : 419\,725~kg à 415~km). Collisions aux rayons réels : le corps le plus léger
+s'écrase, la quantité de mouvement est gardée. Les nombres sont les mêmes, au bit près, que dans Coupole Web.
+
+\paragraph{Réglages et souris.} Cases : force de gravité (flèches bleues, longueur relative à celle du départ pour
+chaque corps), vecteur vitesse (flèches vertes, même échelle pour tous), trajectoires, grille (taille du carreau
+écrite), ruban de mesure (vraie distance), gravité (sans elle, chaque corps file en ligne droite), Lune vue du Soleil ;
+masses du Soleil, de la Terre et de la Lune (0,5 à 2 fois les vraies) ; boutons \emph{Pas}, \emph{Retour} (positions et
+vitesses du dernier départ), \emph{Effacer les trajectoires}. Glisser un astre le déplace (ses satellites le suivent ;
+le temps est suspendu pendant qu'on le tient), tirer le bout d'une flèche verte change la vitesse, glisser les bouts du
+ruban mesure.
+\capture{img/anim_gravite_iss_fr.png}{0.95}
+
+\paragraph{Lune vue du Soleil.} L'encart montre la vraie trajectoire de la Lune autour du Soleil sur les 60 derniers
+jours, à la même échelle en largeur et en hauteur : elle se confond avec celle de la Terre et ne fait jamais de boucle
+(les boucles de la vue « Modèle » viennent de l'agrandissement de la distance Terre--Lune). Dessous, le rapport des
+courbures Lune~/ Terre reste toujours positif (0,49 à 1,41) : la trajectoire de la Lune est toujours tournée vers le
+Soleil, qui la tire 2,2 fois plus fort que la Terre ($GM_\odot/d_\odot^2$ contre $GM_\oplus/d_{\mathrm{Lune}}^2$).
+
+\paragraph{Valeurs et vérifications.} Distances, vitesses relatives (km·s$^{-1}$), périodes mesurées (passages
+successifs par la direction de départ vue du corps central) comparées aux vraies ou à Kepler, énergie totale et moment
+cinétique avec leur variation relative (de l'ordre de $10^{-14}$). Mesures : Terre 365,26~j (année sidérale
+365,256~j), Lune 27,34~j (mois sidéral 27,322~j), ISS 92,87~min, comète 671,0~j ; une intégration indépendante sous
+SageMath (DOP853, tolérance $10^{-13}$, mêmes conditions initiales) donne les mêmes périodes à $2\times10^{-6}$ près
+(\texttt{outils/verif\_anim/gravite\_orbites\_verif.sage}).
+\capture{img/anim_gravite_libre_fr.png}{0.95}
 
 \subsection{Les animations disponibles}
 \begin{center}
@@ -1613,6 +1663,7 @@ Excentricité & $e=c/a$, $b=\sqrt{a^2-c^2}$, somme des distances aux foyers $=2a
 Algèbre de la gravitation & facteurs $\frac13$ à 3 sur $M_1$, $M_2$, $d$ : force multipliée par $ab/c^2$ (fraction exacte)\\
 Loi de la gravitation & $F=GM_1M_2/R^2$ de l'électron à la Voie lactée, accélérations, préréglages, mémoire des résultats\\
 Orbites autour de la Terre & $P=2\pi\sqrt{r^3/GM}$ : Station spatiale, GPS, géostationnaire (42~164~km), Lune\\
+Gravité et orbites & d'après PhET : Soleil, Terre, Lune, ISS, comète en gravitation (Yoshida d'ordre 4, état réel DE440 du 1/01/2026) ; vues modèle et à l'échelle, forces, vitesses, trajectoires, ruban, gravité coupable, périodes mesurées, Lune vue du Soleil\\
 \midrule
 Petits angles & $\alpha\approx206\,265''\,d/D$ contre la valeur exacte $2\arcsin(d/2D)$\\
 Horloge de la Grande Ourse & ciel du nord en projection stéréographique ; un tour par jour sidéral, environ 1$^\circ$ par jour à heure fixe\\
@@ -1919,5 +1970,5 @@ Barbary (2016), Bertin \& Arnouts (1996). Moments adaptatifs : Bernstein \& Jarv
 © OpenStreetMap contributors. SIMBAD et Sesame : CDS, Strasbourg (Wenger et al. 2000) ; Aladin Lite (CDS) ;
 NED (NASA/IPAC) ; JPL Small-Body Database (NASA/JPL). Cosmologie : Planck Collaboration (2020, A\&A 641, A6) ;
 Hinshaw et al. (2013, WMAP 9) ; Riess et al. (2022, SH0ES) ; Hogg (1999, astro-ph/9905116) ; Komatsu et al. (2011)
-pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur). Archives : MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), Astro Data Archive de NOIRLab, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS du nœud Anneaux et Lunes, Imaging Node) ; reproject (Astropy) ; Rector et al. (2007, AJ 133, 598) pour l'ordre chromatique ; pratiques des amateurs : voir \texttt{docs/archives\_methode.md}. Animations : ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0) ; Meeus (1998, \emph{Astronomical Algorithms}, 2\textsuperscript{e} éd.) ; obliquité P03 / IAU 2006 ; limites des constellations de l'UAI (données livrées avec astropy) ; côtes Natural Earth 1:50m (domaine public) ; police STIX Two Math (SIL OFL 1.1) ; NASA Exoplanet Archive, NASA Planetary Fact Sheet, éphéméride JPL DE440 et éléments de Standish, AME 2020, filtres de Landolt (1992), spectre de M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, courbe de rotation : modèle de McMillan (2017) par galpy, mesures d'Eilers et al. (2019) et compilation galkin (Pato \& Iocco 2017), bras de Reid et al. (2019), barre de Wegg et al. (2015) ; machine d'Anticythère : adaptée d'Anticythere3D (même auteur), d'après Freeth et al. (\emph{Nature} 444, 2006 ; \emph{Nature} 454, 2008 ; \emph{Scientific Reports} 11:5821, 2021) ; spectres physiques : CODATA 2022, NIST ASD, Mamajek (2022), Malkov et al. (2020), van Belle et al. (2021), Martins et al. (2005), Castelli \& Kurucz (2003, ATLAS9), NIST-JANAF, Allard et al. (2000), CIE 1931 ; Orion en 3D et fiches au survol : SIMBAD (CDS, Strasbourg), Gaia DR3 (ESA/DPAC), Hipparcos (van Leeuwen 2007), Zucker et al. (2021, CC0), Großschedl et al. (2018), Kounkel et al. (2017, 2018), Foley et al. (2023), O'Dell et al. (2009), Stellarium (figure, CC BY-SA 4.0) ; images ESO/G. Beccari, ESO, et NASA, ESA, M. Robberto (STScI/ESA) and the Hubble Space Telescope Orion Treasury Project Team, NASA, ESA, and the Hubble Heritage Team (AURA/STScI), sous licence CC BY 4.0 (détail dans \texttt{NOTICE}).
+pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur). Archives : MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), Astro Data Archive de NOIRLab, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS du nœud Anneaux et Lunes, Imaging Node) ; reproject (Astropy) ; Rector et al. (2007, AJ 133, 598) pour l'ordre chromatique ; pratiques des amateurs : voir \texttt{docs/archives\_methode.md}. Animations : ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0) ; Meeus (1998, \emph{Astronomical Algorithms}, 2\textsuperscript{e} éd.) ; obliquité P03 / IAU 2006 ; limites des constellations de l'UAI (données livrées avec astropy) ; côtes Natural Earth 1:50m (domaine public) ; police STIX Two Math (SIL OFL 1.1) ; NASA Exoplanet Archive, NASA Planetary Fact Sheet, éphéméride JPL DE440 et éléments de Standish, AME 2020, filtres de Landolt (1992), spectre de M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, courbe de rotation : modèle de McMillan (2017) par galpy, mesures d'Eilers et al. (2019) et compilation galkin (Pato \& Iocco 2017), bras de Reid et al. (2019), barre de Wegg et al. (2015) ; machine d'Anticythère : adaptée d'Anticythere3D (même auteur), d'après Freeth et al. (\emph{Nature} 444, 2006 ; \emph{Nature} 454, 2008 ; \emph{Scientific Reports} 11:5821, 2021) ; spectres physiques : CODATA 2022, NIST ASD, Mamajek (2022), Malkov et al. (2020), van Belle et al. (2021), Martins et al. (2005), Castelli \& Kurucz (2003, ATLAS9), NIST-JANAF, Allard et al. (2000), CIE 1931 ; Gravité et orbites : d'après la simulation PhET « Gravity and Orbits » (PhET Interactive Simulations, University of Colorado Boulder ; rien n'en est repris), CODATA 2018, UAI 2015 (B3) et 2012 (B2), DE440 (Park et al. 2021), NASA (fiches Terre, Lune, ISS), Yoshida (1990) ; Orion en 3D et fiches au survol : SIMBAD (CDS, Strasbourg), Gaia DR3 (ESA/DPAC), Hipparcos (van Leeuwen 2007), Zucker et al. (2021, CC0), Großschedl et al. (2018), Kounkel et al. (2017, 2018), Foley et al. (2023), O'Dell et al. (2009), Stellarium (figure, CC BY-SA 4.0) ; images ESO/G. Beccari, ESO, et NASA, ESA, M. Robberto (STScI/ESA) and the Hubble Space Telescope Orion Treasury Project Team, NASA, ESA, and the Hubble Heritage Team (AURA/STScI), sous licence CC BY 4.0 (détail dans \texttt{NOTICE}).
 \end{document}

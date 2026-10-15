@@ -35,6 +35,35 @@ Processing tab, Start) could not be found — and, at 1366 × 768, that button w
 - Tests: `tests/test_parcours_debutant.py` (first start, pick a target, Download from a local server, file present,
   Open available, menus, double-click, 1366 × 768 and 125 %, archives).
 
+**New animation “Gravity and Orbits” (the 95th)**, after the PhET simulation “Gravity and Orbits” of the PhET
+Interactive Simulations project at the University of Colorado Boulder: idea and features taken up, code, drawings and
+texts are Coupole's own (nothing from PhET is copied; licences checked and cited in `NOTICE`). Done in Coupole Web
+0.6.1 first, with the same mechanics (bit-identical numbers, shared cases `tests/gravite_cas.json`) and the same
+rendering.
+
+- **Scenarios**: Sun and Earth; Sun, Earth and Moon; Earth and Moon; Earth and space station (ISS); free (Sun, Earth,
+  Moon and a comet with a 2.4 au aphelion). The Sun, the Earth and the Moon together start from their **real state on
+  1 January 2026** (DE440, orbits brought into the ecliptic about their line of nodes,
+  `outils/verif_anim/etat_initial_gravite.py`): a Moon launched on a Keplerian circle would, in the Sun's tidal field,
+  get a period of 27.05 to 27.81 d depending on the starting phase.
+- **“Model” view** (bodies enlarged, Earth–Moon distance ×78) **and “To scale” view** (the Earth and the Moon seen
+  from the Sun: a single dot), smooth transition (QTimer stopped on arrival).
+- **Mechanics** `gravite_meca.py`: 4th-order Yoshida, adaptive step, constants CODATA 2018, IAU 2015 and 2012, DE440,
+  NASA; collisions; measured periods (Earth 365.26 d, Moon 27.34 d, ISS 92.87 min, comet 671.0 d), energy and angular
+  momentum conserved to 10⁻¹⁴; independent SageMath integration (`outils/verif_anim/gravite_orbites_verif.sage` →
+  `tests/gravite_orbites_sage.json`): same periods to 2 × 10⁻⁶.
+- **Settings**: gravity force (blue), velocity vector (green), paths, grid, measuring tape, gravity, Moon seen from the
+  Sun, masses of the Sun, the Earth and the Moon; Step, Rewind, Clear paths; drag a body (satellites included), pull a
+  velocity arrow, drag the tape.
+- **Moon seen from the Sun**: real path (never loops) and Moon / Earth curvature ratio, always positive.
+- “Renaissance” topic, “Renaissance Astronomy” module (`ANIMATIONS_AJOUTEES` in `outils/importer_contenu.py`); search
+  “gravity and orbits” / “gravité et orbites” first (cases regenerated); F1 help; FR and EN manuals (“Gravity and
+  Orbits (0.7.2)” section, new screenshots); NOTICE.
+- Paths drawn with 1 px strokes (600 points at most): QPainter's fast path (a thicker stroke made it fill the outline
+  of the self-crossing path, 20 times slower).
+- Tests: `tests/test_anim_gravite.py` (shared cases bit for bit, physics, SageMath, drag, arrow, tape, views and
+  transition, values, frame time).
+
 ## 0.7.1 — 15 October 2026
 
 **Bilingual search, favourites, library; “Now” and “Live”; eclipse shadows in true geometry; readable fusion.** Done in

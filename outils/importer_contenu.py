@@ -33,6 +33,10 @@ REMPLACEMENTS = [
 ]
 
 
+
+# Animations propres à Coupole ajoutées aux modules de ClassAction (l'original ne les connaît pas) : module → ids
+ANIMATIONS_AJOUTEES = {'renaissance': ['gravityorbits']}
+
 def lire(p: Path):
     return json.loads(p.read_text(encoding='utf-8'))
 
@@ -106,7 +110,9 @@ def main(racine: Path) -> int:
                         'questions': [{'id': e['id'], 'n': e['numero'], 'ok': e['id'] in toutes,
                                        't': bilingue(toutes[e['id']]['titre']) if e['id'] in toutes else None}
                                       for e in q.get('questions', [])],
-                        'animations': m.get('animations', []), 'fiches': m.get('fiches', []),
+                        'animations': m.get('animations', []) + [a for a in ANIMATIONS_AJOUTEES.get(m['cle'], [])
+                                                                  if a not in m.get('animations', [])],
+                        'fiches': m.get('fiches', []),
                         'tables': m.get('tables', []), 'images': m.get('images', [])})
     ecrire_gz('modules', {'format': 'coupole-modules/1', 'modules': modules})
     # ressources

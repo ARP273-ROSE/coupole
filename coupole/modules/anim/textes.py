@@ -87,6 +87,19 @@ TEXTES = {
         "engrenages ; application complète : github.com/ARP273-ROSE/Anticythere3D), et, dans « Milieu interstellaire "
         "et formation des étoiles », Orion en 3D : la constellation dépliée à ses vraies distances, avec ses nuages, la "
         "nébuleuse d’Orion et la Tête de Cheval, et une plongée avec les images de l’ESO et de Hubble.</p>"
+        "<h4>Gravité et orbites</h4><p>Dans « Renaissance », d’après la simulation PhET « Gravity and Orbits » du "
+        "projet PhET Interactive Simulations de l’University of Colorado Boulder (idée et fonctions ; code, dessins et "
+        "textes propres à Coupole). Le Soleil, la Terre, la Lune, la station spatiale ou une comète en gravitation, "
+        "calculés pas à pas (schéma symplectique de Yoshida d’ordre 4, constantes officielles ; le Soleil, la Terre et "
+        "la Lune partent de leurs positions réelles du 1ᵉʳ janvier 2026). <b>Vue</b> « Modèle » (astres agrandis, "
+        "distance Terre–Lune agrandie 78 fois) ou « À l’échelle » (vus du Soleil, la Terre et la Lune ne font qu’un "
+        "point), avec un passage en douceur. Cases : force de gravité (flèches bleues), vecteur vitesse (flèches "
+        "vertes), trajectoires, grille, ruban de mesure, gravité (sans elle, chaque corps file tout droit), Lune vue du "
+        "Soleil (sa vraie trajectoire, toujours tournée vers le Soleil, et sa courbure). Glisser un astre le déplace "
+        "(ses satellites suivent), tirer le bout d’une flèche verte change sa vitesse ; <b>Pas</b>, <b>Retour</b> "
+        "(dernier départ), <b>Effacer les trajectoires</b>. Les valeurs donnent les distances, les vitesses, les "
+        "périodes mesurées comparées aux vraies (Terre 365,26 j, Lune 27,3 j), l’énergie et le moment cinétique, "
+        "conservés.</p>"
         "<h4>Fiches au survol</h4><p>Dans Orion en 3D, la Grande Ourse 3D, l’horloge de la Grande Ourse, le lever "
         "héliaque, la comparaison des repères et le diagramme HR, survoler (ou toucher) une étoile ou une nébuleuse "
         "ouvre sa fiche, posée à côté d’elle : nom, type, magnitudes, distance et son incertitude, température, rayon, "
@@ -138,6 +151,18 @@ TEXTES = {
         "application: github.com/ARP273-ROSE/Anticythere3D), and, in “Interstellar Medium and Star Formation”, Orion "
         "in 3D: the constellation unfolded to its true distances, with its clouds, the Orion Nebula and the Horsehead, "
         "and a dive with ESO and Hubble images.</p>"
+        "<h4>Gravity and Orbits</h4><p>In “Renaissance”, after the PhET simulation “Gravity and Orbits” of the PhET "
+        "Interactive Simulations project at the University of Colorado Boulder (idea and features; code, drawings and "
+        "texts are Coupole’s own). The Sun, the Earth, the Moon, the space station or a comet under gravity, computed "
+        "step by step (4th-order Yoshida symplectic scheme, official constants; the Sun, the Earth and the Moon start "
+        "from their real positions on 1 January 2026). <b>View</b> “Model” (bodies enlarged, Earth–Moon distance "
+        "enlarged 78 times) or “To scale” (seen from the Sun, the Earth and the Moon are a single dot), with a smooth "
+        "transition. Boxes: gravity force (blue arrows), velocity vector (green arrows), paths, grid, measuring tape, "
+        "gravity (without it, each body moves off in a straight line), Moon seen from the Sun (its real path, always "
+        "curving towards the Sun, and its curvature). Dragging a body moves it (its satellites follow), pulling the tip "
+        "of a green arrow changes its velocity; <b>Step</b>, <b>Rewind</b> (last start), <b>Clear paths</b>. The "
+        "values give distances, speeds, measured periods compared with the true ones (Earth 365.26 d, Moon 27.3 d), "
+        "energy and angular momentum, conserved.</p>"
         "<h4>Now and live</h4><p>Date- or time-dependent animations (day-night, Sun motions, seasons, sidereal time, "
         "lunar phases, Big Dipper clock, Antikythera…) have the “Now” (the computer’s present instant, in universal "
         "time, shown in your time zone: “09:20 Paris time (UTC+2) · 07:20 UT”, no daylight-saving error), “Live” (the "
@@ -1029,6 +1054,10 @@ TEXTES.update({k: _t(*v) for k, v in ANIM_ANTICYTHERE.items()})
 from .textes_orion import ANIM_ORION  # noqa: E402  (0.5.0 : spectres physiques, Orion en 3D, fiches au survol)
 
 TEXTES.update({k: _t(*v) for k, v in ANIM_ORION.items()})
+
+from .textes_gravite import ANIM_GRAVITE  # noqa: E402  (0.7.2 : gravité et orbites, d'après PhET)
+
+TEXTES.update({k: _t(*v) for k, v in ANIM_GRAVITE.items()})
 
 for _cle, _fr, _en in (('buenos_aires', 'Buenos Aires', 'Buenos Aires'), ('lima', 'Lima', 'Lima'),
                        ('casablanca', 'Casablanca', 'Casablanca'), ('monrovia', 'Monrovia', 'Monrovia'),
