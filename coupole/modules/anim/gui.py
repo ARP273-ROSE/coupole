@@ -2,7 +2,6 @@
 l'animation choisie (créée à la demande, une seule animée à la fois)."""
 from __future__ import annotations
 
-import unicodedata
 
 from PyQt6.QtCore import Qt, QUrl
 from PyQt6.QtGui import QBrush, QDesktopServices
@@ -21,20 +20,24 @@ ADRESSE_WEB = 'https://arp273-rose.github.io/coupole-web/'
 ROLE_ID = Qt.ItemDataRole.UserRole
 
 
-def _sans_accents(s: str) -> str:
-    return ''.join(c for c in unicodedata.normalize('NFD', s.lower()) if unicodedata.category(c) != 'Mn')
+_INDEX_ANIM = None
+_DERNIERE = ('', frozenset())
 
 
 def correspond(entree: catalogue.Entree, texte: str) -> bool:
-    """Recherche insensible à la casse et aux accents, dans les deux langues et dans le titre d'origine."""
-    if not texte.strip():
+    """Recherche bilingue (moteur commun avec Coupole Web) sur les animations : noms, descriptions, titres d'origine,
+    thèmes, identifiants ; accents, casse, pluriels simples et petites fautes tolérés."""
+    global _INDEX_ANIM, _DERNIERE
+    q = texte.strip()
+    if not q:
         return True
-    from ...core import i18n
-    cles = ('anim_nom_' + entree.cle, 'anim_desc_' + entree.cle)
-    foin = ' '.join([entree.id, entree.titre] + [i18n.toutes_les_cles().get(k, {}).get(lg, '')
-                                                   for k in cles for lg in ('fr', 'en')])
-    foin = _sans_accents(foin)
-    return all(m in foin for m in _sans_accents(texte).split())
+    if _DERNIERE[0] != q:
+        if _INDEX_ANIM is None:
+            from .classe import contenu
+            from .classe.recherche import Index
+            _INDEX_ANIM = Index([d for d in contenu.documents() if d['g'] == 'animation'])
+        _DERNIERE = (q, frozenset(r['doc']['id'] for r in _INDEX_ANIM.chercher(q)))
+    return entree.id in _DERNIERE[1]
 
 
 def appliquer_reglages(w, reglages: dict, tout: bool = False):
@@ -110,6 +113,10 @@ class Panneau(QWidget):
         tete = QHBoxLayout()
         tete.setContentsMargins(0, 0, 0, 0)
         tete.addWidget(self.l_titre, 1)
+        from .classe.favoris_qt import BoutonFavori
+        self.b_favori = BoutonFavori('animation', '', '', self)
+        self.b_favori.setVisible(False)
+        tete.addWidget(self.b_favori, 0, Qt.AlignmentFlag.AlignTop)
         self.b_web = QPushButton(tr('anim_version_web'))
         aide(self.b_web, 'anim_version_web_aide')
         self.b_web.clicked.connect(self.ouvrir_web)
@@ -133,8 +140,9 @@ class Panneau(QWidget):
         from .classe.gui import VueClasse
         nav = QHBoxLayout()
         self.b_vues = {}
-        for cle, texte in (('modules', 'classe_nav_modules'), ('animations', 'classe_nav_animations'),
-                           ('mes', 'classe_nav_mes_modules'), ('progression', 'classe_nav_progression')):
+        for cle, texte in (('modules', 'classe_nav_modules'), ('bibliotheque', 'classe_nav_bibliotheque'),
+                           ('animations', 'classe_nav_animations'), ('favoris', 'classe_nav_mes_modules'),
+                           ('progression', 'classe_nav_progression')):
             b = QPushButton(tr(texte))
             b.setCheckable(True)
             b.setAutoExclusive(True)
@@ -252,13 +260,15 @@ class Panneau(QWidget):
 
     # ------------------------------------------------------------ animation
     def montrer(self, vue: str):
-        """Vue du panneau : modules (accueil), animations (catalogue), Mes modules, Ma progression."""
+        """Vue du panneau : modules (accueil), bibliothèque, animations (catalogue), Mes favoris (collections au second
+        plan), Ma progression."""
+        vue = {'mes': 'favoris'}.get(vue, vue)
         if vue == 'animations':
             self.vues.setCurrentIndex(1)
         else:
             self.vues.setCurrentIndex(0)
-            {'modules': self.classe.aller_accueil, 'mes': self.classe.aller_mes_modules,
-             'progression': self.classe.aller_progression}[vue]()
+            {'modules': self.classe.aller_accueil, 'bibliotheque': self.classe.aller_bibliotheque,
+             'favoris': self.classe.aller_favoris, 'progression': self.classe.aller_progression}[vue]()
         self.b_vues[vue].setChecked(True)
 
     def appliquer_sauvegarde(self):
@@ -279,6 +289,8 @@ class Panneau(QWidget):
             self.animations[self.courante].arreter()
         self.courante = ident
         self.l_titre.setText(tr('anim_nom_' + e.cle))
+        self.b_favori.changer('animation', ident, tr('anim_nom_' + e.cle))
+        self.b_favori.setVisible(True)
         self.l_desc.setText(self.description(e))
         if not e.faite:
             self.vide.setText(tr('anim_pas_encore'))

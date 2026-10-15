@@ -81,7 +81,11 @@ def _rejouer(c):
              'marquer': lambda: S.marquer(s, o['qid'], o['champ'], o['v']),
              'etat': lambda: S.etat_question(s, o['qid']),
              'tentative': lambda: S.noter_tentative(s, o['qid'], o['t']),
-             'bilan': lambda: S.bilan(s, o['questions'])}[o['op']]
+             'bilan': lambda: S.bilan(s, o['questions']),
+             'est_favori': lambda: S.est_favori(s, o['genre'], o['id']),
+             'ajouter_favori': lambda: S.ajouter_favori(s, o['genre'], o['id'], o['quand']),
+             'retirer_favori': lambda: S.retirer_favori(s, o['genre'], o['id']),
+             'basculer_favori': lambda: S.basculer_favori(s, o['genre'], o['id'], o['quand'])}[o['op']]
         r = f()
         res.append(None if r is None else json.loads(S.json_js(r)))
     return {'resultats': res, 'final': S.exporter(s)}
@@ -211,7 +215,9 @@ def test_pages_et_progression(app_qt, tmp_path, monkeypatch):
     assert json.loads(ST.stockage().chemin.read_text('utf-8'))['format'] == 'coupole-sauvegarde'
     # recherche FR/EN (questions, animations, fiches…)
     v.aller_recherche('density')
-    assert isinstance(v.pile.currentWidget(), PageRecherche) and v.pile.currentWidget().arbre.topLevelItemCount() >= 2
+    pr = v.pile.currentWidget()
+    assert isinstance(pr, PageRecherche) and len({r['doc']['g'] for r in pr.resultats()}) >= 2
+    assert '<b style=' in pr.vue_res.toHtml() or 'font-weight' in pr.vue_res.toHtml()
     # fenêtres de ressources : plusieurs à la fois, une seule par ressource
     ouvrir_ressource('fiche', 'intro_density')
     ouvrir_ressource('table', 'densities')

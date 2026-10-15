@@ -1,17 +1,19 @@
-"""Navigation par modules au bureau (même organisation que Coupole Web) : accueil (22 modules, bonus, Mes modules,
-reprise), page d'un module à onglets (Questions, Animations, Fiches, Tables, Images ; Organiser pour un module
-personnel), question (menus « Adapter la question », choix, Valider, Montrer la réponse qui clignote, indice,
-explication, ressources liées ★, précédente / suivante W → G → C → D en boucle, plein écran), recherche FR/EN, « Mes
-modules », « Ma progression » (sauvegarde : export, import, réinitialisation tout ou partie avec copie et annulation).
-Fil d'Ariane en haut ; ressources ouvertes dans des fenêtres séparées ; aperçu au survol."""
+"""Navigation par modules au bureau (même organisation que Coupole Web) : accueil (22 modules, bonus, favoris,
+bibliothèque, reprise), page d'un module à onglets (Questions, Animations, Fiches, Tables, Images ; Organiser pour une
+collection), question (menus « Adapter la question », choix, Valider, Montrer la réponse qui clignote, indice,
+explication, ressources liées ★, précédente / suivante W → G → C → D en boucle, plein écran), recherche bilingue
+(moteur commun avec Coupole Web : recherche.py), « Mes favoris » (étoile sur tout atelier ; collections au second
+plan), bibliothèque (présentation d'origine de ClassAction : tout le contenu d'un type, par module), « Ma progression »
+(sauvegarde : export, import, réinitialisation tout ou partie avec copie et annulation).  Fil d'Ariane en haut ;
+ressources ouvertes dans des fenêtres séparées ; aperçu au survol."""
 from __future__ import annotations
 
 import html as _html
 import random
 
-from PyQt6.QtCore import QPoint, QRect, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QAction, QKeySequence, QShortcut
-from PyQt6.QtWidgets import (QAbstractItemView, QComboBox, QFileDialog, QFrame, QGridLayout, QHBoxLayout, QLabel,
+from PyQt6.QtCore import QPoint, QRect, QRectF, QSize, Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QAction, QIcon, QKeySequence, QShortcut
+from PyQt6.QtWidgets import (QAbstractItemView, QComboBox, QFileDialog, QFrame, QGridLayout, QHBoxLayout, QLabel, QTextBrowser,
                              QLineEdit, QListWidget, QListWidgetItem, QMenu, QMessageBox, QCheckBox, QProgressBar, QAbstractButton, QAbstractSpinBox,
                              QPushButton, QScrollArea, QSizePolicy, QStackedWidget, QTabWidget, QTableWidget,
                              QTableWidgetItem, QToolButton, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget,
@@ -21,13 +23,16 @@ from ....core.i18n import langue, tr
 from .. import catalogue
 from . import contenu
 from . import sauvegarde as S
+from .favoris_qt import BoutonFavori, action_favori, basculer as basculer_favori, est_favori, icone_etoile
 from .figure_qt import FigureWidget
+from .recherche import extrait, surligner
 from .moteur_questions import instancier, variantes
 from .ressources_qt import apercu, etiquette, ouvrir_ressource, texte_html, theme_courant, Repliable
 from .stockage import stockage
 
 bi = contenu.bi
 ROLE = Qt.ItemDataRole.UserRole
+ROLE_TITRE = Qt.ItemDataRole.UserRole.value + 1          # titre seul (favoris, menus)
 TYPES = ('W', 'G', 'C', 'D')
 SYMBOLES = {'jamais': '○', 'vue': '◐', 'reussie': '✓', 'ratee': '✗'}
 
@@ -80,9 +85,11 @@ def ordre(qs: list) -> list:
 
 
 # ------------------------------------------------------------------ « Ajouter à… »
-def menu_ajouter(parent, genre: str, i: str, titre: str, apres=None) -> QMenu:
+def menu_ajouter(parent, genre: str, i: str, titre: str, apres=None, annoncer=None) -> QMenu:
     s = stockage().doc
     m = QMenu(tr('classe_ajouter_a'), parent)
+    m.addAction(action_favori(m, genre, i, titre, annoncer))
+    m.addSeparator()
     for mm in s['mes_modules']:
         dedans = any(e['genre'] == genre and e['id'] == i for e in mm['elements'])
         a = QAction(mm['nom'], m)
@@ -120,8 +127,26 @@ class ListeRessources(QListWidget):
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self._menu)
         self.itemActivated.connect(lambda it: self.ouvrir.emit(*it.data(ROLE)))
-        self.itemEntered.connect(lambda it: apercu().programmer(*it.data(ROLE), self.viewport().mapToGlobal(
+        self.itemEntered.connect(lambda it: it.data(ROLE) and apercu().programmer(*it.data(ROLE), self.viewport().mapToGlobal(
             self.visualItemRect(it).bottomLeft())))
+        # favoris : étoile dorée devant les éléments marqués, Ctrl+D bascule l'élément courant
+        QShortcut(QKeySequence('Ctrl+D'), self, self._basculer_courant)
+        stockage().abonner_faible(self.maj_favoris)
+
+    def _basculer_courant(self):
+        it = self.currentItem()
+        if it is not None and it.data(ROLE):
+            g, i = it.data(ROLE)
+            basculer_favori(g, i, it.data(ROLE_TITRE) or it.text())
+
+    def maj_favoris(self):
+        try:
+            for k in range(self.count()):
+                it = self.item(k)
+                if it.data(ROLE):
+                    it.setIcon(icone_etoile(True) if est_favori(*it.data(ROLE)) else QIcon())
+        except RuntimeError:
+            pass
 
     def leaveEvent(self, ev):
         apercu().cacher()
@@ -130,7 +155,10 @@ class ListeRessources(QListWidget):
     def ajouter(self, genre: str, i: str, texte: str, etoile=False, sous=''):
         it = QListWidgetItem(('★ ' if etoile else '') + texte + ('  —  ' + sous if sous else ''))
         it.setData(ROLE, (genre, i))
+        it.setData(ROLE_TITRE, texte)
         it.setToolTip(tr('classe_ouvrir_aide'))
+        if est_favori(genre, i):
+            it.setIcon(icone_etoile(True))
         self.addItem(it)
         return it
 
@@ -141,10 +169,11 @@ class ListeRessources(QListWidget):
         genre, i = it.data(ROLE)
         if self.retirer:
             m = QMenu(self)
+            m.addAction(action_favori(m, genre, i, it.data(ROLE_TITRE) or it.text()))
             a = m.addAction(tr('classe_retirer'))
             a.triggered.connect(lambda: self.retirer(genre, i))
         else:
-            m = menu_ajouter(self, genre, i, it.text())
+            m = menu_ajouter(self, genre, i, it.data(ROLE_TITRE) or it.text())
         m.exec(self.viewport().mapToGlobal(pos))
 
 
@@ -406,13 +435,34 @@ class PageAccueil(QWidget):
                                         k + 1 if m['affiche'] else None, (b['reussies'], b['total'])))
             self.grille.addLayout(g)
             self.grille.addSpacing(6)
-        self.grille.addWidget(_titre(tr('classe_mes_modules'), 1.15))
+        # la bibliothèque : tout le contenu, comme dans ClassAction
+        ms = contenu.modules()
+        n = lambda k: len({i for m in ms for i in m[k]})      # noqa: E731
+        b = self._carte('📚  ' + tr('classe_bibliotheque_carte'), tr(
+            'classe_bibliotheque_carte_texte', q=len({q['id'] for m in ms for q in m['questions']}),
+            a=len({i for m in ms for i in m['animations'] if i in catalogue.PAR_ID}), f=n('fiches'), t=n('tables'),
+            i=n('images')), self.vue.aller_bibliotheque)
         g = GrilleCartes()
-        for mm in s['mes_modules']:
-            n = len(mm['elements'])
-            g.addWidget(self._carte(mm['nom'], tr('classe_n_elements1') if n == 1 else tr('classe_n_elements', n=n),
-                                    lambda _=False, i=mm['id']: self.vue.aller_module(i, True)))
-        g.addWidget(self._carte('+ ' + tr('classe_creer_module'), '', self.vue.creer_module))
+        g.addWidget(b)
+        self.grille.addLayout(g)
+        self.grille.addSpacing(6)
+        # mes favoris (les plus récents d'abord)
+        tete = QHBoxLayout()
+        tete.addWidget(_titre('★ ' + tr('classe_favoris'), 1.15))
+        tete.addStretch(1)
+        tout = QPushButton(tr('classe_tout_voir'))
+        tout.clicked.connect(self.vue.aller_favoris)
+        tete.addWidget(tout)
+        self.grille.addLayout(tete)
+        g = GrilleCartes()
+        favs = [f for f in favoris_affiches(s) if f['ok']][::-1][:12]
+        for f in favs:
+            g.addWidget(self._carte(f['titre'], tr('classe_genre_' + f['genre']) + ('  ·  ' + f['sous'] if f['sous'] else ''),
+                                    lambda _=False, f=f: ouvrir_favori(self.vue, f)))
+        if not favs:
+            vide = QLabel(tr('classe_favoris_vide'))
+            vide.setWordWrap(True)
+            self.grille.addWidget(vide)
         self.grille.addLayout(g)
         self.grille.addStretch(1)
         vus = sorted(((k, v) for k, v in s['modules'].items() if v.get('derniere_question')), key=lambda x: x[1]['visite'], reverse=True)
@@ -462,6 +512,8 @@ class PageModule(QWidget):
             actions.addWidget(self.l_progres)
             actions.addWidget(barre)
         actions.addStretch(1)
+        self.b_favori = BoutonFavori('module', cle, self.titre.text(), self, vue.annoncer, libelle=True)
+        actions.addWidget(self.b_favori)
         if not perso:
             actions.addWidget(self._bouton('classe_copier_module', self._copier))
         else:
@@ -509,6 +561,8 @@ class PageModule(QWidget):
                 e = S.etat_question(s, q['id'])
                 it = QTreeWidgetItem(['%s  %s  %s%s' % (SYMBOLES[e], q['n'], q['titre'], '' if q['ok'] else '  — ' + tr('classe_a_venir'))])
                 it.setData(0, ROLE, q['id'])
+                if est_favori('question', q['id']):
+                    it.setIcon(0, icone_etoile(True))
                 it.setToolTip(0, tr('classe_etat_' + e))
                 if not q['ok']:
                     it.setDisabled(True)
@@ -546,9 +600,10 @@ class PageModule(QWidget):
             return
         if self.perso:
             m = QMenu(self)
+            m.addAction(action_favori(m, 'question', it.data(0, ROLE), it.text(0), self.vue.annoncer))
             m.addAction(tr('classe_retirer')).triggered.connect(lambda: self._retirer('question', it.data(0, ROLE)))
         else:
-            m = menu_ajouter(self, 'question', it.data(0, ROLE), it.text(0))
+            m = menu_ajouter(self, 'question', it.data(0, ROLE), it.text(0), annoncer=self.vue.annoncer)
         m.exec(arbre.viewport().mapToGlobal(pos))
 
     def _organiser(self) -> QWidget:
@@ -716,6 +771,8 @@ class PageQuestion(QWidget):
         self.b_liees.setMenu(menu)
         self.b_liees.setVisible(False)
         tete.addWidget(self.b_liees)
+        self.b_favori = BoutonFavori('question', qid, bi(self.q['titre']), self, self.vue.annoncer)
+        tete.addWidget(self.b_favori)
         self.b_ajouter = QToolButton()
         self.b_ajouter.setText('+')
         self.b_ajouter.setToolTip(tr('classe_ajouter_a'))
@@ -1034,7 +1091,18 @@ class PageQuestion(QWidget):
         return w
 
 
+def _html_surligne(texte: str, mots) -> str:
+    return ''.join('<b style="background-color:%s">%s</b>' % ('rgba(224,165,38,0.32)', _html.escape(t)) if m else _html.escape(t)
+                   for t, m in surligner(texte, mots))
+
+
 class PageRecherche(QWidget):
+    """Recherche bilingue (moteur commun avec Coupole Web) : résultats groupés par type, dans l'ordre du meilleur
+    résultat de chaque type, titres et passages surlignés dans la langue de l'interface ; quand la correspondance
+    n'est que dans l'autre langue, le titre de l'autre langue suit.  Lien ☆/★ : favori."""
+
+    PAR_GROUPE = 30
+
     def __init__(self, vue, q0=''):
         super().__init__()
         self.vue = vue
@@ -1044,41 +1112,430 @@ class PageRecherche(QWidget):
         self.champ.setPlaceholderText(tr('classe_recherche_indice'))
         self.champ.setClearButtonEnabled(True)
         self.champ.setAccessibleName(tr('classe_recherche_titre'))
+        self.champ.setAccessibleDescription(tr('classe_recherche_bilingue'))
         v.addWidget(self.champ)
+        h = QHBoxLayout()
+        aide = QLabel(tr('classe_recherche_bilingue'))
+        aide.setWordWrap(True)
+        aide.setStyleSheet('color: palette(placeholder-text);')
+        h.addWidget(aide, 1)
+        self.fav = QCheckBox(tr('classe_favoris_seulement'))
+        self.fav.toggled.connect(lambda *_: self.maj())
+        h.addWidget(self.fav)
+        v.addLayout(h)
         self.compte = QLabel('')
         v.addWidget(self.compte)
-        self.arbre = QTreeWidget()
-        self.arbre.setHeaderHidden(True)
-        self.arbre.itemActivated.connect(self._ouvrir)
-        v.addWidget(self.arbre, 1)
+        self.vue_res = QTextBrowser()
+        self.vue_res.setOpenLinks(False)
+        self.vue_res.setAccessibleName(tr('classe_recherche_titre'))
+        self.vue_res.anchorClicked.connect(self._lien)
+        v.addWidget(self.vue_res, 1)
+        self.deplies = set()
         self.minuteur = QTimer(self)
         self.minuteur.setSingleShot(True)
         self.minuteur.setInterval(150)
         self.minuteur.timeout.connect(self.maj)
-        self.champ.textChanged.connect(lambda *_: self.minuteur.start())
+        self.champ.textChanged.connect(lambda *_: (self.deplies.clear(), self.minuteur.start()))
+        stockage().abonner_faible(self._sauvegarde_changee)
         self.maj()
 
-    def maj(self):
+    def _sauvegarde_changee(self):
+        self.minuteur.start()
+
+    def resultats(self) -> list:
         r = contenu.chercher(self.champ.text())
-        self.arbre.clear()
-        self.compte.setText(tr('classe_n_resultats', n=len(r)) if r else (tr('classe_aucun_resultat', q=self.champ.text()) if self.champ.text().strip() else ''))
+        if self.fav.isChecked():
+            r = [x for x in r if est_favori(x['doc']['g'], x['doc']['id'])]
+        return r
+
+    def maj(self):
+        try:
+            texte = self.champ.text()
+        except RuntimeError:
+            return
+        r = self.resultats()
+        self.compte.setText(tr('classe_n_resultats', n=len(r)) if r else (tr('classe_aucun_resultat', q=texte) if texte.strip() else ''))
+        lg = langue()
+        autre = 'en' if lg == 'fr' else 'fr'
         info = contenu.info_questions()
-        for g in ('question', 'animation', 'fiche', 'table', 'image'):
-            l = [e for e in r if e['g'] == g and (g != 'question' or (e['id'] in info and info[e['id']]['ok']))][:60]
+        ordre = []
+        for x in r:
+            if x['doc']['g'] not in ordre:
+                ordre.append(x['doc']['g'])
+        morceaux = []
+        for g in ordre:
+            tous = [x for x in r if x['doc']['g'] == g]
+            montres = tous if g in self.deplies else tous[:self.PAR_GROUPE]
+            morceaux.append('<h3>%s <span style="color:gray">(%d)</span></h3>' % (_html.escape(tr('classe_onglet_' + g + 's')), len(tous)))
+            for x in montres:
+                d = x['doc']
+                titre = (d['t'] or {}).get(lg) or (d['t'] or {}).get(autre) or d['id']
+                if g == 'question':
+                    mod = info[d['id']]['module']
+                elif g == 'module':
+                    mod = d['id']
+                else:
+                    mod = (d.get('m') or [''])[0]
+                sous = bi(contenu.module(mod)['titre']) if mod and contenu.module(mod) and g != 'module' else ''
+                if g == 'animation':
+                    e = catalogue.PAR_ID.get(d['id'])
+                    sous = tr('anim_theme_' + e.theme) if e else ''
+                etoile = '★' if est_favori(g, d['id']) else '☆'
+                ligne = '<p style="margin:2px 0 8px 0"><a href="ouvrir:%s:%s:%s">%s</a>' % (g, d['id'], mod, _html_surligne(titre, x['mots']))
+                if sous:
+                    ligne += ' <span style="color:gray">— %s</span>' % _html.escape(sous)
+                ligne += ' &nbsp;<a href="favori:%s:%s" title="%s">%s</a>' % (g, d['id'], _html.escape(tr('classe_favori_nom', titre=titre)), etoile)
+                ici = any(m for _, m in surligner(titre, x['mots']))
+                autres = [t for t in ((d['t'] or {}).get(autre, ''), d.get('o') or '') if t and t != titre and any(m for _, m in surligner(t, x['mots']))]
+                rtxt = (d.get('r') or {}).get(lg, '') if isinstance(d.get('r'), dict) else ''
+                if not ici and autres:
+                    ligne += '<br><i style="color:gray">%s</i>' % _html_surligne(tr('classe_aussi_en', titre=autres[0]), x['mots'])
+                elif rtxt and any(m for _, m in surligner(rtxt, x['mots'])):
+                    ligne += '<br><span style="color:gray">%s</span>' % _html_surligne(extrait(rtxt, x['mots'], 150), x['mots'])
+                morceaux.append(ligne + '</p>')
+            if len(montres) < len(tous):
+                morceaux.append('<p><a href="plus:%s">%s</a></p>' % (g, _html.escape('+ %d' % (len(tous) - len(montres)))))
+        barre = self.vue_res.verticalScrollBar().value()
+        self.vue_res.setHtml(''.join(morceaux))
+        self.vue_res.verticalScrollBar().setValue(barre)
+
+    def _lien(self, url):
+        quoi, _, reste = url.toString().partition(':')
+        if quoi == 'plus':
+            self.deplies.add(reste)
+            return self.maj()
+        if quoi == 'favori':
+            g, _, i = reste.partition(':')
+            return basculer_favori(g, i, contenu.titre(g, i) if g != 'module' else bi((contenu.module(i) or {}).get('titre')), self.vue.annoncer)
+        g, i, mod = (reste.split(':') + ['', ''])[:3]
+        if g == 'question':
+            self.vue.aller_question(mod, i, False)
+        elif g == 'module':
+            self.vue.aller_module(i, False)
+        else:
+            self.vue.ouvrir_ressource(g, i)
+
+
+# ================================================================== favoris et bibliothèque
+ORDRE_FAVORIS = ('module', 'animation', 'question', 'fiche', 'table', 'image')
+
+
+def favoris_affiches(s) -> list:
+    """Favoris dans l'ordre d'ajout : {genre, id, titre, sous, ajoute, ok, module} (titres dans la langue de
+    l'interface ; un favori qui n'existe plus reste, marqué « indisponible »)."""
+    info = contenu.info_questions()
+    out = []
+    for f in s['favoris']:
+        g, i = f['genre'], f['id']
+        d = {'genre': g, 'id': i, 'ajoute': f['ajoute'], 'ok': True, 'sous': '', 'module': ''}
+        if g == 'module':
+            m = contenu.module(i)
+            mm = S.trouver_module(s, i)
+            if m:
+                d.update(titre=bi(m['titre']), module=i)
+            elif mm:
+                d.update(titre=mm['nom'], sous=tr('classe_genre_collection'), module=i, perso=True)
+            else:
+                d.update(titre=i, sous=tr('classe_indisponible'), ok=False)
+        elif g == 'animation':
+            e = catalogue.PAR_ID.get(i)
+            d.update(titre=tr('anim_nom_' + e.cle), sous=tr('anim_theme_' + e.theme)) if e else d.update(titre=i, sous=tr('classe_indisponible'), ok=False)
+        elif g == 'question':
+            q = info.get(i)
+            if q and q['ok']:
+                d.update(titre=bi(q['t']) if q['t'] else i, sous='%s · %s' % (bi(contenu.module(q['module'])['titre']), q['n']), module=q['module'])
+            else:
+                d.update(titre=i, sous=tr('classe_indisponible'), ok=False)
+        else:
+            o = {'fiche': contenu.fiche, 'table': contenu.table, 'image': contenu.image}[g](i)
+            d.update(titre=bi(o['titre'])) if o else d.update(titre=i, sous=tr('classe_indisponible'), ok=False)
+        out.append(d)
+    return out
+
+
+def ouvrir_favori(vue, f: dict):
+    if not f['ok']:
+        return
+    if f['genre'] == 'module':
+        vue.aller_module(f['id'], bool(f.get('perso')))
+    elif f['genre'] == 'question':
+        vue.aller_question(f['module'], f['id'], False)
+    else:
+        vue.ouvrir_ressource(f['genre'], f['id'])
+
+
+class PageFavoris(QWidget):
+    """« Mes favoris » : groupés par type, filtre par type, tri (ajout récent, ancien, titre) ; clic droit ou Suppr :
+    retirer ; les collections (ex-« Mes modules ») au second plan, par « Organiser en collections… »."""
+
+    def __init__(self, vue):
+        super().__init__()
+        self.vue = vue
+        v = QVBoxLayout(self)
+        v.addWidget(_titre(tr('classe_favoris')))
+        t = QLabel(tr('classe_favoris_texte'))
+        t.setWordWrap(True)
+        v.addWidget(t)
+        h = QHBoxLayout()
+        h.addWidget(QLabel(tr('classe_filtre_type')))
+        self.type = QComboBox()
+        self.type.setAccessibleName(tr('classe_filtre_type'))
+        self.type.addItem(tr('classe_tous_types'), '')
+        for g in ORDRE_FAVORIS:
+            self.type.addItem(tr('classe_onglet_' + g + 's'), g)
+        h.addWidget(self.type)
+        h.addSpacing(12)
+        h.addWidget(QLabel(tr('classe_trier')))
+        self.tri = QComboBox()
+        self.tri.setAccessibleName(tr('classe_trier'))
+        for k in ('recent', 'ancien', 'titre'):
+            self.tri.addItem(tr('classe_tri_' + k), k)
+        h.addWidget(self.tri)
+        h.addStretch(1)
+        v.addLayout(h)
+        self.arbre = QTreeWidget()
+        self.arbre.setHeaderHidden(True)
+        self.arbre.setAccessibleName(tr('classe_favoris'))
+        self.arbre.itemActivated.connect(lambda it, *_: it.data(0, ROLE) and ouvrir_favori(self.vue, it.data(0, ROLE)))
+        self.arbre.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.arbre.customContextMenuRequested.connect(self._menu)
+        QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.arbre, self._retirer_courant)
+        QShortcut(QKeySequence('Ctrl+D'), self.arbre, self._retirer_courant)
+        v.addWidget(self.arbre, 1)
+        bas = QHBoxLayout()
+        b = QPushButton(tr('classe_organiser_collections'))
+        b.clicked.connect(vue.aller_mes_modules)
+        bas.addWidget(b)
+        aide = QLabel(tr('classe_collections_aide'))
+        aide.setStyleSheet('color: palette(placeholder-text);')
+        bas.addWidget(aide, 1)
+        v.addLayout(bas)
+        self.type.currentIndexChanged.connect(lambda *_: self.remplir())
+        self.tri.currentIndexChanged.connect(lambda *_: self.remplir())
+        self._differe = QTimer(self)
+        self._differe.setSingleShot(True)
+        self._differe.setInterval(0)
+        self._differe.timeout.connect(self._remplir_sur)
+        stockage().abonner_faible(self._demander)
+        self.remplir()
+
+    def _demander(self):
+        self._differe.start()
+
+    def _remplir_sur(self):
+        try:
+            self.remplir()
+        except RuntimeError:
+            pass
+
+    def remplir(self):
+        self.arbre.clear()
+        tous = favoris_affiches(stockage().doc)
+        tri = self.tri.currentData()
+        if tri == 'recent':
+            tous = tous[::-1]
+        elif tri == 'titre':
+            import locale
+            tous = sorted(tous, key=lambda f: locale.strxfrm(f['titre'].casefold()))
+        filtre = self.type.currentData()
+        if not tous:
+            it = QTreeWidgetItem([tr('classe_favoris_vide')])
+            it.setFlags(Qt.ItemFlag.NoItemFlags)
+            self.arbre.addTopLevelItem(it)
+            return
+        for g in ORDRE_FAVORIS:
+            l = [f for f in tous if f['genre'] == g and (not filtre or filtre == g)]
             if not l:
                 continue
-            racine = QTreeWidgetItem(['%s (%d)' % (tr('classe_onglet_' + g + 's'), len(l))])
-            racine.setFlags(Qt.ItemFlag.ItemIsEnabled)
-            self.arbre.addTopLevelItem(racine)
-            for e in l:
-                mod = info[e['id']]['module'] if g == 'question' else (e['m'][0] if e['m'] else '')
-                nm = bi(contenu.module(mod)['titre']) if mod and contenu.module(mod) else ''
-                it = QTreeWidgetItem([bi(e['t']) + ('  —  ' + nm if nm else '')])
-                it.setData(0, ROLE, (g, e['id'], mod))
-                racine.addChild(it)
-            racine.setExpanded(True)
+            r = QTreeWidgetItem(['%s (%d)' % (tr('classe_onglet_' + g + 's'), len(l))])
+            r.setFlags(Qt.ItemFlag.ItemIsEnabled)
+            self.arbre.addTopLevelItem(r)
+            for f in l:
+                it = QTreeWidgetItem([f['titre'] + ('  —  ' + f['sous'] if f['sous'] else '')])
+                it.setIcon(0, icone_etoile(True))
+                it.setData(0, ROLE, f)
+                if not f['ok']:
+                    it.setDisabled(True)
+                r.addChild(it)
+            r.setExpanded(True)
 
-    def _ouvrir(self, it, *_):
+    def _retirer(self, f):
+        basculer_favori(f['genre'], f['id'], f['titre'], self.vue.annoncer)
+
+    def _retirer_courant(self):
+        it = self.arbre.currentItem()
+        if it is not None and it.data(0, ROLE):
+            self._retirer(it.data(0, ROLE))
+
+    def _menu(self, pos):
+        it = self.arbre.itemAt(pos)
+        if it is None or not it.data(0, ROLE):
+            return
+        f = it.data(0, ROLE)
+        m = QMenu(self)
+        m.addAction(icone_etoile(False, self.palette().color(self.palette().ColorRole.WindowText)),
+                    tr('classe_favori_retirer')).triggered.connect(lambda: self._retirer(f))
+        if f['genre'] != 'module':
+            m.addMenu(menu_ajouter(m, f['genre'], f['id'], f['titre']))
+        m.exec(self.arbre.viewport().mapToGlobal(pos))
+
+
+_VIGNETTES: dict = {}
+
+
+class PageBibliotheque(QWidget):
+    """La présentation d'origine de ClassAction : un onglet par type (Questions, Animations, Fiches, Tables, Images)
+    montre tout le contenu de ce type, rangé par module dans l'ordre d'origine ; filtres module et favoris ; vignettes
+    des images et des animations (dessinées une à une, aux moments creux) ; étoile (Ctrl+D, clic droit)."""
+
+    ONGLETS = ('questions', 'animations', 'fiches', 'tables', 'images')
+    GENRE = {'questions': 'question', 'animations': 'animation', 'fiches': 'fiche', 'tables': 'table', 'images': 'image'}
+
+    def __init__(self, vue, onglet='questions', module='', favoris=False):
+        super().__init__()
+        self.vue = vue
+        v = QVBoxLayout(self)
+        v.addWidget(_titre(tr('classe_bibliotheque')))
+        t = QLabel(tr('classe_bibliotheque_texte'))
+        t.setWordWrap(True)
+        v.addWidget(t)
+        h = QHBoxLayout()
+        h.addWidget(QLabel(tr('classe_filtre_module')))
+        self.module = QComboBox()
+        self.module.setAccessibleName(tr('classe_filtre_module'))
+        self.module.addItem(tr('classe_tous_les_modules'), '')
+        for m in contenu.modules():
+            self.module.addItem(bi(m['titre']) + ('' if m['affiche'] else ' (%s)' % tr('classe_modules_bonus').lower()), m['cle'])
+        self.module.setCurrentIndex(max(0, self.module.findData(module)))
+        h.addWidget(self.module)
+        h.addSpacing(12)
+        self.fav = QCheckBox(tr('classe_favoris_seulement'))
+        self.fav.setChecked(favoris)
+        h.addWidget(self.fav)
+        h.addStretch(1)
+        v.addLayout(h)
+        self.affichage = QLabel('')
+        v.addWidget(self.affichage)
+        self.onglets = QTabWidget()
+        self.onglets.setAccessibleName(tr('classe_bibliotheque'))
+        v.addWidget(self.onglets, 1)
+        self._file = []
+        self._minuteur = QTimer(self)
+        self._minuteur.setInterval(15)
+        self._minuteur.timeout.connect(self._vignette_suivante)
+        self.module.currentIndexChanged.connect(lambda *_: self.remplir())
+        self.fav.toggled.connect(lambda *_: self.remplir())
+        self.onglets.currentChanged.connect(lambda *_: (self._maj_affichage(), self._file and self._minuteur.start()))
+        self.remplir(onglet)
+
+    def elements(self, m, onglet) -> list:
+        g = self.GENRE[onglet]
+        ids = [q['id'] for q in m['questions']] if onglet == 'questions' else list(m[onglet])
+        if onglet == 'animations':
+            ids = [i for i in ids if i in catalogue.PAR_ID]
+        if self.fav.isChecked():
+            ids = [i for i in ids if est_favori(g, i)]
+        return ids
+
+    def modules_vus(self) -> list:
+        k = self.module.currentData()
+        return [m for m in contenu.modules() if not k or m['cle'] == k]
+
+    def total(self, onglet) -> int:
+        return len({i for m in self.modules_vus() for i in self.elements(m, onglet)})
+
+    def remplir(self, onglet=None):
+        onglet = onglet or (self.ONGLETS[self.onglets.currentIndex()] if self.onglets.count() else 'questions')
+        self._file = []
+        self.onglets.blockSignals(True)
+        self.onglets.clear()
+        s = stockage().doc
+        for o in self.ONGLETS:
+            g = self.GENRE[o]
+            if o in ('animations', 'images'):
+                w = QListWidget()
+                w.setViewMode(QListWidget.ViewMode.IconMode)
+                w.setIconSize(QSize(176, 112))
+                w.setGridSize(QSize(200, 160))
+                w.setResizeMode(QListWidget.ResizeMode.Adjust)
+                w.setWordWrap(True)
+                w.setMovement(QListWidget.Movement.Static)
+                w.setAccessibleName(tr('classe_onglet_' + o))
+                for m in self.modules_vus():
+                    ids = self.elements(m, o)
+                    if not ids:
+                        continue
+                    sep = QListWidgetItem('— %s (%d) —' % (bi(m['titre']), len(ids)))
+                    sep.setFlags(Qt.ItemFlag.NoItemFlags)
+                    w.addItem(sep)
+                    for i in ids:
+                        titre = contenu.titre(g, i)
+                        it = QListWidgetItem(('★ ' if est_favori(g, i) else '') + titre)
+                        it.setData(ROLE, (g, i))
+                        it.setData(ROLE_TITRE, titre)
+                        it.setToolTip(titre)
+                        if (g, i) in _VIGNETTES:
+                            it.setIcon(_VIGNETTES[(g, i)])
+                        else:
+                            self._file.append((w, it, g, i))
+                        w.addItem(it)
+                w.itemActivated.connect(lambda it, *_: it.data(ROLE) and self.vue.ouvrir_ressource(*it.data(ROLE)))
+                w.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+                w.customContextMenuRequested.connect(lambda pos, w=w: self._menu(w, pos))
+                QShortcut(QKeySequence('Ctrl+D'), w, lambda w=w: self._basculer(w.currentItem()))
+            else:
+                w = QTreeWidget()
+                w.setHeaderHidden(True)
+                w.setAccessibleName(tr('classe_onglet_' + o))
+                for m in self.modules_vus():
+                    ids = self.elements(m, o)
+                    if not ids:
+                        continue
+                    r = QTreeWidgetItem(['%s (%d)' % (bi(m['titre']), len(ids))])
+                    r.setFlags(Qt.ItemFlag.ItemIsEnabled)
+                    w.addTopLevelItem(r)
+                    if o == 'questions':
+                        for t in TYPES:
+                            for q in [q for q in m['questions'] if q['n'].startswith(t) and q['id'] in ids]:
+                                e = S.etat_question(s, q['id'])
+                                titre = bi(q['t']) if q['t'] else q['id']
+                                it = QTreeWidgetItem(['%s  %s  %s%s' % (SYMBOLES[e], q['n'], titre, '' if q['ok'] else '  — ' + tr('classe_a_venir'))])
+                                it.setData(0, ROLE, ('question', q['id'], m['cle']))
+                                it.setData(0, ROLE_TITRE, titre)
+                                if est_favori('question', q['id']):
+                                    it.setIcon(0, icone_etoile(True))
+                                if not q['ok']:
+                                    it.setDisabled(True)
+                                r.addChild(it)
+                    else:
+                        for i in ids:
+                            titre = contenu.titre(g, i)
+                            it = QTreeWidgetItem([titre])
+                            it.setData(0, ROLE, (g, i, m['cle']))
+                            it.setData(0, ROLE_TITRE, titre)
+                            if est_favori(g, i):
+                                it.setIcon(0, icone_etoile(True))
+                            r.addChild(it)
+                    r.setExpanded(True)
+                w.itemActivated.connect(lambda it, *_: self._ouvrir_arbre(it))
+                w.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+                w.customContextMenuRequested.connect(lambda pos, w=w: self._menu(w, pos))
+                QShortcut(QKeySequence('Ctrl+D'), w, lambda w=w: self._basculer(w.currentItem()))
+            self.onglets.addTab(w, '%s (%d)' % (tr('classe_onglet_' + o), self.total(o)))
+        self.onglets.setCurrentIndex(self.ONGLETS.index(onglet) if onglet in self.ONGLETS else 0)
+        self.onglets.blockSignals(False)
+        self._maj_affichage()
+        if self._file:
+            self._minuteur.start()
+
+    def _maj_affichage(self):
+        o = self.ONGLETS[max(0, self.onglets.currentIndex())]
+        quoi = tr('classe_affichage_favoris' if self.fav.isChecked() else 'classe_affichage_tout')
+        if self.module.currentData():
+            quoi += ' · ' + self.module.currentText()
+        self.affichage.setText(tr('classe_affichage', quoi=quoi, n=self.total(o)))
+
+    def _ouvrir_arbre(self, it):
         d = it.data(0, ROLE)
         if not d:
             return
@@ -1087,6 +1544,102 @@ class PageRecherche(QWidget):
             self.vue.aller_question(mod, i, False)
         else:
             self.vue.ouvrir_ressource(g, i)
+
+    def _donnees(self, it):
+        if it is None:
+            return None
+        d = it.data(0, ROLE) if isinstance(it, QTreeWidgetItem) else it.data(ROLE)
+        if not d:
+            return None
+        titre = it.data(0, ROLE_TITRE) if isinstance(it, QTreeWidgetItem) else it.data(ROLE_TITRE)
+        return d[0], d[1], titre
+
+    def _basculer(self, it):
+        d = self._donnees(it)
+        if d:
+            basculer_favori(d[0], d[1], d[2], self.vue.annoncer)
+            self.remplir()
+
+    def _menu(self, w, pos):
+        d = self._donnees(w.itemAt(pos))
+        if not d:
+            return
+        m = menu_ajouter(self, d[0], d[1], d[2], apres=self.remplir, annoncer=self.vue.annoncer)
+        m.triggered.connect(lambda *_: QTimer.singleShot(0, self.remplir))
+        m.exec(w.viewport().mapToGlobal(pos))
+
+    def _vignette_suivante(self):
+        """Une vignette par battement, d'abord celles de l'onglet visible (image : photo ou schéma ; animation :
+        dessinée par l'animation elle-même) ; sans onglet visible, on attend (repris au changement d'onglet)."""
+        def visible(w):
+            try:
+                return w.isVisible()
+            except RuntimeError:
+                return False
+        self._file = [x for x in self._file if not _detruit(x[0])]
+        k = next((n for n, x in enumerate(self._file) if visible(x[0])), None)
+        if k is None:
+            self._minuteur.stop()
+            return
+        w, it, g, i = self._file.pop(k)
+        icone = _VIGNETTES.get((g, i)) or vignette(g, i)
+        if icone is not None:
+            _VIGNETTES[(g, i)] = icone
+            try:
+                it.setIcon(icone)
+            except RuntimeError:
+                pass
+
+    def showEvent(self, ev):
+        super().showEvent(ev)
+        if self._file:
+            self._minuteur.start()
+
+
+def _detruit(w) -> bool:
+    try:
+        w.objectName()
+        return False
+    except RuntimeError:
+        return True
+
+
+def vignette(g: str, i: str):
+    """Vignette 176 × 112 d'une image (photo ou schéma) ou d'une animation (état de départ, thème courant)."""
+    from PyQt6.QtGui import QImage, QPainter, QPixmap
+    try:
+        if g == 'animation':
+            e = catalogue.PAR_ID[i]
+            a = e.charger()()
+            a.en_lecture = False
+            img = a.image(352, 224)
+            a.deleteLater()
+            return QIcon(QPixmap.fromImage(img).scaled(176, 112, Qt.AspectRatioMode.KeepAspectRatio,
+                                                       Qt.TransformationMode.SmoothTransformation))
+        o = contenu.image(i)
+        if o is None:
+            return None
+        if o.get('nature') == 'photo':
+            pm = QPixmap(str(contenu.chemin_image(i)))
+            if pm.isNull():
+                return None
+            return QIcon(pm.scaled(176, 112, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
+        if o.get('schemas') and contenu.schema(o['schemas'][0]):
+            from .schema_qt import peindre
+            img = QImage(352, 224, QImage.Format.Format_ARGB32_Premultiplied)
+            img.fill(Qt.GlobalColor.transparent)
+            p = QPainter(img)
+            try:
+                p.setRenderHint(QPainter.RenderHint.Antialiasing)
+                peindre(p, contenu.schema(o['schemas'][0]), QRectF(0, 0, 352, 224), theme_courant())
+            finally:
+                p.end()
+            return QIcon(QPixmap.fromImage(img).scaled(176, 112, Qt.AspectRatioMode.KeepAspectRatio,
+                                                       Qt.TransformationMode.SmoothTransformation))
+    except Exception:                                  # une vignette ratée n'empêche rien
+        import logging
+        logging.getLogger(__name__).debug('vignette %s %s', g, i, exc_info=True)
+    return None
 
 
 class PageMesModules(QWidget):
@@ -1234,7 +1787,7 @@ class PageProgression(QWidget):
         h2 = QHBoxLayout()
         self.partie = QComboBox()
         self.partie.setAccessibleName(tr('classe_raz_quoi'))
-        for val, cle in (('reponses', 'classe_raz_reponses'), ('reglages', 'classe_raz_reglages'), ('mes_modules', 'classe_raz_mes_modules'),
+        for val, cle in (('reponses', 'classe_raz_reponses'), ('reglages', 'classe_raz_reglages'), ('favoris', 'classe_raz_favoris'), ('mes_modules', 'classe_raz_mes_modules'),
                          ('preferences', 'classe_raz_preferences'), ('tout', 'classe_raz_tout')):
             self.partie.addItem(tr(cle), val)
         for m in mods:
@@ -1356,6 +1909,10 @@ class VueClasse(QWidget):
             self.aller_module(x, True)
         elif g == 'mes':
             self.aller_mes_modules()
+        elif g == 'favoris':
+            self.aller_favoris()
+        elif g == 'bibliotheque':
+            self.aller_bibliotheque()
 
     def retour(self):
         if not self.histoire:
@@ -1370,7 +1927,8 @@ class VueClasse(QWidget):
         elif g == 'question':
             self._aller_question(*cle[1:], pousser=False)
         else:
-            {'mes': self.aller_mes_modules, 'progression': self.aller_progression}.get(g, self.aller_accueil)()
+            {'mes': self.aller_mes_modules, 'progression': self.aller_progression, 'favoris': self.aller_favoris,
+             'bibliotheque': self.aller_bibliotheque}.get(g, self.aller_accueil)()
         self.b_retour.setEnabled(bool(self.histoire))
 
     def aller_accueil(self):
@@ -1383,7 +1941,7 @@ class VueClasse(QWidget):
         if (perso and not S.trouver_module(stockage().doc, cle)) or (not perso and not contenu.module(cle)):
             return self.aller_accueil()
         page = PageModule(self, cle, perso, onglet)
-        fil = [(tr('classe_accueil'), 'accueil:')] + ([(tr('classe_mes_modules'), 'mes:')] if perso else []) + [(page.titre.text(), '')]
+        fil = [(tr('classe_accueil'), 'accueil:')] + ([(tr('classe_favoris'), 'favoris:'), (tr('classe_mes_modules'), 'mes:')] if perso else []) + [(page.titre.text(), '')]
         (self._montrer if pousser else self._poser)(page, fil, ('module', cle, perso, onglet))
 
     def aller_question(self, cle, qid, perso):
@@ -1401,7 +1959,15 @@ class VueClasse(QWidget):
         self._montrer(PageRecherche(self, q), [(tr('classe_accueil'), 'accueil:'), (tr('classe_recherche_titre'), '')], ('recherche',))
 
     def aller_mes_modules(self):
-        self._montrer(PageMesModules(self), [(tr('classe_accueil'), 'accueil:'), (tr('classe_mes_modules'), '')], ('mes',))
+        self._montrer(PageMesModules(self), [(tr('classe_accueil'), 'accueil:'), (tr('classe_favoris'), 'favoris:'),
+                                             (tr('classe_mes_modules'), '')], ('mes',))
+
+    def aller_favoris(self):
+        self._montrer(PageFavoris(self), [(tr('classe_accueil'), 'accueil:'), (tr('classe_favoris'), '')], ('favoris',))
+
+    def aller_bibliotheque(self, onglet='questions', module='', favoris=False):
+        self._montrer(PageBibliotheque(self, onglet, module, favoris), [(tr('classe_accueil'), 'accueil:'), (tr('classe_bibliotheque'), '')],
+                      ('bibliotheque',))
 
     def aller_progression(self):
         self._montrer(PageProgression(self), [(tr('classe_accueil'), 'accueil:'), (tr('classe_ma_progression'), '')], ('progression',))
@@ -1419,7 +1985,12 @@ class VueClasse(QWidget):
         elif cle[0] == 'progression':
             self._poser(PageProgression(self), [(tr('classe_accueil'), 'accueil:'), (tr('classe_ma_progression'), '')], cle)
         elif cle[0] == 'mes':
-            self._poser(PageMesModules(self), [(tr('classe_accueil'), 'accueil:'), (tr('classe_mes_modules'), '')], cle)
+            self._poser(PageMesModules(self), [(tr('classe_accueil'), 'accueil:'), (tr('classe_favoris'), 'favoris:'),
+                                               (tr('classe_mes_modules'), '')], cle)
+        elif cle[0] == 'favoris':
+            self._poser(PageFavoris(self), [(tr('classe_accueil'), 'accueil:'), (tr('classe_favoris'), '')], cle)
+        elif cle[0] == 'bibliotheque':
+            self._poser(PageBibliotheque(self), [(tr('classe_accueil'), 'accueil:'), (tr('classe_bibliotheque'), '')], cle)
         else:
             self.aller_accueil()
 
@@ -1520,7 +2091,8 @@ class VueClasse(QWidget):
         else:
             stockage().remplacer(S.fusionner(stockage().doc, imp))
         self._appliquer_preferences()
-        self.annoncer(tr('classe_importe', q=len(imp['questions']), a=len(imp['animations']), m=len(imp['mes_modules'])),
+        self.annoncer(tr('classe_importe', q=len(imp['questions']), a=len(imp['animations']), f=len(imp.get('favoris', [])),
+                         m=len(imp['mes_modules'])),
                       lambda: (stockage().remplacer(avant), self._appliquer_preferences()))
         self.rafraichir()
         return True

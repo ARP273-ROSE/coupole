@@ -9,6 +9,7 @@ sont repris (migration de la version 0)."""
 from __future__ import annotations
 
 import logging
+import weakref
 from pathlib import Path
 
 from ....core import config
@@ -65,10 +66,23 @@ class Stockage:
         self.doc['application'] = application()
         self._programmer()
         for f in list(self.abonnes):
+            if isinstance(f, weakref.WeakMethod):
+                m = f()
+                if m is None:                          # widget disparu : abonnement oublié
+                    self._oublier(f)
+                    continue
+            else:
+                m = f
             try:
-                f()
+                m()
+            except RuntimeError:                       # objet Qt détruit (« wrapped C/C++ object … deleted »)
+                self._oublier(f)
             except Exception:                          # un abonné défaillant n'empêche rien
                 log.exception('abonné de la sauvegarde')
+
+    def _oublier(self, f):
+        if f in self.abonnes:
+            self.abonnes.remove(f)
 
     def _programmer(self):
         try:
@@ -112,6 +126,11 @@ class Stockage:
     def abonner(self, f):
         self.abonnes.append(f)
         return lambda: self.abonnes.remove(f) if f in self.abonnes else None
+
+    def abonner_faible(self, methode):
+        """Abonnement d'une méthode de widget, sans le garder en vie : oublié quand le widget disparaît (ni signal
+        `destroyed` ni désabonnement explicite à prévoir)."""
+        self.abonnes.append(weakref.WeakMethod(methode))
 
     # ------------------------------------------------------------ raccourcis
     def reglages_animation(self, ident: str) -> dict:

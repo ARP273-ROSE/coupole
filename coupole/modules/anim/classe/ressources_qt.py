@@ -9,7 +9,7 @@ import re
 from PyQt6 import sip
 from PyQt6.QtCore import QPoint, QRectF, QSize, Qt, QTimer
 from PyQt6.QtGui import QPainter, QPixmap
-from PyQt6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QHeaderView, QLabel, QScrollArea, QSizePolicy,
+from PyQt6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QHBoxLayout, QHeaderView, QLabel, QScrollArea, QSizePolicy,
                              QTableWidget, QTableWidgetItem, QToolButton, QVBoxLayout, QWidget)
 
 from ....core.i18n import langue, tr
@@ -300,7 +300,12 @@ class FenetreRessource(QWidget):
         f.setBold(True)
         t.setFont(f)
         t.setAccessibleName(titre)
-        v.addWidget(t)
+        ligne = QHBoxLayout()
+        ligne.addWidget(t, 1)
+        from .favoris_qt import BoutonFavori
+        self.b_favori = BoutonFavori(genre, i, titre, self)
+        ligne.addWidget(self.b_favori, 0, Qt.AlignmentFlag.AlignTop)
+        v.addLayout(ligne)
         v.addWidget(zone, 1)
         # taille au contenu (bornée) : une petite table n'ouvre plus une grande fenêtre vide
         hc = w.sizeHint().height() + t.sizeHint().height() + g.sizeHint().height() + 50
