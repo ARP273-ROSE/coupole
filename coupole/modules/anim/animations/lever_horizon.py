@@ -9,6 +9,7 @@ from PyQt6.QtCore import QPointF, QRectF
 
 from ....core.i18n import tr
 from .. import astro, dessin
+from ..maintenant import heure_solaire
 from ..base import Animation, angle, date_du_jour
 
 ANNEE = 2026
@@ -18,6 +19,16 @@ EPS = astro.obliquite_moyenne(astro.jj_jour_de_l_annee(ANNEE, 0))
 class LeverHorizon(Animation):
     ID = 'horizon'
     JOURS_PAR_S = 20.0
+
+    TEMPS = ('jour',)
+    HEURE_SOLAIRE = True
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        j, h = heure_solaire(m.i, m.lon)
+        self.poser(self.jour, j)
+        if m.lat is not None:
+            self.poser(self.lat, m.lat)
 
     def construire(self):
         self.cote = self.choix('cote', [('anim_horizon_est', 'est'), ('anim_horizon_ouest', 'ouest')], 'est')

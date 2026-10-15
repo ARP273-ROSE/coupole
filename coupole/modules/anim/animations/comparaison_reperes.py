@@ -11,6 +11,7 @@ import numpy as np
 
 from ....core.i18n import tr
 from .. import astro, dessin, scenes
+from ..maintenant import tsl_heures
 from ..base import Animation, angle, heures_minutes
 from ..etoiles_reelles import couleur_reelle, reelle
 
@@ -33,6 +34,14 @@ class ComparaisonReperes(Animation):
     ID = 'celhorcomp'
     FICHES = True
     HEURES_PAR_S = 1.0
+
+    TEMPS = ('tsl',)
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        self.poser(self.tsl, tsl_heures(m.i.jj, m.lon))
+        if m.lat is not None:
+            self.poser(self.lat, m.lat)
 
     def construire(self):
         self.celeste = self.vue(225.0, 20.0)

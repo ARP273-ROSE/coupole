@@ -11,6 +11,7 @@ import numpy as np
 
 from ....core.i18n import tr
 from .. import astro, dessin, scenes
+from ..maintenant import heure_solaire
 from ..base import Animation, angle, date_du_jour, duree_hm, heures_minutes, nombre
 
 ANNEE = 2026
@@ -36,6 +37,17 @@ class MouvementsSoleil(Animation):
     ID = 'sunmotions'
     JOURS_PAR_S = 0.125                 # mode continu : 3 heures par seconde à la vitesse ×1
     PAS_JOURS_PAR_S = 15.0              # mode jour par jour
+
+    TEMPS = ('jour', 'heure')
+    HEURE_SOLAIRE = True
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        j, h = heure_solaire(m.i, m.lon)
+        self.poser(self.jour, j)
+        self.poser(self.heure, h)
+        if m.lat is not None:
+            self.poser(self.lat, m.lat)
 
     def construire(self):
         self.vue3d = self.vue(215.0, 35.0, 5.0, 89.0)

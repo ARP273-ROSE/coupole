@@ -21,8 +21,6 @@ ANIM_ANTICYTHERE = {
     'anim_antikythera_f_avant': ('face avant', 'front face'),
     'anim_antikythera_f_arriere': ('face arrière', 'back face'),
     'anim_antikythera_f_trois_quarts': ('trois-quarts', 'three-quarter'),
-    'anim_antikythera_aujourdhui': ('Aujourd’hui', 'Today'),
-    'anim_antikythera_aujourdhui_aide': ('Règle la machine sur la date du jour.', 'Sets the machine to today’s date.'),
     'anim_antikythera_lunaison': ('+1 lunaison', '+1 lunation'),
     'anim_antikythera_lunaison_aide': ('Avance d’un mois synodique (29,53 jours).',
                                        'Advances by one synodic month (29.53 days).'),

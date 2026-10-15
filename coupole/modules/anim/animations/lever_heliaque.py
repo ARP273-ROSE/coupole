@@ -14,6 +14,7 @@ from PyQt6.QtGui import QImage, QPainter
 
 from ....core.i18n import tr
 from .. import astro, dessin, scenes
+from ..maintenant import heure_solaire as heure_solaire_moyenne
 from ..base import MOIS_JOURS, Animation, angle, date_du_jour, heures_minutes, nombre
 from ..etoiles_reelles import couleur_reelle, reelle
 
@@ -60,6 +61,17 @@ class LeverHeliaque(Animation):
     ID = 'heliacalrisingsim'
     FICHES = True
     JOURS_PAR_S = 10.0
+
+    TEMPS = ('jour', 'heure')
+    HEURE_SOLAIRE = True
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        j, h = heure_solaire_moyenne(m.i, m.lon)
+        self.poser(self.jour, j)
+        self.poser(self.heure, h)
+        if m.lat is not None:
+            self.poser(self.lat, m.lat)
 
     def construire(self):
         self.vue3d = self.vue(150.0, 35.0, 7.0, 89.0)

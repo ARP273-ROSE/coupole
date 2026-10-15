@@ -6,6 +6,7 @@ import numpy as np
 
 from ....core.i18n import tr
 from .. import astro, dessin, scenes
+from ..maintenant import tsl_heures
 from ..base import Animation, angle, heures_minutes, nombre
 
 
@@ -18,6 +19,15 @@ def angle_horaire_h(tsl_h: float, ra_h: float) -> float:
 class AngleHoraire(Animation):
     ID = 'siderealTimeAndHourAngleDemo'
     VITESSE_H_PAR_S = 1.0          # heures sidérales par seconde à la vitesse ×1
+
+    TEMPS = ('tsl',)
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        # temps sidéral local à la longitude retenue (« Ma position », sinon méridien du fuseau)
+        self.poser(self.tsl, tsl_heures(m.i.jj, m.lon))
+        if m.lat is not None:
+            self.poser(self.lat, m.lat)
 
     def construire(self):
         self.vue3d = self.vue(160.0, 35.0, 7.0, 89.0)

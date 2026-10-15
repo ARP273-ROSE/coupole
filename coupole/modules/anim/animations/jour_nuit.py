@@ -23,6 +23,7 @@ from PyQt6.QtGui import QBrush, QColor, QLinearGradient, QPainterPath, QPolygonF
 
 from ....core.i18n import tr
 from .. import astro, dessin
+from ..maintenant import heure_decimale, jour_index
 from ..base import Animation, angle, date_du_jour, heures_minutes
 from .longitude_latitude import _cotes_tout, _lire_cotes, decimal, dessiner_cotes_carte, globe_xyz
 
@@ -341,6 +342,17 @@ class JourNuit(Animation):
     ID = 'daylightsimulator'
     HEURES_PAR_S = 1.0
     JOURS_PAR_S = 10.0
+
+    TEMPS = ('jour', 'heure')
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        # heure en TU : jour et heure de Greenwich ; « Ma position » place aussi l'observateur
+        self.poser(self.jour, jour_index(m.i.tu[1], m.i.tu[2]))
+        self.poser(self.heure, heure_decimale(m.i.tu))
+        if m.position:
+            self.poser(self.lat, m.lat if m.lat is not None else self.lat.value())
+            self.poser(self.lon, m.lon)
 
     def construire(self):
         self.mode = self.choix('mode', [('anim_daylightsimulator_jour', 'jour'),

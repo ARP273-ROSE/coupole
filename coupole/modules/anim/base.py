@@ -328,7 +328,9 @@ class Toile(QWidget):
         self._dernier = pos
         self._depart = pos
         self._bouge = False
-        self.anim.presser(pos, ev.button())
+        self._bouton = ev.button()
+        self.setFocus(Qt.FocusReason.MouseFocusReason)
+        self._pris = bool(self.anim.presser(pos, ev.button()))
 
     def mouseMoveEvent(self, ev):
         if self._dernier is None:
@@ -348,6 +350,13 @@ class Toile(QWidget):
         self._dernier = pos
         if self._depart is not None and math.hypot(pos.x() - self._depart.x(), pos.y() - self._depart.y()) > 8:
             self._bouge = True
+        # rien n'a été saisi à l'appui (scène pas encore dessinée, réglage changé à cet instant…) : on retente ici, le
+        # glisser ne dépend ainsi ni du focus ni de ce qui s'est passé juste avant (comme Coupole Web)
+        if not getattr(self, '_pris', True):
+            self._pris = bool(self.anim.presser(pos, getattr(self, '_bouton', Qt.MouseButton.LeftButton)))
+            if self._pris:
+                self.update()
+            return
         self.anim.glisser(pos, dx, dy)
 
     def mouseReleaseEvent(self, ev):
@@ -385,6 +394,9 @@ class Animation(QWidget):
     ANIMEE = True               # boutons lecture / pause / vitesse
     LECTURE_AU_DEPART = False
     FICHES = False              # l'animation enregistre des objets à fiche (survol, toucher, clavier) : l'aide le dit
+    TEMPS = ()                  # réglages de date et d'heure que « Maintenant » règle (« En direct » s'arrête si on y touche)
+    PAS_DIRECT = 1              # « En direct » : mise à jour toutes les PAS_DIRECT secondes
+    HEURE_SOLAIRE = False       # l'heure de l'animation est une heure solaire (l'affichage le précise)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -443,6 +455,7 @@ class Animation(QWidget):
         b.clicked.connect(self.reinitialiser)
         self.barre.addWidget(b)
         self.construire()
+        self._preparer_maintenant()
         self.l_aide.setText(self.aide_interaction())
         self.rafraichir()
         if self.ANIMEE and self.LECTURE_AU_DEPART:
@@ -451,6 +464,110 @@ class Animation(QWidget):
     # ------------------------------------------------------------ à redéfinir
     def construire(self):
         pass
+
+    def maintenant(self, m):
+        """Règle la date et l'heure de l'animation sur l'instant `m` (maintenant.Moment) ; rien par défaut."""
+
+    # ------------------------------------------------------------ « Maintenant », « En direct », « Ma position »
+    def observateur(self) -> dict:
+        """Réglages de position de l'observateur : {'lat': Reglage|None, 'lon': Reglage|None}."""
+        out = {}
+        for k, cle in (('lat', 'latitude'), ('lon', 'longitude')):
+            w = self._defauts.get(cle, (None,))[0]
+            out[k] = w if isinstance(w, Reglage) else None
+        return out
+
+    def poser(self, r, v):
+        """Pose une valeur dans les bornes du réglage."""
+        if r is not None and math.isfinite(v):
+            r.setValue(max(r.mini, min(r.maxi, v)))
+
+    def _preparer_maintenant(self):
+        """Boutons « Maintenant », « En direct » et « Ma position » des animations qui dépendent de la date : l'instant
+        de l'appareil (TU absolu, fuseau IANA pour l'affichage, maintenant.py) ; « En direct » met l'heure à jour toutes
+        les secondes (ou minutes) sans rendu continu, et s'arrête dès qu'on touche un réglage de date ou qu'on relance
+        la lecture ; « Ma position » se choisit explicitement parmi les sites connus (jamais de géolocalisation
+        automatique)."""
+        self._direct = None
+        self._applique = False
+        self._position = None
+        if type(self).maintenant is Animation.maintenant:
+            return
+        from PyQt6.QtWidgets import QMenu
+        from . import maintenant as M
+        self._M = M
+        self.b_maintenant = QPushButton(tr('anim_maintenant'))
+        aide(self.b_maintenant, 'anim_maintenant_aide')
+        self.b_maintenant.clicked.connect(lambda: (self._arreter_direct(), self._appliquer_maintenant()))
+        self.b_direct = QPushButton(tr('anim_en_direct'))
+        self.b_direct.setCheckable(True)
+        aide(self.b_direct, 'anim_en_direct_aide')
+        self.b_direct.toggled.connect(self._basculer_direct)
+        self.barre.addWidget(self.b_maintenant)
+        self.barre.addWidget(self.b_direct)
+        obs = self.observateur()
+        if obs['lat'] is not None or obs['lon'] is not None:
+            self.b_position = QPushButton(tr('anim_ma_position'))
+            aide(self.b_position, 'anim_ma_position_aide')
+            menu = QMenu(self.b_position)
+            menu.aboutToShow.connect(lambda m=menu: self._menu_positions(m))
+            self.b_position.setMenu(menu)
+            self.barre.addWidget(self.b_position)
+        self.l_maintenant = QLabel('')
+        self.l_maintenant.setObjectName('anim_maintenant')
+        self.l_maintenant.setWordWrap(True)
+        self.l_maintenant.hide()
+        self.layout().insertWidget(self.layout().indexOf(self.l_valeurs), self.l_maintenant)
+        self._minuteur_direct = QTimer(self)
+        self._minuteur_direct.setInterval(int(self.PAS_DIRECT * 1000))
+        self._minuteur_direct.timeout.connect(self._appliquer_maintenant)
+        for cle in self.TEMPS:
+            w = self._defauts.get(cle, (None,))[0]
+            sig = getattr(w, 'valueChanged', None) or getattr(w, 'currentIndexChanged', None) or getattr(w, 'toggled', None)
+            if sig is not None:
+                sig.connect(lambda *_: None if self._applique else self._arreter_direct())
+
+    def _menu_positions(self, menu):
+        from ...core import sites as S
+        menu.clear()
+        for s in S.sites():
+            a = menu.addAction('%s (%s, %s)' % (s.nom, angle(s.lat), angle(s.lon)))
+            a.triggered.connect(lambda _=False, s=s: self._choisir_position(s.lat, s.lon))
+
+    def _choisir_position(self, lat, lon):
+        self._position = (lat, lon)
+        self._appliquer_maintenant()
+
+    def _appliquer_maintenant(self):
+        M = self._M
+        i = M.maintenant()
+        self._applique = True
+        try:
+            if self.en_lecture:
+                self.basculer_lecture()
+            self.maintenant(M.moment(i, self._position))
+        finally:
+            self._applique = False
+        self.rafraichir()
+        lg = langue()
+        texte = '%s · %s' % (M.texte_date(i, lg), M.texte_heure(i, lg))
+        if self._position:
+            texte += ' — ' + tr('anim_position_retenue', lat=angle(self._position[0]), lon=angle(self._position[1]))
+        elif self.HEURE_SOLAIRE:
+            texte += ' — ' + tr('anim_heure_solaire_fuseau', lon=angle(M.meridien_du_fuseau(i)))
+        self.l_maintenant.setText(texte)
+        self.l_maintenant.show()
+
+    def _basculer_direct(self, actif):
+        if actif:
+            self._appliquer_maintenant()
+            self._minuteur_direct.start()
+        else:
+            self._minuteur_direct.stop()
+
+    def _arreter_direct(self):
+        if getattr(self, 'b_direct', None) is not None and self.b_direct.isChecked():
+            self.b_direct.setChecked(False)
 
     def avancer(self, dt: float):
         pass
@@ -681,6 +798,8 @@ class Animation(QWidget):
     # ------------------------------------------------------------ lecture
     def basculer_lecture(self):
         self.en_lecture = not self.en_lecture
+        if self.en_lecture and not getattr(self, '_applique', False):
+            self._arreter_direct()                 # lecture relancée : le temps de l'animation reprend la main
         if self.ANIMEE:
             self.b_lecture.setText(tr('anim_pause' if self.en_lecture else 'anim_lecture'))
         self._t_dernier = time.monotonic()

@@ -1,0 +1,7175 @@
+{
+ "format": "coupole-maintenant-cas",
+ "version": 1,
+ "cas": [
+  {
+   "iso": "2026-10-25T00:59:59Z",
+   "tz": "Europe/Paris",
+   "ms": 1792889999000,
+   "tz_retenu": "Europe/Paris",
+   "decalage": 120,
+   "decalage_standard": 60,
+   "local": [
+    2026,
+    10,
+    25,
+    2,
+    59,
+    59
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    0,
+    59,
+    59
+   ],
+   "jj": 2461338.5416550925,
+   "jour_local": 297,
+   "jour_tu": 297.0416550925926,
+   "meridien": 15.0,
+   "solaire_meridien": [
+    297,
+    1.9997222222222222
+   ],
+   "solaire_paris": [
+    297,
+    1.156388888888889
+   ],
+   "tsl_paris": 3.385667903566112,
+   "annee_decimale": 2026.8138127536783,
+   "elongation_lune": 165.00595437524316,
+   "texte_fr": "02:59 heure de Paris (UTC+2) · 00:59 TU",
+   "texte_en": "02:59 Paris time (UTC+2) · 00:59 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T00:59:59Z",
+   "tz": "Europe/London",
+   "ms": 1792889999000,
+   "tz_retenu": "Europe/London",
+   "decalage": 60,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    10,
+    25,
+    1,
+    59,
+    59
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    0,
+    59,
+    59
+   ],
+   "jj": 2461338.5416550925,
+   "jour_local": 297,
+   "jour_tu": 297.0416550925926,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    297,
+    0.9997222222222222
+   ],
+   "solaire_paris": [
+    297,
+    1.156388888888889
+   ],
+   "tsl_paris": 3.385667903566112,
+   "annee_decimale": 2026.8138127536783,
+   "elongation_lune": 165.00595437524316,
+   "texte_fr": "01:59 heure de London (UTC+1) · 00:59 TU",
+   "texte_en": "01:59 London time (UTC+1) · 00:59 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T00:59:59Z",
+   "tz": "Pacific/Auckland",
+   "ms": 1792889999000,
+   "tz_retenu": "Pacific/Auckland",
+   "decalage": 780,
+   "decalage_standard": 720,
+   "local": [
+    2026,
+    10,
+    25,
+    13,
+    59,
+    59
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    0,
+    59,
+    59
+   ],
+   "jj": 2461338.5416550925,
+   "jour_local": 297,
+   "jour_tu": 297.0416550925926,
+   "meridien": 180.0,
+   "solaire_meridien": [
+    297,
+    12.999722222222221
+   ],
+   "solaire_paris": [
+    297,
+    1.156388888888889
+   ],
+   "tsl_paris": 3.385667903566112,
+   "annee_decimale": 2026.8138127536783,
+   "elongation_lune": 165.00595437524316,
+   "texte_fr": "13:59 heure d’Auckland (UTC+13) · 00:59 TU",
+   "texte_en": "13:59 Auckland time (UTC+13) · 00:59 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T00:59:59Z",
+   "tz": "America/St_Johns",
+   "ms": 1792889999000,
+   "tz_retenu": "America/St_Johns",
+   "decalage": -150,
+   "decalage_standard": -210,
+   "local": [
+    2026,
+    10,
+    24,
+    22,
+    29,
+    59
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    0,
+    59,
+    59
+   ],
+   "jj": 2461338.5416550925,
+   "jour_local": 296,
+   "jour_tu": 297.0416550925926,
+   "meridien": -52.5,
+   "solaire_meridien": [
+    296,
+    21.499722222222225
+   ],
+   "solaire_paris": [
+    297,
+    1.156388888888889
+   ],
+   "tsl_paris": 3.385667903566112,
+   "annee_decimale": 2026.8138127536783,
+   "elongation_lune": 165.00595437524316,
+   "texte_fr": "22:29 heure de St Johns (UTC−2:30) · 00:59 TU",
+   "texte_en": "22:29 St Johns time (UTC−2:30) · 00:59 UT",
+   "date_fr": "24 octobre 2026",
+   "date_en": "October 24, 2026"
+  },
+  {
+   "iso": "2026-10-25T00:59:59Z",
+   "tz": "Asia/Kathmandu",
+   "ms": 1792889999000,
+   "tz_retenu": "Asia/Kathmandu",
+   "decalage": 345,
+   "decalage_standard": 345,
+   "local": [
+    2026,
+    10,
+    25,
+    6,
+    44,
+    59
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    0,
+    59,
+    59
+   ],
+   "jj": 2461338.5416550925,
+   "jour_local": 297,
+   "jour_tu": 297.0416550925926,
+   "meridien": 86.25,
+   "solaire_meridien": [
+    297,
+    6.749722222222222
+   ],
+   "solaire_paris": [
+    297,
+    1.156388888888889
+   ],
+   "tsl_paris": 3.385667903566112,
+   "annee_decimale": 2026.8138127536783,
+   "elongation_lune": 165.00595437524316,
+   "texte_fr": "06:44 heure de Kathmandu (UTC+5:45) · 00:59 TU",
+   "texte_en": "06:44 Kathmandu time (UTC+5:45) · 00:59 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T00:59:59Z",
+   "tz": "America/New_York",
+   "ms": 1792889999000,
+   "tz_retenu": "America/New_York",
+   "decalage": -240,
+   "decalage_standard": -300,
+   "local": [
+    2026,
+    10,
+    24,
+    20,
+    59,
+    59
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    0,
+    59,
+    59
+   ],
+   "jj": 2461338.5416550925,
+   "jour_local": 296,
+   "jour_tu": 297.0416550925926,
+   "meridien": -75.0,
+   "solaire_meridien": [
+    296,
+    19.999722222222225
+   ],
+   "solaire_paris": [
+    297,
+    1.156388888888889
+   ],
+   "tsl_paris": 3.385667903566112,
+   "annee_decimale": 2026.8138127536783,
+   "elongation_lune": 165.00595437524316,
+   "texte_fr": "20:59 heure de New York (UTC−4) · 00:59 TU",
+   "texte_en": "20:59 New York time (UTC−4) · 00:59 UT",
+   "date_fr": "24 octobre 2026",
+   "date_en": "October 24, 2026"
+  },
+  {
+   "iso": "2026-10-25T00:59:59Z",
+   "tz": "Australia/Lord_Howe",
+   "ms": 1792889999000,
+   "tz_retenu": "Australia/Lord_Howe",
+   "decalage": 660,
+   "decalage_standard": 630,
+   "local": [
+    2026,
+    10,
+    25,
+    11,
+    59,
+    59
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    0,
+    59,
+    59
+   ],
+   "jj": 2461338.5416550925,
+   "jour_local": 297,
+   "jour_tu": 297.0416550925926,
+   "meridien": 157.5,
+   "solaire_meridien": [
+    297,
+    11.499722222222221
+   ],
+   "solaire_paris": [
+    297,
+    1.156388888888889
+   ],
+   "tsl_paris": 3.385667903566112,
+   "annee_decimale": 2026.8138127536783,
+   "elongation_lune": 165.00595437524316,
+   "texte_fr": "11:59 heure de Lord Howe (UTC+11) · 00:59 TU",
+   "texte_en": "11:59 Lord Howe time (UTC+11) · 00:59 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T00:59:59Z",
+   "tz": "Pacific/Chatham",
+   "ms": 1792889999000,
+   "tz_retenu": "Pacific/Chatham",
+   "decalage": 825,
+   "decalage_standard": 765,
+   "local": [
+    2026,
+    10,
+    25,
+    14,
+    44,
+    59
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    0,
+    59,
+    59
+   ],
+   "jj": 2461338.5416550925,
+   "jour_local": 297,
+   "jour_tu": 297.0416550925926,
+   "meridien": 191.25,
+   "solaire_meridien": [
+    297,
+    13.749722222222221
+   ],
+   "solaire_paris": [
+    297,
+    1.156388888888889
+   ],
+   "tsl_paris": 3.385667903566112,
+   "annee_decimale": 2026.8138127536783,
+   "elongation_lune": 165.00595437524316,
+   "texte_fr": "14:44 heure de Chatham (UTC+13:45) · 00:59 TU",
+   "texte_en": "14:44 Chatham time (UTC+13:45) · 00:59 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T00:59:59Z",
+   "tz": "Asia/Kolkata",
+   "ms": 1792889999000,
+   "tz_retenu": "Asia/Kolkata",
+   "decalage": 330,
+   "decalage_standard": 330,
+   "local": [
+    2026,
+    10,
+    25,
+    6,
+    29,
+    59
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    0,
+    59,
+    59
+   ],
+   "jj": 2461338.5416550925,
+   "jour_local": 297,
+   "jour_tu": 297.0416550925926,
+   "meridien": 82.5,
+   "solaire_meridien": [
+    297,
+    6.499722222222222
+   ],
+   "solaire_paris": [
+    297,
+    1.156388888888889
+   ],
+   "tsl_paris": 3.385667903566112,
+   "annee_decimale": 2026.8138127536783,
+   "elongation_lune": 165.00595437524316,
+   "texte_fr": "06:29 heure de Kolkata (UTC+5:30) · 00:59 TU",
+   "texte_en": "06:29 Kolkata time (UTC+5:30) · 00:59 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T00:59:59Z",
+   "tz": "UTC",
+   "ms": 1792889999000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    10,
+    25,
+    0,
+    59,
+    59
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    0,
+    59,
+    59
+   ],
+   "jj": 2461338.5416550925,
+   "jour_local": 297,
+   "jour_tu": 297.0416550925926,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    297,
+    0.9997222222222222
+   ],
+   "solaire_paris": [
+    297,
+    1.156388888888889
+   ],
+   "tsl_paris": 3.385667903566112,
+   "annee_decimale": 2026.8138127536783,
+   "elongation_lune": 165.00595437524316,
+   "texte_fr": "00:59 TU",
+   "texte_en": "00:59 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T00:59:59Z",
+   "tz": "Pas/Un_Fuseau",
+   "ms": 1792889999000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    10,
+    25,
+    0,
+    59,
+    59
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    0,
+    59,
+    59
+   ],
+   "jj": 2461338.5416550925,
+   "jour_local": 297,
+   "jour_tu": 297.0416550925926,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    297,
+    0.9997222222222222
+   ],
+   "solaire_paris": [
+    297,
+    1.156388888888889
+   ],
+   "tsl_paris": 3.385667903566112,
+   "annee_decimale": 2026.8138127536783,
+   "elongation_lune": 165.00595437524316,
+   "texte_fr": "00:59 TU",
+   "texte_en": "00:59 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T01:00:00Z",
+   "tz": "Europe/Paris",
+   "ms": 1792890000000,
+   "tz_retenu": "Europe/Paris",
+   "decalage": 60,
+   "decalage_standard": 60,
+   "local": [
+    2026,
+    10,
+    25,
+    2,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461338.5416666665,
+   "jour_local": 297,
+   "jour_tu": 297.0416666666667,
+   "meridien": 15.0,
+   "solaire_meridien": [
+    297,
+    2.0
+   ],
+   "solaire_paris": [
+    297,
+    1.1566666666666665
+   ],
+   "tsl_paris": 3.3859464403552315,
+   "annee_decimale": 2026.813812785388,
+   "elongation_lune": 165.00610456379945,
+   "texte_fr": "02:00 heure de Paris (UTC+1) · 01:00 TU",
+   "texte_en": "02:00 Paris time (UTC+1) · 01:00 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T01:00:00Z",
+   "tz": "Europe/London",
+   "ms": 1792890000000,
+   "tz_retenu": "Europe/London",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    10,
+    25,
+    1,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461338.5416666665,
+   "jour_local": 297,
+   "jour_tu": 297.0416666666667,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    297,
+    1.0
+   ],
+   "solaire_paris": [
+    297,
+    1.1566666666666665
+   ],
+   "tsl_paris": 3.3859464403552315,
+   "annee_decimale": 2026.813812785388,
+   "elongation_lune": 165.00610456379945,
+   "texte_fr": "01:00 heure de London (UTC) · 01:00 TU",
+   "texte_en": "01:00 London time (UTC) · 01:00 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T01:00:00Z",
+   "tz": "Pacific/Auckland",
+   "ms": 1792890000000,
+   "tz_retenu": "Pacific/Auckland",
+   "decalage": 780,
+   "decalage_standard": 720,
+   "local": [
+    2026,
+    10,
+    25,
+    14,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461338.5416666665,
+   "jour_local": 297,
+   "jour_tu": 297.0416666666667,
+   "meridien": 180.0,
+   "solaire_meridien": [
+    297,
+    13.0
+   ],
+   "solaire_paris": [
+    297,
+    1.1566666666666665
+   ],
+   "tsl_paris": 3.3859464403552315,
+   "annee_decimale": 2026.813812785388,
+   "elongation_lune": 165.00610456379945,
+   "texte_fr": "14:00 heure d’Auckland (UTC+13) · 01:00 TU",
+   "texte_en": "14:00 Auckland time (UTC+13) · 01:00 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T01:00:00Z",
+   "tz": "America/St_Johns",
+   "ms": 1792890000000,
+   "tz_retenu": "America/St_Johns",
+   "decalage": -150,
+   "decalage_standard": -210,
+   "local": [
+    2026,
+    10,
+    24,
+    22,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461338.5416666665,
+   "jour_local": 296,
+   "jour_tu": 297.0416666666667,
+   "meridien": -52.5,
+   "solaire_meridien": [
+    296,
+    21.5
+   ],
+   "solaire_paris": [
+    297,
+    1.1566666666666665
+   ],
+   "tsl_paris": 3.3859464403552315,
+   "annee_decimale": 2026.813812785388,
+   "elongation_lune": 165.00610456379945,
+   "texte_fr": "22:30 heure de St Johns (UTC−2:30) · 01:00 TU",
+   "texte_en": "22:30 St Johns time (UTC−2:30) · 01:00 UT",
+   "date_fr": "24 octobre 2026",
+   "date_en": "October 24, 2026"
+  },
+  {
+   "iso": "2026-10-25T01:00:00Z",
+   "tz": "Asia/Kathmandu",
+   "ms": 1792890000000,
+   "tz_retenu": "Asia/Kathmandu",
+   "decalage": 345,
+   "decalage_standard": 345,
+   "local": [
+    2026,
+    10,
+    25,
+    6,
+    45,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461338.5416666665,
+   "jour_local": 297,
+   "jour_tu": 297.0416666666667,
+   "meridien": 86.25,
+   "solaire_meridien": [
+    297,
+    6.75
+   ],
+   "solaire_paris": [
+    297,
+    1.1566666666666665
+   ],
+   "tsl_paris": 3.3859464403552315,
+   "annee_decimale": 2026.813812785388,
+   "elongation_lune": 165.00610456379945,
+   "texte_fr": "06:45 heure de Kathmandu (UTC+5:45) · 01:00 TU",
+   "texte_en": "06:45 Kathmandu time (UTC+5:45) · 01:00 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T01:00:00Z",
+   "tz": "America/New_York",
+   "ms": 1792890000000,
+   "tz_retenu": "America/New_York",
+   "decalage": -240,
+   "decalage_standard": -300,
+   "local": [
+    2026,
+    10,
+    24,
+    21,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461338.5416666665,
+   "jour_local": 296,
+   "jour_tu": 297.0416666666667,
+   "meridien": -75.0,
+   "solaire_meridien": [
+    296,
+    20.0
+   ],
+   "solaire_paris": [
+    297,
+    1.1566666666666665
+   ],
+   "tsl_paris": 3.3859464403552315,
+   "annee_decimale": 2026.813812785388,
+   "elongation_lune": 165.00610456379945,
+   "texte_fr": "21:00 heure de New York (UTC−4) · 01:00 TU",
+   "texte_en": "21:00 New York time (UTC−4) · 01:00 UT",
+   "date_fr": "24 octobre 2026",
+   "date_en": "October 24, 2026"
+  },
+  {
+   "iso": "2026-10-25T01:00:00Z",
+   "tz": "Australia/Lord_Howe",
+   "ms": 1792890000000,
+   "tz_retenu": "Australia/Lord_Howe",
+   "decalage": 660,
+   "decalage_standard": 630,
+   "local": [
+    2026,
+    10,
+    25,
+    12,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461338.5416666665,
+   "jour_local": 297,
+   "jour_tu": 297.0416666666667,
+   "meridien": 157.5,
+   "solaire_meridien": [
+    297,
+    11.5
+   ],
+   "solaire_paris": [
+    297,
+    1.1566666666666665
+   ],
+   "tsl_paris": 3.3859464403552315,
+   "annee_decimale": 2026.813812785388,
+   "elongation_lune": 165.00610456379945,
+   "texte_fr": "12:00 heure de Lord Howe (UTC+11) · 01:00 TU",
+   "texte_en": "12:00 Lord Howe time (UTC+11) · 01:00 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T01:00:00Z",
+   "tz": "Pacific/Chatham",
+   "ms": 1792890000000,
+   "tz_retenu": "Pacific/Chatham",
+   "decalage": 825,
+   "decalage_standard": 765,
+   "local": [
+    2026,
+    10,
+    25,
+    14,
+    45,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461338.5416666665,
+   "jour_local": 297,
+   "jour_tu": 297.0416666666667,
+   "meridien": 191.25,
+   "solaire_meridien": [
+    297,
+    13.75
+   ],
+   "solaire_paris": [
+    297,
+    1.1566666666666665
+   ],
+   "tsl_paris": 3.3859464403552315,
+   "annee_decimale": 2026.813812785388,
+   "elongation_lune": 165.00610456379945,
+   "texte_fr": "14:45 heure de Chatham (UTC+13:45) · 01:00 TU",
+   "texte_en": "14:45 Chatham time (UTC+13:45) · 01:00 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T01:00:00Z",
+   "tz": "Asia/Kolkata",
+   "ms": 1792890000000,
+   "tz_retenu": "Asia/Kolkata",
+   "decalage": 330,
+   "decalage_standard": 330,
+   "local": [
+    2026,
+    10,
+    25,
+    6,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461338.5416666665,
+   "jour_local": 297,
+   "jour_tu": 297.0416666666667,
+   "meridien": 82.5,
+   "solaire_meridien": [
+    297,
+    6.5
+   ],
+   "solaire_paris": [
+    297,
+    1.1566666666666665
+   ],
+   "tsl_paris": 3.3859464403552315,
+   "annee_decimale": 2026.813812785388,
+   "elongation_lune": 165.00610456379945,
+   "texte_fr": "06:30 heure de Kolkata (UTC+5:30) · 01:00 TU",
+   "texte_en": "06:30 Kolkata time (UTC+5:30) · 01:00 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T01:00:00Z",
+   "tz": "UTC",
+   "ms": 1792890000000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    10,
+    25,
+    1,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461338.5416666665,
+   "jour_local": 297,
+   "jour_tu": 297.0416666666667,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    297,
+    1.0
+   ],
+   "solaire_paris": [
+    297,
+    1.1566666666666665
+   ],
+   "tsl_paris": 3.3859464403552315,
+   "annee_decimale": 2026.813812785388,
+   "elongation_lune": 165.00610456379945,
+   "texte_fr": "01:00 TU",
+   "texte_en": "01:00 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-10-25T01:00:00Z",
+   "tz": "Pas/Un_Fuseau",
+   "ms": 1792890000000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    10,
+    25,
+    1,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    25,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461338.5416666665,
+   "jour_local": 297,
+   "jour_tu": 297.0416666666667,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    297,
+    1.0
+   ],
+   "solaire_paris": [
+    297,
+    1.1566666666666665
+   ],
+   "tsl_paris": 3.3859464403552315,
+   "annee_decimale": 2026.813812785388,
+   "elongation_lune": 165.00610456379945,
+   "texte_fr": "01:00 TU",
+   "texte_en": "01:00 UT",
+   "date_fr": "25 octobre 2026",
+   "date_en": "October 25, 2026"
+  },
+  {
+   "iso": "2026-03-29T00:59:00Z",
+   "tz": "Europe/Paris",
+   "ms": 1774745940000,
+   "tz_retenu": "Europe/Paris",
+   "decalage": 60,
+   "decalage_standard": 60,
+   "local": [
+    2026,
+    3,
+    29,
+    1,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    0,
+    59,
+    0
+   ],
+   "jj": 2461128.540972222,
+   "jour_local": 87,
+   "jour_tu": 87.04097222222222,
+   "meridien": 15.0,
+   "solaire_meridien": [
+    87,
+    1.9833333333333334
+   ],
+   "solaire_paris": [
+    87,
+    1.14
+   ],
+   "tsl_paris": 13.570170935926338,
+   "annee_decimale": 2026.2384684170472,
+   "elongation_lune": 131.34643895550107,
+   "texte_fr": "01:59 heure de Paris (UTC+1) · 00:59 TU",
+   "texte_en": "01:59 Paris time (UTC+1) · 00:59 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T00:59:00Z",
+   "tz": "Europe/London",
+   "ms": 1774745940000,
+   "tz_retenu": "Europe/London",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    3,
+    29,
+    0,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    0,
+    59,
+    0
+   ],
+   "jj": 2461128.540972222,
+   "jour_local": 87,
+   "jour_tu": 87.04097222222222,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    87,
+    0.9833333333333333
+   ],
+   "solaire_paris": [
+    87,
+    1.14
+   ],
+   "tsl_paris": 13.570170935926338,
+   "annee_decimale": 2026.2384684170472,
+   "elongation_lune": 131.34643895550107,
+   "texte_fr": "00:59 heure de London (UTC) · 00:59 TU",
+   "texte_en": "00:59 London time (UTC) · 00:59 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T00:59:00Z",
+   "tz": "Pacific/Auckland",
+   "ms": 1774745940000,
+   "tz_retenu": "Pacific/Auckland",
+   "decalage": 780,
+   "decalage_standard": 720,
+   "local": [
+    2026,
+    3,
+    29,
+    13,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    0,
+    59,
+    0
+   ],
+   "jj": 2461128.540972222,
+   "jour_local": 87,
+   "jour_tu": 87.04097222222222,
+   "meridien": 180.0,
+   "solaire_meridien": [
+    87,
+    12.983333333333333
+   ],
+   "solaire_paris": [
+    87,
+    1.14
+   ],
+   "tsl_paris": 13.570170935926338,
+   "annee_decimale": 2026.2384684170472,
+   "elongation_lune": 131.34643895550107,
+   "texte_fr": "13:59 heure d’Auckland (UTC+13) · 00:59 TU",
+   "texte_en": "13:59 Auckland time (UTC+13) · 00:59 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T00:59:00Z",
+   "tz": "America/St_Johns",
+   "ms": 1774745940000,
+   "tz_retenu": "America/St_Johns",
+   "decalage": -150,
+   "decalage_standard": -210,
+   "local": [
+    2026,
+    3,
+    28,
+    22,
+    29,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    0,
+    59,
+    0
+   ],
+   "jj": 2461128.540972222,
+   "jour_local": 86,
+   "jour_tu": 87.04097222222222,
+   "meridien": -52.5,
+   "solaire_meridien": [
+    86,
+    21.483333333333334
+   ],
+   "solaire_paris": [
+    87,
+    1.14
+   ],
+   "tsl_paris": 13.570170935926338,
+   "annee_decimale": 2026.2384684170472,
+   "elongation_lune": 131.34643895550107,
+   "texte_fr": "22:29 heure de St Johns (UTC−2:30) · 00:59 TU",
+   "texte_en": "22:29 St Johns time (UTC−2:30) · 00:59 UT",
+   "date_fr": "28 mars 2026",
+   "date_en": "March 28, 2026"
+  },
+  {
+   "iso": "2026-03-29T00:59:00Z",
+   "tz": "Asia/Kathmandu",
+   "ms": 1774745940000,
+   "tz_retenu": "Asia/Kathmandu",
+   "decalage": 345,
+   "decalage_standard": 345,
+   "local": [
+    2026,
+    3,
+    29,
+    6,
+    44,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    0,
+    59,
+    0
+   ],
+   "jj": 2461128.540972222,
+   "jour_local": 87,
+   "jour_tu": 87.04097222222222,
+   "meridien": 86.25,
+   "solaire_meridien": [
+    87,
+    6.733333333333333
+   ],
+   "solaire_paris": [
+    87,
+    1.14
+   ],
+   "tsl_paris": 13.570170935926338,
+   "annee_decimale": 2026.2384684170472,
+   "elongation_lune": 131.34643895550107,
+   "texte_fr": "06:44 heure de Kathmandu (UTC+5:45) · 00:59 TU",
+   "texte_en": "06:44 Kathmandu time (UTC+5:45) · 00:59 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T00:59:00Z",
+   "tz": "America/New_York",
+   "ms": 1774745940000,
+   "tz_retenu": "America/New_York",
+   "decalage": -240,
+   "decalage_standard": -300,
+   "local": [
+    2026,
+    3,
+    28,
+    20,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    0,
+    59,
+    0
+   ],
+   "jj": 2461128.540972222,
+   "jour_local": 86,
+   "jour_tu": 87.04097222222222,
+   "meridien": -75.0,
+   "solaire_meridien": [
+    86,
+    19.983333333333334
+   ],
+   "solaire_paris": [
+    87,
+    1.14
+   ],
+   "tsl_paris": 13.570170935926338,
+   "annee_decimale": 2026.2384684170472,
+   "elongation_lune": 131.34643895550107,
+   "texte_fr": "20:59 heure de New York (UTC−4) · 00:59 TU",
+   "texte_en": "20:59 New York time (UTC−4) · 00:59 UT",
+   "date_fr": "28 mars 2026",
+   "date_en": "March 28, 2026"
+  },
+  {
+   "iso": "2026-03-29T00:59:00Z",
+   "tz": "Australia/Lord_Howe",
+   "ms": 1774745940000,
+   "tz_retenu": "Australia/Lord_Howe",
+   "decalage": 660,
+   "decalage_standard": 630,
+   "local": [
+    2026,
+    3,
+    29,
+    11,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    0,
+    59,
+    0
+   ],
+   "jj": 2461128.540972222,
+   "jour_local": 87,
+   "jour_tu": 87.04097222222222,
+   "meridien": 157.5,
+   "solaire_meridien": [
+    87,
+    11.483333333333333
+   ],
+   "solaire_paris": [
+    87,
+    1.14
+   ],
+   "tsl_paris": 13.570170935926338,
+   "annee_decimale": 2026.2384684170472,
+   "elongation_lune": 131.34643895550107,
+   "texte_fr": "11:59 heure de Lord Howe (UTC+11) · 00:59 TU",
+   "texte_en": "11:59 Lord Howe time (UTC+11) · 00:59 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T00:59:00Z",
+   "tz": "Pacific/Chatham",
+   "ms": 1774745940000,
+   "tz_retenu": "Pacific/Chatham",
+   "decalage": 825,
+   "decalage_standard": 765,
+   "local": [
+    2026,
+    3,
+    29,
+    14,
+    44,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    0,
+    59,
+    0
+   ],
+   "jj": 2461128.540972222,
+   "jour_local": 87,
+   "jour_tu": 87.04097222222222,
+   "meridien": 191.25,
+   "solaire_meridien": [
+    87,
+    13.733333333333333
+   ],
+   "solaire_paris": [
+    87,
+    1.14
+   ],
+   "tsl_paris": 13.570170935926338,
+   "annee_decimale": 2026.2384684170472,
+   "elongation_lune": 131.34643895550107,
+   "texte_fr": "14:44 heure de Chatham (UTC+13:45) · 00:59 TU",
+   "texte_en": "14:44 Chatham time (UTC+13:45) · 00:59 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T00:59:00Z",
+   "tz": "Asia/Kolkata",
+   "ms": 1774745940000,
+   "tz_retenu": "Asia/Kolkata",
+   "decalage": 330,
+   "decalage_standard": 330,
+   "local": [
+    2026,
+    3,
+    29,
+    6,
+    29,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    0,
+    59,
+    0
+   ],
+   "jj": 2461128.540972222,
+   "jour_local": 87,
+   "jour_tu": 87.04097222222222,
+   "meridien": 82.5,
+   "solaire_meridien": [
+    87,
+    6.483333333333333
+   ],
+   "solaire_paris": [
+    87,
+    1.14
+   ],
+   "tsl_paris": 13.570170935926338,
+   "annee_decimale": 2026.2384684170472,
+   "elongation_lune": 131.34643895550107,
+   "texte_fr": "06:29 heure de Kolkata (UTC+5:30) · 00:59 TU",
+   "texte_en": "06:29 Kolkata time (UTC+5:30) · 00:59 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T00:59:00Z",
+   "tz": "UTC",
+   "ms": 1774745940000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    3,
+    29,
+    0,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    0,
+    59,
+    0
+   ],
+   "jj": 2461128.540972222,
+   "jour_local": 87,
+   "jour_tu": 87.04097222222222,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    87,
+    0.9833333333333333
+   ],
+   "solaire_paris": [
+    87,
+    1.14
+   ],
+   "tsl_paris": 13.570170935926338,
+   "annee_decimale": 2026.2384684170472,
+   "elongation_lune": 131.34643895550107,
+   "texte_fr": "00:59 TU",
+   "texte_en": "00:59 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T00:59:00Z",
+   "tz": "Pas/Un_Fuseau",
+   "ms": 1774745940000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    3,
+    29,
+    0,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    0,
+    59,
+    0
+   ],
+   "jj": 2461128.540972222,
+   "jour_local": 87,
+   "jour_tu": 87.04097222222222,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    87,
+    0.9833333333333333
+   ],
+   "solaire_paris": [
+    87,
+    1.14
+   ],
+   "tsl_paris": 13.570170935926338,
+   "annee_decimale": 2026.2384684170472,
+   "elongation_lune": 131.34643895550107,
+   "texte_fr": "00:59 TU",
+   "texte_en": "00:59 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T01:00:00Z",
+   "tz": "Europe/Paris",
+   "ms": 1774746000000,
+   "tz_retenu": "Europe/Paris",
+   "decalage": 120,
+   "decalage_standard": 60,
+   "local": [
+    2026,
+    3,
+    29,
+    3,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461128.5416666665,
+   "jour_local": 87,
+   "jour_tu": 87.04166666666667,
+   "meridien": 15.0,
+   "solaire_meridien": [
+    87,
+    2.0
+   ],
+   "solaire_paris": [
+    87,
+    1.1566666666666665
+   ],
+   "tsl_paris": 13.586883233425517,
+   "annee_decimale": 2026.2384703196346,
+   "elongation_lune": 131.35506316969986,
+   "texte_fr": "03:00 heure de Paris (UTC+2) · 01:00 TU",
+   "texte_en": "03:00 Paris time (UTC+2) · 01:00 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T01:00:00Z",
+   "tz": "Europe/London",
+   "ms": 1774746000000,
+   "tz_retenu": "Europe/London",
+   "decalage": 60,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    3,
+    29,
+    2,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461128.5416666665,
+   "jour_local": 87,
+   "jour_tu": 87.04166666666667,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    87,
+    1.0
+   ],
+   "solaire_paris": [
+    87,
+    1.1566666666666665
+   ],
+   "tsl_paris": 13.586883233425517,
+   "annee_decimale": 2026.2384703196346,
+   "elongation_lune": 131.35506316969986,
+   "texte_fr": "02:00 heure de London (UTC+1) · 01:00 TU",
+   "texte_en": "02:00 London time (UTC+1) · 01:00 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T01:00:00Z",
+   "tz": "Pacific/Auckland",
+   "ms": 1774746000000,
+   "tz_retenu": "Pacific/Auckland",
+   "decalage": 780,
+   "decalage_standard": 720,
+   "local": [
+    2026,
+    3,
+    29,
+    14,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461128.5416666665,
+   "jour_local": 87,
+   "jour_tu": 87.04166666666667,
+   "meridien": 180.0,
+   "solaire_meridien": [
+    87,
+    13.0
+   ],
+   "solaire_paris": [
+    87,
+    1.1566666666666665
+   ],
+   "tsl_paris": 13.586883233425517,
+   "annee_decimale": 2026.2384703196346,
+   "elongation_lune": 131.35506316969986,
+   "texte_fr": "14:00 heure d’Auckland (UTC+13) · 01:00 TU",
+   "texte_en": "14:00 Auckland time (UTC+13) · 01:00 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T01:00:00Z",
+   "tz": "America/St_Johns",
+   "ms": 1774746000000,
+   "tz_retenu": "America/St_Johns",
+   "decalage": -150,
+   "decalage_standard": -210,
+   "local": [
+    2026,
+    3,
+    28,
+    22,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461128.5416666665,
+   "jour_local": 86,
+   "jour_tu": 87.04166666666667,
+   "meridien": -52.5,
+   "solaire_meridien": [
+    86,
+    21.5
+   ],
+   "solaire_paris": [
+    87,
+    1.1566666666666665
+   ],
+   "tsl_paris": 13.586883233425517,
+   "annee_decimale": 2026.2384703196346,
+   "elongation_lune": 131.35506316969986,
+   "texte_fr": "22:30 heure de St Johns (UTC−2:30) · 01:00 TU",
+   "texte_en": "22:30 St Johns time (UTC−2:30) · 01:00 UT",
+   "date_fr": "28 mars 2026",
+   "date_en": "March 28, 2026"
+  },
+  {
+   "iso": "2026-03-29T01:00:00Z",
+   "tz": "Asia/Kathmandu",
+   "ms": 1774746000000,
+   "tz_retenu": "Asia/Kathmandu",
+   "decalage": 345,
+   "decalage_standard": 345,
+   "local": [
+    2026,
+    3,
+    29,
+    6,
+    45,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461128.5416666665,
+   "jour_local": 87,
+   "jour_tu": 87.04166666666667,
+   "meridien": 86.25,
+   "solaire_meridien": [
+    87,
+    6.75
+   ],
+   "solaire_paris": [
+    87,
+    1.1566666666666665
+   ],
+   "tsl_paris": 13.586883233425517,
+   "annee_decimale": 2026.2384703196346,
+   "elongation_lune": 131.35506316969986,
+   "texte_fr": "06:45 heure de Kathmandu (UTC+5:45) · 01:00 TU",
+   "texte_en": "06:45 Kathmandu time (UTC+5:45) · 01:00 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T01:00:00Z",
+   "tz": "America/New_York",
+   "ms": 1774746000000,
+   "tz_retenu": "America/New_York",
+   "decalage": -240,
+   "decalage_standard": -300,
+   "local": [
+    2026,
+    3,
+    28,
+    21,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461128.5416666665,
+   "jour_local": 86,
+   "jour_tu": 87.04166666666667,
+   "meridien": -75.0,
+   "solaire_meridien": [
+    86,
+    20.0
+   ],
+   "solaire_paris": [
+    87,
+    1.1566666666666665
+   ],
+   "tsl_paris": 13.586883233425517,
+   "annee_decimale": 2026.2384703196346,
+   "elongation_lune": 131.35506316969986,
+   "texte_fr": "21:00 heure de New York (UTC−4) · 01:00 TU",
+   "texte_en": "21:00 New York time (UTC−4) · 01:00 UT",
+   "date_fr": "28 mars 2026",
+   "date_en": "March 28, 2026"
+  },
+  {
+   "iso": "2026-03-29T01:00:00Z",
+   "tz": "Australia/Lord_Howe",
+   "ms": 1774746000000,
+   "tz_retenu": "Australia/Lord_Howe",
+   "decalage": 660,
+   "decalage_standard": 630,
+   "local": [
+    2026,
+    3,
+    29,
+    12,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461128.5416666665,
+   "jour_local": 87,
+   "jour_tu": 87.04166666666667,
+   "meridien": 157.5,
+   "solaire_meridien": [
+    87,
+    11.5
+   ],
+   "solaire_paris": [
+    87,
+    1.1566666666666665
+   ],
+   "tsl_paris": 13.586883233425517,
+   "annee_decimale": 2026.2384703196346,
+   "elongation_lune": 131.35506316969986,
+   "texte_fr": "12:00 heure de Lord Howe (UTC+11) · 01:00 TU",
+   "texte_en": "12:00 Lord Howe time (UTC+11) · 01:00 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T01:00:00Z",
+   "tz": "Pacific/Chatham",
+   "ms": 1774746000000,
+   "tz_retenu": "Pacific/Chatham",
+   "decalage": 825,
+   "decalage_standard": 765,
+   "local": [
+    2026,
+    3,
+    29,
+    14,
+    45,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461128.5416666665,
+   "jour_local": 87,
+   "jour_tu": 87.04166666666667,
+   "meridien": 191.25,
+   "solaire_meridien": [
+    87,
+    13.75
+   ],
+   "solaire_paris": [
+    87,
+    1.1566666666666665
+   ],
+   "tsl_paris": 13.586883233425517,
+   "annee_decimale": 2026.2384703196346,
+   "elongation_lune": 131.35506316969986,
+   "texte_fr": "14:45 heure de Chatham (UTC+13:45) · 01:00 TU",
+   "texte_en": "14:45 Chatham time (UTC+13:45) · 01:00 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T01:00:00Z",
+   "tz": "Asia/Kolkata",
+   "ms": 1774746000000,
+   "tz_retenu": "Asia/Kolkata",
+   "decalage": 330,
+   "decalage_standard": 330,
+   "local": [
+    2026,
+    3,
+    29,
+    6,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461128.5416666665,
+   "jour_local": 87,
+   "jour_tu": 87.04166666666667,
+   "meridien": 82.5,
+   "solaire_meridien": [
+    87,
+    6.5
+   ],
+   "solaire_paris": [
+    87,
+    1.1566666666666665
+   ],
+   "tsl_paris": 13.586883233425517,
+   "annee_decimale": 2026.2384703196346,
+   "elongation_lune": 131.35506316969986,
+   "texte_fr": "06:30 heure de Kolkata (UTC+5:30) · 01:00 TU",
+   "texte_en": "06:30 Kolkata time (UTC+5:30) · 01:00 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T01:00:00Z",
+   "tz": "UTC",
+   "ms": 1774746000000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    3,
+    29,
+    1,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461128.5416666665,
+   "jour_local": 87,
+   "jour_tu": 87.04166666666667,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    87,
+    1.0
+   ],
+   "solaire_paris": [
+    87,
+    1.1566666666666665
+   ],
+   "tsl_paris": 13.586883233425517,
+   "annee_decimale": 2026.2384703196346,
+   "elongation_lune": 131.35506316969986,
+   "texte_fr": "01:00 TU",
+   "texte_en": "01:00 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-03-29T01:00:00Z",
+   "tz": "Pas/Un_Fuseau",
+   "ms": 1774746000000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    3,
+    29,
+    1,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    3,
+    29,
+    1,
+    0,
+    0
+   ],
+   "jj": 2461128.5416666665,
+   "jour_local": 87,
+   "jour_tu": 87.04166666666667,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    87,
+    1.0
+   ],
+   "solaire_paris": [
+    87,
+    1.1566666666666665
+   ],
+   "tsl_paris": 13.586883233425517,
+   "annee_decimale": 2026.2384703196346,
+   "elongation_lune": 131.35506316969986,
+   "texte_fr": "01:00 TU",
+   "texte_en": "01:00 UT",
+   "date_fr": "29 mars 2026",
+   "date_en": "March 29, 2026"
+  },
+  {
+   "iso": "2026-12-31T23:30:00Z",
+   "tz": "Europe/Paris",
+   "ms": 1798759800000,
+   "tz_retenu": "Europe/Paris",
+   "decalage": 60,
+   "decalage_standard": 60,
+   "local": [
+    2027,
+    1,
+    1,
+    0,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    23,
+    30,
+    0
+   ],
+   "jj": 2461406.4791666665,
+   "jour_local": 0,
+   "jour_tu": 364.9791666666667,
+   "meridien": 15.0,
+   "solaire_meridien": [
+    0,
+    0.5
+   ],
+   "solaire_paris": [
+    364,
+    23.656666666666666
+   ],
+   "tsl_paris": 6.350107662721227,
+   "annee_decimale": 2026.9999429223744,
+   "elongation_lune": 284.0022171002347,
+   "texte_fr": "00:30 heure de Paris (UTC+1) · 23:30 TU",
+   "texte_en": "00:30 Paris time (UTC+1) · 23:30 UT",
+   "date_fr": "1 janvier 2027",
+   "date_en": "January 1, 2027"
+  },
+  {
+   "iso": "2026-12-31T23:30:00Z",
+   "tz": "Europe/London",
+   "ms": 1798759800000,
+   "tz_retenu": "Europe/London",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    12,
+    31,
+    23,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    23,
+    30,
+    0
+   ],
+   "jj": 2461406.4791666665,
+   "jour_local": 364,
+   "jour_tu": 364.9791666666667,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    364,
+    23.5
+   ],
+   "solaire_paris": [
+    364,
+    23.656666666666666
+   ],
+   "tsl_paris": 6.350107662721227,
+   "annee_decimale": 2026.9999429223744,
+   "elongation_lune": 284.0022171002347,
+   "texte_fr": "23:30 heure de London (UTC) · 23:30 TU",
+   "texte_en": "23:30 London time (UTC) · 23:30 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T23:30:00Z",
+   "tz": "Pacific/Auckland",
+   "ms": 1798759800000,
+   "tz_retenu": "Pacific/Auckland",
+   "decalage": 780,
+   "decalage_standard": 720,
+   "local": [
+    2027,
+    1,
+    1,
+    12,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    23,
+    30,
+    0
+   ],
+   "jj": 2461406.4791666665,
+   "jour_local": 0,
+   "jour_tu": 364.9791666666667,
+   "meridien": 180.0,
+   "solaire_meridien": [
+    0,
+    11.5
+   ],
+   "solaire_paris": [
+    364,
+    23.656666666666666
+   ],
+   "tsl_paris": 6.350107662721227,
+   "annee_decimale": 2026.9999429223744,
+   "elongation_lune": 284.0022171002347,
+   "texte_fr": "12:30 heure d’Auckland (UTC+13) · 23:30 TU",
+   "texte_en": "12:30 Auckland time (UTC+13) · 23:30 UT",
+   "date_fr": "1 janvier 2027",
+   "date_en": "January 1, 2027"
+  },
+  {
+   "iso": "2026-12-31T23:30:00Z",
+   "tz": "America/St_Johns",
+   "ms": 1798759800000,
+   "tz_retenu": "America/St_Johns",
+   "decalage": -210,
+   "decalage_standard": -210,
+   "local": [
+    2026,
+    12,
+    31,
+    20,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    23,
+    30,
+    0
+   ],
+   "jj": 2461406.4791666665,
+   "jour_local": 364,
+   "jour_tu": 364.9791666666667,
+   "meridien": -52.5,
+   "solaire_meridien": [
+    364,
+    20.0
+   ],
+   "solaire_paris": [
+    364,
+    23.656666666666666
+   ],
+   "tsl_paris": 6.350107662721227,
+   "annee_decimale": 2026.9999429223744,
+   "elongation_lune": 284.0022171002347,
+   "texte_fr": "20:00 heure de St Johns (UTC−3:30) · 23:30 TU",
+   "texte_en": "20:00 St Johns time (UTC−3:30) · 23:30 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T23:30:00Z",
+   "tz": "Asia/Kathmandu",
+   "ms": 1798759800000,
+   "tz_retenu": "Asia/Kathmandu",
+   "decalage": 345,
+   "decalage_standard": 345,
+   "local": [
+    2027,
+    1,
+    1,
+    5,
+    15,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    23,
+    30,
+    0
+   ],
+   "jj": 2461406.4791666665,
+   "jour_local": 0,
+   "jour_tu": 364.9791666666667,
+   "meridien": 86.25,
+   "solaire_meridien": [
+    0,
+    5.25
+   ],
+   "solaire_paris": [
+    364,
+    23.656666666666666
+   ],
+   "tsl_paris": 6.350107662721227,
+   "annee_decimale": 2026.9999429223744,
+   "elongation_lune": 284.0022171002347,
+   "texte_fr": "05:15 heure de Kathmandu (UTC+5:45) · 23:30 TU",
+   "texte_en": "05:15 Kathmandu time (UTC+5:45) · 23:30 UT",
+   "date_fr": "1 janvier 2027",
+   "date_en": "January 1, 2027"
+  },
+  {
+   "iso": "2026-12-31T23:30:00Z",
+   "tz": "America/New_York",
+   "ms": 1798759800000,
+   "tz_retenu": "America/New_York",
+   "decalage": -300,
+   "decalage_standard": -300,
+   "local": [
+    2026,
+    12,
+    31,
+    18,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    23,
+    30,
+    0
+   ],
+   "jj": 2461406.4791666665,
+   "jour_local": 364,
+   "jour_tu": 364.9791666666667,
+   "meridien": -75.0,
+   "solaire_meridien": [
+    364,
+    18.5
+   ],
+   "solaire_paris": [
+    364,
+    23.656666666666666
+   ],
+   "tsl_paris": 6.350107662721227,
+   "annee_decimale": 2026.9999429223744,
+   "elongation_lune": 284.0022171002347,
+   "texte_fr": "18:30 heure de New York (UTC−5) · 23:30 TU",
+   "texte_en": "18:30 New York time (UTC−5) · 23:30 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T23:30:00Z",
+   "tz": "Australia/Lord_Howe",
+   "ms": 1798759800000,
+   "tz_retenu": "Australia/Lord_Howe",
+   "decalage": 660,
+   "decalage_standard": 630,
+   "local": [
+    2027,
+    1,
+    1,
+    10,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    23,
+    30,
+    0
+   ],
+   "jj": 2461406.4791666665,
+   "jour_local": 0,
+   "jour_tu": 364.9791666666667,
+   "meridien": 157.5,
+   "solaire_meridien": [
+    0,
+    10.0
+   ],
+   "solaire_paris": [
+    364,
+    23.656666666666666
+   ],
+   "tsl_paris": 6.350107662721227,
+   "annee_decimale": 2026.9999429223744,
+   "elongation_lune": 284.0022171002347,
+   "texte_fr": "10:30 heure de Lord Howe (UTC+11) · 23:30 TU",
+   "texte_en": "10:30 Lord Howe time (UTC+11) · 23:30 UT",
+   "date_fr": "1 janvier 2027",
+   "date_en": "January 1, 2027"
+  },
+  {
+   "iso": "2026-12-31T23:30:00Z",
+   "tz": "Pacific/Chatham",
+   "ms": 1798759800000,
+   "tz_retenu": "Pacific/Chatham",
+   "decalage": 825,
+   "decalage_standard": 765,
+   "local": [
+    2027,
+    1,
+    1,
+    13,
+    15,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    23,
+    30,
+    0
+   ],
+   "jj": 2461406.4791666665,
+   "jour_local": 0,
+   "jour_tu": 364.9791666666667,
+   "meridien": 191.25,
+   "solaire_meridien": [
+    0,
+    12.25
+   ],
+   "solaire_paris": [
+    364,
+    23.656666666666666
+   ],
+   "tsl_paris": 6.350107662721227,
+   "annee_decimale": 2026.9999429223744,
+   "elongation_lune": 284.0022171002347,
+   "texte_fr": "13:15 heure de Chatham (UTC+13:45) · 23:30 TU",
+   "texte_en": "13:15 Chatham time (UTC+13:45) · 23:30 UT",
+   "date_fr": "1 janvier 2027",
+   "date_en": "January 1, 2027"
+  },
+  {
+   "iso": "2026-12-31T23:30:00Z",
+   "tz": "Asia/Kolkata",
+   "ms": 1798759800000,
+   "tz_retenu": "Asia/Kolkata",
+   "decalage": 330,
+   "decalage_standard": 330,
+   "local": [
+    2027,
+    1,
+    1,
+    5,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    23,
+    30,
+    0
+   ],
+   "jj": 2461406.4791666665,
+   "jour_local": 0,
+   "jour_tu": 364.9791666666667,
+   "meridien": 82.5,
+   "solaire_meridien": [
+    0,
+    5.0
+   ],
+   "solaire_paris": [
+    364,
+    23.656666666666666
+   ],
+   "tsl_paris": 6.350107662721227,
+   "annee_decimale": 2026.9999429223744,
+   "elongation_lune": 284.0022171002347,
+   "texte_fr": "05:00 heure de Kolkata (UTC+5:30) · 23:30 TU",
+   "texte_en": "05:00 Kolkata time (UTC+5:30) · 23:30 UT",
+   "date_fr": "1 janvier 2027",
+   "date_en": "January 1, 2027"
+  },
+  {
+   "iso": "2026-12-31T23:30:00Z",
+   "tz": "UTC",
+   "ms": 1798759800000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    12,
+    31,
+    23,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    23,
+    30,
+    0
+   ],
+   "jj": 2461406.4791666665,
+   "jour_local": 364,
+   "jour_tu": 364.9791666666667,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    364,
+    23.5
+   ],
+   "solaire_paris": [
+    364,
+    23.656666666666666
+   ],
+   "tsl_paris": 6.350107662721227,
+   "annee_decimale": 2026.9999429223744,
+   "elongation_lune": 284.0022171002347,
+   "texte_fr": "23:30 TU",
+   "texte_en": "23:30 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T23:30:00Z",
+   "tz": "Pas/Un_Fuseau",
+   "ms": 1798759800000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    12,
+    31,
+    23,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    23,
+    30,
+    0
+   ],
+   "jj": 2461406.4791666665,
+   "jour_local": 364,
+   "jour_tu": 364.9791666666667,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    364,
+    23.5
+   ],
+   "solaire_paris": [
+    364,
+    23.656666666666666
+   ],
+   "tsl_paris": 6.350107662721227,
+   "annee_decimale": 2026.9999429223744,
+   "elongation_lune": 284.0022171002347,
+   "texte_fr": "23:30 TU",
+   "texte_en": "23:30 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T10:59:00Z",
+   "tz": "Europe/Paris",
+   "ms": 1798714740000,
+   "tz_retenu": "Europe/Paris",
+   "decalage": 60,
+   "decalage_standard": 60,
+   "local": [
+    2026,
+    12,
+    31,
+    11,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    10,
+    59,
+    0
+   ],
+   "jj": 2461405.957638889,
+   "jour_local": 364,
+   "jour_tu": 364.4576388888889,
+   "meridien": 15.0,
+   "solaire_meridien": [
+    364,
+    11.983333333333333
+   ],
+   "solaire_paris": [
+    364,
+    11.139999999999999
+   ],
+   "tsl_paris": 17.799171505651127,
+   "annee_decimale": 2026.9985140791478,
+   "elongation_lune": 277.8963132964709,
+   "texte_fr": "11:59 heure de Paris (UTC+1) · 10:59 TU",
+   "texte_en": "11:59 Paris time (UTC+1) · 10:59 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T10:59:00Z",
+   "tz": "Europe/London",
+   "ms": 1798714740000,
+   "tz_retenu": "Europe/London",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    12,
+    31,
+    10,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    10,
+    59,
+    0
+   ],
+   "jj": 2461405.957638889,
+   "jour_local": 364,
+   "jour_tu": 364.4576388888889,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    364,
+    10.983333333333333
+   ],
+   "solaire_paris": [
+    364,
+    11.139999999999999
+   ],
+   "tsl_paris": 17.799171505651127,
+   "annee_decimale": 2026.9985140791478,
+   "elongation_lune": 277.8963132964709,
+   "texte_fr": "10:59 heure de London (UTC) · 10:59 TU",
+   "texte_en": "10:59 London time (UTC) · 10:59 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T10:59:00Z",
+   "tz": "Pacific/Auckland",
+   "ms": 1798714740000,
+   "tz_retenu": "Pacific/Auckland",
+   "decalage": 780,
+   "decalage_standard": 720,
+   "local": [
+    2026,
+    12,
+    31,
+    23,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    10,
+    59,
+    0
+   ],
+   "jj": 2461405.957638889,
+   "jour_local": 364,
+   "jour_tu": 364.4576388888889,
+   "meridien": 180.0,
+   "solaire_meridien": [
+    364,
+    22.983333333333334
+   ],
+   "solaire_paris": [
+    364,
+    11.139999999999999
+   ],
+   "tsl_paris": 17.799171505651127,
+   "annee_decimale": 2026.9985140791478,
+   "elongation_lune": 277.8963132964709,
+   "texte_fr": "23:59 heure d’Auckland (UTC+13) · 10:59 TU",
+   "texte_en": "23:59 Auckland time (UTC+13) · 10:59 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T10:59:00Z",
+   "tz": "America/St_Johns",
+   "ms": 1798714740000,
+   "tz_retenu": "America/St_Johns",
+   "decalage": -210,
+   "decalage_standard": -210,
+   "local": [
+    2026,
+    12,
+    31,
+    7,
+    29,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    10,
+    59,
+    0
+   ],
+   "jj": 2461405.957638889,
+   "jour_local": 364,
+   "jour_tu": 364.4576388888889,
+   "meridien": -52.5,
+   "solaire_meridien": [
+    364,
+    7.483333333333333
+   ],
+   "solaire_paris": [
+    364,
+    11.139999999999999
+   ],
+   "tsl_paris": 17.799171505651127,
+   "annee_decimale": 2026.9985140791478,
+   "elongation_lune": 277.8963132964709,
+   "texte_fr": "07:29 heure de St Johns (UTC−3:30) · 10:59 TU",
+   "texte_en": "07:29 St Johns time (UTC−3:30) · 10:59 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T10:59:00Z",
+   "tz": "Asia/Kathmandu",
+   "ms": 1798714740000,
+   "tz_retenu": "Asia/Kathmandu",
+   "decalage": 345,
+   "decalage_standard": 345,
+   "local": [
+    2026,
+    12,
+    31,
+    16,
+    44,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    10,
+    59,
+    0
+   ],
+   "jj": 2461405.957638889,
+   "jour_local": 364,
+   "jour_tu": 364.4576388888889,
+   "meridien": 86.25,
+   "solaire_meridien": [
+    364,
+    16.733333333333334
+   ],
+   "solaire_paris": [
+    364,
+    11.139999999999999
+   ],
+   "tsl_paris": 17.799171505651127,
+   "annee_decimale": 2026.9985140791478,
+   "elongation_lune": 277.8963132964709,
+   "texte_fr": "16:44 heure de Kathmandu (UTC+5:45) · 10:59 TU",
+   "texte_en": "16:44 Kathmandu time (UTC+5:45) · 10:59 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T10:59:00Z",
+   "tz": "America/New_York",
+   "ms": 1798714740000,
+   "tz_retenu": "America/New_York",
+   "decalage": -300,
+   "decalage_standard": -300,
+   "local": [
+    2026,
+    12,
+    31,
+    5,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    10,
+    59,
+    0
+   ],
+   "jj": 2461405.957638889,
+   "jour_local": 364,
+   "jour_tu": 364.4576388888889,
+   "meridien": -75.0,
+   "solaire_meridien": [
+    364,
+    5.983333333333333
+   ],
+   "solaire_paris": [
+    364,
+    11.139999999999999
+   ],
+   "tsl_paris": 17.799171505651127,
+   "annee_decimale": 2026.9985140791478,
+   "elongation_lune": 277.8963132964709,
+   "texte_fr": "05:59 heure de New York (UTC−5) · 10:59 TU",
+   "texte_en": "05:59 New York time (UTC−5) · 10:59 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T10:59:00Z",
+   "tz": "Australia/Lord_Howe",
+   "ms": 1798714740000,
+   "tz_retenu": "Australia/Lord_Howe",
+   "decalage": 660,
+   "decalage_standard": 630,
+   "local": [
+    2026,
+    12,
+    31,
+    21,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    10,
+    59,
+    0
+   ],
+   "jj": 2461405.957638889,
+   "jour_local": 364,
+   "jour_tu": 364.4576388888889,
+   "meridien": 157.5,
+   "solaire_meridien": [
+    364,
+    21.483333333333334
+   ],
+   "solaire_paris": [
+    364,
+    11.139999999999999
+   ],
+   "tsl_paris": 17.799171505651127,
+   "annee_decimale": 2026.9985140791478,
+   "elongation_lune": 277.8963132964709,
+   "texte_fr": "21:59 heure de Lord Howe (UTC+11) · 10:59 TU",
+   "texte_en": "21:59 Lord Howe time (UTC+11) · 10:59 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T10:59:00Z",
+   "tz": "Pacific/Chatham",
+   "ms": 1798714740000,
+   "tz_retenu": "Pacific/Chatham",
+   "decalage": 825,
+   "decalage_standard": 765,
+   "local": [
+    2027,
+    1,
+    1,
+    0,
+    44,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    10,
+    59,
+    0
+   ],
+   "jj": 2461405.957638889,
+   "jour_local": 0,
+   "jour_tu": 364.4576388888889,
+   "meridien": 191.25,
+   "solaire_meridien": [
+    364,
+    23.733333333333334
+   ],
+   "solaire_paris": [
+    364,
+    11.139999999999999
+   ],
+   "tsl_paris": 17.799171505651127,
+   "annee_decimale": 2026.9985140791478,
+   "elongation_lune": 277.8963132964709,
+   "texte_fr": "00:44 heure de Chatham (UTC+13:45) · 10:59 TU",
+   "texte_en": "00:44 Chatham time (UTC+13:45) · 10:59 UT",
+   "date_fr": "1 janvier 2027",
+   "date_en": "January 1, 2027"
+  },
+  {
+   "iso": "2026-12-31T10:59:00Z",
+   "tz": "Asia/Kolkata",
+   "ms": 1798714740000,
+   "tz_retenu": "Asia/Kolkata",
+   "decalage": 330,
+   "decalage_standard": 330,
+   "local": [
+    2026,
+    12,
+    31,
+    16,
+    29,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    10,
+    59,
+    0
+   ],
+   "jj": 2461405.957638889,
+   "jour_local": 364,
+   "jour_tu": 364.4576388888889,
+   "meridien": 82.5,
+   "solaire_meridien": [
+    364,
+    16.483333333333334
+   ],
+   "solaire_paris": [
+    364,
+    11.139999999999999
+   ],
+   "tsl_paris": 17.799171505651127,
+   "annee_decimale": 2026.9985140791478,
+   "elongation_lune": 277.8963132964709,
+   "texte_fr": "16:29 heure de Kolkata (UTC+5:30) · 10:59 TU",
+   "texte_en": "16:29 Kolkata time (UTC+5:30) · 10:59 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T10:59:00Z",
+   "tz": "UTC",
+   "ms": 1798714740000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    12,
+    31,
+    10,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    10,
+    59,
+    0
+   ],
+   "jj": 2461405.957638889,
+   "jour_local": 364,
+   "jour_tu": 364.4576388888889,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    364,
+    10.983333333333333
+   ],
+   "solaire_paris": [
+    364,
+    11.139999999999999
+   ],
+   "tsl_paris": 17.799171505651127,
+   "annee_decimale": 2026.9985140791478,
+   "elongation_lune": 277.8963132964709,
+   "texte_fr": "10:59 TU",
+   "texte_en": "10:59 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T10:59:00Z",
+   "tz": "Pas/Un_Fuseau",
+   "ms": 1798714740000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    12,
+    31,
+    10,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    10,
+    59,
+    0
+   ],
+   "jj": 2461405.957638889,
+   "jour_local": 364,
+   "jour_tu": 364.4576388888889,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    364,
+    10.983333333333333
+   ],
+   "solaire_paris": [
+    364,
+    11.139999999999999
+   ],
+   "tsl_paris": 17.799171505651127,
+   "annee_decimale": 2026.9985140791478,
+   "elongation_lune": 277.8963132964709,
+   "texte_fr": "10:59 TU",
+   "texte_en": "10:59 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T11:00:00Z",
+   "tz": "Europe/Paris",
+   "ms": 1798714800000,
+   "tz_retenu": "Europe/Paris",
+   "decalage": 60,
+   "decalage_standard": 60,
+   "local": [
+    2026,
+    12,
+    31,
+    12,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    11,
+    0,
+    0
+   ],
+   "jj": 2461405.9583333335,
+   "jour_local": 364,
+   "jour_tu": 364.4583333333333,
+   "meridien": 15.0,
+   "solaire_meridien": [
+    364,
+    12.0
+   ],
+   "solaire_paris": [
+    364,
+    11.156666666666666
+   ],
+   "tsl_paris": 17.815883803119263,
+   "annee_decimale": 2026.9985159817352,
+   "elongation_lune": 277.90450145343493,
+   "texte_fr": "12:00 heure de Paris (UTC+1) · 11:00 TU",
+   "texte_en": "12:00 Paris time (UTC+1) · 11:00 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T11:00:00Z",
+   "tz": "Europe/London",
+   "ms": 1798714800000,
+   "tz_retenu": "Europe/London",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    12,
+    31,
+    11,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    11,
+    0,
+    0
+   ],
+   "jj": 2461405.9583333335,
+   "jour_local": 364,
+   "jour_tu": 364.4583333333333,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    364,
+    11.0
+   ],
+   "solaire_paris": [
+    364,
+    11.156666666666666
+   ],
+   "tsl_paris": 17.815883803119263,
+   "annee_decimale": 2026.9985159817352,
+   "elongation_lune": 277.90450145343493,
+   "texte_fr": "11:00 heure de London (UTC) · 11:00 TU",
+   "texte_en": "11:00 London time (UTC) · 11:00 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T11:00:00Z",
+   "tz": "Pacific/Auckland",
+   "ms": 1798714800000,
+   "tz_retenu": "Pacific/Auckland",
+   "decalage": 780,
+   "decalage_standard": 720,
+   "local": [
+    2027,
+    1,
+    1,
+    0,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    11,
+    0,
+    0
+   ],
+   "jj": 2461405.9583333335,
+   "jour_local": 0,
+   "jour_tu": 364.4583333333333,
+   "meridien": 180.0,
+   "solaire_meridien": [
+    364,
+    23.0
+   ],
+   "solaire_paris": [
+    364,
+    11.156666666666666
+   ],
+   "tsl_paris": 17.815883803119263,
+   "annee_decimale": 2026.9985159817352,
+   "elongation_lune": 277.90450145343493,
+   "texte_fr": "00:00 heure d’Auckland (UTC+13) · 11:00 TU",
+   "texte_en": "00:00 Auckland time (UTC+13) · 11:00 UT",
+   "date_fr": "1 janvier 2027",
+   "date_en": "January 1, 2027"
+  },
+  {
+   "iso": "2026-12-31T11:00:00Z",
+   "tz": "America/St_Johns",
+   "ms": 1798714800000,
+   "tz_retenu": "America/St_Johns",
+   "decalage": -210,
+   "decalage_standard": -210,
+   "local": [
+    2026,
+    12,
+    31,
+    7,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    11,
+    0,
+    0
+   ],
+   "jj": 2461405.9583333335,
+   "jour_local": 364,
+   "jour_tu": 364.4583333333333,
+   "meridien": -52.5,
+   "solaire_meridien": [
+    364,
+    7.5
+   ],
+   "solaire_paris": [
+    364,
+    11.156666666666666
+   ],
+   "tsl_paris": 17.815883803119263,
+   "annee_decimale": 2026.9985159817352,
+   "elongation_lune": 277.90450145343493,
+   "texte_fr": "07:30 heure de St Johns (UTC−3:30) · 11:00 TU",
+   "texte_en": "07:30 St Johns time (UTC−3:30) · 11:00 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T11:00:00Z",
+   "tz": "Asia/Kathmandu",
+   "ms": 1798714800000,
+   "tz_retenu": "Asia/Kathmandu",
+   "decalage": 345,
+   "decalage_standard": 345,
+   "local": [
+    2026,
+    12,
+    31,
+    16,
+    45,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    11,
+    0,
+    0
+   ],
+   "jj": 2461405.9583333335,
+   "jour_local": 364,
+   "jour_tu": 364.4583333333333,
+   "meridien": 86.25,
+   "solaire_meridien": [
+    364,
+    16.75
+   ],
+   "solaire_paris": [
+    364,
+    11.156666666666666
+   ],
+   "tsl_paris": 17.815883803119263,
+   "annee_decimale": 2026.9985159817352,
+   "elongation_lune": 277.90450145343493,
+   "texte_fr": "16:45 heure de Kathmandu (UTC+5:45) · 11:00 TU",
+   "texte_en": "16:45 Kathmandu time (UTC+5:45) · 11:00 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T11:00:00Z",
+   "tz": "America/New_York",
+   "ms": 1798714800000,
+   "tz_retenu": "America/New_York",
+   "decalage": -300,
+   "decalage_standard": -300,
+   "local": [
+    2026,
+    12,
+    31,
+    6,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    11,
+    0,
+    0
+   ],
+   "jj": 2461405.9583333335,
+   "jour_local": 364,
+   "jour_tu": 364.4583333333333,
+   "meridien": -75.0,
+   "solaire_meridien": [
+    364,
+    6.0
+   ],
+   "solaire_paris": [
+    364,
+    11.156666666666666
+   ],
+   "tsl_paris": 17.815883803119263,
+   "annee_decimale": 2026.9985159817352,
+   "elongation_lune": 277.90450145343493,
+   "texte_fr": "06:00 heure de New York (UTC−5) · 11:00 TU",
+   "texte_en": "06:00 New York time (UTC−5) · 11:00 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T11:00:00Z",
+   "tz": "Australia/Lord_Howe",
+   "ms": 1798714800000,
+   "tz_retenu": "Australia/Lord_Howe",
+   "decalage": 660,
+   "decalage_standard": 630,
+   "local": [
+    2026,
+    12,
+    31,
+    22,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    11,
+    0,
+    0
+   ],
+   "jj": 2461405.9583333335,
+   "jour_local": 364,
+   "jour_tu": 364.4583333333333,
+   "meridien": 157.5,
+   "solaire_meridien": [
+    364,
+    21.5
+   ],
+   "solaire_paris": [
+    364,
+    11.156666666666666
+   ],
+   "tsl_paris": 17.815883803119263,
+   "annee_decimale": 2026.9985159817352,
+   "elongation_lune": 277.90450145343493,
+   "texte_fr": "22:00 heure de Lord Howe (UTC+11) · 11:00 TU",
+   "texte_en": "22:00 Lord Howe time (UTC+11) · 11:00 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T11:00:00Z",
+   "tz": "Pacific/Chatham",
+   "ms": 1798714800000,
+   "tz_retenu": "Pacific/Chatham",
+   "decalage": 825,
+   "decalage_standard": 765,
+   "local": [
+    2027,
+    1,
+    1,
+    0,
+    45,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    11,
+    0,
+    0
+   ],
+   "jj": 2461405.9583333335,
+   "jour_local": 0,
+   "jour_tu": 364.4583333333333,
+   "meridien": 191.25,
+   "solaire_meridien": [
+    364,
+    23.75
+   ],
+   "solaire_paris": [
+    364,
+    11.156666666666666
+   ],
+   "tsl_paris": 17.815883803119263,
+   "annee_decimale": 2026.9985159817352,
+   "elongation_lune": 277.90450145343493,
+   "texte_fr": "00:45 heure de Chatham (UTC+13:45) · 11:00 TU",
+   "texte_en": "00:45 Chatham time (UTC+13:45) · 11:00 UT",
+   "date_fr": "1 janvier 2027",
+   "date_en": "January 1, 2027"
+  },
+  {
+   "iso": "2026-12-31T11:00:00Z",
+   "tz": "Asia/Kolkata",
+   "ms": 1798714800000,
+   "tz_retenu": "Asia/Kolkata",
+   "decalage": 330,
+   "decalage_standard": 330,
+   "local": [
+    2026,
+    12,
+    31,
+    16,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    11,
+    0,
+    0
+   ],
+   "jj": 2461405.9583333335,
+   "jour_local": 364,
+   "jour_tu": 364.4583333333333,
+   "meridien": 82.5,
+   "solaire_meridien": [
+    364,
+    16.5
+   ],
+   "solaire_paris": [
+    364,
+    11.156666666666666
+   ],
+   "tsl_paris": 17.815883803119263,
+   "annee_decimale": 2026.9985159817352,
+   "elongation_lune": 277.90450145343493,
+   "texte_fr": "16:30 heure de Kolkata (UTC+5:30) · 11:00 TU",
+   "texte_en": "16:30 Kolkata time (UTC+5:30) · 11:00 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T11:00:00Z",
+   "tz": "UTC",
+   "ms": 1798714800000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    12,
+    31,
+    11,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    11,
+    0,
+    0
+   ],
+   "jj": 2461405.9583333335,
+   "jour_local": 364,
+   "jour_tu": 364.4583333333333,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    364,
+    11.0
+   ],
+   "solaire_paris": [
+    364,
+    11.156666666666666
+   ],
+   "tsl_paris": 17.815883803119263,
+   "annee_decimale": 2026.9985159817352,
+   "elongation_lune": 277.90450145343493,
+   "texte_fr": "11:00 TU",
+   "texte_en": "11:00 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-12-31T11:00:00Z",
+   "tz": "Pas/Un_Fuseau",
+   "ms": 1798714800000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    12,
+    31,
+    11,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    12,
+    31,
+    11,
+    0,
+    0
+   ],
+   "jj": 2461405.9583333335,
+   "jour_local": 364,
+   "jour_tu": 364.4583333333333,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    364,
+    11.0
+   ],
+   "solaire_paris": [
+    364,
+    11.156666666666666
+   ],
+   "tsl_paris": 17.815883803119263,
+   "annee_decimale": 2026.9985159817352,
+   "elongation_lune": 277.90450145343493,
+   "texte_fr": "11:00 TU",
+   "texte_en": "11:00 UT",
+   "date_fr": "31 décembre 2026",
+   "date_en": "December 31, 2026"
+  },
+  {
+   "iso": "2026-07-15T12:00:00Z",
+   "tz": "Europe/Paris",
+   "ms": 1784116800000,
+   "tz_retenu": "Europe/Paris",
+   "decalage": 120,
+   "decalage_standard": 60,
+   "local": [
+    2026,
+    7,
+    15,
+    14,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    7,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461237.0,
+   "jour_local": 195,
+   "jour_tu": 195.5,
+   "meridien": 15.0,
+   "solaire_meridien": [
+    195,
+    13.0
+   ],
+   "solaire_paris": [
+    195,
+    12.156666666666666
+   ],
+   "tsl_paris": 7.713661317837735,
+   "annee_decimale": 2026.535616438356,
+   "elongation_lune": 15.192035677318927,
+   "texte_fr": "14:00 heure de Paris (UTC+2) · 12:00 TU",
+   "texte_en": "14:00 Paris time (UTC+2) · 12:00 UT",
+   "date_fr": "15 juillet 2026",
+   "date_en": "July 15, 2026"
+  },
+  {
+   "iso": "2026-07-15T12:00:00Z",
+   "tz": "Europe/London",
+   "ms": 1784116800000,
+   "tz_retenu": "Europe/London",
+   "decalage": 60,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    7,
+    15,
+    13,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    7,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461237.0,
+   "jour_local": 195,
+   "jour_tu": 195.5,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    195,
+    12.0
+   ],
+   "solaire_paris": [
+    195,
+    12.156666666666666
+   ],
+   "tsl_paris": 7.713661317837735,
+   "annee_decimale": 2026.535616438356,
+   "elongation_lune": 15.192035677318927,
+   "texte_fr": "13:00 heure de London (UTC+1) · 12:00 TU",
+   "texte_en": "13:00 London time (UTC+1) · 12:00 UT",
+   "date_fr": "15 juillet 2026",
+   "date_en": "July 15, 2026"
+  },
+  {
+   "iso": "2026-07-15T12:00:00Z",
+   "tz": "Pacific/Auckland",
+   "ms": 1784116800000,
+   "tz_retenu": "Pacific/Auckland",
+   "decalage": 720,
+   "decalage_standard": 720,
+   "local": [
+    2026,
+    7,
+    16,
+    0,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    7,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461237.0,
+   "jour_local": 196,
+   "jour_tu": 195.5,
+   "meridien": 180.0,
+   "solaire_meridien": [
+    196,
+    0.0
+   ],
+   "solaire_paris": [
+    195,
+    12.156666666666666
+   ],
+   "tsl_paris": 7.713661317837735,
+   "annee_decimale": 2026.535616438356,
+   "elongation_lune": 15.192035677318927,
+   "texte_fr": "00:00 heure d’Auckland (UTC+12) · 12:00 TU",
+   "texte_en": "00:00 Auckland time (UTC+12) · 12:00 UT",
+   "date_fr": "16 juillet 2026",
+   "date_en": "July 16, 2026"
+  },
+  {
+   "iso": "2026-07-15T12:00:00Z",
+   "tz": "America/St_Johns",
+   "ms": 1784116800000,
+   "tz_retenu": "America/St_Johns",
+   "decalage": -150,
+   "decalage_standard": -210,
+   "local": [
+    2026,
+    7,
+    15,
+    9,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    7,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461237.0,
+   "jour_local": 195,
+   "jour_tu": 195.5,
+   "meridien": -52.5,
+   "solaire_meridien": [
+    195,
+    8.5
+   ],
+   "solaire_paris": [
+    195,
+    12.156666666666666
+   ],
+   "tsl_paris": 7.713661317837735,
+   "annee_decimale": 2026.535616438356,
+   "elongation_lune": 15.192035677318927,
+   "texte_fr": "09:30 heure de St Johns (UTC−2:30) · 12:00 TU",
+   "texte_en": "09:30 St Johns time (UTC−2:30) · 12:00 UT",
+   "date_fr": "15 juillet 2026",
+   "date_en": "July 15, 2026"
+  },
+  {
+   "iso": "2026-07-15T12:00:00Z",
+   "tz": "Asia/Kathmandu",
+   "ms": 1784116800000,
+   "tz_retenu": "Asia/Kathmandu",
+   "decalage": 345,
+   "decalage_standard": 345,
+   "local": [
+    2026,
+    7,
+    15,
+    17,
+    45,
+    0
+   ],
+   "tu": [
+    2026,
+    7,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461237.0,
+   "jour_local": 195,
+   "jour_tu": 195.5,
+   "meridien": 86.25,
+   "solaire_meridien": [
+    195,
+    17.75
+   ],
+   "solaire_paris": [
+    195,
+    12.156666666666666
+   ],
+   "tsl_paris": 7.713661317837735,
+   "annee_decimale": 2026.535616438356,
+   "elongation_lune": 15.192035677318927,
+   "texte_fr": "17:45 heure de Kathmandu (UTC+5:45) · 12:00 TU",
+   "texte_en": "17:45 Kathmandu time (UTC+5:45) · 12:00 UT",
+   "date_fr": "15 juillet 2026",
+   "date_en": "July 15, 2026"
+  },
+  {
+   "iso": "2026-07-15T12:00:00Z",
+   "tz": "America/New_York",
+   "ms": 1784116800000,
+   "tz_retenu": "America/New_York",
+   "decalage": -240,
+   "decalage_standard": -300,
+   "local": [
+    2026,
+    7,
+    15,
+    8,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    7,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461237.0,
+   "jour_local": 195,
+   "jour_tu": 195.5,
+   "meridien": -75.0,
+   "solaire_meridien": [
+    195,
+    7.0
+   ],
+   "solaire_paris": [
+    195,
+    12.156666666666666
+   ],
+   "tsl_paris": 7.713661317837735,
+   "annee_decimale": 2026.535616438356,
+   "elongation_lune": 15.192035677318927,
+   "texte_fr": "08:00 heure de New York (UTC−4) · 12:00 TU",
+   "texte_en": "08:00 New York time (UTC−4) · 12:00 UT",
+   "date_fr": "15 juillet 2026",
+   "date_en": "July 15, 2026"
+  },
+  {
+   "iso": "2026-07-15T12:00:00Z",
+   "tz": "Australia/Lord_Howe",
+   "ms": 1784116800000,
+   "tz_retenu": "Australia/Lord_Howe",
+   "decalage": 630,
+   "decalage_standard": 630,
+   "local": [
+    2026,
+    7,
+    15,
+    22,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    7,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461237.0,
+   "jour_local": 195,
+   "jour_tu": 195.5,
+   "meridien": 157.5,
+   "solaire_meridien": [
+    195,
+    22.5
+   ],
+   "solaire_paris": [
+    195,
+    12.156666666666666
+   ],
+   "tsl_paris": 7.713661317837735,
+   "annee_decimale": 2026.535616438356,
+   "elongation_lune": 15.192035677318927,
+   "texte_fr": "22:30 heure de Lord Howe (UTC+10:30) · 12:00 TU",
+   "texte_en": "22:30 Lord Howe time (UTC+10:30) · 12:00 UT",
+   "date_fr": "15 juillet 2026",
+   "date_en": "July 15, 2026"
+  },
+  {
+   "iso": "2026-07-15T12:00:00Z",
+   "tz": "Pacific/Chatham",
+   "ms": 1784116800000,
+   "tz_retenu": "Pacific/Chatham",
+   "decalage": 765,
+   "decalage_standard": 765,
+   "local": [
+    2026,
+    7,
+    16,
+    0,
+    45,
+    0
+   ],
+   "tu": [
+    2026,
+    7,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461237.0,
+   "jour_local": 196,
+   "jour_tu": 195.5,
+   "meridien": 191.25,
+   "solaire_meridien": [
+    196,
+    0.75
+   ],
+   "solaire_paris": [
+    195,
+    12.156666666666666
+   ],
+   "tsl_paris": 7.713661317837735,
+   "annee_decimale": 2026.535616438356,
+   "elongation_lune": 15.192035677318927,
+   "texte_fr": "00:45 heure de Chatham (UTC+12:45) · 12:00 TU",
+   "texte_en": "00:45 Chatham time (UTC+12:45) · 12:00 UT",
+   "date_fr": "16 juillet 2026",
+   "date_en": "July 16, 2026"
+  },
+  {
+   "iso": "2026-07-15T12:00:00Z",
+   "tz": "Asia/Kolkata",
+   "ms": 1784116800000,
+   "tz_retenu": "Asia/Kolkata",
+   "decalage": 330,
+   "decalage_standard": 330,
+   "local": [
+    2026,
+    7,
+    15,
+    17,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    7,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461237.0,
+   "jour_local": 195,
+   "jour_tu": 195.5,
+   "meridien": 82.5,
+   "solaire_meridien": [
+    195,
+    17.5
+   ],
+   "solaire_paris": [
+    195,
+    12.156666666666666
+   ],
+   "tsl_paris": 7.713661317837735,
+   "annee_decimale": 2026.535616438356,
+   "elongation_lune": 15.192035677318927,
+   "texte_fr": "17:30 heure de Kolkata (UTC+5:30) · 12:00 TU",
+   "texte_en": "17:30 Kolkata time (UTC+5:30) · 12:00 UT",
+   "date_fr": "15 juillet 2026",
+   "date_en": "July 15, 2026"
+  },
+  {
+   "iso": "2026-07-15T12:00:00Z",
+   "tz": "UTC",
+   "ms": 1784116800000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    7,
+    15,
+    12,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    7,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461237.0,
+   "jour_local": 195,
+   "jour_tu": 195.5,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    195,
+    12.0
+   ],
+   "solaire_paris": [
+    195,
+    12.156666666666666
+   ],
+   "tsl_paris": 7.713661317837735,
+   "annee_decimale": 2026.535616438356,
+   "elongation_lune": 15.192035677318927,
+   "texte_fr": "12:00 TU",
+   "texte_en": "12:00 UT",
+   "date_fr": "15 juillet 2026",
+   "date_en": "July 15, 2026"
+  },
+  {
+   "iso": "2026-07-15T12:00:00Z",
+   "tz": "Pas/Un_Fuseau",
+   "ms": 1784116800000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    7,
+    15,
+    12,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    7,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461237.0,
+   "jour_local": 195,
+   "jour_tu": 195.5,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    195,
+    12.0
+   ],
+   "solaire_paris": [
+    195,
+    12.156666666666666
+   ],
+   "tsl_paris": 7.713661317837735,
+   "annee_decimale": 2026.535616438356,
+   "elongation_lune": 15.192035677318927,
+   "texte_fr": "12:00 TU",
+   "texte_en": "12:00 UT",
+   "date_fr": "15 juillet 2026",
+   "date_en": "July 15, 2026"
+  },
+  {
+   "iso": "2026-01-15T12:00:00Z",
+   "tz": "Europe/Paris",
+   "ms": 1768478400000,
+   "tz_retenu": "Europe/Paris",
+   "decalage": 60,
+   "decalage_standard": 60,
+   "local": [
+    2026,
+    1,
+    15,
+    13,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    1,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461056.0,
+   "jour_local": 14,
+   "jour_tu": 14.5,
+   "meridien": 15.0,
+   "solaire_meridien": [
+    14,
+    13.0
+   ],
+   "solaire_paris": [
+    14,
+    12.156666666666666
+   ],
+   "tsl_paris": 19.820183030546954,
+   "annee_decimale": 2026.0397260273974,
+   "elongation_lune": 322.68006943460205,
+   "texte_fr": "13:00 heure de Paris (UTC+1) · 12:00 TU",
+   "texte_en": "13:00 Paris time (UTC+1) · 12:00 UT",
+   "date_fr": "15 janvier 2026",
+   "date_en": "January 15, 2026"
+  },
+  {
+   "iso": "2026-01-15T12:00:00Z",
+   "tz": "Europe/London",
+   "ms": 1768478400000,
+   "tz_retenu": "Europe/London",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    1,
+    15,
+    12,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    1,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461056.0,
+   "jour_local": 14,
+   "jour_tu": 14.5,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    14,
+    12.0
+   ],
+   "solaire_paris": [
+    14,
+    12.156666666666666
+   ],
+   "tsl_paris": 19.820183030546954,
+   "annee_decimale": 2026.0397260273974,
+   "elongation_lune": 322.68006943460205,
+   "texte_fr": "12:00 heure de London (UTC) · 12:00 TU",
+   "texte_en": "12:00 London time (UTC) · 12:00 UT",
+   "date_fr": "15 janvier 2026",
+   "date_en": "January 15, 2026"
+  },
+  {
+   "iso": "2026-01-15T12:00:00Z",
+   "tz": "Pacific/Auckland",
+   "ms": 1768478400000,
+   "tz_retenu": "Pacific/Auckland",
+   "decalage": 780,
+   "decalage_standard": 720,
+   "local": [
+    2026,
+    1,
+    16,
+    1,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    1,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461056.0,
+   "jour_local": 15,
+   "jour_tu": 14.5,
+   "meridien": 180.0,
+   "solaire_meridien": [
+    15,
+    0.0
+   ],
+   "solaire_paris": [
+    14,
+    12.156666666666666
+   ],
+   "tsl_paris": 19.820183030546954,
+   "annee_decimale": 2026.0397260273974,
+   "elongation_lune": 322.68006943460205,
+   "texte_fr": "01:00 heure d’Auckland (UTC+13) · 12:00 TU",
+   "texte_en": "01:00 Auckland time (UTC+13) · 12:00 UT",
+   "date_fr": "16 janvier 2026",
+   "date_en": "January 16, 2026"
+  },
+  {
+   "iso": "2026-01-15T12:00:00Z",
+   "tz": "America/St_Johns",
+   "ms": 1768478400000,
+   "tz_retenu": "America/St_Johns",
+   "decalage": -210,
+   "decalage_standard": -210,
+   "local": [
+    2026,
+    1,
+    15,
+    8,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    1,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461056.0,
+   "jour_local": 14,
+   "jour_tu": 14.5,
+   "meridien": -52.5,
+   "solaire_meridien": [
+    14,
+    8.5
+   ],
+   "solaire_paris": [
+    14,
+    12.156666666666666
+   ],
+   "tsl_paris": 19.820183030546954,
+   "annee_decimale": 2026.0397260273974,
+   "elongation_lune": 322.68006943460205,
+   "texte_fr": "08:30 heure de St Johns (UTC−3:30) · 12:00 TU",
+   "texte_en": "08:30 St Johns time (UTC−3:30) · 12:00 UT",
+   "date_fr": "15 janvier 2026",
+   "date_en": "January 15, 2026"
+  },
+  {
+   "iso": "2026-01-15T12:00:00Z",
+   "tz": "Asia/Kathmandu",
+   "ms": 1768478400000,
+   "tz_retenu": "Asia/Kathmandu",
+   "decalage": 345,
+   "decalage_standard": 345,
+   "local": [
+    2026,
+    1,
+    15,
+    17,
+    45,
+    0
+   ],
+   "tu": [
+    2026,
+    1,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461056.0,
+   "jour_local": 14,
+   "jour_tu": 14.5,
+   "meridien": 86.25,
+   "solaire_meridien": [
+    14,
+    17.75
+   ],
+   "solaire_paris": [
+    14,
+    12.156666666666666
+   ],
+   "tsl_paris": 19.820183030546954,
+   "annee_decimale": 2026.0397260273974,
+   "elongation_lune": 322.68006943460205,
+   "texte_fr": "17:45 heure de Kathmandu (UTC+5:45) · 12:00 TU",
+   "texte_en": "17:45 Kathmandu time (UTC+5:45) · 12:00 UT",
+   "date_fr": "15 janvier 2026",
+   "date_en": "January 15, 2026"
+  },
+  {
+   "iso": "2026-01-15T12:00:00Z",
+   "tz": "America/New_York",
+   "ms": 1768478400000,
+   "tz_retenu": "America/New_York",
+   "decalage": -300,
+   "decalage_standard": -300,
+   "local": [
+    2026,
+    1,
+    15,
+    7,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    1,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461056.0,
+   "jour_local": 14,
+   "jour_tu": 14.5,
+   "meridien": -75.0,
+   "solaire_meridien": [
+    14,
+    7.0
+   ],
+   "solaire_paris": [
+    14,
+    12.156666666666666
+   ],
+   "tsl_paris": 19.820183030546954,
+   "annee_decimale": 2026.0397260273974,
+   "elongation_lune": 322.68006943460205,
+   "texte_fr": "07:00 heure de New York (UTC−5) · 12:00 TU",
+   "texte_en": "07:00 New York time (UTC−5) · 12:00 UT",
+   "date_fr": "15 janvier 2026",
+   "date_en": "January 15, 2026"
+  },
+  {
+   "iso": "2026-01-15T12:00:00Z",
+   "tz": "Australia/Lord_Howe",
+   "ms": 1768478400000,
+   "tz_retenu": "Australia/Lord_Howe",
+   "decalage": 660,
+   "decalage_standard": 630,
+   "local": [
+    2026,
+    1,
+    15,
+    23,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    1,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461056.0,
+   "jour_local": 14,
+   "jour_tu": 14.5,
+   "meridien": 157.5,
+   "solaire_meridien": [
+    14,
+    22.5
+   ],
+   "solaire_paris": [
+    14,
+    12.156666666666666
+   ],
+   "tsl_paris": 19.820183030546954,
+   "annee_decimale": 2026.0397260273974,
+   "elongation_lune": 322.68006943460205,
+   "texte_fr": "23:00 heure de Lord Howe (UTC+11) · 12:00 TU",
+   "texte_en": "23:00 Lord Howe time (UTC+11) · 12:00 UT",
+   "date_fr": "15 janvier 2026",
+   "date_en": "January 15, 2026"
+  },
+  {
+   "iso": "2026-01-15T12:00:00Z",
+   "tz": "Pacific/Chatham",
+   "ms": 1768478400000,
+   "tz_retenu": "Pacific/Chatham",
+   "decalage": 825,
+   "decalage_standard": 765,
+   "local": [
+    2026,
+    1,
+    16,
+    1,
+    45,
+    0
+   ],
+   "tu": [
+    2026,
+    1,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461056.0,
+   "jour_local": 15,
+   "jour_tu": 14.5,
+   "meridien": 191.25,
+   "solaire_meridien": [
+    15,
+    0.75
+   ],
+   "solaire_paris": [
+    14,
+    12.156666666666666
+   ],
+   "tsl_paris": 19.820183030546954,
+   "annee_decimale": 2026.0397260273974,
+   "elongation_lune": 322.68006943460205,
+   "texte_fr": "01:45 heure de Chatham (UTC+13:45) · 12:00 TU",
+   "texte_en": "01:45 Chatham time (UTC+13:45) · 12:00 UT",
+   "date_fr": "16 janvier 2026",
+   "date_en": "January 16, 2026"
+  },
+  {
+   "iso": "2026-01-15T12:00:00Z",
+   "tz": "Asia/Kolkata",
+   "ms": 1768478400000,
+   "tz_retenu": "Asia/Kolkata",
+   "decalage": 330,
+   "decalage_standard": 330,
+   "local": [
+    2026,
+    1,
+    15,
+    17,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    1,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461056.0,
+   "jour_local": 14,
+   "jour_tu": 14.5,
+   "meridien": 82.5,
+   "solaire_meridien": [
+    14,
+    17.5
+   ],
+   "solaire_paris": [
+    14,
+    12.156666666666666
+   ],
+   "tsl_paris": 19.820183030546954,
+   "annee_decimale": 2026.0397260273974,
+   "elongation_lune": 322.68006943460205,
+   "texte_fr": "17:30 heure de Kolkata (UTC+5:30) · 12:00 TU",
+   "texte_en": "17:30 Kolkata time (UTC+5:30) · 12:00 UT",
+   "date_fr": "15 janvier 2026",
+   "date_en": "January 15, 2026"
+  },
+  {
+   "iso": "2026-01-15T12:00:00Z",
+   "tz": "UTC",
+   "ms": 1768478400000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    1,
+    15,
+    12,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    1,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461056.0,
+   "jour_local": 14,
+   "jour_tu": 14.5,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    14,
+    12.0
+   ],
+   "solaire_paris": [
+    14,
+    12.156666666666666
+   ],
+   "tsl_paris": 19.820183030546954,
+   "annee_decimale": 2026.0397260273974,
+   "elongation_lune": 322.68006943460205,
+   "texte_fr": "12:00 TU",
+   "texte_en": "12:00 UT",
+   "date_fr": "15 janvier 2026",
+   "date_en": "January 15, 2026"
+  },
+  {
+   "iso": "2026-01-15T12:00:00Z",
+   "tz": "Pas/Un_Fuseau",
+   "ms": 1768478400000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    1,
+    15,
+    12,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    1,
+    15,
+    12,
+    0,
+    0
+   ],
+   "jj": 2461056.0,
+   "jour_local": 14,
+   "jour_tu": 14.5,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    14,
+    12.0
+   ],
+   "solaire_paris": [
+    14,
+    12.156666666666666
+   ],
+   "tsl_paris": 19.820183030546954,
+   "annee_decimale": 2026.0397260273974,
+   "elongation_lune": 322.68006943460205,
+   "texte_fr": "12:00 TU",
+   "texte_en": "12:00 UT",
+   "date_fr": "15 janvier 2026",
+   "date_en": "January 15, 2026"
+  },
+  {
+   "iso": "2028-02-29T18:00:00Z",
+   "tz": "Europe/Paris",
+   "ms": 1835460000000,
+   "tz_retenu": "Europe/Paris",
+   "decalage": 60,
+   "decalage_standard": 60,
+   "local": [
+    2028,
+    2,
+    29,
+    19,
+    0,
+    0
+   ],
+   "tu": [
+    2028,
+    2,
+    29,
+    18,
+    0,
+    0
+   ],
+   "jj": 2461831.25,
+   "jour_local": 58,
+   "jour_tu": 58.75,
+   "meridien": 15.0,
+   "solaire_meridien": [
+    58,
+    19.0
+   ],
+   "solaire_paris": [
+    58,
+    18.156666666666666
+   ],
+   "tsl_paris": 4.761724709160626,
+   "annee_decimale": 2028.1632513661202,
+   "elongation_lune": 47.42226958331594,
+   "texte_fr": "19:00 heure de Paris (UTC+1) · 18:00 TU",
+   "texte_en": "19:00 Paris time (UTC+1) · 18:00 UT",
+   "date_fr": "29 février 2028",
+   "date_en": "February 29, 2028"
+  },
+  {
+   "iso": "2028-02-29T18:00:00Z",
+   "tz": "Europe/London",
+   "ms": 1835460000000,
+   "tz_retenu": "Europe/London",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2028,
+    2,
+    29,
+    18,
+    0,
+    0
+   ],
+   "tu": [
+    2028,
+    2,
+    29,
+    18,
+    0,
+    0
+   ],
+   "jj": 2461831.25,
+   "jour_local": 58,
+   "jour_tu": 58.75,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    58,
+    18.0
+   ],
+   "solaire_paris": [
+    58,
+    18.156666666666666
+   ],
+   "tsl_paris": 4.761724709160626,
+   "annee_decimale": 2028.1632513661202,
+   "elongation_lune": 47.42226958331594,
+   "texte_fr": "18:00 heure de London (UTC) · 18:00 TU",
+   "texte_en": "18:00 London time (UTC) · 18:00 UT",
+   "date_fr": "29 février 2028",
+   "date_en": "February 29, 2028"
+  },
+  {
+   "iso": "2028-02-29T18:00:00Z",
+   "tz": "Pacific/Auckland",
+   "ms": 1835460000000,
+   "tz_retenu": "Pacific/Auckland",
+   "decalage": 780,
+   "decalage_standard": 720,
+   "local": [
+    2028,
+    3,
+    1,
+    7,
+    0,
+    0
+   ],
+   "tu": [
+    2028,
+    2,
+    29,
+    18,
+    0,
+    0
+   ],
+   "jj": 2461831.25,
+   "jour_local": 59,
+   "jour_tu": 58.75,
+   "meridien": 180.0,
+   "solaire_meridien": [
+    59,
+    6.0
+   ],
+   "solaire_paris": [
+    58,
+    18.156666666666666
+   ],
+   "tsl_paris": 4.761724709160626,
+   "annee_decimale": 2028.1632513661202,
+   "elongation_lune": 47.42226958331594,
+   "texte_fr": "07:00 heure d’Auckland (UTC+13) · 18:00 TU",
+   "texte_en": "07:00 Auckland time (UTC+13) · 18:00 UT",
+   "date_fr": "1 mars 2028",
+   "date_en": "March 1, 2028"
+  },
+  {
+   "iso": "2028-02-29T18:00:00Z",
+   "tz": "America/St_Johns",
+   "ms": 1835460000000,
+   "tz_retenu": "America/St_Johns",
+   "decalage": -210,
+   "decalage_standard": -210,
+   "local": [
+    2028,
+    2,
+    29,
+    14,
+    30,
+    0
+   ],
+   "tu": [
+    2028,
+    2,
+    29,
+    18,
+    0,
+    0
+   ],
+   "jj": 2461831.25,
+   "jour_local": 58,
+   "jour_tu": 58.75,
+   "meridien": -52.5,
+   "solaire_meridien": [
+    58,
+    14.5
+   ],
+   "solaire_paris": [
+    58,
+    18.156666666666666
+   ],
+   "tsl_paris": 4.761724709160626,
+   "annee_decimale": 2028.1632513661202,
+   "elongation_lune": 47.42226958331594,
+   "texte_fr": "14:30 heure de St Johns (UTC−3:30) · 18:00 TU",
+   "texte_en": "14:30 St Johns time (UTC−3:30) · 18:00 UT",
+   "date_fr": "29 février 2028",
+   "date_en": "February 29, 2028"
+  },
+  {
+   "iso": "2028-02-29T18:00:00Z",
+   "tz": "Asia/Kathmandu",
+   "ms": 1835460000000,
+   "tz_retenu": "Asia/Kathmandu",
+   "decalage": 345,
+   "decalage_standard": 345,
+   "local": [
+    2028,
+    2,
+    29,
+    23,
+    45,
+    0
+   ],
+   "tu": [
+    2028,
+    2,
+    29,
+    18,
+    0,
+    0
+   ],
+   "jj": 2461831.25,
+   "jour_local": 58,
+   "jour_tu": 58.75,
+   "meridien": 86.25,
+   "solaire_meridien": [
+    58,
+    23.75
+   ],
+   "solaire_paris": [
+    58,
+    18.156666666666666
+   ],
+   "tsl_paris": 4.761724709160626,
+   "annee_decimale": 2028.1632513661202,
+   "elongation_lune": 47.42226958331594,
+   "texte_fr": "23:45 heure de Kathmandu (UTC+5:45) · 18:00 TU",
+   "texte_en": "23:45 Kathmandu time (UTC+5:45) · 18:00 UT",
+   "date_fr": "29 février 2028",
+   "date_en": "February 29, 2028"
+  },
+  {
+   "iso": "2028-02-29T18:00:00Z",
+   "tz": "America/New_York",
+   "ms": 1835460000000,
+   "tz_retenu": "America/New_York",
+   "decalage": -300,
+   "decalage_standard": -300,
+   "local": [
+    2028,
+    2,
+    29,
+    13,
+    0,
+    0
+   ],
+   "tu": [
+    2028,
+    2,
+    29,
+    18,
+    0,
+    0
+   ],
+   "jj": 2461831.25,
+   "jour_local": 58,
+   "jour_tu": 58.75,
+   "meridien": -75.0,
+   "solaire_meridien": [
+    58,
+    13.0
+   ],
+   "solaire_paris": [
+    58,
+    18.156666666666666
+   ],
+   "tsl_paris": 4.761724709160626,
+   "annee_decimale": 2028.1632513661202,
+   "elongation_lune": 47.42226958331594,
+   "texte_fr": "13:00 heure de New York (UTC−5) · 18:00 TU",
+   "texte_en": "13:00 New York time (UTC−5) · 18:00 UT",
+   "date_fr": "29 février 2028",
+   "date_en": "February 29, 2028"
+  },
+  {
+   "iso": "2028-02-29T18:00:00Z",
+   "tz": "Australia/Lord_Howe",
+   "ms": 1835460000000,
+   "tz_retenu": "Australia/Lord_Howe",
+   "decalage": 660,
+   "decalage_standard": 630,
+   "local": [
+    2028,
+    3,
+    1,
+    5,
+    0,
+    0
+   ],
+   "tu": [
+    2028,
+    2,
+    29,
+    18,
+    0,
+    0
+   ],
+   "jj": 2461831.25,
+   "jour_local": 59,
+   "jour_tu": 58.75,
+   "meridien": 157.5,
+   "solaire_meridien": [
+    59,
+    4.5
+   ],
+   "solaire_paris": [
+    58,
+    18.156666666666666
+   ],
+   "tsl_paris": 4.761724709160626,
+   "annee_decimale": 2028.1632513661202,
+   "elongation_lune": 47.42226958331594,
+   "texte_fr": "05:00 heure de Lord Howe (UTC+11) · 18:00 TU",
+   "texte_en": "05:00 Lord Howe time (UTC+11) · 18:00 UT",
+   "date_fr": "1 mars 2028",
+   "date_en": "March 1, 2028"
+  },
+  {
+   "iso": "2028-02-29T18:00:00Z",
+   "tz": "Pacific/Chatham",
+   "ms": 1835460000000,
+   "tz_retenu": "Pacific/Chatham",
+   "decalage": 825,
+   "decalage_standard": 765,
+   "local": [
+    2028,
+    3,
+    1,
+    7,
+    45,
+    0
+   ],
+   "tu": [
+    2028,
+    2,
+    29,
+    18,
+    0,
+    0
+   ],
+   "jj": 2461831.25,
+   "jour_local": 59,
+   "jour_tu": 58.75,
+   "meridien": 191.25,
+   "solaire_meridien": [
+    59,
+    6.75
+   ],
+   "solaire_paris": [
+    58,
+    18.156666666666666
+   ],
+   "tsl_paris": 4.761724709160626,
+   "annee_decimale": 2028.1632513661202,
+   "elongation_lune": 47.42226958331594,
+   "texte_fr": "07:45 heure de Chatham (UTC+13:45) · 18:00 TU",
+   "texte_en": "07:45 Chatham time (UTC+13:45) · 18:00 UT",
+   "date_fr": "1 mars 2028",
+   "date_en": "March 1, 2028"
+  },
+  {
+   "iso": "2028-02-29T18:00:00Z",
+   "tz": "Asia/Kolkata",
+   "ms": 1835460000000,
+   "tz_retenu": "Asia/Kolkata",
+   "decalage": 330,
+   "decalage_standard": 330,
+   "local": [
+    2028,
+    2,
+    29,
+    23,
+    30,
+    0
+   ],
+   "tu": [
+    2028,
+    2,
+    29,
+    18,
+    0,
+    0
+   ],
+   "jj": 2461831.25,
+   "jour_local": 58,
+   "jour_tu": 58.75,
+   "meridien": 82.5,
+   "solaire_meridien": [
+    58,
+    23.5
+   ],
+   "solaire_paris": [
+    58,
+    18.156666666666666
+   ],
+   "tsl_paris": 4.761724709160626,
+   "annee_decimale": 2028.1632513661202,
+   "elongation_lune": 47.42226958331594,
+   "texte_fr": "23:30 heure de Kolkata (UTC+5:30) · 18:00 TU",
+   "texte_en": "23:30 Kolkata time (UTC+5:30) · 18:00 UT",
+   "date_fr": "29 février 2028",
+   "date_en": "February 29, 2028"
+  },
+  {
+   "iso": "2028-02-29T18:00:00Z",
+   "tz": "UTC",
+   "ms": 1835460000000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2028,
+    2,
+    29,
+    18,
+    0,
+    0
+   ],
+   "tu": [
+    2028,
+    2,
+    29,
+    18,
+    0,
+    0
+   ],
+   "jj": 2461831.25,
+   "jour_local": 58,
+   "jour_tu": 58.75,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    58,
+    18.0
+   ],
+   "solaire_paris": [
+    58,
+    18.156666666666666
+   ],
+   "tsl_paris": 4.761724709160626,
+   "annee_decimale": 2028.1632513661202,
+   "elongation_lune": 47.42226958331594,
+   "texte_fr": "18:00 TU",
+   "texte_en": "18:00 UT",
+   "date_fr": "29 février 2028",
+   "date_en": "February 29, 2028"
+  },
+  {
+   "iso": "2028-02-29T18:00:00Z",
+   "tz": "Pas/Un_Fuseau",
+   "ms": 1835460000000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2028,
+    2,
+    29,
+    18,
+    0,
+    0
+   ],
+   "tu": [
+    2028,
+    2,
+    29,
+    18,
+    0,
+    0
+   ],
+   "jj": 2461831.25,
+   "jour_local": 58,
+   "jour_tu": 58.75,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    58,
+    18.0
+   ],
+   "solaire_paris": [
+    58,
+    18.156666666666666
+   ],
+   "tsl_paris": 4.761724709160626,
+   "annee_decimale": 2028.1632513661202,
+   "elongation_lune": 47.42226958331594,
+   "texte_fr": "18:00 TU",
+   "texte_en": "18:00 UT",
+   "date_fr": "29 février 2028",
+   "date_en": "February 29, 2028"
+  },
+  {
+   "iso": "2026-11-01T05:59:00Z",
+   "tz": "Europe/Paris",
+   "ms": 1793512740000,
+   "tz_retenu": "Europe/Paris",
+   "decalage": 60,
+   "decalage_standard": 60,
+   "local": [
+    2026,
+    11,
+    1,
+    6,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    5,
+    59,
+    0
+   ],
+   "jj": 2461345.7493055556,
+   "jour_local": 304,
+   "jour_tu": 304.24930555555557,
+   "meridien": 15.0,
+   "solaire_meridien": [
+    304,
+    6.983333333333333
+   ],
+   "solaire_paris": [
+    304,
+    6.140000000000001
+   ],
+   "tsl_paris": 8.842892467044294,
+   "annee_decimale": 2026.833559741248,
+   "elongation_lune": 262.06191394913185,
+   "texte_fr": "06:59 heure de Paris (UTC+1) · 05:59 TU",
+   "texte_en": "06:59 Paris time (UTC+1) · 05:59 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T05:59:00Z",
+   "tz": "Europe/London",
+   "ms": 1793512740000,
+   "tz_retenu": "Europe/London",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    11,
+    1,
+    5,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    5,
+    59,
+    0
+   ],
+   "jj": 2461345.7493055556,
+   "jour_local": 304,
+   "jour_tu": 304.24930555555557,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    304,
+    5.983333333333333
+   ],
+   "solaire_paris": [
+    304,
+    6.140000000000001
+   ],
+   "tsl_paris": 8.842892467044294,
+   "annee_decimale": 2026.833559741248,
+   "elongation_lune": 262.06191394913185,
+   "texte_fr": "05:59 heure de London (UTC) · 05:59 TU",
+   "texte_en": "05:59 London time (UTC) · 05:59 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T05:59:00Z",
+   "tz": "Pacific/Auckland",
+   "ms": 1793512740000,
+   "tz_retenu": "Pacific/Auckland",
+   "decalage": 780,
+   "decalage_standard": 720,
+   "local": [
+    2026,
+    11,
+    1,
+    18,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    5,
+    59,
+    0
+   ],
+   "jj": 2461345.7493055556,
+   "jour_local": 304,
+   "jour_tu": 304.24930555555557,
+   "meridien": 180.0,
+   "solaire_meridien": [
+    304,
+    17.983333333333334
+   ],
+   "solaire_paris": [
+    304,
+    6.140000000000001
+   ],
+   "tsl_paris": 8.842892467044294,
+   "annee_decimale": 2026.833559741248,
+   "elongation_lune": 262.06191394913185,
+   "texte_fr": "18:59 heure d’Auckland (UTC+13) · 05:59 TU",
+   "texte_en": "18:59 Auckland time (UTC+13) · 05:59 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T05:59:00Z",
+   "tz": "America/St_Johns",
+   "ms": 1793512740000,
+   "tz_retenu": "America/St_Johns",
+   "decalage": -210,
+   "decalage_standard": -210,
+   "local": [
+    2026,
+    11,
+    1,
+    2,
+    29,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    5,
+    59,
+    0
+   ],
+   "jj": 2461345.7493055556,
+   "jour_local": 304,
+   "jour_tu": 304.24930555555557,
+   "meridien": -52.5,
+   "solaire_meridien": [
+    304,
+    2.4833333333333334
+   ],
+   "solaire_paris": [
+    304,
+    6.140000000000001
+   ],
+   "tsl_paris": 8.842892467044294,
+   "annee_decimale": 2026.833559741248,
+   "elongation_lune": 262.06191394913185,
+   "texte_fr": "02:29 heure de St Johns (UTC−3:30) · 05:59 TU",
+   "texte_en": "02:29 St Johns time (UTC−3:30) · 05:59 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T05:59:00Z",
+   "tz": "Asia/Kathmandu",
+   "ms": 1793512740000,
+   "tz_retenu": "Asia/Kathmandu",
+   "decalage": 345,
+   "decalage_standard": 345,
+   "local": [
+    2026,
+    11,
+    1,
+    11,
+    44,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    5,
+    59,
+    0
+   ],
+   "jj": 2461345.7493055556,
+   "jour_local": 304,
+   "jour_tu": 304.24930555555557,
+   "meridien": 86.25,
+   "solaire_meridien": [
+    304,
+    11.733333333333333
+   ],
+   "solaire_paris": [
+    304,
+    6.140000000000001
+   ],
+   "tsl_paris": 8.842892467044294,
+   "annee_decimale": 2026.833559741248,
+   "elongation_lune": 262.06191394913185,
+   "texte_fr": "11:44 heure de Kathmandu (UTC+5:45) · 05:59 TU",
+   "texte_en": "11:44 Kathmandu time (UTC+5:45) · 05:59 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T05:59:00Z",
+   "tz": "America/New_York",
+   "ms": 1793512740000,
+   "tz_retenu": "America/New_York",
+   "decalage": -240,
+   "decalage_standard": -300,
+   "local": [
+    2026,
+    11,
+    1,
+    1,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    5,
+    59,
+    0
+   ],
+   "jj": 2461345.7493055556,
+   "jour_local": 304,
+   "jour_tu": 304.24930555555557,
+   "meridien": -75.0,
+   "solaire_meridien": [
+    304,
+    0.9833333333333333
+   ],
+   "solaire_paris": [
+    304,
+    6.140000000000001
+   ],
+   "tsl_paris": 8.842892467044294,
+   "annee_decimale": 2026.833559741248,
+   "elongation_lune": 262.06191394913185,
+   "texte_fr": "01:59 heure de New York (UTC−4) · 05:59 TU",
+   "texte_en": "01:59 New York time (UTC−4) · 05:59 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T05:59:00Z",
+   "tz": "Australia/Lord_Howe",
+   "ms": 1793512740000,
+   "tz_retenu": "Australia/Lord_Howe",
+   "decalage": 660,
+   "decalage_standard": 630,
+   "local": [
+    2026,
+    11,
+    1,
+    16,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    5,
+    59,
+    0
+   ],
+   "jj": 2461345.7493055556,
+   "jour_local": 304,
+   "jour_tu": 304.24930555555557,
+   "meridien": 157.5,
+   "solaire_meridien": [
+    304,
+    16.483333333333334
+   ],
+   "solaire_paris": [
+    304,
+    6.140000000000001
+   ],
+   "tsl_paris": 8.842892467044294,
+   "annee_decimale": 2026.833559741248,
+   "elongation_lune": 262.06191394913185,
+   "texte_fr": "16:59 heure de Lord Howe (UTC+11) · 05:59 TU",
+   "texte_en": "16:59 Lord Howe time (UTC+11) · 05:59 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T05:59:00Z",
+   "tz": "Pacific/Chatham",
+   "ms": 1793512740000,
+   "tz_retenu": "Pacific/Chatham",
+   "decalage": 825,
+   "decalage_standard": 765,
+   "local": [
+    2026,
+    11,
+    1,
+    19,
+    44,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    5,
+    59,
+    0
+   ],
+   "jj": 2461345.7493055556,
+   "jour_local": 304,
+   "jour_tu": 304.24930555555557,
+   "meridien": 191.25,
+   "solaire_meridien": [
+    304,
+    18.733333333333334
+   ],
+   "solaire_paris": [
+    304,
+    6.140000000000001
+   ],
+   "tsl_paris": 8.842892467044294,
+   "annee_decimale": 2026.833559741248,
+   "elongation_lune": 262.06191394913185,
+   "texte_fr": "19:44 heure de Chatham (UTC+13:45) · 05:59 TU",
+   "texte_en": "19:44 Chatham time (UTC+13:45) · 05:59 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T05:59:00Z",
+   "tz": "Asia/Kolkata",
+   "ms": 1793512740000,
+   "tz_retenu": "Asia/Kolkata",
+   "decalage": 330,
+   "decalage_standard": 330,
+   "local": [
+    2026,
+    11,
+    1,
+    11,
+    29,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    5,
+    59,
+    0
+   ],
+   "jj": 2461345.7493055556,
+   "jour_local": 304,
+   "jour_tu": 304.24930555555557,
+   "meridien": 82.5,
+   "solaire_meridien": [
+    304,
+    11.483333333333333
+   ],
+   "solaire_paris": [
+    304,
+    6.140000000000001
+   ],
+   "tsl_paris": 8.842892467044294,
+   "annee_decimale": 2026.833559741248,
+   "elongation_lune": 262.06191394913185,
+   "texte_fr": "11:29 heure de Kolkata (UTC+5:30) · 05:59 TU",
+   "texte_en": "11:29 Kolkata time (UTC+5:30) · 05:59 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T05:59:00Z",
+   "tz": "UTC",
+   "ms": 1793512740000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    11,
+    1,
+    5,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    5,
+    59,
+    0
+   ],
+   "jj": 2461345.7493055556,
+   "jour_local": 304,
+   "jour_tu": 304.24930555555557,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    304,
+    5.983333333333333
+   ],
+   "solaire_paris": [
+    304,
+    6.140000000000001
+   ],
+   "tsl_paris": 8.842892467044294,
+   "annee_decimale": 2026.833559741248,
+   "elongation_lune": 262.06191394913185,
+   "texte_fr": "05:59 TU",
+   "texte_en": "05:59 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T05:59:00Z",
+   "tz": "Pas/Un_Fuseau",
+   "ms": 1793512740000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    11,
+    1,
+    5,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    5,
+    59,
+    0
+   ],
+   "jj": 2461345.7493055556,
+   "jour_local": 304,
+   "jour_tu": 304.24930555555557,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    304,
+    5.983333333333333
+   ],
+   "solaire_paris": [
+    304,
+    6.140000000000001
+   ],
+   "tsl_paris": 8.842892467044294,
+   "annee_decimale": 2026.833559741248,
+   "elongation_lune": 262.06191394913185,
+   "texte_fr": "05:59 TU",
+   "texte_en": "05:59 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T06:00:00Z",
+   "tz": "Europe/Paris",
+   "ms": 1793512800000,
+   "tz_retenu": "Europe/Paris",
+   "decalage": 60,
+   "decalage_standard": 60,
+   "local": [
+    2026,
+    11,
+    1,
+    7,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    6,
+    0,
+    0
+   ],
+   "jj": 2461345.75,
+   "jour_local": 304,
+   "jour_tu": 304.25,
+   "meridien": 15.0,
+   "solaire_meridien": [
+    304,
+    7.0
+   ],
+   "solaire_paris": [
+    304,
+    6.156666666666667
+   ],
+   "tsl_paris": 8.859604764543473,
+   "annee_decimale": 2026.8335616438355,
+   "elongation_lune": 262.07099531494896,
+   "texte_fr": "07:00 heure de Paris (UTC+1) · 06:00 TU",
+   "texte_en": "07:00 Paris time (UTC+1) · 06:00 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T06:00:00Z",
+   "tz": "Europe/London",
+   "ms": 1793512800000,
+   "tz_retenu": "Europe/London",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    11,
+    1,
+    6,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    6,
+    0,
+    0
+   ],
+   "jj": 2461345.75,
+   "jour_local": 304,
+   "jour_tu": 304.25,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    304,
+    6.0
+   ],
+   "solaire_paris": [
+    304,
+    6.156666666666667
+   ],
+   "tsl_paris": 8.859604764543473,
+   "annee_decimale": 2026.8335616438355,
+   "elongation_lune": 262.07099531494896,
+   "texte_fr": "06:00 heure de London (UTC) · 06:00 TU",
+   "texte_en": "06:00 London time (UTC) · 06:00 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T06:00:00Z",
+   "tz": "Pacific/Auckland",
+   "ms": 1793512800000,
+   "tz_retenu": "Pacific/Auckland",
+   "decalage": 780,
+   "decalage_standard": 720,
+   "local": [
+    2026,
+    11,
+    1,
+    19,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    6,
+    0,
+    0
+   ],
+   "jj": 2461345.75,
+   "jour_local": 304,
+   "jour_tu": 304.25,
+   "meridien": 180.0,
+   "solaire_meridien": [
+    304,
+    18.0
+   ],
+   "solaire_paris": [
+    304,
+    6.156666666666667
+   ],
+   "tsl_paris": 8.859604764543473,
+   "annee_decimale": 2026.8335616438355,
+   "elongation_lune": 262.07099531494896,
+   "texte_fr": "19:00 heure d’Auckland (UTC+13) · 06:00 TU",
+   "texte_en": "19:00 Auckland time (UTC+13) · 06:00 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T06:00:00Z",
+   "tz": "America/St_Johns",
+   "ms": 1793512800000,
+   "tz_retenu": "America/St_Johns",
+   "decalage": -210,
+   "decalage_standard": -210,
+   "local": [
+    2026,
+    11,
+    1,
+    2,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    6,
+    0,
+    0
+   ],
+   "jj": 2461345.75,
+   "jour_local": 304,
+   "jour_tu": 304.25,
+   "meridien": -52.5,
+   "solaire_meridien": [
+    304,
+    2.5
+   ],
+   "solaire_paris": [
+    304,
+    6.156666666666667
+   ],
+   "tsl_paris": 8.859604764543473,
+   "annee_decimale": 2026.8335616438355,
+   "elongation_lune": 262.07099531494896,
+   "texte_fr": "02:30 heure de St Johns (UTC−3:30) · 06:00 TU",
+   "texte_en": "02:30 St Johns time (UTC−3:30) · 06:00 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T06:00:00Z",
+   "tz": "Asia/Kathmandu",
+   "ms": 1793512800000,
+   "tz_retenu": "Asia/Kathmandu",
+   "decalage": 345,
+   "decalage_standard": 345,
+   "local": [
+    2026,
+    11,
+    1,
+    11,
+    45,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    6,
+    0,
+    0
+   ],
+   "jj": 2461345.75,
+   "jour_local": 304,
+   "jour_tu": 304.25,
+   "meridien": 86.25,
+   "solaire_meridien": [
+    304,
+    11.75
+   ],
+   "solaire_paris": [
+    304,
+    6.156666666666667
+   ],
+   "tsl_paris": 8.859604764543473,
+   "annee_decimale": 2026.8335616438355,
+   "elongation_lune": 262.07099531494896,
+   "texte_fr": "11:45 heure de Kathmandu (UTC+5:45) · 06:00 TU",
+   "texte_en": "11:45 Kathmandu time (UTC+5:45) · 06:00 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T06:00:00Z",
+   "tz": "America/New_York",
+   "ms": 1793512800000,
+   "tz_retenu": "America/New_York",
+   "decalage": -300,
+   "decalage_standard": -300,
+   "local": [
+    2026,
+    11,
+    1,
+    1,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    6,
+    0,
+    0
+   ],
+   "jj": 2461345.75,
+   "jour_local": 304,
+   "jour_tu": 304.25,
+   "meridien": -75.0,
+   "solaire_meridien": [
+    304,
+    1.0
+   ],
+   "solaire_paris": [
+    304,
+    6.156666666666667
+   ],
+   "tsl_paris": 8.859604764543473,
+   "annee_decimale": 2026.8335616438355,
+   "elongation_lune": 262.07099531494896,
+   "texte_fr": "01:00 heure de New York (UTC−5) · 06:00 TU",
+   "texte_en": "01:00 New York time (UTC−5) · 06:00 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T06:00:00Z",
+   "tz": "Australia/Lord_Howe",
+   "ms": 1793512800000,
+   "tz_retenu": "Australia/Lord_Howe",
+   "decalage": 660,
+   "decalage_standard": 630,
+   "local": [
+    2026,
+    11,
+    1,
+    17,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    6,
+    0,
+    0
+   ],
+   "jj": 2461345.75,
+   "jour_local": 304,
+   "jour_tu": 304.25,
+   "meridien": 157.5,
+   "solaire_meridien": [
+    304,
+    16.5
+   ],
+   "solaire_paris": [
+    304,
+    6.156666666666667
+   ],
+   "tsl_paris": 8.859604764543473,
+   "annee_decimale": 2026.8335616438355,
+   "elongation_lune": 262.07099531494896,
+   "texte_fr": "17:00 heure de Lord Howe (UTC+11) · 06:00 TU",
+   "texte_en": "17:00 Lord Howe time (UTC+11) · 06:00 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T06:00:00Z",
+   "tz": "Pacific/Chatham",
+   "ms": 1793512800000,
+   "tz_retenu": "Pacific/Chatham",
+   "decalage": 825,
+   "decalage_standard": 765,
+   "local": [
+    2026,
+    11,
+    1,
+    19,
+    45,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    6,
+    0,
+    0
+   ],
+   "jj": 2461345.75,
+   "jour_local": 304,
+   "jour_tu": 304.25,
+   "meridien": 191.25,
+   "solaire_meridien": [
+    304,
+    18.75
+   ],
+   "solaire_paris": [
+    304,
+    6.156666666666667
+   ],
+   "tsl_paris": 8.859604764543473,
+   "annee_decimale": 2026.8335616438355,
+   "elongation_lune": 262.07099531494896,
+   "texte_fr": "19:45 heure de Chatham (UTC+13:45) · 06:00 TU",
+   "texte_en": "19:45 Chatham time (UTC+13:45) · 06:00 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T06:00:00Z",
+   "tz": "Asia/Kolkata",
+   "ms": 1793512800000,
+   "tz_retenu": "Asia/Kolkata",
+   "decalage": 330,
+   "decalage_standard": 330,
+   "local": [
+    2026,
+    11,
+    1,
+    11,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    6,
+    0,
+    0
+   ],
+   "jj": 2461345.75,
+   "jour_local": 304,
+   "jour_tu": 304.25,
+   "meridien": 82.5,
+   "solaire_meridien": [
+    304,
+    11.5
+   ],
+   "solaire_paris": [
+    304,
+    6.156666666666667
+   ],
+   "tsl_paris": 8.859604764543473,
+   "annee_decimale": 2026.8335616438355,
+   "elongation_lune": 262.07099531494896,
+   "texte_fr": "11:30 heure de Kolkata (UTC+5:30) · 06:00 TU",
+   "texte_en": "11:30 Kolkata time (UTC+5:30) · 06:00 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T06:00:00Z",
+   "tz": "UTC",
+   "ms": 1793512800000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    11,
+    1,
+    6,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    6,
+    0,
+    0
+   ],
+   "jj": 2461345.75,
+   "jour_local": 304,
+   "jour_tu": 304.25,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    304,
+    6.0
+   ],
+   "solaire_paris": [
+    304,
+    6.156666666666667
+   ],
+   "tsl_paris": 8.859604764543473,
+   "annee_decimale": 2026.8335616438355,
+   "elongation_lune": 262.07099531494896,
+   "texte_fr": "06:00 TU",
+   "texte_en": "06:00 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-11-01T06:00:00Z",
+   "tz": "Pas/Un_Fuseau",
+   "ms": 1793512800000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    11,
+    1,
+    6,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    11,
+    1,
+    6,
+    0,
+    0
+   ],
+   "jj": 2461345.75,
+   "jour_local": 304,
+   "jour_tu": 304.25,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    304,
+    6.0
+   ],
+   "solaire_paris": [
+    304,
+    6.156666666666667
+   ],
+   "tsl_paris": 8.859604764543473,
+   "annee_decimale": 2026.8335616438355,
+   "elongation_lune": 262.07099531494896,
+   "texte_fr": "06:00 TU",
+   "texte_en": "06:00 UT",
+   "date_fr": "1 novembre 2026",
+   "date_en": "November 1, 2026"
+  },
+  {
+   "iso": "2026-04-05T13:59:00Z",
+   "tz": "Europe/Paris",
+   "ms": 1775397540000,
+   "tz_retenu": "Europe/Paris",
+   "decalage": 120,
+   "decalage_standard": 60,
+   "local": [
+    2026,
+    4,
+    5,
+    15,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    13,
+    59,
+    0
+   ],
+   "jj": 2461136.082638889,
+   "jour_local": 94,
+   "jour_tu": 94.5826388888889,
+   "meridien": 15.0,
+   "solaire_meridien": [
+    94,
+    14.983333333333333
+   ],
+   "solaire_paris": [
+    94,
+    14.139999999999999
+   ],
+   "tsl_paris": 3.0657325387001038,
+   "annee_decimale": 2026.2591305175038,
+   "elongation_lune": 219.34254622268782,
+   "texte_fr": "15:59 heure de Paris (UTC+2) · 13:59 TU",
+   "texte_en": "15:59 Paris time (UTC+2) · 13:59 UT",
+   "date_fr": "5 avril 2026",
+   "date_en": "April 5, 2026"
+  },
+  {
+   "iso": "2026-04-05T13:59:00Z",
+   "tz": "Europe/London",
+   "ms": 1775397540000,
+   "tz_retenu": "Europe/London",
+   "decalage": 60,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    4,
+    5,
+    14,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    13,
+    59,
+    0
+   ],
+   "jj": 2461136.082638889,
+   "jour_local": 94,
+   "jour_tu": 94.5826388888889,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    94,
+    13.983333333333333
+   ],
+   "solaire_paris": [
+    94,
+    14.139999999999999
+   ],
+   "tsl_paris": 3.0657325387001038,
+   "annee_decimale": 2026.2591305175038,
+   "elongation_lune": 219.34254622268782,
+   "texte_fr": "14:59 heure de London (UTC+1) · 13:59 TU",
+   "texte_en": "14:59 London time (UTC+1) · 13:59 UT",
+   "date_fr": "5 avril 2026",
+   "date_en": "April 5, 2026"
+  },
+  {
+   "iso": "2026-04-05T13:59:00Z",
+   "tz": "Pacific/Auckland",
+   "ms": 1775397540000,
+   "tz_retenu": "Pacific/Auckland",
+   "decalage": 720,
+   "decalage_standard": 720,
+   "local": [
+    2026,
+    4,
+    6,
+    1,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    13,
+    59,
+    0
+   ],
+   "jj": 2461136.082638889,
+   "jour_local": 95,
+   "jour_tu": 94.5826388888889,
+   "meridien": 180.0,
+   "solaire_meridien": [
+    95,
+    1.9833333333333334
+   ],
+   "solaire_paris": [
+    94,
+    14.139999999999999
+   ],
+   "tsl_paris": 3.0657325387001038,
+   "annee_decimale": 2026.2591305175038,
+   "elongation_lune": 219.34254622268782,
+   "texte_fr": "01:59 heure d’Auckland (UTC+12) · 13:59 TU",
+   "texte_en": "01:59 Auckland time (UTC+12) · 13:59 UT",
+   "date_fr": "6 avril 2026",
+   "date_en": "April 6, 2026"
+  },
+  {
+   "iso": "2026-04-05T13:59:00Z",
+   "tz": "America/St_Johns",
+   "ms": 1775397540000,
+   "tz_retenu": "America/St_Johns",
+   "decalage": -150,
+   "decalage_standard": -210,
+   "local": [
+    2026,
+    4,
+    5,
+    11,
+    29,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    13,
+    59,
+    0
+   ],
+   "jj": 2461136.082638889,
+   "jour_local": 94,
+   "jour_tu": 94.5826388888889,
+   "meridien": -52.5,
+   "solaire_meridien": [
+    94,
+    10.483333333333333
+   ],
+   "solaire_paris": [
+    94,
+    14.139999999999999
+   ],
+   "tsl_paris": 3.0657325387001038,
+   "annee_decimale": 2026.2591305175038,
+   "elongation_lune": 219.34254622268782,
+   "texte_fr": "11:29 heure de St Johns (UTC−2:30) · 13:59 TU",
+   "texte_en": "11:29 St Johns time (UTC−2:30) · 13:59 UT",
+   "date_fr": "5 avril 2026",
+   "date_en": "April 5, 2026"
+  },
+  {
+   "iso": "2026-04-05T13:59:00Z",
+   "tz": "Asia/Kathmandu",
+   "ms": 1775397540000,
+   "tz_retenu": "Asia/Kathmandu",
+   "decalage": 345,
+   "decalage_standard": 345,
+   "local": [
+    2026,
+    4,
+    5,
+    19,
+    44,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    13,
+    59,
+    0
+   ],
+   "jj": 2461136.082638889,
+   "jour_local": 94,
+   "jour_tu": 94.5826388888889,
+   "meridien": 86.25,
+   "solaire_meridien": [
+    94,
+    19.733333333333334
+   ],
+   "solaire_paris": [
+    94,
+    14.139999999999999
+   ],
+   "tsl_paris": 3.0657325387001038,
+   "annee_decimale": 2026.2591305175038,
+   "elongation_lune": 219.34254622268782,
+   "texte_fr": "19:44 heure de Kathmandu (UTC+5:45) · 13:59 TU",
+   "texte_en": "19:44 Kathmandu time (UTC+5:45) · 13:59 UT",
+   "date_fr": "5 avril 2026",
+   "date_en": "April 5, 2026"
+  },
+  {
+   "iso": "2026-04-05T13:59:00Z",
+   "tz": "America/New_York",
+   "ms": 1775397540000,
+   "tz_retenu": "America/New_York",
+   "decalage": -240,
+   "decalage_standard": -300,
+   "local": [
+    2026,
+    4,
+    5,
+    9,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    13,
+    59,
+    0
+   ],
+   "jj": 2461136.082638889,
+   "jour_local": 94,
+   "jour_tu": 94.5826388888889,
+   "meridien": -75.0,
+   "solaire_meridien": [
+    94,
+    8.983333333333333
+   ],
+   "solaire_paris": [
+    94,
+    14.139999999999999
+   ],
+   "tsl_paris": 3.0657325387001038,
+   "annee_decimale": 2026.2591305175038,
+   "elongation_lune": 219.34254622268782,
+   "texte_fr": "09:59 heure de New York (UTC−4) · 13:59 TU",
+   "texte_en": "09:59 New York time (UTC−4) · 13:59 UT",
+   "date_fr": "5 avril 2026",
+   "date_en": "April 5, 2026"
+  },
+  {
+   "iso": "2026-04-05T13:59:00Z",
+   "tz": "Australia/Lord_Howe",
+   "ms": 1775397540000,
+   "tz_retenu": "Australia/Lord_Howe",
+   "decalage": 630,
+   "decalage_standard": 630,
+   "local": [
+    2026,
+    4,
+    6,
+    0,
+    29,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    13,
+    59,
+    0
+   ],
+   "jj": 2461136.082638889,
+   "jour_local": 95,
+   "jour_tu": 94.5826388888889,
+   "meridien": 157.5,
+   "solaire_meridien": [
+    95,
+    0.48333333333333334
+   ],
+   "solaire_paris": [
+    94,
+    14.139999999999999
+   ],
+   "tsl_paris": 3.0657325387001038,
+   "annee_decimale": 2026.2591305175038,
+   "elongation_lune": 219.34254622268782,
+   "texte_fr": "00:29 heure de Lord Howe (UTC+10:30) · 13:59 TU",
+   "texte_en": "00:29 Lord Howe time (UTC+10:30) · 13:59 UT",
+   "date_fr": "6 avril 2026",
+   "date_en": "April 6, 2026"
+  },
+  {
+   "iso": "2026-04-05T13:59:00Z",
+   "tz": "Pacific/Chatham",
+   "ms": 1775397540000,
+   "tz_retenu": "Pacific/Chatham",
+   "decalage": 765,
+   "decalage_standard": 765,
+   "local": [
+    2026,
+    4,
+    6,
+    2,
+    44,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    13,
+    59,
+    0
+   ],
+   "jj": 2461136.082638889,
+   "jour_local": 95,
+   "jour_tu": 94.5826388888889,
+   "meridien": 191.25,
+   "solaire_meridien": [
+    95,
+    2.7333333333333334
+   ],
+   "solaire_paris": [
+    94,
+    14.139999999999999
+   ],
+   "tsl_paris": 3.0657325387001038,
+   "annee_decimale": 2026.2591305175038,
+   "elongation_lune": 219.34254622268782,
+   "texte_fr": "02:44 heure de Chatham (UTC+12:45) · 13:59 TU",
+   "texte_en": "02:44 Chatham time (UTC+12:45) · 13:59 UT",
+   "date_fr": "6 avril 2026",
+   "date_en": "April 6, 2026"
+  },
+  {
+   "iso": "2026-04-05T13:59:00Z",
+   "tz": "Asia/Kolkata",
+   "ms": 1775397540000,
+   "tz_retenu": "Asia/Kolkata",
+   "decalage": 330,
+   "decalage_standard": 330,
+   "local": [
+    2026,
+    4,
+    5,
+    19,
+    29,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    13,
+    59,
+    0
+   ],
+   "jj": 2461136.082638889,
+   "jour_local": 94,
+   "jour_tu": 94.5826388888889,
+   "meridien": 82.5,
+   "solaire_meridien": [
+    94,
+    19.483333333333334
+   ],
+   "solaire_paris": [
+    94,
+    14.139999999999999
+   ],
+   "tsl_paris": 3.0657325387001038,
+   "annee_decimale": 2026.2591305175038,
+   "elongation_lune": 219.34254622268782,
+   "texte_fr": "19:29 heure de Kolkata (UTC+5:30) · 13:59 TU",
+   "texte_en": "19:29 Kolkata time (UTC+5:30) · 13:59 UT",
+   "date_fr": "5 avril 2026",
+   "date_en": "April 5, 2026"
+  },
+  {
+   "iso": "2026-04-05T13:59:00Z",
+   "tz": "UTC",
+   "ms": 1775397540000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    4,
+    5,
+    13,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    13,
+    59,
+    0
+   ],
+   "jj": 2461136.082638889,
+   "jour_local": 94,
+   "jour_tu": 94.5826388888889,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    94,
+    13.983333333333333
+   ],
+   "solaire_paris": [
+    94,
+    14.139999999999999
+   ],
+   "tsl_paris": 3.0657325387001038,
+   "annee_decimale": 2026.2591305175038,
+   "elongation_lune": 219.34254622268782,
+   "texte_fr": "13:59 TU",
+   "texte_en": "13:59 UT",
+   "date_fr": "5 avril 2026",
+   "date_en": "April 5, 2026"
+  },
+  {
+   "iso": "2026-04-05T13:59:00Z",
+   "tz": "Pas/Un_Fuseau",
+   "ms": 1775397540000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    4,
+    5,
+    13,
+    59,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    13,
+    59,
+    0
+   ],
+   "jj": 2461136.082638889,
+   "jour_local": 94,
+   "jour_tu": 94.5826388888889,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    94,
+    13.983333333333333
+   ],
+   "solaire_paris": [
+    94,
+    14.139999999999999
+   ],
+   "tsl_paris": 3.0657325387001038,
+   "annee_decimale": 2026.2591305175038,
+   "elongation_lune": 219.34254622268782,
+   "texte_fr": "13:59 TU",
+   "texte_en": "13:59 UT",
+   "date_fr": "5 avril 2026",
+   "date_en": "April 5, 2026"
+  },
+  {
+   "iso": "2026-04-05T14:00:00Z",
+   "tz": "Europe/Paris",
+   "ms": 1775397600000,
+   "tz_retenu": "Europe/Paris",
+   "decalage": 120,
+   "decalage_standard": 60,
+   "local": [
+    2026,
+    4,
+    5,
+    16,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    14,
+    0,
+    0
+   ],
+   "jj": 2461136.0833333335,
+   "jour_local": 94,
+   "jour_tu": 94.58333333333333,
+   "meridien": 15.0,
+   "solaire_meridien": [
+    94,
+    15.0
+   ],
+   "solaire_paris": [
+    94,
+    14.156666666666666
+   ],
+   "tsl_paris": 3.0824448361992838,
+   "annee_decimale": 2026.2591324200914,
+   "elongation_lune": 219.35020376186003,
+   "texte_fr": "16:00 heure de Paris (UTC+2) · 14:00 TU",
+   "texte_en": "16:00 Paris time (UTC+2) · 14:00 UT",
+   "date_fr": "5 avril 2026",
+   "date_en": "April 5, 2026"
+  },
+  {
+   "iso": "2026-04-05T14:00:00Z",
+   "tz": "Europe/London",
+   "ms": 1775397600000,
+   "tz_retenu": "Europe/London",
+   "decalage": 60,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    4,
+    5,
+    15,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    14,
+    0,
+    0
+   ],
+   "jj": 2461136.0833333335,
+   "jour_local": 94,
+   "jour_tu": 94.58333333333333,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    94,
+    14.0
+   ],
+   "solaire_paris": [
+    94,
+    14.156666666666666
+   ],
+   "tsl_paris": 3.0824448361992838,
+   "annee_decimale": 2026.2591324200914,
+   "elongation_lune": 219.35020376186003,
+   "texte_fr": "15:00 heure de London (UTC+1) · 14:00 TU",
+   "texte_en": "15:00 London time (UTC+1) · 14:00 UT",
+   "date_fr": "5 avril 2026",
+   "date_en": "April 5, 2026"
+  },
+  {
+   "iso": "2026-04-05T14:00:00Z",
+   "tz": "Pacific/Auckland",
+   "ms": 1775397600000,
+   "tz_retenu": "Pacific/Auckland",
+   "decalage": 720,
+   "decalage_standard": 720,
+   "local": [
+    2026,
+    4,
+    6,
+    2,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    14,
+    0,
+    0
+   ],
+   "jj": 2461136.0833333335,
+   "jour_local": 95,
+   "jour_tu": 94.58333333333333,
+   "meridien": 180.0,
+   "solaire_meridien": [
+    95,
+    2.0
+   ],
+   "solaire_paris": [
+    94,
+    14.156666666666666
+   ],
+   "tsl_paris": 3.0824448361992838,
+   "annee_decimale": 2026.2591324200914,
+   "elongation_lune": 219.35020376186003,
+   "texte_fr": "02:00 heure d’Auckland (UTC+12) · 14:00 TU",
+   "texte_en": "02:00 Auckland time (UTC+12) · 14:00 UT",
+   "date_fr": "6 avril 2026",
+   "date_en": "April 6, 2026"
+  },
+  {
+   "iso": "2026-04-05T14:00:00Z",
+   "tz": "America/St_Johns",
+   "ms": 1775397600000,
+   "tz_retenu": "America/St_Johns",
+   "decalage": -150,
+   "decalage_standard": -210,
+   "local": [
+    2026,
+    4,
+    5,
+    11,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    14,
+    0,
+    0
+   ],
+   "jj": 2461136.0833333335,
+   "jour_local": 94,
+   "jour_tu": 94.58333333333333,
+   "meridien": -52.5,
+   "solaire_meridien": [
+    94,
+    10.5
+   ],
+   "solaire_paris": [
+    94,
+    14.156666666666666
+   ],
+   "tsl_paris": 3.0824448361992838,
+   "annee_decimale": 2026.2591324200914,
+   "elongation_lune": 219.35020376186003,
+   "texte_fr": "11:30 heure de St Johns (UTC−2:30) · 14:00 TU",
+   "texte_en": "11:30 St Johns time (UTC−2:30) · 14:00 UT",
+   "date_fr": "5 avril 2026",
+   "date_en": "April 5, 2026"
+  },
+  {
+   "iso": "2026-04-05T14:00:00Z",
+   "tz": "Asia/Kathmandu",
+   "ms": 1775397600000,
+   "tz_retenu": "Asia/Kathmandu",
+   "decalage": 345,
+   "decalage_standard": 345,
+   "local": [
+    2026,
+    4,
+    5,
+    19,
+    45,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    14,
+    0,
+    0
+   ],
+   "jj": 2461136.0833333335,
+   "jour_local": 94,
+   "jour_tu": 94.58333333333333,
+   "meridien": 86.25,
+   "solaire_meridien": [
+    94,
+    19.75
+   ],
+   "solaire_paris": [
+    94,
+    14.156666666666666
+   ],
+   "tsl_paris": 3.0824448361992838,
+   "annee_decimale": 2026.2591324200914,
+   "elongation_lune": 219.35020376186003,
+   "texte_fr": "19:45 heure de Kathmandu (UTC+5:45) · 14:00 TU",
+   "texte_en": "19:45 Kathmandu time (UTC+5:45) · 14:00 UT",
+   "date_fr": "5 avril 2026",
+   "date_en": "April 5, 2026"
+  },
+  {
+   "iso": "2026-04-05T14:00:00Z",
+   "tz": "America/New_York",
+   "ms": 1775397600000,
+   "tz_retenu": "America/New_York",
+   "decalage": -240,
+   "decalage_standard": -300,
+   "local": [
+    2026,
+    4,
+    5,
+    10,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    14,
+    0,
+    0
+   ],
+   "jj": 2461136.0833333335,
+   "jour_local": 94,
+   "jour_tu": 94.58333333333333,
+   "meridien": -75.0,
+   "solaire_meridien": [
+    94,
+    9.0
+   ],
+   "solaire_paris": [
+    94,
+    14.156666666666666
+   ],
+   "tsl_paris": 3.0824448361992838,
+   "annee_decimale": 2026.2591324200914,
+   "elongation_lune": 219.35020376186003,
+   "texte_fr": "10:00 heure de New York (UTC−4) · 14:00 TU",
+   "texte_en": "10:00 New York time (UTC−4) · 14:00 UT",
+   "date_fr": "5 avril 2026",
+   "date_en": "April 5, 2026"
+  },
+  {
+   "iso": "2026-04-05T14:00:00Z",
+   "tz": "Australia/Lord_Howe",
+   "ms": 1775397600000,
+   "tz_retenu": "Australia/Lord_Howe",
+   "decalage": 630,
+   "decalage_standard": 630,
+   "local": [
+    2026,
+    4,
+    6,
+    0,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    14,
+    0,
+    0
+   ],
+   "jj": 2461136.0833333335,
+   "jour_local": 95,
+   "jour_tu": 94.58333333333333,
+   "meridien": 157.5,
+   "solaire_meridien": [
+    95,
+    0.5
+   ],
+   "solaire_paris": [
+    94,
+    14.156666666666666
+   ],
+   "tsl_paris": 3.0824448361992838,
+   "annee_decimale": 2026.2591324200914,
+   "elongation_lune": 219.35020376186003,
+   "texte_fr": "00:30 heure de Lord Howe (UTC+10:30) · 14:00 TU",
+   "texte_en": "00:30 Lord Howe time (UTC+10:30) · 14:00 UT",
+   "date_fr": "6 avril 2026",
+   "date_en": "April 6, 2026"
+  },
+  {
+   "iso": "2026-04-05T14:00:00Z",
+   "tz": "Pacific/Chatham",
+   "ms": 1775397600000,
+   "tz_retenu": "Pacific/Chatham",
+   "decalage": 765,
+   "decalage_standard": 765,
+   "local": [
+    2026,
+    4,
+    6,
+    2,
+    45,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    14,
+    0,
+    0
+   ],
+   "jj": 2461136.0833333335,
+   "jour_local": 95,
+   "jour_tu": 94.58333333333333,
+   "meridien": 191.25,
+   "solaire_meridien": [
+    95,
+    2.75
+   ],
+   "solaire_paris": [
+    94,
+    14.156666666666666
+   ],
+   "tsl_paris": 3.0824448361992838,
+   "annee_decimale": 2026.2591324200914,
+   "elongation_lune": 219.35020376186003,
+   "texte_fr": "02:45 heure de Chatham (UTC+12:45) · 14:00 TU",
+   "texte_en": "02:45 Chatham time (UTC+12:45) · 14:00 UT",
+   "date_fr": "6 avril 2026",
+   "date_en": "April 6, 2026"
+  },
+  {
+   "iso": "2026-04-05T14:00:00Z",
+   "tz": "Asia/Kolkata",
+   "ms": 1775397600000,
+   "tz_retenu": "Asia/Kolkata",
+   "decalage": 330,
+   "decalage_standard": 330,
+   "local": [
+    2026,
+    4,
+    5,
+    19,
+    30,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    14,
+    0,
+    0
+   ],
+   "jj": 2461136.0833333335,
+   "jour_local": 94,
+   "jour_tu": 94.58333333333333,
+   "meridien": 82.5,
+   "solaire_meridien": [
+    94,
+    19.5
+   ],
+   "solaire_paris": [
+    94,
+    14.156666666666666
+   ],
+   "tsl_paris": 3.0824448361992838,
+   "annee_decimale": 2026.2591324200914,
+   "elongation_lune": 219.35020376186003,
+   "texte_fr": "19:30 heure de Kolkata (UTC+5:30) · 14:00 TU",
+   "texte_en": "19:30 Kolkata time (UTC+5:30) · 14:00 UT",
+   "date_fr": "5 avril 2026",
+   "date_en": "April 5, 2026"
+  },
+  {
+   "iso": "2026-04-05T14:00:00Z",
+   "tz": "UTC",
+   "ms": 1775397600000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    4,
+    5,
+    14,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    14,
+    0,
+    0
+   ],
+   "jj": 2461136.0833333335,
+   "jour_local": 94,
+   "jour_tu": 94.58333333333333,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    94,
+    14.0
+   ],
+   "solaire_paris": [
+    94,
+    14.156666666666666
+   ],
+   "tsl_paris": 3.0824448361992838,
+   "annee_decimale": 2026.2591324200914,
+   "elongation_lune": 219.35020376186003,
+   "texte_fr": "14:00 TU",
+   "texte_en": "14:00 UT",
+   "date_fr": "5 avril 2026",
+   "date_en": "April 5, 2026"
+  },
+  {
+   "iso": "2026-04-05T14:00:00Z",
+   "tz": "Pas/Un_Fuseau",
+   "ms": 1775397600000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    4,
+    5,
+    14,
+    0,
+    0
+   ],
+   "tu": [
+    2026,
+    4,
+    5,
+    14,
+    0,
+    0
+   ],
+   "jj": 2461136.0833333335,
+   "jour_local": 94,
+   "jour_tu": 94.58333333333333,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    94,
+    14.0
+   ],
+   "solaire_paris": [
+    94,
+    14.156666666666666
+   ],
+   "tsl_paris": 3.0824448361992838,
+   "annee_decimale": 2026.2591324200914,
+   "elongation_lune": 219.35020376186003,
+   "texte_fr": "14:00 TU",
+   "texte_en": "14:00 UT",
+   "date_fr": "5 avril 2026",
+   "date_en": "April 5, 2026"
+  },
+  {
+   "iso": "2026-10-15T07:20:00Z",
+   "tz": "Europe/Paris",
+   "ms": 1792048800000,
+   "tz_retenu": "Europe/Paris",
+   "decalage": 120,
+   "decalage_standard": 60,
+   "local": [
+    2026,
+    10,
+    15,
+    9,
+    20,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    15,
+    7,
+    20,
+    0
+   ],
+   "jj": 2461328.8055555555,
+   "jour_local": 287,
+   "jour_tu": 287.30555555555554,
+   "meridien": 15.0,
+   "solaire_meridien": [
+    287,
+    8.333333333333334
+   ],
+   "solaire_paris": [
+    287,
+    7.49
+   ],
+   "tsl_paris": 9.079521620832384,
+   "annee_decimale": 2026.7871385083713,
+   "elongation_lune": 53.42777244740864,
+   "texte_fr": "09:20 heure de Paris (UTC+2) · 07:20 TU",
+   "texte_en": "09:20 Paris time (UTC+2) · 07:20 UT",
+   "date_fr": "15 octobre 2026",
+   "date_en": "October 15, 2026"
+  },
+  {
+   "iso": "2026-10-15T07:20:00Z",
+   "tz": "Europe/London",
+   "ms": 1792048800000,
+   "tz_retenu": "Europe/London",
+   "decalage": 60,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    10,
+    15,
+    8,
+    20,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    15,
+    7,
+    20,
+    0
+   ],
+   "jj": 2461328.8055555555,
+   "jour_local": 287,
+   "jour_tu": 287.30555555555554,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    287,
+    7.333333333333333
+   ],
+   "solaire_paris": [
+    287,
+    7.49
+   ],
+   "tsl_paris": 9.079521620832384,
+   "annee_decimale": 2026.7871385083713,
+   "elongation_lune": 53.42777244740864,
+   "texte_fr": "08:20 heure de London (UTC+1) · 07:20 TU",
+   "texte_en": "08:20 London time (UTC+1) · 07:20 UT",
+   "date_fr": "15 octobre 2026",
+   "date_en": "October 15, 2026"
+  },
+  {
+   "iso": "2026-10-15T07:20:00Z",
+   "tz": "Pacific/Auckland",
+   "ms": 1792048800000,
+   "tz_retenu": "Pacific/Auckland",
+   "decalage": 780,
+   "decalage_standard": 720,
+   "local": [
+    2026,
+    10,
+    15,
+    20,
+    20,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    15,
+    7,
+    20,
+    0
+   ],
+   "jj": 2461328.8055555555,
+   "jour_local": 287,
+   "jour_tu": 287.30555555555554,
+   "meridien": 180.0,
+   "solaire_meridien": [
+    287,
+    19.333333333333332
+   ],
+   "solaire_paris": [
+    287,
+    7.49
+   ],
+   "tsl_paris": 9.079521620832384,
+   "annee_decimale": 2026.7871385083713,
+   "elongation_lune": 53.42777244740864,
+   "texte_fr": "20:20 heure d’Auckland (UTC+13) · 07:20 TU",
+   "texte_en": "20:20 Auckland time (UTC+13) · 07:20 UT",
+   "date_fr": "15 octobre 2026",
+   "date_en": "October 15, 2026"
+  },
+  {
+   "iso": "2026-10-15T07:20:00Z",
+   "tz": "America/St_Johns",
+   "ms": 1792048800000,
+   "tz_retenu": "America/St_Johns",
+   "decalage": -150,
+   "decalage_standard": -210,
+   "local": [
+    2026,
+    10,
+    15,
+    4,
+    50,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    15,
+    7,
+    20,
+    0
+   ],
+   "jj": 2461328.8055555555,
+   "jour_local": 287,
+   "jour_tu": 287.30555555555554,
+   "meridien": -52.5,
+   "solaire_meridien": [
+    287,
+    3.8333333333333335
+   ],
+   "solaire_paris": [
+    287,
+    7.49
+   ],
+   "tsl_paris": 9.079521620832384,
+   "annee_decimale": 2026.7871385083713,
+   "elongation_lune": 53.42777244740864,
+   "texte_fr": "04:50 heure de St Johns (UTC−2:30) · 07:20 TU",
+   "texte_en": "04:50 St Johns time (UTC−2:30) · 07:20 UT",
+   "date_fr": "15 octobre 2026",
+   "date_en": "October 15, 2026"
+  },
+  {
+   "iso": "2026-10-15T07:20:00Z",
+   "tz": "Asia/Kathmandu",
+   "ms": 1792048800000,
+   "tz_retenu": "Asia/Kathmandu",
+   "decalage": 345,
+   "decalage_standard": 345,
+   "local": [
+    2026,
+    10,
+    15,
+    13,
+    5,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    15,
+    7,
+    20,
+    0
+   ],
+   "jj": 2461328.8055555555,
+   "jour_local": 287,
+   "jour_tu": 287.30555555555554,
+   "meridien": 86.25,
+   "solaire_meridien": [
+    287,
+    13.083333333333334
+   ],
+   "solaire_paris": [
+    287,
+    7.49
+   ],
+   "tsl_paris": 9.079521620832384,
+   "annee_decimale": 2026.7871385083713,
+   "elongation_lune": 53.42777244740864,
+   "texte_fr": "13:05 heure de Kathmandu (UTC+5:45) · 07:20 TU",
+   "texte_en": "13:05 Kathmandu time (UTC+5:45) · 07:20 UT",
+   "date_fr": "15 octobre 2026",
+   "date_en": "October 15, 2026"
+  },
+  {
+   "iso": "2026-10-15T07:20:00Z",
+   "tz": "America/New_York",
+   "ms": 1792048800000,
+   "tz_retenu": "America/New_York",
+   "decalage": -240,
+   "decalage_standard": -300,
+   "local": [
+    2026,
+    10,
+    15,
+    3,
+    20,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    15,
+    7,
+    20,
+    0
+   ],
+   "jj": 2461328.8055555555,
+   "jour_local": 287,
+   "jour_tu": 287.30555555555554,
+   "meridien": -75.0,
+   "solaire_meridien": [
+    287,
+    2.3333333333333335
+   ],
+   "solaire_paris": [
+    287,
+    7.49
+   ],
+   "tsl_paris": 9.079521620832384,
+   "annee_decimale": 2026.7871385083713,
+   "elongation_lune": 53.42777244740864,
+   "texte_fr": "03:20 heure de New York (UTC−4) · 07:20 TU",
+   "texte_en": "03:20 New York time (UTC−4) · 07:20 UT",
+   "date_fr": "15 octobre 2026",
+   "date_en": "October 15, 2026"
+  },
+  {
+   "iso": "2026-10-15T07:20:00Z",
+   "tz": "Australia/Lord_Howe",
+   "ms": 1792048800000,
+   "tz_retenu": "Australia/Lord_Howe",
+   "decalage": 660,
+   "decalage_standard": 630,
+   "local": [
+    2026,
+    10,
+    15,
+    18,
+    20,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    15,
+    7,
+    20,
+    0
+   ],
+   "jj": 2461328.8055555555,
+   "jour_local": 287,
+   "jour_tu": 287.30555555555554,
+   "meridien": 157.5,
+   "solaire_meridien": [
+    287,
+    17.833333333333332
+   ],
+   "solaire_paris": [
+    287,
+    7.49
+   ],
+   "tsl_paris": 9.079521620832384,
+   "annee_decimale": 2026.7871385083713,
+   "elongation_lune": 53.42777244740864,
+   "texte_fr": "18:20 heure de Lord Howe (UTC+11) · 07:20 TU",
+   "texte_en": "18:20 Lord Howe time (UTC+11) · 07:20 UT",
+   "date_fr": "15 octobre 2026",
+   "date_en": "October 15, 2026"
+  },
+  {
+   "iso": "2026-10-15T07:20:00Z",
+   "tz": "Pacific/Chatham",
+   "ms": 1792048800000,
+   "tz_retenu": "Pacific/Chatham",
+   "decalage": 825,
+   "decalage_standard": 765,
+   "local": [
+    2026,
+    10,
+    15,
+    21,
+    5,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    15,
+    7,
+    20,
+    0
+   ],
+   "jj": 2461328.8055555555,
+   "jour_local": 287,
+   "jour_tu": 287.30555555555554,
+   "meridien": 191.25,
+   "solaire_meridien": [
+    287,
+    20.083333333333332
+   ],
+   "solaire_paris": [
+    287,
+    7.49
+   ],
+   "tsl_paris": 9.079521620832384,
+   "annee_decimale": 2026.7871385083713,
+   "elongation_lune": 53.42777244740864,
+   "texte_fr": "21:05 heure de Chatham (UTC+13:45) · 07:20 TU",
+   "texte_en": "21:05 Chatham time (UTC+13:45) · 07:20 UT",
+   "date_fr": "15 octobre 2026",
+   "date_en": "October 15, 2026"
+  },
+  {
+   "iso": "2026-10-15T07:20:00Z",
+   "tz": "Asia/Kolkata",
+   "ms": 1792048800000,
+   "tz_retenu": "Asia/Kolkata",
+   "decalage": 330,
+   "decalage_standard": 330,
+   "local": [
+    2026,
+    10,
+    15,
+    12,
+    50,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    15,
+    7,
+    20,
+    0
+   ],
+   "jj": 2461328.8055555555,
+   "jour_local": 287,
+   "jour_tu": 287.30555555555554,
+   "meridien": 82.5,
+   "solaire_meridien": [
+    287,
+    12.833333333333334
+   ],
+   "solaire_paris": [
+    287,
+    7.49
+   ],
+   "tsl_paris": 9.079521620832384,
+   "annee_decimale": 2026.7871385083713,
+   "elongation_lune": 53.42777244740864,
+   "texte_fr": "12:50 heure de Kolkata (UTC+5:30) · 07:20 TU",
+   "texte_en": "12:50 Kolkata time (UTC+5:30) · 07:20 UT",
+   "date_fr": "15 octobre 2026",
+   "date_en": "October 15, 2026"
+  },
+  {
+   "iso": "2026-10-15T07:20:00Z",
+   "tz": "UTC",
+   "ms": 1792048800000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    10,
+    15,
+    7,
+    20,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    15,
+    7,
+    20,
+    0
+   ],
+   "jj": 2461328.8055555555,
+   "jour_local": 287,
+   "jour_tu": 287.30555555555554,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    287,
+    7.333333333333333
+   ],
+   "solaire_paris": [
+    287,
+    7.49
+   ],
+   "tsl_paris": 9.079521620832384,
+   "annee_decimale": 2026.7871385083713,
+   "elongation_lune": 53.42777244740864,
+   "texte_fr": "07:20 TU",
+   "texte_en": "07:20 UT",
+   "date_fr": "15 octobre 2026",
+   "date_en": "October 15, 2026"
+  },
+  {
+   "iso": "2026-10-15T07:20:00Z",
+   "tz": "Pas/Un_Fuseau",
+   "ms": 1792048800000,
+   "tz_retenu": "UTC",
+   "decalage": 0,
+   "decalage_standard": 0,
+   "local": [
+    2026,
+    10,
+    15,
+    7,
+    20,
+    0
+   ],
+   "tu": [
+    2026,
+    10,
+    15,
+    7,
+    20,
+    0
+   ],
+   "jj": 2461328.8055555555,
+   "jour_local": 287,
+   "jour_tu": 287.30555555555554,
+   "meridien": 0.0,
+   "solaire_meridien": [
+    287,
+    7.333333333333333
+   ],
+   "solaire_paris": [
+    287,
+    7.49
+   ],
+   "tsl_paris": 9.079521620832384,
+   "annee_decimale": 2026.7871385083713,
+   "elongation_lune": 53.42777244740864,
+   "texte_fr": "07:20 TU",
+   "texte_en": "07:20 UT",
+   "date_fr": "15 octobre 2026",
+   "date_en": "October 15, 2026"
+  }
+ ],
+ "libelles": [
+  [
+   0,
+   "UTC"
+  ],
+  [
+   60,
+   "UTC+1"
+  ],
+  [
+   120,
+   "UTC+2"
+  ],
+  [
+   -150,
+   "UTC−2:30"
+  ],
+  [
+   345,
+   "UTC+5:45"
+  ],
+  [
+   780,
+   "UTC+13"
+  ],
+  [
+   -210,
+   "UTC−3:30"
+  ],
+  [
+   825,
+   "UTC+13:45"
+  ],
+  [
+   -600,
+   "UTC−10"
+  ],
+  [
+   30,
+   "UTC+0:30"
+  ]
+ ],
+ "jours": [
+  [
+   1,
+   1,
+   0
+  ],
+  [
+   2,
+   28,
+   58
+  ],
+  [
+   2,
+   29,
+   58
+  ],
+  [
+   3,
+   1,
+   59
+  ],
+  [
+   12,
+   31,
+   364
+  ],
+  [
+   10,
+   25,
+   297
+  ]
+ ]
+}

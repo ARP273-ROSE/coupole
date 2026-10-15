@@ -13,6 +13,7 @@ from PyQt6.QtCore import QPointF, QRectF
 
 from ....core.i18n import tr
 from .. import astro, dessin, scenes
+from ..maintenant import elongation_lune, heure_solaire
 from ..base import Animation, angle, heures_minutes, nombre
 
 PHASES = ('nl', 'pc', 'pq', 'gc', 'pl', 'gd', 'dq', 'dc')
@@ -35,6 +36,18 @@ def temps_depuis_nouvelle(phase: float, mois: float = astro.MOIS_SYNODIQUE_J) ->
 class PhasesLune(Animation):
     ID = 'lunar_applet'
     JOURS_PAR_S = 0.25
+
+    TEMPS = ('phase', 'heure', 'nom_phase')
+    HEURE_SOLAIRE = True
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        # phase réelle de la Lune (élongation) et heure solaire de l'observateur
+        j, h = heure_solaire(m.i, m.lon)
+        self.poser(self.phase, elongation_lune(m.i.jj))
+        self.poser(self.heure, h)
+        if m.lat is not None:
+            self.poser(self.lat, m.lat)
 
     def construire(self):
         self.ciel3d = self.vue(200.0, 25.0, 10.0, 89.0)

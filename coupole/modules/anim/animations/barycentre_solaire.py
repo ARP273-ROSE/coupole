@@ -12,6 +12,7 @@ from PyQt6.QtGui import QPolygonF
 
 from ....core.i18n import tr
 from .. import astro, deux_corps as dc, dessin
+from ..maintenant import annee_decimale
 from ..base import Animation, nombre
 
 PLANETES = ('mercure', 'venus', 'terre', 'mars', 'jupiter', 'saturne', 'uranus', 'neptune')
@@ -23,6 +24,13 @@ PAS_ANS = 0.1
 class BarycentreSolaire(Animation):
     ID = 'ca_extrasolarplanets_starwobble'
     LECTURE_AU_DEPART = True
+
+    TEMPS = ('annee',)
+    PAS_DIRECT = 60
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        self.poser(self.annee, annee_decimale(m.i))
 
     def construire(self):
         self.annee = self.curseur('annee', 1800.0, 2050.0, 2026.0, dec=1)

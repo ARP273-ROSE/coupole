@@ -5,7 +5,6 @@ l'observateur ; positions J2000 (SIMBAD) précessées à la date, temps sidéral
 couleur du ciel (nuit noire sous −7°, comme l'original)."""
 from __future__ import annotations
 
-import datetime
 import math
 
 import numpy as np
@@ -14,7 +13,8 @@ from PyQt6.QtGui import QPainterPath, QPolygonF
 
 from ....core.i18n import tr
 from .. import astro, dessin
-from ..base import Animation, angle, date_du_jour, heures_minutes, jour_de_date
+from ..maintenant import heure_solaire
+from ..base import Animation, angle, date_du_jour, heures_minutes
 from ..etoiles_reelles import couleur_reelle, reelle
 
 ANNEE = 2026
@@ -64,17 +64,22 @@ class HorlogeGrandeOurse(Animation):
     HEURES_PAR_S = 1.0
     FICHES = True
 
+    TEMPS = ('jour', 'heure')
+    HEURE_SOLAIRE = True
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        j, h = heure_solaire(m.i, m.lon)
+        self.poser(self.jour, j)
+        self.poser(self.heure, h)
+        if m.lat is not None:
+            self.poser(self.lat, m.lat)
+
     def construire(self):
         self.jour = self.curseur('jour', 0.0, 364.0, 78.0, dec=0, cle_texte='anim_c_jour')
         self.heure = self.curseur('heure', 0.0, 24.0, 1.2, dec=2, unite='h', cle_texte='anim_c_heure')
         self.lat = self.curseur('latitude', 10.0, 90.0, 41.0, dec=1, unite='°', cle_texte='anim_c_latitude')
         self.c_noms = self.coche('noms', True)
-        self.bouton('anim_dipperclock_maintenant', self.maintenant)
-
-    def maintenant(self):
-        t = datetime.datetime.now()
-        self.jour.setValue(min(364, jour_de_date(t.month, min(t.day, 28) if t.month == 2 else t.day)))
-        self.heure.setValue(t.hour + t.minute / 60.0)
 
     def avancer(self, dt):
         h = self.heure.value() + dt * self.HEURES_PAR_S

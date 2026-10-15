@@ -9,6 +9,7 @@ from PyQt6.QtCore import QPointF, QRectF
 
 from ....core.i18n import tr
 from .. import astro, dessin
+from ..maintenant import heure_solaire
 from ..base import Animation, angle, date_du_jour
 
 ANNEE = 2026
@@ -39,6 +40,14 @@ REMARQUABLES = jours_remarquables()
 class RayonsSoleil(Animation):
     ID = 'sunsrays'
     JOURS_PAR_S = 365.0 / 30.0
+
+    TEMPS = ('jour',)
+    HEURE_SOLAIRE = True
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        j, h = heure_solaire(m.i, m.lon)
+        self.poser(self.jour, j)
 
     def construire(self):
         self.jour = self.curseur('jour', 0.0, 364.0, 79.0, dec=0, cle_texte='anim_c_jour')

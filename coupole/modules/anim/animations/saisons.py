@@ -11,6 +11,7 @@ from PyQt6.QtGui import QPolygonF
 
 from ....core.i18n import tr
 from .. import astro, dessin
+from ..maintenant import heure_solaire
 from ..base import Animation, angle, date_du_jour, duree_hm, heures_minutes, nombre
 
 ANNEE = 2026
@@ -27,6 +28,16 @@ def etat(jour: float, lat: float) -> dict:
 class Saisons(Animation):
     ID = 'eclipticsimulator'
     JOURS_PAR_S = 20.0
+
+    TEMPS = ('jour',)
+    HEURE_SOLAIRE = True
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        j, h = heure_solaire(m.i, m.lon)
+        self.poser(self.jour, j)
+        if m.lat is not None:
+            self.poser(self.lat, m.lat)
 
     def construire(self):
         self.orbite = self.vue(270.0, 30.0, 0.0, 89.0)

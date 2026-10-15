@@ -13,6 +13,7 @@ from PyQt6.QtGui import QPolygonF
 
 from ....core.i18n import tr
 from .. import astro, dessin
+from ..maintenant import heure_solaire
 from ..base import MOIS_JOURS, Animation, angle, date_du_jour, heures_minutes, nombre
 
 ANNEE = 2026
@@ -64,6 +65,17 @@ def enveloppe(pts: np.ndarray) -> np.ndarray:
 class OmbreBatiment(Animation):
     ID = 'transitmovie'
     JOURS_PAR_S = 8.0
+
+    TEMPS = ('jour', 'heure')
+    HEURE_SOLAIRE = True
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        j, h = heure_solaire(m.i, m.lon)
+        self.poser(self.jour, j)
+        self.poser(self.heure, h)
+        if m.lat is not None:
+            self.poser(self.lat, m.lat)
 
     def construire(self):
         self.vue3d = self.vue(160.0, 35.0, 5.0, 89.0)

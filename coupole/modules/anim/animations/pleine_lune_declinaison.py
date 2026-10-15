@@ -12,6 +12,7 @@ from PyQt6.QtGui import QPolygonF
 
 from ....core.i18n import tr
 from .. import astro, dessin, scenes
+from ..maintenant import heure_solaire
 from ..base import MOIS_JOURS, Animation, angle, date_du_jour
 
 ANNEE = 2026
@@ -34,6 +35,16 @@ def pleine_lune(jour: float, lat: float) -> dict:
 class PleineLuneDeclinaison(Animation):
     ID = 'fullmoondec'
     JOURS_PAR_S = 12.0
+
+    TEMPS = ('jour',)
+    HEURE_SOLAIRE = True
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        j, h = heure_solaire(m.i, m.lon)
+        self.poser(self.jour, j)
+        if m.lat is not None:
+            self.poser(self.lat, m.lat)
 
     def construire(self):
         self.vue3d = self.vue(200.0, 20.0, 7.0, 89.0)

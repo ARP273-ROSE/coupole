@@ -11,7 +11,6 @@ dessinées.  Cadrans gravés : dessin vectoriel (mêmes tracés que dialface.py)
 résolution suit le zoom ; dentures remplacées par leur cercle primitif quand une dent ferait moins de 3 pixels."""
 from __future__ import annotations
 
-import datetime as _dt
 import math
 
 from PyQt6.QtCore import QPointF, QRectF, Qt
@@ -506,6 +505,12 @@ class Anticythere(Animation):
     ID = 'antikythera'
     ANIMEE = True
 
+    TEMPS = ()
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        self.regler_jd(m.i.jj)
+
     def construire(self):
         self.meca = M.machine_calee()
         self.q = VUES['avant']
@@ -524,7 +529,6 @@ class Anticythere(Animation):
         self.face = self.choix('face', [('anim_antikythera_f_avant', 'avant'), ('anim_antikythera_f_arriere', 'arriere'),
                                         ('anim_antikythera_f_trois_quarts', 'trois_quarts')], 'avant')
         self.face.currentIndexChanged.connect(self._vue_choisie)
-        self.bouton('anim_antikythera_aujourdhui', self._aujourdhui)
         self.bouton('anim_antikythera_lunaison', lambda: self.regler_jd(self.jd() + M.SYNODIC_MONTH))
         self.bouton('anim_antikythera_annee', lambda: self.regler_jd(self.jd() + M.TROPICAL_YEAR))
         self.etat_initial()
@@ -532,10 +536,6 @@ class Anticythere(Animation):
     def _vue_choisie(self, *_):
         self.q = VUES.get(self.face.currentData(), VUES['avant'])
         self._s_fige = None
-
-    def _aujourdhui(self):
-        d = _dt.datetime.now(_dt.timezone.utc)
-        self.regler_jd(M.julian_day(d.year, d.month, d.day, d.hour + d.minute / 60))
 
     def etat_initial(self):
         self.meca.days = JD_DEPART - M.J2000

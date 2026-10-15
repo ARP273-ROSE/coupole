@@ -7,6 +7,7 @@ import numpy as np
 
 from ....core.i18n import tr
 from .. import astro, dessin, scenes
+from ..maintenant import heure_solaire
 from ..base import Animation, angle, date_du_jour, duree_hm
 
 ANNEE = 2026
@@ -17,6 +18,16 @@ CHEMINS = (('solstice_juin', EPS, 'accent3'), ('equinoxes', 0.0, 'accent1'), ('s
 class TrajectoiresSoleil(Animation):
     ID = 'sunpaths'
     JOURS_PAR_S = 20.0
+
+    TEMPS = ('jour',)
+    HEURE_SOLAIRE = True
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        j, h = heure_solaire(m.i, m.lon)
+        self.poser(self.jour, j)
+        if m.lat is not None:
+            self.poser(self.lat, m.lat)
 
     def construire(self):
         self.vue3d = self.vue(200.0, 25.0, 1.0, 89.0)
@@ -83,6 +94,16 @@ class VueEnsembleSoleil(Animation):
     équinoxes, trajets des solstices) pour une latitude, comme les quatre étapes de l'original."""
     ID = 'sunmotionsoverview'
     HEURES_PAR_S = 2.0
+
+    TEMPS = ('heure',)
+    HEURE_SOLAIRE = True
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        j, h = heure_solaire(m.i, m.lon)
+        self.poser(self.heure, h)
+        if m.lat is not None:
+            self.poser(self.lat, m.lat)
 
     def construire(self):
         self.vue3d = self.vue(215.0, 25.0, 1.0, 89.0)

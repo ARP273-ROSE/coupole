@@ -12,6 +12,7 @@ from PyQt6.QtGui import QPolygonF
 
 from ....core.i18n import tr
 from .. import astro, dessin
+from ..maintenant import heure_solaire
 from ..base import Animation, angle, date_du_jour, heures_minutes, jour_de_date
 
 ANNEE = 2026
@@ -25,6 +26,14 @@ def dec_ecliptique(ra_deg: float, eps: float) -> float:
 class Ecliptique(Animation):
     ID = 'seasonsim'
     JOURS_PAR_S = 30.0
+
+    TEMPS = ('jour',)
+    HEURE_SOLAIRE = True
+
+    def maintenant(self, m):
+        """« Maintenant » : date et heure de l'appareil (maintenant.py)."""
+        j, h = heure_solaire(m.i, m.lon)
+        self.poser(self.jour, j)
 
     def construire(self):
         self.jour = self.curseur('jour', 0.0, 364.0, 79.0, dec=0, cle_texte='anim_c_jour')
