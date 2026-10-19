@@ -374,6 +374,7 @@ class PanneauParallaxeTP(QWidget):
             self.l_etat.setText(tr('td_tle_aucun', erreur=r['erreur'][:200]))
             return
         self.e_tle.setPlainText('\n'.join(r['tle']))
+        self._tle_pose = self.e_tle.toPlainText()
         self.l_etat.setText(tr('td_tle_recu', date=r['epoque'].strftime('%Y-%m-%d %H:%M'),
                                age=_n(r['age_jours'], 1), source=tr('td_tle_source_' + r['source'])))
 
@@ -402,7 +403,8 @@ class PanneauParallaxeTP(QWidget):
                                 K.lire_angle(az).valeur % 360.0 if az else None))
         tle = None
         lignes = [x for x in self.e_tle.toPlainText().splitlines() if x.strip()]
-        if len(lignes) >= 2:
+        # un TLE posé tout seul n'est pas une saisie : il est cherché de nouveau pour un autre instant
+        if len(lignes) >= 2 and self.e_tle.toPlainText() != getattr(self, '_tle_pose', None):
             tle = tuple(lignes)
         return T.Entrees(lieux[0], lieux[1], self.c_cible.currentData(), self._instant(), tle,
                          self.c_conf.currentData(), self.s_h.value(), self.s_pos.value(), self.s_t.value(), notes)
@@ -414,8 +416,9 @@ class PanneauParallaxeTP(QWidget):
             self.l_etat.setText(tr(ex.cle, **ex.valeurs))
             return
         self.b_calculer.setEnabled(False)
-        self.l_etat.setText(tr('td_calcul_en_cours'))
-        t = Tache(T.calculer, e, parent=self)
+        auto = e.cible == 'iss' and e.instant is not None and not e.tle
+        self.l_etat.setText(tr('td_tle_recherche' if auto else 'td_calcul_en_cours'))
+        t = Tache(_calculer_avec_tle if auto else T.calculer, e, parent=self)
         t.quand_fini(lambda r, e=e: self._resultat(e, r))
         t.quand_erreur(self._erreur)
         self._taches.append(t)
@@ -428,6 +431,13 @@ class PanneauParallaxeTP(QWidget):
 
     def _resultat(self, e, r):
         self.b_calculer.setEnabled(True)
+        info = r.pop('tle_auto', None)
+        if info is not None:
+            if info['tle']:
+                self.e_tle.setPlainText('\n'.join(info['tle']))
+                self._tle_pose = self.e_tle.toPlainText()
+            elif info['erreur']:
+                self.l_etat.setText(tr('td_tle_aucun', erreur=info['erreur'][:200]))
         r['lieux'] = [e.o1, e.o2]
         self.res = r
         self.schema.montrer(r)
@@ -447,6 +457,18 @@ class PanneauParallaxeTP(QWidget):
 
     def aide_html(self) -> str:
         return tr('td_aide_html')
+
+
+def _calculer_avec_tle(e):
+    """ISS, instant donné, aucun TLE saisi : le TLE le plus proche de l'instant est récupéré tout seul (cache, sinon
+    CelesTrak), puis le calcul est fait ; hors ligne et sans cache, le calcul se fait sans éphéméride."""
+    from . import tle
+    info = tle.pour(e.instant)
+    if info['tle']:
+        e.tle = tuple(info['tle'])
+    r = T.calculer(e)
+    r['tle_auto'] = info
+    return r
 
 
 # ============================================================================================== rubrique

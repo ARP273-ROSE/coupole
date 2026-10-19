@@ -99,8 +99,10 @@ TEXTES = {
                               'en': 'ISS TLE closest to the instant: cache, otherwise CelesTrak (current elements). '
                                     'TLE history is not freely available without a Space-Track account: for an old '
                                     'pass, paste a TLE of that time.'},
-    'td_tle_aide': {'fr': 'Deux lignes du TLE (saisie possible hors ligne).', 'en': 'Two TLE lines (can be typed '
-                                                                                   'offline).'},
+    'td_tle_aide': {'fr': 'Deux lignes du TLE. Vide : le TLE le plus proche de l’instant est récupéré tout seul '
+                          '(cache, sinon CelesTrak). Saisie possible hors ligne.',
+                    'en': 'Two TLE lines. Empty: the TLE closest to the instant is fetched automatically (cache, '
+                          'otherwise CelesTrak). Can be typed offline.'},
     'td_tle_indice': {'fr': '1 25544U … / 2 25544 …', 'en': '1 25544U … / 2 25544 …'},
     'td_tle_recu': {'fr': 'TLE du {date} TU ({source}), à {age} jours de l’instant.',
                     'en': 'TLE of {date} UT ({source}), {age} days from the instant.'},
@@ -200,8 +202,17 @@ TEXTES = {
                                          'lieux. Vérifiez.',
                                    'en': 'Huge baseline: latitude and longitude probably swapped for one of the two '
                                          'places. Check.'},
-    'td_a_tle_ancien': {'fr': 'Le TLE est à {j} jours de l’instant : prédiction de l’ISS approximative (plusieurs km).',
-                        'en': 'The TLE is {j} days from the instant: approximate ISS prediction (several km).'},
+    'td_a_tle_ancien': {'fr': 'Le TLE est à {j} jours de l’instant : position de l’ISS approximative (plusieurs km, '
+                              'davantage après une manœuvre). CelesTrak, source libre sans compte, ne publie que les '
+                              'éléments du jour ; l’historique des TLE exige un compte Space-Track (gratuit, '
+                              'personnel) : collez le TLE de la date pour une comparaison exacte.',
+                        'en': 'The TLE is {j} days from the instant: approximate ISS position (several km, more after '
+                              'a manoeuvre). CelesTrak, a free source with no account, only publishes current '
+                              'elements; TLE history requires a Space-Track account (free, personal): paste the TLE '
+                              'of that date for an exact comparison.'},
+    'td_tle_auto': {'fr': 'TLE de l’ISS : récupéré tout seul pour l’instant donné (cache, sinon CelesTrak).',
+                    'en': 'ISS TLE: fetched automatically for the given instant (cache, otherwise CelesTrak).'},
+    'td_tle_recherche': {'fr': 'Récupération du TLE de l’ISS…', 'en': 'Fetching the ISS TLE…'},
     'td_a_sans_sgp4': {'fr': 'Prédiction de l’ISS indisponible (paquet sgp4 absent).',
                        'en': 'ISS prediction unavailable (sgp4 package missing).'},
     'td_a_lune_azimuts': {'fr': 'Lune sans azimuts : la Lune n’est en général pas dans le plan vertical des deux '

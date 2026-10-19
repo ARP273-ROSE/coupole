@@ -201,3 +201,40 @@ def test_references_communes_avec_coupole_web():
         assert r['geometrie']['corde_km'] == pytest.approx(c['corde_km'], abs=1e-9)
         assert r['exact']['distances_km'] == pytest.approx(c['distances_km'], rel=1e-9)
         assert abs(c['corde_km'] - sage[c['id']]['corde_km']) < 1e-6                     # ≤ 1 mm de SageMath
+
+
+def test_tle_recupere_tout_seul(app_qt, monkeypatch):
+    """ISS, instant donné, champ TLE vide : le TLE le plus proche est récupéré tout seul au calcul (sans clic), posé
+    dans le champ, et cherché de nouveau quand l'instant change ; un TLE saisi à la main est gardé tel quel."""
+    from coupole.modules.td import tle as TL
+    from coupole.modules.td.gui import Panneau
+    sky = json.loads((ICI / 'parallaxe_reference_skyfield.json').read_text(encoding='utf-8'))
+    appels = []
+
+    def pour(instant, reseau_permis=True):
+        appels.append(instant)
+        return {'tle': tuple(sky['tle']), 'epoque': TL.epoque(sky['tle']), 'age_jours': 0.2, 'source': 'celestrak',
+                'erreur': ''}
+    monkeypatch.setattr(TL, 'pour', pour)
+    p = Panneau()
+    try:
+        tp = p.parallaxe
+        tp.c_cible.setCurrentIndex(tp.c_cible.findData('iss'))
+        tp.exemple()
+        assert _attendre(app_qt, lambda: tp.res is not None)
+        c = sky['iss'][0]
+        tp.e_instant.setText('%04d-%02d-%02d %02d:%02d:%06.3f' % tuple(c['utc'][1]))
+        tp.res = None
+        tp.calculer()
+        assert _attendre(app_qt, lambda: tp.res is not None)
+        assert len(appels) == 1 and tp.e_tle.toPlainText().startswith('1 25544') and 'ephemeride' in tp.res
+        tp.e_instant.setText('%04d-%02d-%02d %02d:%02d:%06.3f' % (tuple(c['utc'][1][:3]) + (c['utc'][1][3], 0, 0.0)))
+        tp.res = None
+        tp.calculer()
+        assert _attendre(app_qt, lambda: tp.res is not None) and len(appels) == 2
+        tp.e_tle.setPlainText('\n'.join(sky['tle']) + '\n')          # saisie : gardée
+        tp.res = None
+        tp.calculer()
+        assert _attendre(app_qt, lambda: tp.res is not None) and len(appels) == 2
+    finally:
+        p.close()

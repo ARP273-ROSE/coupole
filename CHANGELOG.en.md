@@ -43,7 +43,7 @@ First: **Parallax (course practical)**, after the official practical (ISS, Moon)
 2α = h₁ − h₂ (or 180° − h₁ − h₂ if the object is between the places), R at the surface (like Google Earth) and as a
 chord (astropy's EarthLocation), D = R/2α; then the exact calculation (the horizons make the angle θ; triangulation
 with or without azimuths), the chord's **sagitta** and its dip below each horizon, the ephemeris if the time is
-given (Moon: DE440 or Meeus; ISS: CelesTrak TLE kept in cache, age shown), uncertainties (elevations, places, time).
+given (Moon: DE440 or Meeus; ISS: TLE closest to the instant fetched automatically when calculating, kept in cache, age shown; for an old pass, the warning says history requires a Space-Track account), uncertainties (elevations, places, time).
 Positions written **in any way** (decimal, comma, N/S/E/O/W, degrees-minutes-seconds, free order if the letters say
 so), swap reported. Drawing of the whole exercise (Earth cross-section, chord, verticals, horizons, lines of sight,
 angles, magnifier on the sagitta), numbered steps, fictitious example, CSV export for the “Calculs” sheet. Command
@@ -71,7 +71,7 @@ circumpolar stars if δ < −(90° − |φ|)), checked by SageMath.
 **Tests**: fake WebDAV server (PROPFIND, partial GET, conditional PUT, 412, destructive methods refused and
 counted), synthetic workbook (styles, formula, second sheet, pre-numbered rows), checks, pairs, calculations against
 skyfield + DE440 and SageMath (scripts `outils/verif_parallaxe/`, `outils/verif_td/`), fake nova server, headless
-interface and a beginner's journey end to end; 1,622 tests passed.
+interface and a beginner's journey end to end; 1,623 tests passed.
 
 ## 0.7.2 — 15 October 2026
 

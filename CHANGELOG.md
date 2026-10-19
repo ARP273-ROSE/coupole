@@ -44,7 +44,7 @@ Premier : **Parallaxe (TP du cours)**, d'après le sujet officiel (ISS, Lune) : 
 180° − h₁ − h₂ si l'objet est entre les lieux), R à la surface (comme Google Earth) et en corde (EarthLocation
 d'astropy), D = R/2α ; puis le calcul exact (les horizons font l'angle θ ; triangulation avec ou sans azimuts), la
 **flèche** de la corde et sa profondeur sous chaque horizon, l'éphéméride si l'heure est donnée (Lune : DE440 ou
-Meeus ; ISS : TLE de CelesTrak gardé en cache, âge affiché), les incertitudes (élévations, lieux, heure). Positions
+Meeus ; ISS : TLE le plus proche de l’instant récupéré tout seul au calcul, gardé en cache, âge affiché ; pour un passage ancien, l’avertissement dit que l’historique exige un compte Space-Track), les incertitudes (élévations, lieux, heure). Positions
 écrites de **n'importe quelle façon** (décimal, virgule, N/S/E/O/W, degrés-minutes-secondes, ordre libre si les
 lettres le disent), inversion signalée. Dessin de tout l'exercice (coupe de la Terre, corde, verticales, horizons,
 visées, angles, loupe sur la flèche), pas-à-pas numéroté, exemple fictif, export CSV pour la feuille « Calculs ».
@@ -72,7 +72,7 @@ encadré « Dans l'hémisphère Sud » (culmination vers le nord, défilement de
 **Essais** : serveur WebDAV factice (PROPFIND, GET partiel, PUT conditionnel, 412, méthodes destructrices refusées et
 comptées), classeur synthétique (styles, formule, deuxième feuille, lignes pré-numérotées), contrôles, paires,
 calculs contre skyfield + DE440 et SageMath (scripts `outils/verif_parallaxe/`, `outils/verif_td/`), faux serveur
-nova, interface sans écran et parcours d’un débutant de bout en bout ; 1 622 essais réussis.
+nova, interface sans écran et parcours d’un débutant de bout en bout ; 1 623 essais réussis.
 
 ## 0.7.2 — 15 octobre 2026
 

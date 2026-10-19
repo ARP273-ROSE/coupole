@@ -1923,7 +1923,8 @@ distance.
 
 \paragraph{Ephemerides and uncertainties.} With the time (\emph{Now} button): Moon from JPL DE440 (32~MB, downloaded
 once, then offline) or Meeus otherwise — topocentric and geocentric distances, predicted elevations without and with
-refraction; ISS from the CelesTrak TLE (the closest to the instant among those kept in cache, date shown, warning
+refraction; ISS from the CelesTrak TLE, fetched automatically when calculating if the field is empty (the closest to
+the instant among those kept in cache, otherwise today's; date shown, warning
 beyond 3 days; TLE history is not freely available without a Space-Track account: for an old pass, paste a TLE of
 that time) and SGP4. Uncertainties propagated to $D$ (elevations, positions, time multiplied by the object's speed
 in elevation). \emph{Example} fills in consistent fictitious data; \emph{Export the details} writes a CSV for the
