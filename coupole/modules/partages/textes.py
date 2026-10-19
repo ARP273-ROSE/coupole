@@ -345,23 +345,19 @@ TEXTES = {
                        'en': 'Format of the prepared FITS (photos and videos keep their format).'},
     'pt_format_xisf': {'fr': 'XISF (PixInsight)', 'en': 'XISF (PixInsight)'},
     'pt_format_fits': {'fr': 'FITS', 'en': 'FITS'},
-    'pt_astrometrie_aide': {'fr': 'Solution astrométrique : celle de l’en-tête (si présente) ; sinon, sur demande, '
-                                  'ASTAP ou astrometry.net installés sur cet ordinateur ; en dernier recours, et '
-                                  'seulement avec votre clé d’API (Préférences) et votre accord avant l’envoi, le '
+    'pt_astrometrie_aide': {'fr': 'Solution astrométrique : celle de l’en-tête (si présente) ; « locale » : ASTAP ou '
+                                  'astrometry.net installés sur cet ordinateur ; « puis nova » : en dernier recours, '
+                                  'et seulement avec votre clé d’API (Préférences) et votre accord avant l’envoi, le '
                                   'service libre nova.astrometry.net.',
-                            'en': 'Astrometric solution: the one in the header (if any); otherwise, on request, ASTAP or '
-                                  'astrometry.net installed on this computer; as a last resort, and only with your '
-                                  'API key (Preferences) and your consent before sending, the free '
+                            'en': 'Astrometric solution: the one in the header (if any); “local”: ASTAP or '
+                                  'astrometry.net installed on this computer; “then nova”: as a last resort, and only '
+                                  'with your API key (Preferences) and your consent before sending, the free '
                                   'nova.astrometry.net service.'},
-    'pt_astro_wcs': {'fr': 'Astrométrie : en-tête seulement', 'en': 'Astrometry: header only'},
-    'pt_astro_auto': {'fr': 'Astrométrie : en-tête, sinon ASTAP ou astrometry.net', 'en': 'Astrometry: header, '
-                                                                                         'otherwise ASTAP or '
-                                                                                         'astrometry.net'},
-    'pt_astro_astap': {'fr': 'Astrométrie : en-tête, sinon ASTAP', 'en': 'Astrometry: header, otherwise ASTAP'},
-    'pt_astro_anet': {'fr': 'Astrométrie : en-tête, sinon astrometry.net local',
-                      'en': 'Astrometry: header, otherwise local astrometry.net'},
-    'pt_astro_en_ligne': {'fr': 'Astrométrie : en-tête, ASTAP, astrometry.net, puis en ligne (nova)',
-                          'en': 'Astrometry: header, ASTAP, astrometry.net, then online (nova)'},
+    'pt_astro_wcs': {'fr': 'Astrométrie : en-tête', 'en': 'Astrometry: header'},
+    'pt_astro_auto': {'fr': 'Astrométrie : locale', 'en': 'Astrometry: local'},
+    'pt_astro_astap': {'fr': 'Astrométrie : ASTAP', 'en': 'Astrometry: ASTAP'},
+    'pt_astro_anet': {'fr': 'Astrométrie : astrometry.net', 'en': 'Astrometry: astrometry.net'},
+    'pt_astro_en_ligne': {'fr': 'Astrométrie : locale, puis nova', 'en': 'Astrometry: local, then nova'},
     'pt_nova_sans_cle': {'fr': 'Pour l’astrométrie en ligne, saisissez d’abord votre clé d’API nova.astrometry.net '
                                '(gratuite) dans Préférences > Astrométrie.',
                          'en': 'For online astrometry, first enter your nova.astrometry.net API key (free) in '
@@ -420,11 +416,12 @@ TEXTES = {
     'pt_a_verifier': {'fr': 'Lignes à vérifier seulement', 'en': 'Rows to check only'},
     'pt_a_verifier_aide': {'fr': 'Masquer les lignes sans erreur ni avertissement.', 'en': 'Hide the rows without error '
                                                                                            'or warning.'},
-    'pt_corrections': {'fr': 'Appliquer les corrections proposées aux calculs', 'en': 'Apply the proposed corrections '
-                                                                                      'to the calculations'},
-    'pt_corrections_aide': {'fr': 'Latitude et longitude échangées, heure locale ramenée en TU… Le tableau d’origine '
+    'pt_corrections': {'fr': 'Corrections proposées', 'en': 'Proposed corrections'},
+    'pt_corrections_aide': {'fr': 'Appliquer aux calculs les corrections proposées (latitude et longitude échangées, '
+                                  'heure locale ramenée en TU…). Le tableau d’origine '
                                   'n’est jamais modifié ; les rapports disent les corrections appliquées.',
-                            'en': 'Swapped latitude and longitude, local time converted to UT… The original table is '
+                            'en': 'Apply the proposed corrections to the calculations (swapped latitude and '
+                                  'longitude, local time converted to UT…). The original table is '
                                   'never changed; the reports state the corrections applied.'},
     'pt_exporter_csv': {'fr': 'Exporter (CSV)…', 'en': 'Export (CSV)…'},
     'pt_exporter_csv_aide': {'fr': 'Enregistrer le tableau normalisé, avec les remarques, en CSV.',

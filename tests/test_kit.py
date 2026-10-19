@@ -200,6 +200,8 @@ def test_migration_des_dialogues_sous_linux(tmp_path, monkeypatch):
                     reason='essai complet de --check (20 à 60 s) : en CI, ou avec COUPOLE_TEST_CHECK=1')
 def test_option_check():
     r = subprocess.run([sys.executable, str(RACINE / 'lancer.py'), '--check'], capture_output=True, text=True,
-                       env={**os.environ, 'QT_QPA_PLATFORM': 'offscreen'}, timeout=600, cwd=str(RACINE))
-    assert r.returncode == 0, r.stdout[-2000:] + r.stderr[-2000:]
+                       env={**os.environ, 'QT_QPA_PLATFORM': 'offscreen', 'PYTHONFAULTHANDLER': '1'}, timeout=600,
+                       cwd=str(RACINE))
+    erreurs = '\n'.join(x for x in r.stderr.splitlines() if 'propagateSizeHints' not in x)   # bruit du greffon offscreen
+    assert r.returncode == 0, r.stdout[-2000:] + erreurs[-6000:]
     assert 'essai fumée' in r.stdout and 'OK' in r.stdout
