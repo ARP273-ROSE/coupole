@@ -405,7 +405,7 @@ def test_textes_selon_la_regle():
 
 
 def test_valeurs_et_toile_selon_la_regle(app_qt, langue, monkeypatch):
-    """Les 95 animations : valeurs affichées et textes dessinés sur la toile, réglages par défaut puis changés."""
+    """Les 96 animations : valeurs affichées et textes dessinés sur la toile, réglages par défaut puis changés."""
     from coupole.modules.anim import catalogue, dessin
     from coupole.modules.anim.typo import interdit
     ecrits = []

@@ -1438,3 +1438,34 @@ graphiques » du PROGRESSION.md de Coupole Web, sous-section « Gravité et orbi
   orbites (0.7.2) », 8 captures (`CAPTURES_SEULEMENT=gravite outils/captures_anim.py`) ; CHANGELOG FR puis EN, README,
   NOTICE, manifeste, VERSION 0.7.2.
 - **Aucun tag ni Release.**
+
+## 2026-10-19 — 0.8.0 : Partages du DU, astrométrie en ligne, Calculateurs de TD (branche `partages-du-du`, fusionnée)
+
+- [x] **Partages du DU** (`coupole/modules/partages/`) : client WebDAV réduit à PROPFIND/GET/PUT conditionnel/MKCOL,
+  structure devinée, tableaux contrôlés (date ambiguë tranchée par le nom du fichier, ajout), outil Parallaxe (Lune :
+  directions astrométriques ramenées aux directions géométriques avant la triangulation — le temps de lumière diffère
+  entre observateurs, ≈ 20 km d'erreur sinon ; Lune saturée signalée), dépôt conditionnel, menu *Aide > Guide des
+  partages*, ligne de commande. Corrections : imports relatifs du panneau Parallaxe (`.....core`), « 50s » lu comme
+  le Sud, rapport sans QGuiApplication (ligne de commande), format de date du dépôt (le plus fréquent du tableau),
+  rangement des téléchargements d'après l'en-tête ou le tableau.
+- [x] **Astrométrie** : `core/astrometrie.py` (chaîne en-tête → ASTAP → astrometry.net local → nova) et `core/nova.py`
+  (API officielle, clé dans `nova.json` 600, accord avant chaque lot, image allégée, WCS ramenée, une soumission à
+  la fois, cache par empreinte, reprise). Banque OHP : case « Sans ASTAP : résoudre les images sans solution ».
+  Archives : pas d'étape astrométrique (les produits ont leur WCS).
+- [x] **Calculateurs de TD** (`coupole/modules/td/`) : Parallaxe (TP du cours), lecteur de coordonnées tolérant (cas
+  communs avec Coupole Web : `tests/td_coordonnees_cas.json`), corde (astropy), surface (Vincenty), flèche,
+  profondeurs, calcul exact, DE440/Meeus, TLE CelesTrak en cache, incertitudes, dessin avec loupe, export CSV.
+- [x] **Temps sidéral** : arc de H par défaut, encadré « Dans l'hémisphère Sud » (desktop : description de
+  l'animation ; web : fiche « Ce qu'il faut voir »), vérifié par SageMath.
+- [x] Références : `outils/verif_parallaxe/references_skyfield.py` (skyfield + DE440 + IERS du jour),
+  `verif_parallaxe.sage`, `outils/verif_td/verif_td.sage` et `references_td.py`, `outils/verif_anim/
+  temps_sideral_sud_verif.sage`.
+- [x] Dépendances `jplephem` et `sgp4` (MIT) : requirements, extras `parallaxe` et `test`, `kit.json`,
+  `bibliotheques.EMBARQUEES` (essai réel SGP4 dans les paquets).
+- [x] Manuels FR/EN (sections Partages du DU, astrométrie en ligne, Calculateurs de TD, hémisphère Sud ; captures
+  `outils/captures_partages_td.py`), CHANGELOG FR puis EN, README, VERSION 0.8.0.
+- [x] **Animation « L'atmosphère terrestre »** (96ᵉ, `earthatmosphere`, thème Télescopes) : `anim/atmosphere_calc.py`
+  (masse d'air, extinction, réfraction, Ciddor, aplatissement, avance du lever), `animations/atmosphere.py` (quatre
+  vues), données `anim/donnees/atmosphere_eso.json` (ESO SkyCalc, `outils/verif_atmosphere/donnees_atmosphere.py`),
+  vérification `outils/verif_atmosphere/atmosphere_verif.sage` → `tests/atmosphere_sage.json`.
+- **Aucun tag** : publication sur accord.

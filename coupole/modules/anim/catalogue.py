@@ -41,6 +41,7 @@ ANIMATIONS = (
     ('antikythera', 'ancientastro', 'Antikythera Mechanism', 'Anticythere3D', 'anticythere:Anticythere'),
     ('orion3d', 'ismstarformation', 'Orion in 3D', 'Coupole', 'orion3d:Orion3D'),
     ('gravityorbits', 'renaissance', 'Gravity and Orbits', 'PhET', 'gravite_orbites:GraviteOrbites'),
+    ('earthatmosphere', 'telescopes', "Earth's Atmosphere", 'Coupole', 'atmosphere:Atmosphere'),
     ('smallangledemo', 'ancientastro', 'Small-Angle Approximation Demonstrator', 'ancientastro/smallangledemo.swf',
      'petits_angles:PetitsAngles'),
     ('dipperclock', 'ancientastro', 'Big Dipper Clock', 'ancientastro/dipperclock.swf',
@@ -200,13 +201,17 @@ LOT5 = ('orion3d',)
 # 0.7.2 : Gravité et orbites, d'après la simulation PhET Gravity and Orbits (University of Colorado Boulder ; code,
 # dessins et textes propres à Coupole) ; thème « Renaissance » (lois de Kepler et de Newton)
 LOT6 = ('gravityorbits',)
+# 0.8.0 : l'atmosphère terrestre (propre à Coupole) ; thème « Télescopes » : l'atmosphère, premier instrument que
+# traverse la lumière, décide où et comment on observe (altitude, espace, hauteur sur l'horizon)
+LOT7 = ('earthatmosphere',)
 #: animations qui ne viennent pas de ClassAction : identifiant → (application d'origine, adresse de son dépôt)
 HORS_CLASSACTION = {'antikythera': ('Anticythere3D', 'https://github.com/ARP273-ROSE/Anticythere3D'),
                     'orion3d': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
+                    'earthatmosphere': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
                     'gravityorbits': ('PhET Gravity and Orbits',
                                       'https://phet.colorado.edu/sims/html/gravity-and-orbits/latest/'
                                       'gravity-and-orbits_fr.html')}
-ORDRE = LOT1 + LOT1_BIS + LOT2 + LOT2_BIS + LOT3 + LOT4 + LOT5 + LOT6
+ORDRE = LOT1 + LOT1_BIS + LOT2 + LOT2_BIS + LOT3 + LOT4 + LOT5 + LOT6 + LOT7
 
 
 class Entree:

@@ -720,6 +720,31 @@ TEXTES = {
 'reg_onglets_aide': {'fr': 'Réglages généraux et adresses des services.', 'en': 'General settings and service addresses.'},
     'reg_onglet_general': {'fr': 'Général', 'en': 'General'},
     'reg_onglet_sources': {'fr': 'Sources', 'en': 'Sources'},
+    'reg_onglet_astrometrie': {'fr': 'Astrométrie', 'en': 'Astrometry'},
+    'reg_nova_intro': {'fr': 'Quand une image n’a pas de solution astrométrique, Coupole essaie ASTAP puis '
+                             'astrometry.net installés sur cet ordinateur (libres et gratuits). En dernier recours, le '
+                             'service libre <b>nova.astrometry.net</b> peut résoudre l’image en ligne : créez un compte '
+                             'gratuit sur <a href="https://nova.astrometry.net">nova.astrometry.net</a>, copiez votre '
+                             'clé d’API (« API key », page de votre profil) ci-dessous. Rien n’est envoyé sans votre '
+                             'accord, demandé avant chaque lot ; une image déjà envoyée ne l’est jamais deux fois.',
+                       'en': 'When an image has no astrometric solution, Coupole tries ASTAP then astrometry.net '
+                             'installed on this computer (free and open). As a last resort, the free '
+                             '<b>nova.astrometry.net</b> service can solve the image online: create a free account on '
+                             '<a href="https://nova.astrometry.net">nova.astrometry.net</a>, copy your API key '
+                             '(“API key”, on your profile page) below. Nothing is sent without your consent, asked '
+                             'before each batch; an image already sent is never sent twice.'},
+    'reg_nova_cle': {'fr': 'Clé d’API nova', 'en': 'nova API key'},
+    'reg_nova_cle_aide': {'fr': 'Votre clé personnelle : gardée sur cet ordinateur seulement (fichier à part, lisible '
+                                'par vous seul), envoyée uniquement à nova.astrometry.net, jamais dans un rapport. '
+                                'Vide : pas d’astrométrie en ligne.',
+                          'en': 'Your personal key: kept on this computer only (separate file, readable by you only), '
+                                'sent only to nova.astrometry.net, never in a report. Empty: no online astrometry.'},
+    'reg_nova_public': {'fr': 'Rendre publiques sur nova les images envoyées', 'en': 'Make the images sent public on '
+                                                                                    'nova'},
+    'reg_nova_public_aide': {'fr': 'Décoché (par défaut) : images envoyées en mode non public, licence sans usage '
+                                   'commercial ni modification.',
+                             'en': 'Unchecked (default): images sent as not public, licence without commercial use or '
+                                   'modification.'},
     'reg_sources_intro': {'fr': "Adresses des services. Une valeur modifiée ici est « forcée » : ni une mise à jour ni le fichier "
                                 "distant ne la remplacent. « Défaut » revient à la valeur livrée (ou publiée dans le dépôt).",
                           'en': "Service addresses. A value changed here is « forced »: neither an update nor the remote file "

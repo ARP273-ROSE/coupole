@@ -1,0 +1,10 @@
+{"note": "Cas du calculateur « Parallaxe (TP du cours) » : lieux FICTIFS (centres de villes publics), angles quelconques. Entrées seulement ; les valeurs attendues viennent de SageMath (verif_td.sage) et d'astropy (references_td.py).",
+ "cas": [
+  {"id": "paris-lyon", "o1": [48.8566, 2.3522, 35.0, 62.483, 14.184], "o2": [45.764, 4.8357, 170.0, 33.603, 346.928], "config": "meme_cote"},
+  {"id": "paris-lyon-plan", "o1": [48.8566, 2.3522, 35.0, 40.0, null], "o2": [45.764, 4.8357, 170.0, 25.0, null], "config": "meme_cote"},
+  {"id": "brest-strasbourg-entre", "o1": [48.3904, -4.4861, 50.0, 30.0, null], "o2": [48.5734, 7.7521, 140.0, 35.0, null], "config": "entre"},
+  {"id": "paris-marseille-lune", "o1": [48.8566, 2.3522, 35.0, 31.96731, 117.50126], "o2": [43.2965, 5.3698, 12.0, 36.41708, 116.88005], "config": "meme_cote"},
+  {"id": "sydney-perth", "o1": [-33.8688, 151.2093, 58.0, 20.0, null], "o2": [-31.9523, 115.8613, 20.0, 18.0, null], "config": "entre"},
+  {"id": "courte-base", "o1": [45.0, 6.0, 1000.0, 50.0, null], "o2": [45.2, 6.3, 2500.0, 48.0, null], "config": "meme_cote"},
+  {"id": "equateur-meridien", "o1": [0.0, 0.0, 0.0, 70.0, null], "o2": [3.0, 0.0, 0.0, 60.0, null], "config": "meme_cote"}
+ ]}

@@ -262,6 +262,126 @@ DOSSIER & dossier de sortie (ou un lot)\\
 \par\medskip
 \begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
 \toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages ajouter (add)\newline\normalfont\small Vérifie le lien de partage, affiche les droits (avertit si la suppression est permise) et le mémorise sous un nom libre.}\\
+\midrule
+NOM & nom donné au partage\\
+LIEN & lien de partage (https://…/s/…) ou adresse WebDAV\\
+--mot-de-passe,\allowbreak{} --password MOT\_DE\_PASSE & mot de passe du partage, s’il en a un\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages liste (list)\newline\normalfont\small partages mémorisés}\\
+\midrule
+--json & sortie JSON (pour les scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages oublier (forget)\newline\normalfont\small oublier un partage (rien n’est touché sur le serveur)}\\
+\midrule
+NOM & nom donné au partage\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages explorer (explore)\newline\normalfont\small Lit toute l’arborescence et dit ce qui a été reconnu.}\\
+\midrule
+NOM & nom donné au partage\\
+--fichiers,\allowbreak{} --files & lister aussi chaque fichier\\
+--vus,\allowbreak{} --seen & marquer le contenu actuel comme vu\\
+--json & sortie JSON (pour les scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages tableau (table)\newline\normalfont\small Normalise chaque ligne et signale les anomalies (jamais de modification).}\\
+\midrule
+NOM & nom donné au partage\\
+CHEMIN & tableau à lire (tous par défaut)\\
+--entetes,\allowbreak{} --headers & lire d’abord les en-têtes FITS (lieux et heures, contrôles plus sûrs)\\
+--json & sortie JSON (pour les scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages entetes (headers)\newline\normalfont\small lire les en-têtes des FITS (lieu, heure TU, objet)}\\
+\midrule
+NOM & nom donné au partage\\
+CHEMIN & dossier du partage (tout par défaut)\\
+--json & sortie JSON (pour les scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages paires (pairs)\newline\normalfont\small Cherche les prises d’une même cible par deux observateurs éloignés, presque au même instant.}\\
+\midrule
+NOM & nom donné au partage\\
+--iss S & écart maximal pour l’ISS (s)\\
+--lune,\allowbreak{} --moon S & écart maximal pour la Lune (s)\\
+--base N & base minimale (km)\\
+--entetes,\allowbreak{} --headers & lire d’abord les en-têtes FITS (lieux et heures, contrôles plus sûrs)\\
+--sans-corrections,\allowbreak{} --no-corrections & ne pas appliquer les corrections proposées\\
+--json & sortie JSON (pour les scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages telecharger (download)\newline\normalfont\small Même moteur que la Banque OHP ; FITS préparés en XISF ou FITS ; rangement par date, cible et observateur.}\\
+\midrule
+NOM & nom donné au partage\\
+CHEMIN & chemins dans le partage (fichiers ou dossiers)\\
+--dossier,\allowbreak{} --folder DOSSIER & dossier de téléchargement\\
+--format \{xisf,\allowbreak{}fits\} & format des FITS préparés\\
+--astrometrie,\allowbreak{} --astrometry \{wcs,\allowbreak{}auto,\allowbreak{}astap,\allowbreak{}astrometry.net,\allowbreak{}nova\} & solution astrométrique si l’en-tête n’en a pas\\
+--en-ligne,\allowbreak{} --online & accepter l’envoi des images sans solution à nova.astrometry.net (clé d’API des Préférences)\\
+--sans-originaux,\allowbreak{} --no-originals & ne pas garder les FITS d’origine\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages mesurer (measure)\newline\normalfont\small Centre du disque lunaire (ou trait de l’ISS) et sa position (α, δ) d’après la solution astrométrique de l’image.}\\
+\midrule
+FICHIER & images (FITS avec solution astrométrique)\\
+--cible,\allowbreak{} --target \{lune,\allowbreak{}moon,\allowbreak{}iss\} & cible mesurée\\
+--json & sortie JSON (pour les scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages calculer (compute)\newline\normalfont\small Fichier JSON : \{"cible": "lune"|"iss", "methode": "deux"|"diurne"|"vitesse"|"orbite", "visees": [\{"nom", "lat", "lon", "alt\_m", "points": [\{"instant": "2026-10-21T04:33:44Z", "ra": 96.2, "dec": 23.7\}]\}], "tle": [ligne 1, ligne 2]\}.}\\
+\midrule
+FICHIER & fichier JSON des visées\\
+--html FICHIER & écrire aussi le rapport HTML\\
+--pdf FICHIER & écrire aussi le rapport PDF\\
+--json & sortie JSON (pour les scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages deposer (upload)\newline\normalfont\small Sans --oui, montre seulement ce qui serait envoyé. Jamais d’écrasement : noms libres, dépôts conditionnels, copie locale du tableau.}\\
+\midrule
+NOM & nom donné au partage\\
+FICHIER & fichiers à déposer\\
+--dossier,\allowbreak{} --folder CHEMIN & dossier du partage où déposer\\
+--tableau,\allowbreak{} --table CHEMIN & tableau où ajouter la ligne\\
+--valeur,\allowbreak{} --value RÔLE=VALEUR & valeur de la ligne : auteur=…, cible=…, date=…, latitude=…, longitude=…, altitude=…\\
+--oui,\allowbreak{} --yes & envoyer vraiment\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives liste (list)\newline\normalfont\small liste les archives connues (étape, missions, état)}\\
 \midrule
 --json & sortie JSON (pour les scripts)\\
@@ -490,6 +610,24 @@ Z & redshift(s) à calculer\\
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole anim info}\\
 \midrule
 ID & identifiant ClassAction (ex. sunmotions)\\
+--json & sortie JSON (pour les scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole td parallaxe (parallax)\newline\normalfont\small calculateur « Parallaxe (TP du cours) »}\\
+\midrule
+--p1 TEXTE & position du lieu 1 (n’importe quelle écriture)\\
+--h1 TEXTE & élévation mesurée au lieu 1\\
+--az1 TEXTE & azimut mesuré au lieu 1 (facultatif)\\
+--alt1 TEXTE & altitude du lieu 1\\
+--p2 TEXTE & position du lieu 2 (n’importe quelle écriture)\\
+--h2 TEXTE & élévation mesurée au lieu 2\\
+--az2 TEXTE & azimut mesuré au lieu 2 (facultatif)\\
+--alt2 TEXTE & altitude du lieu 2\\
+--cible,\allowbreak{} --target \{iss,\allowbreak{}lune,\allowbreak{}moon\} & cible : iss ou lune\\
+--instant TEXTE & date et heure TU (comparaison à l’éphéméride)\\
 --json & sortie JSON (pour les scripts)\\
 \bottomrule
 \end{tabularx}

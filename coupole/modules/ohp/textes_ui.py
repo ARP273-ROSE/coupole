@@ -583,6 +583,24 @@ TEXTES = {
     'ohp_garder_fits': {'fr': "Garder les FITS d'origine", 'en': 'Keep the original FITS'},
     'ohp_garder_fits_aide': {'fr': "Conserve aussi les fichiers téléchargés (dans _traitement/fits_origine) : place doublée.",
                              'en': 'Also keep the downloaded files (in _traitement/fits_origine): double the space.'},
+    'ohp_secours_astrometrie': {'fr': 'Sans ASTAP : résoudre les images sans solution (astrometry.net, puis en ligne)',
+                                'en': 'Without ASTAP: solve the images without a solution (astrometry.net, then online)'},
+    'ohp_secours_astrometrie_aide': {'fr': 'Seulement pour les images qui n’ont AUCUNE solution astrométrique, quand '
+                                           'ASTAP n’est pas installé : astrometry.net installé sur cet ordinateur, '
+                                           'puis, si vous avez saisi votre clé d’API (Préférences > Astrométrie) et '
+                                           'que vous l’acceptez au lancement, le service libre nova.astrometry.net.',
+                                     'en': 'Only for the images with NO astrometric solution, when ASTAP is not '
+                                           'installed: astrometry.net installed on this computer, then, if you entered '
+                                           'your API key (Preferences > Astrometry) and agree at launch, the free '
+                                           'nova.astrometry.net service.'},
+    'ohp_nova_accord': {'fr': 'ASTAP n’est pas installé. Les images de ce lot qui n’ont aucune solution astrométrique '
+                              'et qu’astrometry.net installé (s’il l’est) ne résout pas seront ENVOYÉES, une à la fois, '
+                              'au service libre nova.astrometry.net (version allégée), avec votre clé d’API. Images '
+                              '{visibilite}. Accepter ?',
+                        'en': 'ASTAP is not installed. The images of this batch that have no astrometric solution and '
+                              'that the installed astrometry.net (if any) does not solve will be SENT, one at a time, '
+                              'to the free nova.astrometry.net service (lightened version), with your API key. Images '
+                              '{visibilite}. Accept?'},
     'ohp_mode_astap_aide': {'fr': "Quand vérifier avec ASTAP : chaque image, seulement les solutions douteuses, ou jamais.",
                             'en': 'When to check with ASTAP: every image, only doubtful solutions, or never.'},
     'ohp_astap_tous': {'fr': 'Vérifier chaque image', 'en': 'Check every image'},

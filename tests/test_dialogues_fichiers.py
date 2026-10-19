@@ -112,7 +112,7 @@ def test_toutes_les_ouvertures_sont_couvertes():
         if f.name == 'fichiers.py':
             continue
         n += len(re.findall(r'fichiers\.choisir_(?:dossier|fichier|enregistrement)\(', f.read_text(encoding='utf-8')))
-    assert n == 17                     # + export et import de la sauvegarde (tests/test_classe.py)
+    assert n == 23                     # + export/import de la sauvegarde (test_classe.py) ; + 5 Partages ; + 1 TD
 
 
 def _montrer(w, app):
@@ -250,3 +250,63 @@ def test_parent_cache_remplace_par_une_fenetre_visible(app_qt, faux):
     fichiers.choisir_dossier(cache, 'Essai', '')
     assert faux.ouverts[-1].parent is not cache and faux.ouverts[-1].parent.isVisible()
     visible.close()
+
+
+def test_partages_du_du(app_qt, faux, tmp_path):
+    """Partages du DU (0.8.0) : dossier de téléchargement, fichier à déposer, export CSV du tableau contrôlé, TLE et
+    rapport de l'outil Parallaxe."""
+    import datetime as D
+    import time
+    from coupole.modules.partages import etat
+    from coupole.modules.partages.gui import Panneau
+    from . import partages_exemple as X
+    from .serveur_webdav import ServeurWebdav
+    s = ServeurWebdav({'2025/localisations.xlsx': X.classeur(X.lignes_mesures())})
+    for x in etat.lister():
+        etat.retirer(x.ident)
+    p = _montrer(Panneau(), app_qt)
+    try:
+        p.choisir_dossier()
+        verifier_ouverture(faux, 1)
+        p._depot_ajouter()
+        verifier_ouverture(faux, 2)
+        p.ajouter_partage_direct('Essai', s.lien)
+        fin = time.time() + 30
+        while (p.session is None or p.session.structure is None) and time.time() < fin:
+            app_qt.processEvents()
+            time.sleep(0.01)
+        p.session.lire_tableau('2025/localisations.xlsx')
+        p._remplir_tableaux(p.session.structure)
+        p.exporter_csv()
+        d = verifier_ouverture(faux, 3)
+        assert '*.csv' in fichiers.filtres_portail(d.filtre)[0][1]
+        p._choisir_outil()
+        o = p.outil_panneau
+        o.charger_tle()
+        verifier_ouverture(faux, 4)
+        o.resultat = {'genre': 'lune', 'instant': D.datetime(2025, 11, 3, 18, 38, 26)}
+        o.rapport('html')
+        verifier_ouverture(faux, 5)
+    finally:
+        p.arreter()
+        p.close()
+        s.fermer()
+
+
+def test_calculateurs_de_td(app_qt, faux):
+    """Calculateurs de TD (0.8.0) : export du détail des calculs."""
+    import time
+    from coupole.modules.td.gui import Panneau
+    p = _montrer(Panneau(), app_qt)
+    try:
+        tp = p.parallaxe
+        tp.exemple()
+        fin = time.time() + 30
+        while tp.res is None and time.time() < fin:
+            app_qt.processEvents()
+            time.sleep(0.01)
+        tp.exporter()
+        d = verifier_ouverture(faux, 1)
+        assert '*.csv' in fichiers.filtres_portail(d.filtre)[0][1]
+    finally:
+        p.close()

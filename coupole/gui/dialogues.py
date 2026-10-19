@@ -84,6 +84,7 @@ class DialogueReglages(QDialog):
         general = QWidget()
         self.onglets.addTab(adaptatif.defilable(general), tr('reg_onglet_general'))
         self.onglets.addTab(adaptatif.defilable(self._onglet_sources()), tr('reg_onglet_sources'))
+        self.onglets.addTab(adaptatif.defilable(self._onglet_astrometrie()), tr('reg_onglet_astrometrie'))
         for k in range(self.onglets.count()):
             self.onglets.setTabToolTip(k, tr('reg_onglets_aide'))
         f = QFormLayout(general)
@@ -140,6 +141,26 @@ class DialogueReglages(QDialog):
         adaptatif.assouplir(self)
         from . import memoire
         memoire.onglets(self.onglets, 'dialogues.reglages_onglet')
+
+    def _onglet_astrometrie(self):
+        """Astrométrie en ligne (0.8.0) : clé d'API nova.astrometry.net (secret, gardé à part, jamais transmis
+        ailleurs qu'à nova) et visibilité des images envoyées."""
+        from PyQt6.QtWidgets import QLineEdit
+        from ..core import nova
+        w = QWidget()
+        f = QFormLayout(w)
+        intro = QLabel(tr('reg_nova_intro'))
+        intro.setWordWrap(True)
+        intro.setTextFormat(Qt.TextFormat.RichText)
+        intro.setOpenExternalLinks(True)
+        f.addRow(intro)
+        n = nova.reglages()
+        self.nova_cle = champ('reg_nova_cle_aide', n['cle'])
+        self.nova_cle.setEchoMode(QLineEdit.EchoMode.Password)
+        f.addRow(tr('reg_nova_cle'), self.nova_cle)
+        self.nova_public = case('reg_nova_public', n['public'])
+        f.addRow('', self.nova_public)
+        return w
 
     def _onglet_sources(self):
         from ..core import sources
@@ -245,6 +266,9 @@ class DialogueReglages(QDialog):
             from . import theme
             theme.appliquer(nom=r['apparence'])
         self._enregistrer_sources()
+        from ..core import nova
+        if (self.nova_cle.text().strip(), self.nova_public.isChecked()) != tuple(nova.reglages().values()):
+            nova.enregistrer(self.nova_cle.text(), self.nova_public.isChecked())
         self.langue_changee = ancienne != r['langue']
         super().accept()
 

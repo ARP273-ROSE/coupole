@@ -119,7 +119,7 @@ _EN_DANS_FR = re.compile(r"(?<![\w'’-])(the|and|with|this|these|without|from|i
                          r"again|never|always|each|every|about)(?![\w'’-])")
 # noms propres et citations qui gardent légitimement leur langue
 _TOLERES_EN = ("Explorer et Comprendre l'Univers", 'et al.', 'Observatoire de Paris', 'Haute-Provence', 'Pôle', 'Centre de',
-               'Gravity and Orbits')
+               'Gravity and Orbits', 'DU')         # DU : sigle du diplôme (nom propre)
 
 
 def _nettoyer(texte):

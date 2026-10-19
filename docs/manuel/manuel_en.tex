@@ -20,7 +20,7 @@
 \vspace{1.4cm}
 \begin{minipage}{0.78\linewidth}\centering\sffamily\color{ink}
 Free toolbox for students of the « Explorer et Comprendre l'Univers » diploma (Observatoire de Paris).\\[4pt]
-OHP image bank · image quality · spectra and series · sites and times · cosmology.
+OHP image bank · DU shared folders · image quality · spectra and series · sites and times · cosmology · animations · course calculators.
 \end{minipage}
 \vfill
 {\sffamily\small\color{summit}Author: ARP273-ROSE · GNU GPL licence version 3 or later\\
@@ -41,11 +41,13 @@ system language is detected and can be forced (\emph{Language} menu, Preferences
 \textbf{Module} & \textbf{Purpose}\\
 \midrule
 OHP image bank & Inventory, catalogue, download, astrometric check, fixed headers, conversion, stackable sets, anomalies, sky map.\\
+DU shared folders & Collaborative folders of the challenges and practicals: structure, previews, what's new, checked measurement tables, analysis tools (Moon and ISS parallax), upload of one's own measurement without overwriting anything.\\
 Observatory archives & Public images from Hubble, JWST, ESO, Spitzer, WISE, 2MASS, NOIRLab, Keck, SDSS, Voyager, Cassini, Juno: search, volume, download, extraction, alignment, colour.\\
 Image quality & Optional. FWHM, ellipticity, background, noise, gradient, saturation, trails, sampling.\\
 Spectra and series & Reading and plotting 1D data (radio spectra, light curves, tables).\\
 Cosmology & From redshift to distances, ages, volume, distance modulus, scale (Planck 2018 and others).\\
 Sites and times & Site database, OpenStreetMap map, UTC and local time.\\
+Course calculators & The course exercises and practicals step by step with your numbers, then the exact calculation: Parallax (course practical).\\
 My computer & Hardware diagnosis; minimal example module.\\
 \bottomrule
 \end{tabularx}
@@ -645,6 +647,87 @@ application never depends on it. The \emph{Query online services} box stops all 
 \texttt{resolution.sbdb}, \texttt{resolution.sesame}) are set like the other sources.
 
 % =====================================================================
+\section{DU shared folders}\label{sec:partages}
+\capture{img/partages_contenu_en.png}{1.0}
+The challenges and practicals of the course often take place in a \emph{shared folder} (the Observatory's Nextcloud):
+a “\texttt{https://…/s/…}” link where everyone uploads images, videos and sometimes a row in a table. This module
+gathers everything in one place: several remembered shares (free names), their structure, previews, what's new,
+download, checked measurement tables, analysis tools and the upload of your own measurement. \textbf{No link ships
+with Coupole}: you paste the one the course team gave you; it stays on your computer (\texttt{partages.json},
+readable by you only) and never appears in a report.
+
+\paragraph{OHP bank or share?} The OHP bank is a professional archive (TAP service, normalised metadata, FITS from
+the T120 and IRIS telescopes). A share is a collaborative student folder: heterogeneous formats and metadata, typed
+by hand, to be validated. Coupole guesses the structure (dated folders, observers, series, tables), tells where each
+piece of information comes from (header, table, file name) and flags doubts. The layout is the same as the bank's:
+list on the left, content on the right, blue “Download (N · size)” button, right-click menu starting with
+“Download”, three-step guide on first launch (\emph{Help > Shares guide}), previews (FITS, JPEG, PNG, TIFF, first
+frame of a SER or AVI video) and a banner for what is new since your last visit.
+
+\paragraph{What Coupole guesses.} The kind of each file; the instant from the name (“\texttt{YYYY-MM-DD-HH-MM-SS}”,
+the practical's “\texttt{DD-MM-YY-…}”, “\texttt{IMG20260618223000}”…) — a name that reads two ways (17-10-26:
+17 October 2026 or 26 October 2017) is settled by the upload date, and a time read from a name is marked “from the
+name” (often local time); the observer (end of the name, or a “date – place – name” folder); the target (ISS,
+Moon…); the shots (FITS/PNG/TIFF variants of one photo) and the series (exposures less than 2 min apart). FITS
+headers are read \emph{without downloading the image} (partial request: the first 34 kB): site
+(SITELAT/SITELONG), start time and mid-exposure.
+
+\capture{img/partages_mesures_en.png}{1.0}
+\paragraph{Measurement tables.} Workbooks (xlsx, csv) are read \emph{without being modified}. Normalised formats
+(“2,45°”, “48°47′05″ N”, “+44:13:51:00”, Excel day numbers, US dates) and row-by-row checks, with the proof when
+there is one: latitude and longitude swapped (certain if $|$latitude$| > 90^\circ$; proven by the file header, by the
+Moon's position — the noted altitude and azimuth only fit the swapped coordinates — or by comparison with reliable
+sites); local time instead of UT (the header or the Moon agree with the time minus 1 or 2~h); ambiguous date settled
+by the file name; missing fields, missing file. Proposed corrections (marked “*”) are used in the calculations if
+you wish, never in the original table; “Export to CSV” gives the normalised table.
+
+\capture{img/partages_analyse_en.png}{1.0}
+\paragraph{“Parallax (Moon, ISS)” tool.} Analysis tools plug in according to the share's content (this is the first;
+others are added without touching the rest). \emph{Find pairs}: same target, two distant observers (baseline
+$\ge 100$~km), almost at the same instant (ISS $\le 5$~s, Moon $\le 60$~s). \emph{Measure} (right-click an image):
+Moon centre fitted on the limb (Kåsa circle, the terminator is left out; a saturated Moon or a disc of abnormal size
+is flagged and the uncertainty widened), moving object of a series of short exposures or trail of a long exposure for
+the ISS; the direction $(\alpha, \delta)$ comes from the image's astrometric solution. \emph{Compute}, then the HTML or
+PDF report.
+\begin{itemize}
+\item \textbf{Moon}: topocentric vector method (WGS84 positions of both sites in the same frame, closest point of the
+two lines of sight). Directions measured on a photo are \emph{astrometric}: the Moon where it was $\approx 1.2$~s
+earlier, seen from an Earth that has moved since; since the light time differs for the two observers, Coupole turns
+each line of sight into the geometric direction before triangulating (otherwise $\approx 20$~km of error for a 600~km
+baseline). Comparison with JPL DE440 (a 32~MB file downloaded once) or Meeus, error budget (direction, site, time).
+\item \textbf{ISS}: triangulation of both tracks at the common instant, estimate of the clock offset between the
+observers, plane method (no common clock), comparison with the TLE (SGP4).
+\item Single-observer methods: diurnal parallax of the Moon (several hours of measurements), angular speed or
+circular orbit of the ISS.
+\end{itemize}
+
+\paragraph{Verification.} The calculations are compared with independent references (\texttt{outils/verif\_parallaxe/}):
+skyfield and JPL DE440 (observer position within 2~m, Moon directions within 0.05″ with DE440, Moon distance
+recovered within 0.5~km by triangulation, ISS altitude within 20~m, TLE prediction within 10~m) and SageMath at
+200 bits (WGS84 ellipsoid both ways, closest point of two lines, refraction, Kåsa circle, zenith orbit).
+
+\capture{img/partages_depot_en.png}{1.0}
+\paragraph{Uploading your measurement.} Only on your action, after a confirmation listing exactly what will be sent.
+Each file gets a free name (“\texttt{\_2}” if the name exists) and is sent with the condition “the file must not
+exist”; your row is added in the first free row of the table (a filled cell is never replaced, styles and other
+sheets copied byte for byte) with the condition “the table has not changed since it was read”; a local copy of the
+table is kept before the addition; after three conflicts, the row goes into a small
+“\texttt{ligne\_<name>\_<date>.csv}” file next to it. Coupole's WebDAV client has \emph{no} delete, rename or move
+method: even if the link allows it (Coupole tells you), it never touches other people's files.
+
+\paragraph{Astrometry of downloaded images.} The header's solution is kept; otherwise, at your choice: ASTAP or
+astrometry.net installed on your computer, then, as a last resort, the online nova.astrometry.net service
+(section~\ref{sec:nova}).
+
+\begin{ccode}
+coupole partages add "Parallax challenge" "https://…/s/…"\\
+coupole partages explore "Parallax challenge"\\
+coupole partages table "Parallax challenge" --json\\
+coupole partages pairs "Parallax challenge" --headers\\
+coupole partages measure image.fits --target moon
+\end{ccode}
+
+% =====================================================================
 \section{Observatory archives}\label{sec:archives}
 \capture{img/module_archives_en.png}{1.0}
 Major observatories publish their images once the proprietary period of the team that requested them is over
@@ -945,6 +1028,22 @@ system.
 \texttt{/usr/local/bin}, \texttt{\textasciitilde/astap}). Catalogue: chosen folder, \texttt{COUPOLE\_ASTAP\_CATALOGUE},
 program folder, \texttt{/opt/astap}, \texttt{/usr/share/astap/data}, \texttt{/usr/local/opt/astap}. A catalogue is
 declared complete with its 1,476 tiles; the version is read from \texttt{astap\_cli -h}.\end{sloppypar}
+
+
+\paragraph{Online astrometry (nova.astrometry.net)}\label{sec:nova}
+\capture{img/reglages_astrometrie_en.png}{0.6}
+When an image has no astrometric solution and no tool is installed, Coupole can hand it to the \emph{free and open}
+nova.astrometry.net service (Lang, Hogg, Mierle, Blanton \& Roweis 2010). Order followed everywhere (DU shared
+folders, OHP bank for images without a solution when ASTAP is missing): header solution, installed ASTAP, installed
+astrometry.net (\texttt{solve-field}), then nova. You need \emph{your own} API key (free account on
+\url{https://nova.astrometry.net}, profile page) in \emph{Preferences > Astrometry}; it is kept separately
+(\texttt{nova.json}, readable by you only) and only sent to nova. \textbf{Nothing is sent without your consent},
+asked before each batch. What Coupole sends, following the official API documentation: a lightened image (16-bit
+greyscale, reduced above 4 million pixels; the solution is then brought back to the original image, SIP coefficients
+included), the known hints (scale in ″/px with $\pm 20$~\% bounds, approximate centre and radius), images \emph{not
+public} by default, without commercial-use or modification licence. One submission at a time, spaced polling (5~s
+then up to 30~s), maximum delay, clean abort; an image already sent (same fingerprint) is \emph{never} sent again —
+its result, or the failure, is cached, and an interrupted submission resumes polling instead of re-sending the image.
 
 % =====================================================================
 \section{Output formats}
@@ -1674,6 +1773,7 @@ Milky Way rotation & McMillan (2017) model and its components, Eilers et al. (20
 Density waves & tractor and cars: $n_\text{jam}/n=(v-v_t)/(v_\text{slow}-v_t)$, analogy of the spiral arms\\
 Balloon universe & instead of the movie: galaxies on an inflating balloon, $v=Hd$, $H=\dot a/a$; the balloon turns with the mouse\\
 Galactic redshift & spectrum of M32 shifted by $1+z$, lines, light received in U, B, V, R; speed from the relativistic Doppler effect\\
+Earth's atmosphere & airmass (sec $z$, Kasten \& Young, Pickering), extinction $\Delta m = kX$ and reddening, atmospheric windows (ESO SkyCalc), refraction, flattened Sun, earlier rising, dispersion\\
 Telescope & magnification $F/f$, true field, resolving power $1.22\lambda/D$, light-gathering power, focus; Moon, Saturn, globular cluster\\
 CCD sensor & exposure (random photons, Poisson law, saturation) then readout row by row and pixel by pixel\\
 Snell's law & $n_1\sin\theta_1=n_2\sin\theta_2$, total internal reflection, share reflected (Fresnel), Brewster angle\\
@@ -1763,6 +1863,80 @@ Galaxy inside the Sun's orbit $9.9\times10^{10}~M_\odot$; the jam of the density
 coupole anim liste\\
 coupole anim liste --faites --json\\
 coupole anim info sunmotions
+\end{ccode}
+
+
+\paragraph{Earth's atmosphere (0.8.0).} Coupole's own animation (Telescopes theme), four views: thickness crossed
+(airmass: $\sec z$, Kasten \& Young 1989, Pickering 2002, 8~km spherical shell, $\approx 38$ at the horizon),
+extinction and reddening ($\Delta m = kX$, Rayleigh $\propto \lambda^{-4}$, aerosols, ozone), atmospheric windows (ESO
+sky model from 0.3 to 30~µm, sketch from $\gamma$ rays to radio) and refraction (Bennett, Sæmundsson, flattened Sun to
+scale, earlier rising, dispersion after Ciddor 1996, pressure and temperature). Formulas checked with SageMath
+(\texttt{outils/verif\_atmosphere/}).
+\capture{img/anim_earthatmosphere_fenetres_en.png}{0.9}
+\capture{img/anim_earthatmosphere_refraction_en.png}{0.9}
+
+\paragraph{Sidereal time and hour angle: the southern hemisphere.} The hour angle arc is shown by default (a choice
+already made is kept). The “What to look for” card has an \emph{In the southern hemisphere} box:
+$H = \mathrm{LST} - \alpha$ does not change (counted westward from the meridian, $H < 0$ before culmination), but most
+objects culminate toward the north ($\delta > \varphi$); facing north, the sky moves from right to left; the south
+celestial pole has no bright star ($\sigma$~Octantis, magnitude 5.4, about 1° away); a star is circumpolar if
+$\delta < -(90^\circ - |\varphi|)$. These statements are checked by SageMath
+(\texttt{outils/verif\_anim/temps\_sideral\_sud\_verif.sage}).
+
+% =====================================================================
+\section{Course calculators}\label{sec:td}
+Calculators that follow the approach of a course exercise or practical \emph{step by step}, with your numbers, then
+show the exact calculation and what changes. The first: \textbf{Parallax (course practical)}, after the official
+practicals (ISS altitude, Earth–Moon distance).
+
+\capture{img/td_parallaxe_iss_en.png}{1.0}
+\paragraph{The practical's approach.}
+\begin{enumerate}
+\item read in Stellarium the elevations $h_1$ and $h_2$ of the object seen from both places at the same instant (and,
+if possible, the azimuths) — for the Moon, the practical's Moon–star angular distance $\varphi$ works too;
+\item parallax $2\alpha = h_1 - h_2$ (object seen on the same side by both); if the object is \emph{between} the places,
+the lines of sight cross above the baseline and $2\alpha = 180^\circ - h_1 - h_2$;
+\item distance $R$ between the places “for instance with Google Earth” (at the surface) or with astropy's
+\texttt{EarthLocation} (in a straight line: the chord);
+\item $2\alpha = R/D$, $2\alpha$ in radians, hence $D$.
+\end{enumerate}
+Positions can be written \emph{in any way}: decimal with point or comma, signed or with N/S/E/O/W, degrees-minutes-%
+seconds with ° ′ ″ ' " or spaces (“48°47′6″N”, “48 47 06 N”, “2,45° E”, “-2.35”, “48d47m6s”), latitude and longitude
+in any order if the letters say so (without letters: latitude then longitude). An impossible latitude ($> 90^\circ$) is
+corrected and reported; a huge baseline that would become reasonable by swapping latitude and longitude of one place is
+reported. Minutes or seconds $\ge 60$, contradictory sign and letter: the error is stated, nothing is guessed.
+
+\paragraph{Chord, surface and sagitta.} The chord $R = \lvert\vec r_1 - \vec r_2\rvert$ joins the WGS84 geocentric
+positions (like \texttt{EarthLocation.from\_geodetic}); the surface distance is the ellipsoid geodesic (Vincenty). The
+chord runs \emph{below} the ground: its \textbf{sagitta} (gap at the middle between chord and surface) is
+$\approx R^2/(8R_\oplus)$ — 3~km for 400~km — and the calculator gives it exactly on the ellipsoid, with the dip of
+the chord below each place's horizon; a magnifier makes it visible in the drawing.
+
+\capture{img/td_parallaxe_lune_en.png}{1.0}
+\paragraph{The exact calculation.} The two horizons are not parallel: they make the angle $\theta$ at the Earth's
+centre ($5.9^\circ$ for 660~km). With both azimuths, the two lines of sight are triangulated in space (closest point of
+the two lines): distances to both places, distance to the Earth's centre, altitude above the ellipsoid; without
+azimuths, the object is assumed in the vertical plane of both places. The Moon example shows it:
+$h_1 - h_2 = 4.45^\circ$ is almost entirely due to $\theta$, the practical's formula applied to elevations gives
+$\approx 8{,}500$~km, the exact calculation $357{,}917$~km — that is why the Moon practical measures the Moon–star
+distance.
+
+\paragraph{Ephemerides and uncertainties.} With the time (\emph{Now} button): Moon from JPL DE440 (32~MB, downloaded
+once, then offline) or Meeus otherwise — topocentric and geocentric distances, predicted elevations without and with
+refraction; ISS from the CelesTrak TLE (the closest to the instant among those kept in cache, date shown, warning
+beyond 3 days; TLE history is not freely available without a Space-Track account: for an old pass, paste a TLE of
+that time) and SGP4. Uncertainties propagated to $D$ (elevations, positions, time multiplied by the object's speed
+in elevation). \emph{Example} fills in consistent fictitious data; \emph{Export the details} writes a CSV for the
+“Calculs” sheet of the share.
+
+\paragraph{Verification.} Coordinate reader: a battery of cases shared with Coupole Web
+(\texttt{tests/td\_coordonnees\_cas.json}). Geometry and calculations against SageMath at 200 bits
+(\texttt{outils/verif\_td/verif\_td.sage}): chord, surface, sagitta, dips, central angle within 1~mm and
+$10^{-9}$~degree, triangulation, the practical's formula.
+
+\begin{ccode}
+coupole td parallax --p1 "48.8566, 2.3522" --h1 62.483 --az1 14.184 --alt1 35\\
+\hspace*{2em}--p2 "45°45′50″N 4°50′09″E" --h2 33.603 --az2 346.928 --alt2 170
 \end{ccode}
 
 % =====================================================================
@@ -1905,5 +2079,5 @@ Astrophoto). ASTAP: \url{https://www.hnsky.org/astap.htm}. Observatory codes: Mi
 contributors. SIMBAD and Sesame: CDS, Strasbourg (Wenger et al. 2000); Aladin Lite (CDS); NED (NASA/IPAC); JPL
 Small-Body Database (NASA/JPL). Cosmology: Planck Collaboration (2020, A\&A 641, A6); Hinshaw et al. (2013, WMAP 9);
 Riess et al. (2022, SH0ES); Hogg (1999, astro-ph/9905116); Komatsu et al. (2011) for the massive-neutrino density;
-astropy.cosmology; « cosmologie-redshift » calculator (same author). Archives: MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), NOIRLab Astro Data Archive, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS of the Ring-Moon Systems Node, Imaging Node); reproject (Astropy); Rector et al. (2007, AJ 133, 598) for chromatic ordering; amateur practices: see \texttt{docs/archives\_methode.md}. Animations: ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0); Meeus (1998, \emph{Astronomical Algorithms}, 2nd ed.); P03 / IAU 2006 obliquity; IAU constellation boundaries (data shipped with astropy); Natural Earth 1:50m coastlines (public domain); STIX Two Math font (SIL OFL 1.1); NASA Exoplanet Archive, NASA Planetary Fact Sheet, JPL DE440 ephemeris and Standish elements, AME 2020, Landolt filters (1992), spectrum of M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, rotation curve: McMillan (2017) model through galpy, Eilers et al. (2019) measurements and galkin compilation (Pato \& Iocco 2017), Reid et al. (2019) arms, Wegg et al. (2015) bar; Antikythera Mechanism: adapted from Anticythere3D (same author), after Freeth et al. (\emph{Nature} 444, 2006; \emph{Nature} 454, 2008; \emph{Scientific Reports} 11:5821, 2021); physical spectra: CODATA 2022, NIST ASD, Mamajek (2022), Malkov et al. (2020), van Belle et al. (2021), Martins et al. (2005), Castelli \& Kurucz (2003, ATLAS9), NIST-JANAF, Allard et al. (2000), CIE 1931; Gravity and Orbits: after the PhET simulation “Gravity and Orbits” (PhET Interactive Simulations, University of Colorado Boulder; nothing reused), CODATA 2018, IAU 2015 (B3) and 2012 (B2), DE440 (Park et al. 2021), NASA (Earth, Moon, ISS fact sheets), Yoshida (1990); Orion in 3D and hover data sheets: SIMBAD (CDS, Strasbourg), Gaia DR3 (ESA/DPAC), Hipparcos (van Leeuwen 2007), Zucker et al. (2021, CC0), Großschedl et al. (2018), Kounkel et al. (2017, 2018), Foley et al. (2023), O'Dell et al. (2009), Stellarium (figure, CC BY-SA 4.0); images ESO/G. Beccari, ESO, and NASA, ESA, M. Robberto (STScI/ESA) and the Hubble Space Telescope Orion Treasury Project Team, NASA, ESA, and the Hubble Heritage Team (AURA/STScI), under the CC BY 4.0 licence (details in \texttt{NOTICE}).
+astropy.cosmology; « cosmologie-redshift » calculator (same author). Archives: MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), NOIRLab Astro Data Archive, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS of the Ring-Moon Systems Node, Imaging Node); reproject (Astropy); Rector et al. (2007, AJ 133, 598) for chromatic ordering; amateur practices: see \texttt{docs/archives\_methode.md}. Animations: ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0); Meeus (1998, \emph{Astronomical Algorithms}, 2nd ed.); P03 / IAU 2006 obliquity; IAU constellation boundaries (data shipped with astropy); Natural Earth 1:50m coastlines (public domain); STIX Two Math font (SIL OFL 1.1); NASA Exoplanet Archive, NASA Planetary Fact Sheet, JPL DE440 ephemeris and Standish elements, AME 2020, Landolt filters (1992), spectrum of M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, rotation curve: McMillan (2017) model through galpy, Eilers et al. (2019) measurements and galkin compilation (Pato \& Iocco 2017), Reid et al. (2019) arms, Wegg et al. (2015) bar; atmosphere: Kasten \& Young (1989), Pickering (2002), Hansen \& Travis (1974), Ångström (1929), Ciddor (1996), ESO sky model (Noll et al. 2012; Jones et al. 2013); DU shared folders and course calculators: the course's “ISS parallax” and “Moon parallax” practicals (Observatoire de Paris); JPL DE440 (Park et al. 2021) read by jplephem (MIT); ERFA (BSD, derived from SOFA, IAU); SGP4 (Vallado et al. 2006, sgp4 package, MIT) and CelesTrak TLEs; WGS84 (NIMA TR8350.2); Vincenty (1975); Kåsa (1976); Bennett (1982) and Saemundsson (1986) for refraction; skyfield (Rhodes, MIT) for the references; astrometry.net and nova.astrometry.net (Lang et al. 2010, AJ 139, 1782); WebDAV (RFC 4918) and Nextcloud public shares; Office Open XML (ECMA-376); Antikythera Mechanism: adapted from Anticythere3D (same author), after Freeth et al. (\emph{Nature} 444, 2006; \emph{Nature} 454, 2008; \emph{Scientific Reports} 11:5821, 2021); physical spectra: CODATA 2022, NIST ASD, Mamajek (2022), Malkov et al. (2020), van Belle et al. (2021), Martins et al. (2005), Castelli \& Kurucz (2003, ATLAS9), NIST-JANAF, Allard et al. (2000), CIE 1931; Gravity and Orbits: after the PhET simulation “Gravity and Orbits” (PhET Interactive Simulations, University of Colorado Boulder; nothing reused), CODATA 2018, IAU 2015 (B3) and 2012 (B2), DE440 (Park et al. 2021), NASA (Earth, Moon, ISS fact sheets), Yoshida (1990); Orion in 3D and hover data sheets: SIMBAD (CDS, Strasbourg), Gaia DR3 (ESA/DPAC), Hipparcos (van Leeuwen 2007), Zucker et al. (2021, CC0), Großschedl et al. (2018), Kounkel et al. (2017, 2018), Foley et al. (2023), O'Dell et al. (2009), Stellarium (figure, CC BY-SA 4.0); images ESO/G. Beccari, ESO, and NASA, ESA, M. Robberto (STScI/ESA) and the Hubble Space Telescope Orion Treasury Project Team, NASA, ESA, and the Hubble Heritage Team (AURA/STScI), under the CC BY 4.0 licence (details in \texttt{NOTICE}).
 \end{document}

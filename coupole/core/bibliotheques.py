@@ -20,8 +20,12 @@ FACULTATIVES = (
     ('psutil', 'psutil', '', 'machine'),
     ('lxml', 'lxml', 'validation', 'validation'),
     ('cupy', 'cupy-cuda12x', 'gpu', 'gpu'),
+    # module Partages, outil Parallaxe (0.8.0) : éphéméride JPL DE440 et prédiction de l'ISS par TLE (licences MIT)
+    ('jplephem', 'jplephem', 'parallaxe', 'parallaxe'),
+    ('sgp4', 'sgp4', 'parallaxe', 'parallaxe'),
 )
-EMBARQUEES = ('sep', 'reproject', 'astropy_healpix', 'psutil', 'lxml')     # contrôlées dans chaque paquet
+EMBARQUEES = ('sep', 'reproject', 'astropy_healpix', 'psutil', 'lxml', 'jplephem', 'sgp4')   # contrôlées dans chaque
+#                                                                                               paquet
 
 
 def _version(module: str, distribution: str) -> str:
@@ -80,4 +84,11 @@ def essai_embarquees() -> dict:
     import astropy_healpix  # noqa: F401  (tiré par reproject)
     import psutil  # noqa: F401
     import lxml.etree  # noqa: F401
+    import jplephem.spk  # noqa: F401
+    from sgp4.api import Satrec
+    sat = Satrec.twoline2rv('1 25544U 98067A   26291.78980200  .00007771  00000+0  14938-3 0  9993',
+                            '2 25544  51.6325  48.4339 0006764 280.4294  79.5932 15.48929442590914')
+    erreur, r, _ = sat.sgp4(2461332.5, 0.29)
+    if erreur or not 6600 < sum(x * x for x in r) ** 0.5 < 6900:
+        raise RuntimeError('sgp4: unexpected result')
     return {b['module']: b['version'] for b in facultatives() if b['module'] in EMBARQUEES}

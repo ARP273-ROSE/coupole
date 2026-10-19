@@ -35,7 +35,7 @@ class AngleHoraire(Animation):
         self.tsl = self.curseur('tsl', 0.0, 24.0, 2.0, dec=2, unite='h', cle_texte='anim_c_tsl')
         self.ra = self.curseur('ra', 0.0, 24.0, 4.0, dec=2, unite='h', cle_texte='anim_c_ra')
         self.dec = self.curseur('dec', -90.0, 90.0, 30.0, dec=1, unite='°', cle_texte='anim_c_dec')
-        self.c_arc = self.coche('arc', False)
+        self.c_arc = self.coche('arc', True)          # 0.8.0 : arc de H affiché par défaut (choix mémorisé gardé)
 
     def avancer(self, dt):
         self.tsl.setValue((self.tsl.value() + dt * self.VITESSE_H_PAR_S) % 24.0)

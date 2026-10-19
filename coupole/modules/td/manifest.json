@@ -1,0 +1,15 @@
+{
+  "id": "td",
+  "version": "1.0.0",
+  "nom": {"fr": "Calculateurs de TD", "en": "Course calculators"},
+  "description": {
+    "fr": "Calculateurs qui suivent pas à pas la démarche des TD et TP du cours avec vos nombres, puis le calcul exact : Parallaxe (TP du cours) — altitude de l'ISS, distance de la Lune",
+    "en": "Calculators that follow the course exercises and practicals step by step with your numbers, then the exact calculation: Parallax (course practical) — ISS altitude, Moon distance"
+  },
+  "icone": "icone.svg",
+  "ordre": 37,
+  "textes": "textes:TEXTES",
+  "gui": "gui:Panneau",
+  "cli": "cli:enregistrer",
+  "coupole_min": "0.8.0"
+}

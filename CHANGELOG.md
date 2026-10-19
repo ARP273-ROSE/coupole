@@ -2,6 +2,78 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.8.0 — 19 octobre 2026
+
+**Partages du DU.** Nouveau module pour les dossiers collaboratifs des défis et TP (partages Nextcloud de
+l'Observatoire). Aucun lien n'est livré : vous collez celui que l'équipe vous a donné, il reste sur votre ordinateur
+(`partages.json`, lisible par vous seul) et n'apparaît dans aucun rapport.
+
+- **Plusieurs partages mémorisés** (nom libre, renommer, oublier, copier le lien), droits du lien affichés (Coupole
+  prévient si le lien permet de supprimer : il ne le fait jamais).
+- **Structure devinée** sans rien télécharger : genres de fichiers, instant d'après le nom (ambiguïté
+  JJ-MM-AA / AA-MM-JJ tranchée par la date de dépôt, heure « d'après le nom » signalée), observateurs, cibles,
+  prises, séries ; en-têtes FITS lus par requête partielle (34 premiers ko). Présentation comme la Banque OHP : liste à
+  gauche, contenu à droite, bouton bleu « Télécharger (N · taille) », clic droit, guide en trois étapes (*Aide > Guide
+  des partages*), aperçus (FITS, JPEG, PNG, TIFF, SER, AVI), bandeau des nouveautés.
+- **Tableaux de mesures contrôlés** (xlsx, csv, jamais modifiés) : formats normalisés, inversions latitude/longitude
+  (certaines, prouvées par l'en-tête, par la Lune ou par comparaison aux lieux sûrs), heure locale, dates
+  américaines, date ambiguë tranchée par le nom du fichier, fichiers absents ; corrections proposées pour les calculs
+  seulement ; export CSV normalisé.
+- **Outil « Parallaxe (Lune, ISS) »** (architecture d'outils extensible) : paires simultanées, centre de la Lune
+  ajusté sur le limbe (Lune saturée signalée), objet mobile ou trait de l'ISS, distance de la Lune par la méthode
+  vectorielle topocentrique — **directions astrométriques ramenées aux directions géométriques** (le temps de lumière
+  diffère entre les observateurs : ≈ 20 km d'erreur sinon) —, altitude de l'ISS par triangulation avec décalage
+  d'horloge estimé et méthode des plans, comparaison à JPL DE440 (fichier téléchargé une fois) ou à Meeus et au TLE,
+  budget d'erreur, rapports HTML et PDF (aussi depuis la ligne de commande, sans écran).
+- **Dépôt de sa mesure sans rien écraser** : confirmation qui liste tout, noms libres, dépôts conditionnels
+  (If-None-Match / If-Match), première ligne libre du tableau (rien d'autre ne change, octet pour octet), copie
+  locale avant l'ajout, petit CSV à côté après trois conflits ; le client WebDAV n'a aucune méthode de suppression,
+  de renommage ni de déplacement.
+- Ligne de commande `coupole partages` (ajouter, liste, explorer, tableau, entêtes, paires, télécharger, mesurer,
+  calculer, déposer, de440).
+
+**Astrométrie en ligne en dernier recours (nova.astrometry.net).** Chaîne commune : solution de l'en-tête, ASTAP,
+astrometry.net installé, puis le service libre nova.astrometry.net avec **votre** clé d'API (*Préférences >
+Astrométrie*, gardée à part) et **votre accord avant chaque envoi**. Image allégée (16 bits, réduite ; solution
+ramenée à l'image d'origine, SIP compris), indices d'échelle et de position, images non publiques par défaut, une
+soumission à la fois, sondage espacé, abandon propre, reprise ; une image déjà envoyée ne l'est jamais deux fois
+(cache). Sert aux Partages du DU et à la Banque OHP (images sans solution quand ASTAP manque).
+
+**Calculateurs de TD.** Nouvelle rubrique : des calculateurs qui suivent pas à pas la démarche des TD et TP du cours.
+Premier : **Parallaxe (TP du cours)**, d'après le sujet officiel (ISS, Lune) : élévations h₁ et h₂, 2α = h₁ − h₂ (ou
+180° − h₁ − h₂ si l'objet est entre les lieux), R à la surface (comme Google Earth) et en corde (EarthLocation
+d'astropy), D = R/2α ; puis le calcul exact (les horizons font l'angle θ ; triangulation avec ou sans azimuts), la
+**flèche** de la corde et sa profondeur sous chaque horizon, l'éphéméride si l'heure est donnée (Lune : DE440 ou
+Meeus ; ISS : TLE de CelesTrak gardé en cache, âge affiché), les incertitudes (élévations, lieux, heure). Positions
+écrites de **n'importe quelle façon** (décimal, virgule, N/S/E/O/W, degrés-minutes-secondes, ordre libre si les
+lettres le disent), inversion signalée. Dessin de tout l'exercice (coupe de la Terre, corde, verticales, horizons,
+visées, angles, loupe sur la flèche), pas-à-pas numéroté, exemple fictif, export CSV pour la feuille « Calculs ».
+Ligne de commande `coupole td parallaxe`. Vérifié contre SageMath (corde à 1 mm).
+
+**Nouvelle animation « L'atmosphère terrestre : absorption, épaisseur traversée, réfraction »** (96ᵉ, propre à
+Coupole, thème *Télescopes* : l'atmosphère est le premier instrument que traverse la lumière, elle décide où et comment
+on observe). Quatre vues : **épaisseur traversée** (coupe de la Terre et de l'atmosphère, couches, échelle de hauteur
+8 km, trajet qui s'allonge vers l'horizon ; masse d'air par sec z, Kasten & Young 1989, Pickering 2002 et coquille
+sphérique : ≈ 38 à l'horizon) ; **extinction et rougissement** (Rayleigh ∝ λ⁻⁴, aérosols d'Ångström, ozone ;
+Δm = k X en U B V R I ; couleur du Soleil transmis selon sa hauteur) ; **fenêtres atmosphériques** (transmission de
+0,3 à 30 µm d'après le modèle de ciel de l'ESO — SkyCalc, Paranal —, bandes J H K L M N Q et absorptions H₂O, CO₂,
+O₃ ; schéma des domaines γ, X, UV, infrarouge lointain, submillimétrique, radio, ionosphère ; pourquoi des télescopes
+en altitude et dans l'espace) ; **réfraction** (rayon dans des couches d'indice décroissant, exagération possible,
+hauteur apparente et vraie — Bennett, Sæmundsson, ≈ 34′ à l'horizon —, Soleil aplati à l'échelle, lever avancé et
+coucher retardé selon la latitude, dispersion par l'indice de Ciddor, pression et température). Formules vérifiées
+par SageMath, sources dans NOTICE ; lien avec le défi parallaxe et le calculateur de TD.
+
+**Temps sidéral et angle horaire.** L'arc de l'angle horaire est affiché par défaut (un choix mémorisé est gardé) ;
+encadré « Dans l'hémisphère Sud » (culmination vers le nord, défilement de droite à gauche face au nord, σ Octantis,
+étoiles circumpolaires si δ < −(90° − |φ|)), vérifié par SageMath.
+
+**Dépendances** (licences MIT) : `jplephem` (DE440) et `sgp4` (TLE), embarquées dans les paquets autonomes.
+
+**Essais** : serveur WebDAV factice (PROPFIND, GET partiel, PUT conditionnel, 412, méthodes destructrices refusées et
+comptées), classeur synthétique (styles, formule, deuxième feuille, lignes pré-numérotées), contrôles, paires,
+calculs contre skyfield + DE440 et SageMath (scripts `outils/verif_parallaxe/`, `outils/verif_td/`), faux serveur
+nova, interface sans écran et parcours d’un débutant de bout en bout ; 1 622 essais réussis.
+
 ## 0.7.2 — 15 octobre 2026
 
 **Banque OHP : télécharger sans manuel.** Retour d'un étudiant (0.4.1, Windows) : il voyait le catalogue, faisait un

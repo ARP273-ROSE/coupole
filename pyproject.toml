@@ -37,7 +37,9 @@ validation = ["lxml>=4.9", "xisf>=0.9"]
 qualite = ["sep>=1.4"]
 alignement = ["reproject>=0.13"]
 gpu = ["cupy-cuda12x"]
-test = ["pytest>=7", "lxml>=4.9", "xisf>=0.9", "psutil>=5.9", "pillow>=10", "sep>=1.4", "reproject>=0.13"]
+parallaxe = ["jplephem>=2.21", "sgp4>=2.22"]
+test = ["pytest>=7", "lxml>=4.9", "xisf>=0.9", "psutil>=5.9", "pillow>=10", "sep>=1.4", "reproject>=0.13",
+        "jplephem>=2.21", "sgp4>=2.22"]
 
 [project.urls]
 Homepage = "https://github.com/ARP273-ROSE/coupole"

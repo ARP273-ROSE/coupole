@@ -143,6 +143,28 @@ Vérifications SageMath indépendantes du moteur (46 comparaisons) ; tests de r�
 Limites dites dans l'interface : extrapolation des atmosphères hors de la grille ATLAS9, étalonnages bornés ou
 interpolés, magnitude absolue de l'ancien étalonnage là où aucune n'est publiée.
 
+L'atmosphère terrestre (0.8.0) / Earth's atmosphere (coupole/modules/anim/atmosphere_calc.py, animations/atmosphere.py)
+-----------------------------------------------------------------------------------------------------------------
+Animation propre à Coupole (pas dans ClassAction) ; formules réécrites d'après leurs publications et vérifiées par
+SageMath (outils/verif_atmosphere/atmosphere_verif.sage) / Coupole's own animation; formulas rewritten from their
+publications and checked with SageMath :
+  - masse d'air : F. Kasten et A. T. Young, « Revised optical air mass tables and approximation formula », Applied
+    Optics 28 (1989) 4735-4738 ; K. A. Pickering, « The Southern Limits of the Ancient Star Catalog and the
+    Commentary of Hipparchos », DIO 12 (2002) 3-27 (formule de la masse d'air) ;
+  - diffusion Rayleigh : J. E. Hansen et L. D. Travis, « Light scattering in planetary atmospheres », Space Science
+    Reviews 16 (1974) 527-610 ; aérosols : A. Ångström, Geografiska Annaler 11 (1929) 156-166 ; ozone (bande de
+    Chappuis, modèle simplifié) : ordre de grandeur des sections efficaces de A. Serdyuchenko et al., Atmos. Meas.
+    Tech. 7 (2014) 625-636 ;
+  - réfraction : G. G. Bennett, « The Calculation of Astronomical Refraction in Marine Navigation », J. Navigation
+    35 (1982) 255-259 ; T. Sæmundsson, Sky & Telescope 72 (1986) 70 ; indice de l'air : P. E. Ciddor, « Refractive
+    index of air: new equations for the visible and near infrared », Applied Optics 35 (1996) 1566-1573 ;
+  - bandes photométriques U B V R I : longueurs d'onde effectives de M. S. Bessell, PASP 102 (1990) 1181 ;
+  - transmission de l'atmosphère de 0,3 à 30 µm (coupole/modules/anim/donnees/atmosphere_eso.json, outil
+    outils/verif_atmosphere/donnees_atmosphere.py) : modèle de ciel de l'ESO, SkyCalc 2.0.9 (S. Noll et al. 2012,
+    A&A 543, A92 ; A. Jones et al. 2013, A&A 560, A91), Paranal, masse d'air 1, 2,5 mm de vapeur d'eau
+    précipitable, moyennes par intervalle ; hors de ce domaine (γ, X, UV lointain, infrarouge lointain,
+    submillimétrique, radio, ionosphère) : schéma d'ordres de grandeur.
+
 Orion en 3D, fiches au survol, couleur vraie des étoiles (0.5.0) / Orion in 3D, hover data sheets, true star colours
 -------------------------------------------------------------------------------------------------------------------
 Données préparées pour ce projet par son auteur (requêtes du 14/10/2026, gardées avec leur date) ; chaque valeur des

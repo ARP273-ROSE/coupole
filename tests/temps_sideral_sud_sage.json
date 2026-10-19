@@ -1,0 +1,690 @@
+{
+ "outil": "SageMath, RealField(120)",
+ "cas": [
+  {
+   "lat": -12.5,
+   "dec": -80.0,
+   "h_min": 2.5,
+   "h_max": 22.5,
+   "h_culmination": 22.5,
+   "circumpolaire": true,
+   "formule_circumpolaire": true,
+   "culmine_au_nord": false,
+   "formule_nord": false,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    170.00499409677096,
+    189.99500590322904
+   ]
+  },
+  {
+   "lat": -12.5,
+   "dec": -60.0,
+   "h_min": -17.5,
+   "h_max": 42.5,
+   "h_culmination": 42.5,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": false,
+   "formule_nord": false,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    149.4258673475212,
+    210.5741326524788
+   ]
+  },
+  {
+   "lat": -12.5,
+   "dec": -50.0,
+   "h_min": -27.5,
+   "h_max": 52.5,
+   "h_culmination": 52.5,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": false,
+   "formule_nord": false,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    138.90574163252145,
+    221.09425836747855
+   ]
+  },
+  {
+   "lat": -12.5,
+   "dec": -30.0,
+   "h_min": -47.5,
+   "h_max": 72.5,
+   "h_culmination": 72.5,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": false,
+   "formule_nord": false,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    117.7243452440607,
+    242.27565475593929
+   ]
+  },
+  {
+   "lat": -12.5,
+   "dec": -10.0,
+   "h_min": -67.5,
+   "h_max": 87.5,
+   "h_culmination": 87.5,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    96.85549334775286,
+    263.1445066522472
+   ]
+  },
+  {
+   "lat": -12.5,
+   "dec": 0.0,
+   "h_min": -77.5,
+   "h_max": 77.5,
+   "h_culmination": 77.5,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    86.68085946027773,
+    273.3191405397223
+   ]
+  },
+  {
+   "lat": -12.5,
+   "dec": 20.0,
+   "h_min": -82.5,
+   "h_max": 57.5,
+   "h_culmination": 57.5,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    66.93217209657641,
+    293.0678279034236
+   ]
+  },
+  {
+   "lat": -12.5,
+   "dec": 45.0,
+   "h_min": -57.5,
+   "h_max": 32.5,
+   "h_culmination": 32.5,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    43.097124115539984,
+    316.90287588446
+   ]
+  },
+  {
+   "lat": -23.44,
+   "dec": -80.0,
+   "h_min": 13.44,
+   "h_max": 33.44,
+   "h_culmination": 33.44,
+   "circumpolaire": true,
+   "formule_circumpolaire": true,
+   "culmine_au_nord": false,
+   "formule_nord": false,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    169.27601939550053,
+    190.72398060449947
+   ]
+  },
+  {
+   "lat": -23.44,
+   "dec": -60.0,
+   "h_min": -6.56,
+   "h_max": 53.44,
+   "h_culmination": 53.44,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": false,
+   "formule_nord": false,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    146.9782825414275,
+    213.0217174585725
+   ]
+  },
+  {
+   "lat": -23.44,
+   "dec": -50.0,
+   "h_min": -16.56,
+   "h_max": 63.44,
+   "h_culmination": 63.44,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": false,
+   "formule_nord": false,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    135.7182358878698,
+    224.2817641121302
+   ]
+  },
+  {
+   "lat": -23.44,
+   "dec": -30.0,
+   "h_min": -36.56,
+   "h_max": 83.44,
+   "h_culmination": 83.44,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": false,
+   "formule_nord": false,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    113.83606011428759,
+    246.1639398857124
+   ]
+  },
+  {
+   "lat": -23.44,
+   "dec": -10.0,
+   "h_min": -56.56,
+   "h_max": 76.56,
+   "h_culmination": 76.56,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    93.4847635338062,
+    266.5152364661938
+   ]
+  },
+  {
+   "lat": -23.44,
+   "dec": 0.0,
+   "h_min": -66.56,
+   "h_max": 66.56,
+   "h_culmination": 66.56,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    83.91597890417606,
+    276.0840210958239
+   ]
+  },
+  {
+   "lat": -23.44,
+   "dec": 20.0,
+   "h_min": -86.56,
+   "h_max": 46.56,
+   "h_culmination": 46.56,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    65.66269347751643,
+    294.3373065224836
+   ]
+  },
+  {
+   "lat": -23.44,
+   "dec": 45.0,
+   "h_min": -68.44,
+   "h_max": 21.56,
+   "h_culmination": 21.56,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    43.428172673595604,
+    316.5718273264044
+   ]
+  },
+  {
+   "lat": -33.87,
+   "dec": -80.0,
+   "h_min": 23.87,
+   "h_max": 43.87,
+   "h_culmination": 43.87,
+   "circumpolaire": true,
+   "formule_circumpolaire": true,
+   "culmine_au_nord": false,
+   "formule_nord": false,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    168.05188803376797,
+    191.94811196623203
+   ]
+  },
+  {
+   "lat": -33.87,
+   "dec": -60.0,
+   "h_min": 3.87,
+   "h_max": 63.87,
+   "h_culmination": 63.87,
+   "circumpolaire": true,
+   "formule_circumpolaire": true,
+   "culmine_au_nord": false,
+   "formule_nord": false,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    143.25753624435004,
+    216.74246375564996
+   ]
+  },
+  {
+   "lat": -33.87,
+   "dec": -50.0,
+   "h_min": -6.13,
+   "h_max": 73.87,
+   "h_culmination": 73.87,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": false,
+   "formule_nord": false,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    131.18896093494476,
+    228.81103906505524
+   ]
+  },
+  {
+   "lat": -33.87,
+   "dec": -30.0,
+   "h_min": -26.13,
+   "h_max": 86.13,
+   "h_culmination": 86.13,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    109.13452619116663,
+    250.86547380883337
+   ]
+  },
+  {
+   "lat": -33.87,
+   "dec": -10.0,
+   "h_min": -46.13,
+   "h_max": 66.13,
+   "h_culmination": 66.13,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    90.12827139910496,
+    269.87172860089504
+   ]
+  },
+  {
+   "lat": -33.87,
+   "dec": 0.0,
+   "h_min": -56.13,
+   "h_max": 56.13,
+   "h_culmination": 56.13,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    81.50673208185013,
+    278.49326791814985
+   ]
+  },
+  {
+   "lat": -33.87,
+   "dec": 20.0,
+   "h_min": -76.13,
+   "h_max": 36.13,
+   "h_culmination": 36.13,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    65.193734743159,
+    294.806265256841
+   ]
+  },
+  {
+   "lat": -33.87,
+   "dec": 45.0,
+   "h_min": -78.87,
+   "h_max": 11.13,
+   "h_culmination": 11.13,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    44.74545378038699,
+    315.254546219613
+   ]
+  },
+  {
+   "lat": -45.0,
+   "dec": -80.0,
+   "h_min": 35.0,
+   "h_max": 55.0,
+   "h_culmination": 55.0,
+   "circumpolaire": true,
+   "formule_circumpolaire": true,
+   "culmine_au_nord": false,
+   "formule_nord": false,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    165.8352068910509,
+    194.1647931089491
+   ]
+  },
+  {
+   "lat": -45.0,
+   "dec": -60.0,
+   "h_min": 15.0,
+   "h_max": 75.0,
+   "h_culmination": 75.0,
+   "circumpolaire": true,
+   "formule_circumpolaire": true,
+   "culmine_au_nord": false,
+   "formule_nord": false,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    137.16238082488672,
+    222.83761917511328
+   ]
+  },
+  {
+   "lat": -45.0,
+   "dec": -50.0,
+   "h_min": 5.0,
+   "h_max": 85.0,
+   "h_culmination": 85.0,
+   "circumpolaire": true,
+   "formule_circumpolaire": true,
+   "culmine_au_nord": false,
+   "formule_nord": false,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    124.33133698975475,
+    235.66866301024527
+   ]
+  },
+  {
+   "lat": -45.0,
+   "dec": -30.0,
+   "h_min": -15.0,
+   "h_max": 75.0,
+   "h_culmination": 75.0,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    103.12574679305845,
+    256.87425320694155
+   ]
+  },
+  {
+   "lat": -45.0,
+   "dec": -10.0,
+   "h_min": -35.0,
+   "h_max": 55.0,
+   "h_culmination": 55.0,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    86.54419730580202,
+    273.455802694198
+   ]
+  },
+  {
+   "lat": -45.0,
+   "dec": 0.0,
+   "h_min": -45.0,
+   "h_max": 45.0,
+   "h_culmination": 45.0,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    79.27141687839094,
+    280.72858312160906
+   ]
+  },
+  {
+   "lat": -45.0,
+   "dec": 20.0,
+   "h_min": -65.0,
+   "h_max": 25.0,
+   "h_culmination": 25.0,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    65.49112224916585,
+    294.50887775083413
+   ]
+  },
+  {
+   "lat": -45.0,
+   "dec": 45.0,
+   "h_min": -90.0,
+   "h_max": -8.620910738379216e-35,
+   "h_culmination": 0.0,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    47.33882803763487,
+    312.66117196236513
+   ]
+  },
+  {
+   "lat": -70.0,
+   "dec": -80.0,
+   "h_min": 60.0,
+   "h_max": 80.0,
+   "h_culmination": 80.0,
+   "circumpolaire": true,
+   "formule_circumpolaire": true,
+   "culmine_au_nord": false,
+   "formule_nord": false,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    150.34411907864236,
+    209.65588092135764
+   ]
+  },
+  {
+   "lat": -70.0,
+   "dec": -60.0,
+   "h_min": 40.0,
+   "h_max": 80.0,
+   "h_culmination": 80.0,
+   "circumpolaire": true,
+   "formule_circumpolaire": true,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    109.87511904103873,
+    250.12488095896128
+   ]
+  },
+  {
+   "lat": -70.0,
+   "dec": -50.0,
+   "h_min": 30.0,
+   "h_max": 70.0,
+   "h_culmination": 70.0,
+   "circumpolaire": true,
+   "formule_circumpolaire": true,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    99.6587678752666,
+    260.3412321247334
+   ]
+  },
+  {
+   "lat": -70.0,
+   "dec": -30.0,
+   "h_min": 10.0,
+   "h_max": 50.0,
+   "h_culmination": 50.0,
+   "circumpolaire": true,
+   "formule_circumpolaire": true,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    87.28857619367638,
+    272.71142380632364
+   ]
+  },
+  {
+   "lat": -70.0,
+   "dec": -10.0,
+   "h_min": -10.0,
+   "h_max": 30.0,
+   "h_culmination": 30.0,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    79.27770054502845,
+    280.72229945497156
+   ]
+  },
+  {
+   "lat": -70.0,
+   "dec": 0.0,
+   "h_min": -20.0,
+   "h_max": 20.0,
+   "h_culmination": 20.0,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    75.86727725039653,
+    284.1327227496035
+   ]
+  },
+  {
+   "lat": -70.0,
+   "dec": 20.0,
+   "h_min": -40.0,
+   "h_max": 4.310455369189608e-35,
+   "h_culmination": 0.0,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    69.15985268351488,
+    290.8401473164851
+   ]
+  },
+  {
+   "lat": -70.0,
+   "dec": 45.0,
+   "h_min": -65.0,
+   "h_max": -25.0,
+   "h_culmination": -25.0,
+   "circumpolaire": false,
+   "formule_circumpolaire": false,
+   "culmine_au_nord": true,
+   "formule_nord": true,
+   "monte_avant": true,
+   "descend_apres": true,
+   "az_lever_puis_coucher": [
+    58.78936770236873,
+    301.21063229763126
+   ]
+  }
+ ],
+ "sigma_oct": {
+  "dec": -88.95649953627,
+  "distance_pole_deg": 1.04350046373,
+  "V": 5.42
+ }
+}

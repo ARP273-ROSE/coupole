@@ -198,13 +198,14 @@ def _taille_totale(r) -> int:
 
 def telecharger(url: str, chemin: str, taille_attendue: int | None = None, tolerance=2048,
                 limiteur: LimiteurDebit | None = None, arret: threading.Event | None = None,
-                progression=None, essais=4, verifier=None):
+                progression=None, essais=4, verifier=None, en_tetes: dict | None = None):
     """Télécharge avec reprise (.part + HTTP Range) et contrôles.
 
     Une seule requête par essai : le GET (avec « Range: bytes=<déjà reçu>- ») renseigne aussi la taille
     totale (Content-Range), ce qui évite la requête préalable de sondage — deux connexions par image
     devenaient une.  Renvoie ('ok'|'deja', octets reçus).  Lève IOError après `essais` échecs, Annule si
     arrêt.  `verifier(chemin_part)` : contrôle supplémentaire (ex. en-tête FITS), lève IOError si mauvais.
+    `en_tetes` : en-têtes ajoutés à chaque requête (authentification d'un partage WebDAV, 0.8.0).
     """
     part = chemin + '.part'
     dernier = ''
@@ -217,7 +218,10 @@ def telecharger(url: str, chemin: str, taille_attendue: int | None = None, toler
         try:
             debut = 0 if sans_range else (os.path.getsize(part) if os.path.exists(part) else 0)
             recu = 0
-            with requete(url, en_tetes={} if sans_range else {'Range': 'bytes=%d-' % debut}, delai=120) as r:
+            h = dict(en_tetes or {})
+            if not sans_range:
+                h['Range'] = 'bytes=%d-' % debut
+            with requete(url, en_tetes=h, delai=120) as r:
                 total = _taille_totale(r)
                 if r.status != 206:               # Range ignoré (ou fichier complet renvoyé) : on repart de zéro
                     debut = 0
@@ -259,6 +263,8 @@ def telecharger(url: str, chemin: str, taille_attendue: int | None = None, toler
             raise
         except (urllib.error.URLError, OSError, ValueError) as e:
             dernier = str(e)
+            if isinstance(e, urllib.error.HTTPError) and e.code in (401, 403, 404, 410):
+                raise IOError(dernier) from None        # refus définitif : réessayer ne servirait à rien (0.8.0)
             if isinstance(e, urllib.error.HTTPError) and e.code == 416:    # Range hors du fichier : .part faux
                 if not os.path.exists(part) or os.path.getsize(part) == 0:
                     sans_range = True               # 416 dès l'octet 0 : le serveur ne gère pas Range (archive ESO)

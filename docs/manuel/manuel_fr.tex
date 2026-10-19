@@ -21,7 +21,7 @@
 \vspace{1.4cm}
 \begin{minipage}{0.78\linewidth}\centering\sffamily\color{ink}
 Boîte à outils libre pour les étudiants du DU « Explorer et Comprendre l'Univers » (Observatoire de Paris).\\[4pt]
-Banque d'images de l'OHP · qualité des images · spectres et séries · sites et heures · cosmologie.
+Banque d'images de l'OHP · partages du DU · qualité des images · spectres et séries · sites et heures · cosmologie · animations · calculateurs de TD.
 \end{minipage}
 \vfill
 {\sffamily\small\color{summit}Auteur : ARP273-ROSE · Licence GNU GPL version 3 ou ultérieure\\
@@ -43,11 +43,13 @@ anglais ; la langue du système est détectée, et peut être imposée (menu \em
 \textbf{Module} & \textbf{Fonction}\\
 \midrule
 Banque OHP & Inventaire, catalogue, téléchargement, contrôle astrométrique, en-têtes corrigés, conversion, lots empilables, anomalies, carte du ciel.\\
+Partages du DU & Dossiers collaboratifs des défis et TP : structure, aperçus, nouveautés, tableaux de mesures contrôlés, outils d'analyse (Parallaxe Lune et ISS), dépôt de sa mesure sans rien écraser.\\
 Archives des observatoires & Images publiques de Hubble, JWST, ESO, Spitzer, WISE, 2MASS, NOIRLab, Keck, SDSS, Voyager, Cassini, Juno : recherche, volume, téléchargement, extraction, alignement, couleur.\\
 Qualité des images & Facultatif. FWHM, ellipticité, fond, bruit, gradient, saturation, traînées, échantillonnage.\\
 Spectres et séries & Lecture et tracé de données 1D (spectres radio, courbes de lumière, tables).\\
 Cosmologie & Du redshift aux distances, âges, volume, module de distance, échelle (Planck 2018 et autres).\\
 Sites et heures & Base des sites, carte OpenStreetMap, heure UTC et heure locale.\\
+Calculateurs de TD & La démarche des TD et TP pas à pas avec vos nombres, puis le calcul exact : Parallaxe (TP du cours).\\
 Ma machine & Diagnostic matériel ; exemple minimal de module.\\
 \bottomrule
 \end{tabularx}
@@ -665,6 +667,92 @@ tout envoi. Les adresses (\texttt{simbad.base}, \texttt{simbad.page}, \texttt{al
 \texttt{sbdb.page}, \texttt{resolution.sbdb}, \texttt{resolution.sesame}) se règlent comme les autres sources.
 
 % =====================================================================
+\section{Partages du DU}\label{sec:partages}
+\capture{img/partages_contenu_fr.png}{1.0}
+Les défis et les TP du DU se font souvent dans un \emph{dossier partagé} (Nextcloud de l'Observatoire) : un lien
+« \texttt{https://…/s/…} », dans lequel chacun dépose ses images, ses vidéos et parfois une ligne dans un tableau.
+Ce module rassemble tout au même endroit : plusieurs partages mémorisés (nom libre), leur structure, les aperçus, les
+nouveautés, le téléchargement, le contrôle des tableaux de mesures, les outils d'analyse et le dépôt de votre propre
+mesure. \textbf{Aucun lien n'est livré avec Coupole} : vous collez celui que l'équipe du DU vous a donné ; il reste
+sur votre ordinateur (fichier \texttt{partages.json} lisible par vous seul) et n'apparaît dans aucun rapport.
+
+\paragraph{Banque OHP ou partage ?} La Banque OHP est une archive professionnelle (service TAP, métadonnées
+normalisées, FITS des télescopes T120 et IRIS). Un partage est un dossier collaboratif d'étudiants : formats et
+métadonnées hétérogènes, saisis à la main, à valider. Coupole devine la structure (dossiers datés, observateurs,
+séries, tableaux), dit d'où vient chaque information (en-tête, tableau, nom de fichier) et signale les doutes. La
+présentation est la même que celle de la Banque : liste à gauche, contenu à droite, bouton bleu
+« Télécharger (N · taille) », clic droit qui commence par « Télécharger », guide en trois étapes au premier lancement
+(menu \emph{Aide > Guide des partages}), aperçus (FITS, JPEG, PNG, TIFF, première image d'une vidéo SER ou AVI) et
+bandeau des nouveautés depuis votre dernière visite.
+
+\paragraph{Ce que Coupole devine.} Le genre de chaque fichier ; l'instant d'après le nom (« \texttt{AAAA-MM-JJ-HH-MM-SS} »,
+« \texttt{JJ-MM-AA-…} » du sujet, « \texttt{IMG20260618223000} »…) — un nom qui se lit de deux façons
+(17-10-26 : 17 octobre 2026 ou 26 octobre 2017) est tranché par la date de dépôt, et une heure lue dans un nom est
+marquée « d'après le nom » (souvent l'heure locale) ; l'observateur (fin du nom, ou dossier
+« date – lieu – nom ») ; la cible (ISS, Lune…) ; les prises (variantes FITS/PNG/TIFF d'une même photo) et les séries
+(poses espacées de moins de 2 min). Les en-têtes FITS se lisent \emph{sans télécharger l'image} (requête partielle :
+les 34 premiers ko) : lieu (SITELAT/SITELONG), heure de début et milieu de pose.
+
+\capture{img/partages_mesures_fr.png}{1.0}
+\paragraph{Tableaux de mesures.} Les classeurs (xlsx, csv) sont lus \emph{sans être modifiés}. Formats normalisés
+(« 2,45° », « 48°47′05″ N », « +44:13:51:00 », nombres de jours d'Excel, dates américaines) et contrôles ligne par
+ligne, avec la preuve quand il y en a une : latitude et longitude échangées (certain si $|$latitude$| > 90^\circ$ ;
+prouvé par l'en-tête du fichier, par la position de la Lune — hauteur et azimut notés ne collent qu'avec les
+coordonnées échangées — ou par la comparaison aux lieux sûrs) ; heure locale au lieu du TU (l'en-tête ou la Lune
+s'accordent avec l'heure moins 1 ou 2~h) ; date ambiguë tranchée par le nom du fichier ; champs manquants, fichier
+introuvable. Les corrections proposées (marquées « * ») servent aux calculs si vous le voulez, jamais au tableau
+d'origine ; « Exporter en CSV » donne le tableau normalisé.
+
+\capture{img/partages_analyse_fr.png}{1.0}
+\paragraph{Outil « Parallaxe (Lune, ISS) ».} Les outils d'analyse se branchent selon le contenu du partage (le
+premier est celui-ci ; d'autres s'ajoutent sans toucher au reste). \emph{Chercher les paires} : même cible, deux
+observateurs éloignés (base $\ge 100$~km), presque au même instant (ISS $\le 5$~s, Lune $\le 60$~s). \emph{Mesurer}
+(clic droit sur une image) : centre de la Lune ajusté sur le limbe (cercle de Kåsa, le terminateur est écarté ; une
+Lune saturée ou un disque de taille anormale est signalé et l'incertitude élargie), objet mobile d'une série de poses
+courtes ou trait d'une pose longue pour l'ISS ; la direction $(\alpha, \delta)$ vient de la solution astrométrique de
+l'image. \emph{Calculer}, puis le rapport HTML ou PDF.
+\begin{itemize}
+\item \textbf{Lune} : méthode vectorielle topocentrique (positions WGS84 des deux lieux dans le même repère, point le
+plus proche des deux visées). Les directions mesurées sur une photo sont \emph{astrométriques} : la Lune où elle était
+il y a $\approx 1{,}2$~s, vue d'une Terre qui a bougé depuis ; le temps de lumière n'étant pas le même pour les deux
+observateurs, Coupole ramène chaque visée à la direction géométrique avant de trianguler (sans cela, $\approx 20$~km
+d'erreur pour 600~km de base). Comparaison à JPL DE440 (fichier de 32~Mo téléchargé une fois) ou à Meeus, budget
+d'erreur (direction, lieu, heure).
+\item \textbf{ISS} : triangulation des deux traces à l'instant commun, estimation du décalage d'horloge entre les
+observateurs, méthode des plans (sans horloge commune), comparaison au TLE (SGP4).
+\item Méthodes à un observateur : parallaxe diurne de la Lune (plusieurs heures de mesures), vitesse angulaire ou
+orbite circulaire de l'ISS.
+\end{itemize}
+
+\paragraph{Vérification.} Les calculs sont comparés à des références indépendantes (dossier
+\texttt{outils/verif\_parallaxe/}) : skyfield et JPL DE440 (position de l'observateur à 2~m près, directions de la Lune
+à 0,05″ avec DE440, distance de la Lune retrouvée à 0,5~km par la triangulation, altitude de l'ISS à 20~m, prédiction
+TLE à 10~m) et SageMath à 200 bits (ellipsoïde WGS84 dans les deux sens, point le plus proche de deux droites,
+réfraction, cercle de Kåsa, orbite au zénith).
+
+\capture{img/partages_depot_fr.png}{1.0}
+\paragraph{Déposer sa mesure.} Uniquement sur votre action, après une confirmation qui liste exactement ce qui part.
+Chaque fichier prend un nom libre (« \texttt{\_2} » si le nom existe) et part avec la condition « le fichier ne doit
+pas exister » ; votre ligne s'ajoute dans la première ligne libre du tableau (aucune cellule remplie n'est jamais
+remplacée, styles et autres feuilles recopiés octet pour octet) avec la condition « le tableau n'a pas changé depuis
+sa lecture » ; une copie locale du tableau est gardée avant l'ajout ; après trois conflits, la ligne part dans un
+petit fichier « \texttt{ligne\_<nom>\_<date>.csv} » à côté. Le client WebDAV de Coupole n'a \emph{aucune} méthode de
+suppression, de renommage ou de déplacement : même si le lien le permet (Coupole vous le signale), il ne touche jamais
+aux fichiers des autres.
+
+\paragraph{Astrométrie des images téléchargées.} La solution de l'en-tête est gardée ; sinon, au choix : ASTAP ou
+astrometry.net installés sur votre ordinateur, puis, en dernier recours, le service en ligne nova.astrometry.net
+(section~\ref{sec:nova}).
+
+\begin{ccode}
+coupole partages ajouter "Défi parallaxe" "https://…/s/…"\\
+coupole partages explorer "Défi parallaxe"\\
+coupole partages tableau "Défi parallaxe" --json\\
+coupole partages paires "Défi parallaxe" --entetes\\
+coupole partages mesurer image.fits --cible lune
+\end{ccode}
+
+% =====================================================================
 \section{Archives des observatoires}\label{sec:archives}
 \capture{img/module_archives_fr.png}{1.0}
 Les grands observatoires publient leurs images une fois écoulée la période réservée à l'équipe qui les a
@@ -973,6 +1061,23 @@ l'interface d'ASTAP, le paquet GTK3. Un test de l'intégration continue vérifie
 \texttt{/usr/local/bin}, \texttt{\textasciitilde/astap}). Catalogue : dossier choisi, \texttt{COUPOLE\_ASTAP\_CATALOGUE},
 dossier du programme, \texttt{/opt/astap}, \texttt{/usr/share/astap/data}, \texttt{/usr/local/opt/astap}. Un catalogue
 est déclaré complet avec ses 1~476 tuiles ; la version est lue sur \texttt{astap\_cli -h}.\end{sloppypar}
+
+
+\paragraph{Astrométrie en ligne (nova.astrometry.net)}\label{sec:nova}
+\capture{img/reglages_astrometrie_fr.png}{0.6}
+Quand une image n'a pas de solution astrométrique et qu'aucun outil n'est installé, Coupole peut la confier au service
+\emph{libre et gratuit} nova.astrometry.net (Lang, Hogg, Mierle, Blanton \& Roweis 2010). Ordre suivi partout (Partages
+du DU, Banque OHP pour les images sans solution quand ASTAP manque) : solution de l'en-tête, ASTAP installé,
+astrometry.net installé (\texttt{solve-field}), puis nova. Il faut \emph{votre} clé d'API (compte gratuit sur
+\url{https://nova.astrometry.net}, page de votre profil) dans \emph{Préférences > Astrométrie} ; elle est gardée à
+part (\texttt{nova.json}, lisible par vous seul) et n'est envoyée qu'à nova. \textbf{Rien ne part sans votre accord},
+demandé avant chaque lot. Ce que Coupole envoie, d'après la documentation officielle de l'API : une image allégée
+(niveaux de gris 16 bits, réduite au-delà de 4 millions de pixels ; la solution est ensuite ramenée à l'image
+d'origine, coefficients SIP compris), les indices connus (échelle en ″/px avec bornes $\pm 20$~\%, centre approché et
+rayon), images \emph{non publiques} par défaut, sans licence commerciale ni modification. Une seule soumission à la
+fois, sondage espacé (5~s puis jusqu'à 30~s), délai maximal, abandon propre ; une image déjà envoyée (même empreinte)
+n'est \emph{jamais} renvoyée — son résultat, ou l'échec, est gardé en cache, et une soumission interrompue reprend le
+sondage au lieu de renvoyer l'image.
 
 % =====================================================================
 \section{Formats de sortie}
@@ -1734,6 +1839,7 @@ Rotation de la Voie lactée & modèle de McMillan (2017) et ses composantes, mes
 Ondes de densité & tracteur et voitures : $n_\text{bouchon}/n=(v-v_t)/(v_\text{lente}-v_t)$, analogie des bras spiraux\\
 Univers-ballon & au lieu du film : galaxies sur un ballon qui gonfle, $v=Hd$, $H=\dot a/a$ ; le ballon se tourne à la souris\\
 Décalage vers le rouge & spectre de M32 décalé de $1+z$, raies, lumière reçue dans U, B, V, R ; vitesse par l'effet Doppler relativiste\\
+L'atmosphère terrestre & masse d'air (sec $z$, Kasten \& Young, Pickering), extinction $\Delta m = kX$ et rougissement, fenêtres atmosphériques (ESO SkyCalc), réfraction, Soleil aplati, lever avancé, dispersion\\
 Télescope & grossissement $F/f$, champ réel, pouvoir séparateur $1{,}22\lambda/D$, pouvoir collecteur, mise au point ; Lune, Saturne, amas globulaire\\
 Capteur CCD & pose (photons au hasard, loi de Poisson, saturation) puis lecture ligne par ligne et case par case\\
 Loi de Snell-Descartes & $n_1\sin\theta_1=n_2\sin\theta_2$, réflexion totale, part réfléchie (Fresnel), angle de Brewster\\
@@ -1826,6 +1932,80 @@ numérisées par \texttt{outils/verif\_anim/donnees\_lot3.py}.
 coupole anim liste\\
 coupole anim liste --faites --json\\
 coupole anim info sunmotions
+\end{ccode}
+
+
+\paragraph{L'atmosphère terrestre (0.8.0).} Animation propre à Coupole (thème Télescopes), quatre vues : épaisseur
+traversée (masse d'air : $\sec z$, Kasten \& Young 1989, Pickering 2002, coquille sphérique de 8~km, $\approx 38$ à
+l'horizon), extinction et rougissement ($\Delta m = kX$, Rayleigh $\propto \lambda^{-4}$, aérosols, ozone), fenêtres
+atmosphériques (modèle de ciel de l'ESO de 0,3 à 30~µm, schéma des rayons $\gamma$ à la radio) et réfraction (Bennett,
+Sæmundsson, Soleil aplati à l'échelle, lever avancé, dispersion d'après Ciddor 1996, pression et température).
+Formules vérifiées par SageMath (\texttt{outils/verif\_atmosphere/}).
+\capture{img/anim_earthatmosphere_fenetres_fr.png}{0.9}
+\capture{img/anim_earthatmosphere_refraction_fr.png}{0.9}
+
+\paragraph{Temps sidéral et angle horaire : l'hémisphère Sud.} L'arc de l'angle horaire est affiché par défaut (un
+choix déjà fait est gardé). La fiche « Ce qu'il faut voir » porte un encadré \emph{Dans l'hémisphère Sud} :
+$H = \mathrm{TSL} - \alpha$ ne change pas (compté vers l'ouest depuis le méridien, $H < 0$ avant la culmination), mais
+la plupart des astres culminent vers le nord ($\delta > \varphi$) ; face au nord, le ciel défile de droite à gauche ;
+le pôle Sud céleste n'a pas d'étoile brillante ($\sigma$~Octantis, magnitude 5,4, à environ 1°) ; une étoile est
+circumpolaire si $\delta < -(90^\circ - |\varphi|)$. Ces affirmations sont vérifiées par SageMath
+(\texttt{outils/verif\_anim/temps\_sideral\_sud\_verif.sage}).
+
+% =====================================================================
+\section{Calculateurs de TD}\label{sec:td}
+Des calculateurs qui suivent \emph{pas à pas} la démarche d'un TD ou d'un TP du cours, avec vos nombres, puis montrent
+le calcul exact et ce qui change. Le premier : \textbf{Parallaxe (TP du cours)}, qui reprend le sujet officiel
+(altitude de l'ISS, distance Terre-Lune).
+
+\capture{img/td_parallaxe_iss_fr.png}{1.0}
+\paragraph{La démarche du sujet.}
+\begin{enumerate}
+\item relever dans Stellarium les élévations $h_1$ et $h_2$ de l'objet vu des deux lieux, au même instant (et, si
+possible, les azimuts) — pour la Lune, la distance angulaire Lune–étoile $\varphi$ du sujet convient aussi ;
+\item parallaxe $2\alpha = h_1 - h_2$ (objet vu du même côté par les deux) ; si l'objet est \emph{entre} les deux lieux,
+les visées se croisent au-dessus de la base et $2\alpha = 180^\circ - h_1 - h_2$ ;
+\item distance $R$ entre les lieux « par exemple avec Google Earth » (à la surface) ou avec \texttt{EarthLocation}
+d'astropy (en ligne droite : la corde) ;
+\item $2\alpha = R/D$, $2\alpha$ en radians, d'où $D$.
+\end{enumerate}
+Les positions s'écrivent \emph{comme on veut} : décimal avec point ou virgule, signé ou avec N/S/E/O/W, degrés-minutes-%
+secondes avec ° ′ ″ ' " ou des espaces (« 48°47′6″N », « 48 47 06 N », « 2,45° E », « -2.35 », « 48d47m6s »),
+latitude et longitude dans n'importe quel ordre si les lettres le disent (sans lettre : latitude puis longitude). Une
+latitude impossible ($> 90^\circ$) est corrigée et signalée ; une base énorme qui deviendrait raisonnable en échangeant
+latitude et longitude d'un des lieux est signalée. Minutes ou secondes $\ge 60$, signe et lettre contradictoires :
+erreur dite, rien n'est deviné.
+
+\paragraph{Corde, surface et flèche.} La corde $R = \lvert\vec r_1 - \vec r_2\rvert$ relie les positions géocentriques
+WGS84 (comme \texttt{EarthLocation.from\_geodetic}) ; la distance à la surface est la géodésique de l'ellipsoïde
+(Vincenty). La corde passe \emph{sous} le sol : sa \textbf{flèche} (écart au milieu entre la corde et la surface) vaut
+$\approx R^2/(8R_\oplus)$ — 3~km pour 400~km — et le calculateur la donne exactement sur l'ellipsoïde, avec la
+profondeur de la corde sous l'horizon de chaque lieu ; une loupe la rend visible sur le dessin.
+
+\capture{img/td_parallaxe_lune_fr.png}{1.0}
+\paragraph{Le calcul exact.} Les deux horizons ne sont pas parallèles : ils font entre eux l'angle au centre $\theta$
+($5{,}9^\circ$ pour 660~km). Avec les deux azimuts, les deux visées sont triangulées dans l'espace (point le plus proche
+des deux droites) : distances aux deux lieux, distance au centre de la Terre, altitude au-dessus de l'ellipsoïde ;
+sans azimut, l'objet est supposé dans le plan vertical des deux lieux. L'exemple Lune le montre : $h_1 - h_2 = 4{,}45^\circ$
+est presque entièrement dû à $\theta$, la formule du sujet appliquée aux élévations donne $\approx 8\,500$~km, le calcul
+exact $357\,917$~km — c'est pourquoi le TP de la Lune mesure la distance Lune–étoile.
+
+\paragraph{Éphémérides et incertitudes.} Avec l'heure (bouton \emph{Maintenant}) : Lune par JPL DE440 (32~Mo,
+téléchargée une fois, puis hors ligne) ou Meeus à défaut — distances topocentriques et géocentrique, élévations
+prédites sans et avec réfraction ; ISS par le TLE de CelesTrak (le plus proche de l'instant parmi ceux gardés en
+cache, date affichée, avertissement au-delà de 3 jours ; l'historique des TLE n'est pas librement disponible sans
+compte Space-Track : pour un passage ancien, collez un TLE de l'époque) et SGP4. Incertitudes propagées sur $D$
+(élévations, positions, heure multipliée par la vitesse de l'objet en élévation). \emph{Exemple} remplit des données
+fictives cohérentes ; \emph{Exporter le détail} écrit un CSV pour la feuille « Calculs » du partage.
+
+\paragraph{Vérification.} Lecteur de coordonnées : une batterie de cas commune avec Coupole Web
+(\texttt{tests/td\_coordonnees\_cas.json}). Géométrie et calculs contre SageMath à 200 bits
+(\texttt{outils/verif\_td/verif\_td.sage}) : corde, surface, flèche, profondeurs, angle au centre à 1~mm et
+$10^{-9}$~degré près, triangulation, formule du sujet.
+
+\begin{ccode}
+coupole td parallaxe --p1 "48.8566, 2.3522" --h1 62,483 --az1 14,184 --alt1 35\\
+\hspace*{2em}--p2 "45°45′50″N 4°50′09″E" --h2 33.603 --az2 346.928 --alt2 170
 \end{ccode}
 
 % =====================================================================
@@ -1970,5 +2150,5 @@ Barbary (2016), Bertin \& Arnouts (1996). Moments adaptatifs : Bernstein \& Jarv
 © OpenStreetMap contributors. SIMBAD et Sesame : CDS, Strasbourg (Wenger et al. 2000) ; Aladin Lite (CDS) ;
 NED (NASA/IPAC) ; JPL Small-Body Database (NASA/JPL). Cosmologie : Planck Collaboration (2020, A\&A 641, A6) ;
 Hinshaw et al. (2013, WMAP 9) ; Riess et al. (2022, SH0ES) ; Hogg (1999, astro-ph/9905116) ; Komatsu et al. (2011)
-pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur). Archives : MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), Astro Data Archive de NOIRLab, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS du nœud Anneaux et Lunes, Imaging Node) ; reproject (Astropy) ; Rector et al. (2007, AJ 133, 598) pour l'ordre chromatique ; pratiques des amateurs : voir \texttt{docs/archives\_methode.md}. Animations : ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0) ; Meeus (1998, \emph{Astronomical Algorithms}, 2\textsuperscript{e} éd.) ; obliquité P03 / IAU 2006 ; limites des constellations de l'UAI (données livrées avec astropy) ; côtes Natural Earth 1:50m (domaine public) ; police STIX Two Math (SIL OFL 1.1) ; NASA Exoplanet Archive, NASA Planetary Fact Sheet, éphéméride JPL DE440 et éléments de Standish, AME 2020, filtres de Landolt (1992), spectre de M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, courbe de rotation : modèle de McMillan (2017) par galpy, mesures d'Eilers et al. (2019) et compilation galkin (Pato \& Iocco 2017), bras de Reid et al. (2019), barre de Wegg et al. (2015) ; machine d'Anticythère : adaptée d'Anticythere3D (même auteur), d'après Freeth et al. (\emph{Nature} 444, 2006 ; \emph{Nature} 454, 2008 ; \emph{Scientific Reports} 11:5821, 2021) ; spectres physiques : CODATA 2022, NIST ASD, Mamajek (2022), Malkov et al. (2020), van Belle et al. (2021), Martins et al. (2005), Castelli \& Kurucz (2003, ATLAS9), NIST-JANAF, Allard et al. (2000), CIE 1931 ; Gravité et orbites : d'après la simulation PhET « Gravity and Orbits » (PhET Interactive Simulations, University of Colorado Boulder ; rien n'en est repris), CODATA 2018, UAI 2015 (B3) et 2012 (B2), DE440 (Park et al. 2021), NASA (fiches Terre, Lune, ISS), Yoshida (1990) ; Orion en 3D et fiches au survol : SIMBAD (CDS, Strasbourg), Gaia DR3 (ESA/DPAC), Hipparcos (van Leeuwen 2007), Zucker et al. (2021, CC0), Großschedl et al. (2018), Kounkel et al. (2017, 2018), Foley et al. (2023), O'Dell et al. (2009), Stellarium (figure, CC BY-SA 4.0) ; images ESO/G. Beccari, ESO, et NASA, ESA, M. Robberto (STScI/ESA) and the Hubble Space Telescope Orion Treasury Project Team, NASA, ESA, and the Hubble Heritage Team (AURA/STScI), sous licence CC BY 4.0 (détail dans \texttt{NOTICE}).
+pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur). Archives : MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), Astro Data Archive de NOIRLab, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS du nœud Anneaux et Lunes, Imaging Node) ; reproject (Astropy) ; Rector et al. (2007, AJ 133, 598) pour l'ordre chromatique ; pratiques des amateurs : voir \texttt{docs/archives\_methode.md}. Animations : ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0) ; Meeus (1998, \emph{Astronomical Algorithms}, 2\textsuperscript{e} éd.) ; obliquité P03 / IAU 2006 ; limites des constellations de l'UAI (données livrées avec astropy) ; côtes Natural Earth 1:50m (domaine public) ; police STIX Two Math (SIL OFL 1.1) ; NASA Exoplanet Archive, NASA Planetary Fact Sheet, éphéméride JPL DE440 et éléments de Standish, AME 2020, filtres de Landolt (1992), spectre de M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, courbe de rotation : modèle de McMillan (2017) par galpy, mesures d'Eilers et al. (2019) et compilation galkin (Pato \& Iocco 2017), bras de Reid et al. (2019), barre de Wegg et al. (2015) ; atmosphère : Kasten \& Young (1989), Pickering (2002), Hansen \& Travis (1974), Ångström (1929), Ciddor (1996), modèle de ciel de l'ESO (Noll et al. 2012 ; Jones et al. 2013) ; Partages du DU et Calculateurs de TD : sujets « Parallaxe de l'ISS » et « Parallaxe lunaire » du DU (Observatoire de Paris) ; JPL DE440 (Park et al. 2021) lue par jplephem (MIT) ; ERFA (BSD, dérivé de SOFA, UAI) ; SGP4 (Vallado et al. 2006, paquet sgp4, MIT) et TLE de CelesTrak ; WGS84 (NIMA TR8350.2) ; Vincenty (1975) ; Kåsa (1976) ; Bennett (1982) et Saemundsson (1986) pour la réfraction ; skyfield (Rhodes, MIT) pour les références ; astrometry.net et nova.astrometry.net (Lang et al. 2010, AJ 139, 1782) ; WebDAV (RFC 4918) et partages publics Nextcloud ; Office Open XML (ECMA-376) ; machine d'Anticythère : adaptée d'Anticythere3D (même auteur), d'après Freeth et al. (\emph{Nature} 444, 2006 ; \emph{Nature} 454, 2008 ; \emph{Scientific Reports} 11:5821, 2021) ; spectres physiques : CODATA 2022, NIST ASD, Mamajek (2022), Malkov et al. (2020), van Belle et al. (2021), Martins et al. (2005), Castelli \& Kurucz (2003, ATLAS9), NIST-JANAF, Allard et al. (2000), CIE 1931 ; Gravité et orbites : d'après la simulation PhET « Gravity and Orbits » (PhET Interactive Simulations, University of Colorado Boulder ; rien n'en est repris), CODATA 2018, UAI 2015 (B3) et 2012 (B2), DE440 (Park et al. 2021), NASA (fiches Terre, Lune, ISS), Yoshida (1990) ; Orion en 3D et fiches au survol : SIMBAD (CDS, Strasbourg), Gaia DR3 (ESA/DPAC), Hipparcos (van Leeuwen 2007), Zucker et al. (2021, CC0), Großschedl et al. (2018), Kounkel et al. (2017, 2018), Foley et al. (2023), O'Dell et al. (2009), Stellarium (figure, CC BY-SA 4.0) ; images ESO/G. Beccari, ESO, et NASA, ESA, M. Robberto (STScI/ESA) and the Hubble Space Telescope Orion Treasury Project Team, NASA, ESA, and the Hubble Heritage Team (AURA/STScI), sous licence CC BY 4.0 (détail dans \texttt{NOTICE}).
 \end{document}

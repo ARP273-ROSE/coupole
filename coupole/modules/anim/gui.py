@@ -254,9 +254,25 @@ class Panneau(QWidget):
                                                        html.escape(tr('anim_%s_lien' % e.cle)))
         else:
             origine = html.escape(tr('anim_titre_origine', titre=e.titre))
-        return ('<b>%s</b> — <i>%s</i><br>%s<br><span>%s</span><br><small>%s</small>'
-                % (html.escape(tr('anim_nom_' + e.cle)), html.escape(etat), formule.enrichir(tr('anim_desc_' + e.cle)),
-                   origine, html.escape(tr('anim_theme_de', theme=tr('anim_theme_' + e.theme)))))
+        h = ('<b>%s</b> — <i>%s</i><br>%s<br><span>%s</span><br><small>%s</small>'
+             % (html.escape(tr('anim_nom_' + e.cle)), html.escape(etat), formule.enrichir(tr('anim_desc_' + e.cle)),
+                origine, html.escape(tr('anim_theme_de', theme=tr('anim_theme_' + e.theme)))))
+        return h + Panneau.a_voir(e.cle)
+
+    @staticmethod
+    def a_voir(cle: str) -> str:
+        """« Ce qu'il faut voir » et ses encadrés (ex. « Dans l'hémisphère Sud », 0.8.0), quand ils existent."""
+        import html
+        from ...core import i18n
+        cles = i18n.toutes_les_cles()
+        h = ''
+        if 'anim_%s_a_voir' % cle in cles:
+            h += '<p><b>%s</b> — %s</p>' % (html.escape(tr('anim_a_voir_titre')),
+                                           formule.enrichir(tr('anim_%s_a_voir' % cle)))
+        if 'anim_%s_sud' % cle in cles:
+            h += ('<table width="100%%" cellpadding="6" style="border:1px solid #6d8fb8"><tr><td><b>%s</b><br>%s'
+                  '</td></tr></table>' % (html.escape(tr('anim_encadre_sud')), formule.enrichir(tr('anim_%s_sud' % cle))))
+        return h
 
     # ------------------------------------------------------------ animation
     def montrer(self, vue: str):

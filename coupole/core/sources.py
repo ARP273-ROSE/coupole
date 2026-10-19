@@ -36,7 +36,9 @@ FORMAT = 1
 DOMAINES_AUTORISES = ('obspm.fr', 'unistra.fr', 'u-strasbg.fr', 'nasa.gov', 'caltech.edu', 'github.com',
                       'githubusercontent.com', 'giff.re', 'openstreetmap.org',
                       # module Archives (0.2.0) : MAST, ESO, NOIRLab, SDSS, Gemini, SMOKA, OPUS (PDS)
-                      'stsci.edu', 'eso.org', 'noirlab.edu', 'sdss.org', 'gemini.edu', 'nao.ac.jp', 'seti.org')
+                      'stsci.edu', 'eso.org', 'noirlab.edu', 'sdss.org', 'gemini.edu', 'nao.ac.jp', 'seti.org',
+                      # module Partages (0.8.0) : éléments orbitaux de l'ISS, astrométrie en ligne (libre)
+                      'celestrak.org', 'astrometry.net')
 CLES_TEXTE = {'ohp.collection', 'maj.depot', 'ohp.telechargement.de', 'ohp.telechargement.vers',
               'archives.irsa.collections', 'archives.koa.tables'}
 

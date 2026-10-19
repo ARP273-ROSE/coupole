@@ -12,3 +12,6 @@ lxml>=4.9
 sep>=1.4
 reproject>=0.13
 psutil>=5.9
+# module Partages, outil Parallaxe (0.8.0) : éphéméride DE440 (jplephem) et TLE de l'ISS (sgp4), licences MIT
+jplephem>=2.21
+sgp4>=2.22

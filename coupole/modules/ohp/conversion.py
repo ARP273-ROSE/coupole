@@ -218,6 +218,9 @@ def convertir(x: dict, fic: str, sortie: str, med: dict, medo: dict, options: di
         if resolu is None and pb:                # aveugle, en dernier recours
             resolu, m2 = astap_mod.resoudre(etat, fic, None, None, 0, 180)
             msg_astap += ' ; aveugle : ' + m2
+    if resolu is None and sol is None and not faire_astap and options.get('astrometrie_secours') and \
+            mode != 'jamais':
+        resolu, msg_astap = _secours_astrometrie(ref, ent, x, options, info)
     sol_a = wcs_de(resolu, nx, ny) if resolu is not None else None
     info['astap'] = msg_astap
     if sol_a is not None:
@@ -416,3 +419,26 @@ def convertir(x: dict, fic: str, sortie: str, med: dict, medo: dict, options: di
     info['staging'] = sortie
     info['t_conversion'] = round(time.time() - t0, 2)
     return info
+
+
+def _secours_astrometrie(donnees, ent, x, options, info):
+    """Image sans solution et ASTAP absent (0.8.0) : astrometry.net installé, puis nova.astrometry.net si
+    l'utilisateur l'a accepté (`options['en_ligne']`).  Rend (Entete de la solution ou None, message)."""
+    from astropy.io import fits
+
+    from ...core import astrometrie
+    h = fits.Header()
+    for k in ('XPIXSZ', 'FOCALLEN', 'XBINNING'):
+        if ent.getf(k):
+            h[k] = ent.getf(k)
+    if x.get('s_ra') is not None and x.get('s_dec') is not None:
+        h['RA'], h['DEC'] = float(x['s_ra']), float(x['s_dec'])
+    try:
+        sol, source = astrometrie.resoudre(donnees, h, 'astrometry.net' if not options.get('en_ligne') else 'auto',
+                                           bool(options.get('en_ligne')), nom=str(x.get('obs_id') or 'image'))
+    except Exception as e:                       # service injoignable, clé refusée… : l'image reste sans solution
+        return None, 'secours: %s' % type(e).__name__
+    if sol is None:
+        return None, 'secours: no solution'
+    info['astrometrie_secours'] = source
+    return Entete([c.image for c in sol.cards if c.keyword]), source

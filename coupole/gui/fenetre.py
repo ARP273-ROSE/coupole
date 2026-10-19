@@ -206,6 +206,8 @@ class FenetrePrincipale(QMainWindow):
         m.addAction(action(self, 'act_manuel', self.manuel, QKeySequence('Shift+F1')))
         if hasattr(self.panneau_module('ohp'), 'montrer_guide'):     # guide du premier lancement (0.7.2)
             m.addAction(action(self, 'act_guide_ohp', lambda: self.ouvrir_module('ohp').montrer_guide()))
+        if hasattr(self.panneau_module('partages'), 'montrer_guide'):  # Partages du DU (0.8.0)
+            m.addAction(action(self, 'act_guide_partages', lambda: self.ouvrir_module('partages').montrer_guide()))
         m.addAction(action(self, 'act_raccourcis', lambda: dialogues.afficher_raccourcis(self)))
         m.addSeparator()
         m.addAction(action(self, 'act_signaler', lambda: dialogues.DialogueSignaler(self).exec()))

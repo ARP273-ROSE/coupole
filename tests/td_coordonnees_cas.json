@@ -1,0 +1,322 @@
+{
+ "note": "Cas communs du lecteur de coordonnées (Coupole bureau et Coupole Web) : texte saisi, valeur attendue en degrés ou clé d’erreur.",
+ "cas": [
+  {
+   "type": "angle",
+   "texte": "48.785",
+   "attendu": 48.785
+  },
+  {
+   "type": "angle",
+   "texte": "48,785",
+   "attendu": 48.785
+  },
+  {
+   "type": "angle",
+   "texte": "-2.35",
+   "attendu": -2.35
+  },
+  {
+   "type": "angle",
+   "texte": "+44:13:51",
+   "attendu": 44.23083333333334
+  },
+  {
+   "type": "angle",
+   "texte": "48°47′6″N",
+   "attendu": 48.785
+  },
+  {
+   "type": "angle",
+   "texte": "48° 47' 6\" N",
+   "attendu": 48.785
+  },
+  {
+   "type": "angle",
+   "texte": "48 47 06 N",
+   "attendu": 48.785
+  },
+  {
+   "type": "angle",
+   "texte": "48d47m6s",
+   "attendu": 48.785
+  },
+  {
+   "type": "angle",
+   "texte": "N 48 47 06",
+   "attendu": 48.785
+  },
+  {
+   "type": "angle",
+   "texte": "2,45° E",
+   "attendu": 2.45
+  },
+  {
+   "type": "angle",
+   "texte": "2.45E",
+   "attendu": 2.45
+  },
+  {
+   "type": "angle",
+   "texte": "O 1,6",
+   "attendu": -1.6
+  },
+  {
+   "type": "angle",
+   "texte": "1.6 W",
+   "attendu": -1.6
+  },
+  {
+   "type": "angle",
+   "texte": "48°47,1′ N",
+   "attendu": 48.785
+  },
+  {
+   "type": "angle",
+   "texte": "48º47’06”",
+   "attendu": 48.785
+  },
+  {
+   "type": "angle",
+   "texte": "33°52′ S",
+   "attendu": -33.86666666666667
+  },
+  {
+   "type": "angle",
+   "texte": "  151.2093 ",
+   "attendu": 151.2093
+  },
+  {
+   "type": "angle",
+   "texte": "−33,8688",
+   "attendu": -33.8688
+  },
+  {
+   "type": "angle",
+   "texte": "0",
+   "attendu": 0.0
+  },
+  {
+   "type": "angle",
+   "texte": "90°",
+   "attendu": 90.0
+  },
+  {
+   "type": "angle",
+   "texte": "48 47",
+   "attendu": 48.78333333333333
+  },
+  {
+   "type": "angle",
+   "texte": "12°30'",
+   "attendu": 12.5
+  },
+  {
+   "type": "angle",
+   "texte": "0°0′30″ W",
+   "attendu": -0.008333333333333333
+  },
+  {
+   "type": "angle",
+   "texte": "48d 47m 6s N",
+   "attendu": 48.785
+  },
+  {
+   "type": "angle",
+   "texte": "",
+   "erreur": "td_err_vide"
+  },
+  {
+   "type": "angle",
+   "texte": "abc",
+   "erreur": "td_err_illisible"
+  },
+  {
+   "type": "angle",
+   "texte": "48°61′",
+   "erreur": "td_err_minutes"
+  },
+  {
+   "type": "angle",
+   "texte": "48°47′61″",
+   "erreur": "td_err_secondes"
+  },
+  {
+   "type": "angle",
+   "texte": "-48° N",
+   "erreur": "td_err_signe"
+  },
+  {
+   "type": "angle",
+   "texte": "48.5°30′",
+   "erreur": "td_err_illisible"
+  },
+  {
+   "type": "position",
+   "texte": "48.785, 2.45",
+   "attendu": [
+    48.785,
+    2.45
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "48,785 2,45",
+   "attendu": [
+    48.785,
+    2.45
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "48,785, 2,45",
+   "attendu": [
+    48.785,
+    2.45
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "48.785,2.45",
+   "attendu": [
+    48.785,
+    2.45
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "48.785;2.45",
+   "attendu": [
+    48.785,
+    2.45
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "48.785 / 2.45",
+   "attendu": [
+    48.785,
+    2.45
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "48°47′6″N 2°27′E",
+   "attendu": [
+    48.785,
+    2.45
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "2°27′E 48°47′6″N",
+   "attendu": [
+    48.785,
+    2.45
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "N 48 47 06 E 2 27 00",
+   "attendu": [
+    48.785,
+    2.45
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "48 47 06 N 2 27 00 E",
+   "attendu": [
+    48.785,
+    2.45
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "48 47 06 2 27 00",
+   "attendu": [
+    48.785,
+    2.45
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "48d47m6s N 2d27m E",
+   "attendu": [
+    48.785,
+    2.45
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "48°47'06\" 2°27'00\"",
+   "attendu": [
+    48.785,
+    2.45
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "-33.8688 151.2093",
+   "attendu": [
+    -33.8688,
+    151.2093
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "33°52′ S 151°12′ E",
+   "attendu": [
+    -33.86666666666667,
+    151.2
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "151.2093, -33.8688",
+   "attendu": [
+    -33.8688,
+    151.2093
+   ],
+   "notes": [
+    "td_a_inversion_certaine"
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "2.45 W 48.78 N",
+   "attendu": [
+    48.78,
+    -2.45
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "48.78N 357.55E",
+   "attendu": [
+    48.78,
+    -2.45
+   ]
+  },
+  {
+   "type": "position",
+   "texte": "48.785",
+   "erreur": "td_err_deux_angles"
+  },
+  {
+   "type": "position",
+   "texte": "48 N 2 S",
+   "erreur": "td_err_deux_lat"
+  },
+  {
+   "type": "position",
+   "texte": "95 120",
+   "erreur": "td_err_latitude"
+  },
+  {
+   "type": "position",
+   "texte": "48,785,2,45",
+   "erreur": "td_err_deux_angles"
+  }
+ ]
+}

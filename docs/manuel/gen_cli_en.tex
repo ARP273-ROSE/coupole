@@ -262,6 +262,126 @@ FOLDER & output folder (or one stack)\\
 \par\medskip
 \begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
 \toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages ajouter (add)\newline\normalfont\small Checks the share link, shows the rights (warns if deletion is allowed) and remembers it under a free name.}\\
+\midrule
+NAME & name given to the share\\
+LINK & share link (https://…/s/…) or WebDAV address\\
+--mot-de-passe,\allowbreak{} --password PASSWORD & share password, if any\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages liste (list)\newline\normalfont\small remembered shares}\\
+\midrule
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages oublier (forget)\newline\normalfont\small forget a share (nothing is touched on the server)}\\
+\midrule
+NAME & name given to the share\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages explorer (explore)\newline\normalfont\small Reads the whole tree and states what was recognised.}\\
+\midrule
+NAME & name given to the share\\
+--fichiers,\allowbreak{} --files & list each file as well\\
+--vus,\allowbreak{} --seen & mark the current content as seen\\
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages tableau (table)\newline\normalfont\small Normalises each row and reports anomalies (never changes anything).}\\
+\midrule
+NAME & name given to the share\\
+PATH & table to read (all by default)\\
+--entetes,\allowbreak{} --headers & read the FITS headers first (places and times, safer checks)\\
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages entetes (headers)\newline\normalfont\small read the FITS headers (place, UT time, object)}\\
+\midrule
+NAME & name given to the share\\
+PATH & share folder (everything by default)\\
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages paires (pairs)\newline\normalfont\small Looks for shots of the same target by two distant observers, at almost the same time.}\\
+\midrule
+NAME & name given to the share\\
+--iss S & maximum difference for the ISS (s)\\
+--lune,\allowbreak{} --moon S & maximum difference for the Moon (s)\\
+--base N & minimum baseline (km)\\
+--entetes,\allowbreak{} --headers & read the FITS headers first (places and times, safer checks)\\
+--sans-corrections,\allowbreak{} --no-corrections & do not apply the proposed corrections\\
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages telecharger (download)\newline\normalfont\small Same engine as the OHP image bank; FITS prepared as XISF or FITS; sorted by date, target and observer.}\\
+\midrule
+NAME & name given to the share\\
+PATH & paths in the share (files or folders)\\
+--dossier,\allowbreak{} --folder FOLDER & download folder\\
+--format \{xisf,\allowbreak{}fits\} & format of the prepared FITS\\
+--astrometrie,\allowbreak{} --astrometry \{wcs,\allowbreak{}auto,\allowbreak{}astap,\allowbreak{}astrometry.net,\allowbreak{}nova\} & astrometric solution when the header has none\\
+--en-ligne,\allowbreak{} --online & agree to send the images without a solution to nova.astrometry.net (API key from the Preferences)\\
+--sans-originaux,\allowbreak{} --no-originals & do not keep the original FITS\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages mesurer (measure)\newline\normalfont\small Centre of the lunar disc (or ISS trail) and its position (α, δ) from the astrometric solution of the image.}\\
+\midrule
+FILE & images (FITS with an astrometric solution)\\
+--cible,\allowbreak{} --target \{lune,\allowbreak{}moon,\allowbreak{}iss\} & measured target\\
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages calculer (compute)\newline\normalfont\small JSON file: \{"cible": "lune"|"iss", "methode": "deux"|"diurne"|"vitesse"|"orbite", "visees": [\{"nom", "lat", "lon", "alt\_m", "points": [\{"instant": "2026-10-21T04:33:44Z", "ra": 96.2, "dec": 23.7\}]\}], "tle": [line 1, line 2]\}.}\\
+\midrule
+FILE & JSON sightings file\\
+--html FILE & also write the HTML report\\
+--pdf FILE & also write the PDF report\\
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole partages deposer (upload)\newline\normalfont\small Without --yes, only shows what would be sent. Never overwrites: free names, conditional uploads, local copy of the table.}\\
+\midrule
+NAME & name given to the share\\
+FILE & files to upload\\
+--dossier,\allowbreak{} --folder PATH & share folder to upload to\\
+--tableau,\allowbreak{} --table PATH & table to add the row to\\
+--valeur,\allowbreak{} --value ROLE=VALUE & row value: auteur=…, cible=…, date=…, latitude=…, longitude=…, altitude=…\\
+--oui,\allowbreak{} --yes & really send\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole archives liste (list)\newline\normalfont\small list the known archives (stage, missions, status)}\\
 \midrule
 --json & JSON output (for scripts)\\
@@ -490,6 +610,24 @@ Z & redshift(s) to compute\\
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole anim info}\\
 \midrule
 ID & ClassAction id (e.g. sunmotions)\\
+--json & JSON output (for scripts)\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole td parallaxe (parallax)\newline\normalfont\small “Parallax (course practical)” calculator}\\
+\midrule
+--p1 TEXT & position of place 1 (any format)\\
+--h1 TEXT & elevation measured at place 1\\
+--az1 TEXT & azimuth measured at place 1 (optional)\\
+--alt1 TEXT & elevation of place 1\\
+--p2 TEXT & position of place 2 (any format)\\
+--h2 TEXT & elevation measured at place 2\\
+--az2 TEXT & azimuth measured at place 2 (optional)\\
+--alt2 TEXT & elevation of place 2\\
+--cible,\allowbreak{} --target \{iss,\allowbreak{}lune,\allowbreak{}moon\} & target: iss or moon\\
+--instant TEXT & date and time UT (ephemeris comparison)\\
 --json & JSON output (for scripts)\\
 \bottomrule
 \end{tabularx}

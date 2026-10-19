@@ -1886,8 +1886,8 @@
   ]
  },
  "reel": {
-  "documents": 818,
-  "vocabulaire": 5451,
+  "documents": 819,
+  "vocabulaire": 5460,
   "requetes": [
    [
     "seasons",
@@ -7557,6 +7557,16 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "earthatmosphere",
+      "n": 1,
+      "score": 38,
+      "mots": [
+       "atmosphere",
+       "atmospheric"
+      ]
+     },
+     {
       "g": "question",
       "id": "ca_terrplanets_earthearlyatmosphere",
       "n": 1,
@@ -7609,15 +7619,6 @@
       "score": 18,
       "mots": [
        "atmospheric"
-      ]
-     },
-     {
-      "g": "question",
-      "id": "ca_jovianplanets_titanaltimeter",
-      "n": 1,
-      "score": 10,
-      "mots": [
-       "atmosphere"
       ]
      }
     ]

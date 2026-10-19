@@ -30,6 +30,8 @@ TEXTES = {
                       '{faites} animations available out of {total} in the original catalogue.'),
     'anim_disponible': _t('disponible', 'available'),
     'anim_a_venir': _t('à venir', 'coming'),
+    'anim_a_voir_titre': _t('Ce qu’il faut voir', 'What to look for'),
+    'anim_encadre_sud': _t('Dans l’hémisphère Sud', 'In the southern hemisphere'),
     'anim_titre_origine': _t('Titre d’origine : {titre}', 'Original title: {titre}'),
     'anim_theme_de': _t('Thème : {theme}', 'Topic: {theme}'),
     'anim_choisir': _t('Choisissez une animation dans le catalogue, à gauche.',
@@ -353,6 +355,26 @@ _ANIM = {
                                                    'le méridien (positif vers l’ouest).',
                                                    'Draw the hour angle along the star’s parallel, from the meridian '
                                                    '(positive toward west).'),
+    'anim_siderealtimeandhourangledemo_a_voir': (
+        'Le temps sidéral local est l’ascension droite des étoiles qui passent au méridien. L’angle horaire d’une '
+        'étoile, H = TSL − α, dit depuis combien de temps elle a culminé (positif vers l’ouest) : H = 0 au méridien, '
+        'H = ± 6 h près de l’horizon pour une étoile de l’équateur. Faites tourner le ciel et suivez H.',
+        'Local sidereal time is the right ascension of the stars crossing the meridian. A star’s hour angle, '
+        'H = LST − α, tells how long ago it culminated (positive toward west): H = 0 on the meridian, H = ± 6 h near '
+        'the horizon for a star on the equator. Turn the sky and follow H.'),
+    'anim_siderealtimeandhourangledemo_sud': (
+        'H = TSL − α ne change pas : l’angle horaire se compte toujours vers l’ouest depuis le méridien, H < 0 avant '
+        'la culmination, H > 0 après. Mais la plupart des astres culminent vers le NORD (tous ceux dont δ > φ). Face '
+        'au nord, l’est est à droite : le ciel défile de droite à gauche. Le pôle Sud céleste, à une hauteur égale à '
+        '|φ|, n’a pas d’étoile brillante : la plus proche visible à l’œil nu, σ Octantis (magnitude 5,4), en est à '
+        'environ 1°. Une étoile est circumpolaire (jamais couchée) si δ < −(90° − |φ|) : à 34° S, toutes celles de '
+        'déclinaison inférieure à −56°.',
+        'H = LST − α does not change: the hour angle is still counted westward from the meridian, H < 0 before '
+        'culmination, H > 0 after. But most objects culminate toward the NORTH (all those with δ > φ). Facing north, '
+        'east is on the right: the sky moves from right to left. The south celestial pole, at an altitude equal to '
+        '|φ|, has no bright star: the nearest one visible to the naked eye, σ Octantis (magnitude 5.4), lies about '
+        '1° from it. A star is circumpolar (never sets) if δ < −(90° − |φ|): at 34° S, all those with a declination '
+        'below −56°.'),
     'anim_siderealtimeandhourangledemo_h': ('Angle horaire H = TSL − α', 'Hour angle H = LST − α'),
     # ------------------------------------------------------------ mouvements du Soleil
     'anim_sunmotions_mode': ('Animation', 'Animation'),
@@ -1058,6 +1080,8 @@ TEXTES.update({k: _t(*v) for k, v in ANIM_ORION.items()})
 from .textes_gravite import ANIM_GRAVITE  # noqa: E402  (0.7.2 : gravité et orbites, d'après PhET)
 
 TEXTES.update({k: _t(*v) for k, v in ANIM_GRAVITE.items()})
+from .textes_atmosphere import ANIM_ATMOSPHERE  # noqa: E402  (0.8.0 : l'atmosphère terrestre)
+TEXTES.update({k: _t(*v) for k, v in ANIM_ATMOSPHERE.items()})
 
 for _cle, _fr, _en in (('buenos_aires', 'Buenos Aires', 'Buenos Aires'), ('lima', 'Lima', 'Lima'),
                        ('casablanca', 'Casablanca', 'Casablanca'), ('monrovia', 'Monrovia', 'Monrovia'),

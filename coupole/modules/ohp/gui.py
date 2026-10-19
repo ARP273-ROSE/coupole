@@ -1499,6 +1499,10 @@ class Panneau(QWidget):
             lambda *_: memoire.reglage_differe('ohp_mode_astap', self.mode_astap.currentData()))
         hg.addWidget(self.mode_astap)
         hg.addWidget(bouton('ohp_assistant_astap', self._astap))
+        # 0.8.0 : images SANS solution et ASTAP absent : astrometry.net installé, puis (accord demandé) nova en ligne
+        self.secours_astro = case('ohp_secours_astrometrie', False)
+        memoire.case(self.secours_astro, 'modules.ohp.secours_astrometrie')
+        hg.addWidget(self.secours_astro)
         vo.addWidget(g)
         g = QGroupBox(tr('ohp_groupe_machine'))
         gl = QGridLayout(g)
@@ -1782,7 +1786,15 @@ class Panneau(QWidget):
         self.barre.setValue(0)
         self._octets, self._t0, self._total = 0, time.time(), 0
         self._evts = FileEvenements(self, self._evenements)
+        en_ligne = False
+        if self.secours_astro.isChecked() and etat is None:
+            from ...core import nova
+            if nova.configure():
+                vis = tr('pt_nova_publiques' if nova.reglages()['public'] else 'pt_nova_privees')
+                en_ligne = QMessageBox.question(self, tr('pt_nova_accord_titre'), tr('ohp_nova_accord', visibilite=vis)) \
+                    == QMessageBox.StandardButton.Yes
         opts = {'format': fmt, 'langue': self.noms.currentData(), 'astap': etat,
+                'astrometrie_secours': self.secours_astro.isChecked(), 'en_ligne': en_ligne,
                 'mode_astap': self.mode_astap.currentData(), 'debit_octets_s': self.debit.value() * 1e6,
                 'garder_fits': self.garder_fits.isChecked(), 'garder_doublons': self.garder_doublons.isChecked()}
         self._log(tr('ohp_journal_debut', n=est['images'], dest=dest, format=fmt.upper()))

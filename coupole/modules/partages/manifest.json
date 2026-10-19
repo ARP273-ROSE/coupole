@@ -1,0 +1,15 @@
+{
+  "id": "partages",
+  "version": "1.0.0",
+  "nom": {"fr": "Partages du DU", "en": "DU shared folders"},
+  "description": {
+    "fr": "Dossiers partagés des défis et TP (liens Nextcloud de l'Observatoire) : plusieurs partages mémorisés, structure découverte (dates, observateurs, séries, tableaux), aperçus, nouveautés, téléchargement, tableaux de mesures contrôlés, outils d'analyse (Parallaxe de la Lune et de l'ISS) et dépôt de sa propre mesure sans rien écraser",
+    "en": "Shared folders of the challenges and practicals (Observatory Nextcloud links): several remembered shares, discovered structure (dates, observers, series, tables), previews, what's new, download, checked measurement tables, analysis tools (Moon and ISS parallax) and upload of one's own measurement without overwriting anything"
+  },
+  "icone": "icone.svg",
+  "ordre": 12,
+  "textes": "textes:TEXTES",
+  "gui": "gui:Panneau",
+  "cli": "cli:enregistrer",
+  "coupole_min": "0.8.0"
+}

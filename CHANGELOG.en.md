@@ -2,6 +2,77 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.8.0 — 19 October 2026
+
+**DU shared folders.** New module for the collaborative folders of the challenges and practicals (the Observatory's
+Nextcloud shares). No link ships with Coupole: you paste the one the team gave you; it stays on your computer
+(`partages.json`, readable by you only) and never appears in a report.
+
+- **Several remembered shares** (free name, rename, forget, copy the link), link rights shown (Coupole warns if the
+  link allows deleting: it never does).
+- **Guessed structure** without downloading anything: file kinds, instant from the name (DD-MM-YY / YY-MM-DD
+  ambiguity settled by the upload date, time “from the name” flagged), observers, targets, shots, series; FITS
+  headers read with a partial request (first 34 kB). Same layout as the OHP bank: list on the left, content on the
+  right, blue “Download (N · size)” button, right-click menu, three-step guide (*Help > Shares guide*), previews
+  (FITS, JPEG, PNG, TIFF, SER, AVI), what's-new banner.
+- **Checked measurement tables** (xlsx, csv, never modified): normalised formats, latitude/longitude swaps (certain,
+  proven by the header, by the Moon or by comparison with reliable sites), local time, US dates, ambiguous date
+  settled by the file name, missing files; corrections proposed for the calculations only; normalised CSV export.
+- **“Parallax (Moon, ISS)” tool** (extensible tool architecture): simultaneous pairs, Moon centre fitted on the limb
+  (saturated Moon flagged), moving object or trail of the ISS, Moon distance by the topocentric vector method —
+  **astrometric directions turned into geometric directions** (the light time differs between the observers:
+  ≈ 20 km of error otherwise) —, ISS altitude by triangulation with estimated clock offset and plane method,
+  comparison with JPL DE440 (file downloaded once) or Meeus and with the TLE, error budget, HTML and PDF reports
+  (also from the command line, without a screen).
+- **Upload of one's measurement without overwriting anything**: confirmation listing everything, free names,
+  conditional uploads (If-None-Match / If-Match), first free row of the table (nothing else changes, byte for byte),
+  local copy before the addition, small CSV next to it after three conflicts; the WebDAV client has no delete,
+  rename or move method.
+- Command line `coupole partages` (add, list, explore, table, headers, pairs, download, measure, compute, upload,
+  de440).
+
+**Online astrometry as a last resort (nova.astrometry.net).** Common chain: header solution, ASTAP, installed
+astrometry.net, then the free nova.astrometry.net service with **your** API key (*Preferences > Astrometry*, kept
+separately) and **your consent before each upload**. Lightened image (16-bit, reduced; solution brought back to the
+original image, SIP included), scale and position hints, images not public by default, one submission at a time,
+spaced polling, clean abort, resume; an image already sent is never sent twice (cache). Used by the DU shared folders
+and the OHP bank (images without a solution when ASTAP is missing).
+
+**Course calculators.** New section: calculators that follow the course exercises and practicals step by step.
+First: **Parallax (course practical)**, after the official practical (ISS, Moon): elevations h₁ and h₂,
+2α = h₁ − h₂ (or 180° − h₁ − h₂ if the object is between the places), R at the surface (like Google Earth) and as a
+chord (astropy's EarthLocation), D = R/2α; then the exact calculation (the horizons make the angle θ; triangulation
+with or without azimuths), the chord's **sagitta** and its dip below each horizon, the ephemeris if the time is
+given (Moon: DE440 or Meeus; ISS: CelesTrak TLE kept in cache, age shown), uncertainties (elevations, places, time).
+Positions written **in any way** (decimal, comma, N/S/E/O/W, degrees-minutes-seconds, free order if the letters say
+so), swap reported. Drawing of the whole exercise (Earth cross-section, chord, verticals, horizons, lines of sight,
+angles, magnifier on the sagitta), numbered steps, fictitious example, CSV export for the “Calculs” sheet. Command
+line `coupole td parallax`. Checked against SageMath (chord within 1 mm).
+
+**New animation “Earth's atmosphere: absorption, thickness crossed, refraction”** (96th, Coupole's own, *Telescopes*
+theme: the atmosphere is the first instrument light goes through; it decides where and how we observe). Four views:
+**thickness crossed** (cross-section of the Earth and atmosphere, layers, 8 km scale height, path growing toward the
+horizon; airmass by sec z, Kasten & Young 1989, Pickering 2002 and spherical shell: ≈ 38 at the horizon);
+**extinction and reddening** (Rayleigh ∝ λ⁻⁴, Ångström aerosols, ozone; Δm = k X in U B V R I; colour of the
+transmitted Sun versus its altitude); **atmospheric windows** (transmission from 0.3 to 30 µm after the ESO sky model —
+SkyCalc, Paranal —, J H K L M N Q bands and H₂O, CO₂, O₃ absorptions; sketch of the γ, X, UV, far-infrared,
+submillimetre, radio and ionosphere domains; why telescopes go to altitude and to space); **refraction** (ray through
+layers of decreasing index, optional exaggeration, apparent and true altitude — Bennett, Sæmundsson, ≈ 34′ at the
+horizon —, flattened Sun to scale, earlier rising and later setting versus latitude, dispersion from Ciddor's index,
+pressure and temperature). Formulas checked with SageMath, sources in NOTICE; link with the parallax challenge and
+the course calculator.
+
+**Sidereal time and hour angle.** The hour angle arc is shown by default (a remembered choice is kept); “In the
+southern hemisphere” box (culmination toward the north, sky moving right to left facing north, σ Octantis,
+circumpolar stars if δ < −(90° − |φ|)), checked by SageMath.
+
+**Dependencies** (MIT licences): `jplephem` (DE440) and `sgp4` (TLE), shipped in the standalone packages.
+
+**Tests**: fake WebDAV server (PROPFIND, partial GET, conditional PUT, 412, destructive methods refused and
+counted), synthetic workbook (styles, formula, second sheet, pre-numbered rows), checks, pairs, calculations against
+skyfield + DE440 and SageMath (scripts `outils/verif_parallaxe/`, `outils/verif_td/`), fake nova server, headless
+interface and a beginner's journey end to end; 1,622 tests passed.
+
 ## 0.7.2 — 15 October 2026
 
 **OHP image bank: download without the manual.** Feedback from a student (0.4.1, Windows): he saw the catalogue,

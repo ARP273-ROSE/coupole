@@ -53,6 +53,8 @@
     "astropy_healpix",
     "psutil",
     "lxml.etree",
+    "jplephem.spk",
+    "sgp4.api",
     "updater",
     "reporting",
     "interface_kit",
