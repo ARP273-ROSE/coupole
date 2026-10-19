@@ -2,6 +2,10 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.8.1 — 19 October 2026
+
+- **Practical-work calculator « Parallax »**: the ISS TLE is now fetched automatically when computing (CelesTrak), no click needed, and kept for offline use. For an old date, Coupole uses the closest one and says so (the full history needs a free Space-Track account).
+
 ## 0.8.0 — 19 October 2026
 
 **DU shared folders.** New module for the collaborative folders of the challenges and practicals (the Observatory's

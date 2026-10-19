@@ -2,6 +2,10 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.8.1 — 19 octobre 2026
+
+- **Calculateur de TD « Parallaxe »** : le TLE de l'ISS est récupéré tout seul au moment du calcul (CelesTrak), sans clic ; il est gardé pour le hors-ligne. Pour une date ancienne, Coupole prend le plus proche et le signale (l'historique complet demande un compte Space-Track, gratuit).
+
 ## 0.8.0 — 19 octobre 2026
 
 **Partages du DU.** Nouveau module pour les dossiers collaboratifs des défis et TP (partages Nextcloud de
