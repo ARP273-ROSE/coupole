@@ -287,30 +287,39 @@ class Atmosphere(Animation):
         hs = [-1.0 + i * 0.25 for i in range(185)]
         ax.courbe([(x_, 60 * A.refraction_vraie(x_, P, T)) for x_ in hs], 'accent1', 2.0)
         ax.verticale(h, 'soleil', etiquette=arcmin(A.refraction_vraie(h, P, T)))
-        # Soleil au coucher, à l'échelle, et dispersion
+        # Soleil à la hauteur choisie, à l'échelle : la vue suit le Soleil, l'horizon sort du cadre s'il le faut
         r3 = dessin.cadre(p, droite, tr('anim_earthatmosphere_t_soleil_couchant'))
-        ap = A.aplatissement(0.0, 0.2666, P, T)
+        ap = A.aplatissement(h, 0.2666, P, T)
         kk = r3.height() * 0.35 / 0.6                      # pixels par degré
-        cx, hy = r3.center().x(), r3.top() + r3.height() * 0.62
-        p.setPen(dessin.stylo('horizon', 1.5))
-        p.drawLine(QPointF(r3.left() + 8, hy), QPointF(r3.right() - 8, hy))
+        cx = r3.center().x()
+        yc = min(max(r3.top() + r3.height() * 0.62 - h * kk, r3.top() + r3.height() * 0.40),
+                 r3.top() + r3.height() * 0.68)            # centre vrai du Soleil, gardé dans le cadre
+        hy = yc + h * kk                                   # ordonnée de l'horizon (hauteur 0)
+        p.save()
+        p.setClipRect(r3)
+        if hy < r3.bottom() - 50:
+            p.setPen(dessin.stylo('horizon', 1.5))
+            p.drawLine(QPointF(r3.left() + 8, hy), QPointF(r3.right() - 8, hy))
         # disque vrai (pointillés) et apparent (forme exacte point par point)
         p.setPen(dessin.stylo('doux', 1.0, pointille=True))
         p.setBrush(dessin.Qt.BrushStyle.NoBrush)
-        p.drawEllipse(QPointF(cx, hy), 0.2666 * kk, 0.2666 * kk)
+        p.drawEllipse(QPointF(cx, yc), 0.2666 * kk, 0.2666 * kk)
         forme = QPainterPath()
         for i in range(73):
             t = 2 * math.pi * i / 72
-            hv = 0.2666 * math.sin(t)
+            hv = h + 0.2666 * math.sin(t)
             ha = hv + A.refraction_vraie(hv, P, T)
             pt = QPointF(cx + 0.2666 * kk * math.cos(t), hy - ha * kk)
             forme.moveTo(pt) if i == 0 else forme.lineTo(pt)
         p.setPen(dessin.stylo('soleil', 1.5))
         p.setBrush(dessin.c('soleil', 0.8))
         p.drawPath(forme)
+        p.restore()
+        if hy >= r3.bottom() - 50:
+            dessin.etiquette(p, cx, r3.bottom() - 56, tr('anim_earthatmosphere_e_horizon_bas', h=nombre(h, 1)), 'doux')
         dessin.etiquette(p, cx, hy - (ap['haut_apparent'] + 0.05) * kk, tr(
-            'anim_earthatmosphere_e_aplati', r=nombre(ap['rapport'], 2)), 'texte')
-        dessin.etiquette(p, cx, hy + 0.35 * kk, tr('anim_earthatmosphere_e_vrai'), 'doux')
+            'anim_earthatmosphere_e_aplati', r=nombre(ap['rapport'], 3)), 'texte')
+        dessin.etiquette(p, cx, yc + 0.35 * kk, tr('anim_earthatmosphere_e_vrai'), 'doux')
         dessin.etiquette(p, cx, r3.bottom() - 34, tr('anim_earthatmosphere_e_avance', t=nombre(
             A.avance_lever_min(self.latitude.value()), 1), lat=nombre(self.latitude.value(), 0)), 'texte')
         # dispersion : images bleue, verte, rouge d'une étoile à la hauteur choisie

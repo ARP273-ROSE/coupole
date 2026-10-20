@@ -92,11 +92,12 @@ ANIM_ATMOSPHERE = {
                                                                                    '× {k}'),
     'anim_earthatmosphere_e_exagere': ('réfraction × 40', 'refraction × 40'),
     'anim_earthatmosphere_t_refraction': ('Réfraction selon la hauteur', 'Refraction versus altitude'),
-    'anim_earthatmosphere_t_soleil_couchant': ('Le Soleil à l’horizon, à l’échelle', 'The Sun at the horizon, to '
-                                                                                    'scale'),
+    'anim_earthatmosphere_t_soleil_couchant': ('Le Soleil à la hauteur choisie, à l’échelle', 'The Sun at the chosen '
+                                                                                         'altitude, to scale'),
     'anim_earthatmosphere_e_aplati': ('aplati : {r} × son diamètre', 'flattened: {r} × its diameter'),
-    'anim_earthatmosphere_e_vrai': ('pointillés : position vraie, sous l’horizon', 'dotted: true position, below '
-                                                                                  'the horizon'),
+    'anim_earthatmosphere_e_vrai': ('pointillés : position vraie, sans atmosphère', 'dotted: true position, '
+                                                                                   'without atmosphere'),
+    'anim_earthatmosphere_e_horizon_bas': ('horizon {h}° plus bas', 'horizon {h}° below'),
     'anim_earthatmosphere_e_avance': ('lever avancé et coucher retardé de {t} min (latitude {lat}°)',
                                       'rising earlier and setting later by {t} min (latitude {lat}°)'),
     'anim_earthatmosphere_e_dispersion': ('bleu, vert, rouge : {d}″ d’écart', 'blue, green, red: {d}″ apart'),
