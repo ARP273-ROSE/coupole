@@ -2,7 +2,7 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
-## Unreleased
+## 0.8.2 — 20 October 2026
 
 - **Animations navigation in a logical order**: Modules, Animations, Library, Favourites, Progress. The Library loses
   its “Animations” tab, which repeated the Animations page (grouped by theme, with search); a module's animations

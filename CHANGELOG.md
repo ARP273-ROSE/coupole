@@ -2,7 +2,7 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
-## Non publié
+## 0.8.2 — 20 octobre 2026
 
 - **Navigation des animations dans un ordre logique** : Modules, Animations, Bibliothèque, Favoris, Progression. La
   Bibliothèque perd son onglet « Animations », qui répétait la page Animations (rangée par thème, avec la recherche) ;
