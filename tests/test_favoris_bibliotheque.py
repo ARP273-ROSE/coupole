@@ -74,18 +74,18 @@ def test_bibliotheque(app_qt):
     s = ST.stockage().doc
     v.aller_bibliotheque()
     pb = v.pile.currentWidget()
-    assert isinstance(pb, PageBibliotheque) and pb.onglets.count() == 5
+    assert isinstance(pb, PageBibliotheque) and pb.onglets.count() == 4
     assert '(517)' in pb.onglets.tabText(0)
     # filtre par module
     pb.module.setCurrentIndex(pb.module.findData('lunarcycles'))
     assert pb.onglets.widget(0).topLevelItemCount() == 1
     # images : vignettes (dessinées aux moments creux)
-    pb.onglets.setCurrentIndex(4)
+    pb.onglets.setCurrentIndex(3)
     v.resize(1000, 700)
     v.show()
     for _ in range(40):
         pb._vignette_suivante()
-    imgs = pb.onglets.widget(4)
+    imgs = pb.onglets.widget(3)
     assert any(not imgs.item(k).icon().isNull() for k in range(imgs.count()) if imgs.item(k).data(256))
     # favoris seulement
     S.ajouter_favori(s, 'image', 'lunareclipse')

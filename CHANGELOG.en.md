@@ -2,6 +2,14 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## Unreleased
+
+- **Animations navigation in a logical order**: Modules, Animations, Library, Favourites, Progress. The Library loses
+  its “Animations” tab, which repeated the Animations page (grouped by theme, with search); a module's animations
+  remain in the module's page.
+- **Earth's atmosphere, Refraction view**: the to-scale Sun follows the altitude slider (it was stuck on the horizon);
+  the view follows it and shows where the horizon is when it leaves the frame.
+
 ## 0.8.1 — 19 October 2026
 
 - **Practical-work calculator « Parallax »**: the ISS TLE is now fetched automatically when computing (CelesTrak), no click needed, and kept for offline use. For an old date, Coupole uses the closest one and says so (the full history needs a free Space-Track account).

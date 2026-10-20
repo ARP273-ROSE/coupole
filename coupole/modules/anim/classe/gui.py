@@ -435,13 +435,12 @@ class PageAccueil(QWidget):
                                         k + 1 if m['affiche'] else None, (b['reussies'], b['total'])))
             self.grille.addLayout(g)
             self.grille.addSpacing(6)
-        # la bibliothèque : tout le contenu, comme dans ClassAction
+        # la bibliothèque : questions, fiches, tables et images, comme dans ClassAction
         ms = contenu.modules()
         n = lambda k: len({i for m in ms for i in m[k]})      # noqa: E731
         b = self._carte('📚  ' + tr('classe_bibliotheque_carte'), tr(
-            'classe_bibliotheque_carte_texte', q=len({q['id'] for m in ms for q in m['questions']}),
-            a=len({i for m in ms for i in m['animations'] if i in catalogue.PAR_ID}), f=n('fiches'), t=n('tables'),
-            i=n('images')), self.vue.aller_bibliotheque)
+            'classe_bibliotheque_carte_texte', q=len({q['id'] for m in ms for q in m['questions']}), f=n('fiches'),
+            t=n('tables'), i=n('images')), self.vue.aller_bibliotheque)
         g = GrilleCartes()
         g.addWidget(b)
         self.grille.addLayout(g)
@@ -1384,12 +1383,13 @@ _VIGNETTES: dict = {}
 
 
 class PageBibliotheque(QWidget):
-    """La présentation d'origine de ClassAction : un onglet par type (Questions, Animations, Fiches, Tables, Images)
-    montre tout le contenu de ce type, rangé par module dans l'ordre d'origine ; filtres module et favoris ; vignettes
-    des images et des animations (dessinées une à une, aux moments creux) ; étoile (Ctrl+D, clic droit)."""
+    """La présentation d'origine de ClassAction : un onglet par type (Questions, Fiches, Tables, Images) montre tout le
+    contenu de ce type, rangé par module dans l'ordre d'origine ; filtres module et favoris ; vignettes des images
+    (dessinées une à une, aux moments creux) ; étoile (Ctrl+D, clic droit).  Les animations ont leur propre vue
+    (bouton « Animations ») : l'onglet qui la répétait a été retiré."""
 
-    ONGLETS = ('questions', 'animations', 'fiches', 'tables', 'images')
-    GENRE = {'questions': 'question', 'animations': 'animation', 'fiches': 'fiche', 'tables': 'table', 'images': 'image'}
+    ONGLETS = ('questions', 'fiches', 'tables', 'images')
+    GENRE = {'questions': 'question', 'fiches': 'fiche', 'tables': 'table', 'images': 'image'}
 
     def __init__(self, vue, onglet='questions', module='', favoris=False):
         super().__init__()

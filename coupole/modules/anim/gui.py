@@ -140,8 +140,8 @@ class Panneau(QWidget):
         from .classe.gui import VueClasse
         nav = QHBoxLayout()
         self.b_vues = {}
-        for cle, texte in (('modules', 'classe_nav_modules'), ('bibliotheque', 'classe_nav_bibliotheque'),
-                           ('animations', 'classe_nav_animations'), ('favoris', 'classe_nav_mes_modules'),
+        for cle, texte in (('modules', 'classe_nav_modules'), ('animations', 'classe_nav_animations'),
+                           ('bibliotheque', 'classe_nav_bibliotheque'), ('favoris', 'classe_nav_mes_modules'),
                            ('progression', 'classe_nav_progression')):
             b = QPushButton(tr(texte))
             b.setCheckable(True)

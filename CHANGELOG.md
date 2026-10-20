@@ -2,6 +2,14 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## Non publié
+
+- **Navigation des animations dans un ordre logique** : Modules, Animations, Bibliothèque, Favoris, Progression. La
+  Bibliothèque perd son onglet « Animations », qui répétait la page Animations (rangée par thème, avec la recherche) ;
+  les animations d'un module restent dans la page du module.
+- **L'atmosphère terrestre, vue Réfraction** : le Soleil à l'échelle suit le curseur de hauteur (il était figé sur
+  l'horizon) ; la vue le suit et indique l'horizon quand il sort du cadre.
+
 ## 0.8.1 — 19 octobre 2026
 
 - **Calculateur de TD « Parallaxe »** : le TLE de l'ISS est récupéré tout seul au moment du calcul (CelesTrak), sans clic ; il est gardé pour le hors-ligne. Pour une date ancienne, Coupole prend le plus proche et le signale (l'historique complet demande un compte Space-Track, gratuit).

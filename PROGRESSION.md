@@ -1469,3 +1469,12 @@ graphiques » du PROGRESSION.md de Coupole Web, sous-section « Gravité et orbi
   vues), données `anim/donnees/atmosphere_eso.json` (ESO SkyCalc, `outils/verif_atmosphere/donnees_atmosphere.py`),
   vérification `outils/verif_atmosphere/atmosphere_verif.sage` → `tests/atmosphere_sage.json`.
 - **Aucun tag** : publication sur accord.
+
+## 2026-10-20 — navigation et atmosphère (non publié)
+
+- [x] Atmosphère, vue Réfraction : le Soleil suit la hauteur (bureau et web).
+- [x] Navigation : Modules · Animations · Bibliothèque · Favoris · Progression ; onglet « Animations » retiré de la
+  Bibliothèque (doublon). Textes, aide et manuels FR/EN mis à jour.
+- [ ] **À la prochaine Release** : refaire les captures (`outils/captures_anim.py fr|en docs/manuel/img`, la barre
+  a changé) puis recompiler les manuels (`docs/manuel/compiler.sh`, date à mettre à jour).
+
