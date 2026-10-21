@@ -2,11 +2,13 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
-## Unreleased
+## 0.8.3 — 21 October 2026
 
 - **Earth's atmosphere**: only the settings that matter for the chosen view are shown (temperature and latitude only
   serve refraction, aerosols only extinction); the Extinction view also plots the optical depth along the line of
-  sight (τ × X), which follows the altitude.
+  sight (τ × X), which follows the altitude. Refraction view: the refraction curve covers every altitude (0 to 90°,
+  it stopped at 45°) and the drawn ray follows the altitude down to the horizon (fixed horizontal compression; below
+  37°, the drawn angle no longer changed).
 
 ## 0.8.2 — 20 October 2026
 

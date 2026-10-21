@@ -1478,3 +1478,8 @@ graphiques » du PROGRESSION.md de Coupole Web, sous-section « Gravité et orbi
 - [x] Captures refaites (`outils/captures_anim.py fr|en docs/manuel/img`, la barre
   a changé) puis recompiler les manuels (`docs/manuel/compiler.sh`, date à mettre à jour).
 
+
+## 2026-10-21 — 0.8.3 : atmosphère
+
+- [x] Réglages montrés selon la vue ; épaisseur optique le long de la visée (τ × X) ; courbe de réfraction 0–90° ;
+  rayon dessiné avec une compression horizontale fixe (× 4). Captures de l'atmosphère et manuels refaits.

@@ -2,11 +2,13 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
-## Non publié
+## 0.8.3 — 21 octobre 2026
 
 - **L'atmosphère terrestre** : seuls les réglages utiles à la vue choisie sont affichés (température et latitude ne
   servent qu'à la réfraction, les aérosols qu'à l'extinction) ; la vue Extinction trace aussi l'épaisseur optique le
-  long de la visée (τ × X), qui suit la hauteur.
+  long de la visée (τ × X), qui suit la hauteur. Vue Réfraction : la courbe de réfraction couvre toutes les hauteurs
+  (0 à 90°, elle s'arrêtait à 45°) et le rayon dessiné suit la hauteur jusqu'à l'horizon (compression horizontale
+  fixe ; sous 37°, l'angle tracé ne changeait plus).
 
 ## 0.8.2 — 20 octobre 2026
 
