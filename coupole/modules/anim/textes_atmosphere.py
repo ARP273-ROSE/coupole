@@ -57,7 +57,9 @@ ANIM_ATMOSPHERE = {
     'anim_earthatmosphere_e_trajet': ('trajet {l} km, X = {x}', 'path {l} km, X = {x}'),
     'anim_earthatmosphere_e_agrandie': ('épaisseurs agrandies × {k}', 'thicknesses enlarged × {k}'),
     'anim_earthatmosphere_sphere': ('coquille de 8 km', '8 km shell'),
-    'anim_earthatmosphere_t_tau': ('Épaisseur optique au zénith', 'Optical depth at the zenith'),
+    'anim_earthatmosphere_t_tau': ('Épaisseur optique : au zénith, et le long de la visée', 'Optical depth: at the zenith, '
+                                                                                        'and along the line of sight'),
+    'anim_earthatmosphere_visee': ('le long de la visée (× X = {x})', 'along the line of sight (× X = {x})'),
     'anim_earthatmosphere_total': ('total', 'total'),
     'anim_earthatmosphere_ozone': ('ozone (Chappuis)', 'ozone (Chappuis)'),
     'anim_earthatmosphere_t_soleil': ('Le Soleil transmis', 'The transmitted Sun'),

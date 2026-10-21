@@ -2,6 +2,12 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## Unreleased
+
+- **Earth's atmosphere**: only the settings that matter for the chosen view are shown (temperature and latitude only
+  serve refraction, aerosols only extinction); the Extinction view also plots the optical depth along the line of
+  sight (τ × X), which follows the altitude.
+
 ## 0.8.2 — 20 October 2026
 
 - **Animations navigation in a logical order**: Modules, Animations, Library, Favourites, Progress. The Library loses

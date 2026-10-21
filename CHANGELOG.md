@@ -2,6 +2,12 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## Non publié
+
+- **L'atmosphère terrestre** : seuls les réglages utiles à la vue choisie sont affichés (température et latitude ne
+  servent qu'à la réfraction, les aérosols qu'à l'extinction) ; la vue Extinction trace aussi l'épaisseur optique le
+  long de la visée (τ × X), qui suit la hauteur.
+
 ## 0.8.2 — 20 octobre 2026
 
 - **Navigation des animations dans un ordre logique** : Modules, Animations, Bibliothèque, Favoris, Progression. La

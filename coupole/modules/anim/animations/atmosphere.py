@@ -45,6 +45,17 @@ class Atmosphere(Animation):
         self.beta = self.curseur('aerosols', 0.0, 0.3, 0.05, dec=2)
         self.latitude = self.curseur('latitude', 0.0, 65.0, 48.8, dec=1, unite='°')
         self.exagerer = self.coche('exagerer', False)
+        self.vue_c.currentIndexChanged.connect(self._reglages_utiles)
+        self._reglages_utiles()
+
+    def _reglages_utiles(self, *_):
+        """Seuls les réglages qui changent la vue affichée sont montrés (température et latitude : réfraction)."""
+        v = self.vue_c.currentData()
+        self.pression.setVisible(v != 'fenetres')
+        self.temperature.setVisible(v in ('epaisseur', 'refraction'))
+        self.beta.setVisible(v == 'extinction')
+        self.latitude.setVisible(v == 'refraction')
+        self.exagerer.setVisible(v == 'refraction')
 
     def _p(self):
         return self.pression.value(), self.temperature.value()
@@ -158,9 +169,12 @@ class Atmosphere(Animation):
         gauche = QRectF(rect.x(), rect.y(), rect.width() * 0.66, rect.height())
         droite = QRectF(gauche.right(), rect.y(), rect.width() - gauche.width(), rect.height())
         r = dessin.cadre(p, gauche, tr('anim_earthatmosphere_t_tau'))
-        ax = Axes(r, 0.3, 1.0, 0.0, 1.2, marges=(40, 6, 12, 22)).avec(p)
+        ax = Axes(r, 0.3, 1.0, 0.0, 1.2 * min(max(X, 1.0), 6.0), marges=(40, 6, 12, 22)).avec(p)
         ax.bande_visible(0.15, echelle=0.001)
         ax.fond(p, 'λ (µm)', 'τ', n_x=7, n_y=4)
+        # le long de la visée : τ × X (masse d'air à la hauteur choisie)
+        ax.courbe([(l, X * A.tau_total(l, P, beta)) for l in [0.3 + i * 0.005 for i in range(141)]], 'accent1', 1.6,
+                  pointille=True)
         ls = [0.3 + i * 0.005 for i in range(141)]
         ax.courbe([(l, A.tau_rayleigh(l, P)) for l in ls], 'accent2', 1.4)
         ax.courbe([(l, A.tau_aerosols(l, beta)) for l in ls], 'doux', 1.4)
@@ -169,10 +183,11 @@ class Atmosphere(Animation):
         for b, l in A.BANDES.items():
             ax.verticale(l, COULEURS_BANDES[b], etiquette='%s : k = %s' % (b, nombre(A.k_bande(l, P, beta), 2)))
         dessin.police(p, 0.8)
-        yy = r.top() + 14
-        for cle, nom in (('accent1', tr('anim_earthatmosphere_total')), ('accent2', 'Rayleigh ∝ λ⁻⁴'),
+        yy = r.top() + r.height() * 0.35
+        for cle, nom in (('accent1', tr('anim_earthatmosphere_total')),
+                         ('accent1', '- - ' + tr('anim_earthatmosphere_visee', x=nombre(X, 2))), ('accent2', 'Rayleigh ∝ λ⁻⁴'),
                          ('doux', tr('anim_earthatmosphere_aerosols')), ('arc1', tr('anim_earthatmosphere_ozone'))):
-            dessin.texte(p, ax.r.right() - 90, yy, nom, cle)
+            dessin.texte(p, ax.r.right() - 130, yy, nom, cle)
             yy += 14
         dessin.police(p, 1 / 0.8)
         # Soleil transmis à la hauteur choisie
