@@ -273,7 +273,7 @@ class Atmosphere(Animation):
             a = math.radians(max(ang, 0.2))
             xs.append(xs[-1] + (hauteur / n_couches) / math.tan(a))
             ys.append(ys[-1] + hauteur / n_couches)
-        kx = min(1.0, (r.right() - 12 - ox) / max(xs[-1], 1e-9))
+        kx = 0.25                     # compression horizontale FIXE (× 4) : l'angle dessiné suit la hauteur
         path = QPainterPath(QPointF(ox, oy))
         for x_, y_ in zip(xs[1:], ys[1:]):
             path.lineTo(QPointF(ox + kx * x_, oy - y_))
@@ -287,9 +287,8 @@ class Atmosphere(Animation):
         L0 = 1.2 * hauteur / math.tan(a0)
         p.drawLine(QPointF(ox, oy), QPointF(ox + kx * L0, oy - 1.2 * hauteur))
         p.restore()
-        if kx < 0.999:
-            dessin.etiquette(p, r.center().x(), r.bottom() - 6, tr('anim_earthatmosphere_e_comprime', k=nombre(
-                1 / kx, 0)), 'doux')
+        dessin.etiquette(p, r.center().x(), r.bottom() - 6, tr('anim_earthatmosphere_e_comprime', k=nombre(1 / kx, 0)),
+                         'doux')
         dessin.disque(p, ox, oy, 4, 'texte')
         dessin.etiquette(p, ox + 60, oy - 18, tr('anim_earthatmosphere_e_apparente'), 'accent1')
         if self.exagerer.isChecked():
