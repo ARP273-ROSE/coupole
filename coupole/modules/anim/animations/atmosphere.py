@@ -297,9 +297,9 @@ class Atmosphere(Animation):
         # réfraction selon la hauteur
         r2 = dessin.cadre(p, QRectF(gauche.x(), gauche.y() + gauche.height() * 0.55, gauche.width(),
                                     gauche.height() * 0.45), tr('anim_earthatmosphere_t_refraction'))
-        ax = Axes(r2, -1.0, 45.0, 0.0, 40.0, marges=(40, 6, 12, 22)).avec(p)
+        ax = Axes(r2, -1.0, 90.0, 0.0, 40.0, marges=(40, 6, 12, 22)).avec(p)
         ax.fond(p, '%s (°)' % tr('anim_earthatmosphere_hauteur'), '′', n_x=9, n_y=4)
-        hs = [-1.0 + i * 0.25 for i in range(185)]
+        hs = [-1.0 + i * 0.25 for i in range(365)]
         ax.courbe([(x_, 60 * A.refraction_vraie(x_, P, T)) for x_ in hs], 'accent1', 2.0)
         ax.verticale(h, 'soleil', etiquette=arcmin(A.refraction_vraie(h, P, T)))
         # Soleil à la hauteur choisie, à l'échelle : la vue suit le Soleil, l'horizon sort du cadre s'il le faut
