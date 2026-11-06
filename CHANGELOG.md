@@ -2,6 +2,12 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.8.5 — 6 novembre 2026
+
+- **ASTAP sous Windows ARM** : l'auteur d'ASTAP a retiré sa version ARM64 (le lien proposé par Coupole était mort) ;
+  Coupole propose désormais l'installeur et la version ligne de commande x64, que Windows 11 ARM exécute par
+  émulation, avec une note qui l'explique.
+
 ## 0.8.4 — 6 novembre 2026
 
 - **Calculateurs de TD, Parallaxe, schéma de la Lune** : à ×1, le schéma montre tout l'exercice, la Terre et la Lune

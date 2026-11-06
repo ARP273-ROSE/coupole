@@ -286,20 +286,16 @@ def conseils_installation(systeme: str | None = None, arch: str | None = None,
     r = {'systeme': s, 'arch': a, 'famille': fam, 'programme': [], 'cli': None, 'catalogue': [],
          'etapes': [], 'notes': [], 'dossier': '', 'page': SITE}
     if s == 'windows':
+        r['programme'] = [('astap_lien_installeur', _u('windows_installer/astap_setup.exe'))]
+        r['cli'] = _u('windows_installer/astap_command-line_version_win64.zip')
+        r['catalogue'] = [('astap_lien_d80_exe', _u('star_databases/d80_star_database.exe')),
+                          ('astap_lien_d50_exe', _u('star_databases/d50_star_database.exe'))]
+        r['etapes'] = ['astap_etape_win_1', 'astap_etape_win_2', 'astap_etape_win_3', 'astap_etape_win_4']
+        r['dossier'] = 'C:\\Program Files\\astap'
         if a == 'arm64':
-            r['cli'] = _u('windows_installer/astap_command-line_version_win11_aarch64.zip')
-            r['programme'] = [('astap_lien_cli_zip', r['cli'])]
-            r['catalogue'] = [('astap_lien_d80_exe', _u('star_databases/d80_star_database.exe')),
-                              ('astap_lien_d50_zip', _u('star_databases/d50_star_database.zip'))]
-            r['etapes'] = ['astap_etape_win_arm_1', 'astap_etape_win_arm_2', 'astap_etape_win_arm_3']
-            r['dossier'] = 'C:\\astap'
-        else:
-            r['programme'] = [('astap_lien_installeur', _u('windows_installer/astap_setup.exe'))]
-            r['cli'] = _u('windows_installer/astap_command-line_version_win64.zip')
-            r['catalogue'] = [('astap_lien_d80_exe', _u('star_databases/d80_star_database.exe')),
-                              ('astap_lien_d50_exe', _u('star_databases/d50_star_database.exe'))]
-            r['etapes'] = ['astap_etape_win_1', 'astap_etape_win_2', 'astap_etape_win_3', 'astap_etape_win_4']
-            r['dossier'] = 'C:\\Program Files\\astap'
+            # plus de version ARM64 (le zip win11_aarch64 a disparu de SourceForge en novembre 2026) : les
+            # versions x64 tournent sous Windows 11 ARM par émulation
+            r['notes'] = ['astap_note_win_arm']
     elif s == 'macos':
         if a == 'arm64':
             r['programme'] = [('astap_lien_pkg_m', _u('macOS%20installer/astap_M1.pkg'))]

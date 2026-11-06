@@ -91,6 +91,9 @@ def test_guide_astap_liens_et_extraction_sure():
     assert textes.EXTRAIRE == astap.EXTRAIRE_D80_DEB
     assert '-C /opt/astap' in astap.EXTRAIRE_D80_DEB and '-C / ' not in astap.EXTRAIRE_D80_DEB
     assert '--no-same-owner' in astap.EXTRAIRE_D80_DEB and "'./opt/astap/d80_*'" in astap.EXTRAIRE_D80_DEB
+    w = astap.conseils_installation('windows', 'arm64', '')          # plus d'ARM64 : les versions x64, par émulation
+    assert w['cli'].endswith('win64.zip/download') and w['notes'] == ['astap_note_win_arm']
+    assert 'aarch64' not in ' '.join(u for _, u in w['programme'])
     for s, a, f in (('linux', 'x86_64', 'rpm'), ('linux', 'arm64', 'autre'), ('windows', 'arm64', '')):
         assert not any('d80_star_database.zip' in u for _, u in astap.conseils_installation(s, a, f)['catalogue'])
 

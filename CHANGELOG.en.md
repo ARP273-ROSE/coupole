@@ -2,6 +2,12 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.8.5 — 6 November 2026
+
+- **ASTAP on Windows ARM**: the ASTAP author withdrew the ARM64 build (the link Coupole offered was dead); Coupole
+  now offers the x64 installer and command-line version, which Windows 11 ARM runs through emulation, with a note
+  explaining it.
+
 ## 0.8.4 — 6 November 2026
 
 - **Course calculators, Parallax, Moon diagram**: at ×1 the diagram shows the whole exercise, the Earth and the Moon

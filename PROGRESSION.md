@@ -1488,3 +1488,4 @@ graphiques » du PROGRESSION.md de Coupole Web, sous-section « Gravité et orbi
 - Défaut : pour la Lune, ×1 ne cadrait que la base (l'objet « lointain » restait hors cadre), donc ×1 et ×60 donnaient le même cadre et le curseur de zoom ne faisait rien.
 - Correctif : `cadrage()` commun (bureau `coupole/modules/td/gui.py`, web `src/app/page_td.ts`). ×1 = tout l'exercice, Lune comprise ; ×60 = la base ; étendue en progression géométrique et centre qui suit la même fraction. Les visées vont jusqu'à l'objet, étiquettes locales masquées quand la base fait moins de 40 px, « objet à … km → » si l'objet sort du cadre.
 - Tests : `test_cadrage_zoom_lune` (bureau), `tests/unit/td_cadrage.test.ts` + e2e td (27/27) côté web.
+- 0.8.5 (06/11/2026) : ASTAP Windows ARM → versions x64 (zip win11_aarch64 retiré de SourceForge), note `astap_note_win_arm`. Le test Archives Windows 3.12 a échoué une fois puis réussi à la relance (instable).

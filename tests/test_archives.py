@@ -607,7 +607,8 @@ def test_telechargement_reprise_etat_possession(serveur, tmp_path):
     evts = []
     t = T.Telechargement(tmp_path / 'sortie', obs, cible='M 16', fmt='xisf', rapporter=evts.append, debit_octets_s=0)
     b = t.executer()
-    assert b['ok'] == 2 and b['echec'] == 1
+    # échec isolé une fois sur Windows 3.12 (CI du 06/11/2026) : en cas de récidive, la raison s'affiche
+    assert b['ok'] == 2 and b['echec'] == 1, (b, [x for x in evts if x.get('genre') == 'erreur'], serveur.requetes)
     p = T.possession(tmp_path / 'sortie')
     assert p['mast:a_i2d.fits']['statut'] == 'ok' and p['mast:mauvais.fits']['statut'] == 'echec'
     racine = T.dossier_archives(tmp_path / 'sortie')

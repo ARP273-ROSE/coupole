@@ -297,16 +297,10 @@ TEXTES = {
                                 'it to astap.exe.'},
     'astap_etape_win_4': {'fr': "Tous les fichiers (programme et catalogue) doivent être dans le même dossier.",
                           'en': 'All files (program and catalogue) must be in the same folder.'},
-    'astap_etape_win_arm_1': {'fr': "Créer le dossier {dossier} et y décompresser astap_cli.exe.",
-                              'en': 'Create the folder {dossier} and unzip astap_cli.exe into it.'},
-    'astap_etape_win_arm_2': {'fr': "Catalogue : lancer d80_star_database.exe (installeur x86, que Windows 11 ARM "
-                                    "exécute par émulation) en choisissant ce même dossier, ou décompresser "
-                                    "d50_star_database.zip dans ce dossier (il n'existe pas de D80 en zip).",
-                              'en': 'Catalogue: run d80_star_database.exe (x86 installer, which Windows 11 ARM runs '
-                                    'through emulation) choosing this same folder, or unzip d50_star_database.zip into '
-                                    'it (there is no D80 zip).'},
-    'astap_etape_win_arm_3': {'fr': "Indiquer ce dossier à Coupole (bouton « Choisir » ou coupole astap --definir {dossier}).",
-                              'en': 'Point Coupole to this folder (« Choose » button or coupole astap --set {dossier}).'},
+    'astap_note_win_arm': {'fr': "Windows sur ARM : il n'existe plus de version ARM64 d'ASTAP ; les versions x64 "
+                                 "ci-dessus fonctionnent, Windows 11 ARM les exécute par émulation.",
+                           'en': 'Windows on ARM: there is no longer an ARM64 build of ASTAP; the x64 versions above '
+                                 'work, Windows 11 ARM runs them through emulation.'},
     'astap_etape_mac_1': {'fr': "Clic droit sur le paquet du programme, « Ouvrir », puis suivre l'installation "
                                 "(ASTAP.app arrive dans Applications).",
                           'en': 'Right-click the program package, « Open », then follow the installation (ASTAP.app goes '
