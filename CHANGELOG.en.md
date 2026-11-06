@@ -2,6 +2,12 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.8.4 — 6 November 2026
+
+- **Course calculators, Parallax, Moon diagram**: at ×1 the diagram shows the whole exercise, the Earth and the Moon
+  at the same scale, with both lines of sight meeting at the Moon; the zoom slider narrows down to the baseline
+  (h₁, h₂, R, horizons). Before, for the Moon, the frame held only the baseline and the zoom changed nothing.
+
 ## 0.8.3 — 21 October 2026
 
 - **Earth's atmosphere**: only the settings that matter for the chosen view are shown (temperature and latitude only

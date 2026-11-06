@@ -2,6 +2,12 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.8.4 — 6 novembre 2026
+
+- **Calculateurs de TD, Parallaxe, schéma de la Lune** : à ×1, le schéma montre tout l'exercice, la Terre et la Lune
+  à la même échelle, avec les deux visées qui se rejoignent sur la Lune ; le curseur de zoom resserre jusqu'à la base
+  (h₁, h₂, R, horizons). Avant, pour la Lune, le cadre ne contenait que la base et le zoom ne changeait rien.
+
 ## 0.8.3 — 21 octobre 2026
 
 - **L'atmosphère terrestre** : seuls les réglages utiles à la vue choisie sont affichés (température et latitude ne

@@ -1483,3 +1483,8 @@ graphiques » du PROGRESSION.md de Coupole Web, sous-section « Gravité et orbi
 
 - [x] Réglages montrés selon la vue ; épaisseur optique le long de la visée (τ × X) ; courbe de réfraction 0–90° ;
   rayon dessiné avec une compression horizontale fixe (× 4). Captures de l'atmosphère et manuels refaits.
+
+## 06/11/2026 — Calculateur de parallaxe : zoom du schéma pour la Lune (non publié, non commité)
+- Défaut : pour la Lune, ×1 ne cadrait que la base (l'objet « lointain » restait hors cadre), donc ×1 et ×60 donnaient le même cadre et le curseur de zoom ne faisait rien.
+- Correctif : `cadrage()` commun (bureau `coupole/modules/td/gui.py`, web `src/app/page_td.ts`). ×1 = tout l'exercice, Lune comprise ; ×60 = la base ; étendue en progression géométrique et centre qui suit la même fraction. Les visées vont jusqu'à l'objet, étiquettes locales masquées quand la base fait moins de 40 px, « objet à … km → » si l'objet sort du cadre.
+- Tests : `test_cadrage_zoom_lune` (bureau), `tests/unit/td_cadrage.test.ts` + e2e td (27/27) côté web.

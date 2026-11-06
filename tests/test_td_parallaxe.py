@@ -238,3 +238,16 @@ def test_tle_recupere_tout_seul(app_qt, monkeypatch):
         assert _attendre(app_qt, lambda: tp.res is not None) and len(appels) == 2
     finally:
         p.close()
+
+
+def test_cadrage_zoom_lune():
+    """Lune : ×1 montre la Terre ET la Lune ; le zoom resserre jusqu'à la base (il ne restait inerte que pour la Lune)."""
+    from coupole.modules.td.gui import cadrage
+    x1, y1, x2, y2, xm, ym = -330.0, 6362.0, 330.0, 6362.0, 300.0, 364000.0
+    e1, cx1, cy1 = cadrage(x1, y1, x2, y2, xm, ym, True, 1.0)
+    e60, cx60, cy60 = cadrage(x1, y1, x2, y2, xm, ym, True, 60.0)
+    assert abs(ym - cy1) < e1 / 2 and abs(0 - cy1) < e1 / 2         # Lune et centre de la Terre dans le cadre
+    assert e1 / e60 > 300 and abs(cy60 - y1) < e60 / 2              # ×60 : la base seule
+    for z in (2.0, 5.0, 20.0, 40.0):                                # les deux lieux restent toujours visibles
+        e, cx, cy = cadrage(x1, y1, x2, y2, xm, ym, True, z)
+        assert abs(cy - y1) < e / 2 and abs(cx - x1) < e / 2 and abs(cx - x2) < e / 2

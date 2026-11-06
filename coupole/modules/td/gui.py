@@ -27,6 +27,26 @@ CALCULATEURS = (('parallaxe_tp', 'td_calc_parallaxe'),)
 
 
 # ============================================================================================== dessin
+
+def cadrage(x1, y1, x2, y2, xm, ym, loin, zoom):
+    """Cadre du schéma (km) : étendue et centre.  ×1 : tout l'exercice, objet compris (pour la Lune, la Terre
+    et la Lune) ; ×60 : la base seule (pour un objet lointain, la base et le départ des visées).  Entre les deux,
+    progression géométrique de l'étendue ; le centre suit la même fraction, ce qui garde la base dans le cadre."""
+    def boite(xs, ys):
+        e = max(max(xs) - min(xs), max(ys) - min(ys), 50.0) * 1.35
+        return e, (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+    eg, cxg, cyg = boite([x1, x2, xm], [y1, y2, ym])
+    if loin:
+        el, cxl, cyl = boite([x1, x2], [y1, y2, y1 + 0.35 * abs(x2 - x1) + 50])
+    else:
+        el, cxl, cyl = max(abs(x2 - x1), 1.0) * 1.3, (x1 + x2) / 2, (y1 + y2) / 2
+    el = min(el, eg)
+    u = min(1.0, max(0.0, (zoom - 1.0) / 59.0))
+    e = eg * (el / eg) ** u
+    f = (eg - e) / (eg - el) if eg > el else 1.0
+    return e, cxg + f * (cxl - cxg), cyg + f * (cyl - cyg)
+
+
 class Schema(QWidget):
     """Coupe de la Terre dans le plan des deux lieux et du centre : corde R, verticales, horizons, visées h₁ et h₂,
     angle au centre θ, parallaxe 2α, distance D, flèche agrandie à la loupe.  `zoom` : 1 (tout l'exercice) à 60."""
@@ -83,29 +103,20 @@ class Schema(QWidget):
         (x1, y1), (x2, y2), (xm, ym), rt = self._plan()
         w, h = self.width(), self.height()
         loin = math.hypot(xm, ym) > 3 * rt
-        # cadre : la base et l'objet (s'il n'est pas trop loin), resserré par le zoom
-        xs, ys = [x1, x2], [y1, y2]
-        if not loin:
-            xs.append(xm)
-            ys.append(ym)
-        else:
-            ys.append(y1 + 0.35 * abs(x2 - x1) + 50)
-        cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
-        # zoom : de tout l'exercice (×1) jusqu'à la base seule (×60), en progression géométrique ; le centre glisse
-        # vers le milieu de la base, les deux lieux restent toujours dans le cadre
-        tout = max(max(xs) - min(xs), max(ys) - min(ys), 50.0) * 1.35
-        base = max(abs(x2 - x1), 1.0) * 1.3
-        u = min(1.0, max(0.0, (self.zoom - 1.0) / 59.0))
-        etendue = tout * (min(base, tout) / tout) ** u
-        cx, cy = cx + u * ((x1 + x2) / 2 - cx), cy + u * ((y1 + y2) / 2 - cy)
+        # zoom : de tout l'exercice, objet compris, même la Lune (×1), jusqu'à la base seule (×60), en progression
+        # géométrique ; le centre glisse au même rythme que l'étendue, les deux lieux restent toujours dans le cadre
+        etendue, cx, cy = cadrage(x1, y1, x2, y2, xm, ym, loin, self.zoom)
         k = min(w, h) / etendue
 
         def P(x, y):
             return QPointF(w / 2 + (x - cx) * k, h / 2 - (y - cy) * k)
+        M = P(xm, ym)
+        vu = self.rect().contains(M.toPoint())                # l'objet est-il dans le cadre ?
+        petit = math.hypot((x2 - x1) * k, (y2 - y1) * k) < 40   # base réduite à un point : pas d'étiquettes locales
         places: list[QRectF] = []
         # la loupe dans le coin le plus libre (loin des lieux et de l'objet) ; les étiquettes l'évitent
         lw, lh = 190, 110
-        pts = [P(x1, y1), P(x2, y2)] + ([P(xm, ym)] if not loin else [])
+        pts = [P(x1, y1), P(x2, y2)] + ([M] if vu else [])
         coins = [QRectF(w - lw - 8, 8, lw, lh), QRectF(8, 8, lw, lh), QRectF(w - lw - 8, h - lh - 8, lw, lh),
                  QRectF(8, h - lh - 8, lw, lh)]
         self._r_loupe = max(coins, key=lambda r: min(math.hypot(r.center().x() - q.x(), r.center().y() - q.y())
@@ -136,12 +147,12 @@ class Schema(QWidget):
         p.drawEllipse(centre, rt * k, rt * k)
         g = self.res['geometrie']
         x = self.res['exact']
-        A, B, M = P(x1, y1), P(x2, y2), P(xm, ym)
+        A, B = P(x1, y1), P(x2, y2)
         # verticales et horizons
         for (xa, ya), pt in (((x1, y1), A), ((x2, y2), B)):
             n = math.hypot(xa, ya)
             ux, uy = xa / n, ya / n
-            L = etendue * 0.18
+            L = min(etendue * 0.18, 2 * max(abs(x2 - x1), 50.0)) if loin else etendue * 0.18
             p.setPen(QPen(c['doux'], 1, Qt.PenStyle.DashLine))
             p.drawLine(pt, P(xa + ux * L, ya + uy * L))
             p.setPen(QPen(c['horizon'], 1.4))
@@ -151,32 +162,30 @@ class Schema(QWidget):
         p.drawLine(A, B)
         # visées et objet
         p.setPen(QPen(c['visee'], 1.8))
-        if loin:
-            for (xa, ya), pt in (((x1, y1), A), ((x2, y2), B)):
-                dx, dy = xm - xa, ym - ya
-                n = math.hypot(dx, dy)
-                fin = P(xa + dx / n * etendue, ya + dy / n * etendue)
-                p.drawLine(pt, fin)
-            etiquette(QPointF(w / 2 - fm.horizontalAdvance(tr('td_s_objet_loin', d=_n(x['distances_km'][0], 0))) / 2,
-                              26), tr('td_s_objet_loin', d=_n(x['distances_km'][0], 0)), c['visee'])
-        else:
-            p.drawLine(A, M)
-            p.drawLine(B, M)
+        p.drawLine(A, M)
+        p.drawLine(B, M)
+        if vu:
             p.setBrush(c['objet'])
             p.drawEllipse(M, 4, 4)
             etiquette(M, tr('td_s_D', d=_n(x['distances_km'][0], 0)), c['visee'])
-            etiquette(QPointF((M.x() + A.x()) / 2, (M.y() + A.y()) / 2), '2α = %s°' % _n(
-                x['parallaxe_vraie_deg'], 2), c['visee'])
+            mi = QPointF((M.x() + A.x()) / 2, (M.y() + A.y()) / 2)
+            etiquette(mi if self.rect().contains(mi.toPoint()) else QPointF(M.x(), M.y() + 22),
+                      '2α = %s°' % _n(x['parallaxe_vraie_deg'], 2), c['visee'])
+        else:
+            texte = tr('td_s_objet_loin', d=_n(x['distances_km'][0], 0))
+            etiquette(QPointF(w / 2 - fm.horizontalAdvance(texte) / 2, 26), texte, c['visee'])
         p.setBrush(Qt.BrushStyle.NoBrush)
         for pt, n, o in ((A, 1, self.res['lieux'][0]), (B, 2, self.res['lieux'][1])):
             p.setPen(QPen(c['texte'], 1))
             p.setBrush(c['visee'])
             p.drawEllipse(pt, 3.5, 3.5)
-            etiquette(pt, 'h%s = %s°' % ('₁' if n == 1 else '₂', _n(o.h, 3)), c['texte'])
-        etiquette(QPointF((A.x() + B.x()) / 2, (A.y() + B.y()) / 2), tr('td_s_R', r=_n(g['corde_km'], 1)),
-                  c['corde'])
-        for pt, prof in ((A, g['profondeur_deg'][0]), (B, g['profondeur_deg'][1])):
-            etiquette(QPointF(pt.x(), pt.y() + 16), tr('td_s_prof', p=_n(abs(prof), 2)), c['horizon'])
+            if not petit:
+                etiquette(pt, 'h%s = %s°' % ('₁' if n == 1 else '₂', _n(o.h, 3)), c['texte'])
+        if not petit:
+            etiquette(QPointF((A.x() + B.x()) / 2, (A.y() + B.y()) / 2), tr('td_s_R', r=_n(g['corde_km'], 1)),
+                      c['corde'])
+            for pt, prof in ((A, g['profondeur_deg'][0]), (B, g['profondeur_deg'][1])):
+                etiquette(QPointF(pt.x(), pt.y() + 16), tr('td_s_prof', p=_n(abs(prof), 2)), c['horizon'])
         etiquette(centre if self.rect().contains(centre.toPoint()) else QPointF(w / 2, h - 30),
                   'θ = %s°' % _n(g['angle_centre_deg'], 3), c['doux'])
         self._loupe(p, c, g, fm)
