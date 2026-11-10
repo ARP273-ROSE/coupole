@@ -2,6 +2,13 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.8.6 — 10 novembre 2026
+
+- **XISF de PixInsight 1.9.6** : Coupole lit les XISF compressés écrits selon la révision 2 de la spécification
+  (octobre 2026), celle qu'applique PixInsight 1.9.6 : bloc découpé en sous-blocs de 4 Mio, sous-blocs qui ne se
+  compressent pas stockés tels quels. Avant, ces fichiers étaient refusés (« decompressed size … »). Sommes de
+  contrôle SHA3-256 et SHA3-512 acceptées. Les fichiers déjà lisibles se lisent comme avant.
+
 ## 0.8.5 — 6 novembre 2026
 
 - **ASTAP sous Windows ARM** : l'auteur d'ASTAP a retiré sa version ARM64 (le lien proposé par Coupole était mort) ;

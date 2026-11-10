@@ -2,6 +2,13 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.8.6 — 10 November 2026
+
+- **PixInsight 1.9.6 XISF files**: Coupole reads compressed XISF files written under revision 2 of the specification
+  (October 2026), as PixInsight 1.9.6 does: block split into 4 MiB subblocks, subblocks that do not compress stored
+  as is. Such files used to be rejected ("decompressed size …"). SHA3-256 and SHA3-512 checksums accepted. Files
+  that were already readable read as before.
+
 ## 0.8.5 — 6 November 2026
 
 - **ASTAP on Windows ARM**: the ASTAP author withdrew the ARM64 build (the link Coupole offered was dead); Coupole

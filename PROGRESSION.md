@@ -1489,3 +1489,10 @@ graphiques » du PROGRESSION.md de Coupole Web, sous-section « Gravité et orbi
 - Correctif : `cadrage()` commun (bureau `coupole/modules/td/gui.py`, web `src/app/page_td.ts`). ×1 = tout l'exercice, Lune comprise ; ×60 = la base ; étendue en progression géométrique et centre qui suit la même fraction. Les visées vont jusqu'à l'objet, étiquettes locales masquées quand la base fait moins de 40 px, « objet à … km → » si l'objet sort du cadre.
 - Tests : `test_cadrage_zoom_lune` (bureau), `tests/unit/td_cadrage.test.ts` + e2e td (27/27) côté web.
 - 0.8.5 (06/11/2026) : ASTAP Windows ARM → versions x64 (zip win11_aarch64 retiré de SourceForge), note `astap_note_win_arm`. Le test Archives Windows 3.12 a échoué une fois puis réussi à la relance (instable).
+
+## 10/11/2026 — 0.8.6 : XISF révision 2 (PixInsight 1.9.6)
+- [x] `core/xisf.py` : attribut `subblocks`, sous-blocs non compressés (c == u, § 10.6.1), longueur exacte de chaque
+  sous-bloc vérifiée, unshuffle après réassemblage ; checksums SHA3-256/512.
+- [x] `tests/test_xisf_sous_blocs.py` (18 cas, encodeur indépendant ; 16 échouaient avec l'ancien lecteur ; relu aussi
+  par PyPI `xisf` 1.0.1). Extras `validation`/`test` : `xisf>=1.0.1`.
+- Pas de tag : publication sur accord.

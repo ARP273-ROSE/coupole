@@ -4,7 +4,7 @@ Repris de ``_outils/xisf_ecrire.py`` et ``_outils/xisf_lire.py`` (traitement de
 la banque OHP du 7-8 octobre 2026, 7 625 fichiers validés par le schéma XSD
 officiel et relus par la bibliothèque PyPI ``xisf``).
 
-Écrivain, d'après la spécification XISF 1.0 révision 1 :
+Écrivain, d’après la spécification XISF 1.0 révision 1 (lecture : révision 2, sous-blocs) :
   § 9.2  fichier monolithique : 'XISF0100' + longueur de l'en-tête (uint32 LE)
          + 4 octets nuls + en-tête XML, puis bourrage nul et bloc attaché ;
   § 10.3 location="attachment:position:taille" ; § 10.5 checksum SHA-1 du bloc
@@ -200,7 +200,41 @@ def _desordonner(octets, n):
     return np.concatenate([np.ascontiguousarray(a[:m * n].reshape(n, m).T).reshape(-1), a[m * n:]])
 
 
-def _decompresser(bloc, spec):
+def _sous_blocs(attr, c_total, u_total):
+    """§ 10.6 : subblocks="c1,u1:c2,u2:..." ; sans attribut, un seul sous-bloc (tout le bloc)."""
+    if not attr:
+        return [(c_total, u_total)]
+    try:
+        sb = [tuple(int(v) for v in part.split(',')) for part in attr.strip().split(':')]
+    except ValueError:
+        raise ErreurXISF('subblocks %s' % attr)
+    _verifier(all(len(s) == 2 for s in sb), 'subblocks %s' % attr)
+    _verifier(sum(c for c, _ in sb) == c_total, 'subblocks: compressed lengths do not match the block')
+    _verifier(sum(u for _, u in sb) == u_total, 'subblocks: uncompressed lengths do not match the size')
+    return sb
+
+
+def _decompresser_un(base, octets, u):
+    """Un sous-bloc compressé ; doit donner exactement u octets (révision 2, § 10.6.1)."""
+    if base == 'zstd':
+        import zstandard
+        d = zstandard.ZstdDecompressor().decompress(octets, max_output_size=u)
+    elif base in ('lz4', 'lz4hc'):
+        import lz4.block
+        d = lz4.block.decompress(octets, uncompressed_size=u)
+    else:
+        import zlib
+        z = zlib.decompressobj()
+        d = z.decompress(octets, u + 1)
+        _verifier(z.eof, 'zlib stream truncated')
+    _verifier(len(d) == u, 'decompressed size %d != %d' % (len(d), u))
+    return d
+
+
+def _decompresser(bloc, spec, sous_blocs=None):
+    """Bloc compressé, en un seul morceau ou en sous-blocs (XISF 1.0 révision 2, écrit par PixInsight ≥ 1.9.6 :
+    sous-blocs de 4 Mio, ceux qui ne se compressent pas stockés tels quels, c == u).  Le byte shuffling
+    s'applique au bloc entier, après réassemblage des sous-blocs."""
     parts = spec.split(':')
     _verifier(len(parts) >= 2 and parts[1].isdigit(), 'compression %s' % spec)
     codec = parts[0]
@@ -211,17 +245,25 @@ def _decompresser(bloc, spec):
         _verifier(len(parts) == 3, 'compression %s: missing item size' % spec)
         item = int(parts[2])
     base = codec.split('+')[0]
-    if base == 'zstd':
-        import zstandard
-        d = zstandard.ZstdDecompressor().decompress(bloc, max_output_size=taille)
-    elif base in ('lz4', 'lz4hc'):
-        import lz4.block
-        d = lz4.block.decompress(bloc, uncompressed_size=taille)
-    elif base == 'zlib':
-        import zlib
-        d = zlib.decompress(bloc)
-    else:
+    if base not in ('zstd', 'lz4', 'lz4hc', 'zlib'):
         raise ErreurXISF('non standard codec: %s' % codec)
+    morceaux, pos = [], 0
+    for c, u in _sous_blocs(sous_blocs, len(bloc), taille):
+        octets = bytes(bloc[pos:pos + c])
+        pos += c
+        if c == u:
+            # Sous-bloc non compressé (§ 10.6.1).  Un encodeur antérieur à la révision 2 a pu compresser un
+            # sous-bloc en exactement u octets : pour zlib et zstd, on essaie d'abord de le décompresser.
+            d = octets
+            if base in ('zstd', 'zlib'):
+                try:
+                    d = _decompresser_un(base, octets, u)
+                except Exception:
+                    d = octets
+            morceaux.append(d)
+        else:
+            morceaux.append(_decompresser_un(base, octets, u))
+    d = morceaux[0] if len(morceaux) == 1 else b''.join(morceaux)
     _verifier(len(d) == taille, 'decompressed size %d != %d' % (len(d), taille))
     return _desordonner(d, item) if codec.endswith('+sh') else np.frombuffer(d, np.uint8)
 
@@ -322,12 +364,13 @@ def lire(chemin, xsd=None, strict: bool = False):
     if cs:
         algo, _, dig = cs.partition(':')
         h = {'sha1': hashlib.sha1, 'sha-1': hashlib.sha1, 'sha256': hashlib.sha256, 'sha-256': hashlib.sha256,
-             'sha512': hashlib.sha512, 'sha-512': hashlib.sha512}.get(algo.lower())
+             'sha512': hashlib.sha512, 'sha-512': hashlib.sha512,
+             'sha3-256': hashlib.sha3_256, 'sha3-512': hashlib.sha3_512}.get(algo.lower())
         if h is None:
             _verifier(not strict, 'checksum algorithm %s' % algo)
         else:
             _verifier(h(bloc).hexdigest() == dig.lower(), 'wrong checksum: altered block')
-    brut = _decompresser(bloc, im.get('compression')) if im.get('compression') else bloc
+    brut = _decompresser(bloc, im.get('compression'), im.get('subblocks')) if im.get('compression') else bloc
     dt = np.dtype(TYPES[fmt])
     if im.get('byteOrder') == 'big':
         dt = dt.newbyteorder('>')
