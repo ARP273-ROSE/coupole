@@ -2,7 +2,13 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
-## Next version (0.9.0, unreleased) — Newton's cannon
+## 0.9.0 — 11 November 2026 — Newton's cannon
+
+- **v₁ / v₂ magnet**: dropped near a mark (slider or arrow), the speed slider takes the exact value of v₁ or v₂.
+  Before, it landed slightly below: the ball crashed near the ground or eventually came back.
+- **Play/Pause button** of every animation: icons drawn by Qt instead of the ▶ and ⏸ characters, which showed as an
+  empty box with some fonts.
+- The cannon idea comes from the Science Étonnante simulator (credited in NOTICE), remade without copying anything.
 
 - **Newton's cannon** (97th animation, Renaissance theme and module): Newton's thought experiment. A cannon on top of a
   mountain fires faster and faster: the ball lands farther and farther away, goes round the body, then escapes. Earth,

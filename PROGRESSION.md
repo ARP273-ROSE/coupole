@@ -1497,7 +1497,7 @@ graphiques » du PROGRESSION.md de Coupole Web, sous-section « Gravité et orbi
   par PyPI `xisf` 1.0.1). Extras `validation`/`test` : `xisf>=1.0.1`.
 - Pas de tag : publication sur accord.
 
-## 11/11/2026 — Le canon de Newton (97ᵉ animation ; branche `canon-newton`, prochaine version 0.9.0, NON publiée)
+## 11/11/2026 — Le canon de Newton (97ᵉ animation ; branche `canon-newton`, version 0.9.0, publiée le 11/11)
 Demande : une animation « canon de Newton » au bureau et au web, ergonomie avant tout (l'idée vient des *Principia* /
 du *Traité du système du monde*, domaine public ; rien n'est repris d'aucun simulateur existant).
 - [x] `anim/canon_meca.py` (sans Qt, jumeau de `src/calc/canon.ts`) : astre immobile + boulet de masse nulle dans

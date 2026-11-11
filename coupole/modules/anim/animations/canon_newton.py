@@ -298,7 +298,7 @@ class CanonNewton(Animation):
         if abs(ang) <= 1.5:
             ang = 0.0                    # aimanté à l'horizontale (le tir de Newton)
         self.r_angle.setValue(max(-90.0, min(90.0, ang)))
-        self.r_vit[a].setValue(math.hypot(dx, dy) / self._k_fleche() / C.REGLAGES[a]['uv'])
+        self.r_vit[a].setValue(self.r_vit[a].aimanter(math.hypot(dx, dy) / self._k_fleche() / C.REGLAGES[a]['uv']))
 
     def _deplacer_vue(self, q):
         x0, y0, ox, oy = self._depart_pan

@@ -2,7 +2,13 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
-## Prochaine version (0.9.0, non publiée) — Le canon de Newton
+## 0.9.0 — 11 novembre 2026 — Le canon de Newton
+
+- **Aimant v₁ / v₂** : posé près d'un repère (glissière ou flèche), le curseur de vitesse prend la valeur exacte de
+  v₁ ou v₂. Avant, il tombait un peu en dessous : le boulet s'écrasait au ras du sol ou finissait par revenir.
+- **Bouton Lecture/Pause** de toutes les animations : icônes dessinées par Qt au lieu des caractères ▶ et ⏸,
+  qui s'affichaient en carré vide avec certaines polices.
+- Idée du canon reprise du simulateur de Science Étonnante (cité dans NOTICE), refait sans rien en copier.
 
 - **Le canon de Newton** (97ᵉ animation, thème et module « Renaissance ») : l'expérience de pensée de Newton. Un canon
   au sommet d'une montagne tire de plus en plus vite : le boulet retombe de plus en plus loin, fait le tour de l'astre,

@@ -56,7 +56,7 @@ TEXTES = {
                                      'grabbing it.'),
     'anim_aide_deplacer': _t('Glisser avec la souris : déplacer les objets de la scène.',
                              'Drag with the mouse: move the objects in the scene.'),
-    'anim_lecture': _t('▶ Lecture', '▶ Play'),
+    'anim_lecture': _t('Lecture', 'Play'),
     'anim_maintenant': _t('Maintenant', 'Now'),
     'anim_maintenant_aide': _t('Régler la date et l’heure sur l’instant présent de l’ordinateur (temps universel, '
                                'affiché dans votre fuseau).', 'Set the date and time to the computer’s present '
@@ -73,7 +73,7 @@ TEXTES = {
     'anim_heure_solaire_fuseau': _t('heure solaire moyenne au méridien du fuseau ({lon})',
                                     'mean solar time at the time zone meridian ({lon})'),
     'anim_lecture_aide': _t('Lancer ou mettre en pause l’animation.', 'Start or pause the animation.'),
-    'anim_pause': _t('⏸ Pause', '⏸ Pause'),
+    'anim_pause': _t('Pause', 'Pause'),
     'anim_vitesse': _t('Vitesse', 'Speed'),
     'anim_vitesse_aide': _t('Vitesse de l’animation, de 0,1 à 10 fois la vitesse normale (échelle logarithmique).',
                             'Animation speed, from 0.1 to 10 times the normal speed (logarithmic scale).'),

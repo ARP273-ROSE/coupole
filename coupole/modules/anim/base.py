@@ -154,7 +154,24 @@ class Reglage(QWidget):
     def _curseur_bouge(self, pos):
         if self._sync:
             return
-        self._appliquer(self._val(pos), curseur=False)
+        v = self._val(pos)
+        aimante = False
+        if abs(pos - self._pos(self._v)) > 1:     # glisser (pas un simple pas du clavier) : aimant des repères
+            w = self.aimanter(v)
+            aimante, v = w != v, w
+        self._appliquer(v, curseur=aimante)       # aimanté : la poignée saute sur le repère
+
+    #: aimant des repères, en positions de la glissière (sur PAS)
+    AIMANT = 4
+
+    def aimanter(self, v: float) -> float:
+        """Valeur exacte du repère le plus proche si v en est à moins de AIMANT positions de la glissière (sinon v) :
+        posé « sur » v₁ ou v₂, le curseur donne v₁ ou v₂ exactement, pas un peu moins (le boulet s'écraserait ou
+        reviendrait)."""
+        reps = getattr(getattr(self, '_regle', None), 'reperes', None) or []
+        proches = [(abs(self._pos(v) - self._pos(r)), r) for r, _, _ in reps]
+        proches = [x for x in proches if x[0] <= self.AIMANT]
+        return min(proches)[1] if proches else v
 
     def _champ_change(self, v):
         if self._sync:
@@ -522,6 +539,7 @@ class Animation(QWidget):
         self.minuteur.timeout.connect(self._battement)
         if self.ANIMEE:
             self.b_lecture = QPushButton(tr('anim_lecture'))
+            self._icone_lecture()
             aide(self.b_lecture, 'anim_lecture_aide')
             self.b_lecture.clicked.connect(self.basculer_lecture)
             self.barre.addWidget(self.b_lecture)
@@ -878,12 +896,19 @@ class Animation(QWidget):
         """Remet l'état interne (temps, positions) à son origine ; appelé par Réinitialiser."""
 
     # ------------------------------------------------------------ lecture
+    def _icone_lecture(self):
+        # Icônes dessinées par le style Qt : les glyphes ▶/⏸ manquent dans certaines polices (carré vide).
+        from PyQt6.QtWidgets import QStyle
+        sp = QStyle.StandardPixmap.SP_MediaPause if self.en_lecture else QStyle.StandardPixmap.SP_MediaPlay
+        self.b_lecture.setIcon(self.style().standardIcon(sp))
+
     def basculer_lecture(self):
         self.en_lecture = not self.en_lecture
         if self.en_lecture and not getattr(self, '_applique', False):
             self._arreter_direct()                 # lecture relancée : le temps de l'animation reprend la main
         if self.ANIMEE:
             self.b_lecture.setText(tr('anim_pause' if self.en_lecture else 'anim_lecture'))
+            self._icone_lecture()
         self._t_dernier = time.monotonic()
         if self.en_lecture and self.isVisible():
             self.minuteur.start()

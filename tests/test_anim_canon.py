@@ -369,3 +369,24 @@ def test_rendu_rapide(app_qt):
         meilleur = min(meilleur, (time.perf_counter() - t0) / 5)
     assert meilleur < (0.06 if os.environ.get('CI') else 0.03)
     a.close()
+
+
+def test_aimant_v1_v2(app_qt):
+    """Posé « sur » v₁ ou v₂ (glissière ou flèche), le curseur donne la valeur exacte : un peu moins, le boulet
+    s'écrasait au ras du sol ou revenait au lieu de s'échapper.  Un pas du clavier sort du repère."""
+    a = _anim()
+    a.prereglage('ras_sol')
+    r = a.r_vit[a.astre()]
+    A = C.ASTRES[a.astre()]
+    r0 = A['r'] + a.altitude_m()
+    v1 = C.v_satellisation(A['gm'], r0) / C.REGLAGES[a.astre()]['uv']
+    v2 = C.v_liberation(A['gm'], r0) / C.REGLAGES[a.astre()]['uv']
+    r.setValue(5.0)
+    r.curseur.setValue(r._pos(v1) - 2)
+    assert r.value() == v1
+    r.setValue(5.0)
+    r.curseur.setValue(r._pos(v2) + 3)
+    assert r.value() == v2
+    r.curseur.setValue(r.curseur.value() + 1)
+    assert r.value() != v2
+    assert r.aimanter(9.5) == 9.5

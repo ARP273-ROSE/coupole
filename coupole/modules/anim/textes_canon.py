@@ -188,10 +188,12 @@ ANIM_CANON = {
     'anim_newtoncannon_ve_chute': ('il tombe…', 'it is falling…'),
     'anim_newtoncannon_adapte': ('Propre à Coupole (pas dans ClassAction), d’après l’expérience de pensée de Newton '
                                  '(Traité du système du monde, 1728) : UAI 2015, DE440, Dawn (Cérès), DART (Dimorphos), '
-                                 'atmosphère CIRA-72',
+                                 'atmosphère CIRA-72 ; idée reprise du simulateur de Science Étonnante (explorables.scienceetonnante.com), '
+                                 'refait sans rien en copier',
                                  'Coupole’s own (not in ClassAction), after Newton’s thought experiment (Treatise of '
                                  'the System of the World, 1728): IAU 2015, DE440, Dawn (Ceres), DART (Dimorphos), '
-                                 'CIRA-72 atmosphere'),
+                                 'CIRA-72 atmosphere; idea taken from the Science Étonnante simulator (explorables.scienceetonnante.com), '
+                                 'remade without copying anything'),
     'anim_newtoncannon_lien': ('Sources : fichier NOTICE de Coupole', 'Sources: Coupole NOTICE file'),
     # aide
     'anim_newtoncannon_souris': ('Tirer le bout de la flèche verte règle l’angle et la vitesse (cercles v₁ : '
