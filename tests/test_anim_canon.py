@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import math
+import sys
 import time
 from pathlib import Path
 
@@ -16,6 +17,8 @@ from coupole.modules.anim import canon_meca as C
 
 ICI = Path(__file__).resolve().parent
 SAGE = json.loads((ICI / 'canon_newton_sage.json').read_text('utf-8'))
+#: le fichier des cas communs est produit sous Linux : comparaison au bit près sur la même libm seulement
+LIBM_REFERENCE = sys.platform.startswith('linux')
 CAS = json.loads((ICI / 'canon_cas.json').read_text('utf-8'))
 
 
@@ -171,7 +174,9 @@ def test_cas_communs_reproduits():
             assert k == e['pas'] and t.etat == e['etat'] and t.tours() == e['tours'] and len(t.x) == e['n_trace']
             for a, x in ((t.t, e['t']), (b.x, e['x']), (b.y, e['y']), (b.vx, e['vx']), (b.vy, e['vy']),
                          (t.phi, e['phi'])):
-                assert a == x
+                # au bit près sous Linux (où le fichier est produit) ; ailleurs, la bibliothèque mathématique
+                # (sqrt, exp, atan2) peut différer du dernier bit (Windows, macOS : CI du 11/11/2026)
+                assert a == x if LIBM_REFERENCE else math.isclose(a, x, rel_tol=1e-9, abs_tol=1e-9)
     for p, v in CAS['prereglages'].items():
         astre, _, nom = p.partition('_')
         assert C.prereglage(nom, astre) == v
