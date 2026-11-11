@@ -1,5 +1,5 @@
 """Navigation par modules (0.6.0), mêmes contenus et mêmes règles que Coupole Web : données importées (24 modules,
-517 questions, fiches, tables, schémas, images), moteur des questions identique au web (empreintes), sauvegarde
+522 questions (517 de ClassAction, 5 propres à Coupole), fiches, tables, schémas, images), moteur des questions identique au web (empreintes), sauvegarde
 commune (cas de parité avec src/contenu/sauvegarde.ts), schémas sans recouvrement (chasses estimées et mesure Qt),
 règle typographique, rendu hors écran de toutes les questions, pages (accueil, module, question, recherche, Mes
 modules, progression), fenêtres de ressources, export / import / réinitialisation, réglages des animations gardés."""
@@ -22,7 +22,7 @@ def test_modules_et_ressources_completes():
     from coupole.modules.anim import catalogue
     ms = contenu.modules()
     assert len(ms) == 24 and sum(m['affiche'] for m in ms) == 22
-    assert len(contenu.toutes_les_questions()) == 517
+    assert len(contenu.toutes_les_questions()) == 522      # 517 de ClassAction + 5 propres à Coupole (canon de Newton)
     for m in ms:
         for a in m['animations']:
             assert a in catalogue.PAR_ID, (m['cle'], a)

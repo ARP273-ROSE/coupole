@@ -222,6 +222,9 @@ class Systeme:
         self.courbure_max = -math.inf
         self.trio = None         # indices (Soleil, Terre, Lune) quand le scénario les a tous trois
         self.derniers_pas = 0
+        #: accélérations ajoutées à la gravité (frottement de l'air du canon de Newton) : rappel(corps, ax, ay) qui
+        #: ajoute aux listes ax, ay, ou None
+        self.acc_sup = None
         self._ax = []
         self._ay = []
         self.charger(list(cs))
@@ -298,6 +301,8 @@ class Systeme:
 
     def _pousser(self, h: float) -> None:
         accelerations(self.corps, self.gravite, self._ax, self._ay)
+        if self.acc_sup is not None:
+            self.acc_sup(self.corps, self._ax, self._ay)
         for i, c in enumerate(self.corps):
             if not c.actif:
                 continue

@@ -64,7 +64,7 @@ REQUETES_REELLES = ['seasons', 'saisons', 'Kepler’s third law', 'troisième lo
                     'rotation galaxie', 'black body', 'corps noir', 'wien', 'doppler', 'redshift', 'décalage vers le rouge',
                     'hubble', 'exoplanets', 'exoplanètes', 'transit', 'retrograde', 'rétrograde', 'sun', 'Soleil',
                     'hr diagram', 'diagramme HR', 'binary stars', 'étoiles binaires', 'tides', 'marées', 'antikythera',
-                    'anticythère', 'orion', 'gravity and orbits', 'gravité et orbites', 'gravite orbite', 'phet', 'telescope', 'télescope', 'light', 'lumière', 'cosmology', 'cosmologie',
+                    'anticythère', 'orion', 'gravity and orbits', 'gravité et orbites', 'gravite orbite', 'phet', 'canon de newton', "newton's cannon", 'vitesse de libération', 'satellisation', 'telescope', 'télescope', 'light', 'lumière', 'cosmology', 'cosmologie',
                     'big bang', 'dark matter', 'matière noire', 'scale', 'échelle', 'sidereal day', 'jour sidéral',
                     'celestial sphere', 'sphère céleste', 'equinox', 'équinoxe', 'solstice', 'zodiac', 'constellations',
                     'neutron star', 'étoile à neutrons', 'supernova', 'stellar evolution', 'évolution stellaire',

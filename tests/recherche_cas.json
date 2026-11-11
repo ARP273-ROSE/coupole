@@ -1886,8 +1886,8 @@
   ]
  },
  "reel": {
-  "documents": 819,
-  "vocabulaire": 5460,
+  "documents": 826,
+  "vocabulaire": 5533,
   "requetes": [
    [
     "seasons",
@@ -3463,6 +3463,26 @@
      },
      {
       "g": "question",
+      "id": "co_renaissance_canon_liberation",
+      "n": 2,
+      "score": 17,
+      "mots": [
+       "back",
+       "body"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "co_renaissance_canon_satellisation",
+      "n": 2,
+      "score": 17,
+      "mots": [
+       "back",
+       "body"
+      ]
+     },
+     {
+      "g": "question",
       "id": "ca_stellarevolution_bhplots",
       "n": 1,
       "score": 32,
@@ -3503,25 +3523,6 @@
       "n": 1,
       "score": 26,
       "mots": [
-       "blackbody"
-      ]
-     },
-     {
-      "g": "question",
-      "id": "ca_light_areaunderbbc",
-      "n": 1,
-      "score": 26,
-      "mots": [
-       "blackbody"
-      ]
-     },
-     {
-      "g": "question",
-      "id": "ca_light_bbdescriptions",
-      "n": 1,
-      "score": 26,
-      "mots": [
-       "blackbodies",
        "blackbody"
       ]
      }
@@ -5335,6 +5336,286 @@
       "score": 7,
       "mots": [
        "pet"
+      ]
+     }
+    ]
+   ],
+   [
+    "canon de newton",
+    [
+     {
+      "g": "animation",
+      "id": "newtoncannon",
+      "n": 2,
+      "score": 70,
+      "mots": [
+       "cannon",
+       "canon",
+       "newton",
+       "newtoncannon"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "renaissance_canon_newton",
+      "n": 2,
+      "score": 67,
+      "mots": [
+       "cannon",
+       "canon",
+       "newton"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "gravcalc",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "newton"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_newtonslaws",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "newton"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_rock",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "newton"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "renaissance_slide2",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "newton"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "renaissance_slide3",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "newton"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "telescopes_telescopes",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "newton",
+       "newtonian"
+      ]
+     }
+    ]
+   ],
+   [
+    "newton's cannon",
+    [
+     {
+      "g": "animation",
+      "id": "newtoncannon",
+      "n": 2,
+      "score": 76,
+      "mots": [
+       "cannon",
+       "canon",
+       "newton",
+       "newtoncannon"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "renaissance_canon_newton",
+      "n": 2,
+      "score": 67,
+      "mots": [
+       "cannon",
+       "canon",
+       "newton"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "gravcalc",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "newton"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_newtonslaws",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "newton"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_rock",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "newton"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "renaissance_slide2",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "newton"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "renaissance_slide3",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "newton"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "telescopes_telescopes",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "newton",
+       "newtonian"
+      ]
+     }
+    ]
+   ],
+   [
+    "vitesse de libération",
+    [
+     {
+      "g": "question",
+      "id": "co_renaissance_canon_liberation",
+      "n": 2,
+      "score": 41,
+      "mots": [
+       "liberation",
+       "vitesse"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "renaissance_canon_newton",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "liberation",
+       "vitesse",
+       "vitesses"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "terrplanets_atmo_reten2",
+      "n": 2,
+      "score": 40,
+      "mots": [
+       "liberation",
+       "vitesse"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_light_photonspeeds",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "vitesse"
+      ]
+     },
+     {
+      "g": "question",
+      "id": "ca_renaissance_orbitalveldistancegraph",
+      "n": 1,
+      "score": 32,
+      "mots": [
+       "vitesse",
+       "vitesses"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "ca_extrasolarplanets_graph",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "vitesse"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "radialvelocitysimulator",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "vitesse"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "stellarvel",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "vitesse"
+      ]
+     }
+    ]
+   ],
+   [
+    "satellisation",
+    [
+     {
+      "g": "question",
+      "id": "co_renaissance_canon_liberation",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "satellisation"
+      ]
+     },
+     {
+      "g": "fiche",
+      "id": "renaissance_canon_newton",
+      "n": 1,
+      "score": 20,
+      "mots": [
+       "satellisation"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "newtoncannon",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "satellisation"
       ]
      }
     ]

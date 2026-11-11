@@ -1082,6 +1082,8 @@ from .textes_gravite import ANIM_GRAVITE  # noqa: E402  (0.7.2 : gravité et orb
 TEXTES.update({k: _t(*v) for k, v in ANIM_GRAVITE.items()})
 from .textes_atmosphere import ANIM_ATMOSPHERE  # noqa: E402  (0.8.0 : l'atmosphère terrestre)
 TEXTES.update({k: _t(*v) for k, v in ANIM_ATMOSPHERE.items()})
+from .textes_canon import ANIM_CANON  # noqa: E402  (0.9.0 : le canon de Newton)
+TEXTES.update({k: _t(*v) for k, v in ANIM_CANON.items()})
 
 for _cle, _fr, _en in (('buenos_aires', 'Buenos Aires', 'Buenos Aires'), ('lima', 'Lima', 'Lima'),
                        ('casablanca', 'Casablanca', 'Casablanca'), ('monrovia', 'Monrovia', 'Monrovia'),

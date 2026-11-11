@@ -2,6 +2,31 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## Prochaine version (0.9.0, non publiée) — Le canon de Newton
+
+- **Le canon de Newton** (97ᵉ animation, thème et module « Renaissance ») : l'expérience de pensée de Newton. Un canon
+  au sommet d'une montagne tire de plus en plus vite : le boulet retombe de plus en plus loin, fait le tour de l'astre,
+  puis s'échappe. Terre, Lune, Mars, Cérès ou l'astéroïde Dimorphos (où quelques centimètres par seconde suffisent).
+  - **En un geste** : gros bouton « Feu ! » (et touche Espace), pause, « Recommencer », temps ×1 à ×1 000 ; on tire le
+    bout de la flèche verte pour régler à la fois l'angle et la vitesse (aimantée à l'horizontale), curseurs et champs
+    synchronisés, flèches du clavier.
+  - **Repères** : vitesses de satellisation v₁ = √(GM/r) et de libération v₂ = √(2GM/r) à l'altitude du canon,
+    marquées sous le curseur de vitesse et en cercles autour du canon ; trajectoire prévue en pointillés pendant le
+    réglage ; type de trajectoire, excentricité, périapside et apoapside, période (3ᵉ loi de Kepler), énergie.
+  - **Cadrage automatique** qui suit le boulet (molette pour zoomer, glisser pour déplacer la vue zoomée,
+    « Recadrer » ou double-clic pour revenir) ; tirs précédents gardés en couleurs, avec leur légende.
+  - **Préréglages en un clic** (tombe au pied, tour au ras du sol, orbite de l'ISS, ellipse, juste libéré, hyperbole,
+    rentrée atmosphérique) et **défis** vérifiés automatiquement (orbite circulaire, libération au plus juste,
+    orbite au-dessus de l'air, antipodes, satellite de Dimorphos).
+  - **Atmosphère réelle** en option (Terre : modèle exponentiel par tranches de 0 à 1 000 km, CIRA-72 ; Mars) : boulet,
+    capsule ou satellite freinés ; une orbite basse se dégrade jusqu'à la rentrée.
+  - Calcul par le moteur de « Gravité et orbites » (Yoshida d'ordre 4) ; constantes UAI 2015, DE440, Dawn (Cérès),
+    DART (Dimorphos) ; valeurs vérifiées sous SageMath ; mêmes valeurs que Coupole Web au caractère près.
+- **Fiche « Le canon de Newton »** (définition, formules et ordres de grandeur, piège, « pour aller plus loin ») et
+  **5 questions** nouvelles dans le module Renaissance (G24 à G28), écrites pour Coupole.
+- Animations : un curseur peut porter des repères (v₁, v₂) ; une animation peut répondre au clavier quand la scène a
+  le focus.
+
 ## 0.8.6 — 10 novembre 2026
 
 - **XISF de PixInsight 1.9.6** : Coupole lit les XISF compressés écrits selon la révision 2 de la spécification

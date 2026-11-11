@@ -185,6 +185,46 @@ class Reglage(QWidget):
         self._v = float(self.champ.value())
         self._vers_curseur(self._v)
 
+    def poser_reperes(self, reperes: list):
+        """Repères sous le curseur : [(valeur, texte, clé de couleur)] (ex. vitesses de satellisation et de libération
+        du canon de Newton) ; liste vide : aucun.  Décrits aussi dans l'info-bulle et le nom accessible du curseur."""
+        reperes = [(float(v), str(t), str(k)) for v, t, k in reperes]
+        if getattr(self, '_regle', None) is None:
+            if not reperes:
+                return
+            boite = QWidget()
+            boite.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            boite.setMinimumWidth(110)
+            v = QVBoxLayout(boite)
+            v.setContentsMargins(0, 0, 0, 0)
+            v.setSpacing(0)
+            self.layout().replaceWidget(self.curseur, boite)
+            v.addWidget(self.curseur)
+            self._regle = _Regle(self)
+            v.addWidget(self._regle)
+            self.layout().setStretchFactor(boite, 1)
+            boite.setVisible(True)
+            self.curseur.setVisible(True)
+            self._aide_base = self.curseur.toolTip()
+        self._regle.reperes = reperes
+        self._regle.setVisible(bool(reperes))
+        self._regle.update()
+        desc = ' · '.join('%s = %s' % (t, nombre(v, self.champ.decimals()) + self.champ.suffix()) for v, t, _ in reperes)
+        self.curseur.setAccessibleDescription(desc)
+        self.curseur.setToolTip((self._aide_base + '\n' if self._aide_base else '') + desc)
+
+    def position_ecran(self, v: float) -> float:
+        """Abscisse (pixels du curseur) de la valeur v sur la glissière."""
+        from PyQt6.QtWidgets import QStyle, QStyleOptionSlider
+        opt = QStyleOptionSlider()
+        self.curseur.initStyleOption(opt)
+        st = self.curseur.style()
+        rail = st.subControlRect(QStyle.ComplexControl.CC_Slider, opt, QStyle.SubControl.SC_SliderGroove, self.curseur)
+        poignee = st.subControlRect(QStyle.ComplexControl.CC_Slider, opt, QStyle.SubControl.SC_SliderHandle,
+                                    self.curseur)
+        etendue = rail.width() - poignee.width()
+        return rail.x() + poignee.width() / 2 + st.sliderPositionFromValue(0, self.PAS, self._pos(v), etendue)
+
     def borner(self, mini: float, maxi: float):
         """Change les bornes (le simulateur du module de distance les fait suivre le verrou choisi)."""
         self.mini, self.maxi = mini, maxi
@@ -193,6 +233,41 @@ class Reglage(QWidget):
         self._sync = False
         self._appliquer(self._v)
         self._vers_curseur(self._v)
+
+
+class _Regle(QWidget):
+    """Repères dessinés sous la glissière d'un Reglage (petit trait + texte court)."""
+
+    def __init__(self, reglage):
+        super().__init__()
+        self.r = reglage
+        self.reperes = []
+        f = self.font()
+        f.setPointSizeF(f.pointSizeF() * 0.82)
+        self.setFont(f)
+        self.setFixedHeight(self.fontMetrics().height() + 5)
+
+    def paintEvent(self, ev):
+        from PyQt6.QtGui import QPainter
+        p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        fm = self.fontMetrics()
+        poses = []
+        for v, t, k in sorted(self.reperes):
+            if not (self.r.mini <= v <= self.r.maxi):
+                continue
+            x = self.r.position_ecran(v)
+            col = dessin.c(k) if k in dessin.PALETTES[dessin.theme()] else self.palette().text().color()
+            p.setPen(dessin.stylo(col, 2.0))
+            p.drawLine(QPointF(x, 0), QPointF(x, 4))
+            w = fm.horizontalAdvance(t)
+            x0 = max(0.0, min(self.width() - w, x - w / 2))
+            if poses and x0 < poses[-1] + 4:
+                x0 = poses[-1] + 4
+            poses.append(x0 + w)
+            p.setPen(col)
+            p.drawText(QPointF(x0, 4 + fm.ascent()), t)
+        p.end()
 
 
 class Toile(QWidget):
@@ -302,6 +377,9 @@ class Toile(QWidget):
 
     def keyPressEvent(self, ev):
         k = ev.key()
+        if self._designe is None and self.anim.touche(ev):
+            ev.accept()
+            return
         if k == Qt.Key.Key_Escape and self._designe is not None:
             self.designer(None)
             ev.accept()
@@ -647,6 +725,10 @@ class Animation(QWidget):
     def nom_accessible(self) -> str:
         """Nom de la scène pour les lecteurs d'écran (les titres complets des panneaux y sont ajoutés)."""
         return tr('anim_nom_' + self.ID.lower()) if self.ID else ''
+
+    def touche(self, ev) -> bool:
+        """Touche pressée quand la toile a le focus (QKeyEvent) ; rend True si l'animation s'en sert."""
+        return False
 
     def molette(self, pos: QPointF, delta: float) -> bool:
         """Molette sur la toile (delta en huitièmes de degré) ; rend True si l'animation s'en sert."""

@@ -2,6 +2,29 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## Next version (0.9.0, unreleased) — Newton's cannon
+
+- **Newton's cannon** (97th animation, Renaissance theme and module): Newton's thought experiment. A cannon on top of a
+  mountain fires faster and faster: the ball lands farther and farther away, goes round the body, then escapes. Earth,
+  Moon, Mars, Ceres or the asteroid Dimorphos (where a few centimetres per second are enough).
+  - **One gesture**: big "Fire!" button (and Space key), pause, "Restart", time ×1 to ×1,000; drag the tip of the green
+    arrow to set both angle and speed (snaps to horizontal), synchronised sliders and fields, arrow keys.
+  - **Marks**: orbital speed v₁ = √(GM/r) and escape speed v₂ = √(2GM/r) at the cannon's altitude, marked under the
+    speed slider and as circles around the cannon; predicted path as a dotted line while setting up; path type,
+    eccentricity, periapsis and apoapsis, period (Kepler's 3rd law), energy.
+  - **Automatic framing** that follows the ball (wheel to zoom, drag to pan the zoomed view, "Reframe" or double-click
+    to go back); previous shots kept in colour, with their legend.
+  - **One-click presets** (falls nearby, round trip at ground level, ISS orbit, ellipse, just escaping, hyperbola,
+    atmospheric re-entry) and automatically checked **challenges** (circular orbit, just enough to escape, orbit above
+    the air, antipodes, satellite of Dimorphos).
+  - Optional **real atmosphere** (Earth: layered exponential model from 0 to 1,000 km, CIRA-72; Mars): ball, capsule
+    or satellite slowed down; a low orbit decays until re-entry.
+  - Computed by the "Gravity and Orbits" engine (4th-order Yoshida); IAU 2015, DE440, Dawn (Ceres), DART (Dimorphos)
+    constants; values checked with SageMath; same values as Coupole Web, character for character.
+- **"Newton's cannon" outline** (definition, formulas and orders of magnitude, pitfall, "going further") and **5 new
+  questions** in the Renaissance module (G24 to G28), written for Coupole.
+- Animations: a slider can carry marks (v₁, v₂); an animation can respond to the keyboard when the scene has focus.
+
 ## 0.8.6 — 10 November 2026
 
 - **PixInsight 1.9.6 XISF files**: Coupole reads compressed XISF files written under revision 2 of the specification

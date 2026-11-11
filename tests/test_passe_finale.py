@@ -1,9 +1,9 @@
 """Passe finale (0.7.0) : audit fonctionnel automatisé de bout en bout.
 
-- les 517 questions : chaque variante (jusqu'à 3 par question) s'instancie, s'affiche, se note (bonne réponse →
+- les 522 questions : chaque variante (jusqu'à 3 par question) s'instancie, s'affiche, se note (bonne réponse →
   « réussie », mauvaise → tentative fausse enregistrée), « Montrer la réponse » marque la réponse vue ;
 - textes des figures toujours lisibles sur ce qu'il y a dessous (contraste ≥ 3, deux thèmes) ;
-- les 96 animations : ouverture, chaque réglage aux bornes et chaque choix, chaque bouton, quelques pas : aucune
+- les 97 animations : ouverture, chaque réglage aux bornes et chaque choix, chaque bouton, quelques pas : aucune
   exception, et aucune opération ne prend plus de 100 ms de processeur dans le fil graphique (300 ms en intégration
   continue, machines partagées) ;
 - glissers aléatoires (dont valeurs non finies) sur toutes les animations ;
@@ -82,7 +82,7 @@ def test_toutes_les_questions_se_notent(app_qt):
         assert doc['questions'][qid]['reponse_vue'], qid
         pq.deleteLater()
     app_qt.processEvents()
-    assert len(contenu.toutes_les_questions()) == 517 and n >= 517 and notees > 400
+    assert len(contenu.toutes_les_questions()) == 522 and n >= 522 and notees > 400
     b = S.bilan(doc, list(contenu.toutes_les_questions()))
     assert b['reussies'] >= 400 and b['tentatives'] >= notees
 

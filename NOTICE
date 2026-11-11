@@ -143,6 +143,22 @@ Vérifications SageMath indépendantes du moteur (46 comparaisons) ; tests de r�
 Limites dites dans l'interface : extrapolation des atmosphères hors de la grille ATLAS9, étalonnages bornés ou
 interpolés, magnitude absolue de l'ancien étalonnage là où aucune n'est publiée.
 
+Le canon de Newton (prochaine version) / Newton's cannon (coupole/modules/anim/canon_meca.py, animations/canon_newton.py)
+-----------------------------------------------------------------------------------------------------------------
+Animation propre à Coupole (pas dans ClassAction), d'après l'expérience de pensée d'I. Newton, A Treatise of the
+System of the World (1728, domaine public) ; code, dessins et textes propres / Coupole's own animation, after Newton's
+thought experiment; own code, drawings and texts. Constantes et données (vérifiées par SageMath,
+outils/verif_anim/canon_newton_verif.sage de Coupole) / constants and data (checked with SageMath) :
+  - G : CODATA 2018 ; Terre : GM et rayon équatorial nominaux, résolution B3 de l'UAI (2015) ; Lune, Mars : GM de
+    l'éphéméride JPL DE440 (R. S. Park et al., AJ 161 (2021) 105), rayon moyen de la Lune (NASA Moon Fact Sheet),
+    rayon moyen de Mars 3 389,5 km (rapport du groupe de travail de l'UAI, Archinal et al. 2018) ;
+  - Cérès : GM 62,629 05 km³·s⁻² et volume 434,13 × 10⁶ km³, R. S. Park et al., Icarus 319 (2019) 812 (mission Dawn) ;
+  - Dimorphos : masse 4,3 × 10⁹ kg et diamètre de la sphère de même volume 151 m, R. T. Daly et al., Nature 616
+    (2023) 443 (mission DART) ;
+  - atmosphère terrestre : modèle exponentiel par tranches de 0 à 1 000 km (CIRA-72), table de D. A. Vallado,
+    Fundamentals of Astrodynamics and Applications, 4e éd. (2013), tableau 8-4 (valeurs numériques seulement) ;
+    atmosphère martienne : ρ₀ = 0,020 kg·m⁻³, H = 11,1 km (NASA, Mars Fact Sheet).
+
 L'atmosphère terrestre (0.8.0) / Earth's atmosphere (coupole/modules/anim/atmosphere_calc.py, animations/atmosphere.py)
 -----------------------------------------------------------------------------------------------------------------
 Animation propre à Coupole (pas dans ClassAction) ; formules réécrites d'après leurs publications et vérifiées par

@@ -1496,3 +1496,48 @@ graphiques » du PROGRESSION.md de Coupole Web, sous-section « Gravité et orbi
 - [x] `tests/test_xisf_sous_blocs.py` (18 cas, encodeur indépendant ; 16 échouaient avec l'ancien lecteur ; relu aussi
   par PyPI `xisf` 1.0.1). Extras `validation`/`test` : `xisf>=1.0.1`.
 - Pas de tag : publication sur accord.
+
+## 11/11/2026 — Le canon de Newton (97ᵉ animation ; branche `canon-newton`, prochaine version 0.9.0, NON publiée)
+Demande : une animation « canon de Newton » au bureau et au web, ergonomie avant tout (l'idée vient des *Principia* /
+du *Traité du système du monde*, domaine public ; rien n'est repris d'aucun simulateur existant).
+- [x] `anim/canon_meca.py` (sans Qt, jumeau de `src/calc/canon.ts`) : astre immobile + boulet de masse nulle dans
+  `gravite_meca.Systeme` (Yoshida 4, pas adaptatif) ; crochet `Systeme.acc_sup` ajouté au moteur (frottement de l'air,
+  sans effet sur « Gravité et orbites » : ses cas au bit près passent toujours) ; pas borné par le temps de freinage
+  (2 %) et par la hauteur d'échelle (2 %) ; impact : dernier pas refait en 32 morceaux puis intersection avec la
+  sphère ; 2 000 pas au plus par appel (jamais de gel) ; éléments de Kepler analytiques, conique prévue, préréglages,
+  contextes et verdicts des défis (`juger`), communs au web.
+- [x] Astres : Terre et Lune (constantes de `gravite_meca`), Mars (GM DE440, R 3 389,5 km), Cérès (Park et al. 2019 :
+  GM 62,629 05 km³·s⁻², sphère de 434,13 × 10⁶ km³ → 469,725 km), Dimorphos (Daly et al. 2023 : 4,3 × 10⁹ kg, 151 m).
+  Air : Terre par tranches exponentielles 0–1 000 km (CIRA-72, Vallado tableau 8-4, table relue sur
+  SatelliteToolboxAtmosphericModels.jl) — une seule hauteur d'échelle donnerait 10⁻⁹ fois trop peu d'air à 400 km ;
+  Mars ρ₀ 0,020, H 11,1 km. Projectiles : B = 1 300 (boulet), 350 (capsule), 50 (satellite) kg·m⁻².
+- [x] `animations/canon_newton.py`, `textes_canon.py`, catalogue `LOT8` (thème Renaissance), module Renaissance
+  (`ANIMATIONS_AJOUTEES`), manifeste. Base : `Reglage.poser_reperes` (repères sous un curseur, décrits dans
+  l'info-bulle et le nom accessible) et `Animation.touche` (clavier quand la toile a le focus).
+- Ergonomie : « Feu ! » (bouton principal, Espace/Entrée), Pause, Recommencer, Effacer, Recadrer, Temps ×1…×1 000 (le
+  curseur de vitesse commun est masqué) ; flèche verte à tirer (angle + vitesse d'un geste, aimantée à 0° à ±1,5°,
+  vue figée pendant le geste) ; cercles v₁/v₂ autour du canon et repères sous le curseur ; trajectoire prévue en
+  pointillés ; cadrage automatique (planète + prévue + tir en cours, bande du haut laissée à la légende), molette =
+  zoom manuel puis glisser = déplacer, double-clic ou Recadrer = auto ; un curseur d'altitude et de vitesse par astre
+  (unités naturelles : km·s⁻¹, m·s⁻¹ pour Cérès, cm·s⁻¹ et m pour Dimorphos ; adresse partageable et mémoire sans
+  conversion) ; 8 tirs gardés, couleurs distinctes, légende ; temps conseillé par astre (×1 000 sur Cérès et
+  Dimorphos).
+- [x] SageMath : `outils/verif_anim/canon_newton_verif.sage` (120 bits, conteneur `sagemath`) →
+  `tests/canon_newton_sage.json` : constantes, v₁ et v₂ (surface et altitudes des réglages), éléments de tous les
+  préréglages, impacts par l'équation de Kepler (temps et angle), tirs inclinés, antipodes (v pour 179°, plage
+  7 916–7 952 m·s⁻¹ à 10° pour 180° ± 3°), tirs avec air par DOP853 (rtol 10⁻¹²).
+  Résultats : sans air, impact à 2 × 10⁻⁵ près (pied de la montagne : 151,743 s contre 151,7425 s) ; ISS
+  92,867 min mesurée = Kepler à 10⁻⁷ ; avec air (frottement en schéma d'ordre 1) : rentrée de la capsule 2 376 s
+  contre 2 380 s, orbite à 180 km qui retombe après 7 tours 38 271 s contre 38 331 s (≤ 0,4 %).
+- [x] Cas communs `tests/canon_cas.json` (`outils/cas_canon.py CHEMIN_WEB`) : sans air, état identique au bit près au
+  web ; avec air (exp) et angle balayé (atan2), écart ≤ 10⁻⁹.
+- [x] Contenus (dossier `_sources_externes/contenu_coupole`, réimporté par `outils/importer_contenu.py`) : fiche
+  `renaissance_canon_newton` (définition, 4 formules, ordres de grandeur, piège, « pour aller plus loin » : trois
+  niveaux), schéma `canon_newton`, valeurs `canon_*` ajoutées à `ressources/verif/verif.sage` (les 462 autres
+  valeurs inchangées), 4 sources (Newton 1728, Daly 2023, Park 2019, Vallado 2013) ; 5 questions propres
+  `co_renaissance_canon_*` (G24 à G28) : l'assembleur accepte désormais des questions propres à Coupole (champ de
+  travail `propre`, identifiant `co_…`, ajoutées en fin de module ; les 517 questions d'origine sont identiques).
+- [x] Tests : `tests/test_anim_canon.py` (53) ; comptes 96 → 97 ; recherche (cas régénérés, « canon de newton »,
+  « newton's cannon », « satellisation », « vitesse de libération »).
+- Captures de contrôle : hors dépôt (dossier de travail local).
+- Reste : manuels LaTeX FR/EN pas encore complétés (section et captures) ; publication (tag, Release) sur accord.

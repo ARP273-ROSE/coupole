@@ -75,7 +75,7 @@ def test_bibliotheque(app_qt):
     v.aller_bibliotheque()
     pb = v.pile.currentWidget()
     assert isinstance(pb, PageBibliotheque) and pb.onglets.count() == 4
-    assert '(517)' in pb.onglets.tabText(0)
+    assert '(522)' in pb.onglets.tabText(0)
     # filtre par module
     pb.module.setCurrentIndex(pb.module.findData('lunarcycles'))
     assert pb.onglets.widget(0).topLevelItemCount() == 1

@@ -2,7 +2,7 @@
 
     QT_QPA_PLATFORM=offscreen python -m coupole.essai_fumee
 
-Ouvre la fenêtre principale et chaque module, les 95 animations, une page de chaque sorte (accueil des modules,
+Ouvre la fenêtre principale et chaque module, les 97 animations, une page de chaque sorte (accueil des modules,
 module, question notée, recherche, Mes modules, progression), une fiche, une table et une image, vérifie que toutes
 les données livrées se lisent (JSON compressés, images WebP, police mathématique), change de thème et de langue.
 Code de sortie 0 si tout va bien ; sinon 1 et la liste des défauts.  Rien n'est écrit hors d'un dossier temporaire."""

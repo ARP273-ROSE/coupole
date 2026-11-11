@@ -42,6 +42,7 @@ ANIMATIONS = (
     ('orion3d', 'ismstarformation', 'Orion in 3D', 'Coupole', 'orion3d:Orion3D'),
     ('gravityorbits', 'renaissance', 'Gravity and Orbits', 'PhET', 'gravite_orbites:GraviteOrbites'),
     ('earthatmosphere', 'telescopes', "Earth's Atmosphere", 'Coupole', 'atmosphere:Atmosphere'),
+    ('newtoncannon', 'renaissance', "Newton's Cannon", 'Coupole', 'canon_newton:CanonNewton'),
     ('smallangledemo', 'ancientastro', 'Small-Angle Approximation Demonstrator', 'ancientastro/smallangledemo.swf',
      'petits_angles:PetitsAngles'),
     ('dipperclock', 'ancientastro', 'Big Dipper Clock', 'ancientastro/dipperclock.swf',
@@ -204,14 +205,18 @@ LOT6 = ('gravityorbits',)
 # 0.8.0 : l'atmosphère terrestre (propre à Coupole) ; thème « Télescopes » : l'atmosphère, premier instrument que
 # traverse la lumière, décide où et comment on observe (altitude, espace, hauteur sur l'horizon)
 LOT7 = ('earthatmosphere',)
+# 0.9.0 : le canon de Newton (propre à Coupole, d'après l'expérience de pensée des Principia, 1687) ; thème
+# « Renaissance » (lois de Newton)
+LOT8 = ('newtoncannon',)
 #: animations qui ne viennent pas de ClassAction : identifiant → (application d'origine, adresse de son dépôt)
 HORS_CLASSACTION = {'antikythera': ('Anticythere3D', 'https://github.com/ARP273-ROSE/Anticythere3D'),
                     'orion3d': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
                     'earthatmosphere': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
+                    'newtoncannon': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
                     'gravityorbits': ('PhET Gravity and Orbits',
                                       'https://phet.colorado.edu/sims/html/gravity-and-orbits/latest/'
                                       'gravity-and-orbits_fr.html')}
-ORDRE = LOT1 + LOT1_BIS + LOT2 + LOT2_BIS + LOT3 + LOT4 + LOT5 + LOT6 + LOT7
+ORDRE = LOT1 + LOT1_BIS + LOT2 + LOT2_BIS + LOT3 + LOT4 + LOT5 + LOT6 + LOT7 + LOT8
 
 
 class Entree:
