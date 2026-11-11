@@ -159,7 +159,8 @@ def etat_tir(R: float, altitude: float, v: float, angle_deg: float):
 
 def conique(el: dict, x0: float, y0: float, R: float, r_lim: float, n: int = 240) -> list:
     """Points (x, y) de la trajectoire prévue (sans air) depuis (x0, y0), dans le sens du mouvement : un tour pour une
-    ellipse, jusqu'à r_lim pour une orbite ouverte, jusqu'au sol si elle le touche (dernier point sur la sphère)."""
+    ellipse, jusqu'à r_lim pour une orbite ouverte, jusqu'au sol si elle le touche (dernier point sur la sphère).
+    Ellipse qui sort de r_lim : la partie au-delà est omise (None marque la coupure) et le retour est tracé."""
     mu_h = el['h']
     e = el['e']
     r0 = el['r']
@@ -189,6 +190,7 @@ def conique(el: dict, x0: float, y0: float, R: float, r_lim: float, n: int = 240
             nu1 = nu0
     pts = []
     prec = None
+    dehors = None                                # dernier point hors de r_lim (ellipse : on reprend au retour)
     for k in range(n + 1):
         nu = nu0 + (nu1 - nu0) * k / n
         den = 1 + e * math.cos(nu)
@@ -204,10 +206,21 @@ def conique(el: dict, x0: float, y0: float, R: float, r_lim: float, n: int = 240
                 xi, yi = intersection(prec[0], prec[1], x, y, R)
                 pts.append((xi, yi))
             break
+        if r > r_lim:
+            if e >= 1:
+                pts.append((x, y))
+                break
+            if prec is not None:                 # sortie du cadre : point de sortie, puis coupure
+                pts.append((x, y))
+                pts.append(None)
+                prec = None
+            dehors = (x, y)
+            continue
+        if prec is None and dehors is not None:  # retour dans le cadre : la ligne repart du dernier point dehors
+            pts.append(dehors)
+        dehors = None
         pts.append((x, y))
         prec = (x, y)
-        if r > r_lim:
-            break
     return pts
 
 

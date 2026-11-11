@@ -2,6 +2,11 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.9.1 — unreleased
+
+- **Newton's cannon, predicted path**: an ellipse leaving the frame (e.g. 10.06 km·s⁻¹ near the ground) kept the way
+  out but lost the way back; the return to the cannon is now drawn, the far part cut off.
+
 ## 0.9.0 — 11 November 2026 — Newton's cannon
 
 - **v₁ / v₂ magnet**: dropped near a mark (slider or arrow), the speed slider takes the exact value of v₁ or v₂.

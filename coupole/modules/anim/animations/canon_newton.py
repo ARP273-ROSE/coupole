@@ -475,7 +475,7 @@ class CanonNewton(Animation):
         self._cam['cy'] = r.center().y() + haut_l / 2
         r0 = R + self.altitude_m()
         x0, x1, y0, y1 = -R, R, -R, max(R, r0)
-        pts = list(self._apercu_pts()) if self.c_apercu.isChecked() else []
+        pts = [q for q in self._apercu_pts() if q is not None] if self.c_apercu.isChecked() else []
         t = self.courant()
         if t is not None and t.astre == self.astre():
             n = len(t.x)
@@ -601,12 +601,16 @@ class CanonNewton(Animation):
         dessin.reserver(p, tx, ty, 8, True)
 
     def _dessiner_apercu(self, p):
-        pts = self._apercu_pts()
-        if len(pts) < 2:
-            return
         p.setPen(dessin.stylo('doux', 1.3, 0.9, True))
         p.setBrush(Qt.BrushStyle.NoBrush)
-        p.drawPolyline(QPolygonF([QPointF(*self._vers_ecran(x, y)) for x, y in pts]))
+        morceau = []
+        for q in list(self._apercu_pts()) + [None]:     # None : coupure (ellipse sortie du cadre, puis retour)
+            if q is not None:
+                morceau.append(QPointF(*self._vers_ecran(*q)))
+                continue
+            if len(morceau) >= 2:
+                p.drawPolyline(QPolygonF(morceau))
+            morceau = []
 
     def _trace(self, p, t):
         if t.astre != self.astre() or len(t.x) < 1:

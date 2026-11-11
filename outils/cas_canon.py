@@ -49,14 +49,14 @@ def main(web=None):
     for astre in C.NOMS_ASTRES:
         A = C.ASTRES[astre]
         for alt in (C.REGLAGES[astre]['a0'] * C.REGLAGES[astre]['ua'],):
-            for kv in (0.3, 0.9, 1.0, 1.2, 1.4142135623730951, 1.6):
+            for kv in (0.3, 0.9, 1.0, 1.2, 1.35, 1.4142135623730951, 1.6):
                 for ang in (0.0, 30.0, 90.0, -20.0):
                     r0 = A['r'] + alt
                     v = kv * C.v_satellisation(A['gm'], r0)
                     x, y, vx, vy = C.etat_tir(A['r'], alt, v, ang)
                     out['elements'].append({'astre': astre, 'alt': alt, 'v': v, 'angle': ang,
                                             'el': el(C.elements(A['gm'], A['r'], x, y, vx, vy))})
-                    if ang in (0.0, 30.0) and kv in (0.3, 1.2, 1.6):
+                    if ang in (0.0, 30.0) and kv in (0.3, 1.2, 1.35, 1.6):
                         e = C.elements(A['gm'], A['r'], x, y, vx, vy)
                         out['coniques'].append({'astre': astre, 'alt': alt, 'v': v, 'angle': ang,
                                                 'pts': C.conique(e, x, y, A['r'], 4 * e['r'])})

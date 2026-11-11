@@ -2,6 +2,11 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.9.1 — non publiée
+
+- **Canon de Newton, trajectoire prévue** : une ellipse qui sort du cadre (par exemple 10,06 km·s⁻¹ au ras du sol)
+  gardait l'aller mais perdait le retour ; le retour jusqu'au canon est maintenant tracé, la partie lointaine coupée.
+
 ## 0.9.0 — 11 novembre 2026 — Le canon de Newton
 
 - **Aimant v₁ / v₂** : posé près d'un repère (glissière ou flèche), le curseur de vitesse prend la valeur exacte de

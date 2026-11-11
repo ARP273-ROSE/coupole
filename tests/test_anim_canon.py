@@ -395,3 +395,15 @@ def test_aimant_v1_v2(app_qt):
     r.curseur.setValue(r.curseur.value() + 1)
     assert r.value() != v2
     assert r.aimanter(9.5) == 9.5
+
+
+def test_apercu_ellipse_sortie_du_cadre_garde_le_retour():
+    """Ellipse dont l'apogée dépasse le cadre (10,06 km·s⁻¹ à 1 km, signalé le 12/11/2026) : la partie lointaine est
+    coupée (None) mais le retour jusqu'au canon reste tracé, comme pour une ellipse entière."""
+    A = C.ASTRES['terre']
+    x, y, vx, vy = C.etat_tir(A['r'], 1000.0, 10060.0, 0.0)
+    e = C.elements(A['gm'], A['r'], x, y, vx, vy)
+    pts = C.conique(e, x, y, A['r'], 4 * e['r'])
+    assert pts.count(None) == 1
+    assert math.hypot(pts[-1][0] - x, pts[-1][1] - y) < 1e-3 * e['r']
+    assert all(math.hypot(*q) <= 4 * e['r'] * 1.5 for q in pts if q is not None)
