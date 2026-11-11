@@ -405,5 +405,12 @@ def test_apercu_ellipse_sortie_du_cadre_garde_le_retour():
     e = C.elements(A['gm'], A['r'], x, y, vx, vy)
     pts = C.conique(e, x, y, A['r'], 4 * e['r'])
     assert pts.count(None) == 1
+    # avec la limite de l'animation, l'ellipse (apogée 4,26 r) est montrée entière et se referme
+    entiere = C.conique(e, x, y, A['r'], C.limite_apercu(e))
+    assert None not in entiere and math.hypot(entiere[-1][0] - x, entiere[-1][1] - y) < 1e-3 * e['r']
+    # près de v₂ (apogée > 30 r) : coupure, retour toujours tracé
+    x, y, vx, vy = C.etat_tir(A['r'], 1000.0, 0.999 * C.v_liberation(A['gm'], A['r'] + 1000.0), 0.0)
+    e2 = C.elements(A['gm'], A['r'], x, y, vx, vy)
+    assert C.limite_apercu(e2) == 30 * e2['r'] and C.conique(e2, x, y, A['r'], C.limite_apercu(e2)).count(None) == 1
     assert math.hypot(pts[-1][0] - x, pts[-1][1] - y) < 1e-3 * e['r']
     assert all(math.hypot(*q) <= 4 * e['r'] * 1.5 for q in pts if q is not None)

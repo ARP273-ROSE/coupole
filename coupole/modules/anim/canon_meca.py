@@ -157,6 +157,20 @@ def etat_tir(R: float, altitude: float, v: float, angle_deg: float):
     return 0.0, R + altitude, v * math.cos(a), v * math.sin(a)
 
 
+#: aperçu : rayon de cadrage d'une orbite ouverte, et plus grand apogée montré en entier (× rayon du tir)
+APERCU_OUVERT = 4.0
+APERCU_ELLIPSE_MAX = 30.0
+
+
+def limite_apercu(el: dict) -> float:
+    """Rayon jusqu'où l'aperçu est tracé : toute l'ellipse (apogée + 5 %) jusqu'à 30 fois le rayon du tir, pour que
+    l'orbite se referme à l'écran ; 4 fois ce rayon pour une orbite ouverte (ou une ellipse plus grande encore)."""
+    r0 = el['r']
+    if el['e'] < 1 and math.isfinite(el['ra']):
+        return max(APERCU_OUVERT * r0, min(1.05 * el['ra'], APERCU_ELLIPSE_MAX * r0))
+    return APERCU_OUVERT * r0
+
+
 def conique(el: dict, x0: float, y0: float, R: float, r_lim: float, n: int = 240) -> list:
     """Points (x, y) de la trajectoire prévue (sans air) depuis (x0, y0), dans le sens du mouvement : un tour pour une
     ellipse, jusqu'à r_lim pour une orbite ouverte, jusqu'au sol si elle le touche (dernier point sur la sphère).

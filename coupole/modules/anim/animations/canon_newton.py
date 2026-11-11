@@ -456,7 +456,7 @@ class CanonNewton(Animation):
         cle = (self.astre(), self.altitude_m(), self.vitesse_ms(), self.r_angle.value())
         if self._apercu[0] != cle:
             (x, y), el = self._tir_regle()
-            self._apercu = (cle, C.conique(el, x, y, A['r'], 4 * el['r']))
+            self._apercu = (cle, C.conique(el, x, y, A['r'], C.limite_apercu(el)))
         return self._apercu[1]
 
     def _cadrer(self, r: QRectF):

@@ -5,7 +5,8 @@ French version (reference): [CHANGELOG.md](CHANGELOG.md).
 ## 0.9.1 — unreleased
 
 - **Newton's cannon, predicted path**: an ellipse leaving the frame (e.g. 10.06 km·s⁻¹ near the ground) kept the way
-  out but lost the way back; the return to the cannon is now drawn, the far part cut off.
+  out but lost the way back; the view now shows the whole ellipse, closed on the cannon (beyond 30 times the launch
+  radius, very close to v₂, the far part is cut and the way back is still drawn).
 
 ## 0.9.0 — 11 November 2026 — Newton's cannon
 

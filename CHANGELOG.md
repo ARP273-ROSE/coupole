@@ -5,7 +5,8 @@ Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 ## 0.9.1 — non publiée
 
 - **Canon de Newton, trajectoire prévue** : une ellipse qui sort du cadre (par exemple 10,06 km·s⁻¹ au ras du sol)
-  gardait l'aller mais perdait le retour ; le retour jusqu'au canon est maintenant tracé, la partie lointaine coupée.
+  gardait l'aller mais perdait le retour ; le cadrage montre maintenant l'ellipse entière, refermée sur le canon (au-delà
+  de 30 fois le rayon du tir, tout près de v₂, la partie lointaine est coupée et le retour reste tracé).
 
 ## 0.9.0 — 11 novembre 2026 — Le canon de Newton
 
