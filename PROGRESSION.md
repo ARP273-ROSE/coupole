@@ -1541,3 +1541,19 @@ du *Traité du système du monde*, domaine public ; rien n'est repris d'aucun si
   « newton's cannon », « satellisation », « vitesse de libération »).
 - Captures de contrôle : hors dépôt (dossier de travail local).
 - Reste : manuels LaTeX FR/EN pas encore complétés (section et captures) ; publication (tag, Release) sur accord.
+
+## 2026-11-11/12 — 0.9.0 puis 0.9.1 publiées (canon de Newton)
+- 0.9.0 publiée (tag v0.9.0, Release), puis 0.9.1 ; Release unique en ligne : v0.9.1 (les précédentes supprimées).
+- Corrections 0.9.0 → 0.9.1 :
+  - curseur à v₁/v₂ : la glissière (1000 pas) s'arrêtait juste sous la vitesse visée → `Reglage.aimanter` (AIMANT = 4
+    positions), sauf pas au clavier ;
+  - aperçu de l'ellipse : `canon_meca.limite_apercu(el)` = max(4 r₀, min(1,05·ra, 30 r₀)) → ellipse entière jusqu'à 30 r₀,
+    elle se referme sur le canon ; au-delà, coupure par None (point de sortie, puis retour) ;
+  - bouton Lecture/Pause : icônes Qt standard (SP_MediaPlay/SP_MediaPause) au lieu des glyphes ▶/⏸ ;
+  - cas communs `canon_cas.json` : au bit près sous Linux seulement, rel_tol 1e-9 sous Windows/macOS (libm différente).
+- Vérifié : CI verte sur les 3 systèmes ; tests locaux par l'image docker `coupole-test:3.12-p` (~13 min).
+
+### NOTE DE REPRISE (15/11/2026)
+- main = 47dba46 (0.9.1), publié. Rien en cours.
+- Restes facultatifs, non validés : manuels LaTeX FR/EN du canon (section + captures, aide F1) ; animation
+  « parallaxe d'un astéroïde → valeur de l'ua » (idée née d'une question de cours, à proposer).
