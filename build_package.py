@@ -57,7 +57,12 @@ PY_EMBED_URL = (f'https://www.python.org/ftp/python/{PY_VERSION}/'
                 f'python-{PY_VERSION}-embed-amd64.zip')
 # pip pose depuis sa roue : le get-pip.py actuel refuse de s'installer sous Windows
 # (« To modify pip, please run… », 03/11/2026). Roue pure Python, simple archive.
-PIP_VERSION = '25.2'
+# 26.x : les sources sans pyproject.toml passent par le backend PEP 517 de
+# setuptools, qui met le dossier du paquet dans le chemin. pip 25.2 prenait
+# encore l'ancien « setup.py egg_info » : sous le Python embarque (._pth), un
+# setup.py qui importe un module voisin (versioneer.py de pims, tire par
+# reproject) echouait — Coupole 0.9.2, 18/11/2026.
+PIP_VERSION = '26.3'
 PIP_WHEEL_URL = (f'https://files.pythonhosted.org/packages/py3/p/pip/'
                  f'pip-{PIP_VERSION}-py3-none-any.whl')
 
