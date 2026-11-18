@@ -2,6 +2,14 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.9.2 — 18 November 2026
+
+- **Signed updates**: each release publishes a manifest (version number and SHA-256 of every archive) signed
+  with an Ed25519 key that is not on GitHub. The application now installs an update only if its archive is listed
+  in a manifest signed by that key: a stolen GitHub access can no longer push code to installed copies. Verified
+  in pure Python (`signature_maj.py`).
+- Update: the address reached after redirects is checked as well.
+
 ## 0.9.1 — 12 November 2026
 
 - **Newton's cannon, predicted path**: an ellipse leaving the frame (e.g. 10.06 km·s⁻¹ near the ground) kept the way

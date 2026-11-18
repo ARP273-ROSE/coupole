@@ -8,6 +8,7 @@ La structure est LA MEME que celle du paquet Windows produit par
     <NomApp>/
         python/     un CPython autonome
         app/        le code de l'application
+        outils/     outils tiers embarques (kit.json « outils », outils_kit.py)
         <NomApp>.sh (ou le bundle .app sous macOS)
 
 C'est ce qui permet a `updater.py` de fonctionner a l'identique sur les trois
@@ -245,6 +246,15 @@ def step_app():
     log(f'application copiee ({sum(1 for _ in app.rglob("*"))} entrees)')
 
 
+def step_outils():
+    """Outils tiers embarques (kit.json « outils ») : Tesseract, Tectonic...
+    poses dans outils/<nom>/ a cote de python/ et app/ (la mise a jour, qui ne
+    remplace que app/, n'y touche pas), essayes, caches pre-remplis. Le detail
+    vit dans outils_kit.py, commun aux trois systemes."""
+    import outils_kit
+    outils_kit.poser_tous(KIT, PKG, CACHE, ROOT, app=PKG / 'app', log=log)
+
+
 # Dossier reel du lanceur, liens symboliques suivis (~/.local/bin/app ->
 # .../App.sh, et lien de lien) : `dirname "$0"` seul donnait le dossier du
 # LIEN, et l'application ne trouvait plus python/ ni app/. Sans `readlink -f`,
@@ -323,8 +333,9 @@ def step_lanceur():
         lanceur = macos / NOM
         lanceur.write_text(texte_lanceur('../Resources'), encoding='utf-8')
         lanceur.chmod(0o755)
-        for entree in ('python', 'app'):
-            shutil.move(str(PKG / entree), str(resources / entree))
+        for entree in ('python', 'app', 'outils'):
+            if (PKG / entree).exists():
+                shutil.move(str(PKG / entree), str(resources / entree))
         shutil.rmtree(PKG, ignore_errors=True)
         log(f'bundle : {bundle.name}')
 
@@ -368,8 +379,10 @@ echo "Installation dans / Installing into: $CIBLE"
 mkdir -p "$CIBLE"
 # Les donnees de l'utilisateur (reglages, rapports) vivent ailleurs, dans
 # $DONNEES/__NOM__ : elles ne sont jamais touchees ici.
-rm -rf "$CIBLE/python" "$CIBLE/app"
+rm -rf "$CIBLE/python" "$CIBLE/app" "$CIBLE/outils"
 cp -R "$ICI/python" "$ICI/app" "$ICI/$NOM_APP.sh" "$CIBLE/"
+# outils tiers embarques (kit.json « outils »), s'il y en a
+[ -d "$ICI/outils" ] && cp -R "$ICI/outils" "$CIBLE/"
 chmod +x "$CIBLE/$NOM_APP.sh" "$CIBLE/python/bin/"python3*
 APPS="$DONNEES/applications"
 mkdir -p "$APPS"
@@ -473,7 +486,11 @@ def _elaguer_qt(site: Path):
     qt = pyqt / 'Qt6'
     if not qt.is_dir():
         return
-    prefixes = QT_ELAGUES + tuple(p.replace('Qt6', 'Qt', 1) for p in QT_ELAGUES)
+    # kit.json « qt_garder » : fragments de nom epargnes (["Pdf"] garde
+    # libQt6Pdf, QtPdf.framework et le module PyQt6.QtPdf), comme sous Windows.
+    gardes = tuple(KIT.get('qt_garder') or ())
+    prefixes = tuple(p for p in QT_ELAGUES + tuple(p.replace('Qt6', 'Qt', 1) for p in QT_ELAGUES)
+                     if not any(g in p for g in gardes))
     for d in (qt / 'lib', qt / 'bin', qt / 'libexec'):
         if not d.is_dir():
             continue
@@ -488,6 +505,8 @@ def _elaguer_qt(site: Path):
         shutil.rmtree(qt / 'plugins' / nom, ignore_errors=True)
     shutil.rmtree(qt / 'qml', ignore_errors=True)
     for nom in PYQT_ELAGUES:
+        if any(g in nom for g in gardes):
+            continue
         for f in pyqt.glob(nom + '.*'):
             f.unlink(missing_ok=True)
     tr = qt / 'translations'
@@ -741,6 +760,7 @@ def main():
     exe = step_python()
     step_deps(exe)
     step_app()
+    step_outils()
     step_lanceur()
     step_elaguer()
     step_controler_qt()

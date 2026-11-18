@@ -90,6 +90,10 @@ def _faux_paquet(tmp_path, monkeypatch):
 def test_mise_a_jour_par_archive_garde_les_donnees(tmp_path, monkeypatch):
     app = _faux_paquet(tmp_path, monkeypatch)
     u = maj.kit('updater')
+    # La signature des mises a jour a son propre essai (test_signature_maj.py) :
+    # celui-ci porte sur la conservation des donnees.
+    sans_cle = {k: v for k, v in u._kit().items() if k != 'cle_publique_maj'}
+    monkeypatch.setattr(u, '_kit', lambda: sans_cle)
     archive = io.BytesIO()
     with zipfile.ZipFile(archive, 'w') as z:
         z.writestr('lancer.py', '# nouveau\n')
