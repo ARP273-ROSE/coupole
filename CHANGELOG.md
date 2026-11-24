@@ -2,6 +2,11 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.9.3 — 24 novembre 2026
+
+- Sécurité : Python embarqué 3.13.17 (la 3.12.10 ne recevait plus de correctifs de sécurité sous Windows) ; l'interpréteur téléchargé à la construction est vérifié par son empreinte SHA-256. Rapports d'incident : plus de faux avertissement « vigie sans battement » au démarrage.
+- Security: bundled Python 3.13.17 (3.12.10 no longer received security fixes on Windows); the interpreter downloaded at build time is checked against its SHA-256. Incident reports: no more false “watchdog without heartbeat” warning at start-up.
+
 ## 0.9.2 — 18 novembre 2026
 
 - **Mises à jour signées** : chaque version publie un manifeste (numéro de version et empreinte SHA-256 de chaque archive) signé par une clé Ed25519 qui n'est pas sur GitHub. L'application n'installe plus une mise à jour que si son archive figure dans un manifeste signé par cette clé : un accès GitHub volé ne peut plus pousser de code sur les postes installés. Vérification en Python pur (`signature_maj.py`).
