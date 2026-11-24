@@ -98,5 +98,6 @@
     "poste": "installation"
   },
   "cle_publique_maj": "kHjUuLfq9BPw5+cmaBXwqFGMR4J9Jq5r0wBQLybZN0s=",
-  "release_unique": true
+  "release_unique": true,
+  "python": "3.13"
 }
