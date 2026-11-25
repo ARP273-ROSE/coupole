@@ -184,13 +184,17 @@ class Occultation(Animation):
         ax.fond(p, tr('anim_occultation_axe_t'), tr('anim_occultation_axe_flux'), grille=False,
                 fmt_x=lambda x: nombre(x, 0 if tm >= 20 else (1 if tm >= 2 else 2)), fmt_y=lambda y: '')
         m = 200
-        for i, y in enumerate(ys):                          # du bas (premier observateur) vers le haut
-            base = i + 0.1
-            pts = []
-            for j in range(m + 1):
-                tt = -tm + 2.0 * tm * j / m
-                pts.append((tt, base + 0.75 * (1.0 - oc.fraction_cachee(el, -v * tt, y, re))))
-            ax.courbe(pts, 'accent1' if el.corde(y) else 'doux', 1.4)
+        cle = (el.a, el.b, el.psi, el.y0, tuple(ys), v, tm, re)
+        if getattr(self, '_cache_courbes', (None,))[0] != cle:          # les courbes ne dépendent pas de l'instant
+            courbes = []
+            for i, y in enumerate(ys):                           # du bas (premier observateur) vers le haut
+                base = i + 0.1
+                courbes.append(([(-tm + 2.0 * tm * j / m,
+                                  base + 0.75 * (1.0 - oc.fraction_cachee(el, -v * (-tm + 2.0 * tm * j / m), y, re)))
+                                 for j in range(m + 1)], 'accent1' if el.corde(y) else 'doux'))
+            self._cache_courbes = (cle, courbes)
+        for pts, coul in self._cache_courbes[1]:
+            ax.courbe(pts, coul, 1.4)
         ax.verticale(t, 'accent3', 1.2)
 
     def _forme(self, p, r):

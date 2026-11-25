@@ -163,6 +163,23 @@ outils/verif_anim/canon_newton_verif.sage de Coupole) / constants and data (chec
     Fundamentals of Astrodynamics and Applications, 4e éd. (2013), tableau 8-4 (valeurs numériques seulement) ;
     atmosphère martienne : ρ₀ = 0,020 kg·m⁻³, H = 11,1 km (NASA, Mars Fact Sheet).
 
+Quatre animations de cours de plus (0.11.0) / Four more course animations (coupole/modules/anim/interferometrie.py,
+occultation.py, kozai.py, lagrange.py ; animations/interferometrie.py, occultation.py, kozai.py, lagrange.py)
+-----------------------------------------------------------------------------------------------------------------
+Code, dessins et textes propres ; formules et valeurs vérifiées par SageMath (outils/verif_anim/
+interferometrie_verif.sage, occultation_verif.sage, kozai_verif.sage, lagrange_verif.sage) / own code, drawings and
+texts; formulas and values checked with SageMath :
+  - interférométrie : théorème de Zernike et van Cittert, visibilité d'un disque uniforme (M. Born et E. Wolf,
+    Principles of Optics) ; diamètre de Bételgeuse 0,047″ (A. A. Michelson et F. G. Pease, ApJ 53, 249, 1921) ;
+    bases du VLTI (ESO) et de CHARA ;
+  - occultation : diamètre d'Éris 2 326 km (B. Sicardy et al., Nature 478, 493, 2011) ; ellipse ajustée par
+    moindres carrés sur les extrémités des cordes (méthode classique des campagnes d'occultation) ;
+  - Kozai-Lidov : équations séculaires quadrupolaires d'une particule test (M. Holman, J. Touma et S. Tremaine,
+    Nature 386, 254, 1997) et leur forme vectorielle (S. Tremaine, J. Touma et F. Kazandjian, MNRAS 394, 1085,
+    2009) ; rapports de masse M☉/M_J = 1 047,348 644 et M⊕/M☾ = 81,300 568 (UAI 2009) ;
+  - points de Lagrange : problème restreint circulaire des trois corps (C. D. Murray et S. F. Dermott, Solar System
+    Dynamics, 1999), μ de Routh ; rapport Charon/Pluton 0,1218.
+
 Quatre animations de cours (0.10.0) / Four course animations (coupole/modules/anim/diffraction.py,
 elements_orbitaux.py, hohmann_meca.py, meteores.py ; animations/resolution.py, elements_orbite.py, hohmann.py,
 radiant.py)

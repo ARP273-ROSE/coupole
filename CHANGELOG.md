@@ -2,6 +2,29 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.11.0 — 25 novembre 2026 — Quatre animations de cours de plus
+
+Quatre nouvelles animations propres à Coupole (105 en tout), au bureau comme dans Coupole Web ; formules et valeurs
+vérifiées par SageMath (`outils/verif_anim/{interferometrie,occultation,kozai,lagrange}_verif.sage`), mêmes nombres au
+caractère près dans les deux applications.
+
+- **Interférences et interférométrie** (Télescopes) : deux télescopes séparés d'une base B, fronts d'onde et retard
+  B sin α ; franges d'interfrange λ / B dans la tache d'Airy d'une ouverture ; visibilité d'une étoile non résolue,
+  d'un disque (|2 J₁(x)/x|, premier zéro à 1,22 λ / θ, franges retournées au-delà) et d'un couple ; des fentes
+  d'Young à Michelson et Pease (Bételgeuse, 1920), au VLTI et à CHARA ; base qui s'allonge en lecture.
+- **Occultation d'une étoile par un astéroïde** (Petits corps) : l'ombre balaie une ligne d'observateurs, chacun voit
+  l'étoile disparaître le temps d'une corde ; courbes de lumière, cordes mesurées avec leurs erreurs de
+  chronométrage, ellipse ajustée par moindres carrés ; vitesse de l'ombre à l'opposition, échelle de Fresnel,
+  étoile géante cachée en partie ; ceinture principale, petit troyen, Éris.
+- **Le mécanisme de Kozai-Lidov** (Renaissance) : équations séculaires quadrupolaires (forme vectorielle, régulière
+  en e = 0) intégrées pas à pas ; C = √(1 − e²) cos i conservé, inclinaison critique 39,23°, eₘₐₓ = √(1 − 5/3 cos² i₀),
+  période mesurée ; orbite en 3D, e(t) et i(t), portrait de phase ; astéroïde et Jupiter, satellite et Lune,
+  planète et étoile compagne.
+- **Les points de Lagrange** (Renaissance) : repère tournant du problème restreint, L1 à L5, zones interdites par la
+  constante de Jacobi, potentiel effectif ; têtards, fers à cheval, départs instables de L1, L2, L3 ; rayon de Hill
+  (L2 du JWST à 1,5 million de km) ; Soleil-Terre, Terre-Lune, Soleil-Jupiter, Pluton-Charon (L4 instable).
+- Modules et recherche : les quatre animations rejoignent Télescopes, Petits corps et Renaissance.
+
 ## 0.10.0 — 25 novembre 2026 — Quatre animations de cours
 
 Quatre animations propres à Coupole (101 en tout), au bureau comme dans Coupole Web, sur des notions qu'un premier

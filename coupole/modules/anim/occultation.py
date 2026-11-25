@@ -101,7 +101,7 @@ GRILLE = grille_etoile()
 def fraction_cachee(el: Ellipse, x: float, y: float, r_etoile: float) -> float:
     """Part du disque de l'étoile (rayon projeté r_etoile, en km) cachée par l'ellipse, l'observateur étant en (x, y)
     par rapport au plan de l'ombre."""
-    if r_etoile <= 1e-9:
+    if r_etoile <= 1e-3 * el.b:                 # étoile ponctuelle à l'échelle de l'astéroïde : tout ou rien
         return 1.0 if el.dedans(x, y) else 0.0
     n = sum(1 for u, v in GRILLE if el.dedans(x + u * r_etoile, y + v * r_etoile))
     return n / len(GRILLE)

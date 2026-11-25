@@ -1590,3 +1590,31 @@ choisies par intérêt pour l'examen, chacune avec un noyau sans Qt jumeau du we
   Release (`gh release delete v0.9.3 --cleanup-tag`).
 - Reste (plan ordonné dans l'inventaire privé) : interférences et interférométrie ; occultation stellaire par un
   astéroïde ; Kozai-Lidov ; points de Lagrange ; diagramme a–e ; libration ; précession des équinoxes ; résonances.
+
+## 25/11/2026 (suite) — 0.11.0 : quatre animations de cours de plus (105 animations ; branche `animations-cours-2`)
+Même méthode que la 0.10.0 (noyau sans Qt jumeau du web, vérification SageMath, tests, textes FR/EN, manuels) :
+- [x] **Interférences et interférométrie** (`interferometry`, Télescopes) : `anim/interferometrie.py` (interfrange λ/B,
+  1,22 λ/d, visibilité complexe point/disque/couple, base du premier zéro, coupe des franges dans l'Airy d'une
+  ouverture), `animations/interferometrie.py` (schéma des fronts et du retard B sin α, franges, V(B)). Sage :
+  instruments, 2 J₁(x)/x, Bételgeuse 47 mas → 3,08 m à 575 nm, couples, intensités.
+- [x] **Occultation d'une étoile par un astéroïde** (`occultation`, Petits corps) : `anim/occultation.py` (vitesse de
+  l'ombre à l'opposition, Fresnel, étoile projetée, ellipse tournée et cordes, disque de l'étoile échantillonné,
+  bruit de chronométrage Park-Miller, ellipse ajustée par moindres carrés), `animations/occultation.py`. Sage : cordes
+  par les racines exactes, ajustements recalculés.
+- [x] **Le mécanisme de Kozai-Lidov** (`kozai`, Renaissance) : `anim/kozai.py` (forme vectorielle de Tremaine, Touma et
+  Kazandjian, RK4 à pas égaux, second membre sans trigonométrie → mêmes nombres au web), `animations/kozai.py` (3D,
+  e(t)/i(t), portrait de phase, période mesurée). Sage : équations redérivées du hamiltonien, forme vectorielle
+  = forme en éléments, intégration mpmath.odefun, maxima de e.
+- [x] **Les points de Lagrange** (`lagrange`, Renaissance) : `anim/lagrange.py` (problème restreint circulaire plan,
+  L1–L3 par bissection, Jacobi, Hill, Routh, RK4 avec Coriolis, régions), `animations/lagrange.py` (carte du
+  repère tournant avec zones interdites, zoom de Hill, potentiel sur l'axe). Sage : racines à 45 chiffres,
+  stabilité de L4 par les valeurs propres, têtard et fer à cheval par mpmath.odefun.
+- [x] Modules (ANIMATIONS_AJOUTEES), recherche, comptes 105, manifeste, NOTICE, CHANGELOG FR/EN, README, manuels FR/EN
+  (section « Quatre animations de cours de plus », captures `docs/manuel/img/anim_{interferometry,occultation,kozai,
+  lagrange}_*.png`, tableau) ; degrés en mode maths corrigés (`^\circ`, le « ° » donnait « ř »).
+- Pièges : un attribut `touche` masquait la méthode clavier `Animation.touche` (renommé `collision`) ; règle
+  typographique : pas de « _ » ni de « ^ » hors formule (eₘₐₓ, tₖ, ∛).
+
+### NOTE DE REPRISE (25/11/2026, soir)
+- Restent (plan ordonné hors dépôt) : diagramme a–e (+ assistance gravitationnelle, cratère), libration, précession
+  des équinoxes, résonances et chaos, limite de Roche.

@@ -2,6 +2,28 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.11.0 — 25 November 2026 — Four more course animations
+
+Four new animations of Coupole's own (105 in all), on the desktop as in Coupole Web; formulas and values checked
+with SageMath (`outils/verif_anim/{interferometrie,occultation,kozai,lagrange}_verif.sage`), same numbers to the
+character in both applications.
+
+- **Interference and interferometry** (Telescopes): two telescopes a baseline B apart, wavefronts and delay B sin α;
+  fringes spaced λ / B inside the Airy spot of one aperture; visibility of an unresolved star, of a disc
+  (|2 J₁(x)/x|, first zero at 1.22 λ / θ, reversed fringes beyond) and of a pair; from Young's slits to Michelson
+  and Pease (Betelgeuse, 1920), the VLTI and CHARA; baseline growing while playing.
+- **Occultation of a star by an asteroid** (Small bodies): the shadow sweeps a line of observers, each sees the star
+  vanish for the time of one chord; light curves, measured chords with their timing errors, least-squares fitted
+  ellipse; shadow speed at opposition, Fresnel scale, giant star only partly hidden; main belt, small Trojan, Eris.
+- **The Kozai-Lidov mechanism** (Renaissance): quadrupole secular equations (vector form, regular at e = 0)
+  integrated step by step; C = √(1 − e²) cos i conserved, critical inclination 39.23°, eₘₐₓ = √(1 − 5/3 cos² i₀),
+  measured period; 3D orbit, e(t) and i(t), phase portrait; asteroid and Jupiter, satellite and Moon, planet and
+  companion star.
+- **The Lagrange points** (Renaissance): rotating frame of the restricted problem, L1 to L5, regions forbidden by the
+  Jacobi constant, effective potential; tadpoles, horseshoes, unstable starts at L1, L2, L3; Hill radius (JWST's
+  L2 at 1.5 million km); Sun-Earth, Earth-Moon, Sun-Jupiter, Pluto-Charon (unstable L4).
+- Modules and search: the four animations join Telescopes, Small bodies and Renaissance.
+
 ## 0.10.0 — 25 November 2026 — Four course animations
 
 Four animations of Coupole's own (101 in all), on the desktop as in Coupole Web, on topics that a first astronomy

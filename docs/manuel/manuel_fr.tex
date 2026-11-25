@@ -1329,7 +1329,7 @@ tournent désormais sous Windows, macOS et Linux, en français et en anglais, da
 reposent sur des formules de référence vérifiées. D'après ClassAction, University of Nebraska-Lincoln Astronomy
 Education, licence Apache 2.0 (fichiers \texttt{NOTICE} et \texttt{LICENCES/Apache-2.0.txt}).
 
-\paragraph{Catalogue.} À gauche, les 92 animations du catalogue d'origine, plus neuf propres à Coupole (dont la machine d'Anticythère, section~\ref{sec:anticythere}, Orion en 3D, section~\ref{sec:orion}, et Gravité et orbites, section~\ref{sec:gravite}), classées par thème (coordonnées et
+\paragraph{Catalogue.} À gauche, les 92 animations du catalogue d'origine, plus treize propres à Coupole (dont la machine d'Anticythère, section~\ref{sec:anticythere}, Orion en 3D, section~\ref{sec:orion}, et Gravité et orbites, section~\ref{sec:gravite}), classées par thème (coordonnées et
 mouvements, Lune, Renaissance et orbites, propriétés stellaires, lumière et spectres, exoplanètes…), avec une recherche
 (française ou anglaise, sans accents), un filtre par thème et par état. Les thèmes suivent un ordre pédagogique, de
 l'introduction et du ciel vu de la Terre jusqu'à la cosmologie. Chacune a son nom et sa description dans les
@@ -1772,7 +1772,10 @@ Gravité et orbites & d'après PhET : Soleil, Terre, Lune, ISS, comète en gravi
 Le canon de Newton & satellisation $v_1$, libération $v_2$, Terre, Lune, Mars, Cérès, Dimorphos, atmosphère réelle, défis\\
 Les éléments d'une orbite & $a$, $e$, $i$, $\Omega$, $\omega$, $M$ en 3D, trace au sol, orbites types, vis-viva\\
 Le transfert de Hohmann & $\Delta v_1$, $\Delta v_2$, durée, angle de phase, fenêtres de tir (orbite basse, Lune, Mars, Vénus, Jupiter)\\
+Le mécanisme de Kozai-Lidov & échange $e$--$i$ à $C=\sqrt{1-e^2}\cos i$ constant, $i_c=39{,}23^\circ$, $e_\text{max}$, portrait de phase\\
+Les points de Lagrange & repère tournant, L1 à L5, zones interdites (Jacobi), têtards, fers à cheval, rayon de Hill\\
 Étoiles filantes et radiant & ciel vu de dessous, traînées vers le radiant, taux $\mathrm{ZHR}\times\sin h$, nuit du maximum de sept pluies\\
+Occultation d'une étoile par un astéroïde & ombre, cordes, courbes de lumière, ellipse ajustée, vitesse de l'ombre, Fresnel\\
 \midrule
 Petits angles & $\alpha\approx206\,265''\,d/D$ contre la valeur exacte $2\arcsin(d/2D)$\\
 Horloge de la Grande Ourse & ciel du nord en projection stéréographique ; un tour par jour sidéral, environ 1$^\circ$ par jour à heure fixe\\
@@ -1845,6 +1848,7 @@ Univers-ballon & au lieu du film : galaxies sur un ballon qui gonfle, $v=Hd$, $H
 Décalage vers le rouge & spectre de M32 décalé de $1+z$, raies, lumière reçue dans U, B, V, R ; vitesse par l'effet Doppler relativiste\\
 L'atmosphère terrestre & masse d'air (sec $z$, Kasten \& Young, Pickering), extinction $\Delta m = kX$ et rougissement, fenêtres atmosphériques (ESO SkyCalc), réfraction, Soleil aplati, lever avancé, dispersion\\
 Diffraction et pouvoir de résolution & tache d'Airy, $1{,}22\lambda/D$, critère de Rayleigh, obstruction centrale, écart d'éclat, turbulence (pose longue)\\
+Interférences et interférométrie & franges $\lambda/B$, visibilité d'un disque ($1{,}22\lambda/\theta$) et d'un couple, Young, Michelson, VLTI, CHARA\\
 Télescope & grossissement $F/f$, champ réel, pouvoir séparateur $1{,}22\lambda/D$, pouvoir collecteur, mise au point ; Lune, Saturne, amas globulaire\\
 Capteur CCD & pose (photons au hasard, loi de Poisson, saturation) puis lecture ligne par ligne et case par case\\
 Loi de Snell-Descartes & $n_1\sin\theta_1=n_2\sin\theta_2$, réflexion totale, part réfléchie (Fresnel), angle de Brewster\\
@@ -1985,7 +1989,7 @@ formule vis-viva $v^2=GM(2/r-1/a)$.
 $\Delta v_1=\sqrt{GM(2/r_1-1/a)}-\sqrt{GM/r_1}$ au départ, $\Delta v_2$ à l'arrivée, durée $\pi\sqrt{a^3/GM}$ avec
 $a=(r_1+r_2)/2$. Pour trouver la cible au rendez-vous, il faut partir quand elle a l'avance $\varphi=\pi-n_2t$
 (angle de phase) : la fenêtre revient à chaque période synodique. Orbite basse vers la station, l'orbite
-géostationnaire ou la Lune ; Terre vers Mars (2,94 puis 2,65~km\,s$^{-1}$, 259~jours, $\varphi=44{,}3°$, une fenêtre
+géostationnaire ou la Lune ; Terre vers Mars (2,94 puis 2,65~km\,s$^{-1}$, 259~jours, $\varphi=44{,}3^\circ$, une fenêtre
 tous les 780~jours), Vénus (les deux poussées freinent) ou Jupiter. « Partir à la fenêtre de tir » ou « Partir
 maintenant » ; le cercle pointillé montre où sera la cible à l'arrivée si l'on part maintenant.
 \capture{img/anim_hohmann_fr.png}{0.9}
@@ -1996,6 +2000,47 @@ courtes près de lui ; prolongées vers l'arrière, elles s'y croisent. Taux att
 r^{6{,}5-m_\text{lim}}$ ; courbes de la nuit (hauteur du radiant, taux, crépuscule) ; latitude et magnitude limite
 réglables. Les étoiles de fond sont tirées au hasard (pas un vrai catalogue).
 \capture{img/anim_meteorradiant_fr.png}{0.9}
+\end{itemize}
+
+\paragraph{Quatre animations de cours de plus (0.11.0).} Même démarche ; vérifications SageMath
+\texttt{outils/verif\_anim/interferometrie\_verif.sage}, \texttt{occultation\_verif.sage}, \texttt{kozai\_verif.sage},
+\texttt{lagrange\_verif.sage}.
+\begin{itemize}
+\item \textbf{Interférences et interférométrie} (Télescopes). Deux télescopes de diamètre $d$ séparés d'une base $B$ :
+le front d'onde de l'étoile atteint l'un avec le retard $\delta=B\sin\alpha$, et les faisceaux recombinés donnent des
+franges d'interfrange $\lambda/B$ sur le ciel, prises dans la tache d'Airy d'un télescope seul ($1{,}22\,\lambda/d$).
+Leur contraste, la visibilité $V$, est le module de la transformée de Fourier de la source à la fréquence $B/\lambda$
+(Zernike et van Cittert) : $V=1$ pour une étoile non résolue ; $V=|2J_1(x)/x|$, $x=\pi\theta B/\lambda$, pour un
+disque de diamètre $\theta$, nulle à $B=1{,}22\,\lambda/\theta$ (franges retournées au-delà) ; pour un couple séparé de
+$\rho$, $V=|1+r\,e^{-2i\pi B\rho/\lambda}|/(1+r)$, au plus bas à $B=\lambda/2\rho$. Instruments : fentes d'Young (on y lit
+aussi l'interfrange sur un écran à 1~m), interféromètre de Michelson et Pease (Bételgeuse, 47~mas : franges disparues
+vers 3,08~m à 575~nm), VLTI, CHARA. En lecture, la base peut s'allonger.
+\capture{img/anim_interferometry_fr.png}{0.9}
+\item \textbf{Occultation d'une étoile par un astéroïde} (Petits corps). L'étoile étant à l'infini, l'ombre a la taille
+de l'astéroïde (ellipse de demi-axes $a$, $b$) ; elle balaie la Terre à la vitesse
+$v=\sqrt{GM_\odot/1\,\text{ua}}\,(1-1/\sqrt{r})$ à l'opposition (10,9~km\,s$^{-1}$ à 2,5~ua, 26,7~km\,s$^{-1}$ pour Éris).
+Chaque observateur d'une ligne tirée en travers de la trajectoire voit l'étoile disparaître le temps d'une corde :
+durée $=$ corde$/v$. Courbes de lumière de chacun, cordes mesurées avec l'erreur de chronométrage $\sigma v$, ellipse
+ajustée par moindres carrés sur leurs extrémités (au moins trois cordes) et comparée à la vraie forme ; erreur de
+prévision (les « négatifs » des bords), échelle de Fresnel $\sqrt{\lambda\Delta/2}$, diamètre de l'étoile projeté
+$\theta\Delta$ (une supergéante n'est cachée qu'en partie).
+\capture{img/anim_occultation_fr.png}{0.9}
+\item \textbf{Le mécanisme de Kozai-Lidov} (Renaissance). Un perturbateur lointain sur une orbite circulaire, inclinée
+de $i$ sur celle du corps : en moyenne sur les deux orbites (ordre quadrupolaire, particule test), $e$ et $i$
+s'échangent en gardant $C=\sqrt{1-e^2}\cos i$ ; au-delà de $i_c=\arccos\sqrt{3/5}=39{,}23^\circ$, une orbite presque
+circulaire monte jusqu'à $e_\text{max}=\sqrt{1-\tfrac53\cos^2 i_0}$ (0,838 pour 65°) quand $i$ redescend à $39{,}23^\circ$.
+Les équations, redérivées du hamiltonien par SageMath, sont intégrées sous forme vectorielle (régulière en $e=0$) en
+temps $t_K=(M/M')(a'/a)^3/n$ : 5\,291~ans pour un astéroïde à 2,7~ua perturbé par Jupiter. Orbite en 3D, $e(t)$ et
+$i(t)$, portrait de phase $(\omega,e)$ (circulation ou libration selon $\omega_0$), période mesurée.
+\capture{img/anim_kozai_fr.png}{0.9}
+\item \textbf{Les points de Lagrange} (Renaissance). Problème restreint circulaire des trois corps dans le repère qui
+tourne avec les deux astres (masses $1-\mu$ et $\mu$) : potentiel effectif $-\Omega$,
+$\Omega=(x^2+y^2)/2+(1-\mu)/r_1+\mu/r_2$, force de Coriolis, constante de Jacobi $C=2\Omega-v^2$ ; en gris, les zones
+où $2\Omega<C$, interdites. L1, L2, L3 sur l'axe (instables), L4 et L5 en triangles équilatéraux (stables si
+$\mu<0{,}0385$). Petit corps lâché près de L4 (têtard), en face du petit astre (fer à cheval) ou à côté de L1, L2, L3 ;
+zoom sur le petit astre et sa sphère de Hill $a\sqrt[3]{\mu/3}$ (L2 du JWST à 1,51 million de km) ; Soleil-Terre,
+Terre-Lune, Soleil-Jupiter, Pluton-Charon.
+\capture{img/anim_lagrange_fr.png}{0.9}
 \end{itemize}
 
 

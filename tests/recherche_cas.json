@@ -1886,8 +1886,8 @@
   ]
  },
  "reel": {
-  "documents": 830,
-  "vocabulaire": 5577,
+  "documents": 834,
+  "vocabulaire": 5668,
   "requetes": [
    [
     "seasons",
@@ -3654,6 +3654,16 @@
      },
      {
       "g": "animation",
+      "id": "interferometry",
+      "n": 1,
+      "score": 7,
+      "mots": [
+       "bien",
+       "when"
+      ]
+     },
+     {
+      "g": "animation",
       "id": "pathtracer",
       "n": 1,
       "score": 7,
@@ -3673,15 +3683,6 @@
      {
       "g": "animation",
       "id": "snellslaw",
-      "n": 1,
-      "score": 7,
-      "mots": [
-       "when"
-      ]
-     },
-     {
-      "g": "question",
-      "id": "ca_200level_lstatnoon",
       "n": 1,
       "score": 7,
       "mots": [
@@ -6394,6 +6395,15 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "occultation",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "scale"
+      ]
+     },
+     {
       "g": "question",
       "id": "ca_cosmology_hdage",
       "n": 1,
@@ -6409,15 +6419,6 @@
       "score": 10,
       "mots": [
        "scale"
-      ]
-     },
-     {
-      "g": "question",
-      "id": "ca_extrasolarplanets_ampperiod",
-      "n": 1,
-      "score": 10,
-      "mots": [
-       "scales"
       ]
      }
     ]
@@ -6489,12 +6490,12 @@
       ]
      },
      {
-      "g": "question",
-      "id": "ca_cosmology_hdage",
+      "g": "animation",
+      "id": "occultation",
       "n": 1,
       "score": 10,
       "mots": [
-       "echelles"
+       "echelle"
       ]
      }
     ]

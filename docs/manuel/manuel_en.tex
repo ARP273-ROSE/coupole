@@ -1288,7 +1288,7 @@ now run on Windows, macOS and Linux, in French and English, in the Coupole theme
 checked reference formulas. After ClassAction, University of Nebraska-Lincoln Astronomy Education, Apache License 2.0
 (\texttt{NOTICE} and \texttt{LICENCES/Apache-2.0.txt} files).
 
-\paragraph{Catalogue.} On the left, the 92 animations of the original catalogue, plus nine of Coupole's own (including the Antikythera Mechanism, section~\ref{sec:anticythere}, Orion in 3D, section~\ref{sec:orion}, and Gravity and Orbits, section~\ref{sec:gravite}), sorted by topic (coordinates and
+\paragraph{Catalogue.} On the left, the 92 animations of the original catalogue, plus thirteen of Coupole's own (including the Antikythera Mechanism, section~\ref{sec:anticythere}, Orion in 3D, section~\ref{sec:orion}, and Gravity and Orbits, section~\ref{sec:gravite}), sorted by topic (coordinates and
 motions, Moon, Renaissance and orbits, stellar properties, light and spectra, extrasolar planets…), with a search
 (French or English, accents ignored) and filters by topic and status. Topics follow a teaching order, from the
 introduction and the sky seen from the Earth to cosmology. Each has its name and description in both
@@ -1706,7 +1706,10 @@ Gravity and Orbits & after PhET: Sun, Earth, Moon, ISS, comet under gravity (4th
 Newton's cannon & orbital speed $v_1$, escape speed $v_2$, Earth, Moon, Mars, Ceres, Dimorphos, real atmosphere, challenges\\
 The elements of an orbit & $a$, $e$, $i$, $\Omega$, $\omega$, $M$ in 3D, ground track, typical orbits, vis-viva\\
 The Hohmann transfer & $\Delta v_1$, $\Delta v_2$, trip time, phase angle, launch windows (low orbit, Moon, Mars, Venus, Jupiter)\\
+The Kozai-Lidov mechanism & $e$--$i$ exchange at constant $C=\sqrt{1-e^2}\cos i$, $i_c=39.23^\circ$, $e_\text{max}$, phase portrait\\
+The Lagrange points & rotating frame, L1 to L5, forbidden regions (Jacobi), tadpoles, horseshoes, Hill radius\\
 Meteors and their radiant & sky seen from below, trails towards the radiant, rate $\mathrm{ZHR}\times\sin h$, peak night of seven showers\\
+Occultation of a star by an asteroid & shadow, chords, light curves, fitted ellipse, shadow speed, Fresnel\\
 \midrule
 Small angles & $\alpha\approx206\,265''\,d/D$ against the exact value $2\arcsin(d/2D)$\\
 Big Dipper clock & northern sky in stereographic projection; one turn per sidereal day, about 1$^\circ$ per day at a fixed time\\
@@ -1779,6 +1782,7 @@ Balloon universe & instead of the movie: galaxies on an inflating balloon, $v=Hd
 Galactic redshift & spectrum of M32 shifted by $1+z$, lines, light received in U, B, V, R; speed from the relativistic Doppler effect\\
 Earth's atmosphere & airmass (sec $z$, Kasten \& Young, Pickering), extinction $\Delta m = kX$ and reddening, atmospheric windows (ESO SkyCalc), refraction, flattened Sun, earlier rising, dispersion\\
 Diffraction and resolving power & Airy spot, $1.22\lambda/D$, Rayleigh criterion, central obstruction, brightness difference, turbulence (long exposure)\\
+Interference and interferometry & fringes $\lambda/B$, visibility of a disc ($1.22\lambda/\theta$) and of a pair, Young, Michelson, VLTI, CHARA\\
 Telescope & magnification $F/f$, true field, resolving power $1.22\lambda/D$, light-gathering power, focus; Moon, Saturn, globular cluster\\
 CCD sensor & exposure (random photons, Poisson law, saturation) then readout row by row and pixel by pixel\\
 Snell's law & $n_1\sin\theta_1=n_2\sin\theta_2$, total internal reflection, share reflected (Fresnel), Brewster angle\\
@@ -1916,7 +1920,7 @@ $v^2=GM(2/r-1/a)$.
 $\Delta v_1=\sqrt{GM(2/r_1-1/a)}-\sqrt{GM/r_1}$ at departure, $\Delta v_2$ at arrival, trip time $\pi\sqrt{a^3/GM}$ with
 $a=(r_1+r_2)/2$. To meet the target, you must leave when it leads by $\varphi=\pi-n_2t$ (phase angle): the window comes
 back every synodic period. Low orbit to the station, geostationary orbit or the Moon; Earth to Mars (2.94 then
-2.65~km\,s$^{-1}$, 259~days, $\varphi=44.3°$, a window every 780~days), Venus (both burns brake) or Jupiter. “Leave at
+2.65~km\,s$^{-1}$, 259~days, $\varphi=44.3^\circ$, a window every 780~days), Venus (both burns brake) or Jupiter. “Leave at
 the launch window” or “Leave now”; the dotted circle shows where the target will be at arrival if you leave now.
 \capture{img/anim_hohmann_en.png}{0.9}
 \item \textbf{Meteors and their radiant} (Small bodies). The peak night of seven showers (Quadrantids, Lyrids, Eta
@@ -1926,6 +1930,45 @@ backwards they cross there. Expected rate $\mathrm{ZHR}\times\sin h\div r^{6.5-m
 night (radiant altitude, rate, twilight); adjustable latitude and limiting magnitude. Background stars are random (not
 a real catalogue).
 \capture{img/anim_meteorradiant_en.png}{0.9}
+\end{itemize}
+
+\paragraph{Four more course animations (0.11.0).} Same approach; SageMath checks
+\texttt{outils/verif\_anim/interferometrie\_verif.sage}, \texttt{occultation\_verif.sage}, \texttt{kozai\_verif.sage},
+\texttt{lagrange\_verif.sage}.
+\begin{itemize}
+\item \textbf{Interference and interferometry} (Telescopes). Two telescopes of diameter $d$ a baseline $B$ apart: the
+star's wavefront reaches one with the delay $\delta=B\sin\alpha$, and the recombined beams give fringes spaced
+$\lambda/B$ on the sky, inside the Airy spot of a single telescope ($1.22\,\lambda/d$). Their contrast, the
+visibility $V$, is the modulus of the Fourier transform of the source at the spatial frequency $B/\lambda$ (Zernike
+and van Cittert): $V=1$ for an unresolved star; $V=|2J_1(x)/x|$, $x=\pi\theta B/\lambda$, for a disc of diameter
+$\theta$, zero at $B=1.22\,\lambda/\theta$ (reversed fringes beyond); for a pair $\rho$ apart,
+$V=|1+r\,e^{-2i\pi B\rho/\lambda}|/(1+r)$, lowest at $B=\lambda/2\rho$. Instruments: Young's slits (with the fringe
+spacing on a screen 1~m away), Michelson and Pease's interferometer (Betelgeuse, 47~mas: fringes gone near 3.08~m at
+575~nm), VLTI, CHARA. While playing, the baseline can grow.
+\capture{img/anim_interferometry_en.png}{0.9}
+\item \textbf{Occultation of a star by an asteroid} (Small bodies). The star being at infinity, the shadow has the
+asteroid's size (ellipse of semi-axes $a$, $b$); it sweeps the Earth at $v=\sqrt{GM_\odot/1\,\text{au}}\,(1-1/\sqrt{r})$
+at opposition (10.9~km\,s$^{-1}$ at 2.5~au, 26.7~km\,s$^{-1}$ for Eris). Each observer of a line drawn across the path
+sees the star vanish for the time of one chord: duration $=$ chord$/v$. Light curves of each observer, measured
+chords with the timing error $\sigma v$, least-squares ellipse fitted to their ends (at least three chords) and
+compared with the true shape; prediction error (the ``negatives'' at the edges), Fresnel scale
+$\sqrt{\lambda\Delta/2}$, star diameter projected $\theta\Delta$ (a supergiant is only partly hidden).
+\capture{img/anim_occultation_en.png}{0.9}
+\item \textbf{The Kozai-Lidov mechanism} (Renaissance). A distant perturber on a circular orbit, inclined by $i$ to
+the body's orbit: averaged over both orbits (quadrupole order, test particle), $e$ and $i$ trade off keeping
+$C=\sqrt{1-e^2}\cos i$; above $i_c=\arccos\sqrt{3/5}=39.23^\circ$, a nearly circular orbit climbs to
+$e_\text{max}=\sqrt{1-\tfrac53\cos^2 i_0}$ (0.838 for 65°) when $i$ has come down to $39.23^\circ$. The equations,
+re-derived from the Hamiltonian with SageMath, are integrated in vector form (regular at $e=0$) in units of
+$t_K=(M/M')(a'/a)^3/n$: 5,291~years for an asteroid at 2.7~au perturbed by Jupiter. 3D orbit, $e(t)$ and $i(t)$, phase
+portrait $(\omega,e)$ (circulation or libration depending on $\omega_0$), measured period.
+\capture{img/anim_kozai_en.png}{0.9}
+\item \textbf{The Lagrange points} (Renaissance). Circular restricted three-body problem in the frame rotating with the
+two bodies (masses $1-\mu$ and $\mu$): effective potential $-\Omega$, $\Omega=(x^2+y^2)/2+(1-\mu)/r_1+\mu/r_2$, Coriolis
+force, Jacobi constant $C=2\Omega-v^2$; in grey, the forbidden regions where $2\Omega<C$. L1, L2, L3 on the axis
+(unstable), L4 and L5 at equilateral triangles (stable if $\mu<0.0385$). Small body released near L4 (tadpole),
+opposite the small body (horseshoe) or next to L1, L2, L3; zoom on the small body and its Hill sphere
+$a\sqrt[3]{\mu/3}$ (JWST's L2 at 1.51 million km); Sun-Earth, Earth-Moon, Sun-Jupiter, Pluto-Charon.
+\capture{img/anim_lagrange_en.png}{0.9}
 \end{itemize}
 
 

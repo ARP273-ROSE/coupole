@@ -35,8 +35,10 @@ REMPLACEMENTS = [
 
 
 # Animations propres à Coupole ajoutées aux modules de ClassAction (l'original ne les connaît pas) : module → ids
-ANIMATIONS_AJOUTEES = {'renaissance': ['gravityorbits', 'newtoncannon', 'orbitalelements', 'hohmann'],
-                       'telescopes': ['resolution'], 'solarsystemdebris': ['meteorradiant']}
+ANIMATIONS_AJOUTEES = {'renaissance': ['gravityorbits', 'newtoncannon', 'orbitalelements', 'hohmann', 'kozai',
+                                       'lagrange'],
+                       'telescopes': ['resolution', 'interferometry'],
+                       'solarsystemdebris': ['meteorradiant', 'occultation']}
 
 def lire(p: Path):
     return json.loads(p.read_text(encoding='utf-8'))
