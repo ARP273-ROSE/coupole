@@ -121,6 +121,41 @@ TEXTES_PLANIF = {
                    'en': 'Approximate time, ± {m} min (TLE age at that date: {a} days): run the precise search again '
                          '2 or 3 days before.'},
     'pl_cli_tendance': {'fr': 'ISS : tendance jusqu’à 90 jours (heures indicatives)', 'en': 'ISS: outlook up to 90 days (approximate times)'},
+    # choix d'un lieu (carte, adresse)
+    'lieu_bouton': {'fr': 'Carte / adresse…', 'en': 'Map / address…'},
+    'lieu_bouton_aide': {'fr': 'Choisir le lieu sur une carte ou par son adresse ; remplit la position et l’altitude.',
+                         'en': 'Pick the place on a map or by its address; fills in the position and the elevation.'},
+    'lieu_titre': {'fr': 'Choisir un lieu', 'en': 'Choose a place'},
+    'lieu_intro': {'fr': 'Cliquez sur la carte (glisser pour la déplacer, molette pour zoomer), ou tapez une adresse, '
+                         'une ville, un lieu-dit puis « Chercher ». L’altitude du terrain est ajoutée toute seule.',
+                   'en': 'Click on the map (drag to move it, wheel to zoom), or type an address, a town or a place '
+                         'name then “Search”. The ground elevation is added automatically.'},
+    'lieu_adresse': {'fr': 'Adresse ou lieu', 'en': 'Address or place'},
+    'lieu_adresse_aide': {'fr': 'Adresse, ville, observatoire… Elle est envoyée au service Nominatim '
+                                '(OpenStreetMap) quand vous cliquez sur « Chercher », et seulement alors.',
+                          'en': 'Address, town, observatory… It is sent to the Nominatim service (OpenStreetMap) '
+                                'when you click “Search”, and only then.'},
+    'lieu_adresse_indice': {'fr': 'ex. 61 avenue de l’Observatoire, Paris', 'en': 'e.g. Royal Observatory, Greenwich'},
+    'lieu_chercher': {'fr': 'Chercher', 'en': 'Search'},
+    'lieu_chercher_aide': {'fr': 'Chercher cette adresse (OpenStreetMap).', 'en': 'Look up this address (OpenStreetMap).'},
+    'lieu_resultats_aide': {'fr': 'Lieux trouvés : choisissez le bon, puis affinez d’un clic sur la carte si besoin.',
+                            'en': 'Places found: pick the right one, then refine with a click on the map if needed.'},
+    'lieu_carte_aide': {'fr': 'Cliquez pour poser le lieu ; glissez pour déplacer la carte ; molette : zoom.',
+                        'en': 'Click to set the place; drag to move the map; wheel: zoom.'},
+    'lieu_aucun': {'fr': 'Aucun lieu choisi.', 'en': 'No place chosen.'},
+    'lieu_point': {'fr': 'Lieu choisi', 'en': 'Chosen place'},
+    'lieu_recherche': {'fr': 'Recherche…', 'en': 'Searching…'},
+    'lieu_rien': {'fr': 'Rien trouvé : essayez une autre écriture, ou cliquez sur la carte.',
+                  'en': 'Nothing found: try another spelling, or click on the map.'},
+    'lieu_erreur': {'fr': 'Recherche impossible (hors ligne ?) : {erreur}', 'en': 'Search failed (offline?): {erreur}'},
+    'lieu_alt_inconnue': {'fr': 'altitude inconnue (à saisir)', 'en': 'elevation unknown (type it in)'},
+    'lieu_choisi': {'fr': 'Lieu : <b>{pos}</b> — altitude {alt} — {nom}', 'en': 'Place: <b>{pos}</b> — elevation {alt} — {nom}'},
+    'lieu_utiliser': {'fr': 'Utiliser ce lieu', 'en': 'Use this place'},
+    'lieu_utiliser_aide': {'fr': 'Remplir la position et l’altitude avec ce lieu.', 'en': 'Fill in the position and elevation with this place.'},
+    'lieu_attribution': {'fr': 'Carte et adresses © contributeurs d’<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ; '
+                               'altitude : <a href="https://open-meteo.com/">Open-Meteo</a> (Copernicus DEM GLO-90).',
+                         'en': 'Map and addresses © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors; '
+                               'elevation: <a href="https://open-meteo.com/">Open-Meteo</a> (Copernicus DEM GLO-90).'},
     # détail
     'pl_d_titre_iss': {'fr': 'Passage de l’ISS du {date}', 'en': 'ISS pass on {date}'},
     'pl_d_titre_lune': {'fr': 'La Lune le {date}', 'en': 'The Moon on {date}'},

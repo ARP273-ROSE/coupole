@@ -119,6 +119,7 @@ class PanneauPlanif(QWidget):
                 self.e[cle + str(n)] = w
                 fl.addRow(tr('pl_nom' if cle == 'nom' else 'td_' + cle), w)
                 memoire.champ(w, 'modules.td.planif.%s%d' % (cle, n))
+            fl.addRow('', bouton('lieu_bouton', lambda _=False, n=n: self.choisir_lieu(n)))
             vg.addWidget(g)
         f = QFormLayout()
         self.e_debut = champ('pl_debut_aide', '', 'pl_debut_indice')
@@ -200,6 +201,10 @@ class PanneauPlanif(QWidget):
         self.c_tendance.setVisible(not lune)
         tendance = not lune and self.c_tendance.isChecked()
         self.s_jours.setMaximum(P.JOURS_MAX['lune' if lune else 'tendance' if tendance else 'iss'])
+
+    def choisir_lieu(self, n):
+        from .gui_lieu import choisir
+        choisir(self, self.e['p%d' % n], self.e['alt%d' % n], self.e['nom%d' % n])
 
     def exemple(self):
         for n, (nom, pos, alt) in enumerate((('Paris', '48.8366 N, 2.3360 E', '67'),

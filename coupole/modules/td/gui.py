@@ -256,6 +256,7 @@ class PanneauParallaxeTP(QWidget):
                 self.e[cle + str(n)] = w
                 fl.addRow(tr('td_' + cle), w)
                 memoire.champ(w, 'modules.td.parallaxe.%s%d' % (cle, n))
+            fl.addRow('', bouton('lieu_bouton', lambda _=False, n=n: self.choisir_lieu(n)))
             vg.addWidget(g)
         f = QFormLayout()
         h = QHBoxLayout()
@@ -328,6 +329,10 @@ class PanneauParallaxeTP(QWidget):
         self._maj_eph()
 
     # ------------------------------------------------------------------ outils
+    def choisir_lieu(self, n):
+        from .gui_lieu import choisir
+        choisir(self, self.e['p%d' % n], self.e['alt%d' % n])
+
     def _zoom(self, v):
         self.schema.zoom = v / 10.0
         self.schema.update()

@@ -347,3 +347,6 @@ Space Station, https://live.ariss.org/iss.txt) quand CelesTrak ne répond pas.
 Reference stars: Yale Bright Star Catalogue, 5th revision (Hoffleit & Warren 1991), CDS catalogue V/50; stars with
 V <= 5.5, J2000 positions moved to 2027.0 by proper motion.  ISS TLE: CelesTrak, or ARISS when CelesTrak does not
 answer.
+Choix d'un lieu / choosing a place: carte et adresses © contributeurs d'OpenStreetMap (ODbL), service Nominatim ;
+altitude : Open-Meteo (CC BY 4.0), modèle Copernicus DEM GLO-90 (© DLR e.V. 2010-2014 et © Airbus Defence and Space GmbH
+2014-2018, fourni sous licence COPERNICUS par l'Union européenne et l'ESA).

@@ -345,6 +345,7 @@ class CacheTuiles:
 
 class CarteMonde(QWidget):
     site_clique = pyqtSignal(object)
+    lieu_clique = pyqtSignal(float, float)     # (lon, lat) d'un clic sans glisser, hors des points
     vue_changee = pyqtSignal()        # zoom ou centre changés (la vue est gardée d'une fermeture à l'autre)
     _rafraichir = pyqtSignal()
     BUDGET_TUILES_S = 0.03
@@ -524,7 +525,13 @@ class CarteMonde(QWidget):
 
     def mouseReleaseEvent(self, ev):
         if self._glisse is not None:
-            self.vue_changee.emit()
+            d = ev.position() - self._glisse[0]
+            if abs(d.x()) + abs(d.y()) < 5:                    # un clic, pas un glisser : le lieu cliqué
+                ox, oy = self._origine()
+                lon, lat = monde_vers_lonlat(ox + ev.position().x(), oy + ev.position().y(), self.z)
+                self.lieu_clique.emit(((lon + 180.0) % 360.0) - 180.0, lat)
+            else:
+                self.vue_changee.emit()
         self._glisse = None
 
     def wheelEvent(self, ev):

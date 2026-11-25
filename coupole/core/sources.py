@@ -38,7 +38,9 @@ DOMAINES_AUTORISES = ('obspm.fr', 'unistra.fr', 'u-strasbg.fr', 'nasa.gov', 'cal
                       # module Archives (0.2.0) : MAST, ESO, NOIRLab, SDSS, Gemini, SMOKA, OPUS (PDS)
                       'stsci.edu', 'eso.org', 'noirlab.edu', 'sdss.org', 'gemini.edu', 'nao.ac.jp', 'seti.org',
                       # module Partages (0.8.0) : éléments orbitaux de l'ISS, astrométrie en ligne (libre)
-                      'celestrak.org', 'ariss.org', 'astrometry.net')
+                      'celestrak.org', 'ariss.org', 'astrometry.net',
+                      # choix d'un lieu (0.12.0) : altitude du terrain (Open-Meteo, données Copernicus DEM)
+                      'open-meteo.com')
 CLES_TEXTE = {'ohp.collection', 'maj.depot', 'ohp.telechargement.de', 'ohp.telechargement.vers',
               'archives.irsa.collections', 'archives.koa.tables'}
 

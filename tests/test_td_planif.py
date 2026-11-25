@@ -193,3 +193,43 @@ def test_tendance_iss():
     for a, b in zip(semaine, sorted(precis['creneaux'], key=lambda c: c.meilleur)):
         assert abs((a.meilleur - b.meilleur).total_seconds()) <= 10          # pas de 10 s au lieu de 5 s
     assert P.Criteres('iss', DEBUT, jours=200, tle=TLE, tendance=True) and P.JOURS_MAX['tendance'] == 90
+
+
+def test_choisir_un_lieu(qapp_planif, monkeypatch):
+    """« Carte / adresse… » : adresse (Nominatim simulé) → résultat → altitude (Open-Meteo simulé) ; clic sur la carte ;
+    champs remplis dans le format que relit le lecteur de coordonnées."""
+    import time
+    from PyQt6.QtWidgets import QDialog, QLineEdit
+    from coupole.modules.td import coordonnees as K
+    from coupole.modules.td import gui_lieu as L
+    monkeypatch.setattr(L, 'geocoder', lambda t, lg='fr': [{'nom': 'Observatoire, Paris, France', 'court': 'Paris',
+                                                            'lat': 48.8366, 'lon': 2.3360}])
+    monkeypatch.setattr(L, 'altitude', lambda lat, lon: 62.0)
+
+    def attendre(cond):
+        fin = time.time() + 20
+        while not cond() and time.time() < fin:
+            qapp_planif.processEvents()
+            time.sleep(0.01)
+
+    d = L.DialogueLieu(None)
+    d.e_adresse.setText('Observatoire de Paris')
+    d.chercher()
+    attendre(lambda: d.choix is not None and d.choix['alt'] is not None)
+    assert d.choix == {'lat': 48.8366, 'lon': 2.3360, 'alt': 62.0, 'nom': 'Paris'}
+    d.carte.lieu_clique.emit(2.34, 48.84)                       # un clic tout près : le lieu est affiné, nom gardé
+    attendre(lambda: d.choix['lat'] == 48.84 and d.choix['alt'] is not None)
+    assert d.choix['nom'] == 'Paris'
+    d.carte.lieu_clique.emit(4.84, 45.76)                       # un clic loin : autre lieu, sans nom
+    attendre(lambda: d.choix['lat'] == 45.76 and d.choix['alt'] is not None)
+    assert d.choix['lon'] == 4.84 and d.choix['nom'] == ''
+    d.close()
+    assert L.texte_position(-33.86, -70.5) == '33.86000 S, 70.50000 W'
+    p = K.lire_position(L.texte_position(-33.86, -70.5))
+    assert (p.lat, p.lon) == (-33.86, -70.5)
+    # choisir() remplit position, altitude et nom (sans écraser un nom déjà saisi)
+    pos, alt, nom = QLineEdit(), QLineEdit(), QLineEdit('Mon site')
+    monkeypatch.setattr(L.DialogueLieu, 'exec', lambda self: (self._poser(45.76, 4.84, 170.0, 'Lyon', chercher_alt=False),
+                                                              QDialog.DialogCode.Accepted)[1])
+    assert L.choisir(None, pos, alt, nom)
+    assert pos.text() == '45.76000 N, 4.84000 E' and alt.text() == '170' and nom.text() == 'Mon site'

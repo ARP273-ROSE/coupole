@@ -14,6 +14,8 @@ Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 - **Tendance sur 90 jours** (ISS) : avec le TLE du jour, les soirs de passage restent justes des semaines ; heures
   données à ± une marge (dérive mesurée ≈ 3,8 s par jour d'âge du TLE, marge = le double), classement par date,
   `--tendance` en ligne de commande.
+- **Choisir un lieu sur une carte ou par son adresse** (Parallaxe et Planificateur) : carte OpenStreetMap cliquable,
+  adresse cherchée par Nominatim, altitude du terrain par Open-Meteo (Copernicus DEM) ; rien n'est envoyé avant un clic.
 - TLE de l'ISS : si CelesTrak ne répond pas (erreur 503 fréquente), celui d'ARISS.
 - Étoiles de repère : Yale Bright Star Catalogue (V ≤ 5,5), dans `coupole/modules/td/donnees/`.
 

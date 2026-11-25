@@ -14,6 +14,8 @@ French version (reference): [CHANGELOG.md](CHANGELOG.md).
 - **90-day outlook** (ISS): with today's TLE, the evenings with passes stay right for weeks; times given within ± a
   margin (measured drift ≈ 3.8 s per day of TLE age, margin = twice that), sorted by date, `--outlook` on the
   command line.
+- **Choosing a place on a map or by its address** (Parallax and Planner): clickable OpenStreetMap map, address looked
+  up with Nominatim, ground elevation from Open-Meteo (Copernicus DEM); nothing is sent before a click.
 - ISS TLE: when CelesTrak does not answer (frequent 503 error), the one from ARISS.
 - Reference stars: Yale Bright Star Catalogue (V ≤ 5.5), in `coupole/modules/td/donnees/`.
 
