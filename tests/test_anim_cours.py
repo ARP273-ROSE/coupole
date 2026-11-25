@@ -145,3 +145,44 @@ def test_orbite_interface(app_qt):
     for trace in (True, False):
         a.c_trace.setChecked(trace)
         assert not a.image(640, 420).isNull()
+
+
+# ---------------------------------------------------------------- le transfert de Hohmann
+def test_hohmann_bilans():
+    from coupole.modules.anim import hohmann_meca as hm
+    s = sage('hohmann')
+    for k, (mu, r1, r2, *_r) in hm.SCENARIOS.items():
+        b = hm.bilan(mu, r1, r2)
+        for x in ('v1', 'v2', 'vd', 'va', 'dv1', 'dv2', 'dv', 't', 'phase', 'synodique'):
+            assert b[x] == pytest.approx(s[k][x], rel=1e-11, abs=1e-12), (k, x)
+        for f, (r, ang) in s[k]['position'].items():
+            rr, aa = hm.position_transfert(b, r1, r2, 0.0, b['t'] * float(f))
+            assert rr == pytest.approx(r, rel=1e-11), (k, f)
+            assert math.remainder(aa - ang, 2 * math.pi) == pytest.approx(0.0, abs=1e-9), (k, f)
+        # au bout de la demi-ellipse : r₂, à l'opposé du départ ; partir à l'angle de phase = rendez-vous
+        rr, aa = hm.position_transfert(b, r1, r2, 0.3, b['t'])
+        assert rr == pytest.approx(r2, rel=1e-9) and math.remainder(aa - 0.3 - math.pi, 2 * math.pi) == pytest.approx(0, abs=1e-7)
+        assert hm.ecart_rendez_vous(b, b['phase']) == pytest.approx(0.0, abs=1e-9)
+        assert hm.attente_fenetre(b, b['phase']) == pytest.approx(0.0, abs=1e-6 * b['synodique']) or \
+            hm.attente_fenetre(b, b['phase']) == pytest.approx(b['synodique'], rel=1e-6)
+
+
+def test_hohmann_interface(app_qt):
+    from coupole.modules.anim.animations.hohmann import Hohmann
+    a = Hohmann()
+    a.resize(900, 640)
+    a.scenario.setCurrentIndex(a.scenario.findData('terre_mars'))
+    a.c_auto.setChecked(True)
+    for _ in range(120):                              # attente, départ à la fenêtre, transfert, arrivée
+        a.pas(0.1)
+    assert a.etape() == 'arrive' and abs(a.ecart()) < 0.5
+    assert 'rendez-vous réussi' in dict(a.valeurs())['Vaisseau']
+    a.recommencer()
+    a.c_auto.setChecked(False)
+    a.lancer()                                        # départ immédiat : la cible n'y est pas
+    for _ in range(70):
+        a.pas(0.1)
+    assert a.etape() == 'arrive' and abs(a.ecart()) > 2
+    for k in ('leo_geo', 'terre_venus', 'terre_lune'):
+        a.scenario.setCurrentIndex(a.scenario.findData(k))
+        assert a.etape() == 'attente' and not a.image(640, 420).isNull()
