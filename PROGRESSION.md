@@ -1693,3 +1693,6 @@ manuels FR/EN § « Animations de cours de la 0.12.0 ») :
   `couleur_blanche`. Sage : `newton_verif.sage`.
 - [x] NOTICE, CHANGELOG, descriptions du catalogue, manuels (captures `anim_lagrange_halo_*`, `anim_newton_*`).
 
+
+## 25/11/2026 (soir) — publication
+- Version publiée sur demande (« publie ») : Coupole 0.12.0, Release v0.12.0 (commit 9c67d97). Reste : simulateurs NAAP des cours à venir, inventaire #86.
