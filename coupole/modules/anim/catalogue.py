@@ -51,6 +51,9 @@ ANIMATIONS = (
     ('occultation', 'solarsystemdebris', 'Occultation of a Star by an Asteroid', 'Coupole', 'occultation:Occultation'),
     ('kozai', 'renaissance', 'The Kozai-Lidov Mechanism', 'Coupole', 'kozai:Kozai'),
     ('lagrange', 'renaissance', 'The Lagrange Points', 'Coupole', 'lagrange:Lagrange'),
+    ('aediagram', 'solarsystemdebris', 'The a–e Diagram', 'Coupole', 'diagramme_ae:DiagrammeAE'),
+    ('gravityassist', 'renaissance', 'Gravity Assist', 'Coupole', 'assistance:Assistance'),
+    ('impactcrater', 'solarsystemdebris', 'Impact Craters', 'Coupole', 'cratere:Cratere'),
     ('smallangledemo', 'ancientastro', 'Small-Angle Approximation Demonstrator', 'ancientastro/smallangledemo.swf',
      'petits_angles:PetitsAngles'),
     ('dipperclock', 'ancientastro', 'Big Dipper Clock', 'ancientastro/dipperclock.swf',
@@ -229,6 +232,9 @@ HORS_CLASSACTION = {'antikythera': ('Anticythere3D', 'https://github.com/ARP273-
                     'occultation': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
                     'kozai': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
                     'lagrange': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
+                    'aediagram': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
+                    'gravityassist': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
+                    'impactcrater': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
                     'gravityorbits': ('PhET Gravity and Orbits',
                                       'https://phet.colorado.edu/sims/html/gravity-and-orbits/latest/'
                                       'gravity-and-orbits_fr.html')}
@@ -237,7 +243,8 @@ HORS_CLASSACTION = {'antikythera': ('Anticythere3D', 'https://github.com/ARP273-
 # (Renaissance : lois de Kepler et de Newton), étoiles filantes et radiant (petits corps du Système solaire) ;
 # 0.11.0 : interférences et interférométrie (Télescopes), occultation stellaire (petits corps), mécanisme de
 # Kozai-Lidov et points de Lagrange (Renaissance)
-LOT9 = ('resolution', 'orbitalelements', 'hohmann', 'meteorradiant', 'interferometry', 'occultation', 'kozai', 'lagrange')
+LOT9 = ('resolution', 'orbitalelements', 'hohmann', 'meteorradiant', 'interferometry', 'occultation', 'kozai', 'lagrange',
+        'aediagram', 'gravityassist', 'impactcrater')
 ORDRE = LOT1 + LOT1_BIS + LOT2 + LOT2_BIS + LOT3 + LOT4 + LOT5 + LOT6 + LOT7 + LOT8 + LOT9
 
 

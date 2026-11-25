@@ -17,6 +17,23 @@ Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 - TLE de l'ISS : si CelesTrak ne répond pas (erreur 503 fréquente), celui d'ARISS.
 - Étoiles de repère : Yale Bright Star Catalogue (V ≤ 5,5), dans `coupole/modules/td/donnees/`.
 
+### Animations de cours (108 animations)
+
+Nouvelles animations propres à Coupole, au bureau comme dans Coupole Web ; formules et valeurs vérifiées par SageMath,
+mêmes nombres au caractère près dans les deux applications.
+
+- **Le diagramme a–e** (Petits corps) : chaque point (a, e) est une orbite ; géocroiseurs Atira, Aten, Apollo, Amor
+  sur les courbes q = a(1 − e) et Q = a(1 + e) constants, croiseurs de Mars, ceinture principale et lacunes de
+  Kirkwood (résonances avec Jupiter), Hilda, troyens, centaures, transneptuniens ; 27 petits corps réels (base SBDB du
+  JPL), clic dans le diagramme, orbite vue de dessus parmi les planètes, paramètre de Tisserand (astéroïde ou comète).
+- **L'assistance gravitationnelle** (Renaissance) : hyperbole du survol vue de la planète, déviation
+  δ = 2 arcsin(1/(1 + rₚv∞²/GM)), triangle des vitesses v = V + v∞, gain ou perte selon le côté du passage, orbites
+  autour du Soleil avant et après ; contrôlée par une intégration indépendante du survol
+  (`outils/verif_anim/survols_impacts_verif.sage`).
+- **Le cratère d'impact** (Petits corps) : lois d'échelle de Collins, Melosh et Marcus (2005) ; cavité transitoire,
+  cratère simple ou complexe, profondeur, énergie en mégatonnes, fréquence de tels impacts ; coupe animée à l'échelle ;
+  le cas du cours (1,5 km à 20 km·s⁻¹) donne 22,4 km.
+
 ## 0.11.0 — 25 novembre 2026 — Quatre animations de cours de plus
 
 Quatre nouvelles animations propres à Coupole (105 en tout), au bureau comme dans Coupole Web ; formules et valeurs

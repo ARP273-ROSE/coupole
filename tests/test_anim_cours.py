@@ -540,3 +540,134 @@ def test_lagrange_interface(app_qt):
 def lg_c(a):
     from coupole.modules.anim import lagrange as lg
     return lg.jacobi(a.mu_a()[0], *a.s)
+
+
+# ---------------------------------------------------------------- diagramme a–e (0.12.0)
+def test_diagramme_ae_contre_sage():
+    from coupole.modules.anim import diagramme_ae as ae
+    s = sage('survols_impacts')
+    for k, ref in s['ae'].items():
+        a, e, i = {'sedna': (544.0, 0.86, 11.9)}.get(k) or [o[1:] for o in ae.OBJETS if o[0] == k][0]
+        assert ae.perihelie(a, e) == pytest.approx(ref['q'], rel=1e-9), k
+        assert ae.aphelie(a, e) == pytest.approx(ref['Q'], rel=1e-9), k
+        assert ae.periode(a) == pytest.approx(ref['P'], rel=1e-9), k
+        assert ae.tisserand(a, e, i) == pytest.approx(ref['T'], rel=1e-8, abs=1e-9), k
+        assert ae.famille(a, e) == ref['famille'], k
+    for pq, ref in s['resonances'].items():
+        p, q = map(int, pq.split(':'))
+        assert ae.resonance(p, q) == pytest.approx(ref, rel=1e-9)
+    for cle, ref in s['kepler'].items():
+        a, e, m = map(float, cle.split(','))
+        x, y = ae.position(a, e, m)
+        assert x == pytest.approx(ref[0], abs=1e-9) and y == pytest.approx(ref[1], abs=1e-9), cle
+
+
+def test_diagramme_ae_familles_et_croisements():
+    from coupole.modules.anim import diagramme_ae as ae
+    assert ae.famille(0.741, 0.322) == 'atira' and ae.famille(0.922, 0.191) == 'aten'
+    assert ae.famille(1.13, 0.204) == 'apollo' and ae.famille(1.46, 0.223) == 'amor'
+    assert ae.famille(5.28, 0.0243) == 'troyen' and ae.famille(39.6, 0.252) == 'transneptunien'
+    assert ae.croisees(1.13, 0.204) == ['terre'] and ae.croisees(17.9, 0.968)[-1] == 'neptune'
+    assert ae.genre_tisserand(ae.tisserand(3.46, 0.641, 7.04)) == 'comete_jupiter'
+    assert ae.genre_tisserand(ae.tisserand(17.9, 0.968, 162.0)) == 'comete_halley'
+
+
+def test_diagramme_ae_interface(app_qt):
+    from PyQt6.QtCore import QPointF
+    from coupole.modules.anim.animations.diagramme_ae import DiagrammeAE
+    a = DiagrammeAE()
+    a.resize(1000, 700)
+    a.objet.setCurrentIndex(a.objet.findData('apophis'))
+    assert a.a.value() == pytest.approx(0.922) and a.e.value() == pytest.approx(0.191)
+    v = dict(a.valeurs())
+    assert v['Classe de l’orbite'].startswith('géocroiseur Aten') and v['Croise l’orbite de'] == 'Terre'
+    assert not a.image(900, 560).isNull()
+    ax = a._graphe
+    assert a.presser(QPointF(ax.px(1.5), ax.py(0.5)), None)
+    assert a.objet.currentData() == 'libre' and a.a.value() == pytest.approx(1.5, rel=0.02)
+    assert dict(a.valeurs())['Classe de l’orbite'].startswith('géocroiseur Apollo')
+
+
+# ---------------------------------------------------------------- assistance gravitationnelle (0.12.0)
+def test_assistance_contre_integration_sage():
+    from coupole.modules.anim import assistance as ga
+    s = sage('survols_impacts')
+    for cle, ref in s['survols'].items():
+        pl, vinf, rp, ang, cote = cle.split(',')
+        r = ga.survol(pl, float(vinf), float(rp), float(ang), cote == 'derriere')
+        assert r['V'] == pytest.approx(ref['V'], rel=1e-9), cle
+        assert r['delta'] == pytest.approx(ref['delta'], rel=1e-9), cle
+        assert r['delta'] == pytest.approx(ref['delta_integre'], abs=1e-8), cle       # survol intégré par Sage
+        assert r['u_out'][0] == pytest.approx(ref['u_out'][0], abs=1e-8), cle
+        assert r['u_out'][1] == pytest.approx(ref['u_out'][1], abs=1e-8), cle
+        assert r['gain'] == pytest.approx(ref['gain'], abs=1e-7), cle
+        assert r['dv'] == pytest.approx(ref['dv'], rel=1e-9) and r['v_peri'] == pytest.approx(ref['v_peri'], rel=1e-9)
+        for nom in ('orb_in', 'orb_out'):
+            for k in ('a', 'e', 'q', 'Q'):
+                if ref[nom][k] is None:
+                    assert math.isinf(r[nom][k]), (cle, nom, k)
+                else:
+                    assert r[nom][k] == pytest.approx(ref[nom][k], rel=1e-8), (cle, nom, k)
+
+
+def test_assistance_hyperbole():
+    from coupole.modules.anim import assistance as ga
+    gm, _, _ = ga.planete('jupiter')
+    s = ga.survol('jupiter', 10.0, 5.0, 150.0, True)
+    x, y = ga.hyperbole(s, gm, 0.0)
+    assert math.hypot(x, y) == pytest.approx(s['r_p'], rel=1e-12)
+    # loin du périastre, la direction du mouvement tend vers u_in (avant) et u_out (après)
+    for f, u in ((-12.0, s['u_in']), (12.0, s['u_out'])):
+        p0, p1 = ga.hyperbole(s, gm, f), ga.hyperbole(s, gm, f + 1e-3)
+        d = math.hypot(p1[0] - p0[0], p1[1] - p0[1])
+        assert ((p1[0] - p0[0]) / d, (p1[1] - p0[1]) / d) == pytest.approx(u, abs=1e-6)
+    t = 3.0e4
+    f = ga.anomalie(s, gm, t)
+    a = s['r_p'] / (s['e'] - 1.0)
+    assert s['e'] * math.sinh(f) - f == pytest.approx(math.sqrt(gm / a ** 3) * t, rel=1e-12)
+
+
+def test_assistance_interface(app_qt):
+    from coupole.modules.anim.animations.assistance import Assistance
+    a = Assistance()
+    a.resize(1000, 700)
+    v = dict(a.valeurs())
+    assert v['Gain'].startswith('+10,27') and v['Orbite après le survol'] == 'de 5,01 à 77,06 ua du Soleil'
+    a.angle.setValue(90.0)                           # v∞ perpendiculaire : derrière accélère, devant freine
+    assert dict(a.valeurs())['Gain'].startswith('+')
+    a.cote.setCurrentIndex(a.cote.findData('devant'))
+    assert dict(a.valeurs())['Gain'].startswith('−')
+    a.planete.setCurrentIndex(a.planete.findData('venus'))
+    for _ in range(30):
+        a.pas(0.2)
+    assert not a.image(900, 560).isNull()
+
+
+# ---------------------------------------------------------------- cratère d'impact (0.12.0)
+def test_cratere_contre_sage():
+    from coupole.modules.anim import cratere as cr
+    s = sage('survols_impacts')
+    for cle, ref in s['crateres'].items():
+        L, v, th, ri, rt = map(float, cle.split(','))
+        c = cr.cratere(L, v, th, ri, rt)
+        for k in ('transitoire', 'prof_transitoire', 'final', 'profondeur', 'rempart', 'breche'):
+            assert c[k] == pytest.approx(ref[k], rel=1e-8, abs=1e-6), (cle, k)
+        assert c['genre'] == ref['genre']
+        e = cr.energie(L, ri, v)
+        assert e == pytest.approx(ref['E'], rel=1e-8)
+        assert cr.recurrence_ans(e / cr.MT_J) == pytest.approx(ref['recurrence'], rel=1e-8)
+
+
+def test_cratere_cas_du_cours(app_qt):
+    from coupole.modules.anim.animations.cratere import Cratere
+    a = Cratere()
+    a.resize(1000, 700)
+    v = dict(a.valeurs())
+    assert v['Diamètre du cratère final'] == '22,4 km'                 # « un cratère de 23 km » au cours
+    assert v['Forme'].startswith('cratère complexe')
+    a.exemple.setCurrentIndex(a.exemple.findData('meteor_crater'))
+    v = dict(a.valeurs())
+    assert v['Forme'].startswith('cratère simple') and 'Attention' in v
+    for _ in range(25):
+        a.pas(0.25)
+    assert not a.image(900, 560).isNull()

@@ -1774,8 +1774,11 @@ Les éléments d'une orbite & $a$, $e$, $i$, $\Omega$, $\omega$, $M$ en 3D, trac
 Le transfert de Hohmann & $\Delta v_1$, $\Delta v_2$, durée, angle de phase, fenêtres de tir (orbite basse, Lune, Mars, Vénus, Jupiter)\\
 Le mécanisme de Kozai-Lidov & échange $e$--$i$ à $C=\sqrt{1-e^2}\cos i$ constant, $i_c=39{,}23^\circ$, $e_\text{max}$, portrait de phase\\
 Les points de Lagrange & repère tournant, L1 à L5, zones interdites (Jacobi), têtards, fers à cheval, rayon de Hill\\
+L'assistance gravitationnelle & déviation $\delta=2\arcsin\bigl(1/(1+r_pv_\infty^2/GM)\bigr)$, $\vec v=\vec V+\vec v_\infty$, gain, orbites avant et après\\
 Étoiles filantes et radiant & ciel vu de dessous, traînées vers le radiant, taux $\mathrm{ZHR}\times\sin h$, nuit du maximum de sept pluies\\
 Occultation d'une étoile par un astéroïde & ombre, cordes, courbes de lumière, ellipse ajustée, vitesse de l'ombre, Fresnel\\
+Le diagramme $a$--$e$ & familles Atira, Aten, Apollo, Amor ($q$, $Q$ constants), lacunes de Kirkwood, 27 petits corps réels, Tisserand\\
+Le cratère d'impact & lois d'échelle de Collins et al. (2005) : cavité transitoire, cratère simple ou complexe, énergie, fréquence\\
 \midrule
 Petits angles & $\alpha\approx206\,265''\,d/D$ contre la valeur exacte $2\arcsin(d/2D)$\\
 Horloge de la Grande Ourse & ciel du nord en projection stéréographique ; un tour par jour sidéral, environ 1$^\circ$ par jour à heure fixe\\
@@ -2041,6 +2044,37 @@ $\mu<0{,}0385$). Petit corps lâché près de L4 (têtard), en face du petit ast
 zoom sur le petit astre et sa sphère de Hill $a\sqrt[3]{\mu/3}$ (L2 du JWST à 1,51 million de km) ; Soleil-Terre,
 Terre-Lune, Soleil-Jupiter, Pluton-Charon.
 \capture{img/anim_lagrange_fr.png}{0.9}
+\end{itemize}
+
+\paragraph{Animations de cours de la 0.12.0.} Même démarche ; vérifications SageMath
+\texttt{outils/verif\_anim/survols\_impacts\_verif.sage} (diagramme $a$--$e$, assistance gravitationnelle, cratère).
+\begin{itemize}
+\item \textbf{Le diagramme $a$--$e$} (Petits corps). Chaque point (demi-grand axe $a$, excentricité $e$) est une orbite
+autour du Soleil : périhélie $q=a(1-e)$, aphélie $Q=a(1+e)$, période $P=a^{3/2}$ (ans, $a$ en ua). Les géocroiseurs se
+lisent sur des courbes de $q$ ou $Q$ constants : Atira ($a<1$, $Q<0{,}983$~ua), Aten ($a<1$, $Q>0{,}983$), Apollo
+($a>1$, $q<1{,}017$), Amor ($1{,}017<q<1{,}3$) ; puis croiseurs de Mars ($q<1{,}666$), ceinture principale, troyens,
+centaures, transneptuniens (classes de la base SBDB du JPL). Lacunes de Kirkwood aux résonances $a=a_J(q/p)^{2/3}$
+(3:1 à 2,50~ua, 5:2, 7:3, 2:1 à 3,28~ua), Hilda (3:2) et troyens (1:1). Paramètre de Tisserand
+$T_J=a_J/a+2\cos i\sqrt{(a/a_J)(1-e^2)}$ : astéroïde au-dessus de 3, comète de la famille de Jupiter entre 2 et 3, de
+type Halley en dessous. 27 petits corps réels (éléments SBDB arrondis) ; clic dans le diagramme pour choisir un point ;
+l'orbite est dessinée vue de dessus parmi celles des planètes.
+\capture{img/anim_aediagram_fr.png}{0.9}
+\item \textbf{L'assistance gravitationnelle} (Renaissance). Coniques raccordées : vue de la planète, la sonde décrit une
+hyperbole et repart avec la même vitesse $v_\infty$, tournée de $\delta=2\arcsin\bigl(1/(1+r_pv_\infty^2/GM)\bigr)$ ;
+vue du Soleil, $\vec v=\vec V+\vec v_\infty$ change de longueur (triangle des vitesses, variation au plus
+$2v_\infty\sin(\delta/2)$). Passer derrière la planète tourne $\vec v_\infty$ vers l'avant (gain), devant vers l'arrière.
+Orbites autour du Soleil avant et après (aphélie, ou libération). La déviation et le sens de sortie ont été contrôlés
+par une intégration numérique indépendante du survol (SageMath, à $10^{-10}$ près). Vénus, Terre, Mars, Jupiter, Saturne.
+\capture{img/anim_gravityassist_fr.png}{0.9}
+\item \textbf{Le cratère d'impact} (Petits corps). Lois d'échelle de G.~S. Collins, H.~J. Melosh et R.~A. Marcus (2005,
+\emph{Meteoritics \& Planetary Science} 40, 817) : cavité transitoire
+$D_{tc}=1{,}161\,(\rho_i/\rho_t)^{1/3}L^{0{,}78}v^{0{,}44}g^{-0{,}22}\sin^{1/3}\theta$, profondeur $D_{tc}/2\sqrt2$ ;
+cratère simple ($D=1{,}25\,D_{tc}$, lentille de brèche) ou complexe ($D=1{,}17\,D_{tc}^{1{,}13}/D_c^{0{,}13}$,
+$D_c=3{,}2$~km, profondeur $0{,}4\,D^{0{,}3}$) ; énergie $\tfrac12mv^2$ en mégatonnes ($4{,}18\times10^{15}$~J), un impact
+aussi énergique tous les $109\,E_\text{Mt}^{0{,}78}$~ans. Le cas du cours (1,5~km à 20~km\,s$^{-1}$) donne 22,4~km.
+Coupe à l'échelle animée (chute, creusement, effondrement) et diamètre final selon la taille de l'impacteur.
+L'entrée atmosphérique n'est pas modélisée (impacteurs de plus de 200~m).
+\capture{img/anim_impactcrater_fr.png}{0.9}
 \end{itemize}
 
 

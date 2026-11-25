@@ -1708,8 +1708,11 @@ The elements of an orbit & $a$, $e$, $i$, $\Omega$, $\omega$, $M$ in 3D, ground 
 The Hohmann transfer & $\Delta v_1$, $\Delta v_2$, trip time, phase angle, launch windows (low orbit, Moon, Mars, Venus, Jupiter)\\
 The Kozai-Lidov mechanism & $e$--$i$ exchange at constant $C=\sqrt{1-e^2}\cos i$, $i_c=39.23^\circ$, $e_\text{max}$, phase portrait\\
 The Lagrange points & rotating frame, L1 to L5, forbidden regions (Jacobi), tadpoles, horseshoes, Hill radius\\
+Gravity assist & deflection $\delta=2\arcsin\bigl(1/(1+r_pv_\infty^2/GM)\bigr)$, $\vec v=\vec V+\vec v_\infty$, gain, orbits before and after\\
 Meteors and their radiant & sky seen from below, trails towards the radiant, rate $\mathrm{ZHR}\times\sin h$, peak night of seven showers\\
 Occultation of a star by an asteroid & shadow, chords, light curves, fitted ellipse, shadow speed, Fresnel\\
+The $a$--$e$ diagram & Atira, Aten, Apollo, Amor groups (constant $q$, $Q$), Kirkwood gaps, 27 real small bodies, Tisserand\\
+Impact craters & Collins et al. (2005) scaling laws: transient cavity, simple or complex crater, energy, frequency\\
 \midrule
 Small angles & $\alpha\approx206\,265''\,d/D$ against the exact value $2\arcsin(d/2D)$\\
 Big Dipper clock & northern sky in stereographic projection; one turn per sidereal day, about 1$^\circ$ per day at a fixed time\\
@@ -1969,6 +1972,35 @@ force, Jacobi constant $C=2\Omega-v^2$; in grey, the forbidden regions where $2\
 opposite the small body (horseshoe) or next to L1, L2, L3; zoom on the small body and its Hill sphere
 $a\sqrt[3]{\mu/3}$ (JWST's L2 at 1.51 million km); Sun-Earth, Earth-Moon, Sun-Jupiter, Pluto-Charon.
 \capture{img/anim_lagrange_en.png}{0.9}
+\end{itemize}
+
+\paragraph{Course animations of 0.12.0.} Same approach; SageMath checks
+\texttt{outils/verif\_anim/survols\_impacts\_verif.sage} ($a$--$e$ diagram, gravity assist, impact craters).
+\begin{itemize}
+\item \textbf{The $a$--$e$ diagram} (Solar System debris). Each point (semi-major axis $a$, eccentricity $e$) is an
+orbit around the Sun: perihelion $q=a(1-e)$, aphelion $Q=a(1+e)$, period $P=a^{3/2}$ (years, $a$ in au). Near-Earth
+objects are read along curves of constant $q$ or $Q$: Atira ($a<1$, $Q<0.983$~au), Aten ($a<1$, $Q>0.983$), Apollo
+($a>1$, $q<1.017$), Amor ($1.017<q<1.3$); then Mars-crossers ($q<1.666$), main belt, Trojans, Centaurs,
+trans-Neptunian objects (JPL SBDB classes). Kirkwood gaps at the resonances $a=a_J(q/p)^{2/3}$ (3:1 at 2.50~au, 5:2,
+7:3, 2:1 at 3.28~au), Hildas (3:2) and Trojans (1:1). Tisserand parameter $T_J=a_J/a+2\cos i\sqrt{(a/a_J)(1-e^2)}$:
+asteroid above 3, Jupiter-family comet between 2 and 3, Halley type below. 27 real small bodies (rounded SBDB
+elements); click in the diagram to choose a point; the orbit is drawn from above among those of the planets.
+\capture{img/anim_aediagram_en.png}{0.9}
+\item \textbf{Gravity assist} (Renaissance). Patched conics: seen from the planet, the probe follows a hyperbola and
+leaves at the same speed $v_\infty$, turned by $\delta=2\arcsin\bigl(1/(1+r_pv_\infty^2/GM)\bigr)$; seen from the Sun,
+$\vec v=\vec V+\vec v_\infty$ changes length (velocity triangle, change at most $2v_\infty\sin(\delta/2)$). Passing behind
+the planet turns $\vec v_\infty$ forwards (gain), in front backwards. Orbits around the Sun before and after (aphelion,
+or escape). The deflection and exit direction were checked by an independent numerical integration of the flyby
+(SageMath, to $10^{-10}$). Venus, Earth, Mars, Jupiter, Saturn.
+\capture{img/anim_gravityassist_en.png}{0.9}
+\item \textbf{Impact craters} (Solar System debris). Scaling laws of G.~S. Collins, H.~J. Melosh and R.~A. Marcus (2005,
+\emph{Meteoritics \& Planetary Science} 40, 817): transient cavity
+$D_{tc}=1.161\,(\rho_i/\rho_t)^{1/3}L^{0.78}v^{0.44}g^{-0.22}\sin^{1/3}\theta$, depth $D_{tc}/2\sqrt2$; simple crater
+($D=1.25\,D_{tc}$, breccia lens) or complex ($D=1.17\,D_{tc}^{1.13}/D_c^{0.13}$, $D_c=3.2$~km, depth $0.4\,D^{0.3}$);
+energy $\tfrac12mv^2$ in megatons ($4.18\times10^{15}$~J), an impact this energetic every $109\,E_\text{Mt}^{0.78}$~years.
+The course example (1.5~km at 20~km\,s$^{-1}$) gives 22.4~km. Animated cross-section to scale (fall, excavation,
+collapse) and final diameter versus impactor size. Atmospheric entry is not modelled (impactors larger than 200~m).
+\capture{img/anim_impactcrater_en.png}{0.9}
 \end{itemize}
 
 

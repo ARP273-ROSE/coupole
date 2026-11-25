@@ -3,7 +3,7 @@
 - les 522 questions : chaque variante (jusqu'à 3 par question) s'instancie, s'affiche, se note (bonne réponse →
   « réussie », mauvaise → tentative fausse enregistrée), « Montrer la réponse » marque la réponse vue ;
 - textes des figures toujours lisibles sur ce qu'il y a dessous (contraste ≥ 3, deux thèmes) ;
-- les 105 animations : ouverture, chaque réglage aux bornes et chaque choix, chaque bouton, quelques pas : aucune
+- les 108 animations : ouverture, chaque réglage aux bornes et chaque choix, chaque bouton, quelques pas : aucune
   exception, et aucune opération ne prend plus de 100 ms de processeur dans le fil graphique (300 ms en intégration
   continue, machines partagées) ;
 - glissers aléatoires (dont valeurs non finies) sur toutes les animations ;

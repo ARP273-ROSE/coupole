@@ -17,6 +17,22 @@ French version (reference): [CHANGELOG.md](CHANGELOG.md).
 - ISS TLE: when CelesTrak does not answer (frequent 503 error), the one from ARISS.
 - Reference stars: Yale Bright Star Catalogue (V ≤ 5.5), in `coupole/modules/td/donnees/`.
 
+### Course animations (108 animations)
+
+New animations of Coupole's own, on the desktop as in Coupole Web; formulas and values checked with SageMath, same
+numbers to the character in both applications.
+
+- **The a–e diagram** (Solar System debris): each point (a, e) is an orbit; Atira, Aten, Apollo, Amor near-Earth
+  objects along curves of constant q = a(1 − e) and Q = a(1 + e), Mars-crossers, main belt and Kirkwood gaps
+  (resonances with Jupiter), Hildas, Trojans, Centaurs, trans-Neptunian objects; 27 real small bodies (JPL SBDB),
+  click in the diagram, orbit seen from above among the planets, Tisserand parameter (asteroid or comet).
+- **Gravity assist** (Renaissance): flyby hyperbola seen from the planet, deflection δ = 2 arcsin(1/(1 + rₚv∞²/GM)),
+  velocity triangle v = V + v∞, gain or loss depending on the side of the pass, orbits around the Sun before and
+  after; checked against an independent integration of the flyby (`outils/verif_anim/survols_impacts_verif.sage`).
+- **Impact craters** (Solar System debris): scaling laws of Collins, Melosh and Marcus (2005); transient cavity,
+  simple or complex crater, depth, energy in megatons, frequency of such impacts; animated cross-section to scale; the
+  course example (1.5 km at 20 km·s⁻¹) gives 22.4 km.
+
 ## 0.11.0 — 25 November 2026 — Four more course animations
 
 Four new animations of Coupole's own (105 in all), on the desktop as in Coupole Web; formulas and values checked

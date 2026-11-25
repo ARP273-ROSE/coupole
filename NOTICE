@@ -163,6 +163,18 @@ outils/verif_anim/canon_newton_verif.sage de Coupole) / constants and data (chec
     Fundamentals of Astrodynamics and Applications, 4e éd. (2013), tableau 8-4 (valeurs numériques seulement) ;
     atmosphère martienne : ρ₀ = 0,020 kg·m⁻³, H = 11,1 km (NASA, Mars Fact Sheet).
 
+Animations de cours de la 0.12.0 / Course animations of 0.12.0 (coupole/modules/anim/diagramme_ae.py, assistance.py,
+cratere.py ; animations/diagramme_ae.py, assistance.py, cratere.py)
+---------------------------------------------------------------------------------------------------------------------
+Code, dessins et textes propres ; formules et valeurs vérifiées par SageMath (outils/verif_anim/
+survols_impacts_verif.sage) / own code, drawings and texts; formulas and values checked with SageMath :
+  - diagramme a–e : éléments orbitaux des petits corps tirés de la base SBDB du JPL (ssd-api.jpl.nasa.gov, novembre
+    2026, arrondis à trois chiffres) ; groupes de géocroiseurs du CNEOS (NASA/JPL) et classes orbitales de la SBDB ;
+    critère de Tisserand ;
+  - assistance gravitationnelle : coniques raccordées ; GM et rayons des planètes (JPL) ;
+  - cratère d'impact : lois d'échelle de G. S. Collins, H. J. Melosh et R. A. Marcus, « Earth Impact Effects
+    Program », Meteoritics & Planetary Science 40, 817 (2005), équations 3, 21 à 28 et 48.
+
 Quatre animations de cours de plus (0.11.0) / Four more course animations (coupole/modules/anim/interferometrie.py,
 occultation.py, kozai.py, lagrange.py ; animations/interferometrie.py, occultation.py, kozai.py, lagrange.py)
 -----------------------------------------------------------------------------------------------------------------
