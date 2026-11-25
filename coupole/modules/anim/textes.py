@@ -1084,6 +1084,9 @@ from .textes_atmosphere import ANIM_ATMOSPHERE  # noqa: E402  (0.8.0 : l'atmosph
 TEXTES.update({k: _t(*v) for k, v in ANIM_ATMOSPHERE.items()})
 from .textes_canon import ANIM_CANON  # noqa: E402  (0.9.0 : le canon de Newton)
 TEXTES.update({k: _t(*v) for k, v in ANIM_CANON.items()})
+from .textes_cours import ANIM_COURS  # noqa: E402  (animations tirées des cours : résolution, orbites…)
+
+TEXTES.update({k: _t(*v) for k, v in ANIM_COURS.items()})
 
 for _cle, _fr, _en in (('buenos_aires', 'Buenos Aires', 'Buenos Aires'), ('lima', 'Lima', 'Lima'),
                        ('casablanca', 'Casablanca', 'Casablanca'), ('monrovia', 'Monrovia', 'Monrovia'),
