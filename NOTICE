@@ -324,3 +324,14 @@ Photographs: exact credits and licences, shown under each image; resized and con
       coupole/modules/anim/classe/donnees/images/photo_andromede.webp — La galaxie d’Andromède (M31) — Adam Evans, CC BY 2.0, via Wikimedia Commons — CC BY 2.0 (https://creativecommons.org/licenses/by/2.0/) — https://commons.wikimedia.org/wiki/File:Andromeda_Galaxy_(with_h-alpha).jpg
       coupole/modules/anim/classe/donnees/images/photo_crabe.webp — La nébuleuse du Crabe (M1) — NASA, ESA, J. Hester and A. Loll (Arizona State University), domaine public, via Wikimedia Commons — Public domain (https://commons.wikimedia.org/wiki/File:Crab_Nebula.jpg) — https://commons.wikimedia.org/wiki/File:Crab_Nebula.jpg
       coupole/modules/anim/classe/donnees/images/photo_etacarinae.webp — Êta de la Carène et la nébuleuse de l’Homoncule — Jon Morse (University of Colorado) & NASA Hubble Space Telescope, domaine public, via Wikimedia Commons — Public domain (https://commons.wikimedia.org/wiki/File:Eta_Carinae.jpg) — https://commons.wikimedia.org/wiki/File:Eta_Carinae.jpg
+
+
+Planificateur de parallaxe (coupole/modules/td/planif.py, donnees/etoiles_v55.json.gz)
+------------------------------------------------------------------------------------
+Étoiles de repère : Yale Bright Star Catalogue, 5e révision (Hoffleit D., Warren W. H. Jr., 1991), distribué par le
+CDS (catalogue V/50) ; étoiles de magnitude V <= 5,5, positions J2000 avancées à 2027,0 par le mouvement propre
+(outils/donnees_etoiles_td/etoiles_td.py).  TLE de l'ISS : CelesTrak, ou ARISS (Amateur Radio on the International
+Space Station, https://live.ariss.org/iss.txt) quand CelesTrak ne répond pas.
+Reference stars: Yale Bright Star Catalogue, 5th revision (Hoffleit & Warren 1991), CDS catalogue V/50; stars with
+V <= 5.5, J2000 positions moved to 2027.0 by proper motion.  ISS TLE: CelesTrak, or ARISS when CelesTrak does not
+answer.

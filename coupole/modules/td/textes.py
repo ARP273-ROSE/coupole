@@ -322,3 +322,7 @@ TEXTES = {
               'explained by the “Earth’s atmosphere” animation (Telescopes theme). “Example”: fictitious data. “Export the details”: for the '
               '“Calculs” sheet of the share.</p>'},
 }
+
+from .textes_planif import TEXTES_PLANIF  # noqa: E402
+
+TEXTES.update(TEXTES_PLANIF)

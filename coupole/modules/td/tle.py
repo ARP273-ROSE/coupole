@@ -62,14 +62,24 @@ def garder(tle: tuple) -> None:
 
 
 def telecharger() -> tuple:
-    """TLE courant de CelesTrak (adresse dans les sources de Coupole) ; gardé en cache."""
+    """TLE courant de CelesTrak (adresse dans les sources de Coupole) ; si CelesTrak ne répond pas (il est parfois
+    saturé : erreur 503), celui que publie ARISS (Amateur Radio on the ISS).  Gardé en cache."""
     from ...core import reseau, sources
-    texte = reseau.lire_texte(sources.valeur('tle.iss'), delai=20)
-    t = lignes(texte)
-    if not t:
-        raise ValueError('no TLE in answer')
-    garder(t)
-    return t
+    erreur = None
+    for cle in ('tle.iss', 'tle.iss_secours'):
+        url = sources.valeur(cle)
+        if not url:
+            continue
+        try:
+            t = lignes(reseau.lire_texte(url, delai=20))
+        except Exception as e:                              # service saturé ou injoignable : la source suivante
+            erreur = e
+            continue
+        if t and t[0][2:7] == '25544':
+            garder(t)
+            return t
+        erreur = ValueError('no TLE in answer')
+    raise erreur or ValueError('no TLE source')
 
 
 def pour(instant: D.datetime, reseau_permis: bool = True) -> dict:

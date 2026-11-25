@@ -634,6 +634,24 @@ ID & ClassAction id (e.g. sunmotions)\\
 \par\medskip
 \begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
 \toprule
+\multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole td planifier (plan)\newline\normalfont\small Parallax planner: slots when two places see the ISS or the Moon together.}\\
+\midrule
+--p1 TEXT & Position of place 1 (latitude, longitude)\\
+--alt1 TEXT & elevation of place 1\\
+--p2 TEXT & Position of place 2 (latitude, longitude)\\
+--alt2 TEXT & elevation of place 2\\
+--cible,\allowbreak{} --target \{iss,\allowbreak{}lune,\allowbreak{}moon\} & ISS: passes over the next days (a TLE is only good for a few days). Moon: evenings over the next months with a reference star near the Moon.\\
+--debut,\allowbreak{} --start TEXT & Start (UTC), YYYY-MM-DD[ HH:MM]\\
+--jours,\allowbreak{} --days JOURS & Number of days\\
+--hmin HMIN & Minimum elevation of the object, seen from BOTH places.\\
+--soleil,\allowbreak{} --sun SOLEIL & Maximum Sun elevation at both places: −6° end of civil twilight, −12° nautical, −18° full night. The ISS is mostly seen early and late in the night.\\
+--ics TEXT & Also write an .ics calendar to this path\\
+--csv & Save the slots as a CSV table.\\
+\bottomrule
+\end{tabularx}
+\par\medskip
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\small\raggedright}p{0.38\linewidth}X@{}}
+\toprule
 \multicolumn{2}{@{}p{\linewidth}@{}}{\sffamily\bfseries coupole sites\newline\normalfont\small Observing sites (OpenStreetMap map), time zones, UTC and local time}\\
 \midrule
 --ajouter,\allowbreak{} --add X & add a site: ID NAME LAT LON ALT TIMEZONE [MPC]\\

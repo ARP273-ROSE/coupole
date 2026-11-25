@@ -49,7 +49,7 @@ Qualité des images & Facultatif. FWHM, ellipticité, fond, bruit, gradient, sat
 Spectres et séries & Lecture et tracé de données 1D (spectres radio, courbes de lumière, tables).\\
 Cosmologie & Du redshift aux distances, âges, volume, module de distance, échelle (Planck 2018 et autres).\\
 Sites et heures & Base des sites, carte OpenStreetMap, heure UTC et heure locale.\\
-Calculateurs de TD & La démarche des TD et TP pas à pas avec vos nombres, puis le calcul exact : Parallaxe (TP du cours).\\
+Calculateurs de TD & La démarche des TD et TP pas à pas avec vos nombres, puis le calcul exact : Parallaxe (TP du cours) ; Planificateur de parallaxe (ISS, Lune).\\
 Ma machine & Diagnostic matériel ; exemple minimal de module.\\
 \bottomrule
 \end{tabularx}
@@ -2108,6 +2108,46 @@ coupole td parallaxe --p1 "48.8566, 2.3522" --h1 62,483 --az1 14,184 --alt1 35\\
 \hspace*{2em}--p2 "45°45′50″N 4°50′09″E" --h2 33.603 --az2 346.928 --alt2 170
 \end{ccode}
 
+\subsection{Planificateur de parallaxe (ISS, Lune)}\label{sec:td-planif}
+\capture{img/td_planif_iss_fr.png}{1.0}
+Le second calculateur répond aux retours de la promotion sur le TP de parallaxe (calculs faux quand l'ISS ne passe pas
+entre les deux observateurs, manipulation longue, TP Lune difficile) : pour deux lieux, il cherche les créneaux où
+l'objet est visible des \emph{deux} à la fois et les classe du plus facile au plus difficile.
+
+\paragraph{Conditions.} Hauteur minimale atteinte aux deux lieux (20° par défaut) ; Soleil au plus à $-6^\circ$ aux deux
+lieux (fin du crépuscule civil ; $-12^\circ$ nautique, $-18^\circ$ nuit noire) ; ISS éclairée par le Soleil (ombre cylindrique
+de la Terre) ; pour la Lune, fraction éclairée au plus de 95~\% et une étoile de repère (magnitude $\le 4{,}5$) à
+moins de 5° du centre de la Lune, vue des deux lieux, hors du disque.
+
+\paragraph{La note (sur 100).} Elle monte quand les deux observateurs voient l'objet haut, quand l'objet passe près du
+\emph{plan vertical commun} des deux lieux (le plan qui les contient avec le centre de la Terre : c'est là que la
+formule $D = R/2\alpha$ du sujet est juste) et quand la parallaxe est grande. Pour l'ISS, chaque créneau donne
+l'erreur que ferait la formule du sujet à cet instant (avec $2\alpha = 180^\circ - h_1 - h_2$ si l'ISS est entre les deux
+lieux, $\lvert h_1 - h_2\rvert$ sinon) et le décalage d'horloge qui fausse la parallaxe de 1~\% (l'ISS file à
+environ 1°/s : une demi-seconde suffit). Pour la Lune, la grandeur mesurée est $\Delta\varphi = \varphi_1 -
+\varphi_2$, la différence de distance Lune--étoile entre les deux lieux ; elle vaut au mieux $R/D$ (quelques minutes
+d'arc pour 400~km de base), seulement si la base est alignée avec la direction Lune--étoile : la note et l'erreur de
+la formule le disent.
+
+\capture{img/td_planif_lune_fr.png}{1.0}
+\paragraph{Affichage et exports.} Le tableau classe les créneaux ; le ciel de chaque lieu (zénith au centre, horizon
+au bord) montre la trajectoire et le meilleur instant ; le détail donne hauteurs, azimuts, distances, magnitude de
+l'ISS, étoiles brillantes voisines, étoile de repère de la Lune. \emph{Exporter (CSV)} enregistre le tableau,
+\emph{Agenda (.ics)} un fichier à importer et à envoyer à son binôme. Les heures sont en UTC, ou dans le fuseau de
+l'ordinateur. Une fois la mesure faite, on la dépouille avec \emph{Parallaxe (TP du cours)}.
+
+\paragraph{Calculs et vérification.} ISS : TLE de CelesTrak, ou d'ARISS quand CelesTrak ne répond pas (le TLE ne vaut
+que quelques jours : 14 jours au plus, relancer la veille), SGP4 ; Lune : JPL DE440 si le fichier est là, sinon
+ERFA ; Soleil : ERFA ; étoiles : Yale Bright Star Catalogue, 5\textsuperscript{e} révision (Hoffleit \& Warren 1991,
+V $\le 5{,}5$). Contrôle indépendant par skyfield (\texttt{outils/verif\_planif/references\_skyfield.py} : écart
+$\le 0{,}1^\circ$ pour l'ISS, $0{,}003^\circ$ pour la Lune) et formules par SageMath
+(\texttt{outils/verif\_planif/verif\_planif\_sage.py}). En ligne de commande :
+\begin{ccode}
+coupole td planifier --p1 "48.8366 N 2.3360 E" --p2 "45.76 N 4.84 E" --alt2 170 --jours 7 --ics binome.ics\\
+coupole td planifier --p1 "48.8366, 2.3360" --p2 "45.76, 4.84" --cible lune --jours 60 --csv
+\end{ccode}
+
+
 % =====================================================================
 \section{Machine et performance}
 \capture{img/module_machine_fr.png}{0.9}
@@ -2250,5 +2290,5 @@ Barbary (2016), Bertin \& Arnouts (1996). Moments adaptatifs : Bernstein \& Jarv
 © OpenStreetMap contributors. SIMBAD et Sesame : CDS, Strasbourg (Wenger et al. 2000) ; Aladin Lite (CDS) ;
 NED (NASA/IPAC) ; JPL Small-Body Database (NASA/JPL). Cosmologie : Planck Collaboration (2020, A\&A 641, A6) ;
 Hinshaw et al. (2013, WMAP 9) ; Riess et al. (2022, SH0ES) ; Hogg (1999, astro-ph/9905116) ; Komatsu et al. (2011)
-pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur). Archives : MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), Astro Data Archive de NOIRLab, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS du nœud Anneaux et Lunes, Imaging Node) ; reproject (Astropy) ; Rector et al. (2007, AJ 133, 598) pour l'ordre chromatique ; pratiques des amateurs : voir \texttt{docs/archives\_methode.md}. Animations : ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0) ; Meeus (1998, \emph{Astronomical Algorithms}, 2\textsuperscript{e} éd.) ; obliquité P03 / IAU 2006 ; limites des constellations de l'UAI (données livrées avec astropy) ; côtes Natural Earth 1:50m (domaine public) ; police STIX Two Math (SIL OFL 1.1) ; NASA Exoplanet Archive, NASA Planetary Fact Sheet, éphéméride JPL DE440 et éléments de Standish, AME 2020, filtres de Landolt (1992), spectre de M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, courbe de rotation : modèle de McMillan (2017) par galpy, mesures d'Eilers et al. (2019) et compilation galkin (Pato \& Iocco 2017), bras de Reid et al. (2019), barre de Wegg et al. (2015) ; atmosphère : Kasten \& Young (1989), Pickering (2002), Hansen \& Travis (1974), Ångström (1929), Ciddor (1996), modèle de ciel de l'ESO (Noll et al. 2012 ; Jones et al. 2013) ; Partages du DU et Calculateurs de TD : sujets « Parallaxe de l'ISS » et « Parallaxe lunaire » du DU (Observatoire de Paris) ; JPL DE440 (Park et al. 2021) lue par jplephem (MIT) ; ERFA (BSD, dérivé de SOFA, UAI) ; SGP4 (Vallado et al. 2006, paquet sgp4, MIT) et TLE de CelesTrak ; WGS84 (NIMA TR8350.2) ; Vincenty (1975) ; Kåsa (1976) ; Bennett (1982) et Saemundsson (1986) pour la réfraction ; skyfield (Rhodes, MIT) pour les références ; astrometry.net et nova.astrometry.net (Lang et al. 2010, AJ 139, 1782) ; WebDAV (RFC 4918) et partages publics Nextcloud ; Office Open XML (ECMA-376) ; machine d'Anticythère : adaptée d'Anticythere3D (même auteur), d'après Freeth et al. (\emph{Nature} 444, 2006 ; \emph{Nature} 454, 2008 ; \emph{Scientific Reports} 11:5821, 2021) ; spectres physiques : CODATA 2022, NIST ASD, Mamajek (2022), Malkov et al. (2020), van Belle et al. (2021), Martins et al. (2005), Castelli \& Kurucz (2003, ATLAS9), NIST-JANAF, Allard et al. (2000), CIE 1931 ; Gravité et orbites : d'après la simulation PhET « Gravity and Orbits » (PhET Interactive Simulations, University of Colorado Boulder ; rien n'en est repris), CODATA 2018, UAI 2015 (B3) et 2012 (B2), DE440 (Park et al. 2021), NASA (fiches Terre, Lune, ISS), Yoshida (1990) ; Orion en 3D et fiches au survol : SIMBAD (CDS, Strasbourg), Gaia DR3 (ESA/DPAC), Hipparcos (van Leeuwen 2007), Zucker et al. (2021, CC0), Großschedl et al. (2018), Kounkel et al. (2017, 2018), Foley et al. (2023), O'Dell et al. (2009), Stellarium (figure, CC BY-SA 4.0) ; images ESO/G. Beccari, ESO, et NASA, ESA, M. Robberto (STScI/ESA) and the Hubble Space Telescope Orion Treasury Project Team, NASA, ESA, and the Hubble Heritage Team (AURA/STScI), sous licence CC BY 4.0 (détail dans \texttt{NOTICE}).
+pour la densité des neutrinos massifs ; astropy.cosmology ; calculateur « cosmologie-redshift » (même auteur). Archives : MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), Astro Data Archive de NOIRLab, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS du nœud Anneaux et Lunes, Imaging Node) ; reproject (Astropy) ; Rector et al. (2007, AJ 133, 598) pour l'ordre chromatique ; pratiques des amateurs : voir \texttt{docs/archives\_methode.md}. Animations : ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0) ; Meeus (1998, \emph{Astronomical Algorithms}, 2\textsuperscript{e} éd.) ; obliquité P03 / IAU 2006 ; limites des constellations de l'UAI (données livrées avec astropy) ; côtes Natural Earth 1:50m (domaine public) ; police STIX Two Math (SIL OFL 1.1) ; NASA Exoplanet Archive, NASA Planetary Fact Sheet, éphéméride JPL DE440 et éléments de Standish, AME 2020, filtres de Landolt (1992), spectre de M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, courbe de rotation : modèle de McMillan (2017) par galpy, mesures d'Eilers et al. (2019) et compilation galkin (Pato \& Iocco 2017), bras de Reid et al. (2019), barre de Wegg et al. (2015) ; atmosphère : Kasten \& Young (1989), Pickering (2002), Hansen \& Travis (1974), Ångström (1929), Ciddor (1996), modèle de ciel de l'ESO (Noll et al. 2012 ; Jones et al. 2013) ; Partages du DU et Calculateurs de TD : sujets « Parallaxe de l'ISS » et « Parallaxe lunaire » du DU (Observatoire de Paris) ; JPL DE440 (Park et al. 2021) lue par jplephem (MIT) ; ERFA (BSD, dérivé de SOFA, UAI) ; SGP4 (Vallado et al. 2006, paquet sgp4, MIT) et TLE de CelesTrak et d'ARISS ; Yale Bright Star Catalogue, 5\textsuperscript{e} révision (Hoffleit \& Warren 1991, CDS V/50) ; WGS84 (NIMA TR8350.2) ; Vincenty (1975) ; Kåsa (1976) ; Bennett (1982) et Saemundsson (1986) pour la réfraction ; skyfield (Rhodes, MIT) pour les références ; astrometry.net et nova.astrometry.net (Lang et al. 2010, AJ 139, 1782) ; WebDAV (RFC 4918) et partages publics Nextcloud ; Office Open XML (ECMA-376) ; machine d'Anticythère : adaptée d'Anticythere3D (même auteur), d'après Freeth et al. (\emph{Nature} 444, 2006 ; \emph{Nature} 454, 2008 ; \emph{Scientific Reports} 11:5821, 2021) ; spectres physiques : CODATA 2022, NIST ASD, Mamajek (2022), Malkov et al. (2020), van Belle et al. (2021), Martins et al. (2005), Castelli \& Kurucz (2003, ATLAS9), NIST-JANAF, Allard et al. (2000), CIE 1931 ; Gravité et orbites : d'après la simulation PhET « Gravity and Orbits » (PhET Interactive Simulations, University of Colorado Boulder ; rien n'en est repris), CODATA 2018, UAI 2015 (B3) et 2012 (B2), DE440 (Park et al. 2021), NASA (fiches Terre, Lune, ISS), Yoshida (1990) ; Orion en 3D et fiches au survol : SIMBAD (CDS, Strasbourg), Gaia DR3 (ESA/DPAC), Hipparcos (van Leeuwen 2007), Zucker et al. (2021, CC0), Großschedl et al. (2018), Kounkel et al. (2017, 2018), Foley et al. (2023), O'Dell et al. (2009), Stellarium (figure, CC BY-SA 4.0) ; images ESO/G. Beccari, ESO, et NASA, ESA, M. Robberto (STScI/ESA) and the Hubble Space Telescope Orion Treasury Project Team, NASA, ESA, and the Hubble Heritage Team (AURA/STScI), sous licence CC BY 4.0 (détail dans \texttt{NOTICE}).
 \end{document}

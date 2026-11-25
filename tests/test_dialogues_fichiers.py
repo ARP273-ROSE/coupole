@@ -112,7 +112,7 @@ def test_toutes_les_ouvertures_sont_couvertes():
         if f.name == 'fichiers.py':
             continue
         n += len(re.findall(r'fichiers\.choisir_(?:dossier|fichier|enregistrement)\(', f.read_text(encoding='utf-8')))
-    assert n == 23                     # + export/import de la sauvegarde (test_classe.py) ; + 5 Partages ; + 1 TD
+    assert n == 25                     # + export/import de la sauvegarde (test_classe.py) ; + 5 Partages ; + 1 TD ; + 2 planificateur
 
 
 def _montrer(w, app):
@@ -310,3 +310,28 @@ def test_calculateurs_de_td(app_qt, faux):
         assert '*.csv' in fichiers.filtres_portail(d.filtre)[0][1]
     finally:
         p.close()
+
+
+def test_planificateur_de_parallaxe(app_qt, faux):
+    """Planificateur de parallaxe (0.12.0) : export CSV et agenda .ics par les vrais boutons."""
+    import datetime as D
+    import json
+    from coupole.modules.td import planif as PL
+    from coupole.modules.td.gui import Panneau
+    ref = json.loads((Path(__file__).parent / 'td_planif_reference.json').read_text(encoding='utf-8'))
+    s1, s2 = (PL.Site(*x) for x in ref['sites'])
+    p = _montrer(Panneau(), app_qt)
+    try:
+        p.liste.setCurrentRow(1)
+        pl = p.planif
+        pl._resultat(PL.chercher(s1, s2, PL.Criteres('iss', D.datetime.fromisoformat(ref['debut']), jours=2,
+                                                     tle=tuple(ref['tle']))))
+        _bouton(pl, 'pl_csv').click()
+        d = verifier_ouverture(faux, 1)
+        assert '*.csv' in fichiers.filtres_portail(d.filtre)[0][1]
+        _bouton(pl, 'pl_ics').click()
+        d = verifier_ouverture(faux, 2)
+        assert '*.ics' in fichiers.filtres_portail(d.filtre)[0][1]
+    finally:
+        p.close()
+

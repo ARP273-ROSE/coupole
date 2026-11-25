@@ -47,7 +47,7 @@ Image quality & Optional. FWHM, ellipticity, background, noise, gradient, satura
 Spectra and series & Reading and plotting 1D data (radio spectra, light curves, tables).\\
 Cosmology & From redshift to distances, ages, volume, distance modulus, scale (Planck 2018 and others).\\
 Sites and times & Site database, OpenStreetMap map, UTC and local time.\\
-Course calculators & The course exercises and practicals step by step with your numbers, then the exact calculation: Parallax (course practical).\\
+Course calculators & The course exercises and practicals step by step with your numbers, then the exact calculation: Parallax (course practical); Parallax planner (ISS, Moon).\\
 My computer & Hardware diagnosis; minimal example module.\\
 \bottomrule
 \end{tabularx}
@@ -2037,6 +2037,46 @@ coupole td parallax --p1 "48.8566, 2.3522" --h1 62.483 --az1 14.184 --alt1 35\\
 \hspace*{2em}--p2 "45°45′50″N 4°50′09″E" --h2 33.603 --az2 346.928 --alt2 170
 \end{ccode}
 
+\subsection{Parallax planner (ISS, Moon)}\label{sec:td-planif}
+\capture{img/td_planif_iss_en.png}{1.0}
+The second calculator answers the class's feedback on the parallax practical (wrong results when the ISS does not pass
+between the two observers, a long procedure, a hard Moon practical): for two places, it looks for slots when the
+object is visible from \emph{both} at once and ranks them from easiest to hardest.
+
+\paragraph{Conditions.} Minimum elevation reached at both places (20° by default); Sun at most at $-6^\circ$ at both places
+(end of civil twilight; $-12^\circ$ nautical, $-18^\circ$ full night); ISS lit by the Sun (cylindrical Earth shadow); for the
+Moon, at most 95~\% illuminated and a reference star (magnitude $\le 4.5$) within 5° of the Moon's centre, seen from
+both places, off the disc.
+
+\paragraph{The score (out of 100).} It rises when both observers see the object high, when the object crosses near
+the \emph{common vertical plane} of the two places (the plane containing them and the Earth's centre: that is where
+the practical's formula $D = R/2\alpha$ holds) and when the parallax is large. For the ISS, each slot gives the error
+the practical's formula would make at that time (with $2\alpha = 180^\circ - h_1 - h_2$ when the ISS is between the two
+places, $\lvert h_1 - h_2\rvert$ otherwise) and the clock offset that spoils the parallax by 1~\% (the ISS moves
+about 1°/s: half a second is enough). For the Moon, the measured quantity is $\Delta\varphi = \varphi_1 -
+\varphi_2$, the difference in Moon--star distance between the two places; at best it equals $R/D$ (a few arcminutes
+for a 400~km baseline), only when the baseline lines up with the Moon--star direction: the score and the formula
+error say so.
+
+\capture{img/td_planif_lune_en.png}{1.0}
+\paragraph{Display and exports.} The table ranks the slots; each place's sky (zenith at the centre, horizon at the
+edge) shows the track and the best time; the details give elevations, azimuths, distances, ISS magnitude, nearby
+bright stars, the Moon's reference star. \emph{Export (CSV)} saves the table, \emph{Calendar (.ics)} a file to import
+and send to one's partner. Times are in UTC, or in the computer's time zone. Once the measurement is made, reduce it
+with \emph{Parallax (course practical)}.
+
+\paragraph{Computation and checks.} ISS: TLE from CelesTrak, or from ARISS when CelesTrak does not answer (a TLE is
+only good for a few days: 14 days at most, search again the day before), SGP4; Moon: JPL DE440 when the file is
+present, otherwise ERFA; Sun: ERFA; stars: Yale Bright Star Catalogue, 5th revision (Hoffleit \& Warren 1991,
+V $\le 5.5$). Independent check against skyfield (\texttt{outils/verif\_planif/references\_skyfield.py}: within
+$0.1^\circ$ for the ISS, $0.003^\circ$ for the Moon) and formulas against SageMath
+(\texttt{outils/verif\_planif/verif\_planif\_sage.py}). From the command line:
+\begin{ccode}
+coupole td plan --p1 "48.8366 N 2.3360 E" --p2 "45.76 N 4.84 E" --alt2 170 --days 7 --ics partner.ics\\
+coupole td plan --p1 "48.8366, 2.3360" --p2 "45.76, 4.84" --target moon --days 60 --csv
+\end{ccode}
+
+
 % =====================================================================
 \section{Computer and performance}
 \capture{img/module_machine_en.png}{0.9}
@@ -2177,5 +2217,5 @@ Astrophoto). ASTAP: \url{https://www.hnsky.org/astap.htm}. Observatory codes: Mi
 contributors. SIMBAD and Sesame: CDS, Strasbourg (Wenger et al. 2000); Aladin Lite (CDS); NED (NASA/IPAC); JPL
 Small-Body Database (NASA/JPL). Cosmology: Planck Collaboration (2020, A\&A 641, A6); Hinshaw et al. (2013, WMAP 9);
 Riess et al. (2022, SH0ES); Hogg (1999, astro-ph/9905116); Komatsu et al. (2011) for the massive-neutrino density;
-astropy.cosmology; « cosmologie-redshift » calculator (same author). Archives: MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), NOIRLab Astro Data Archive, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS of the Ring-Moon Systems Node, Imaging Node); reproject (Astropy); Rector et al. (2007, AJ 133, 598) for chromatic ordering; amateur practices: see \texttt{docs/archives\_methode.md}. Animations: ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0); Meeus (1998, \emph{Astronomical Algorithms}, 2nd ed.); P03 / IAU 2006 obliquity; IAU constellation boundaries (data shipped with astropy); Natural Earth 1:50m coastlines (public domain); STIX Two Math font (SIL OFL 1.1); NASA Exoplanet Archive, NASA Planetary Fact Sheet, JPL DE440 ephemeris and Standish elements, AME 2020, Landolt filters (1992), spectrum of M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, rotation curve: McMillan (2017) model through galpy, Eilers et al. (2019) measurements and galkin compilation (Pato \& Iocco 2017), Reid et al. (2019) arms, Wegg et al. (2015) bar; atmosphere: Kasten \& Young (1989), Pickering (2002), Hansen \& Travis (1974), Ångström (1929), Ciddor (1996), ESO sky model (Noll et al. 2012; Jones et al. 2013); DU shared folders and course calculators: the course's “ISS parallax” and “Moon parallax” practicals (Observatoire de Paris); JPL DE440 (Park et al. 2021) read by jplephem (MIT); ERFA (BSD, derived from SOFA, IAU); SGP4 (Vallado et al. 2006, sgp4 package, MIT) and CelesTrak TLEs; WGS84 (NIMA TR8350.2); Vincenty (1975); Kåsa (1976); Bennett (1982) and Saemundsson (1986) for refraction; skyfield (Rhodes, MIT) for the references; astrometry.net and nova.astrometry.net (Lang et al. 2010, AJ 139, 1782); WebDAV (RFC 4918) and Nextcloud public shares; Office Open XML (ECMA-376); Antikythera Mechanism: adapted from Anticythere3D (same author), after Freeth et al. (\emph{Nature} 444, 2006; \emph{Nature} 454, 2008; \emph{Scientific Reports} 11:5821, 2021); physical spectra: CODATA 2022, NIST ASD, Mamajek (2022), Malkov et al. (2020), van Belle et al. (2021), Martins et al. (2005), Castelli \& Kurucz (2003, ATLAS9), NIST-JANAF, Allard et al. (2000), CIE 1931; Gravity and Orbits: after the PhET simulation “Gravity and Orbits” (PhET Interactive Simulations, University of Colorado Boulder; nothing reused), CODATA 2018, IAU 2015 (B3) and 2012 (B2), DE440 (Park et al. 2021), NASA (Earth, Moon, ISS fact sheets), Yoshida (1990); Orion in 3D and hover data sheets: SIMBAD (CDS, Strasbourg), Gaia DR3 (ESA/DPAC), Hipparcos (van Leeuwen 2007), Zucker et al. (2021, CC0), Großschedl et al. (2018), Kounkel et al. (2017, 2018), Foley et al. (2023), O'Dell et al. (2009), Stellarium (figure, CC BY-SA 4.0); images ESO/G. Beccari, ESO, and NASA, ESA, M. Robberto (STScI/ESA) and the Hubble Space Telescope Orion Treasury Project Team, NASA, ESA, and the Hubble Heritage Team (AURA/STScI), under the CC BY 4.0 licence (details in \texttt{NOTICE}).
+astropy.cosmology; « cosmologie-redshift » calculator (same author). Archives: MAST (STScI), ESO Science Archive Facility, IRSA (NASA/IPAC), NOIRLab Astro Data Archive, Keck Observatory Archive (NExScI), SDSS, Planetary Data System (OPUS of the Ring-Moon Systems Node, Imaging Node); reproject (Astropy); Rector et al. (2007, AJ 133, 598) for chromatic ordering; amateur practices: see \texttt{docs/archives\_methode.md}. Animations: ClassAction, University of Nebraska-Lincoln Astronomy Education (Apache License 2.0); Meeus (1998, \emph{Astronomical Algorithms}, 2nd ed.); P03 / IAU 2006 obliquity; IAU constellation boundaries (data shipped with astropy); Natural Earth 1:50m coastlines (public domain); STIX Two Math font (SIL OFL 1.1); NASA Exoplanet Archive, NASA Planetary Fact Sheet, JPL DE440 ephemeris and Standish elements, AME 2020, Landolt filters (1992), spectrum of M32 (Santos et al. 2002), Catalog and Atlas of Eclipsing Binaries, rotation curve: McMillan (2017) model through galpy, Eilers et al. (2019) measurements and galkin compilation (Pato \& Iocco 2017), Reid et al. (2019) arms, Wegg et al. (2015) bar; atmosphere: Kasten \& Young (1989), Pickering (2002), Hansen \& Travis (1974), Ångström (1929), Ciddor (1996), ESO sky model (Noll et al. 2012; Jones et al. 2013); DU shared folders and course calculators: the course's “ISS parallax” and “Moon parallax” practicals (Observatoire de Paris); JPL DE440 (Park et al. 2021) read by jplephem (MIT); ERFA (BSD, derived from SOFA, IAU); SGP4 (Vallado et al. 2006, sgp4 package, MIT) and CelesTrak and ARISS TLEs; Yale Bright Star Catalogue, 5th revision (Hoffleit \& Warren 1991, CDS V/50); WGS84 (NIMA TR8350.2); Vincenty (1975); Kåsa (1976); Bennett (1982) and Saemundsson (1986) for refraction; skyfield (Rhodes, MIT) for the references; astrometry.net and nova.astrometry.net (Lang et al. 2010, AJ 139, 1782); WebDAV (RFC 4918) and Nextcloud public shares; Office Open XML (ECMA-376); Antikythera Mechanism: adapted from Anticythere3D (same author), after Freeth et al. (\emph{Nature} 444, 2006; \emph{Nature} 454, 2008; \emph{Scientific Reports} 11:5821, 2021); physical spectra: CODATA 2022, NIST ASD, Mamajek (2022), Malkov et al. (2020), van Belle et al. (2021), Martins et al. (2005), Castelli \& Kurucz (2003, ATLAS9), NIST-JANAF, Allard et al. (2000), CIE 1931; Gravity and Orbits: after the PhET simulation “Gravity and Orbits” (PhET Interactive Simulations, University of Colorado Boulder; nothing reused), CODATA 2018, IAU 2015 (B3) and 2012 (B2), DE440 (Park et al. 2021), NASA (Earth, Moon, ISS fact sheets), Yoshida (1990); Orion in 3D and hover data sheets: SIMBAD (CDS, Strasbourg), Gaia DR3 (ESA/DPAC), Hipparcos (van Leeuwen 2007), Zucker et al. (2021, CC0), Großschedl et al. (2018), Kounkel et al. (2017, 2018), Foley et al. (2023), O'Dell et al. (2009), Stellarium (figure, CC BY-SA 4.0); images ESO/G. Beccari, ESO, and NASA, ESA, M. Robberto (STScI/ESA) and the Hubble Space Telescope Orion Treasury Project Team, NASA, ESA, and the Hubble Heritage Team (AURA/STScI), under the CC BY 4.0 licence (details in \texttt{NOTICE}).
 \end{document}

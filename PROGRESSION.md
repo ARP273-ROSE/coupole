@@ -1618,3 +1618,22 @@ Même méthode que la 0.10.0 (noyau sans Qt jumeau du web, vérification SageMat
 ### NOTE DE REPRISE (25/11/2026, soir)
 - Restent (plan ordonné hors dépôt) : diagramme a–e (+ assistance gravitationnelle, cratère), libration, précession
   des équinoxes, résonances et chaos, limite de Roche.
+
+## 25/11/2026 — Planificateur de parallaxe (0.12.0 en préparation, non publiée)
+Demande après le message de l'enseignant sur le forum (25/11) : calculs faux quand l'ISS ne passe pas entre
+les observateurs, TP long, TP Lune difficile, un script pour optimiser les dates serait utile → « écris le script
+toi-même avec une interface graphique ».
+- [x] `coupole/modules/td/planif.py` : ISS (TLE + SGP4 vectorisé, pas 5 s, 14 j au plus ; ombre cylindrique ; magnitude
+  −1,8 à 1000 km) et Lune (DE440 ou ERFA moon98, pas 5 min, 400 j au plus ; étoile de repère V ≤ 4,5 à moins de 5°,
+  hors du disque, aux deux lieux) ; repère terrestre R3(ERA)·C2I(milieu). Note /100 : hauteur min, écart au plan
+  vertical commun, parallaxe, erreur de la formule du sujet (ISS) ; Δφ / (R/D) et phase (Lune). Exports CSV et .ics.
+- [x] `gui_planif.py` (2ᵉ calculateur de la rubrique TD) : tableau, ciel des deux lieux, détail ; `cli.py`
+  `coupole td planifier|plan`.
+- [x] `tle.py` : repli sur ARISS (`tle.iss_secours`, live.ariss.org/iss.txt) — CelesTrak répondait 503 le 25/11.
+- [x] Étoiles : `outils/donnees_etoiles_td/etoiles_td.py` → `td/donnees/etoiles_v55.json.gz` (BSC5, 2887 étoiles).
+- [x] Vérif : `outils/verif_planif/references_skyfield.py` (ISS ≤ 0,083°, Lune ≤ 0,003°, phase ≤ 0,005 ; skyfield
+  installé à part : `pip install --target <dossier> skyfield` puis PYTHONPATH) → `tests/td_planif_reference.json` ;
+  `verif_planif_sage.py` (corde, formule du sujet, magnitude, Δφ idéal, phase : identiques). `tests/test_td_planif.py`.
+- [x] Manuels FR/EN § « Planificateur de parallaxe » (+ captures `outils/captures_planif.py`), README, NOTICE, CHANGELOG.
+- [ ] **Coupole Web** : porter le planificateur (page TD) — même données d'étoiles, références JSON communes.
+- [ ] Publier 0.12.0 (VERSION, date du CHANGELOG, recompiler les manuels) avec la version web, sur accord.

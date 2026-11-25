@@ -2,6 +2,18 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.12.0 — in preparation — Parallax planner
+
+- **Parallax planner** (Course calculators): for two places, the ISS passes (14 days at most) and Moon evenings (400
+  days at most) visible from both at once, dark sky, ISS lit, Moon not too full with a nearby reference star; ranked
+  by a score that favours the object high for both and close to the common vertical plane (where the practical's
+  formula D = R/2α holds). For each slot: the practical's formula error, the clock offset that spoils the parallax
+  by 1 %, ISS magnitude, nearby stars, the Moon's Δφ and its maximum R/D; both places' skies; CSV export and .ics
+  calendar; command line `coupole td plan`. Checked against skyfield (`outils/verif_planif/references_skyfield.py`)
+  and SageMath (`verif_planif_sage.py`).
+- ISS TLE: when CelesTrak does not answer (frequent 503 error), the one from ARISS.
+- Reference stars: Yale Bright Star Catalogue (V ≤ 5.5), in `coupole/modules/td/donnees/`.
+
 ## 0.11.0 — 25 November 2026 — Four more course animations
 
 Four new animations of Coupole's own (105 in all), on the desktop as in Coupole Web; formulas and values checked

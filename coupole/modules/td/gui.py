@@ -23,7 +23,7 @@ from . import parallaxe_tp as T
 from .presentation import _n, html_detail, texte_export
 
 UTC = D.timezone.utc
-CALCULATEURS = (('parallaxe_tp', 'td_calc_parallaxe'),)
+CALCULATEURS = (('parallaxe_tp', 'td_calc_parallaxe'), ('planif', 'td_calc_planif'))
 
 
 # ============================================================================================== dessin
@@ -503,6 +503,9 @@ class Panneau(QWidget):
         self.pile = QStackedWidget()
         self.parallaxe = PanneauParallaxeTP()
         self.pile.addWidget(self.parallaxe)
+        from .gui_planif import PanneauPlanif
+        self.planif = PanneauPlanif()
+        self.pile.addWidget(self.planif)
         sp.addWidget(self.pile)
         sp.setStretchFactor(0, 1)
         sp.setStretchFactor(1, 5)
@@ -512,7 +515,8 @@ class Panneau(QWidget):
         self.liste.currentRowChanged.connect(self.pile.setCurrentIndex)
 
     def aide_html(self) -> str:
-        return tr('td_aide_html')
+        w = self.pile.currentWidget()
+        return w.aide_html() if w is not self.parallaxe else tr('td_aide_html')
 
 
 _ = (QComboBox,)

@@ -2,6 +2,18 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.12.0 — en préparation — Planificateur de parallaxe
+
+- **Planificateur de parallaxe** (Calculateurs de TD) : pour deux lieux, les passages de l'ISS (14 jours au plus) et
+  les soirées de Lune (400 jours au plus) visibles des deux à la fois, ciel noir, ISS éclairée, Lune pas trop pleine
+  avec une étoile de repère proche ; classés par une note qui favorise l'objet haut pour les deux et proche du plan
+  vertical commun (là où la formule du sujet D = R/2α est juste). Pour chaque créneau : erreur de la formule du sujet,
+  décalage d'horloge qui fausse la parallaxe de 1 %, magnitude de l'ISS, étoiles voisines, Δφ de la Lune et son
+  maximum R/D ; ciel des deux lieux ; export CSV et agenda .ics ; ligne de commande `coupole td planifier`.
+  Contrôlé par skyfield (`outils/verif_planif/references_skyfield.py`) et SageMath (`verif_planif_sage.py`).
+- TLE de l'ISS : si CelesTrak ne répond pas (erreur 503 fréquente), celui d'ARISS.
+- Étoiles de repère : Yale Bright Star Catalogue (V ≤ 5,5), dans `coupole/modules/td/donnees/`.
+
 ## 0.11.0 — 25 novembre 2026 — Quatre animations de cours de plus
 
 Quatre nouvelles animations propres à Coupole (105 en tout), au bureau comme dans Coupole Web ; formules et valeurs
