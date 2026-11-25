@@ -19,7 +19,7 @@ French version (reference): [CHANGELOG.md](CHANGELOG.md).
 - ISS TLE: when CelesTrak does not answer (frequent 503 error), the one from ARISS.
 - Reference stars: Yale Bright Star Catalogue (V ≤ 5.5), in `coupole/modules/td/donnees/`.
 
-### Course animations (112 animations)
+### Course animations (115 animations)
 
 New animations of Coupole's own, on the desktop as in Coupole Web; formulas and values checked with SageMath, same
 numbers to the character in both applications.
@@ -51,6 +51,29 @@ numbers to the character in both applications.
   (fluid) or ∛3 R ∛(ρₚ/ρₛ) (rigid, solved symbolically in SageMath), the tide wins and its debris spreads into a ring;
   close-up of the tidal forces, stretching relative to self-gravity; Saturn and its rings, Mars and Phobos, Jupiter
   and a comet, the Earth and the Moon.
+- **Secular precession of an orbit** (Solar System debris): under the pull of the giant planets, the line of apsides
+  of a near-Earth asteroid advances and its line of nodes regresses by a few arcseconds per year (Laplace-Lagrange
+  theory, A = (n/4) Σ (m/M☉) α² b⁽¹⁾₃/₂(α)); its nodes cross the Earth's orbit four times per turn of ω, and the
+  minimum orbit intersection distance (MOID) then drops to zero; Apollo, Icarus, Phaethon, Adonis, Toutatis (SBDB);
+  checked in SageMath through the Laplace coefficients (integral and series), an independent minimisation of the MOID
+  and a direct Sun-Jupiter integration (rates of ϖ and Ω within 0.2% over 3,000 years).
+- **Mutual events of the Galilean satellites** (Solar System): when the Earth and the Sun pass through the orbital
+  plane (every six years), one satellite occults another or casts its shadow on it; discs seen from the Earth with
+  umbra and penumbra, system seen from the north, light curve of the pair (brightness drop, Δm, duration), limiting
+  latitude B; eclipse computed as an integral of the hidden share of the solar disc, checked against a SageMath double
+  integral (within 2 × 10⁻⁷).
+- **Meteoroid trails** (Solar System debris): at each perihelion passage the comet releases grains (ejection speed,
+  size and radiation pressure) that stretch along the orbit; (Δt, Δr) diagram at the node for the current year,
+  activity year by year: storms follow the comet's returns; Leonids (55P), Perseids (109P), a fictitious comet whose
+  node lies on the Earth's orbit; grain orbits checked by numerical integration in SageMath (positions and node
+  passages within 2 × 10⁻⁷).
+- **Lagrange points: halo orbits** around L1 and L2 in three dimensions (Richardson, 3rd order; amplitudes, period:
+  176.8 days around Sun-Earth L1), seen from the large body; the body released on it follows it for one turn then
+  drifts away (instability); checked by a differential correction in SageMath (true periodic orbit within a few per
+  cent of the amplitude, half-period within 0.3%).
+- **Interference: Newton's rings** (second set-up): air film between a lens and a plate, dark rings at √(kλR/n),
+  reflection or transmission, index of the film, white light (Newton's colours); checked in SageMath (exact sphere,
+  two Fresnel waves).
 
 ## 0.11.0 — 25 November 2026 — Four more course animations
 

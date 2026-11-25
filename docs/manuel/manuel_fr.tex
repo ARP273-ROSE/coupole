@@ -2023,6 +2023,16 @@ $\rho$, $V=|1+r\,e^{-2i\pi B\rho/\lambda}|/(1+r)$, au plus bas à $B=\lambda/2\r
 aussi l'interfrange sur un écran à 1~m), interféromètre de Michelson et Pease (Bételgeuse, 47~mas : franges disparues
 vers 3,08~m à 575~nm), VLTI, CHARA. En lecture, la base peut s'allonger.
 \capture{img/anim_interferometry_fr.png}{0.9}
+\emph{Anneaux de Newton} (0.12.0, montage « anneaux de Newton ») : une lentille plan-convexe de rayon de courbure $R$
+posée sur une lame de verre laisse une lame d'air (ou d'un liquide d'indice $n$) d'épaisseur $e(r)=r^2/2R$. En
+réflexion, les deux ondes réfléchies sur les faces de la lame diffèrent de $2ne+\lambda/2$ (déphasage de $\pi$ sur le
+verre) : $I=\bigl(1-\cos(4\pi ne/\lambda)\bigr)/2$, centre noir, anneaux sombres à $r_k=\sqrt{k\lambda R/n}$ (0,767~mm
+pour $R=1$~m et $\lambda=589$~nm) ; en transmission, la figure complémentaire ; en lumière blanche, les teintes de
+Newton (sommes CIE au pas de 5~nm). Les réglages propres à l'interféromètre sont grisés pendant ce montage. Contrôlé sous SageMath
+(\texttt{newton\_verif.sage}) : racines en géométrie exacte de la sphère (écart relatif $<2\times10^{-4}$ dans le
+domaine des réglages) et éclairement de deux ondes aux amplitudes de Fresnel (verre d'indice 1,5), identique au
+modèle une fois normalisé (contraste $>0{,}999$).
+\capture{img/anim_newton_fr.png}{0.9}
 \item \textbf{Occultation d'une étoile par un astéroïde} (Petits corps). L'étoile étant à l'infini, l'ombre a la taille
 de l'astéroïde (ellipse de demi-axes $a$, $b$) ; elle balaie la Terre à la vitesse
 $v=\sqrt{GM_\odot/1\,\text{ua}}\,(1-1/\sqrt{r})$ à l'opposition (10,9~km\,s$^{-1}$ à 2,5~ua, 26,7~km\,s$^{-1}$ pour Éris).
@@ -2048,12 +2058,22 @@ $\mu<0{,}0385$). Petit corps lâché près de L4 (têtard), en face du petit ast
 zoom sur le petit astre et sa sphère de Hill $a\sqrt[3]{\mu/3}$ (L2 du JWST à 1,51 million de km) ; Soleil-Terre,
 Terre-Lune, Soleil-Jupiter, Pluton-Charon.
 \capture{img/anim_lagrange_fr.png}{0.9}
+\emph{Orbites de halo} (0.12.0, cas « orbite de halo autour de L1 / L2 ») : développement analytique du troisième
+ordre de D.~L. Richardson (\emph{Celestial Mechanics} 22, 241, 1980), en trois dimensions : amplitudes $A_x$ et $A_z$ liées
+par $l_1A_x^2+l_2A_z^2+\Delta=0$, fréquence $\lambda\nu$ ; $\delta$ règle $A_z$ (borné à $0{,}4\,\gamma$), son signe la
+famille nord ou sud. Pour Soleil-Terre, période de 176,8~jours autour de L1 et 179,0 autour de L2. Le panneau du bas
+montre l'orbite vue du grand astre (plan $y$--$z$) : le corps lâché sur l'état de Richardson et intégré tel quel
+(problème restreint en 3D) la suit environ un tour puis s'en écarte (ces orbites sont instables : SOHO, Gaia ou le
+JWST corrigent leur trajectoire). Contrôlé sous SageMath (\texttt{halo\_verif.sage}) : une vraie orbite périodique
+obtenue par correction différentielle (Newton sur $x_0$ et $\dot y_0$) diffère de l'état de Richardson de quelques
+pour cent de l'amplitude, et sa demi-période de moins de 0,3~\%.
+\capture{img/anim_lagrange_halo_fr.png}{0.9}
 \end{itemize}
 
 \paragraph{Animations de cours de la 0.12.0.} Même démarche ; vérifications SageMath dans \texttt{outils/verif\_anim/} :
 \texttt{survols\_impacts\_verif.sage} (diagramme $a$--$e$, assistance gravitationnelle, cratère),
 \texttt{libration\_verif.sage}, \texttt{precession\_verif.sage}, \texttt{resonances\_verif.sage},
-\texttt{roche\_verif.sage}.
+\texttt{roche\_verif.sage}, \texttt{seculaire\_verif.sage}, \texttt{mutuels\_verif.sage}, \texttt{trainees\_verif.sage}.
 \begin{itemize}
 \item \textbf{Le diagramme $a$--$e$} (Petits corps). Chaque point (demi-grand axe $a$, excentricité $e$) est une orbite
 autour du Soleil : périhélie $q=a(1-e)$, aphélie $Q=a(1+e)$, période $P=a^{3/2}$ (ans, $a$ en ua). Les géocroiseurs se
@@ -2123,6 +2143,47 @@ chaque grain suit sa propre orbite de Kepler (contrôlée par intégration numé
 Phobos (à 2,76~R, sous la limite fluide de 3,12~R mais au-dessus de la limite rigide), Jupiter et une comète, la Terre
 et la Lune (limite 2,88~R, à comparer à ses 60~R).
 \capture{img/anim_roche_fr.png}{0.9}
+\item \textbf{La précession séculaire d'une orbite} (Petits corps). En moyenne sur les révolutions, le demi-grand axe
+d'un astéroïde ne change pas, mais son orbite tourne sous l'effet des planètes. Théorie séculaire linéaire de
+Laplace-Lagrange pour une particule test (Murray et Dermott, \emph{Solar System Dynamics}, chap.~7), avec les quatre
+planètes géantes sur des orbites circulaires dans l'écliptique : les éléments forcés sont nuls et
+$\varpi=\varpi_0+At$, $\Omega=\Omega_0-At$, donc $\omega=\omega_0+2At$, avec
+$A=\frac n4\sum_j\frac{m_j}{M_\odot}\alpha_j^2\,b^{(1)}_{3/2}(\alpha_j)$, $\alpha_j=a/a_j$ et le coefficient de Laplace
+$b^{(1)}_{3/2}(\alpha)=\frac1\pi\int_0^{2\pi}\cos\psi\,(1-2\alpha\cos\psi+\alpha^2)^{-3/2}\,d\psi$. Les nœuds sont à
+$r=a(1-e^2)/(1\pm e\cos\omega)$ : l'orbite ne peut toucher celle de la Terre que lorsqu'un nœud passe à 1~ua, quatre fois
+par tour de $\omega$ ; la distance minimale entre les orbites (MOID) tombe alors à zéro. Pour (1862) Apollo,
+$A=14{,}3''$ par an : $\varpi$ fait le tour en 90\,367~ans, $\omega$ en 45\,183~ans, prochain croisement vers l'an 22\,494 ;
+(3200) Phaéton croise vers 2641. Limites dites dans l'animation : théorie linéaire (ordre de grandeur pour $e$ grand),
+planètes telluriques laissées de côté (elles accélèrent en vrai la précession). Contrôlée sous SageMath
+(\texttt{seculaire\_verif.sage}) : coefficients de Laplace par intégration et par la série hypergéométrique, instants
+des croisements, MOID par une minimisation indépendante (à $10^{-7}$~ua), et une intégration directe Soleil-Jupiter
+sur 3\,000~ans dont les pentes de $\varpi$ et de $\Omega$ retrouvent $\pm A$ à 0,2~\% près.
+\capture{img/anim_secularprecession_fr.png}{0.9}
+\item \textbf{Les phénomènes mutuels des satellites galiléens} (Système solaire). Tous les six ans, la Terre et le
+Soleil passent dans le plan des orbites : vu de la Terre, un satellite peut en occulter un autre (« 2\,O\,1 » : Europe
+occulte Io) ; vu du Soleil, lui faire de l'ombre (« 2\,E\,1 »). Géométrie simplifiée et dite : orbites circulaires
+coplanaires, Terre et Soleil à la latitude $B$ au-dessus du plan, Soleil à l'angle de phase $\varphi$, disques
+uniformes d'éclat $\propto pR^2$. Occultation : l'éclat perdu est l'aire commune des deux disques. Éclipse : un point
+du disque éclipsé, à la distance $s$ de l'axe de l'ombre, perd la part du disque solaire (rayon angulaire
+$R_\odot/D$) cachée par le satellite actif (rayon angulaire $R/\ell$) ; on intègre en $s$ le long des arcs de cercle
+du disque éclipsé (ombre et pénombre). L'écart des centres à la rencontre vaut $(Y_1-Y_2)\sin B$ : il n'y a de
+phénomène que si $B$ est petit (0,71° au plus pour 2\,O\,1 à mi-orbite). Pour 2\,O\,1 par défaut : baisse d'éclat de
+38,7~\% ($\Delta m=0{,}53$) en 58~min. Contrôlée sous SageMath (\texttt{mutuels\_verif.sage}) : aire commune par
+quadrature, éclat à des instants donnés (exact pour les occultations, intégrale double pour les éclipses, à
+$2\times10^{-7}$ près), premiers et derniers contacts.
+\capture{img/anim_mutualevents_fr.png}{0.9}
+\item \textbf{Les traînées de météoroïdes} (Petits corps). À chaque passage au périhélie, la comète lâche 200~grains
+(vitesses tirées dans une boule de rayon $\Delta v$) ; la pression de radiation réduit la gravité qu'ils ressentent à
+$GM(1-\beta)$, $\beta=5{,}7\times10^{-5}/(\rho s)$ (Burns, Lamy et Soter 1979). Chaque grain suit sa propre orbite de
+Kepler : leurs périodes diffèrent un peu et le nuage s'étire en traînée. La Terre (orbite képlérienne) passe au nœud
+chaque année au même jour (Léonides le 17~novembre, Perséides le 12~août) ; le diagramme montre, pour l'année en
+cours, chaque grain au nœud par son avance ou son retard sur la Terre $\Delta t$ et sa distance à l'orbite terrestre
+$\Delta r$ ; on compte les grains à moins de 0,01~ua et 10~jours. Les années riches suivent les retours de la comète
+(1865, 1965, 1999 pour 55P). Modèle sans perturbations des planètes (qui, en vrai, déplacent les traînées et font
+manquer ou réussir les averses) ; les Léonides passent ici 0,008~ua à l'intérieur de l'orbite terrestre. Contrôlée sous
+SageMath (\texttt{trainees\_verif.sage}) : grains intégrés numériquement (DOP853) sur plusieurs révolutions, positions et
+passages au nœud à $2\times10^{-7}$ près, dates de passage de la Terre.
+\capture{img/anim_meteoroidtrails_fr.png}{0.9}
 \end{itemize}
 
 

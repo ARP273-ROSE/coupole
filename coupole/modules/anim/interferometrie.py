@@ -13,10 +13,17 @@ d'éclat de la source, prise à la fréquence spatiale B / λ (théorème de Zer
   minimum (1 − r) / (1 + r) pour B = λ / (2ρ).
 
 Coupe des franges : I(α) = A(α) [1 + V cos(2π B α / λ − φ)], où A est la tache d'Airy d'une ouverture (on la
-suppose plus large que la source, θ ≪ λ / d)."""
+suppose plus large que la source, θ ≪ λ / d).
+
+Anneaux de Newton : une lentille plan-convexe de rayon de courbure R posée sur une lame de verre laisse entre elles
+une lame d'air (ou d'un liquide d'indice n) d'épaisseur e(r) = r²/(2R) à la distance r du contact (r ≪ R).  En
+réflexion, les ondes réfléchies sur les deux faces de la lame diffèrent de 2ne + λ/2 (déphasage de π à la réflexion
+sur le verre, plus réfringent) : I = (1 − cos(4π n e / λ))/2, centre noir, anneaux sombres à r_k = √(kλR/n) ; en
+transmission, la figure complémentaire.  En lumière blanche, chaque λ donne ses anneaux : teintes de Newton."""
 from __future__ import annotations
 
 import cmath
+import functools
 import math
 
 from .diffraction import RAYLEIGH, SEC_PAR_RAD, airy, j1
@@ -114,3 +121,54 @@ def verdict(genre: str, taille_mas: float, d_m: float, lam_nm: float, v: float) 
     if taille_mas >= resolution_mas(d_m, lam_nm):
         return 'v_seul'
     return 'v_interferometre' if v < SEUIL_RESOLU else 'v_non_resolue'
+
+
+# ------------------------------------------------------------------ anneaux de Newton
+N_ANNEAUX = 12                        # anneaux sombres montrés
+
+
+def epaisseur_nm(r_mm: float, R_m: float) -> float:
+    """Épaisseur de la lame (nm) à r (mm) du contact, lentille de rayon R (m) : r²/(2R)."""
+    return (r_mm * 1e-3) ** 2 / (2.0 * R_m) * 1e9
+
+
+def newton(r_mm: float, R_m: float, lam_nm: float, n: float, cote: str = 'reflexion') -> float:
+    """Éclairement relatif (0–1) à r (mm) du centre."""
+    return newton_e(epaisseur_nm(r_mm, R_m), lam_nm, n, cote)
+
+
+def rayon_sombre(k: int, R_m: float, lam_nm: float, n: float, cote: str = 'reflexion') -> float:
+    """Rayon (mm) du k-ième anneau sombre (k = 1, 2…) : √(kλR/n) en réflexion, √((k − ½)λR/n) en transmission."""
+    kk = k if cote == 'reflexion' else k - 0.5
+    return math.sqrt(kk * lam_nm * 1e-9 * R_m / n) * 1e3
+
+
+@functools.lru_cache(maxsize=1)
+def _cie():
+    """Fonctions colorimétriques CIE 1931 (pas de 5 nm) et Y du blanc (spectre plat)."""
+    from .lumiere import spectres
+    d = spectres()['cie']
+    ws = [d['w0'] + d['pas'] * i for i in range(len(d['x']))]
+    yw = 0.0
+    for v in d['y']:
+        yw += v
+    return ws, d['x'], d['y'], d['z'], yw
+
+
+def couleur_blanche(r_mm: float, R_m: float, n: float, cote: str = 'reflexion') -> tuple[int, int, int]:
+    """Couleur (sRGB) en lumière blanche (spectre plat, sommes CIE au pas de 5 nm), rapportée au blanc."""
+    from .lumiere import rgb_de_xyz
+    ws, xb, yb, zb, yw = _cie()
+    e = epaisseur_nm(r_mm, R_m)
+    x = y = z = 0.0
+    for w, a, b, c in zip(ws, xb, yb, zb):
+        f = newton_e(e, w, n, cote)
+        x += f * a
+        y += f * b
+        z += f * c
+    return rgb_de_xyz(x / yw, y / yw, z / yw)
+
+
+def newton_e(e_nm: float, lam_nm: float, n: float, cote: str) -> float:
+    i = (1.0 - math.cos(4.0 * math.pi * n * e_nm / lam_nm)) / 2.0
+    return i if cote == 'reflexion' else 1.0 - i

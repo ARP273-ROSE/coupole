@@ -1089,6 +1089,8 @@ from .textes_cours import ANIM_COURS  # noqa: E402  (animations tirées des cour
 TEXTES.update({k: _t(*v) for k, v in ANIM_COURS.items()})
 from .textes_cours2 import ANIM_COURS_2  # noqa: E402  (0.12.0 : diagramme a–e, survols, cratères, libration…)
 TEXTES.update({k: _t(*v) for k, v in ANIM_COURS_2.items()})
+from .textes_cours3 import ANIM_COURS_3  # noqa: E402  (0.12.0 : précession séculaire, phénomènes mutuels, traînées)
+TEXTES.update({k: _t(*v) for k, v in ANIM_COURS_3.items()})
 
 for _cle, _fr, _en in (('buenos_aires', 'Buenos Aires', 'Buenos Aires'), ('lima', 'Lima', 'Lima'),
                        ('casablanca', 'Casablanca', 'Casablanca'), ('monrovia', 'Monrovia', 'Monrovia'),

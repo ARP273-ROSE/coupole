@@ -287,6 +287,57 @@ ANIM_COURS = {
     'anim_meteorradiant_ciel_jour': ('jour', 'daylight'),
     # ================================================================ Interférences et interférométrie
     'anim_interferometry_instrument': ('Instrument', 'Instrument'),
+    'anim_interferometry_montage': ('Montage', 'Set-up'),
+    'anim_interferometry_montage_aide': ('Deux télescopes recombinés (interférométrie stellaire), ou les anneaux de '
+                                         'Newton : une lentille posée sur une lame de verre.',
+                                         'Two recombined telescopes (stellar interferometry), or Newton’s rings: a lens '
+                                         'resting on a glass plate.'),
+    'anim_interferometry_m_interferometre': ('interféromètre (deux télescopes)', 'interferometer (two telescopes)'),
+    'anim_interferometry_m_anneaux': ('anneaux de Newton', 'Newton’s rings'),
+    'anim_interferometry_rayon': ('Rayon de courbure de la lentille R', 'Radius of curvature of the lens R'),
+    'anim_interferometry_rayon_aide': ('Plus la lentille est plate (R grand), plus la lame d’air s’épaissit lentement '
+                                       'et plus les anneaux sont larges : r ∝ √R.',
+                                       'The flatter the lens (large R), the more slowly the air film thickens and the '
+                                       'wider the rings: r ∝ √R.'),
+    'anim_interferometry_indice': ('Indice de la lame n', 'Index of the film n'),
+    'anim_interferometry_indice_aide': ('1 pour de l’air, 1,33 pour de l’eau glissée entre la lentille et la lame : '
+                                        'la longueur d’onde y est n fois plus courte, les anneaux se resserrent.',
+                                        '1 for air, 1.33 for water slipped between lens and plate: the wavelength is '
+                                        'n times shorter there, the rings tighten.'),
+    'anim_interferometry_cote': ('Vu', 'Seen'),
+    'anim_interferometry_cote_aide': ('En réflexion (lumière renvoyée vers le haut : centre noir) ou en transmission '
+                                      '(lumière qui traverse : figure complémentaire, centre clair).',
+                                      'In reflection (light sent back up: dark centre) or in transmission (light going '
+                                      'through: complementary pattern, bright centre).'),
+    'anim_interferometry_c_reflexion': ('en réflexion', 'in reflection'),
+    'anim_interferometry_c_transmission': ('en transmission', 'in transmission'),
+    'anim_interferometry_blanche': ('Lumière blanche', 'White light'),
+    'anim_interferometry_blanche_aide': ('Chaque longueur d’onde donne ses anneaux : ils se mélangent en teintes de '
+                                         'Newton, puis en blanc loin du centre.',
+                                         'Each wavelength makes its own rings: they blend into Newton’s colours, then '
+                                         'into white far from the centre.'),
+    'anim_interferometry_t_anneaux': ('Les anneaux de Newton', 'Newton’s rings'),
+    'anim_interferometry_t_lame': ('Coupe : la lame d’air (courbure exagérée)', 'Cross-section: the air film (curvature '
+                                   'exaggerated)'),
+    'anim_interferometry_t_profil': ('Éclairement selon la distance au centre', 'Brightness versus distance from the '
+                                     'centre'),
+    'anim_interferometry_verre': ('lame de verre', 'glass plate'),
+    'anim_interferometry_legende_lame': ('e(r) = r²/2R ; retard 2ne + λ/2', 'e(r) = r²/2R; delay 2ne + λ/2'),
+    'anim_interferometry_axe_r': ('r (mm)', 'r (mm)'),
+    'anim_interferometry_mm': ('{x} mm', '{x} mm'),
+    'anim_interferometry_nm': ('{x} nm', '{x} nm'),
+    'anim_interferometry_trois': ('{a} ; {b} ; {c} mm', '{a}; {b}; {c} mm'),
+    'anim_interferometry_v_anneaux': ('Anneaux sombres r₁, r₂, r₃ = √(kλR/n)', 'Dark rings r₁, r₂, r₃ = √(kλR/n)'),
+    'anim_interferometry_v_ecart10': ('Écart du 9ᵉ au 10ᵉ anneau (ils se resserrent)', 'Gap from the 9th to the 10th '
+                                      'ring (they tighten)'),
+    'anim_interferometry_v_centre': ('Centre (lentille au contact)', 'Centre (lens in contact)'),
+    'anim_interferometry_centre_reflexion': ('noir : déphasage de π à la réflexion sur le verre', 'dark: phase shift '
+                                             'of π on reflection off the glass'),
+    'anim_interferometry_centre_transmission': ('clair', 'bright'),
+    'anim_interferometry_v_lame': ('Épaisseur de la lame au 1ᵉʳ anneau', 'Film thickness at the 1st ring'),
+    'anim_interferometry_v_blanche': ('En lumière blanche', 'In white light'),
+    'anim_interferometry_teintes': ('teintes de Newton près du centre, blanc au-delà', 'Newton’s colours near the '
+                                    'centre, white further out'),
     'anim_interferometry_instrument_aide': ('Choisir un instrument règle sa base et le diamètre de ses ouvertures ; '
                                             'on peut ensuite les changer à la main.',
                                             'Choosing an instrument sets its baseline and the diameter of its '
@@ -536,8 +587,19 @@ ANIM_COURS = {
     'anim_lagrange_s_soleil_jupiter': ('Soleil et Jupiter', 'Sun and Jupiter'),
     'anim_lagrange_s_pluton_charon': ('Pluton et Charon (μ > 0,0385)', 'Pluto and Charon (μ > 0.0385)'),
     'anim_lagrange_cas': ('Petit corps lâché', 'Small body released'),
-    'anim_lagrange_cas_aide': ('Où l’on lâche le petit corps, au repos (ou sur un cercle) dans le repère tournant.',
-                               'Where the small body is released, at rest (or on a circle) in the rotating frame.'),
+    'anim_lagrange_cas_aide': ('Où l’on lâche le petit corps, au repos (ou sur un cercle) dans le repère tournant ; '
+                               'ou sur une orbite de halo autour de L1 ou L2, en trois dimensions.',
+                               'Where the small body is released, at rest (or on a circle) in the rotating frame; or on '
+                               'a halo orbit around L1 or L2, in three dimensions.'),
+    'anim_lagrange_c_halo_l1': ('Orbite de halo autour de L1', 'Halo orbit around L1'),
+    'anim_lagrange_c_halo_l2': ('Orbite de halo autour de L2', 'Halo orbit around L2'),
+    'anim_lagrange_t_halo': ('L’orbite de halo vue du grand astre', 'The halo orbit seen from the large body'),
+    'anim_lagrange_legende_halo': ('pointillés : Richardson (3ᵉ ordre) ; jaune : trajectoire intégrée',
+                                   'dotted: Richardson (3rd order); yellow: integrated path'),
+    'anim_lagrange_v_halo': ('Orbite de halo : amplitudes Ax, Ay, Az ; période', 'Halo orbit: amplitudes Ax, Ay, Az; '
+                             'period'),
+    'anim_lagrange_halo': ('{ax} km, {ay} km, {az} km ; {j} jours', '{ax} km, {ay} km, {az} km; {j} days'),
+    'anim_lagrange_v_ecart': ('Écart du corps à l’orbite de Richardson', 'Distance of the body from Richardson’s orbit'),
     'anim_lagrange_c_tetard': ('Près de L4 : un « têtard »', 'Near L4: a “tadpole”'),
     'anim_lagrange_c_fer_a_cheval': ('En face du petit astre : un « fer à cheval »',
                                      'Opposite the small body: a “horseshoe”'),
@@ -546,9 +608,13 @@ ANIM_COURS = {
     'anim_lagrange_c_l3': ('Juste à côté de L3', 'Right next to L3'),
     'anim_lagrange_delta': ('Écart au départ δ', 'Initial offset δ'),
     'anim_lagrange_delta_aide': ('Écart au point de départ, en unités de la distance a des deux astres (L1, L2, '
-                                 'L3 : δ/100). Plus il est grand, plus la boucle est large.',
+                                 'L3 : δ/100). Plus il est grand, plus la boucle est large. Orbite de halo : δ est '
+                                 'l’amplitude hors du plan Az (en a, bornée à 0,4 fois la distance du point au petit '
+                                 'astre ; son signe choisit la famille nord ou sud).',
                                  'Offset from the starting point, in units of the distance a between the two bodies '
-                                 '(L1, L2, L3: δ/100). The larger it is, the wider the loop.'),
+                                 '(L1, L2, L3: δ/100). The larger it is, the wider the loop. Halo orbit: δ is the '
+                                 'out-of-plane amplitude Az (in a, capped at 0.4 times the distance from the point to '
+                                 'the small body; its sign picks the northern or southern family).'),
     'anim_lagrange_interdit': ('Zones interdites', 'Forbidden regions'),
     'anim_lagrange_interdit_aide': ('En gris, là où 2Ω < C : le petit corps n’a pas l’énergie d’y aller '
                                     '(courbes de vitesse nulle).',

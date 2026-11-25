@@ -1886,8 +1886,8 @@
   ]
  },
  "reel": {
-  "documents": 841,
-  "vocabulaire": 5783,
+  "documents": 844,
+  "vocabulaire": 5841,
   "requetes": [
    [
     "seasons",
@@ -6234,6 +6234,15 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "interferometry",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "dark"
+      ]
+     },
+     {
       "g": "question",
       "id": "ca_binaryvariablestars_lightCurveShape",
       "n": 1,
@@ -6254,15 +6263,6 @@
      {
       "g": "question",
       "id": "ca_stellarprops2_lumfuncnumvisible",
-      "n": 1,
-      "score": 10,
-      "mots": [
-       "dark"
-      ]
-     },
-     {
-      "g": "question",
-      "id": "ca_sunsolarenergy_sunspotcause",
       "n": 1,
       "score": 10,
       "mots": [
@@ -7292,6 +7292,16 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "interferometry",
+      "n": 2,
+      "score": 15,
+      "mots": [
+       "etoile",
+       "newton"
+      ]
+     },
+     {
       "g": "image",
       "id": "spectralclassification",
       "n": 2,
@@ -7301,15 +7311,6 @@
        "neutral",
        "neutre",
        "neutres"
-      ]
-     },
-     {
-      "g": "module",
-      "id": "stellarevolution",
-      "n": 1,
-      "score": 32,
-      "mots": [
-       "etoiles"
       ]
      }
     ]
@@ -7994,6 +7995,16 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "secularprecession",
+      "n": 2,
+      "score": 17,
+      "mots": [
+       "effet",
+       "terre"
+      ]
+     },
+     {
       "g": "question",
       "id": "ca_lunarcycles_futuretides",
       "n": 2,
@@ -8035,15 +8046,6 @@
      {
       "g": "animation",
       "id": "dopplershift",
-      "n": 1,
-      "score": 31,
-      "mots": [
-       "effet"
-      ]
-     },
-     {
-      "g": "question",
-      "id": "ca_light_dopplershift",
       "n": 1,
       "score": 31,
       "mots": [
@@ -9122,21 +9124,22 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "secularprecession",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "orbit",
+       "orbite",
+       "orbites"
+      ]
+     },
+     {
       "g": "question",
       "id": "ca_coordsmotion_earthchanges",
       "n": 1,
       "score": 37,
       "mots": [
-       "orbite"
-      ]
-     },
-     {
-      "g": "question",
-      "id": "ca_lunarcycles_moonplane",
-      "n": 1,
-      "score": 37,
-      "mots": [
-       "orbit",
        "orbite"
       ]
      }

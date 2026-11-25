@@ -1663,3 +1663,33 @@ Même méthode que les 0.10.0 et 0.11.0 (noyau sans Qt jumeau du web, vérificat
   temporaire, sinon les réglages mémorisés faussent l'image.
 - Reste (inventaire privé) : précession séculaire d'une orbite (#51), phénomènes mutuels, traînées de météoroïdes,
   NAAP des cours à venir.
+
+## 25/11/2026 (soir) — animations de cours P11 à P13 (115 animations ; dans l'entrée 0.12.0, non publiée)
+Même méthode (noyau sans Qt jumeau du web, vérification SageMath, tests, textes FR/EN dans `anim/textes_cours3.py`,
+manuels FR/EN § « Animations de cours de la 0.12.0 ») :
+- [x] **Précession séculaire d'une orbite** (`secularprecession`, Petits corps) : `anim/seculaire.py` (Laplace-Lagrange,
+  particule test, planètes géantes circulaires coplanaires : ϖ̇ = A, Ω̇ = −A ; coefficients de Laplace par trapèzes
+  N = 256 ; nœuds, croisements, MOID par 360 points + section dorée). Sage : `seculaire_verif.sage` (série
+  hypergéométrique, MOID par minimisation à deux variables, intégration directe Soleil-Jupiter : pentes de ϖ et Ω à
+  0,06 % et 0,13 % de A).
+- [x] **Phénomènes mutuels des satellites galiléens** (`mutualevents`, Système solaire) : `anim/mutuels.py` (aire commune
+  de deux disques ; éclipse = intégrale radiale en s, arcs de cercle, Simpson en θ avec s = u + (v − u)(1 − cos θ)/2,
+  N = 32, sinon les racines carrées aux bornes ne convergent qu'en h^1,5). Sage : `mutuels_verif.sage` (dblquad,
+  contacts par find_root). Notation « 2 O 1 » avec espaces fines insécables : « 2E1 » enfreint la règle typographique
+  (chiffre-E-chiffre lu comme une puissance de dix).
+- [x] **Traînées de météoroïdes** (`meteoroidtrails`, Petits corps) : `anim/trainees.py` (grains de Park et Miller,
+  β de Burns, Lamy et Soter, Kepler 3D, Terre képlérienne de Standish, diagramme (Δt, Δr), activité par année, filet
+  0,01 ua × 10 j). Sage : `trainees_verif.sage` (DOP853 sur plusieurs révolutions, nœuds par événements).
+- [x] Modules (ANIMATIONS_AJOUTEES : solarsystemdebris, solar), recherche, comptes 115, manifeste, README, NOTICE,
+  CHANGELOG FR/EN, manuels (sections, captures, PDF recompilés).
+- [x] **P14 — orbites de halo** dans `lagrange` (cas `halo_l1`, `halo_l2` ; δ = Az en a, borné à 0,4 γ) : classe
+  `lagrange.Halo` (Richardson 1980, 3ᵉ ordre ; repère X = x_L + γx vérifié : seule cette orientation converge par
+  correction différentielle), intégrateur 3D (`pas_rk4_3`, `jacobi_etat`), panneau « vue du grand astre » (y–z),
+  valeurs Ax, Ay, Az, période, écart à l'orbite de Richardson. Sage : `halo_verif.sage` (correction différentielle,
+  Newton sur x0 et vy0). Piège : sans correction, l'état de Richardson intégré sur une période s'écarte de plusieurs
+  Az (monodromie ≈ 10³) : on ne vérifie pas par « retour au départ ».
+- [x] **P15 — anneaux de Newton** dans `interferometry` (choix « montage » ; réglages R, n, réflexion/transmission,
+  lumière blanche ; réglages des anneaux masqués pour l'interféromètre, ceux de l'interféromètre grisés pour les anneaux : masquer douze réglages coûtait > 100 ms dans un panneau déjà bien utilisé, passe finale) : `interferometrie.newton`, `rayon_sombre`,
+  `couleur_blanche`. Sage : `newton_verif.sage`.
+- [x] NOTICE, CHANGELOG, descriptions du catalogue, manuels (captures `anim_lagrange_halo_*`, `anim_newton_*`).
+

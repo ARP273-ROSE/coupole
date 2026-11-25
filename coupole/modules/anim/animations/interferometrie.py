@@ -2,6 +2,7 @@
 donnent des franges d'interfrange λ / B, comme les fentes d'Young.  Leur contraste (la visibilité) baisse quand la
 source est résolue : disque d'une étoile (premier zéro à B = 1,22 λ / θ, la mesure de Bételgeuse par Michelson et
 Pease), couple serré.  Un interféromètre résout ainsi λ / B, bien plus fin que le 1,22 λ / d d'un télescope seul.
+Second montage : les anneaux de Newton (lame d'air entre une lentille et une lame de verre).
 Calculs : ``interferometrie.py``."""
 from __future__ import annotations
 
@@ -14,6 +15,7 @@ from ....core.i18n import tr
 from .. import dessin, interferometrie as itf
 from ..base import Animation, nombre
 from ..graphe import Axes
+from ..lumiere import couleur_longueur_onde
 from .resolution import angle_sec
 
 B_MIN, B_MAX = 0.0001, 1000.0          # bornes du curseur de base (m)
@@ -36,6 +38,8 @@ class Interferometrie(Animation):
     ID = 'interferometry'
 
     def construire(self):
+        self.montage = self.choix('montage', [('anim_interferometry_m_interferometre', 'interferometre'),
+                                              ('anim_interferometry_m_anneaux', 'anneaux')], 'interferometre')
         self.instrument = self.choix('instrument', [('anim_interferometry_i_libre', 'libre')] +
                                      [('anim_interferometry_i_' + k, k) for k, _, _ in itf.INSTRUMENTS], 'vlti_ut')
         self.base = self.curseur('base', B_MIN, B_MAX, 130.0, dec=4, unite='m', log=True)
@@ -46,9 +50,34 @@ class Interferometrie(Animation):
         self.dmag = self.curseur('dmag', 0.0, 5.0, 0.0, dec=1)
         self.c_balayer = self.coche('balayer', False)
         self.c_enveloppe = self.coche('enveloppe', True)
+        self.rayon = self.curseur('rayon', 0.1, 20.0, 1.0, dec=2, unite='m', log=True)
+        self.indice = self.curseur('indice', 1.0, 1.7, 1.0, dec=2)
+        self.cote = self.choix('cote', [('anim_interferometry_c_reflexion', 'reflexion'),
+                                        ('anim_interferometry_c_transmission', 'transmission')], 'reflexion')
+        self.c_blanche = self.coche('blanche', False)
         self._instrument = self.instrument.currentData()
         self._objet = self.objet.currentData()
+        self._blanc = None
         self.t = 0.0
+        self.montage.currentIndexChanged.connect(self._reglages_utiles)
+        self._reglages_utiles()
+
+    def anneaux(self) -> bool:
+        return self.montage.currentData() == 'anneaux'
+
+    def _reglages_utiles(self, *_):
+        """Chaque montage n'active que ses réglages (la longueur d'onde sert aux deux)."""
+        a = self.anneaux()
+        if getattr(self, '_montre', None) == a:
+            return
+        self._montre = a
+        # réglages des anneaux masqués pour l'interféromètre ; ceux de l'interféromètre seulement grisés pour les
+        # anneaux (masquer coûte une mise en page par réglage : trop lent pour douze)
+        for w in (self.instrument, self.base, self.diametre, self.objet, self.taille, self.dmag, self.c_balayer,
+                  self.c_enveloppe):
+            w.setEnabled(not a)
+        for w in (self.rayon, self.indice, self.cote._boite, self.c_blanche):
+            w.setVisible(a)
 
     def reglage_change(self):
         k = self.instrument.currentData()
@@ -87,12 +116,14 @@ class Interferometrie(Animation):
 
     def avancer(self, dt):
         self.t += dt
-        if self.c_balayer.isChecked():
+        if self.c_balayer.isChecked() and not self.anneaux():
             b0, b1 = self.axe_bases()
             b = self.base.value() * 10 ** (0.12 * dt)
             self.base.setValue(b0 if b > b1 else b)
 
     def valeurs(self):
+        if self.anneaux():
+            return self._valeurs_anneaux()
         b, d, lam = self.base.value(), self.diametre.value(), self.lam.value()
         g, t = self.genre(), self.taille.value()
         v = self.v()
@@ -116,8 +147,28 @@ class Interferometrie(Animation):
             out.append((tr('anim_interferometry_v_ecran'), '%s mm' % nombre(lam * 1e-6 / b, 2)))
         return out
 
+    def _valeurs_anneaux(self):
+        R, lam, n, cote = self.rayon.value(), self.lam.value(), self.indice.value(), self.cote.currentData()
+        rs = [itf.rayon_sombre(k, R, lam, n, cote) for k in (1, 2, 3)]
+        out = [(tr('anim_interferometry_v_anneaux'), tr('anim_interferometry_trois', a=nombre(rs[0], 3),
+                                                        b=nombre(rs[1], 3), c=nombre(rs[2], 3))),
+               (tr('anim_interferometry_v_ecart10'), tr('anim_interferometry_mm', x=nombre(
+                   itf.rayon_sombre(10, R, lam, n, cote) - itf.rayon_sombre(9, R, lam, n, cote), 3))),
+               (tr('anim_interferometry_v_centre'), tr('anim_interferometry_centre_' + cote)),
+               (tr('anim_interferometry_v_lame'), tr('anim_interferometry_nm', x=nombre(
+                   itf.epaisseur_nm(rs[0], R), 0)))]
+        if self.c_blanche.isChecked():
+            out.append((tr('anim_interferometry_v_blanche'), tr('anim_interferometry_teintes')))
+        return out
+
     # ------------------------------------------------------------ dessin
     def dessiner(self, p, rect):
+        if self.anneaux():
+            z = dessin.zones_principale(rect, 2, 0.5)
+            self._anneaux(p, dessin.cadre(p, z[0], tr('anim_interferometry_t_anneaux')))
+            self._lame(p, dessin.cadre(p, z[1], tr('anim_interferometry_t_lame')))
+            self._profil(p, dessin.cadre(p, z[2], tr('anim_interferometry_t_profil')))
+            return
         z = dessin.zones_principale(rect, 2, 0.46)
         self._schema(p, dessin.cadre(p, z[0], tr('anim_interferometry_t_schema')))
         self._franges(p, dessin.cadre(p, z[1], tr('anim_interferometry_t_franges')))
@@ -246,3 +297,94 @@ class Interferometrie(Animation):
         else:
             dessin.texte(p, ax.r.right() - 18 if b > b1 else ax.r.left() + 18, ax.r.top() + 10,
                          ('B →' if b > b1 else '← B'), 'accent3', fond=True)
+
+    # ------------------------------------------------------------ anneaux de Newton
+    N_BANDES = 160
+
+    def _r_max(self) -> float:
+        return itf.rayon_sombre(itf.N_ANNEAUX, self.rayon.value(), self.lam.value(), self.indice.value()) * 1.04
+
+    def _couleurs(self):
+        """Couleur de chaque bande radiale (du centre au bord)."""
+        R, lam, n, cote = self.rayon.value(), self.lam.value(), self.indice.value(), self.cote.currentData()
+        rmax = self._r_max()
+        blanche = self.c_blanche.isChecked()
+        cle = (R, lam, n, cote, blanche)
+        if self._blanc is not None and self._blanc[0] == cle:
+            return rmax, self._blanc[1]
+        out = []
+        base = couleur_longueur_onde(lam)
+        for j in range(self.N_BANDES):
+            r = rmax * (j + 0.5) / self.N_BANDES
+            if blanche:
+                out.append(itf.couleur_blanche(r, R, n, cote))
+            else:
+                i = itf.newton(r, R, lam, n, cote)
+                out.append(tuple(int(round(c * i)) for c in base))
+        self._blanc = (cle, out)
+        return rmax, out
+
+    def _anneaux(self, p, r):
+        rmax, cols = self._couleurs()
+        cx, cy = r.center().x(), r.center().y() + 6
+        Rp = 0.46 * min(r.width(), r.height() - 24)
+        p.save()
+        p.setPen(dessin.Qt.PenStyle.NoPen)
+        n = len(cols)
+        for j in range(n - 1, -1, -1):
+            p.setBrush(QColor(*cols[j]))
+            rr = Rp * (j + 1) / n
+            p.drawEllipse(QPointF(cx, cy), rr, rr)
+        p.restore()
+        # échelle : 1 mm
+        mm = Rp / rmax
+        y0 = r.bottom() - 14
+        if mm < r.width() * 0.8:
+            p.setPen(dessin.stylo('texte', 1.6))
+            p.drawLine(QPointF(r.left() + 12, y0), QPointF(r.left() + 12 + mm, y0))
+            dessin.texte(p, r.left() + 12 + mm / 2, y0 - 9, tr('anim_interferometry_mm', x='1'), 'texte',
+                         fond=True)
+
+    def _lame(self, p, r):
+        """Coupe (courbure très exagérée) : lentille plan-convexe sur une lame, lame d'air, rayons réfléchis."""
+        w, h = r.width(), r.height()
+        x0, x1 = r.left() + 0.08 * w, r.right() - 0.08 * w
+        xc = (x0 + x1) / 2.0
+        ybas = r.top() + 0.66 * h                      # dessus de la lame de verre
+        R_ecran = 1.6 * (x1 - x0)                      # rayon de courbure dessiné (exagéré)
+        p.save()
+        p.setPen(dessin.stylo('grille', 1.2))
+        p.setBrush(dessin.c('equateur', 0.25))
+        p.drawRect(QRectF(x0, ybas, x1 - x0, 0.14 * h))
+        pts_x, pts_y = [], []
+        m = 60
+        for j in range(m + 1):
+            x = x0 + (x1 - x0) * j / m
+            pts_x.append(x)
+            pts_y.append(ybas - (R_ecran - math.sqrt(R_ecran ** 2 - (x - xc) ** 2)))
+        ytop = min(pts_y) - 0.22 * h
+        poly_x = pts_x + [x1, x0]
+        poly_y = pts_y + [ytop, ytop]
+        p.drawPolygon(dessin.polygone(poly_x, poly_y))
+        # rayons : un incident, deux réfléchis (sur le dessous de la lentille et sur la lame)
+        for k, f in enumerate((0.22, 0.38)):
+            x = xc + f * (x1 - xc)
+            e = R_ecran - math.sqrt(R_ecran ** 2 - (x - xc) ** 2)
+            p.setPen(dessin.stylo('accent1', 1.4))
+            dessin.fleche(p, x, r.top() + 22, x, ybas - e - 1, dessin.stylo('accent1', 1.4), 5)
+            dessin.fleche(p, x, ybas - e, x - 6, r.top() + 26, dessin.stylo('accent2', 1.2, 0.9), 5)
+            dessin.fleche(p, x + 3, ybas, x + 9, r.top() + 26, dessin.stylo('accent3', 1.2, 0.9), 5)
+        p.restore()
+        dessin.texte(p, xc, ybas + 0.07 * h, tr('anim_interferometry_verre'), 'doux')
+        dessin.texte(p, r.left() + 6, r.bottom() - 10, tr('anim_interferometry_legende_lame'), 'doux', centre=False,
+                     fond=True)
+
+    def _profil(self, p, r):
+        R, lam, n, cote = self.rayon.value(), self.lam.value(), self.indice.value(), self.cote.currentData()
+        rmax = self._r_max()
+        ax = Axes(r, 0.0, rmax, 0.0, 1.08, marges=(40, 6, 8, 30)).avec(p)
+        ax.fond(p, tr('anim_interferometry_axe_r'), tr('anim_interferometry_axe_i'))
+        pts = [(rmax * j / 400.0, itf.newton(rmax * j / 400.0, R, lam, n, cote)) for j in range(401)]
+        ax.courbe(pts, 'accent1', 1.6)
+        for k in range(1, 4):
+            ax.verticale(itf.rayon_sombre(k, R, lam, n, cote), 'accent3', 1.0, True, 'r%s' % '₁₂₃'[k - 1])

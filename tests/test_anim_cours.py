@@ -852,3 +852,240 @@ def test_roche_dislocation(app_qt):
         a.pas(0.25)
     assert a.debris is None                             # Phobos, rigide, tient à 2,76 R
     assert not a.image(900, 560).isNull()
+
+
+# ---------------------------------------------------------------- précession séculaire d'une orbite (0.12.0)
+def test_seculaire_contre_sage():
+    from coupole.modules.anim import seculaire as sc
+    s = sage('seculaire')
+    for al, b1, b2 in s['laplace']:
+        assert sc.laplace_b(1.5, 1, al) == pytest.approx(b1, rel=1e-9)
+        assert sc.laplace_b(1.5, 2, al) == pytest.approx(b2, rel=1e-9)
+    for k, a, e, i, o, w in sc.OBJETS:
+        ref = s['objets'][k]
+        A = sc.frequence(a)
+        assert A == pytest.approx(ref['A'], rel=1e-9), k
+        assert A * sc.SEC_PAR_RAD == pytest.approx(ref['A_arcsec_an'], rel=1e-9)
+        assert sc.frequence_quadrupole(a) == pytest.approx(ref['quadrupole'], rel=1e-9)
+        assert sc.noeuds(a, e, w) == pytest.approx((ref['r_asc'], ref['r_desc']), rel=1e-9)
+        c = sc.croisements(a, e, w, A, 0.0, 2.0 * math.pi / A)
+        assert [g for _, g in c] == [g for _, g in ref['croisements']], k
+        assert [t for t, _ in c] == pytest.approx([t for t, _ in ref['croisements']], abs=1e-3)
+        assert sc.moid(a, e, i, w) == pytest.approx(ref['moid'], abs=1e-7), k
+        for ww, m in ref['moid_w']:
+            assert sc.moid(a, e, i, ww) == pytest.approx(m, abs=1e-7), (k, ww)
+    # théorie contre intégration directe (Soleil + Jupiter circulaire, 3 000 ans) : à 0,2 % près
+    it = s['integration']
+    A_j = sc.moyen_mouvement(it['a']) / 4.0 * sc.terme(it['a'], 5.2029, 1047.348_644)
+    assert A_j == pytest.approx(it['A_jupiter'], rel=1e-9)
+    assert it['pente_varpi'] == pytest.approx(A_j, rel=2e-3)
+    assert -it['pente_omega'] == pytest.approx(A_j, rel=2e-3)
+
+
+def test_seculaire_interface(app_qt):
+    from coupole.modules.anim.animations.seculaire import Seculaire
+    a = Seculaire()
+    a.resize(1000, 700)
+    v = dict(a.valeurs())
+    assert v['Date'] == 'an 2026'
+    assert v['Précession A = (n/4) Σ (m/M☉) α² b(α)'] == '14,34″ par an'
+    assert v['Prochain croisement'] == 'an 22494 (nœud ascendant)'
+    a.suivant()
+    assert a.t == pytest.approx(20467.80114, abs=1e-3)
+    assert float(dict(a.valeurs())['Distance minimale à l’orbite terrestre (MOID)'].split()[0].replace(',', '.')) < 1e-3
+    a.objet.setCurrentIndex(a.objet.findData('phaethon'))
+    assert a.a.value() == pytest.approx(1.27) and a.t == 0.0
+    assert dict(a.valeurs())['Prochain croisement'] == 'an 2641 (nœud descendant)'
+    a.e.setValue(0.1)
+    assert dict(a.valeurs())['Prochain croisement'].startswith('jamais')
+    assert not a.image(900, 560).isNull()
+
+
+# ---------------------------------------------------------------- phénomènes mutuels des satellites galiléens (0.12.0)
+def test_mutuels_contre_sage():
+    from coupole.modules.anim import mutuels as mu
+    s = sage('mutuels')
+    for d, r1, r2, aire in s['lentilles']:
+        assert mu.aire_commune(d, r1, r2) == pytest.approx(aire, rel=1e-9)
+    for r in s['rencontres']:
+        R = mu.Rencontre(*r['cas'])
+        tol = 1e-9 if r['cas'][2] == 'occultation' else 1e-6
+        for t, f in r['flux']:
+            assert R.flux(t) == pytest.approx(f, abs=tol), (r['cas'], t)
+        # durée tracée (flux < 1) contre premier et dernier contacts autour de 0 (pas de la courbe : 2T/240)
+        ct = [x for x in r['contacts'] if abs(x) < R.demi_fenetre()]
+        fmin, _, duree = mu.resume(R.courbe())
+        if len(ct) == 2:
+            assert duree == pytest.approx(ct[1] - ct[0], abs=4.0 * R.demi_fenetre() / 240.0), r["cas"]   # un pas à chaque bout
+
+
+def test_mutuels_cas_limites():
+    from coupole.modules.anim import mutuels as mu
+    assert mu.aire_commune(0.0, 2.0, 1.0) == pytest.approx(math.pi)
+    assert mu.aire_commune(3.0, 2.0, 1.0) == 0.0
+    # occultation totale d'Europe par Io (Io plus grand) : il ne reste que l'éclat d'Io
+    R = mu.Rencontre('io', 'europe', 'occultation', 0.0, 0.0, 0.5)
+    fio, feu = mu.flux_propre('io'), mu.flux_propre('europe')
+    assert mu.resume(R.courbe())[0] == pytest.approx(fio / (fio + feu), rel=1e-12)
+    # B trop grand : rien
+    R = mu.Rencontre('europe', 'io', 'occultation', 1.0, 0.0, 0.5)
+    assert R.b_limite() < 1.0 and mu.resume(R.courbe())[2] == 0.0
+
+
+def test_mutuels_interface(app_qt):
+    from coupole.modules.anim.animations.mutuels import Mutuels
+    a = Mutuels()
+    a.resize(1000, 700)
+    v = dict(a.valeurs())
+    assert v['Phénomène'] == '2\u202fO\u202f1 : Europe occulte Io'
+    assert v['Baisse d’éclat maximale'] == '38,7 % (Δm = 0,53)'
+    a.genre.setCurrentIndex(a.genre.findData('eclipse'))
+    assert dict(a.valeurs())['Phénomène'] == '2\u202fE\u202f1 : Europe éclipse Io'
+    a.passif.setCurrentIndex(a.passif.findData('europe'))           # même satellite : on prend le suivant
+    assert a.paire() == ('europe', 'ganymede')
+    for _ in range(5):
+        a.pas(0.5)
+    assert not a.image(900, 560).isNull()
+
+
+# ---------------------------------------------------------------- traînées de météoroïdes (0.12.0)
+def test_trainees_contre_sage():
+    from coupole.modules.anim import trainees as tn
+    s = sage('trainees')
+    for k, r in tn.TAILLES:
+        assert tn.beta(r) == pytest.approx(s['beta'][k], rel=1e-9)
+    for lam, an, t in s['terre']:
+        assert tn.date_terre(lam, an) == pytest.approx(t, abs=1e-8)
+    for cas in s['grains']:
+        orb = tn.orbite_comete(cas['comete'])
+        P = orb.periode()
+        tk = orb.t0 + round((cas['tk'] - orb.t0) / P) * P
+        assert tk == pytest.approx(cas['tk'], abs=1e-7)
+        grains = tn.ejecter(orb, tk, cas['dv'], cas['beta'], n=3, graine=cas['graine'])
+        genre = tn.noeud_terrestre(orb)
+        for o, ref in zip(grains, cas['grains']):
+            r, lam, mn = tn.noeud(o, genre)
+            tau0 = tk + ((mn - o.m0) % (2.0 * math.pi)) / o.n
+            for j, (t_ref, r_ref) in enumerate(ref['noeuds']):
+                assert tau0 + j * o.periode() == pytest.approx(t_ref, abs=2e-7), (cas['comete'], j)
+                assert r == pytest.approx(r_ref, abs=1e-8)
+            for t, x, y, z in ref['positions']:
+                assert o.position(t) == pytest.approx((x, y, z), abs=2e-7)
+
+
+def test_trainees_essaim():
+    from coupole.modules.anim import trainees as tn
+    # comète fictive : son nœud descendant est exactement sur l'orbite terrestre
+    orb = tn.orbite_comete('fictive')
+    r, lam, _ = tn.noeud(orb, 'desc')
+    assert r == pytest.approx(tn.r_terre(lam), abs=1e-12)
+    # les Léonides : nœud descendant, 17 novembre, la comète passe 0,0082 ua à l'intérieur
+    orb = tn.orbite_comete('tempel_tuttle')
+    assert tn.noeud_terrestre(orb) == 'desc'
+    r, lam, _ = tn.noeud(orb, 'desc')
+    assert r - tn.r_terre(lam) == pytest.approx(-0.00819, abs=1e-5)
+    assert tn.date_terre(lam, 1999) == pytest.approx(1999.8784, abs=1e-4)
+    a0, a1 = tn.fenetre('fictive')
+    E = tn.Essaim('fictive', 10.0, 'mm', a0, a1)
+    assert len(E.ejections) == 10 and all(len(g) == tn.N_GRAINS for _, g, _ in E.traines)
+    act = E.activite(a0, a1)
+    meilleures = sorted(act, key=lambda y: -act[y])[:6]
+    # l'activité se concentre dans les années qui suivent un retour de la comète
+    assert all(min(abs(y - tk) for tk in E.ejections) < 6.0 for y in meilleures)
+    assert sum(act.values()) > 100
+
+
+def test_trainees_interface(app_qt):
+    from coupole.modules.anim.animations.trainees import Trainees
+    a = Trainees()
+    a.resize(1000, 700)
+    v = dict(a.valeurs())
+    assert v['Essaim'] == 'Léonides (55P/Tempel-Tuttle)'
+    assert v['Nœud de la comète, écart à l’orbite terrestre'] == '0,9804 ua (Δr = −0,0082 ua)'
+    assert v['La Terre au nœud'] in ('16 novembre', '17 novembre')
+    assert v['Année la plus riche'] == '1865 (26 grains)'
+    a.t = 1999.5
+    v = dict(a.valeurs())
+    assert v['Traînées lâchées'] == '8' and int(v['Grains rencontrés cette année (|Δr| < 0,01 ua, |Δt| < 10 j)']) > 10
+    a.comete.setCurrentIndex(a.comete.findData('swift_tuttle'))
+    assert dict(a.valeurs())['La Terre au nœud'] in ('11 août', '12 août')
+    a.cadrage.setCurrentIndex(a.cadrage.findData('orbite'))
+    for _ in range(5):
+        a.pas(0.5)
+    assert not a.image(900, 560).isNull()
+
+
+# ---------------------------------------------------------------- orbites de halo (points de Lagrange, 0.12.0)
+def test_halo_richardson_contre_sage():
+    from coupole.modules.anim import lagrange as lg
+    s = sage('halo')
+    mus = {k: m for k, m, _ in lg.SYSTEMES}
+    for c in s['cas']:
+        mu = mus[c['systeme']]
+        h = lg.halo(mu, c['point'], c['delta'])
+        assert h.gamma == pytest.approx(c['gamma'], rel=1e-10)
+        assert (h.Ax, h.Az) == pytest.approx((c['Ax'], c['Az']), rel=1e-9)
+        assert h.periode() == pytest.approx(c['periode'], rel=1e-10)
+        e = h.etat(0.0)
+        assert e == pytest.approx(c['richardson'], abs=1e-12)
+        # vraie orbite périodique (correction différentielle sous SageMath) : Richardson en est proche
+        g, amp = c['gamma'], max(c['Ax'], c['Az']) * c['gamma']
+        assert abs(c['corrige'][0] - e[0]) < 0.07 * amp, c
+        assert c['corrige'][4] == pytest.approx(e[4], rel=0.05)
+        assert c['demi_periode_corrigee'] == pytest.approx(h.periode() / 2.0, rel=3e-3)
+        assert lg.depart(mu, 'halo_' + c['point'].lower(), c['delta']) == pytest.approx(e, abs=1e-15)
+
+
+def test_halo_interface(app_qt):
+    from coupole.modules.anim.animations.lagrange import Lagrange
+    a = Lagrange()
+    a.resize(1000, 700)
+    a.systeme.setCurrentIndex(a.systeme.findData('soleil_terre'))
+    a.cas.setCurrentIndex(a.cas.findData('halo_l1'))
+    assert a.delta.value() == pytest.approx(0.01) and len(a.s) == 6
+    v = dict(a.valeurs())
+    assert v['Orbite de halo : amplitudes Ax, Ay, Az ; période'].endswith('176,8 jours')
+    assert v['Écart du corps à l’orbite de Richardson'] == '0 km'
+    a.pas(0.05)
+    assert float(dict(a.valeurs())['Écart du corps à l’orbite de Richardson'].split()[0].replace(' ', '')
+                 .replace(' ', '')) < 1000.0
+    assert not a.image(900, 560).isNull()
+    a.cas.setCurrentIndex(a.cas.findData('tetard'))
+    assert len(a.s) == 4 and 'Orbite de halo : amplitudes Ax, Ay, Az ; période' not in dict(a.valeurs())
+
+
+# ---------------------------------------------------------------- anneaux de Newton (interférométrie, 0.12.0)
+def test_newton_contre_sage():
+    from coupole.modules.anim import interferometrie as itf
+    s = sage('newton')
+    for R, lam, n, cote, k, r_mince, r_exact in s['rayons']:
+        r = itf.rayon_sombre(k, R, lam, n, cote)
+        assert r == pytest.approx(r_mince, rel=1e-12)
+        assert r == pytest.approx(r_exact, rel=2e-4)                   # lame mince : e ≈ r²/2R
+        assert itf.newton(r, R, lam, n, cote) == pytest.approx(0.0, abs=1e-12)
+    for n, ph, fresnel, modele, contraste in s['fresnel']:
+        assert fresnel == pytest.approx(modele, abs=1e-12) and contraste < 1e-3
+        e = ph * 589.0 / (4.0 * math.pi * n)
+        assert itf.newton_e(e, 589.0, n, 'reflexion') == pytest.approx(modele, abs=1e-12)
+    for R, lam, n, r_mm, I in s['eclairement']:
+        assert itf.newton(r_mm, R, lam, n) == pytest.approx(I, abs=0.04)    # e exact contre r²/2R
+
+
+def test_newton_interface(app_qt):
+    from coupole.modules.anim.animations.interferometrie import Interferometrie
+    a = Interferometrie()
+    a.resize(1000, 700)
+    assert not a.rayon.isVisible() or a.rayon.isHidden()
+    a.montage.setCurrentIndex(a.montage.findData('anneaux'))
+    a.lam.setValue(589.0)
+    v = dict(a.valeurs())
+    assert v['Anneaux sombres r₁, r₂, r₃ = √(kλR/n)'] == '0,767 ; 1,085 ; 1,329 mm'
+    assert v['Épaisseur de la lame au 1ᵉʳ anneau'] == '294 nm'
+    a.indice.setValue(1.33)
+    assert dict(a.valeurs())['Anneaux sombres r₁, r₂, r₃ = √(kλR/n)'].startswith('0,665')
+    a.c_blanche.setChecked(True)
+    a.cote.setCurrentIndex(a.cote.findData('transmission'))
+    assert dict(a.valeurs())['Centre (lentille au contact)'] == 'clair'
+    assert not a.image(900, 560).isNull()
+    a.montage.setCurrentIndex(a.montage.findData('interferometre'))
+    assert 'Interfrange λ / B' in ' '.join(k for k, _ in a.valeurs()) or len(a.valeurs()) > 4

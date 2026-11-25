@@ -188,6 +188,27 @@ survols_impacts_verif.sage) / own code, drawings and texts; formulas and values 
     satellite fluide (É. Roche, 1849), allongement d'équilibre d'un corps fluide homogène (nombre de Love h₂ = 5/2) ;
     densités : Terre 5 514, Lune 3 344, Mars 3 933, Phobos 1 876, Jupiter 1 326, Saturne 687 kg·m⁻³ (NASA, fiches
     planétaires), glace 920 et noyau de comète ≈ 500 kg·m⁻³ (valeurs typiques).
+  - précession séculaire d'une orbite (coupole/modules/anim/seculaire.py, animations/seculaire.py ;
+    seculaire_verif.sage) : théorie séculaire linéaire de Laplace-Lagrange pour une particule test (C. D. Murray et
+    S. F. Dermott, Solar System Dynamics, 1999, chapitre 7) ; demi-grands axes des planètes géantes (éléments moyens
+    J2000 de E. M. Standish, JPL) et rapports de masses (UAI 2009) ; éléments de (1862) Apollo, (1566) Icare,
+    (3200) Phaéton, (2101) Adonis et (4179) Toutatis : base SBDB du JPL (époque 2026, arrondis) ; seuil de 0,05 ua des
+    astéroïdes potentiellement dangereux (CNEOS).
+  - phénomènes mutuels des satellites galiléens (coupole/modules/anim/mutuels.py, animations/mutuels.py ;
+    mutuels_verif.sage) : demi-grands axes, rayons, périodes et albédos géométriques d'Io, Europe, Ganymède et
+    Callisto (NASA, fiches des satellites de Jupiter) ; rayon solaire nominal 695 700 km (UAI 2015) ; géométrie
+    simplifiée (orbites circulaires coplanaires, disques uniformes) ; notation des phénomènes (« 2O1 », « 1E2 ») de
+    l'usage des campagnes d'observation.
+  - traînées de météoroïdes (coupole/modules/anim/trainees.py, animations/trainees.py ; trainees_verif.sage) :
+    éléments de 55P/Tempel-Tuttle et 109P/Swift-Tuttle (base SBDB du JPL, arrondis) ; pression de radiation
+    β = 5,7 × 10⁻⁵ Q/(ρ s) (J. A. Burns, P. L. Lamy et S. Soter, Icarus 40, 1, 1979) ; orbite de la Terre : éléments
+    moyens J2000 de E. M. Standish (JPL) ; constante de Gauss.
+  - orbites de halo (coupole/modules/anim/lagrange.py, animations/lagrange.py ; halo_verif.sage) : développement du
+    3e ordre de D. L. Richardson, « Analytic construction of periodic orbits about the collinear points », Celestial
+    Mechanics 22, 241 (1980) ; périodes sidérales de la Terre, de la Lune, de Jupiter et de Charon.
+  - anneaux de Newton (coupole/modules/anim/interferometrie.py, animations/interferometrie.py ; newton_verif.sage) :
+    lame mince e = r²/2R, coefficients de réflexion de Fresnel ; fonctions colorimétriques CIE 1931 (déjà utilisées
+    par les spectres).
 
 Quatre animations de cours de plus (0.11.0) / Four more course animations (coupole/modules/anim/interferometrie.py,
 occultation.py, kozai.py, lagrange.py ; animations/interferometrie.py, occultation.py, kozai.py, lagrange.py)

@@ -38,8 +38,9 @@ REMPLACEMENTS = [
 ANIMATIONS_AJOUTEES = {'renaissance': ['gravityorbits', 'newtoncannon', 'orbitalelements', 'hohmann', 'kozai',
                                        'lagrange', 'gravityassist', 'resonances', 'roche'],
                        'telescopes': ['resolution', 'interferometry'],
-                       'solarsystemdebris': ['meteorradiant', 'occultation', 'aediagram', 'impactcrater'],
-                       'lunarcycles': ['libration'], 'coordsmotion': ['precession']}
+                       'solarsystemdebris': ['meteorradiant', 'occultation', 'aediagram', 'impactcrater',
+                                             'secularprecession', 'meteoroidtrails'],
+                       'lunarcycles': ['libration'], 'coordsmotion': ['precession'], 'solar': ['mutualevents']}
 
 def lire(p: Path):
     return json.loads(p.read_text(encoding='utf-8'))

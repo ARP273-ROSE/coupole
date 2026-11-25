@@ -19,7 +19,7 @@ Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 - TLE de l'ISS : si CelesTrak ne répond pas (erreur 503 fréquente), celui d'ARISS.
 - Étoiles de repère : Yale Bright Star Catalogue (V ≤ 5,5), dans `coupole/modules/td/donnees/`.
 
-### Animations de cours (112 animations)
+### Animations de cours (115 animations)
 
 Nouvelles animations propres à Coupole, au bureau comme dans Coupole Web ; formules et valeurs vérifiées par SageMath,
 mêmes nombres au caractère près dans les deux applications.
@@ -53,6 +53,29 @@ mêmes nombres au caractère près dans les deux applications.
   (fluide) ou ∛3 R ∛(ρₚ/ρₛ) (rigide, résolu symboliquement sous SageMath), la marée l'emporte et ses débris s'étalent en
   anneau ; gros plan sur les forces de marée, étirement rapporté à la gravité propre ; Saturne et ses anneaux, Mars et
   Phobos, Jupiter et une comète, la Terre et la Lune.
+- **Précession séculaire d'une orbite** (Petits corps) : sous l'effet des planètes géantes, la ligne des apsides d'un
+  géocroiseur avance et sa ligne des nœuds recule de quelques secondes d'arc par an (théorie de Laplace-Lagrange,
+  A = (n/4) Σ (m/M☉) α² b⁽¹⁾₃/₂(α)) ; ses nœuds passent sur l'orbite terrestre quatre fois par tour de ω, et la
+  distance minimale entre les orbites (MOID) tombe alors à zéro ; Apollo, Icare, Phaéton, Adonis, Toutatis (SBDB) ;
+  contrôlée sous SageMath par les coefficients de Laplace (intégrale et série), par une minimisation indépendante de
+  la MOID et par une intégration directe Soleil-Jupiter (pente de ϖ et de Ω à 0,2 % près sur 3 000 ans).
+- **Phénomènes mutuels des satellites galiléens** (Système solaire) : quand la Terre et le Soleil passent dans le plan
+  des orbites (tous les six ans), un satellite en occulte un autre ou lui fait de l'ombre ; disques vus de la Terre avec
+  ombre et pénombre, système vu du nord, courbe de lumière de la paire (baisse d'éclat, Δm, durée), latitude B limite ;
+  éclipse calculée par une intégrale de la part du disque solaire cachée, contrôlée par une intégrale double SageMath
+  (à 2 × 10⁻⁷ près).
+- **Traînées de météoroïdes** (Petits corps) : à chaque passage au périhélie, la comète lâche des grains (vitesse
+  d'éjection, taille et pression de radiation) qui s'étirent le long de l'orbite ; diagramme (Δt, Δr) au nœud pour
+  l'année en cours, activité année par année : les averses suivent les retours de la comète ; Léonides (55P), Perséides
+  (109P), comète fictive dont le nœud est sur l'orbite terrestre ; orbites des grains contrôlées par intégration
+  numérique sous SageMath (positions et passages au nœud à 2 × 10⁻⁷ près).
+- **Points de Lagrange : orbites de halo** autour de L1 et L2 en trois dimensions (Richardson, 3ᵉ ordre ; amplitudes,
+  période : 176,8 jours autour de L1 Soleil-Terre), vues du grand astre ; le corps lâché dessus la suit un tour puis
+  s'en écarte (instabilité) ; contrôlées par une correction différentielle sous SageMath (vraie orbite périodique à
+  quelques pour cent de l'amplitude, demi-période à 0,3 %).
+- **Interférences : anneaux de Newton** (second montage) : lame d'air entre une lentille et une lame, anneaux sombres
+  à √(kλR/n), réflexion ou transmission, indice de la lame, lumière blanche (teintes de Newton) ; contrôlés sous
+  SageMath (sphère exacte, deux ondes de Fresnel).
 
 ## 0.11.0 — 25 novembre 2026 — Quatre animations de cours de plus
 

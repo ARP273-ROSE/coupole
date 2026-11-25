@@ -2,7 +2,8 @@
 Jupiter, Pluton et Charon), cinq points d'équilibre.  L1 et L2 encadrent le petit astre à peu près au rayon de Hill
 (SOHO, JWST) ; L4 et L5, en triangle équilatéral, retiennent les troyens si μ < 0,0385.  Un petit corps lâché près
 d'eux trace un « têtard », un « fer à cheval » ou s'échappe ; les zones grisées lui sont interdites (constante de
-Jacobi).  Calculs : ``lagrange.py``."""
+Jacobi).  Orbites de halo autour de L1 et L2 (Richardson, 3ᵉ ordre), vues du grand astre : le corps lâché sur l'orbite
+analytique la suit environ un tour puis s'en écarte (instabilité).  Calculs : ``lagrange.py``."""
 from __future__ import annotations
 
 import math
@@ -59,11 +60,18 @@ class Lagrange(Animation):
     def mu_a(self):
         return [(m, a) for k, m, a in lg.SYSTEMES if k == self.systeme.currentData()][0]
 
+    def est_halo(self) -> bool:
+        return self.cas.currentData() in ('halo_l1', 'halo_l2')
+
+    def halo(self):
+        mu, _ = self.mu_a()
+        return lg.halo(mu, self.cas.currentData()[-2:].upper(), self.delta.value())
+
     def recommencer(self):
         mu, _ = self.mu_a()
         self.s = lg.depart(mu, self.cas.currentData(), self.delta.value())
         self.t = 0.0
-        self.trace = [(self.s[0], self.s[1])]
+        self.trace = [self._point()]
         self.collision = False
         self._cle = (self.systeme.currentData(), self.cas.currentData(), self.delta.value())
         self.rafraichir()
@@ -87,18 +95,21 @@ class Lagrange(Animation):
         for _ in range(n):
             self.s, self.collision = lg.integrer(mu, self.s, total / n)
             self.t += total / n
-            self.trace.append((self.s[0], self.s[1]))
+            self.trace.append(self._point())
             if self.collision:
                 break
         if len(self.trace) > N_TRACE:
             del self.trace[:len(self.trace) - N_TRACE]
+
+    def _point(self):
+        return (self.s[0], self.s[1], self.s[2]) if len(self.s) == 6 else (self.s[0], self.s[1])
 
     # ------------------------------------------------------------ valeurs
     def valeurs(self):
         mu, a = self.mu_a()
         L = lg.points_lagrange(mu)
         sec = 1.0 - mu
-        c = lg.jacobi(mu, *self.s)
+        c = lg.jacobi_etat(mu, self.s)
         cl = {k: lg.jacobi(mu, x, y, 0.0, 0.0) for k, (x, y) in L.items()}
         out = [(tr('anim_lagrange_v_mu'), scientifique(mu)),
                (tr('anim_lagrange_v_l1'), distance(sec - L['L1'][0], a)),
@@ -110,6 +121,16 @@ class Lagrange(Animation):
                                                                                ('L1', 'L2', 'L3', 'L4'))),
                (tr('anim_lagrange_v_regions'), tr('anim_lagrange_' + lg.regions(mu, c))),
                (tr('anim_lagrange_v_temps'), tr('anim_lagrange_orbites', n=nombre(self.t / (2.0 * math.pi), 1)))]
+        if self.est_halo():
+            h = self.halo()
+            km = h.gamma * a
+            jours = h.periode() / (2.0 * math.pi) * lg.PERIODES_J[self.systeme.currentData()]
+            out.append((tr('anim_lagrange_v_halo'), tr('anim_lagrange_halo', ax=nombre(h.Ax * km, 0),
+                                                       ay=nombre(abs(h.k) * h.Ax * km, 0), az=nombre(h.Az * km, 0),
+                                                       j=nombre(jours, 1))))
+            x0 = h.etat(2.0 * math.pi * ((self.t / h.periode()) % 1.0))
+            ecart = math.sqrt(sum((self.s[i] - x0[i]) ** 2 for i in range(3))) * a
+            out.append((tr('anim_lagrange_v_ecart'), nombre(ecart, 0) + ' km'))
         if self.collision:
             out.append((tr('anim_lagrange_v_etat'), tr('anim_lagrange_contact')))
         return out
@@ -121,7 +142,10 @@ class Lagrange(Animation):
         self._carte(p, dessin.cadre(p, z[0], tr('anim_lagrange_t_carte')), mu, (0.0, 0.0), 1.55, True)
         rh = lg.rayon_hill(mu)
         self._carte(p, dessin.cadre(p, z[1], tr('anim_lagrange_t_zoom')), mu, (1.0 - mu, 0.0), 2.6 * rh, False)
-        self._potentiel(p, dessin.cadre(p, z[2], tr('anim_lagrange_t_potentiel')), mu)
+        if self.est_halo():
+            self._halo(p, dessin.cadre(p, z[2], tr('anim_lagrange_t_halo')))
+        else:
+            self._potentiel(p, dessin.cadre(p, z[2], tr('anim_lagrange_t_potentiel')), mu)
 
     def _carte(self, p, r, mu, centre, demi, grande):
         cote = min(r.width(), r.height() - 6)
@@ -130,7 +154,7 @@ class Lagrange(Animation):
 
         def pt(x, y):
             return QPointF(cx + k * (x - centre[0]), cy - k * (y - centre[1]))
-        c = lg.jacobi(mu, *self.s)
+        c = lg.jacobi_etat(mu, self.s)
         if self.c_interdit.isChecked():
             n = N_GRILLE
             cle = (mu, round(c, 12), centre, demi, round(cote, 1))
@@ -166,7 +190,7 @@ class Lagrange(Animation):
             p.setPen(dessin.stylo('accent2', 1.0, 0.8, pointille=True))
             p.drawEllipse(pt(1.0 - mu, 0.0), lg.rayon_hill(mu) * k, lg.rayon_hill(mu) * k)
         # trace et corps
-        tr_ = [pt(x, y) for x, y in self.trace]
+        tr_ = [pt(q[0], q[1]) for q in self.trace]
         if len(tr_) >= 2:
             p.setPen(dessin.stylo('accent1', 1.2, 0.85))
             for q0, q1 in zip(tr_[:-1], tr_[1:]):
@@ -196,7 +220,7 @@ class Lagrange(Animation):
             v = -lg.omega(mu, x, 0.0)
             pts.append((x, max(ymin - 1.0, v)))
         ax.courbe(pts, 'accent2', 1.8)
-        c = lg.jacobi(mu, *self.s)
+        c = lg.jacobi_etat(mu, self.s)
         ax.horizontale(-c / 2.0, 'accent3', 1.2)
         for nom in ('L1', 'L2', 'L3'):
             x = L[nom][0]
@@ -205,4 +229,34 @@ class Lagrange(Animation):
                 dessin.disque(p, ax.px(x), ax.py(v), 3.5, 'accent2')
                 dessin.etiquette(p, ax.px(x), ax.py(v), nom, 'accent2')
         dessin.texte(p, ax.r.left() + 6, ax.r.bottom() - 10, tr('anim_lagrange_legende_pot'), 'doux', centre=False,
+                     fond=True)
+
+    def _halo(self, p, r):
+        """L'orbite de halo vue du grand astre (plan y–z), centrée sur le point de Lagrange : courbe de Richardson en
+        pointillés, trajectoire intégrée, corps."""
+        h = self.halo()
+        courbe = h.courbe()
+        demi = 1.25 * max(max(abs(y) for _, y, _ in courbe), max(abs(z) for _, _, z in courbe), 1e-9)
+        k = min(r.width(), r.height() - 30) / (2.0 * demi)
+        cx, cy = r.center().x(), r.center().y() + 4
+
+        def pt(y, z):
+            return QPointF(cx - k * y, cy - k * z)            # vu depuis le grand astre (x vers nous) : y vers la gauche
+        p.save()
+        p.setClipRect(r)
+        p.setPen(dessin.stylo('accent2', 1.4, 0.9, pointille=True))
+        for (_, y0, z0), (_, y1, z1) in zip(courbe[:-1], courbe[1:]):
+            p.drawLine(pt(y0, z0), pt(y1, z1))
+        pts = [pt(q[1], q[2]) for q in self.trace if len(q) == 3]
+        p.setPen(dessin.stylo('accent1', 1.3, 0.9))
+        for q0, q1 in zip(pts[:-1], pts[1:]):
+            p.drawLine(q0, q1)
+        q = pt(self.s[1], self.s[2]) if len(self.s) == 6 else pt(0.0, 0.0)
+        dessin.disque(p, q.x(), q.y(), 4.0, 'accent3', 'texte')
+        p.setPen(dessin.stylo('accent2', 1.8))
+        p.drawLine(QPointF(cx - 5, cy - 5), QPointF(cx + 5, cy + 5))
+        p.drawLine(QPointF(cx - 5, cy + 5), QPointF(cx + 5, cy - 5))
+        dessin.etiquette(p, cx, cy, self.cas.currentData()[-2:].upper(), 'accent2')
+        p.restore()
+        dessin.texte(p, r.left() + 6, r.bottom() - 10, tr('anim_lagrange_legende_halo'), 'doux', centre=False,
                      fond=True)

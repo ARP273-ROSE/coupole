@@ -1953,6 +1953,15 @@ $V=|1+r\,e^{-2i\pi B\rho/\lambda}|/(1+r)$, lowest at $B=\lambda/2\rho$. Instrume
 spacing on a screen 1~m away), Michelson and Pease's interferometer (Betelgeuse, 47~mas: fringes gone near 3.08~m at
 575~nm), VLTI, CHARA. While playing, the baseline can grow.
 \capture{img/anim_interferometry_en.png}{0.9}
+\emph{Newton's rings} (0.12.0, “Newton's rings” set-up): a plano-convex lens of radius of curvature $R$ resting on a
+glass plate leaves an air film (or a liquid of index $n$) of thickness $e(r)=r^2/2R$. In reflection, the two waves
+reflected off the faces of the film differ by $2ne+\lambda/2$ (phase shift of $\pi$ off the glass):
+$I=\bigl(1-\cos(4\pi ne/\lambda)\bigr)/2$, dark centre, dark rings at $r_k=\sqrt{k\lambda R/n}$ (0.767~mm for $R=1$~m and
+$\lambda=589$~nm); in transmission, the complementary pattern; in white light, Newton's colours (CIE sums at 5~nm steps).
+The interferometer's own settings are greyed out in this set-up. Checked in SageMath (\texttt{newton\_verif.sage}): roots in the exact
+sphere geometry (relative difference $<2\times10^{-4}$ over the settings' range) and brightness of two waves with
+Fresnel amplitudes (glass of index 1.5), identical to the model once normalised (contrast $>0.999$).
+\capture{img/anim_newton_en.png}{0.9}
 \item \textbf{Occultation of a star by an asteroid} (Small bodies). The star being at infinity, the shadow has the
 asteroid's size (ellipse of semi-axes $a$, $b$); it sweeps the Earth at $v=\sqrt{GM_\odot/1\,\text{au}}\,(1-1/\sqrt{r})$
 at opposition (10.9~km\,s$^{-1}$ at 2.5~au, 26.7~km\,s$^{-1}$ for Eris). Each observer of a line drawn across the path
@@ -1976,12 +1985,22 @@ force, Jacobi constant $C=2\Omega-v^2$; in grey, the forbidden regions where $2\
 opposite the small body (horseshoe) or next to L1, L2, L3; zoom on the small body and its Hill sphere
 $a\sqrt[3]{\mu/3}$ (JWST's L2 at 1.51 million km); Sun-Earth, Earth-Moon, Sun-Jupiter, Pluto-Charon.
 \capture{img/anim_lagrange_en.png}{0.9}
+\emph{Halo orbits} (0.12.0, “halo orbit around L1 / L2” cases): third-order analytic expansion of D.~L. Richardson
+(\emph{Celestial Mechanics} 22, 241, 1980), in three dimensions: amplitudes $A_x$ and $A_z$ linked by
+$l_1A_x^2+l_2A_z^2+\Delta=0$, frequency $\lambda\nu$; $\delta$ sets $A_z$ (capped at $0.4\,\gamma$), its sign the northern
+or southern family. For Sun-Earth, a period of 176.8~days around L1 and 179.0 around L2. The bottom panel shows the
+orbit seen from the large body ($y$--$z$ plane): the body released on Richardson's state and integrated as is
+(restricted problem in 3D) follows it for about one turn then drifts away (these orbits are unstable: SOHO, Gaia or
+JWST correct their path). Checked in SageMath (\texttt{halo\_verif.sage}): a true periodic orbit obtained by
+differential correction (Newton on $x_0$ and $\dot y_0$) differs from Richardson's state by a few per cent of the
+amplitude, and its half-period by less than 0.3\%.
+\capture{img/anim_lagrange_halo_en.png}{0.9}
 \end{itemize}
 
 \paragraph{Course animations of 0.12.0.} Same approach; SageMath checks in \texttt{outils/verif\_anim/}:
 \texttt{survols\_impacts\_verif.sage} ($a$--$e$ diagram, gravity assist, impact craters),
 \texttt{libration\_verif.sage}, \texttt{precession\_verif.sage}, \texttt{resonances\_verif.sage},
-\texttt{roche\_verif.sage}.
+\texttt{roche\_verif.sage}, \texttt{seculaire\_verif.sage}, \texttt{mutuels\_verif.sage}, \texttt{trainees\_verif.sage}.
 \begin{itemize}
 \item \textbf{The $a$--$e$ diagram} (Solar System debris). Each point (semi-major axis $a$, eccentricity $e$) is an
 orbit around the Sun: perihelion $q=a(1-e)$, aphelion $Q=a(1+e)$, period $P=a^{3/2}$ (years, $a$ in au). Near-Earth
@@ -2045,6 +2064,45 @@ orbit (checked by numerical integration) and differential rotation spreads them 
 (limit 2.21~R: the main rings end near 2.27~R), Mars and Phobos (at 2.76~R, inside the fluid limit of 3.12~R but
 outside the rigid one), Jupiter and a comet, the Earth and the Moon (limit 2.88~R, compared with its 60~R).
 \capture{img/anim_roche_en.png}{0.9}
+\item \textbf{Secular precession of an orbit} (Solar System debris). Averaged over the revolutions, an asteroid's
+semi-major axis does not change, but its orbit turns under the pull of the planets. Linear Laplace-Lagrange secular
+theory for a test particle (Murray and Dermott, \emph{Solar System Dynamics}, ch.~7), with the four giant planets on
+circular orbits in the ecliptic: the forced elements vanish and $\varpi=\varpi_0+At$, $\Omega=\Omega_0-At$, hence
+$\omega=\omega_0+2At$, with $A=\frac n4\sum_j\frac{m_j}{M_\odot}\alpha_j^2\,b^{(1)}_{3/2}(\alpha_j)$, $\alpha_j=a/a_j$ and
+the Laplace coefficient $b^{(1)}_{3/2}(\alpha)=\frac1\pi\int_0^{2\pi}\cos\psi\,(1-2\alpha\cos\psi+\alpha^2)^{-3/2}\,d\psi$.
+The nodes lie at $r=a(1-e^2)/(1\pm e\cos\omega)$: the orbit can only touch the Earth's when a node passes 1~au, four
+times per turn of $\omega$; the minimum orbit intersection distance (MOID) then drops to zero. For (1862) Apollo,
+$A=14.3''$ per year: $\varpi$ goes round in 90,367~years, $\omega$ in 45,183~years, next crossing around the year
+22,494; (3200) Phaethon crosses around 2641. Limits stated in the animation: linear theory (order of magnitude for
+large $e$), terrestrial planets left out (they actually speed the precession up). Checked in SageMath
+(\texttt{seculaire\_verif.sage}): Laplace coefficients by integration and by the hypergeometric series, crossing
+epochs, MOID by an independent minimisation (to $10^{-7}$~au), and a direct Sun-Jupiter integration over 3,000~years
+whose rates of $\varpi$ and $\Omega$ recover $\pm A$ within 0.2\%.
+\capture{img/anim_secularprecession_en.png}{0.9}
+\item \textbf{Mutual events of the Galilean satellites} (Solar System). Every six years, the Earth and the Sun pass
+through the orbital plane: seen from the Earth, one satellite can occult another (“2\,O\,1”: Europa occults Io); seen
+from the Sun, it can cast its shadow on it (“2\,E\,1”). Simplified geometry, stated: circular coplanar orbits, Earth and
+Sun at latitude $B$ above the plane, Sun at phase angle $\varphi$, uniform discs of brightness $\propto pR^2$.
+Occultation: the lost light is the common area of the two discs. Eclipse: a point of the eclipsed disc, at distance
+$s$ from the shadow axis, loses the share of the solar disc (angular radius $R_\odot/D$) hidden by the active
+satellite (angular radius $R/\ell$); this is integrated in $s$ along the circular arcs of the eclipsed disc (umbra
+and penumbra). The distance between centres at the encounter is $(Y_1-Y_2)\sin B$: there is an event only if $B$ is
+small (0.71° at most for 2\,O\,1 at mid-orbit). For the default 2\,O\,1: brightness drop of 38.7\% ($\Delta m=0.53$)
+in 58~min. Checked in SageMath (\texttt{mutuels\_verif.sage}): common area by quadrature, brightness at given times
+(exact for occultations, double integral for eclipses, within $2\times10^{-7}$), first and last contacts.
+\capture{img/anim_mutualevents_en.png}{0.9}
+\item \textbf{Meteoroid trails} (Solar System debris). At each perihelion passage the comet releases 200~grains
+(speeds drawn in a ball of radius $\Delta v$); radiation pressure reduces the gravity they feel to $GM(1-\beta)$,
+$\beta=5.7\times10^{-5}/(\rho s)$ (Burns, Lamy and Soter 1979). Each grain follows its own Kepler orbit: their periods
+differ slightly and the cloud stretches into a trail. The Earth (Keplerian orbit) reaches the node every year on the
+same day (Leonids on 17~November, Perseids on 12~August); the diagram shows, for the current year, each grain at the
+node by how far ahead of or behind the Earth it is, $\Delta t$, and its distance from the Earth's orbit, $\Delta r$;
+grains within 0.01~au and 10~days are counted. Rich years follow the comet's returns (1865, 1965, 1999 for 55P).
+Model without planetary perturbations (which actually move the trails and make storms happen or fail); the Leonids
+pass here 0.008~au inside the Earth's orbit. Checked in SageMath (\texttt{trainees\_verif.sage}): grains integrated
+numerically (DOP853) over several revolutions, positions and node passages within $2\times10^{-7}$, the Earth's
+passage dates.
+\capture{img/anim_meteoroidtrails_en.png}{0.9}
 \end{itemize}
 
 
