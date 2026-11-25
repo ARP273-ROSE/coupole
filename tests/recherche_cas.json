@@ -1886,8 +1886,8 @@
   ]
  },
  "reel": {
-  "documents": 826,
-  "vocabulaire": 5533,
+  "documents": 830,
+  "vocabulaire": 5577,
   "requetes": [
    [
     "seasons",
@@ -7645,13 +7645,12 @@
       ]
      },
      {
-      "g": "question",
-      "id": "ca_extrasolarplanets_detectionconfirmation",
+      "g": "animation",
+      "id": "hohmann",
       "n": 1,
       "score": 10,
       "mots": [
-       "jupiter",
-       "jupiters"
+       "jupiter"
       ]
      }
     ]
@@ -9061,6 +9060,17 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "orbitalelements",
+      "n": 1,
+      "score": 37,
+      "mots": [
+       "orbit",
+       "orbite",
+       "orbites"
+      ]
+     },
+     {
       "g": "question",
       "id": "ca_coordsmotion_earthchanges",
       "n": 1,
@@ -9072,16 +9082,6 @@
      {
       "g": "question",
       "id": "ca_lunarcycles_moonplane",
-      "n": 1,
-      "score": 37,
-      "mots": [
-       "orbit",
-       "orbite"
-      ]
-     },
-     {
-      "g": "question",
-      "id": "ca_renaissance_asteroid",
       "n": 1,
       "score": 37,
       "mots": [

@@ -2,6 +2,29 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.10.0 — 25 novembre 2026 — Quatre animations de cours
+
+Quatre animations propres à Coupole (101 en tout), au bureau comme dans Coupole Web, sur des notions qu'un premier
+cours d'astronomie montre en vidéo ou en applet ; chaque formule et chaque valeur vérifiées par SageMath
+(`outils/verif_anim/*_verif.sage`), mêmes nombres au caractère près dans les deux applications.
+
+- **Diffraction et pouvoir de résolution** (thème Télescopes) : image simulée de deux étoiles et coupe d'intensité ;
+  tache d'Airy de rayon 1,22 λ / D, critère de Rayleigh (creux de 73,5 %), obstruction centrale (anneaux renforcés),
+  écart d'éclat, turbulence (pose longue : convolution exacte par la gaussienne du seeing) ; de la pupille de l'œil
+  à l'ELT, avec le diamètre au-delà duquel la turbulence décide.
+- **Les éléments d'une orbite** (Renaissance) : a, e, i, Ω, ω et le temps en 3D (équateur, point vernal γ, nœuds,
+  apsides, angles dessinés, orbite pointillée au sud de l'équateur et cachée par la Terre), trace au sol et orbite
+  dans son plan ; station spatiale, héliosynchrone, GPS, Molniya, géostationnaire ; période, périgée, apogée,
+  vitesses (vis-viva).
+- **Le transfert de Hohmann** (Renaissance) : orbite basse vers la station, l'orbite géostationnaire ou la Lune ;
+  Terre vers Mars, Vénus, Jupiter ; Δv₁, Δv₂, durée, angle de phase, période synodique ; départ à la fenêtre de tir
+  ou tout de suite (la cible manque alors le rendez-vous), cible à l'arrivée en fantôme, barres des vitesses.
+- **Étoiles filantes et radiant** (Petits corps) : nuit du maximum de sept pluies (calendrier IMO) dans le ciel vu
+  de dessous ; traînées sur des grands cercles, prolongées jusqu'au radiant ; taux ZHR × sin h corrigé de la
+  magnitude limite ; hauteur du radiant et crépuscule au fil de la nuit.
+- Modules : les quatre animations rejoignent les modules Renaissance, Télescopes et Petits corps ; recherche
+  régénérée.
+
 ## 0.9.3 — 24 novembre 2026
 
 - Sécurité : Python embarqué 3.13.17 (la 3.12.10 ne recevait plus de correctifs de sécurité sous Windows) ; l'interpréteur téléchargé à la construction est vérifié par son empreinte SHA-256. Rapports d'incident : plus de faux avertissement « vigie sans battement » au démarrage.

@@ -2,6 +2,27 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.10.0 — 25 November 2026 — Four course animations
+
+Four animations of Coupole's own (101 in all), on the desktop as in Coupole Web, on topics that a first astronomy
+course shows as videos or applets; every formula and value checked with SageMath (`outils/verif_anim/*_verif.sage`),
+same numbers to the character in both applications.
+
+- **Diffraction and resolving power** (Telescopes): simulated image of two stars and intensity cut; Airy spot of
+  radius 1.22 λ / D, Rayleigh criterion (73.5% dip), central obstruction (stronger rings), brightness difference,
+  turbulence (long exposure: exact convolution by the seeing Gaussian); from the eye's pupil to the ELT, with the
+  diameter beyond which turbulence takes over.
+- **The elements of an orbit** (Renaissance): a, e, i, Ω, ω and time in 3D (equator, vernal point γ, nodes, apsides,
+  angles drawn, orbit dotted south of the equator and hidden by the Earth), ground track and the orbit in its own
+  plane; space station, Sun-synchronous, GPS, Molniya, geostationary; period, perigee, apogee, speeds (vis-viva).
+- **The Hohmann transfer** (Renaissance): low orbit to the station, geostationary orbit or the Moon; Earth to Mars,
+  Venus, Jupiter; Δv₁, Δv₂, trip time, phase angle, synodic period; leave at the launch window or right now (the
+  target then misses the rendezvous), ghost of the target at arrival, speed bars.
+- **Meteors and their radiant** (Small bodies): the peak night of seven showers (IMO calendar) in the sky seen from
+  below; trails on great circles, extended back to the radiant; rate ZHR × sin h corrected for limiting magnitude;
+  radiant altitude and twilight through the night.
+- Modules: the four animations join the Renaissance, Telescopes and Small bodies modules; search index rebuilt.
+
 ## 0.9.2 — 18 November 2026
 
 - **Signed updates**: each release publishes a manifest (version number and SHA-256 of every archive) signed

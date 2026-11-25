@@ -1288,7 +1288,7 @@ now run on Windows, macOS and Linux, in French and English, in the Coupole theme
 checked reference formulas. After ClassAction, University of Nebraska-Lincoln Astronomy Education, Apache License 2.0
 (\texttt{NOTICE} and \texttt{LICENCES/Apache-2.0.txt} files).
 
-\paragraph{Catalogue.} On the left, the 92 animations of the original catalogue, plus three (the Antikythera Mechanism, section~\ref{sec:anticythere}, Orion in 3D, section~\ref{sec:orion}, and Gravity and Orbits, section~\ref{sec:gravite}), sorted by topic (coordinates and
+\paragraph{Catalogue.} On the left, the 92 animations of the original catalogue, plus nine of Coupole's own (including the Antikythera Mechanism, section~\ref{sec:anticythere}, Orion in 3D, section~\ref{sec:orion}, and Gravity and Orbits, section~\ref{sec:gravite}), sorted by topic (coordinates and
 motions, Moon, Renaissance and orbits, stellar properties, light and spectra, extrasolar planets…), with a search
 (French or English, accents ignored) and filters by topic and status. Topics follow a teaching order, from the
 introduction and the sky seen from the Earth to cosmology. Each has its name and description in both
@@ -1703,6 +1703,10 @@ Gravity algebra & factors $\frac13$ to 3 on $M_1$, $M_2$, $d$: force multiplied 
 Law of gravity & $F=GM_1M_2/R^2$ from the electron to the Milky Way, accelerations, presets, stored results\\
 Earth orbits & $P=2\pi\sqrt{r^3/GM}$: Space Station, GPS, geostationary (42,164~km), Moon\\
 Gravity and Orbits & after PhET: Sun, Earth, Moon, ISS, comet under gravity (4th-order Yoshida, real DE440 state on 1/01/2026); model and to-scale views, forces, velocities, paths, tape, gravity on/off, measured periods, Moon seen from the Sun\\
+Newton's cannon & orbital speed $v_1$, escape speed $v_2$, Earth, Moon, Mars, Ceres, Dimorphos, real atmosphere, challenges\\
+The elements of an orbit & $a$, $e$, $i$, $\Omega$, $\omega$, $M$ in 3D, ground track, typical orbits, vis-viva\\
+The Hohmann transfer & $\Delta v_1$, $\Delta v_2$, trip time, phase angle, launch windows (low orbit, Moon, Mars, Venus, Jupiter)\\
+Meteors and their radiant & sky seen from below, trails towards the radiant, rate $\mathrm{ZHR}\times\sin h$, peak night of seven showers\\
 \midrule
 Small angles & $\alpha\approx206\,265''\,d/D$ against the exact value $2\arcsin(d/2D)$\\
 Big Dipper clock & northern sky in stereographic projection; one turn per sidereal day, about 1$^\circ$ per day at a fixed time\\
@@ -1774,6 +1778,7 @@ Density waves & tractor and cars: $n_\text{jam}/n=(v-v_t)/(v_\text{slow}-v_t)$, 
 Balloon universe & instead of the movie: galaxies on an inflating balloon, $v=Hd$, $H=\dot a/a$; the balloon turns with the mouse\\
 Galactic redshift & spectrum of M32 shifted by $1+z$, lines, light received in U, B, V, R; speed from the relativistic Doppler effect\\
 Earth's atmosphere & airmass (sec $z$, Kasten \& Young, Pickering), extinction $\Delta m = kX$ and reddening, atmospheric windows (ESO SkyCalc), refraction, flattened Sun, earlier rising, dispersion\\
+Diffraction and resolving power & Airy spot, $1.22\lambda/D$, Rayleigh criterion, central obstruction, brightness difference, turbulence (long exposure)\\
 Telescope & magnification $F/f$, true field, resolving power $1.22\lambda/D$, light-gathering power, focus; Moon, Saturn, globular cluster\\
 CCD sensor & exposure (random photons, Poisson law, saturation) then readout row by row and pixel by pixel\\
 Snell's law & $n_1\sin\theta_1=n_2\sin\theta_2$, total internal reflection, share reflected (Fresnel), Brewster angle\\
@@ -1874,6 +1879,55 @@ scale, earlier rising, dispersion after Ciddor 1996, pressure and temperature). 
 (\texttt{outils/verif\_atmosphere/}).
 \capture{img/anim_earthatmosphere_fenetres_en.png}{0.9}
 \capture{img/anim_earthatmosphere_refraction_en.png}{0.9}
+
+\paragraph{Newton's cannon (0.9.0).} Coupole's own animation (Renaissance theme and module), after Newton's thought
+experiment: a cannon on top of a mountain fires faster and faster. The ball lands farther and farther away, goes round
+the body at $v_1=\sqrt{GM/r}$ (orbital speed), then escapes at $v_2=\sqrt{2}\,v_1$. Earth, Moon, Mars, Ceres or
+Dimorphos; “Fire!” (Space), green arrow to drag (angle and speed in one gesture), $v_1$ and $v_2$ marks under the slider
+and around the cannon (the slider snaps to them), predicted path, shots kept with a legend, automatic framing or mouse
+wheel, presets and challenges; real atmosphere (capsule re-entry, decaying low orbit). Checked with SageMath
+(\texttt{outils/verif\_anim/canon\_newton\_verif.sage}).
+\capture{img/anim_newtoncannon_en.png}{0.9}
+
+\paragraph{Four course animations (0.10.0).} Coupole's own animations on topics that a first astronomy course shows as
+videos or applets; formulas and values checked with SageMath (\texttt{outils/verif\_anim/resolution\_verif.sage},
+\texttt{elements\_orbite\_verif.sage}, \texttt{hohmann\_verif.sage}, \texttt{radiant\_verif.sage}), same numbers in
+Coupole Web.
+\begin{itemize}
+\item \textbf{Diffraction and resolving power} (Telescopes). Simulated image of two stars and intensity cut along the
+line joining them. Airy spot of a pupil of diameter $D$ with central obstruction $\varepsilon$:
+$I(v)=\big[2J_1(v)/v-\varepsilon^2\,2J_1(\varepsilon v)/(\varepsilon v)\big]^2/(1-\varepsilon^2)^2$, $v=\pi D\theta/\lambda$;
+first dark ring at $1.22\,\lambda/D$ ($\varepsilon=0$); at that separation (Rayleigh criterion) the intensity in between
+drops to 73.5\%. The obstruction narrows the spot and strengthens the rings; a faint companion ($\Delta m$) gets lost
+in the rings. Turbulence: long exposure = Airy spot convolved with a Gaussian whose full width at half maximum is the
+seeing; beyond $D=1.22\,\lambda/\text{seeing}$ (14~cm for 1\,$''$ in visible light) turbulence decides. Instruments:
+eye, 80~mm refractor, 203~mm Schmidt-Cassegrain, 1~m, Hubble, VLT, ELT. Stretched image (logarithmic scale) to see
+the rings.
+\capture{img/anim_resolution_en.png}{0.9}
+\item \textbf{The elements of an orbit} (Renaissance). The six numbers of an orbit around the Earth: $a$, $e$, $i$,
+$\Omega$ (from the vernal point $\gamma$, in the equator), $\omega$ (from the ascending node to the perigee) and time
+(mean anomaly $M$, Kepler's equation $M=E-e\sin E$). 3D view: equatorial plane, line of nodes, line of apsides, angles
+drawn; the orbit is dotted south of the equator and hidden behind the Earth. Ground track (the Earth turns in one
+sidereal day) and the orbit seen in its own plane (true anomaly $\nu$). Typical orbits: space station, Sun-synchronous,
+GPS, Molniya, geostationary. Values: $T=2\pi\sqrt{a^3/GM}$, perigee, apogee, speeds from the vis-viva equation
+$v^2=GM(2/r-1/a)$.
+\capture{img/anim_orbitalelements_en.png}{0.9}
+\item \textbf{The Hohmann transfer} (Renaissance). Two burns and a half-ellipse tangent to both orbits:
+$\Delta v_1=\sqrt{GM(2/r_1-1/a)}-\sqrt{GM/r_1}$ at departure, $\Delta v_2$ at arrival, trip time $\pi\sqrt{a^3/GM}$ with
+$a=(r_1+r_2)/2$. To meet the target, you must leave when it leads by $\varphi=\pi-n_2t$ (phase angle): the window comes
+back every synodic period. Low orbit to the station, geostationary orbit or the Moon; Earth to Mars (2.94 then
+2.65~km\,s$^{-1}$, 259~days, $\varphi=44.3°$, a window every 780~days), Venus (both burns brake) or Jupiter. “Leave at
+the launch window” or “Leave now”; the dotted circle shows where the target will be at arrival if you leave now.
+\capture{img/anim_hohmann_en.png}{0.9}
+\item \textbf{Meteors and their radiant} (Small bodies). The peak night of seven showers (Quadrantids, Lyrids, Eta
+Aquariids, Perseids, Orionids, Leonids, Geminids; radiant, speed, ZHR and population index $r$ from the IMO calendar)
+in the sky seen from below. Trails are great-circle arcs moving away from the radiant, short near it; extended
+backwards they cross there. Expected rate $\mathrm{ZHR}\times\sin h\div r^{6.5-m_\text{lim}}$; curves through the
+night (radiant altitude, rate, twilight); adjustable latitude and limiting magnitude. Background stars are random (not
+a real catalogue).
+\capture{img/anim_meteorradiant_en.png}{0.9}
+\end{itemize}
+
 
 \paragraph{Sidereal time and hour angle: the southern hemisphere.} The hour angle arc is shown by default (a choice
 already made is kept). The “What to look for” card has an \emph{In the southern hemisphere} box:

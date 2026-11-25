@@ -1329,7 +1329,7 @@ tournent désormais sous Windows, macOS et Linux, en français et en anglais, da
 reposent sur des formules de référence vérifiées. D'après ClassAction, University of Nebraska-Lincoln Astronomy
 Education, licence Apache 2.0 (fichiers \texttt{NOTICE} et \texttt{LICENCES/Apache-2.0.txt}).
 
-\paragraph{Catalogue.} À gauche, les 92 animations du catalogue d'origine, plus trois (la machine d'Anticythère, section~\ref{sec:anticythere}, Orion en 3D, section~\ref{sec:orion}, et Gravité et orbites, section~\ref{sec:gravite}), classées par thème (coordonnées et
+\paragraph{Catalogue.} À gauche, les 92 animations du catalogue d'origine, plus neuf propres à Coupole (dont la machine d'Anticythère, section~\ref{sec:anticythere}, Orion en 3D, section~\ref{sec:orion}, et Gravité et orbites, section~\ref{sec:gravite}), classées par thème (coordonnées et
 mouvements, Lune, Renaissance et orbites, propriétés stellaires, lumière et spectres, exoplanètes…), avec une recherche
 (française ou anglaise, sans accents), un filtre par thème et par état. Les thèmes suivent un ordre pédagogique, de
 l'introduction et du ciel vu de la Terre jusqu'à la cosmologie. Chacune a son nom et sa description dans les
@@ -1769,6 +1769,10 @@ Algèbre de la gravitation & facteurs $\frac13$ à 3 sur $M_1$, $M_2$, $d$ : for
 Loi de la gravitation & $F=GM_1M_2/R^2$ de l'électron à la Voie lactée, accélérations, préréglages, mémoire des résultats\\
 Orbites autour de la Terre & $P=2\pi\sqrt{r^3/GM}$ : Station spatiale, GPS, géostationnaire (42~164~km), Lune\\
 Gravité et orbites & d'après PhET : Soleil, Terre, Lune, ISS, comète en gravitation (Yoshida d'ordre 4, état réel DE440 du 1/01/2026) ; vues modèle et à l'échelle, forces, vitesses, trajectoires, ruban, gravité coupable, périodes mesurées, Lune vue du Soleil\\
+Le canon de Newton & satellisation $v_1$, libération $v_2$, Terre, Lune, Mars, Cérès, Dimorphos, atmosphère réelle, défis\\
+Les éléments d'une orbite & $a$, $e$, $i$, $\Omega$, $\omega$, $M$ en 3D, trace au sol, orbites types, vis-viva\\
+Le transfert de Hohmann & $\Delta v_1$, $\Delta v_2$, durée, angle de phase, fenêtres de tir (orbite basse, Lune, Mars, Vénus, Jupiter)\\
+Étoiles filantes et radiant & ciel vu de dessous, traînées vers le radiant, taux $\mathrm{ZHR}\times\sin h$, nuit du maximum de sept pluies\\
 \midrule
 Petits angles & $\alpha\approx206\,265''\,d/D$ contre la valeur exacte $2\arcsin(d/2D)$\\
 Horloge de la Grande Ourse & ciel du nord en projection stéréographique ; un tour par jour sidéral, environ 1$^\circ$ par jour à heure fixe\\
@@ -1840,6 +1844,7 @@ Ondes de densité & tracteur et voitures : $n_\text{bouchon}/n=(v-v_t)/(v_\text{
 Univers-ballon & au lieu du film : galaxies sur un ballon qui gonfle, $v=Hd$, $H=\dot a/a$ ; le ballon se tourne à la souris\\
 Décalage vers le rouge & spectre de M32 décalé de $1+z$, raies, lumière reçue dans U, B, V, R ; vitesse par l'effet Doppler relativiste\\
 L'atmosphère terrestre & masse d'air (sec $z$, Kasten \& Young, Pickering), extinction $\Delta m = kX$ et rougissement, fenêtres atmosphériques (ESO SkyCalc), réfraction, Soleil aplati, lever avancé, dispersion\\
+Diffraction et pouvoir de résolution & tache d'Airy, $1{,}22\lambda/D$, critère de Rayleigh, obstruction centrale, écart d'éclat, turbulence (pose longue)\\
 Télescope & grossissement $F/f$, champ réel, pouvoir séparateur $1{,}22\lambda/D$, pouvoir collecteur, mise au point ; Lune, Saturne, amas globulaire\\
 Capteur CCD & pose (photons au hasard, loi de Poisson, saturation) puis lecture ligne par ligne et case par case\\
 Loi de Snell-Descartes & $n_1\sin\theta_1=n_2\sin\theta_2$, réflexion totale, part réfléchie (Fresnel), angle de Brewster\\
@@ -1943,6 +1948,56 @@ Sæmundsson, Soleil aplati à l'échelle, lever avancé, dispersion d'après Cid
 Formules vérifiées par SageMath (\texttt{outils/verif\_atmosphere/}).
 \capture{img/anim_earthatmosphere_fenetres_fr.png}{0.9}
 \capture{img/anim_earthatmosphere_refraction_fr.png}{0.9}
+
+\paragraph{Le canon de Newton (0.9.0).} Animation propre à Coupole (thème et module Renaissance), d'après l'expérience
+de pensée de Newton : un canon au sommet d'une montagne tire de plus en plus vite. Le boulet retombe de plus en plus
+loin, fait le tour de l'astre à $v_1=\sqrt{GM/r}$ (vitesse de satellisation), puis s'échappe à $v_2=\sqrt{2}\,v_1$
+(libération). Terre, Lune, Mars, Cérès ou Dimorphos ; « Feu ! » (Espace), flèche verte à tirer (angle et vitesse
+d'un geste), repères $v_1$ et $v_2$ sous le curseur et autour du canon (le curseur s'y aimante), trajectoire prévue en
+pointillés, tirs gardés et légendés, cadrage automatique ou molette, préréglages et défis ; atmosphère réelle (rentrée
+d'une capsule, orbite basse qui se dégrade). Vérifié par SageMath (\texttt{outils/verif\_anim/canon\_newton\_verif.sage}).
+\capture{img/anim_newtoncannon_fr.png}{0.9}
+
+\paragraph{Quatre animations de cours (0.10.0).} Animations propres à Coupole sur des notions qu'un premier cours
+d'astronomie montre en vidéo ou en applet ; formules et valeurs vérifiées par SageMath
+(\texttt{outils/verif\_anim/resolution\_verif.sage}, \texttt{elements\_orbite\_verif.sage}, \texttt{hohmann\_verif.sage},
+\texttt{radiant\_verif.sage}), mêmes nombres dans Coupole Web.
+\begin{itemize}
+\item \textbf{Diffraction et pouvoir de résolution} (Télescopes). Image simulée de deux étoiles et coupe d'intensité le
+long de la droite qui les joint. Tache d'Airy d'une pupille de diamètre $D$ à obstruction centrale $\varepsilon$ :
+$I(v)=\big[2J_1(v)/v-\varepsilon^2\,2J_1(\varepsilon v)/(\varepsilon v)\big]^2/(1-\varepsilon^2)^2$, $v=\pi D\theta/\lambda$ ;
+premier anneau noir à $1{,}22\,\lambda/D$ ($\varepsilon=0$) ; à cet écart (critère de Rayleigh), l'intensité au milieu
+retombe à 73,5~\%. L'obstruction resserre la tache et renforce les anneaux ; un compagnon faible ($\Delta m$) se perd
+dans les anneaux. Turbulence : pose longue = tache d'Airy convoluée par une gaussienne de largeur à mi-hauteur égale au
+seeing ; au-delà de $D=1{,}22\,\lambda/\text{seeing}$ (14~cm pour 1\,$''$ dans le visible), c'est elle qui décide.
+Instruments : œil, lunette de 80~mm, Schmidt-Cassegrain de 203~mm, 1~m, Hubble, VLT, ELT. Image étirée
+(échelle logarithmique) pour voir les anneaux.
+\capture{img/anim_resolution_fr.png}{0.9}
+\item \textbf{Les éléments d'une orbite} (Renaissance). Les six nombres d'une orbite autour de la Terre : $a$, $e$, $i$,
+$\Omega$ (depuis le point vernal $\gamma$, dans l'équateur), $\omega$ (du nœud ascendant au périgée) et le temps
+(anomalie moyenne $M$, équation de Kepler $M=E-e\sin E$). Vue en 3D : plan de l'équateur, ligne des nœuds, ligne des
+apsides, angles dessinés ; l'orbite est pointillée au sud de l'équateur et cachée derrière la Terre. Trace au sol (la
+Terre tourne en un jour sidéral) et orbite vue dans son plan (anomalie vraie $\nu$). Orbites types : station spatiale,
+héliosynchrone, GPS, Molniya, géostationnaire. Valeurs : $T=2\pi\sqrt{a^3/GM}$, périgée, apogée, vitesses par la
+formule vis-viva $v^2=GM(2/r-1/a)$.
+\capture{img/anim_orbitalelements_fr.png}{0.9}
+\item \textbf{Le transfert de Hohmann} (Renaissance). Deux poussées et une demi-ellipse tangente aux deux orbites :
+$\Delta v_1=\sqrt{GM(2/r_1-1/a)}-\sqrt{GM/r_1}$ au départ, $\Delta v_2$ à l'arrivée, durée $\pi\sqrt{a^3/GM}$ avec
+$a=(r_1+r_2)/2$. Pour trouver la cible au rendez-vous, il faut partir quand elle a l'avance $\varphi=\pi-n_2t$
+(angle de phase) : la fenêtre revient à chaque période synodique. Orbite basse vers la station, l'orbite
+géostationnaire ou la Lune ; Terre vers Mars (2,94 puis 2,65~km\,s$^{-1}$, 259~jours, $\varphi=44{,}3°$, une fenêtre
+tous les 780~jours), Vénus (les deux poussées freinent) ou Jupiter. « Partir à la fenêtre de tir » ou « Partir
+maintenant » ; le cercle pointillé montre où sera la cible à l'arrivée si l'on part maintenant.
+\capture{img/anim_hohmann_fr.png}{0.9}
+\item \textbf{Étoiles filantes et radiant} (Petits corps). La nuit du maximum de sept pluies (Quadrantides, Lyrides,
+êta Aquarides, Perséides, Orionides, Léonides, Géminides ; radiant, vitesse, ZHR et indice de population $r$ du
+calendrier de l'IMO) dans le ciel vu de dessous. Les traînées sont des arcs de grand cercle qui s'éloignent du radiant,
+courtes près de lui ; prolongées vers l'arrière, elles s'y croisent. Taux attendu $\mathrm{ZHR}\times\sin h\div
+r^{6{,}5-m_\text{lim}}$ ; courbes de la nuit (hauteur du radiant, taux, crépuscule) ; latitude et magnitude limite
+réglables. Les étoiles de fond sont tirées au hasard (pas un vrai catalogue).
+\capture{img/anim_meteorradiant_fr.png}{0.9}
+\end{itemize}
+
 
 \paragraph{Temps sidéral et angle horaire : l'hémisphère Sud.} L'arc de l'angle horaire est affiché par défaut (un
 choix déjà fait est gardé). La fiche « Ce qu'il faut voir » porte un encadré \emph{Dans l'hémisphère Sud} :
