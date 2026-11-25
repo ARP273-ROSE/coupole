@@ -469,3 +469,74 @@ def test_kozai_interface_periode(app_qt):
         a.pas(0.1)
     assert a.e_max < 0.1
     assert not a.image(640, 420).isNull()
+
+
+# ---------------------------------------------------------------- les points de Lagrange
+def test_lagrange_points_et_constantes():
+    from coupole.modules.anim import lagrange as lg
+    s = sage('lagrange')
+    assert lg.MU_ROUTH == pytest.approx(s['mu_routh'], abs=1e-15)
+    for k, mu, _ in lg.SYSTEMES:
+        c = s['systemes'][k]
+        assert mu == pytest.approx(c['mu'], rel=1e-14), k
+        L = lg.points_lagrange(mu)
+        for n, (x, y) in L.items():
+            assert (x, y) == pytest.approx(tuple(c['L'][n]), abs=1e-12), (k, n)
+            assert lg.jacobi(mu, x, y, 0.0, 0.0) == pytest.approx(c['C'][n], abs=1e-11), (k, n)
+            gx, gy = lg.gradient(mu, x, y)
+            assert abs(gx) < 1e-9 and abs(gy) < 1e-9, (k, n)          # vrais équilibres
+        assert lg.rayon_hill(mu) == pytest.approx(c['hill'], rel=1e-13)
+        assert (mu < lg.MU_ROUTH) == c['L4_stable'], k
+
+
+def test_lagrange_trajectoires_contre_sage():
+    from coupole.modules.anim import lagrange as lg
+    s = sage('lagrange')
+    mu = lg.SYSTEMES[2][1]
+    for cas, delta in (('tetard', 0.005), ('fer_a_cheval', 0.01)):
+        st = lg.depart(mu, cas, delta)
+        c0 = lg.jacobi(mu, *st)
+        t = 0.0
+        for tt in ('2', '6'):
+            st, touche = lg.integrer(mu, st, float(tt) - t)
+            t = float(tt)
+            assert not touche
+            assert st == pytest.approx(tuple(s['trajectoires'][cas][tt]), abs=1e-10), (cas, tt)
+        assert lg.jacobi(mu, *st) == pytest.approx(c0, abs=1e-11)
+    # régions selon C
+    L = lg.points_lagrange(mu)
+    cl = {k: lg.jacobi(mu, x, y, 0.0, 0.0) for k, (x, y) in L.items()}
+    assert lg.regions(mu, cl['L1'] + 1e-6) == 'r_ferme'
+    assert lg.regions(mu, (cl['L1'] + cl['L2']) / 2) == 'r_l1'
+    assert lg.regions(mu, (cl['L2'] + cl['L3']) / 2) == 'r_l2'
+    assert lg.regions(mu, (cl['L3'] + cl['L4']) / 2) == 'r_l3'
+    assert lg.regions(mu, cl['L4'] - 1e-6) == 'r_partout'
+
+
+def test_lagrange_interface(app_qt):
+    from coupole.modules.anim.animations.lagrange import Lagrange
+    a = Lagrange()
+    a.resize(1000, 700)
+    a.systeme.setCurrentIndex(a.systeme.findData('soleil_terre'))
+    v = dict(a.valeurs())
+    assert v['L2 : distance au petit astre'].endswith('1,51 millions de km')     # le JWST
+    assert v['Rapport de masse μ'] == '3,040 × 10⁻⁶'
+    a.systeme.setCurrentIndex(a.systeme.findData('soleil_jupiter'))
+    a.cas.setCurrentIndex(a.cas.findData('fer_a_cheval'))
+    assert a.delta.value() == pytest.approx(0.01)
+    c0 = lg_c(a)
+    for _ in range(40):
+        a.pas(0.1)
+    assert lg_c(a) == pytest.approx(c0, abs=1e-9) and len(a.trace) > 100
+    assert dict(a.valeurs())['Son énergie lui permet d’aller'].startswith('aussi au-delà de L2')
+    a.systeme.setCurrentIndex(a.systeme.findData('pluton_charon'))
+    assert dict(a.valeurs())['L4 et L5'] == 'instables (μ > 0,0385)'
+    a.cas.setCurrentIndex(a.cas.findData('l1'))
+    for _ in range(80):
+        a.pas(0.1)
+    assert not a.image(640, 420).isNull()
+
+
+def lg_c(a):
+    from coupole.modules.anim import lagrange as lg
+    return lg.jacobi(a.mu_a()[0], *a.s)
