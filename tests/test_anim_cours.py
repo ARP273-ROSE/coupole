@@ -186,3 +186,62 @@ def test_hohmann_interface(app_qt):
     for k in ('leo_geo', 'terre_venus', 'terre_lune'):
         a.scenario.setCurrentIndex(a.scenario.findData(k))
         assert a.etape() == 'attente' and not a.image(640, 420).isNull()
+
+
+# ---------------------------------------------------------------- étoiles filantes et radiant
+def test_radiant_hauteur_et_taux():
+    from coupole.modules.anim import meteores as me
+    s = sage('radiant')
+    for c in s['cas']:
+        az, h = me.hauteur_radiant(c['essaim'], c['heure'], c['lat'])
+        # (temps sidéral en double précision : jour julien ≈ 2,46 × 10⁶, d'où quelques 10⁻⁸ degré)
+        assert h == pytest.approx(c['h'], abs=1e-6), c
+        assert math.remainder(az - c['az'], 360.0) == pytest.approx(0.0, abs=1e-6), c
+        assert me.taux_horaire(c['essaim'], h, c['mlim']) == pytest.approx(c['hr'], rel=1e-7, abs=1e-9), c
+    for k, hc in s['culmination'].items():
+        assert me.culmination(k, 45.0)[0] == pytest.approx(hc, abs=1e-8)
+        # à l'heure de culmination, le radiant est au méridien, à 90° − |φ − δ|
+        az, h = me.hauteur_radiant(k, hc if hc >= 12 else hc + 24, 45.0)
+        assert h == pytest.approx(90.0 - abs(45.0 - me.ESSAIMS[k][3]), abs=1e-6)
+
+
+def test_radiant_traînees_vers_le_radiant():
+    """Toute traînée est sur un grand cercle qui passe par le radiant et s'en éloigne ; plus courte près de lui."""
+    from coupole.modules.anim import meteores as me
+    g = me.Aleatoire(7)
+    az_r, h_r = 40.0, 55.0
+    rad = me.vers_horizon(az_r, h_r)
+    n = 0
+    for _ in range(400):
+        t = me.trainee(g, az_r, h_r)
+        if t is None or t[4] < 1.5:
+            continue
+        n += 1
+        p, q = me.vers_horizon(t[0], t[1]), me.vers_horizon(t[2], t[3])
+        nrm = (p[1] * q[2] - p[2] * q[1], p[2] * q[0] - p[0] * q[2], p[0] * q[1] - p[1] * q[0])
+        assert abs(sum(a * b for a, b in zip(nrm, rad))) < 1e-9          # radiant dans le plan du grand cercle
+        dist = lambda v: math.degrees(math.acos(max(-1, min(1, sum(a * b for a, b in zip(v, rad))))))
+        assert dist(q) > dist(p)                                          # s'éloigne du radiant
+        lg = math.degrees(math.acos(max(-1, min(1, sum(a * b for a, b in zip(p, q))))))
+        assert lg <= 25.0 * 1.2 * math.sin(math.radians(t[4])) + 1e-9
+    assert n > 150
+    # générateur identique au web (Park et Miller) : premiers tirages connus
+    g = me.Aleatoire(1)
+    assert [round(g() * 2147483647) for _ in range(3)] == [16807, 282475249, 1622650073]
+
+
+def test_radiant_interface(app_qt):
+    from coupole.modules.anim.animations.radiant import Radiant
+    a = Radiant()
+    a.resize(900, 640)
+    a.essaim.setCurrentIndex(a.essaim.findData('perseides'))
+    a.lat.setValue(45.0)
+    a.heure.setValue(23.0)
+    v = dict(a.valeurs())
+    assert v['Le radiant culmine'].startswith('5 h 4')
+    for _ in range(200):
+        a.pas(0.1)
+    assert 18.0 <= a.heure.value() <= 30.0 and a.filantes
+    a.lat.setValue(-55.0)                              # Perséides invisibles de l'hémisphère sud profond
+    assert dict(a.valeurs())['Hauteur du radiant'].startswith('sous')
+    assert not a.image(640, 420).isNull()
