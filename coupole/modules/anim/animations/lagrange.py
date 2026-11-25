@@ -18,7 +18,7 @@ from ..graphe import Axes
 VITESSE = 4.0 * math.pi           # radians de temps (2 orbites) par seconde réelle, à la vitesse ×1
 N_TRACE = 20000
 PAS_TRACE = 0.05                  # radians de temps entre deux points de la trace
-N_GRILLE = 90
+N_GRILLE = 72
 
 
 def distance(x_a: float, a_km: float) -> str:

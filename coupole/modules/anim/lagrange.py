@@ -11,6 +11,7 @@ d'équilibre : L1, L2, L3 sur l'axe (instables), L4 et L5 au sommet des triangle
 μ < μ_Routh = (1 − √(23/27))/2 = 0,038 52).  Rayon de Hill : r_H ≈ a (μ/3)^(1/3)."""
 from __future__ import annotations
 
+import functools
 import math
 
 MU_ROUTH = (1.0 - math.sqrt(23.0 / 27.0)) / 2.0
@@ -51,6 +52,7 @@ def _bissection(f, a: float, b: float, n: int = 200) -> float:
     return 0.5 * (a + b)
 
 
+@functools.lru_cache(maxsize=16)
 def points_lagrange(mu: float) -> dict:
     """Positions (x, y) des cinq points de Lagrange."""
     def f(x):
