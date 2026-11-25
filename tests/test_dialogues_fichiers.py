@@ -324,7 +324,7 @@ def test_planificateur_de_parallaxe(app_qt, faux):
     try:
         p.liste.setCurrentRow(1)
         pl = p.planif
-        pl._resultat(PL.chercher(s1, s2, PL.Criteres('iss', D.datetime.fromisoformat(ref['debut']), jours=2,
+        pl._resultat(PL.chercher(s1, s2, PL.Criteres('iss', D.datetime.strptime(ref['debut'], '%Y%m%dT%H%M%SZ').replace(tzinfo=D.timezone.utc), jours=2,
                                                      tle=tuple(ref['tle']))))
         _bouton(pl, 'pl_csv').click()
         d = verifier_ouverture(faux, 1)

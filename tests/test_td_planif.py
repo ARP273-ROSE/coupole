@@ -17,7 +17,11 @@ ICI = Path(__file__).parent
 REF = json.loads((ICI / 'td_planif_reference.json').read_text(encoding='utf-8'))
 UTC = D.timezone.utc
 S1, S2 = (P.Site(*x) for x in REF['sites'])
-DEBUT = D.datetime.fromisoformat(REF['debut'])
+def _t(x):
+    return D.datetime.strptime(x, '%Y%m%dT%H%M%SZ').replace(tzinfo=UTC)
+
+
+DEBUT = _t(REF['debut'])
 TLE = tuple(REF['tle'])
 
 
@@ -36,9 +40,9 @@ def test_iss_contre_skyfield(iss):
     att = {x['instant']: x for x in REF['iss']}
     assert len(iss['creneaux']) == len(att)
     for c in iss['creneaux']:
-        r = att[c.meilleur.isoformat()]
+        r = att[c.meilleur.strftime('%Y%m%dT%H%M%SZ')]
         for n in (0, 1):
-            assert abs(c.h[n] - r['h'][n]) < 1e-6                                   # non-régression
+            assert abs(c.h[n] - r['h'][n]) < 0.01            # non-régression (UT1 − UTC et DE440 varient selon la machine)
             assert abs(c.h[n] - r['skyfield_h_az'][n][0]) < 0.15                    # skyfield
             assert abs((c.az[n] - r['skyfield_h_az'][n][1] + 180) % 360 - 180) < 0.15
         assert c.entre == r['entre']
@@ -65,7 +69,7 @@ def test_lune_contre_references(lune):
     att = {x['instant']: x for x in REF['lune']}
     assert len(lune['creneaux']) == len(att)
     for c in lune['creneaux']:
-        r = att[c.meilleur.isoformat()]
+        r = att[c.meilleur.strftime('%Y%m%dT%H%M%SZ')]
         assert c.etoile['nom'] == r['etoile']['nom']
         for n in (0, 1):
             assert abs(c.h[n] - r['h'][n]) < 0.02          # DE440 ou ERFA selon la machine

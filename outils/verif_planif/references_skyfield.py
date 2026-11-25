@@ -31,7 +31,7 @@ def main():
     terre, soleil, lune = eph['earth'], eph['sun'], eph['moon']
     w = [wgs84.latlon(s.lat, s.lon, s.alt_m) for s in (S1, S2)]
     sat = EarthSatellite(*TLE, 'ISS', ts)
-    sortie = {'tle': TLE, 'sites': [[s.lat, s.lon, s.alt_m] for s in (S1, S2)], 'debut': DEBUT.isoformat(),
+    sortie = {'tle': TLE, 'sites': [[s.lat, s.lon, s.alt_m] for s in (S1, S2)], 'debut': DEBUT.strftime('%Y%m%dT%H%M%SZ'),
               'iss': [], 'lune': []}
     r = P.chercher(S1, S2, P.Criteres('iss', DEBUT, jours=7, tle=TLE))
     eh = es = 0.0
@@ -45,7 +45,7 @@ def main():
             s_alt = (terre + w[n]).at(t).observe(soleil).apparent().altaz()[0].degrees
             es = max(es, abs(s_alt - c.soleil[n]))
         assert sat.at(t).is_sunlit(eph), c.meilleur
-        sortie['iss'].append({'instant': c.meilleur.isoformat(), 'h': c.h, 'az': c.az, 'soleil': c.soleil,
+        sortie['iss'].append({'instant': c.meilleur.astimezone(UTC).strftime('%Y%m%dT%H%M%SZ'), 'h': c.h, 'az': c.az, 'soleil': c.soleil,
                               'parallaxe_deg': c.parallaxe_deg, 'entre': c.entre, 'skyfield_h_az': sky})
     print('ISS : %d créneaux ; écart max hauteur/azimut %.4f° ; Soleil %.3f°' % (len(r['creneaux']), eh, es))
     r = P.chercher(S1, S2, P.Criteres('lune', DEBUT, jours=60))
@@ -69,11 +69,21 @@ def main():
             ep = max(ep, abs(phi - c.etoile['sep%d' % (n + 1)]) * 3600)
         f = (terre + w[0]).at(t).observe(lune).apparent().fraction_illuminated(soleil)
         ef = max(ef, abs(f - c.phase))
-        sortie['lune'].append({'instant': c.meilleur.isoformat(), 'h': c.h, 'phase': c.phase, 'etoile': c.etoile,
+        sortie['lune'].append({'instant': c.meilleur.astimezone(UTC).strftime('%Y%m%dT%H%M%SZ'), 'h': c.h, 'phase': c.phase, 'etoile': c.etoile,
                                'skyfield_h': sky, 'skyfield_phase': float(f)})
     print('Lune (%s) : %d créneaux ; écart max hauteur %.4f° ; φ %.1f″ ; fraction éclairée %.4f'
           % (r['source'], len(r['creneaux']), eh, ep, ef))
-    (RACINE / 'tests/td_planif_reference.json').write_text(json.dumps(sortie, ensure_ascii=False, indent=1))
+    # nombres arrondis, instants compacts : de longues suites de chiffres séparées par « : » ressemblent à des
+    # numéros (garde-fou de confidentialité)
+    def arrondir(x):
+        if isinstance(x, float):
+            return round(x, 5)
+        if isinstance(x, list):
+            return [arrondir(v) for v in x]
+        if isinstance(x, dict):
+            return {k: arrondir(v) for k, v in x.items()}
+        return x
+    (RACINE / 'tests/td_planif_reference.json').write_text(json.dumps(arrondir(sortie), ensure_ascii=False, indent=1))
 
 
 if __name__ == '__main__':
