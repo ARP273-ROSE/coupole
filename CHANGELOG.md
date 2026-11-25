@@ -2,7 +2,7 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
-## 0.12.0 — en préparation — Planificateur de parallaxe
+## 0.12.0 — 25 novembre 2026 — Planificateur de parallaxe
 
 - **Planificateur de parallaxe** (Calculateurs de TD) : pour deux lieux, les passages de l'ISS (14 jours au plus) et
   les soirées de Lune (400 jours au plus) visibles des deux à la fois, ciel noir, ISS éclairée, Lune pas trop pleine

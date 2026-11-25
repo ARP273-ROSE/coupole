@@ -2,7 +2,7 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
-## 0.12.0 — in preparation — Parallax planner
+## 0.12.0 — 25 November 2026 — Parallax planner
 
 - **Parallax planner** (Course calculators): for two places, the ISS passes (14 days at most) and Moon evenings (400
   days at most) visible from both at once, dark sky, ISS lit, Moon not too full with a nearby reference star; ranked
