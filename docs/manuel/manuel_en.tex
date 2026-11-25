@@ -2058,6 +2058,14 @@ about 1°/s: half a second is enough). For the Moon, the measured quantity is $\
 for a 400~km baseline), only when the baseline lines up with the Moon--star direction: the score and the formula
 error say so.
 
+\paragraph{90-day outlook (ISS).} Orbital elements (TLE) age: compared with the one of 25/11/2026, those of 01/11 and
+15/10 put the ISS 89~s and 158~s early, a drift of about 3.8~s per day of age (air drag and reboosts cannot be
+predicted). The ground track only slides by about 1° per 4~minutes of error: the \emph{evenings} with passes stay
+right for weeks. The \emph{90-day outlook} box therefore searches up to 90~days with today's TLE, sorts the slots by
+date and shows the time within $\pm$ a margin (twice the measured drift). Checked: with the 01/11 TLE, the week of
+25/11 gives the same seven passes, shifted by 1.5 to 2~min, within the announced margin (3 to 3.5~min). Run the
+precise search again 2 or 3~days before (\texttt{coupole td plan --outlook}).
+
 \capture{img/td_planif_lune_en.png}{1.0}
 \paragraph{Display and exports.} The table ranks the slots; each place's sky (zenith at the centre, horizon at the
 edge) shows the track and the best time; the details give elevations, azimuths, distances, ISS magnitude, nearby

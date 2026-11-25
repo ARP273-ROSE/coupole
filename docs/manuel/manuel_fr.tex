@@ -2129,6 +2129,15 @@ environ 1°/s : une demi-seconde suffit). Pour la Lune, la grandeur mesurée est
 d'arc pour 400~km de base), seulement si la base est alignée avec la direction Lune--étoile : la note et l'erreur de
 la formule le disent.
 
+\paragraph{Tendance sur 90 jours (ISS).} Les éléments orbitaux (TLE) vieillissent : comparés à celui du 25/11/2026,
+ceux du 01/11 et du 15/10 plaçaient l'ISS 89~s et 158~s trop tôt, soit une dérive d'environ 3,8~s par jour d'âge (le
+frottement de l'atmosphère et les relèvements d'orbite ne se prévoient pas). Le tracé au sol, lui, ne glisse que
+d'environ 1° pour 4~minutes d'erreur : les \emph{soirs} de passage restent justes des semaines. La case
+\emph{Tendance sur 90 jours} cherche donc jusqu'à 90~jours avec le TLE du jour, classe les créneaux par date et
+affiche l'heure à $\pm$ une marge (le double de la dérive mesurée). Vérifié : avec le TLE du 01/11, la semaine du
+25/11 donne les mêmes sept passages, décalés de 1,5 à 2~min, dans la marge annoncée (3 à 3,5~min). Relancer la
+recherche précise 2 ou 3~jours avant (\texttt{coupole td planifier --tendance}).
+
 \capture{img/td_planif_lune_fr.png}{1.0}
 \paragraph{Affichage et exports.} Le tableau classe les créneaux ; le ciel de chaque lieu (zénith au centre, horizon
 au bord) montre la trajectoire et le meilleur instant ; le détail donne hauteurs, azimuts, distances, magnitude de

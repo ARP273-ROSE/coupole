@@ -32,7 +32,10 @@ R_EQ = 6378.137                     # km
 UA_KM = 149597870.7
 R_LUNE = 1737.4                     # km
 MAG_ISS_1000 = -1.8                 # magnitude standard de l'ISS à 1000 km, pleine phase (usage courant)
-JOURS_MAX = {'iss': 14.0, 'lune': 400.0}
+JOURS_MAX = {'iss': 14.0, 'lune': 400.0, 'tendance': 90.0}
+# Dérive mesurée d'un TLE de l'ISS : ≈ 3,8 s de retard ou d'avance par jour d'âge (TLE du 15/10 et du 01/11/2026
+# comparés à celui du 25/11 : 158 s à 42 j, 89 s à 24 j) ; la marge affichée en vaut le double (relèvements d'orbite).
+DERIVE_TLE_S_PAR_JOUR = 3.8
 
 
 class ErreurPlanif(ValueError):
@@ -64,6 +67,7 @@ class Criteres:
     pas_s: float = 0.0                   # 0 : 5 s (ISS), 300 s (Lune)
     tle: tuple | None = None
     max_resultats: int = 40
+    tendance: bool = False               # ISS : jusqu'à 90 jours, heures indicatives, classement par date
 
 
 @dataclass
@@ -90,6 +94,7 @@ class Creneau:
     etoiles_proches: list = field(default_factory=list)  # ISS : étoiles brillantes près de l'ISS (lieu 1)
     trace: list = field(default_factory=list)          # [(dt, h1, az1, h2, az2)] pour le dessin
     remarques: list = field(default_factory=list)      # clés de textes
+    marge_s: float = 0.0                               # ISS : incertitude sur l'heure (âge du TLE)
 
 
 # ============================================================================================== outils
@@ -259,8 +264,8 @@ def chercher_iss(s1: Site, s2: Site, c: Criteres) -> dict:
         raise ErreurPlanif('pl_err_tle')
     from . import tle as TL
     debut = (c.debut or D.datetime.now(UTC)).astimezone(UTC)
-    jours = min(max(c.jours, 0.1), JOURS_MAX['iss'])
-    pas = c.pas_s or 5.0
+    jours = min(max(c.jours, 0.1), JOURS_MAX['tendance' if c.tendance else 'iss'])
+    pas = c.pas_s or (10.0 if c.tendance else 5.0)
     T = _Temps(debut, np.arange(0.0, jours * 86400.0, pas))
     X = _iss_terre(c.tle, T)
     sol = T.vers_terre(soleil_gcrs(T))
@@ -315,6 +320,11 @@ def chercher_iss(s1: Site, s2: Site, c: Criteres) -> dict:
             cr.remarques.append('pl_r_hors_plan')
         if max(mag) > 1.5:
             cr.remarques.append('pl_r_faible')
+        ep_ = TL.epoque(c.tle)
+        if ep_ is not None:
+            cr.marge_s = max(30.0, 2 * DERIVE_TLE_S_PAR_JOUR * abs((cr.meilleur - ep_).total_seconds()) / 86400)
+            if cr.marge_s > 120:
+                cr.remarques.append('pl_r_indicatif')
         out.append(cr)
     age = None
     ep = TL.epoque(c.tle)
@@ -440,12 +450,19 @@ def chercher(s1: Site, s2: Site, c: Criteres) -> dict:
     if abs(s1.lat) > 90 or abs(s2.lat) > 90:
         raise ErreurPlanif('pl_err_lieu')
     r = chercher_iss(s1, s2, c) if c.cible == 'iss' else chercher_lune(s1, s2, c)
-    r['creneaux'].sort(key=lambda x: -x.note)
+    if c.tendance and c.cible == 'iss':
+        r['creneaux'].sort(key=lambda x: x.meilleur)
+        c.max_resultats = max(c.max_resultats, 400)
+    else:
+        r['creneaux'].sort(key=lambda x: -x.note)
     r['nombre_total'] = len(r['creneaux'])
     r['creneaux'] = r['creneaux'][:c.max_resultats]
     r['cible'] = c.cible
     r['sites'] = [s1, s2]
-    if c.cible == 'iss' and r['age_tle_j'] is not None and r['age_tle_j'] + c.jours > 5:
+    r['tendance'] = bool(c.tendance and c.cible == 'iss')
+    if r['tendance']:
+        r.setdefault('alertes', []).append('pl_a_tendance')
+    elif c.cible == 'iss' and r['age_tle_j'] is not None and r['age_tle_j'] + c.jours > 5:
         r.setdefault('alertes', []).append('pl_a_tle_vieux')
     return r
 
@@ -466,7 +483,7 @@ def csv(r: dict, heure_locale: bool = False) -> str:
     def t(x):
         return (x.astimezone() if heure_locale else x).strftime('%Y-%m-%d %H:%M:%S%z')
     lignes = ['cible;debut;fin;meilleur;note;h1;az1;h2;az2;d1_km;d2_km;soleil1;soleil2;parallaxe_deg;'
-              'ecart_plan_deg;entre;erreur_sujet_pct;vitesse_deg_s;synchro_s;mag1;mag2;phase;etoile;V;delta_arcmin']
+              'ecart_plan_deg;entre;erreur_sujet_pct;vitesse_deg_s;synchro_s;mag1;mag2;phase;etoile;V;delta_arcmin;marge_s']
     for c in r['creneaux']:
         e = c.etoile or {}
         lignes.append(';'.join(str(x) for x in (
@@ -477,7 +494,7 @@ def csv(r: dict, heure_locale: bool = False) -> str:
             round(c.vitesse_deg_s, 4), '' if math.isinf(c.synchro_s) else round(c.synchro_s, 3),
             *(['%.1f' % m for m in c.magnitude] if c.magnitude else ['', '']),
             '' if c.phase is None else round(c.phase, 3), e.get('nom', ''), e.get('V', ''),
-            '' if not e else round(e['delta_arcmin'], 2))))
+            '' if not e else round(e['delta_arcmin'], 2), round(c.marge_s) if c.marge_s else '')))
     return '\n'.join(lignes) + '\n'
 
 
@@ -491,6 +508,8 @@ def ics(r: dict) -> str:
         titre = ('Parallaxe ISS' if c.cible == 'iss' else 'Parallaxe Lune') + ' (%d/100)' % round(c.note)
         desc = 'h1 %.1f° az1 %.1f° / h2 %.1f° az2 %.1f° ; meilleur instant %s UTC' % (
             c.h[0], c.az[0], c.h[1], c.az[1], c.meilleur.astimezone(UTC).strftime('%H:%M:%S'))
+        if c.marge_s > 120:
+            desc += ' ; heure indicative à ± %d min' % round(c.marge_s / 60)
         if c.etoile:
             desc += ' ; étoile %s (V %.1f), Δφ %.2f′' % (c.etoile['nom'], c.etoile['V'], c.etoile['delta_arcmin'])
         out += ['BEGIN:VEVENT', 'UID:coupole-planif-%s-%d@coupole' % (f(c.meilleur), k), 'DTSTAMP:' + now,

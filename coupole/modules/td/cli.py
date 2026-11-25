@@ -33,6 +33,7 @@ def enregistrer(p):
     s.add_argument('--soleil', '--sun', type=float, default=-6.0, help=tr('pl_soleil_aide'))
     s.add_argument('--ics', default='', metavar=tr('td_meta_texte'), help=tr('pl_cli_ics'))
     s.add_argument('--csv', action='store_true', help=tr('pl_csv_aide'))
+    s.add_argument('--tendance', '--outlook', action='store_true', help=tr('pl_cli_tendance'))
     s.set_defaults(fonction=cmd_planifier)
 
 
@@ -93,7 +94,9 @@ def cmd_planifier(a):
                 debut = D.datetime.fromisoformat(a.debut).replace(tzinfo=D.timezone.utc)
             except ValueError:
                 raise K.CoordonneeIllisible('pl_err_debut', texte=a.debut) from None
-        c = P.Criteres(cible, debut, a.jours or (7.0 if cible == 'iss' else 60.0), a.hmin, a.soleil)
+        tendance = cible == 'iss' and a.tendance
+        c = P.Criteres(cible, debut, a.jours or (60.0 if tendance else 7.0 if cible == 'iss' else 60.0), a.hmin, a.soleil,
+                       tendance=tendance)
         r = P.chercher_avec_tle(sites[0], sites[1], c)
     except (K.CoordonneeIllisible, P.ErreurPlanif) as ex:
         print(tr(ex.cle, **{'erreur': '', **ex.valeurs}), file=sys.stderr)
@@ -110,7 +113,10 @@ def cmd_planifier(a):
     for c in r['creneaux']:
         mesure = ('%s°' % _n(c.parallaxe_deg, 1) if c.cible == 'iss'
                   else 'Δφ %s′ %s' % (_n(c.etoile['delta_arcmin'], 2), c.etoile['nom']))
-        print(tr('pl_cli_ligne', date=c.meilleur.strftime('%Y-%m-%d %H:%M:%S UTC'), note=round(c.note),
+        date = c.meilleur.strftime('%Y-%m-%d %H:%M:%S UTC')
+        if c.marge_s > 120:
+            date = c.meilleur.strftime('%Y-%m-%d %H:%M UTC') + ' ± %d min' % round(c.marge_s / 60)
+        print(tr('pl_cli_ligne', date=date, note=round(c.note),
                  h1=_n(c.h[0], 0), h2=_n(c.h[1], 0), mesure=mesure,
                  err='—' if c.erreur_sujet_pct is None else '%s %%' % _n(c.erreur_sujet_pct, 1),
                  infos=', '.join(tr(k) for k in c.remarques)))

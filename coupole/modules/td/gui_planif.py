@@ -143,6 +143,10 @@ class PanneauPlanif(QWidget):
         for w, cle in ((self.s_jours, 'jours'), (self.s_hmin, 'hmin'), (self.s_soleil, 'soleil'), (self.s_mag, 'mag'),
                        (self.s_sep, 'sep'), (self.s_phase, 'phase')):
             memoire.nombre(w, 'modules.td.planif.' + cle)
+        self.c_tendance = aide(QCheckBox(tr('pl_tendance')), 'pl_tendance_aide')
+        memoire.case(self.c_tendance, 'modules.td.planif.tendance')
+        self.c_tendance.toggled.connect(self._cible)
+        vg.addWidget(self.c_tendance)
         self.c_locale = aide(QCheckBox(tr('pl_locale')), 'pl_locale_aide')
         memoire.case(self.c_locale, 'modules.td.planif.locale')
         self.c_locale.toggled.connect(lambda _: self._remplir())
@@ -193,7 +197,9 @@ class PanneauPlanif(QWidget):
     def _cible(self, *_):
         lune = self.c_cible.currentData() == 'lune'
         self.g_lune.setVisible(lune)
-        self.s_jours.setMaximum(P.JOURS_MAX['lune' if lune else 'iss'])
+        self.c_tendance.setVisible(not lune)
+        tendance = not lune and self.c_tendance.isChecked()
+        self.s_jours.setMaximum(P.JOURS_MAX['lune' if lune else 'tendance' if tendance else 'iss'])
 
     def exemple(self):
         for n, (nom, pos, alt) in enumerate((('Paris', '48.8366 N, 2.3360 E', '67'),
@@ -226,6 +232,7 @@ class PanneauPlanif(QWidget):
                                 self.e['nom%d' % n].text().strip()))
         c = P.Criteres(self.c_cible.currentData(), self._debut(), self.s_jours.value(), self.s_hmin.value(),
                        self.s_soleil.value(), self.s_mag.value(), self.s_sep.value(), self.s_phase.value() / 100.0)
+        c.tendance = c.cible == 'iss' and self.c_tendance.isChecked()
         return sites, c
 
     def chercher(self):
@@ -282,7 +289,10 @@ class PanneauPlanif(QWidget):
             else:
                 mesure = 'Δφ %s′ (%s)' % (_n(c.etoile['delta_arcmin'], 2), c.etoile['nom'])
             err = '—' if c.erreur_sujet_pct is None else '%s %%' % _n(c.erreur_sujet_pct, 1)
-            vals = (self._t(c.meilleur, '%d/%m/%Y'), self._t(c.meilleur, '%H:%M:%S'), '%d' % round(c.note),
+            heure = self._t(c.meilleur, '%H:%M' if c.marge_s > 120 else '%H:%M:%S')
+            if c.marge_s > 120:
+                heure += ' ± %d min' % round(c.marge_s / 60)
+            vals = (self._t(c.meilleur, '%d/%m/%Y'), heure, '%d' % round(c.note),
                     '%s° / %s°' % (_n(c.h[0], 0), _n(c.h[1], 0)), mesure, err,
                     ', '.join(tr(k) for k in c.remarques))
             for j, x in enumerate(vals):
@@ -345,6 +355,9 @@ def html_creneau(c, noms, t) -> str:
         lignes.append('<p>%s</p>' % (tr('pl_d_sujet', e=_n(c.erreur_sujet_pct, 1)) if c.erreur_sujet_pct is not None
                                      else tr('pl_d_sujet_na')))
         lignes.append('<p>%s</p>' % tr('pl_d_synchro_iss', v=_n(c.vitesse_deg_s, 2), s=_n(c.synchro_s, 2)))
+        if c.marge_s > 120:
+            lignes.append('<p><b>%s</b></p>' % tr('pl_d_marge', m='%d' % round(c.marge_s / 60),
+                                                  a=_n(c.marge_s / (2 * P.DERIVE_TLE_S_PAR_JOUR), 0)))
         if c.etoiles_proches:
             lignes.append('<p>%s</p>' % tr('pl_d_etoiles', liste=', '.join(
                 '%s (%s, %s°)' % (e(x['nom']), _n(x['V'], 1), _n(x['sep'], 1)) for x in c.etoiles_proches)))

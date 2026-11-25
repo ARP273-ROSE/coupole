@@ -104,6 +104,23 @@ TEXTES_PLANIF = {
     'pl_r_faible': {'fr': 'ISS peu brillante', 'en': 'faint ISS'},
     'pl_r_lune_faible': {'fr': 'parallaxe faible vers l’étoile', 'en': 'small parallax towards the star'},
     'pl_r_lune_pleine': {'fr': 'Lune très éclairée', 'en': 'bright Moon'},
+    'pl_tendance': {'fr': 'Tendance sur 90 jours (heures indicatives)', 'en': '90-day outlook (approximate times)'},
+    'pl_tendance_aide': {'fr': 'ISS : chercher jusqu’à 90 jours avec le TLE du jour. Les soirs de passage restent justes '
+                               'des semaines ; l’heure dérive d’environ 4 s par jour d’âge du TLE (marge affichée). '
+                               'Classement par date. Relancer la recherche précise 2 ou 3 jours avant.',
+                         'en': 'ISS: search up to 90 days with today’s TLE. The evenings with passes stay right for weeks; '
+                               'the time drifts by about 4 s per day of TLE age (margin shown). Sorted by date. Run the '
+                               'precise search again 2 or 3 days before.'},
+    'pl_a_tendance': {'fr': 'Tendance : les dates et les soirs sont fiables, les heures sont à ± la marge indiquée ; '
+                            'relancez la recherche précise 2 ou 3 jours avant.',
+                      'en': 'Outlook: dates and evenings are reliable, times are within ± the margin shown; run the '
+                            'precise search again 2 or 3 days before.'},
+    'pl_r_indicatif': {'fr': 'heure indicative', 'en': 'approximate time'},
+    'pl_d_marge': {'fr': 'Heure indicative à ± {m} min (âge du TLE à cette date : {a} jours) : relancez la recherche '
+                         'précise 2 ou 3 jours avant.',
+                   'en': 'Approximate time, ± {m} min (TLE age at that date: {a} days): run the precise search again '
+                         '2 or 3 days before.'},
+    'pl_cli_tendance': {'fr': 'ISS : tendance jusqu’à 90 jours (heures indicatives)', 'en': 'ISS: outlook up to 90 days (approximate times)'},
     # détail
     'pl_d_titre_iss': {'fr': 'Passage de l’ISS du {date}', 'en': 'ISS pass on {date}'},
     'pl_d_titre_lune': {'fr': 'La Lune le {date}', 'en': 'The Moon on {date}'},

@@ -177,3 +177,19 @@ def qapp_planif(tmp_path, monkeypatch):
     monkeypatch.setattr(tle, 'dossier', lambda: tmp_path)
     tle.garder(TLE)
     return app
+
+
+def test_tendance_iss():
+    """Tendance (90 jours au plus) : classement par date, marge qui croît avec l'âge du TLE, mêmes passages que la
+    recherche précise sur la première semaine."""
+    r = P.chercher(S1, S2, P.Criteres('iss', DEBUT, jours=30, tle=TLE, tendance=True))
+    cs = r['creneaux']
+    assert r['tendance'] and 'pl_a_tendance' in r['alertes'] and len(cs) > 15
+    assert [c.meilleur for c in cs] == sorted(c.meilleur for c in cs)
+    assert cs[-1].marge_s > cs[0].marge_s and cs[-1].marge_s > 120 and 'pl_r_indicatif' in cs[-1].remarques
+    precis = P.chercher(S1, S2, P.Criteres('iss', DEBUT, jours=7, tle=TLE))
+    semaine = [c for c in cs if c.meilleur < DEBUT + D.timedelta(days=7)]
+    assert len(semaine) == len(precis['creneaux'])
+    for a, b in zip(semaine, sorted(precis['creneaux'], key=lambda c: c.meilleur)):
+        assert abs((a.meilleur - b.meilleur).total_seconds()) <= 10          # pas de 10 s au lieu de 5 s
+    assert P.Criteres('iss', DEBUT, jours=200, tle=TLE, tendance=True) and P.JOURS_MAX['tendance'] == 90

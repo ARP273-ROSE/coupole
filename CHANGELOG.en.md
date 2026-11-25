@@ -11,6 +11,9 @@ French version (reference): [CHANGELOG.md](CHANGELOG.md).
   by 1 %, ISS magnitude, nearby stars, the Moon's Δφ and its maximum R/D; both places' skies; CSV export and .ics
   calendar; command line `coupole td plan`. Checked against skyfield (`outils/verif_planif/references_skyfield.py`)
   and SageMath (`verif_planif_sage.py`).
+- **90-day outlook** (ISS): with today's TLE, the evenings with passes stay right for weeks; times given within ± a
+  margin (measured drift ≈ 3.8 s per day of TLE age, margin = twice that), sorted by date, `--outlook` on the
+  command line.
 - ISS TLE: when CelesTrak does not answer (frequent 503 error), the one from ARISS.
 - Reference stars: Yale Bright Star Catalogue (V ≤ 5.5), in `coupole/modules/td/donnees/`.
 

@@ -11,6 +11,9 @@ Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
   décalage d'horloge qui fausse la parallaxe de 1 %, magnitude de l'ISS, étoiles voisines, Δφ de la Lune et son
   maximum R/D ; ciel des deux lieux ; export CSV et agenda .ics ; ligne de commande `coupole td planifier`.
   Contrôlé par skyfield (`outils/verif_planif/references_skyfield.py`) et SageMath (`verif_planif_sage.py`).
+- **Tendance sur 90 jours** (ISS) : avec le TLE du jour, les soirs de passage restent justes des semaines ; heures
+  données à ± une marge (dérive mesurée ≈ 3,8 s par jour d'âge du TLE, marge = le double), classement par date,
+  `--tendance` en ligne de commande.
 - TLE de l'ISS : si CelesTrak ne répond pas (erreur 503 fréquente), celui d'ARISS.
 - Étoiles de repère : Yale Bright Star Catalogue (V ≤ 5,5), dans `coupole/modules/td/donnees/`.
 
