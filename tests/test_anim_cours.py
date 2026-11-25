@@ -404,3 +404,68 @@ def test_occultation_interface(app_qt):
         a.pas(0.1)
         assert -tm - 1e-9 <= a.instant() <= tm + 1e-9
     assert not a.image(640, 420).isNull()
+
+
+# ---------------------------------------------------------------- le mécanisme de Kozai-Lidov
+def test_kozai_constantes_et_tk():
+    from coupole.modules.anim import kozai as kz
+    s = sage('kozai')
+    assert s['hamiltonien'] and s['vectoriel']
+    assert kz.I_CRITIQUE == pytest.approx(s['i_critique'], abs=1e-12)
+    for i0, em in s['e_max'].items():
+        assert kz.e_max_circulaire(float(i0)) == pytest.approx(em, abs=1e-12)
+        assert kz.i_a_e(kz.constante_c(0.0, float(i0)), em) == pytest.approx(s['i_au_max'][i0], abs=1e-8)
+    assert kz.e_max_circulaire(30.0) == 0.0
+    for k, m, ap, per in kz.SYSTEMES:
+        assert kz.t_kozai_ans(m, ap, per) == pytest.approx(s['t_k'][k], rel=1e-12), k
+
+
+def test_kozai_integration_contre_sage():
+    from coupole.modules.anim import kozai as kz
+    s = sage('kozai')
+    for c in s['etats']:
+        ev, jv = kz.vecteurs(c['e0'], c['i0'], c['w0'])
+        tau = 0.0
+        for tt in ('3', '7.5'):
+            ev, jv = kz.integrer(ev, jv, float(tt) - tau)
+            tau = float(tt)
+            assert ev + jv == pytest.approx(c['etats'][tt], abs=2e-9), (c, tt)
+        # C et l'énergie conservés
+        e, i, w, _ = kz.elements(ev, jv)
+        assert kz.constante_c(e, i) == pytest.approx(kz.constante_c(c['e0'], c['i0']), abs=1e-10)
+        assert kz.energie(e, i, w) == pytest.approx(kz.energie(c['e0'], c['i0'], c['w0']), abs=1e-9)
+
+
+def test_kozai_elements_aller_retour():
+    from coupole.modules.anim import kozai as kz
+    for e, i, w, o in ((0.3, 63.0, 40.0, 10.0), (0.6, 52.0, 230.0, -120.0), (0.01, 85.0, 359.0, 0.0)):
+        e2, i2, w2, o2 = kz.elements(*kz.vecteurs(e, i, w, o))
+        assert (e2, i2) == pytest.approx((e, i), abs=1e-12)
+        assert math.remainder(w2 - w, 360.0) == pytest.approx(0.0, abs=1e-9)
+        assert math.remainder(o2 - o, 360.0) == pytest.approx(0.0, abs=1e-9)
+
+
+def test_kozai_interface_periode(app_qt):
+    from coupole.modules.anim.animations.kozai import Kozai
+    s = sage('kozai')
+    a = Kozai()
+    a.resize(1000, 700)
+    a.i0.setValue(65.0)
+    a.e0.setValue(0.05)
+    a.w0.setValue(0.0)
+    a.recommencer()
+    for _ in range(140):                                  # 0,1 s × 2 t_K/s : 28 t_K
+        a.pas(0.1)
+    m = s['maxima']['0.05_65_0']
+    # instant du maximum interpolé linéairement entre deux images (pas de 0,2 t_K ici) : à 3 × 10⁻³ près
+    assert a.maxima[0] == pytest.approx(m[0], abs=3e-3) and a.maxima[1] == pytest.approx(m[1], abs=3e-3)
+    v = dict(a.valeurs())
+    assert v['Période des oscillations'].startswith('5,03 t_K')
+    assert v['e maximale atteinte'].startswith('0,83')
+    assert v['Inclinaison critique arccos √(3/5)'] == '39,23°'
+    a.i0.setValue(30.0)                                   # sous l'inclinaison critique : e reste petite
+    assert a.tau == 0.0
+    for _ in range(50):
+        a.pas(0.1)
+    assert a.e_max < 0.1
+    assert not a.image(640, 420).isNull()
