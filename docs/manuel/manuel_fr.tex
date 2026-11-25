@@ -1779,6 +1779,10 @@ L'assistance gravitationnelle & déviation $\delta=2\arcsin\bigl(1/(1+r_pv_\inft
 Occultation d'une étoile par un astéroïde & ombre, cordes, courbes de lumière, ellipse ajustée, vitesse de l'ombre, Fresnel\\
 Le diagramme $a$--$e$ & familles Atira, Aten, Apollo, Amor ($q$, $Q$ constants), lacunes de Kirkwood, 27 petits corps réels, Tisserand\\
 Le cratère d'impact & lois d'échelle de Collins et al. (2005) : cavité transitoire, cratère simple ou complexe, énergie, fréquence\\
+Rotation synchrone et libration & $l=\nu-M$, $b$, Lune vue de la Terre, part de la surface vue (58~\%), libration diurne\\
+La précession des équinoxes & pôle céleste en 25\,772~ans, étoiles polaires (Thuban, Polaris, Véga), point vernal dans le zodiaque\\
+Résonances et chaos & figures des résonances dans le repère tournant (Hilda, troyens), Kirkwood, écart de deux jumeaux (chaos)\\
+La limite de Roche & $2{,}44\,R\sqrt[3]{\rho_p/\rho_s}$ (fluide), $1{,}44$ (rigide), satellite qui se disloque en anneau, marée\\
 \midrule
 Petits angles & $\alpha\approx206\,265''\,d/D$ contre la valeur exacte $2\arcsin(d/2D)$\\
 Horloge de la Grande Ourse & ciel du nord en projection stéréographique ; un tour par jour sidéral, environ 1$^\circ$ par jour à heure fixe\\
@@ -2046,15 +2050,17 @@ Terre-Lune, Soleil-Jupiter, Pluton-Charon.
 \capture{img/anim_lagrange_fr.png}{0.9}
 \end{itemize}
 
-\paragraph{Animations de cours de la 0.12.0.} Même démarche ; vérifications SageMath
-\texttt{outils/verif\_anim/survols\_impacts\_verif.sage} (diagramme $a$--$e$, assistance gravitationnelle, cratère).
+\paragraph{Animations de cours de la 0.12.0.} Même démarche ; vérifications SageMath dans \texttt{outils/verif\_anim/} :
+\texttt{survols\_impacts\_verif.sage} (diagramme $a$--$e$, assistance gravitationnelle, cratère),
+\texttt{libration\_verif.sage}, \texttt{precession\_verif.sage}, \texttt{resonances\_verif.sage},
+\texttt{roche\_verif.sage}.
 \begin{itemize}
 \item \textbf{Le diagramme $a$--$e$} (Petits corps). Chaque point (demi-grand axe $a$, excentricité $e$) est une orbite
 autour du Soleil : périhélie $q=a(1-e)$, aphélie $Q=a(1+e)$, période $P=a^{3/2}$ (ans, $a$ en ua). Les géocroiseurs se
 lisent sur des courbes de $q$ ou $Q$ constants : Atira ($a<1$, $Q<0{,}983$~ua), Aten ($a<1$, $Q>0{,}983$), Apollo
 ($a>1$, $q<1{,}017$), Amor ($1{,}017<q<1{,}3$) ; puis croiseurs de Mars ($q<1{,}666$), ceinture principale, troyens,
 centaures, transneptuniens (classes de la base SBDB du JPL). Lacunes de Kirkwood aux résonances $a=a_J(q/p)^{2/3}$
-(3:1 à 2,50~ua, 5:2, 7:3, 2:1 à 3,28~ua), Hilda (3:2) et troyens (1:1). Paramètre de Tisserand
+($3{:}1$ à 2,50~ua, $5{:}2$, $7{:}3$, $2{:}1$ à 3,28~ua), Hilda ($3{:}2$) et troyens ($1{:}1$). Paramètre de Tisserand
 $T_J=a_J/a+2\cos i\sqrt{(a/a_J)(1-e^2)}$ : astéroïde au-dessus de 3, comète de la famille de Jupiter entre 2 et 3, de
 type Halley en dessous. 27 petits corps réels (éléments SBDB arrondis) ; clic dans le diagramme pour choisir un point ;
 l'orbite est dessinée vue de dessus parmi celles des planètes.
@@ -2075,6 +2081,48 @@ aussi énergique tous les $109\,E_\text{Mt}^{0{,}78}$~ans. Le cas du cours (1,5~
 Coupe à l'échelle animée (chute, creusement, effondrement) et diamètre final selon la taille de l'impacteur.
 L'entrée atmosphérique n'est pas modélisée (impacteurs de plus de 200~m).
 \capture{img/anim_impactcrater_fr.png}{0.9}
+\item \textbf{Rotation synchrone et libration} (Cycles de la Lune). La Lune tourne uniformément en un mois sidéral
+(rotation synchrone, due aux marées) mais parcourt son orbite elliptique à vitesse variable : le point situé sous la
+Terre se déplace en longitude de $l=\nu-M\approx2e\sin M$ (6,3° au plus pour $e=0{,}0549$ ; 7,9° pour la vraie Lune,
+dont l'orbite est déformée par le Soleil). L'équateur lunaire est incliné de $I=6{,}68^\circ$ sur l'orbite :
+$b=\arcsin(\sin I\sin(\nu+\varpi))$. Un observateur à la surface voit en plus $\arcsin(R_\oplus/d)=0{,}95^\circ$
+(libration diurne). La part de la surface vue au moins une fois se calcule par azimuts autour du point opposé à la
+Terre (un point n'est jamais vu si $\vec P\cdot\vec S<-\sin\rho$ pour toutes les directions $\vec S$ de la Terre),
+contrôlée par une grille fine de la sphère sous SageMath (\texttt{libration\_verif.sage}) : 56,5~\% en un mois, 58,0~\%
+au fil des années dans ce modèle képlérien (59~\% pour la vraie Lune). La Lune vue de la Terre (mer des Crises,
+Copernic, Tycho, Grimaldi, mer Orientale), l'orbite vue de dessus avec le méridien repère, la courbe $(l,b)$ du mois ;
+comparaison avec une Lune qui ne tournerait pas.
+\capture{img/anim_libration_fr.png}{0.9}
+\item \textbf{La précession des équinoxes} (Coordonnées et mouvements). L'axe de la Terre décrit un cône autour de la
+perpendiculaire à l'écliptique : le pôle céleste fait le tour du pôle de l'écliptique, à $\varepsilon=23{,}44^\circ$, en
+$360^\circ/p=25\,772$~ans ($p=5\,028{,}796\,195''$ par siècle, UAI 2006). Modèle simple : écliptique J2000 fixe,
+obliquité constante, vitesse uniforme, mouvements propres négligés (les dates sont justes à quelques siècles près).
+Étoiles du Yale Bright Star Catalogue ; Polaris passe au plus près en 2103 (0,46°), Thuban vers $-2829$ (0,20°), Véga
+vers 13\,789 (4,8°), Kochab vers $-1100$. Le point vernal recule de $p$ par an le long des constellations de l'UAI :
+il est entré dans les Poissons vers $-54$ et passera dans le Verseau en 2598. Recalculé par matrices de rotation
+sous SageMath (\texttt{precession\_verif.sage}).
+\capture{img/anim_precession_fr.png}{0.9}
+\item \textbf{Résonances et chaos} (Renaissance). Problème restreint circulaire Soleil-Jupiter (mêmes équations et
+même intégrateur que les points de Lagrange) : un astéroïde lâché à son périhélie sur l'orbite $(a,e)$, à l'angle
+$\varphi_0$ de Jupiter, et un jumeau lâché $10^{-7}a_J$ (78~km) plus loin. Dans le repère tournant, une orbite en
+résonance dessine une figure fermée : triangle des Hilda ($3{:}2$, $a=3{,}97$~ua), têtard des troyens ($1{:}1$) ; demi-grand
+axe et excentricité osculateurs au fil du temps, résonances $a=a_J(q/p)^{2/3}$ (lacunes de Kirkwood $3{:}1$, $5{:}2$, $7{:}3$, $2{:}1$).
+L'écart des jumeaux, en échelle logarithmique, croît lentement sur une orbite régulière et exponentiellement quand
+l'astéroïde frôle Jupiter (comète) : c'est le chaos. Jupiter réel ou dix fois plus lourd ; repère tournant ou fixe.
+Contrôlé par une intégration indépendante sous SageMath (\texttt{resonances\_verif.sage}, DOP853 à $10^{-13}$) : mêmes
+positions à $10^{-9}$ près.
+\capture{img/anim_resonances_fr.png}{0.9}
+\item \textbf{La limite de Roche} (Renaissance). Un satellite fait de grains tenus par leur seule gravité (sans
+cohésion) est disloqué par la marée sous $d=K\,R\sqrt[3]{\rho_p/\rho_s}$ : $K=2{,}44$ pour un satellite fluide, que la
+marée allonge (Roche) ; $K=\sqrt[3]3=1{,}44$ pour une sphère rigide en rotation synchrone (au point le plus proche de la
+planète, marée et force centrifuge $3GMr/d^3$ égalent la gravité propre $Gm/r^2$ ; résolu symboliquement sous SageMath,
+\texttt{roche\_verif.sage}). Étirement de marée rapporté à la gravité propre $3(\rho_p/\rho_s)(R/d)^3$, allongement
+d'équilibre d'un satellite fluide $\tfrac{15}{4}(\rho_p/\rho_s)(R/d)^3$. Le satellite descend lentement ; sous la limite,
+chaque grain suit sa propre orbite de Kepler (contrôlée par intégration numérique) et la rotation différentielle les
+étale en anneau. Saturne et un bloc de glace (limite 2,21~R : les anneaux principaux s'arrêtent vers 2,27~R), Mars et
+Phobos (à 2,76~R, sous la limite fluide de 3,12~R mais au-dessus de la limite rigide), Jupiter et une comète, la Terre
+et la Lune (limite 2,88~R, à comparer à ses 60~R).
+\capture{img/anim_roche_fr.png}{0.9}
 \end{itemize}
 
 

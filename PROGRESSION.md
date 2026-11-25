@@ -1637,3 +1637,29 @@ toi-même avec une interface graphique ».
 - [x] Manuels FR/EN § « Planificateur de parallaxe » (+ captures `outils/captures_planif.py`), README, NOTICE, CHANGELOG.
 - [ ] **Coupole Web** : porter le planificateur (page TD) — même données d'étoiles, références JSON communes.
 - [ ] Publier 0.12.0 (VERSION, date du CHANGELOG, recompiler les manuels) avec la version web, sur accord.
+
+## 25/11/2026 (suite) — animations de cours P6 à P10 (112 animations ; dans l'entrée 0.12.0, non publiée)
+Même méthode que les 0.10.0 et 0.11.0 (noyau sans Qt jumeau du web, vérification SageMath, tests, textes FR/EN dans
+`anim/textes_cours2.py`, manuels FR/EN § « Animations de cours de la 0.12.0 ») :
+- [x] **Le diagramme a–e** (`aediagram`, Petits corps) : `anim/diagramme_ae.py` (q, Q, P, familles CNEOS/SBDB,
+  Tisserand, résonances, 27 petits corps SBDB arrondis), diagramme cliquable, orbite vue de dessus.
+- [x] **L'assistance gravitationnelle** (`gravityassist`, Renaissance) : `anim/assistance.py` (coniques raccordées,
+  hyperbole, triangle des vitesses, orbites avant/après).
+- [x] **Le cratère d'impact** (`impactcrater`, Petits corps) : `anim/cratere.py` (Collins, Melosh et Marcus 2005, éq. 3,
+  21–28, 48, relues dans l'article ; cas du cours 22,4 km). Sage commun : `survols_impacts_verif.sage` (dont un survol
+  intégré numériquement : déviation et sens de sortie à 10⁻¹⁰).
+- [x] **Rotation synchrone et libration** (`libration`, Cycles de la Lune) : `anim/libration.py` (l = ν − M, b, part vue
+  par azimuts ; Sage : grille fine de la sphère, écart < 10⁻³).
+- [x] **La précession des équinoxes** (`precession`, Coordonnées) : `anim/precession.py` (UAI 2006, écliptique fixe,
+  étoiles BSC5 arrondies, constellations zodiacales de l'UAI ; Sage : matrices de rotation, minima).
+- [x] **Résonances et chaos** (`resonances`, Renaissance) : `anim/resonances.py` (problème restreint de `lagrange.py`,
+  jumeaux ; Sage : DOP853, positions à 10⁻⁹).
+- [x] **La limite de Roche** (`roche`, Renaissance) : `anim/roche.py` (2,44 et ∛3, grains en orbites de Kepler ; Sage :
+  résolution symbolique de la limite rigide, orbites intégrées).
+- [x] Modules (ANIMATIONS_AJOUTEES), recherche, comptes 112, manifeste, NOTICE, CHANGELOG FR/EN, README, manuels.
+- Pièges : un attribut `_cle` masque la méthode `Animation._cle` (renommé `_cle_depart`) ; pas de « _ » dans les
+  textes (ρₚ/ρₛ) ; milliers en espace fine insécable dans les textes FR (test typographie du web) ; étiquettes qui se
+  chevauchent au format téléphone (test web) : légende masquée sur un petit panneau ; captures : `COUPOLE_HOME`
+  temporaire, sinon les réglages mémorisés faussent l'image.
+- Reste (inventaire privé) : précession séculaire d'une orbite (#51), phénomènes mutuels, traînées de météoroïdes,
+  NAAP des cours à venir.

@@ -1886,8 +1886,8 @@
   ]
  },
  "reel": {
-  "documents": 837,
-  "vocabulaire": 5727,
+  "documents": 841,
+  "vocabulaire": 5783,
   "requetes": [
    [
     "seasons",
@@ -3673,20 +3673,20 @@
      },
      {
       "g": "animation",
+      "id": "roche",
+      "n": 1,
+      "score": 7,
+      "mots": [
+       "wins"
+      ]
+     },
+     {
+      "g": "animation",
       "id": "siderealTimeAndHourAngleDemo",
       "n": 1,
       "score": 7,
       "mots": [
        "lien"
-      ]
-     },
-     {
-      "g": "animation",
-      "id": "snellslaw",
-      "n": 1,
-      "score": 7,
-      "mots": [
-       "when"
       ]
      }
     ]
@@ -5110,6 +5110,17 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "roche",
+      "n": 2,
+      "score": 30,
+      "mots": [
+       "gravite",
+       "gravity",
+       "orbites"
+      ]
+     },
+     {
       "g": "question",
       "id": "ca_solarsystemdebris_plutostability",
       "n": 2,
@@ -5124,15 +5135,6 @@
      {
       "g": "question",
       "id": "ca_200level_gravityforces",
-      "n": 1,
-      "score": 33,
-      "mots": [
-       "gravity"
-      ]
-     },
-     {
-      "g": "question",
-      "id": "ca_renaissance_gravitydirection",
       "n": 1,
       "score": 33,
       "mots": [
@@ -5199,6 +5201,17 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "roche",
+      "n": 2,
+      "score": 30,
+      "mots": [
+       "gravite",
+       "gravity",
+       "orbites"
+      ]
+     },
+     {
       "g": "question",
       "id": "ca_solarsystemdebris_plutostability",
       "n": 2,
@@ -5213,16 +5226,6 @@
      {
       "g": "question",
       "id": "ca_renaissance_realisticorbit",
-      "n": 1,
-      "score": 33,
-      "mots": [
-       "orbites",
-       "orbits"
-      ]
-     },
-     {
-      "g": "question",
-      "id": "ca_renaissance_satelliteorbits",
       "n": 1,
       "score": 33,
       "mots": [
@@ -5290,6 +5293,17 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "roche",
+      "n": 2,
+      "score": 30,
+      "mots": [
+       "gravite",
+       "gravity",
+       "orbites"
+      ]
+     },
+     {
       "g": "question",
       "id": "ca_solarsystemdebris_plutostability",
       "n": 2,
@@ -5304,16 +5318,6 @@
      {
       "g": "question",
       "id": "ca_renaissance_realisticorbit",
-      "n": 1,
-      "score": 33,
-      "mots": [
-       "orbites",
-       "orbits"
-      ]
-     },
-     {
-      "g": "question",
-      "id": "ca_renaissance_satelliteorbits",
       "n": 1,
       "score": 33,
       "mots": [
@@ -5547,6 +5551,16 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "libration",
+      "n": 2,
+      "score": 32,
+      "mots": [
+       "libration",
+       "vitesse"
+      ]
+     },
+     {
       "g": "question",
       "id": "ca_light_photonspeeds",
       "n": 1,
@@ -5577,15 +5591,6 @@
      {
       "g": "animation",
       "id": "radialvelocitysimulator",
-      "n": 1,
-      "score": 31,
-      "mots": [
-       "vitesse"
-      ]
-     },
-     {
-      "g": "animation",
-      "id": "stellarvel",
       "n": 1,
       "score": 31,
       "mots": [
@@ -6879,6 +6884,17 @@
       ]
      },
      {
+      "g": "animation",
+      "id": "precession",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "equinox",
+       "equinoxe",
+       "equinoxes"
+      ]
+     },
+     {
       "g": "fiche",
       "id": "coordsmotion_slide3",
       "n": 1,
@@ -6930,6 +6946,17 @@
       "mots": [
        "equinox",
        "equinoxe"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "precession",
+      "n": 1,
+      "score": 31,
+      "mots": [
+       "equinox",
+       "equinoxe",
+       "equinoxes"
       ]
      },
      {
@@ -7053,6 +7080,15 @@
       "mots": [
        "zodiac"
       ]
+     },
+     {
+      "g": "animation",
+      "id": "precession",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "zodiac"
+      ]
      }
     ]
    ],
@@ -7066,6 +7102,15 @@
       "score": 10,
       "mots": [
        "constellation"
+      ]
+     },
+     {
+      "g": "animation",
+      "id": "precession",
+      "n": 1,
+      "score": 10,
+      "mots": [
+       "constellations"
       ]
      },
      {

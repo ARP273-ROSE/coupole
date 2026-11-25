@@ -19,7 +19,7 @@ Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 - TLE de l'ISS : si CelesTrak ne répond pas (erreur 503 fréquente), celui d'ARISS.
 - Étoiles de repère : Yale Bright Star Catalogue (V ≤ 5,5), dans `coupole/modules/td/donnees/`.
 
-### Animations de cours (108 animations)
+### Animations de cours (112 animations)
 
 Nouvelles animations propres à Coupole, au bureau comme dans Coupole Web ; formules et valeurs vérifiées par SageMath,
 mêmes nombres au caractère près dans les deux applications.
@@ -35,6 +35,24 @@ mêmes nombres au caractère près dans les deux applications.
 - **Le cratère d'impact** (Petits corps) : lois d'échelle de Collins, Melosh et Marcus (2005) ; cavité transitoire,
   cratère simple ou complexe, profondeur, énergie en mégatonnes, fréquence de tels impacts ; coupe animée à l'échelle ;
   le cas du cours (1,5 km à 20 km·s⁻¹) donne 22,4 km.
+- **Rotation synchrone et libration** (Cycles de la Lune) : la Lune tourne uniformément mais parcourt son orbite à
+  vitesse variable (l = ν − M ≈ 2e sin M) et son équateur est incliné de 6,68° (b) ; la Lune vue de la Terre avec ses
+  formations repères, orbite vue de dessus et méridien repère, courbe de libration ; part de la surface vue au moins
+  une fois (58 % dans ce modèle, contrôlée par une grille fine de la sphère sous SageMath), libration diurne, Lune
+  qui ne tournerait pas.
+- **La précession des équinoxes** (Coordonnées et mouvements) : le pôle céleste fait le tour du pôle de l'écliptique
+  en 25 772 ans (vitesse UAI 2006) ; carte du ciel autour du pôle de l'écliptique avec les étoiles polaires
+  successives (Thuban vers −2800, Polaris en 2100, Véga vers 13 800), bande des constellations de l'UAI le long de
+  l'écliptique où recule le point vernal (Verseau en 2598), axe de la Terre et son cône ; modèle simple (écliptique
+  fixe, obliquité constante).
+- **Résonances et chaos** (Renaissance) : un astéroïde et son jumeau lâché 78 km plus loin, sous l'effet du Soleil et
+  de Jupiter (problème restreint) ; triangle des Hilda (3:2) et têtard des troyens dans le repère tournant, demi-grand
+  axe au fil du temps près des lacunes de Kirkwood, écart des jumeaux en échelle logarithmique : lent sur une orbite
+  régulière, exponentiel pour une comète qui frôle Jupiter ; contrôlée par une intégration indépendante (SageMath).
+- **La limite de Roche** (Renaissance) : un satellite fait de grains descend vers sa planète ; sous 2,44 R ∛(ρₚ/ρₛ)
+  (fluide) ou ∛3 R ∛(ρₚ/ρₛ) (rigide, résolu symboliquement sous SageMath), la marée l'emporte et ses débris s'étalent en
+  anneau ; gros plan sur les forces de marée, étirement rapporté à la gravité propre ; Saturne et ses anneaux, Mars et
+  Phobos, Jupiter et une comète, la Terre et la Lune.
 
 ## 0.11.0 — 25 novembre 2026 — Quatre animations de cours de plus
 

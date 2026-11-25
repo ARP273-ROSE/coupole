@@ -215,14 +215,14 @@ ANIM_COURS_2 = {
     'anim_impactcrater_impacteur': ('Impacteur', 'Impactor'),
     'anim_impactcrater_impacteur_aide': ('Nature, donc densité, de l’impacteur.', 'Nature, hence density, of the '
                                          'impactor.'),
-    'anim_impactcrater_i_glace': ('glace (comète), 1 000 kg·m⁻³', 'ice (comet), 1,000 kg·m⁻³'),
-    'anim_impactcrater_i_poreux': ('roche poreuse, 1 500 kg·m⁻³', 'porous rock, 1,500 kg·m⁻³'),
-    'anim_impactcrater_i_rocheux': ('roche dense, 3 000 kg·m⁻³', 'dense rock, 3,000 kg·m⁻³'),
-    'anim_impactcrater_i_fer': ('fer, 8 000 kg·m⁻³', 'iron, 8,000 kg·m⁻³'),
+    'anim_impactcrater_i_glace': ('glace (comète), 1 000 kg·m⁻³', 'ice (comet), 1,000 kg·m⁻³'),
+    'anim_impactcrater_i_poreux': ('roche poreuse, 1 500 kg·m⁻³', 'porous rock, 1,500 kg·m⁻³'),
+    'anim_impactcrater_i_rocheux': ('roche dense, 3 000 kg·m⁻³', 'dense rock, 3,000 kg·m⁻³'),
+    'anim_impactcrater_i_fer': ('fer, 8 000 kg·m⁻³', 'iron, 8,000 kg·m⁻³'),
     'anim_impactcrater_cible': ('Sol', 'Ground'),
     'anim_impactcrater_cible_aide': ('Roche de la cible (densité).', 'Target rock (density).'),
-    'anim_impactcrater_c_sedimentaire': ('roches sédimentaires, 2 500 kg·m⁻³', 'sedimentary rock, 2,500 kg·m⁻³'),
-    'anim_impactcrater_c_cristalline': ('roches cristallines, 2 750 kg·m⁻³', 'crystalline rock, 2,750 kg·m⁻³'),
+    'anim_impactcrater_c_sedimentaire': ('roches sédimentaires, 2 500 kg·m⁻³', 'sedimentary rock, 2,500 kg·m⁻³'),
+    'anim_impactcrater_c_cristalline': ('roches cristallines, 2 750 kg·m⁻³', 'crystalline rock, 2,750 kg·m⁻³'),
     'anim_impactcrater_t_coupe': ('Coupe du cratère (à l’échelle)', 'Cross-section of the crater (to scale)'),
     'anim_impactcrater_t_graphe': ('Diamètre final selon la taille de l’impacteur', 'Final diameter versus impactor '
                                    'size'),
@@ -251,4 +251,227 @@ ANIM_COURS_2 = {
     'anim_impactcrater_atmosphere': ('sous 200 m, l’atmosphère freine et fragmente l’impacteur (non modélisé ici)',
                                      'below 200 m, the atmosphere slows down and breaks up the impactor (not '
                                      'modelled here)'),
+    # ================================================================ Rotation synchrone et libration
+    'anim_libration_e': ('Excentricité de l’orbite e', 'Orbital eccentricity e'),
+    'anim_libration_e_aide': ('0,0549 pour la Lune ; on peut l’exagérer pour mieux voir l’effet : la Lune va plus vite '
+                              'près de la Terre, alors que sa rotation reste uniforme.',
+                              '0.0549 for the Moon; it can be exaggerated to see the effect better: the Moon moves '
+                              'faster near the Earth, while its rotation stays uniform.'),
+    'anim_libration_i': ('Inclinaison de l’équateur lunaire I', 'Tilt of the lunar equator I'),
+    'anim_libration_i_aide': ('Angle entre l’équateur de la Lune et le plan de son orbite (6,68°) : on voit tour à tour '
+                              'un peu au-delà du pôle nord et du pôle sud.',
+                              'Angle between the Moon’s equator and its orbital plane (6.68°): we see in turn a little '
+                              'beyond the north pole and the south pole.'),
+    'anim_libration_varpi': ('Angle nœud – périgée ϖ', 'Node – perigee angle ϖ'),
+    'anim_libration_varpi_aide': ('Angle entre la ligne des nœuds de l’équateur lunaire et le périgée ; il fait le tour '
+                                  'en quelques années, ce qui change la forme de la courbe de libration.',
+                                  'Angle between the line of nodes of the lunar equator and the perigee; it goes '
+                                  'round in a few years, which changes the shape of the libration curve.'),
+    'anim_libration_rotation': ('Rotation de la Lune', 'Rotation of the Moon'),
+    'anim_libration_rotation_aide': ('Synchrone (un tour en un mois sidéral, comme la vraie Lune, freinée par les marées) '
+                                     'ou aucune, pour comparer : on verrait alors toute la Lune en un mois.',
+                                     'Synchronous (one turn per sidereal month, like the real Moon, braked by the tides) '
+                                     'or none, to compare: we would then see the whole Moon within a month.'),
+    'anim_libration_r_synchrone': ('synchrone', 'synchronous'),
+    'anim_libration_r_aucune': ('aucune (pour comparer)', 'none (to compare)'),
+    'anim_libration_diurne': ('Libration diurne', 'Diurnal libration'),
+    'anim_libration_diurne_aide': ('Un observateur à la surface de la Terre voit la Lune d’un point déplacé de jusqu’à un '
+                                   'rayon terrestre : environ 0,95° de plus sur les bords (au lever et au coucher).',
+                                   'An observer on the Earth’s surface sees the Moon from a point shifted by up to one '
+                                   'Earth radius: about 0.95° more at the edges (at moonrise and moonset).'),
+    'anim_libration_grille': ('Méridiens et parallèles', 'Meridians and parallels'),
+    'anim_libration_grille_aide': ('Grille tous les 30° ; en jaune le méridien origine, en bleu les méridiens ±90° (le '
+                                   'bord de la Lune sans libration).',
+                                   'Grid every 30°; in yellow the prime meridian, in blue the ±90° meridians (the edge '
+                                   'of the Moon without libration).'),
+    'anim_libration_t_lune': ('La Lune vue de la Terre', 'The Moon seen from the Earth'),
+    'anim_libration_t_orbite': ('L’orbite vue de dessus', 'The orbit seen from above'),
+    'anim_libration_t_courbe': ('Libration au fil du mois', 'Libration over the month'),
+    'anim_libration_legende_lune': ('nord en haut, est lunaire à droite', 'north up, lunar east to the right'),
+    'anim_libration_legende_orbite': ('jaune : méridien origine (Lune agrandie)', 'yellow: prime meridian (Moon '
+                                      'enlarged)'),
+    'anim_libration_axe_l': ('l (°)', 'l (°)'),
+    'anim_libration_axe_b': ('b (°)', 'b (°)'),
+    'anim_libration_f_crisium': ('mer des Crises', 'Mare Crisium'),
+    'anim_libration_f_tycho': ('Tycho', 'Tycho'),
+    'anim_libration_f_copernic': ('Copernic', 'Copernicus'),
+    'anim_libration_f_grimaldi': ('Grimaldi', 'Grimaldi'),
+    'anim_libration_f_orientale': ('mer Orientale', 'Mare Orientale'),
+    'anim_libration_v_jour': ('Depuis le périgée', 'Since perigee'),
+    'anim_libration_jours': ('{n} jours', '{n} days'),
+    'anim_libration_v_l': ('Libration en longitude l = ν − M', 'Libration in longitude l = ν − M'),
+    'anim_libration_v_b': ('Libration en latitude b', 'Libration in latitude b'),
+    'anim_libration_v_distance': ('Distance Terre-Lune', 'Earth-Moon distance'),
+    'anim_libration_v_mois': ('Surface vue au moins une fois en un mois', 'Surface seen at least once in a month'),
+    'anim_libration_v_annees': ('… au fil des années (ϖ tourne)', '… over the years (ϖ turns)'),
+    'anim_libration_v_diurne': ('Libration diurne arcsin(R⊕/d)', 'Diurnal libration arcsin(R⊕/d)'),
+    # ================================================================ La précession des équinoxes
+    'anim_precession_annee': ('Année', 'Year'),
+    'anim_precession_annee_aide': ('Année (numérotation astronomique : l’an 0 est l’an 1 av. J.-C.). En lecture, le '
+                                   'temps défile de mille ans par seconde.',
+                                   'Year (astronomical numbering: year 0 is 1 BC). When playing, time runs at a '
+                                   'thousand years per second.'),
+    'anim_precession_noms': ('Noms des étoiles', 'Star names'),
+    'anim_precession_noms_aide': ('Polaris, Kochab, Thuban, Véga, Deneb, Alderamin, Errai… : les « étoiles polaires » '
+                                  'successives.',
+                                  'Polaris, Kochab, Thuban, Vega, Deneb, Alderamin, Errai…: the successive “pole '
+                                  'stars”.'),
+    'anim_precession_dates': ('Dates sur le cercle du pôle', 'Dates on the pole circle'),
+    'anim_precession_dates_aide': ('Position du pôle céleste tous les 2 000 ans.',
+                                   'Position of the celestial pole every 2,000 years.'),
+    'anim_precession_t_carte': ('Le ciel autour du pôle de l’écliptique', 'The sky around the ecliptic pole'),
+    'anim_precession_t_zodiaque': ('Le point vernal recule le long du zodiaque', 'The vernal point moves back along '
+                                   'the zodiac'),
+    'anim_precession_t_terre': ('L’axe de la Terre décrit un cône', 'The Earth’s axis sweeps a cone'),
+    'anim_precession_pole_ecl': ('pôle de l’écliptique', 'ecliptic pole'),
+    'anim_precession_pole': ('pôle céleste', 'celestial pole'),
+    'anim_precession_legende_carte': ('pointillé : cercle de 23,44° que parcourt le pôle ; rouge : 10° autour du pôle',
+                                      'dotted: 23.44° circle the pole travels; red: 10° around the pole'),
+    'anim_precession_gamma': ('équinoxe de mars', 'March equinox'),
+    'anim_precession_legende_zodiaque': ('limites des constellations de l’UAI le long de l’écliptique',
+                                         'IAU constellation boundaries along the ecliptic'),
+    'anim_precession_normale': ('perpendiculaire à l’écliptique', 'perpendicular to the ecliptic'),
+    'anim_precession_axe': ('axe de rotation', 'rotation axis'),
+    'anim_precession_av_jc': ('{a} ({b} av. J.-C.)', '{a} ({b} BC)'),
+    'anim_precession_v_annee': ('Année', 'Year'),
+    'anim_precession_v_periode': ('Précession', 'Precession'),
+    'anim_precession_periode': ('un tour en {p} ans ({v}″ par an)', 'one turn in {p} years ({v}″ per year)'),
+    'anim_precession_v_decalage': ('Recul du point vernal depuis l’an 2000', 'Shift of the vernal point since 2000'),
+    'anim_precession_v_polaire': ('Étoile brillante la plus proche du pôle', 'Bright star closest to the pole'),
+    'anim_precession_a': ('{e}, à {d}', '{e}, {d} away'),
+    'anim_precession_v_polaris': ('Distance de Polaris au pôle', 'Distance of Polaris from the pole'),
+    'anim_precession_v_vega': ('Déclinaison de Véga', 'Declination of Vega'),
+    'anim_precession_v_equinoxe': ('À l’équinoxe de mars, le Soleil est devant', 'At the March equinox, the Sun is in '
+                                   'front of'),
+    'anim_precession_v_suivante': ('Constellation suivante', 'Next constellation'),
+    'anim_precession_vers': ('{c}, à partir de {a}', '{c}, from {a}'),
+    'anim_precession_e_polaris': ('Polaris', 'Polaris'),
+    'anim_precession_e_vega': ('Véga', 'Vega'),
+    'anim_precession_e_thuban': ('Thuban', 'Thuban'),
+    'anim_precession_e_deneb': ('Deneb', 'Deneb'),
+    'anim_precession_e_kochab': ('Kochab', 'Kochab'),
+    'anim_precession_e_alderamin': ('Alderamin', 'Alderamin'),
+    'anim_precession_e_errai': ('Errai', 'Errai'),
+    'anim_precession_e_iota_her': ('ι Herculis', 'ι Herculis'),
+    'anim_precession_e_delta_cyg': ('δ Cygni', 'δ Cygni'),
+    'anim_precession_e_capella': ('Capella', 'Capella'),
+    # ================================================================ Résonances et chaos
+    'anim_resonances_cas': ('Astéroïde', 'Asteroid'),
+    'anim_resonances_cas_aide': ('Un cas tout prêt (demi-grand axe, excentricité, position par rapport à Jupiter au '
+                                 'départ) ; chaque réglage peut ensuite être changé.',
+                                 'A ready-made case (semi-major axis, eccentricity, position relative to Jupiter at '
+                                 'the start); each setting can then be changed.'),
+    'anim_resonances_c_kirkwood': ('Dans la lacune de Kirkwood 3:1 (2,50 ua)', 'In the 3:1 Kirkwood gap (2.50 au)'),
+    'anim_resonances_c_ceinture': ('Ceinture principale, hors résonance (2,30 ua)', 'Main belt, off resonance (2.30 '
+                                   'au)'),
+    'anim_resonances_c_hilda': ('Hilda, résonance 3:2 (3,97 ua)', 'Hilda, 3:2 resonance (3.97 au)'),
+    'anim_resonances_c_troyen': ('Troyen, résonance 1:1 (devant Jupiter, en L4)', 'Trojan, 1:1 resonance (ahead of '
+                                 'Jupiter, at L4)'),
+    'anim_resonances_c_deux_un': ('Lacune 2:1 (3,28 ua)', '2:1 gap (3.28 au)'),
+    'anim_resonances_c_comete': ('Comète qui croise l’orbite de Jupiter', 'Comet crossing Jupiter’s orbit'),
+    'anim_resonances_a': ('Demi-grand axe a', 'Semi-major axis a'),
+    'anim_resonances_a_aide': ('Demi-grand axe de départ, autour du Soleil.', 'Starting semi-major axis, around the '
+                               'Sun.'),
+    'anim_resonances_e': ('Excentricité e', 'Eccentricity e'),
+    'anim_resonances_e_aide': ('Excentricité de départ ; l’astéroïde part de son périhélie.',
+                               'Starting eccentricity; the asteroid starts from its perihelion.'),
+    'anim_resonances_phi': ('Angle avec Jupiter φ₀', 'Angle from Jupiter φ₀'),
+    'anim_resonances_phi_aide': ('Angle, vu du Soleil, entre Jupiter et l’astéroïde au départ.',
+                                 'Angle, seen from the Sun, between Jupiter and the asteroid at the start.'),
+    'anim_resonances_masse': ('Masse de Jupiter', 'Mass of Jupiter'),
+    'anim_resonances_masse_aide': ('Réelle, ou dix fois plus grande pour voir plus vite les effets de Jupiter.',
+                                   'Real, or ten times larger to see Jupiter’s effects sooner.'),
+    'anim_resonances_m_reelle': ('réelle', 'real'),
+    'anim_resonances_m_x10': ('× 10', '× 10'),
+    'anim_resonances_repere': ('Repère', 'Frame'),
+    'anim_resonances_repere_aide': ('Tournant avec Jupiter (une orbite en résonance y dessine une figure fermée) ou fixe.',
+                                    'Rotating with Jupiter (a resonant orbit draws a closed figure in it) or fixed.'),
+    'anim_resonances_r_tournant': ('tournant avec Jupiter', 'rotating with Jupiter'),
+    'anim_resonances_r_fixe': ('fixe', 'fixed'),
+    'anim_resonances_jumeau': ('Jumeau', 'Twin'),
+    'anim_resonances_jumeau_aide': ('Un second astéroïde lâché 78 km plus loin (10⁻⁷ fois la distance de Jupiter), en '
+                                    'bleu.',
+                                    'A second asteroid released 78 km away (10⁻⁷ times Jupiter’s distance), in blue.'),
+    'anim_resonances_relancer': ('Relancer', 'Restart'),
+    'anim_resonances_relancer_aide': ('Repart des conditions initiales.', 'Starts again from the initial conditions.'),
+    'anim_resonances_t_tournant': ('Dans le repère qui tourne avec Jupiter', 'In the frame rotating with Jupiter'),
+    'anim_resonances_t_fixe': ('Dans un repère fixe', 'In a fixed frame'),
+    'anim_resonances_t_a': ('Demi-grand axe au fil du temps', 'Semi-major axis over time'),
+    'anim_resonances_t_ecart': ('Écart entre les deux jumeaux (échelle logarithmique)', 'Distance between the two '
+                                'twins (logarithmic scale)'),
+    'anim_resonances_axe_t': ('orbites de Jupiter', 'Jupiter orbits'),
+    'anim_resonances_axe_a': ('a (ua)', 'a (au)'),
+    'anim_resonances_axe_ecart': ('écart (ua)', 'distance (au)'),
+    'anim_resonances_jupiter': ('Jupiter', 'Jupiter'),
+    'anim_resonances_v_temps': ('Temps écoulé', 'Elapsed time'),
+    'anim_resonances_temps': ('{n} orbites de Jupiter ({ans} ans)', '{n} Jupiter orbits ({ans} years)'),
+    'anim_resonances_v_a': ('Demi-grand axe a', 'Semi-major axis a'),
+    'anim_resonances_v_e': ('Excentricité e', 'Eccentricity e'),
+    'anim_resonances_v_rapport': ('Période de Jupiter / période de l’astéroïde', 'Jupiter’s period / the asteroid’s '
+                                  'period'),
+    'anim_resonances_v_proche': ('Résonance la plus proche', 'Nearest resonance'),
+    'anim_resonances_proche': ('{p}:{q} à {a} ua (écart {d} %)', '{p}:{q} at {a} au ({d}% away)'),
+    'anim_resonances_ejecte': ('orbite ouverte : éjecté par Jupiter', 'open orbit: ejected by Jupiter'),
+    'anim_resonances_v_ecart': ('Écart entre les jumeaux', 'Distance between the twins'),
+    'anim_resonances_ecart': ('{km} km (× {f} depuis le départ)', '{km} km (× {f} since the start)'),
+    'anim_resonances_v_etat': ('État', 'State'),
+    'anim_resonances_collision': ('collision avec Jupiter ou le Soleil', 'collision with Jupiter or the Sun'),
+    # ================================================================ La limite de Roche
+    'anim_roche_systeme': ('Système', 'System'),
+    'anim_roche_systeme_aide': ('Planète et satellite : règle le rapport des densités et la distance de départ.',
+                                'Planet and satellite: sets the density ratio and the starting distance.'),
+    'anim_roche_s_terre_lune': ('Terre et Lune (rapprochée : elle est à 60 R)', 'Earth and Moon (brought closer: it is '
+                                'at 60 R)'),
+    'anim_roche_s_mars_phobos': ('Mars et Phobos (à 2,76 R, il descend)', 'Mars and Phobos (at 2.76 R, it is '
+                                 'spiralling in)'),
+    'anim_roche_s_saturne_glace': ('Saturne et un bloc de glace (à la distance de Mimas)', 'Saturn and a block of ice '
+                                   '(at Mimas’s distance)'),
+    'anim_roche_s_jupiter_comete': ('Jupiter et une comète (ρ ≈ 500 kg·m⁻³)', 'Jupiter and a comet (ρ ≈ 500 kg·m⁻³)'),
+    'anim_roche_rapport': ('Rapport des densités ρₚ/ρₛ', 'Density ratio ρₚ/ρₛ'),
+    'anim_roche_rapport_aide': ('Densité de la planète divisée par celle du satellite (échelle logarithmique) : un '
+                                'satellite peu dense se disloque plus loin.',
+                                'Density of the planet divided by that of the satellite (logarithmic scale): a '
+                                'low-density satellite breaks up further out.'),
+    'anim_roche_d0': ('Distance de départ', 'Starting distance'),
+    'anim_roche_d0_aide': ('Distance du satellite au centre de la planète, en rayons de la planète.',
+                           'Distance of the satellite from the planet’s centre, in planet radii.'),
+    'anim_roche_modele': ('Satellite', 'Satellite'),
+    'anim_roche_modele_aide': ('Fluide (il s’allonge sous la marée : limite 2,44 R ∛(ρₚ/ρₛ)) ou rigide, sans cohésion '
+                               '(sphère en rotation synchrone : 1,44 R ∛(ρₚ/ρₛ)).',
+                               'Fluid (the tide elongates it: limit 2.44 R ∛(ρₚ/ρₛ)) or rigid, without cohesion '
+                               '(sphere in synchronous rotation: 1.44 R ∛(ρₚ/ρₛ)).'),
+    'anim_roche_m_fluide': ('fluide', 'fluid'),
+    'anim_roche_m_rigide': ('rigide', 'rigid'),
+    'anim_roche_descente': ('Le satellite descend', 'The satellite spirals in'),
+    'anim_roche_descente_aide': ('Son orbite rétrécit peu à peu, comme celle de Phobos freinée par les marées (bien plus '
+                                 'vite ici : en réalité, des dizaines de millions d’années).',
+                                 'Its orbit slowly shrinks, like Phobos’s, braked by the tides (much faster here: in '
+                                 'reality, tens of millions of years).'),
+    'anim_roche_relancer': ('Relancer', 'Restart'),
+    'anim_roche_relancer_aide': ('Repart de la distance de départ, satellite entier.', 'Starts again from the starting '
+                                 'distance, with a whole satellite.'),
+    'anim_roche_t_vue': ('Le satellite et sa planète', 'The satellite and its planet'),
+    'anim_roche_t_gros_plan': ('Gros plan : la marée étire le satellite', 'Close-up: the tide stretches the satellite'),
+    'anim_roche_t_graphe': ('Étirement de marée / gravité propre', 'Tidal stretching / self-gravity'),
+    'anim_roche_legende_vue': ('pointillés : limites fluide (rouge) et rigide (bleu)', 'dotted: fluid (red) and rigid '
+                               '(blue) limits'),
+    'anim_roche_legende_gros_plan': ('la planète est à gauche ; flèches : marée', 'the planet is to the left; arrows: '
+                                     'tide'),
+    'anim_roche_plus_de_satellite': ('satellite disloqué', 'satellite broken up'),
+    'anim_roche_axe_d': ('d (R)', 'd (R)'),
+    'anim_roche_axe_rapport': ('marée / gravité', 'tide / gravity'),
+    'anim_roche_rigide_court': ('rigide', 'rigid'),
+    'anim_roche_fluide_court': ('fluide', 'fluid'),
+    'anim_roche_r_km': ('{r} R ({km} km)', '{r} R ({km} km)'),
+    'anim_roche_v_fluide': ('Limite de Roche, satellite fluide 2,44 R ∛(ρₚ/ρₛ)', 'Roche limit, fluid satellite '
+                            '2.44 R ∛(ρₚ/ρₛ)'),
+    'anim_roche_v_rigide': ('Limite, satellite rigide ∛3 R ∛(ρₚ/ρₛ)', 'Limit, rigid satellite ∛3 R ∛(ρₚ/ρₛ)'),
+    'anim_roche_v_d': ('Distance du satellite', 'Distance of the satellite'),
+    'anim_roche_v_etirement': ('Étirement de marée / gravité propre 3 (ρₚ/ρₛ)(R/d)³', 'Tidal stretching / '
+                               'self-gravity 3 (ρₚ/ρₛ)(R/d)³'),
+    'anim_roche_v_allongement': ('Allongement d’un satellite fluide 15/4 (ρₚ/ρₛ)(R/d)³', 'Elongation of a fluid '
+                                 'satellite 15/4 (ρₚ/ρₛ)(R/d)³'),
+    'anim_roche_v_etat': ('État', 'State'),
+    'anim_roche_intact': ('entier', 'whole'),
+    'anim_roche_disloque': ('disloqué : {n} grains sur {m} en anneau', 'broken up: {n} grains out of {m} in a ring'),
 }

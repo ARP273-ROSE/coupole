@@ -19,7 +19,7 @@ French version (reference): [CHANGELOG.md](CHANGELOG.md).
 - ISS TLE: when CelesTrak does not answer (frequent 503 error), the one from ARISS.
 - Reference stars: Yale Bright Star Catalogue (V ≤ 5.5), in `coupole/modules/td/donnees/`.
 
-### Course animations (108 animations)
+### Course animations (112 animations)
 
 New animations of Coupole's own, on the desktop as in Coupole Web; formulas and values checked with SageMath, same
 numbers to the character in both applications.
@@ -34,6 +34,23 @@ numbers to the character in both applications.
 - **Impact craters** (Solar System debris): scaling laws of Collins, Melosh and Marcus (2005); transient cavity,
   simple or complex crater, depth, energy in megatons, frequency of such impacts; animated cross-section to scale; the
   course example (1.5 km at 20 km·s⁻¹) gives 22.4 km.
+- **Synchronous rotation and libration** (Lunar cycles): the Moon spins uniformly but travels its orbit at a varying
+  speed (l = ν − M ≈ 2e sin M) and its equator is tilted by 6.68° (b); the Moon seen from the Earth with landmark
+  features, orbit seen from above with the reference meridian, libration curve; share of the surface seen at least
+  once (58% in this model, checked against a fine grid of the sphere in SageMath), diurnal libration, a Moon that
+  would not spin.
+- **Precession of the equinoxes** (Coordinates and motions): the celestial pole goes round the ecliptic pole in
+  25,772 years (IAU 2006 rate); sky map around the ecliptic pole with the successive pole stars (Thuban around −2800,
+  Polaris in 2100, Vega around 13,800), band of IAU constellations along the ecliptic where the vernal point moves back
+  (Aquarius in 2598), the Earth's axis sweeping its cone; simple model (fixed ecliptic, constant obliquity).
+- **Resonances and chaos** (Renaissance): an asteroid and its twin released 78 km away, under the pull of the Sun and
+  Jupiter (restricted problem); Hilda triangle (3:2) and Trojan tadpole in the rotating frame, semi-major axis over
+  time near the Kirkwood gaps, distance between the twins on a logarithmic scale: slow on a regular orbit, exponential
+  for a comet skimming past Jupiter; checked by an independent integration (SageMath).
+- **The Roche limit** (Renaissance): a satellite made of grains spirals in towards its planet; below 2.44 R ∛(ρₚ/ρₛ)
+  (fluid) or ∛3 R ∛(ρₚ/ρₛ) (rigid, solved symbolically in SageMath), the tide wins and its debris spreads into a ring;
+  close-up of the tidal forces, stretching relative to self-gravity; Saturn and its rings, Mars and Phobos, Jupiter
+  and a comet, the Earth and the Moon.
 
 ## 0.11.0 — 25 November 2026 — Four more course animations
 

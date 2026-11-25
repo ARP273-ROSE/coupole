@@ -174,6 +174,20 @@ survols_impacts_verif.sage) / own code, drawings and texts; formulas and values 
   - assistance gravitationnelle : coniques raccordées ; GM et rayons des planètes (JPL) ;
   - cratère d'impact : lois d'échelle de G. S. Collins, H. J. Melosh et R. A. Marcus, « Earth Impact Effects
     Program », Meteoritics & Planetary Science 40, 817 (2005), équations 3, 21 à 28 et 48.
+  - libration (coupole/modules/anim/libration.py, animations/libration.py ; libration_verif.sage) : inclinaison de
+    l'équateur lunaire sur l'orbite 6,68° (loi de Cassini) ; coordonnées sélénographiques arrondies de la mer des
+    Crises, de Tycho, Copernic, Grimaldi et de la mer Orientale (nomenclature planétaire de l'UAI).
+  - précession (coupole/modules/anim/precession.py, animations/precession.py ; precession_verif.sage) : précession
+    générale en longitude 5 028,796 195″ par siècle et obliquité 84 381,406″ (UAI 2006, N. Capitaine et al., A&A 412,
+    567, 2003) ; positions des étoiles : Yale Bright Star Catalogue, 5e éd. (D. Hoffleit et W. H. Warren, CDS V/50),
+    arrondies ; limites des constellations de l'UAI le long de l'écliptique (déjà utilisées par l'animation du zodiaque).
+  - résonances et chaos (coupole/modules/anim/resonances.py, animations/resonances.py ; resonances_verif.sage) :
+    problème restreint circulaire (C. D. Murray et S. F. Dermott, Solar System Dynamics, 1999) ; période sidérale
+    de Jupiter 11,862 ans.
+  - limite de Roche (coupole/modules/anim/roche.py, animations/roche.py ; roche_verif.sage) : coefficient 2,44 du
+    satellite fluide (É. Roche, 1849), allongement d'équilibre d'un corps fluide homogène (nombre de Love h₂ = 5/2) ;
+    densités : Terre 5 514, Lune 3 344, Mars 3 933, Phobos 1 876, Jupiter 1 326, Saturne 687 kg·m⁻³ (NASA, fiches
+    planétaires), glace 920 et noyau de comète ≈ 500 kg·m⁻³ (valeurs typiques).
 
 Quatre animations de cours de plus (0.11.0) / Four more course animations (coupole/modules/anim/interferometrie.py,
 occultation.py, kozai.py, lagrange.py ; animations/interferometrie.py, occultation.py, kozai.py, lagrange.py)

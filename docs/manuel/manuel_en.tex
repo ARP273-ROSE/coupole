@@ -1713,6 +1713,10 @@ Meteors and their radiant & sky seen from below, trails towards the radiant, rat
 Occultation of a star by an asteroid & shadow, chords, light curves, fitted ellipse, shadow speed, Fresnel\\
 The $a$--$e$ diagram & Atira, Aten, Apollo, Amor groups (constant $q$, $Q$), Kirkwood gaps, 27 real small bodies, Tisserand\\
 Impact craters & Collins et al. (2005) scaling laws: transient cavity, simple or complex crater, energy, frequency\\
+Synchronous rotation and libration & $l=\nu-M$, $b$, the Moon seen from the Earth, share of the surface seen (58\,\%), diurnal libration\\
+Precession of the equinoxes & celestial pole in 25{,}772~years, pole stars (Thuban, Polaris, Vega), vernal point in the zodiac\\
+Resonances and chaos & resonance figures in the rotating frame (Hildas, Trojans), Kirkwood, distance between two twins (chaos)\\
+The Roche limit & $2.44\,R\sqrt[3]{\rho_p/\rho_s}$ (fluid), $1.44$ (rigid), satellite breaking up into a ring, tide\\
 \midrule
 Small angles & $\alpha\approx206\,265''\,d/D$ against the exact value $2\arcsin(d/2D)$\\
 Big Dipper clock & northern sky in stereographic projection; one turn per sidereal day, about 1$^\circ$ per day at a fixed time\\
@@ -1974,8 +1978,10 @@ $a\sqrt[3]{\mu/3}$ (JWST's L2 at 1.51 million km); Sun-Earth, Earth-Moon, Sun-Ju
 \capture{img/anim_lagrange_en.png}{0.9}
 \end{itemize}
 
-\paragraph{Course animations of 0.12.0.} Same approach; SageMath checks
-\texttt{outils/verif\_anim/survols\_impacts\_verif.sage} ($a$--$e$ diagram, gravity assist, impact craters).
+\paragraph{Course animations of 0.12.0.} Same approach; SageMath checks in \texttt{outils/verif\_anim/}:
+\texttt{survols\_impacts\_verif.sage} ($a$--$e$ diagram, gravity assist, impact craters),
+\texttt{libration\_verif.sage}, \texttt{precession\_verif.sage}, \texttt{resonances\_verif.sage},
+\texttt{roche\_verif.sage}.
 \begin{itemize}
 \item \textbf{The $a$--$e$ diagram} (Solar System debris). Each point (semi-major axis $a$, eccentricity $e$) is an
 orbit around the Sun: perihelion $q=a(1-e)$, aphelion $Q=a(1+e)$, period $P=a^{3/2}$ (years, $a$ in au). Near-Earth
@@ -2001,6 +2007,44 @@ energy $\tfrac12mv^2$ in megatons ($4.18\times10^{15}$~J), an impact this energe
 The course example (1.5~km at 20~km\,s$^{-1}$) gives 22.4~km. Animated cross-section to scale (fall, excavation,
 collapse) and final diameter versus impactor size. Atmospheric entry is not modelled (impactors larger than 200~m).
 \capture{img/anim_impactcrater_en.png}{0.9}
+\item \textbf{Synchronous rotation and libration} (Lunar cycles). The Moon spins uniformly once per sidereal month
+(synchronous rotation, due to the tides) but travels its elliptical orbit at a varying speed: the sub-Earth point moves
+in longitude by $l=\nu-M\approx2e\sin M$ (6.3° at most for $e=0.0549$; 7.9° for the real Moon, whose orbit is distorted
+by the Sun). The lunar equator is tilted by $I=6.68^\circ$ to the orbit: $b=\arcsin(\sin I\sin(\nu+\varpi))$. An
+observer on the surface sees $\arcsin(R_\oplus/d)=0.95^\circ$ more (diurnal libration). The share of the surface seen at
+least once is computed by azimuths around the anti-Earth point (a point is never seen if $\vec P\cdot\vec S<-\sin\rho$
+for all directions $\vec S$ of the Earth), checked against a fine grid of the sphere in SageMath
+(\texttt{libration\_verif.sage}): 56.5\,\% in a month, 58.0\,\% over the years in this Keplerian model (59\,\% for the
+real Moon). The Moon seen from the Earth (Mare Crisium, Copernicus, Tycho, Grimaldi, Mare Orientale), the orbit seen
+from above with the reference meridian, the month's $(l,b)$ curve; comparison with a Moon that would not spin.
+\capture{img/anim_libration_en.png}{0.9}
+\item \textbf{Precession of the equinoxes} (Coordinates and motions). The Earth's axis sweeps a cone around the
+perpendicular to the ecliptic: the celestial pole goes round the ecliptic pole, at $\varepsilon=23.44^\circ$, in
+$360^\circ/p=25{,}772$~years ($p=5{,}028.796\,195''$ per century, IAU 2006). Simple model: fixed J2000 ecliptic, constant
+obliquity, uniform rate, proper motions neglected (dates good to a few centuries). Stars from the Yale Bright Star
+Catalogue; Polaris is closest in 2103 (0.46°), Thuban around $-2829$ (0.20°), Vega around 13{,}789 (4.8°), Kochab
+around $-1100$. The vernal point moves back by $p$ per year along the IAU constellations: it entered Pisces around
+$-54$ and will move into Aquarius in 2598. Recomputed with rotation matrices in SageMath (\texttt{precession\_verif.sage}).
+\capture{img/anim_precession_en.png}{0.9}
+\item \textbf{Resonances and chaos} (Renaissance). Circular restricted Sun-Jupiter problem (same equations and same
+integrator as the Lagrange points): an asteroid released at its perihelion on the orbit $(a,e)$, at the angle
+$\varphi_0$ from Jupiter, and a twin released $10^{-7}a_J$ (78~km) away. In the rotating frame, a resonant orbit draws
+a closed figure: the Hilda triangle (3:2, $a=3.97$~au), the Trojan tadpole (1:1); osculating semi-major axis and
+eccentricity over time, resonances $a=a_J(q/p)^{2/3}$ (Kirkwood gaps 3:1, 5:2, 7:3, 2:1). The distance between the
+twins, on a logarithmic scale, grows slowly on a regular orbit and exponentially when the asteroid skims past Jupiter
+(comet): that is chaos. Real Jupiter or ten times heavier; rotating or fixed frame. Checked by an independent
+integration in SageMath (\texttt{resonances\_verif.sage}, DOP853 at $10^{-13}$): same positions to $10^{-9}$.
+\capture{img/anim_resonances_en.png}{0.9}
+\item \textbf{The Roche limit} (Renaissance). A satellite made of grains held by their own gravity alone (no cohesion)
+is torn apart by the tide below $d=K\,R\sqrt[3]{\rho_p/\rho_s}$: $K=2.44$ for a fluid satellite, which the tide elongates
+(Roche); $K=\sqrt[3]3=1.44$ for a rigid sphere in synchronous rotation (at the point closest to the planet, tide and
+centrifugal force $3GMr/d^3$ equal self-gravity $Gm/r^2$; solved symbolically in SageMath, \texttt{roche\_verif.sage}).
+Tidal stretching relative to self-gravity $3(\rho_p/\rho_s)(R/d)^3$, equilibrium elongation of a fluid satellite
+$\tfrac{15}{4}(\rho_p/\rho_s)(R/d)^3$. The satellite slowly spirals in; below the limit, each grain follows its own Kepler
+orbit (checked by numerical integration) and differential rotation spreads them into a ring. Saturn and a block of ice
+(limit 2.21~R: the main rings end near 2.27~R), Mars and Phobos (at 2.76~R, inside the fluid limit of 3.12~R but
+outside the rigid one), Jupiter and a comet, the Earth and the Moon (limit 2.88~R, compared with its 60~R).
+\capture{img/anim_roche_en.png}{0.9}
 \end{itemize}
 
 

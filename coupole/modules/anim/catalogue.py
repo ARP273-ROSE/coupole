@@ -54,6 +54,11 @@ ANIMATIONS = (
     ('aediagram', 'solarsystemdebris', 'The a–e Diagram', 'Coupole', 'diagramme_ae:DiagrammeAE'),
     ('gravityassist', 'renaissance', 'Gravity Assist', 'Coupole', 'assistance:Assistance'),
     ('impactcrater', 'solarsystemdebris', 'Impact Craters', 'Coupole', 'cratere:Cratere'),
+    ('libration', 'lunarcycles', 'Synchronous Rotation and Libration', 'Coupole', 'libration:Libration'),
+    ('precession', 'coordsmotion', 'Precession of the Equinoxes', 'Coupole', 'precession:Precession'),
+    ('resonances', 'renaissance', 'Resonances and Chaos', 'Coupole', 'resonances:Resonances'),
+    ('roche', 'renaissance', 'The Roche Limit', 'Coupole', 'roche:Roche'),
+    # fin des animations de cours 0.12.0
     ('smallangledemo', 'ancientastro', 'Small-Angle Approximation Demonstrator', 'ancientastro/smallangledemo.swf',
      'petits_angles:PetitsAngles'),
     ('dipperclock', 'ancientastro', 'Big Dipper Clock', 'ancientastro/dipperclock.swf',
@@ -235,6 +240,10 @@ HORS_CLASSACTION = {'antikythera': ('Anticythere3D', 'https://github.com/ARP273-
                     'aediagram': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
                     'gravityassist': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
                     'impactcrater': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
+                    'roche': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
+                    'resonances': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
+                    'precession': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
+                    'libration': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
                     'gravityorbits': ('PhET Gravity and Orbits',
                                       'https://phet.colorado.edu/sims/html/gravity-and-orbits/latest/'
                                       'gravity-and-orbits_fr.html')}
@@ -244,7 +253,7 @@ HORS_CLASSACTION = {'antikythera': ('Anticythere3D', 'https://github.com/ARP273-
 # 0.11.0 : interférences et interférométrie (Télescopes), occultation stellaire (petits corps), mécanisme de
 # Kozai-Lidov et points de Lagrange (Renaissance)
 LOT9 = ('resolution', 'orbitalelements', 'hohmann', 'meteorradiant', 'interferometry', 'occultation', 'kozai', 'lagrange',
-        'aediagram', 'gravityassist', 'impactcrater')
+        'aediagram', 'gravityassist', 'impactcrater', 'libration', 'precession', 'resonances', 'roche')
 ORDRE = LOT1 + LOT1_BIS + LOT2 + LOT2_BIS + LOT3 + LOT4 + LOT5 + LOT6 + LOT7 + LOT8 + LOT9
 
 

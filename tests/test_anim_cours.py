@@ -671,3 +671,184 @@ def test_cratere_cas_du_cours(app_qt):
     for _ in range(25):
         a.pas(0.25)
     assert not a.image(900, 560).isNull()
+
+
+# ---------------------------------------------------------------- rotation synchrone et libration (0.12.0)
+def test_libration_contre_sage():
+    from coupole.modules.anim import libration as lb
+    s = sage('libration')
+    for cle, (l_ref, b_ref) in s['libration'].items():
+        M, e, I, w = map(float, cle.split(','))
+        l, b = lb.libration(M, e, I, w)
+        assert l == pytest.approx(l_ref, abs=1e-8) and b == pytest.approx(b_ref, abs=1e-8), cle
+    lmax = max(lb.libration(k / 1000.0, lb.E_LUNE, 0.0, 0.0)[0] for k in range(3142))
+    assert lmax == pytest.approx(s['l_max'], abs=1e-5)
+    assert lb.rho_diurne(lb.E_LUNE) == pytest.approx(s['rho_diurne'], abs=1e-9)
+    rho = lb.rho_diurne(lb.E_LUNE)
+    # part vue : méthode des azimuts (Coupole) contre une grille fine de la sphère (Sage), à 10⁻³ près
+    for cle, (f0, f1) in s['fractions'].items():
+        if cle == 'annees':
+            assert lb.fraction_annees(lb.E_LUNE, lb.I_LUNE) == pytest.approx(f0, abs=1e-3)
+            assert lb.fraction_annees(lb.E_LUNE, lb.I_LUNE, rho_deg=rho) == pytest.approx(f1, abs=1e-3)
+            continue
+        e, I, w = map(float, cle.split(','))
+        assert lb.fraction_mois(e, I, w) == pytest.approx(f0, abs=1e-3), cle
+        assert lb.fraction_mois(e, I, w, rho_deg=rho) == pytest.approx(f1, abs=1e-3), cle
+
+
+def test_libration_projection_et_rotation():
+    from coupole.modules.anim import libration as lb
+    assert lb.projection(0.0, 0.0, 0.0, 0.0) == pytest.approx((0.0, 0.0, 1.0))
+    x, _, z = lb.projection(17.0, 59.1, 6.0, 0.0)              # l > 0 : la mer des Crises se rapproche du centre
+    assert x < lb.projection(17.0, 59.1, 0.0, 0.0)[0] and z > 0.0
+    assert lb.fraction_mois(0.0549, 6.68, 0.0, synchrone=False) == pytest.approx(1.0)
+    assert lb.fraction_mois(0.0, 0.0, 0.0) == pytest.approx(0.5)
+
+
+def test_libration_interface(app_qt):
+    from coupole.modules.anim.animations.libration import Libration
+    a = Libration()
+    a.resize(1000, 700)
+    v = dict(a.valeurs())
+    assert v['… au fil des années (ϖ tourne)'] == '58,0 %' and v['Libration diurne arcsin(R⊕/d)'] == '0,95°'
+    for _ in range(12):
+        a.pas(0.3)
+    assert '(2e sin M' in dict(a.valeurs())['Libration en longitude l = ν − M']
+    a.rotation.setCurrentIndex(a.rotation.findData('aucune'))
+    assert dict(a.valeurs())['Surface vue au moins une fois en un mois'] == '100,0 %'
+    assert not a.image(900, 560).isNull()
+
+
+# ---------------------------------------------------------------- précession des équinoxes (0.12.0)
+def test_precession_contre_sage():
+    from coupole.modules.anim import precession as pr
+    s = sage('precession')
+    assert pr.PERIODE_ANS == pytest.approx(s['periode'], rel=1e-9) and pr.EPS == pytest.approx(s['eps'], rel=1e-9)
+    for n, d in s['distances'].items():
+        for t, ref in d.items():
+            assert pr.distance_au_pole(n, float(t)) == pytest.approx(ref, abs=1e-8), (n, t)
+    for n, (t, d) in s['minimum'].items():
+        ts = [t + k for k in range(-30, 31)]
+        t_min = min(ts, key=lambda x: pr.distance_au_pole(n, x))
+        assert abs(t_min - t) <= 1.0 and pr.distance_au_pole(n, t_min) == pytest.approx(d, abs=1e-5), n
+    assert pr.annee_entree('aqr', 2026.0) == pytest.approx(s['verseau'], abs=1e-6)
+    assert pr.annee_entree('ari', -5000.0) == pytest.approx(s['taureau_belier'], abs=1e-6)
+
+
+def test_precession_etoiles_polaires_et_zodiaque():
+    from coupole.modules.anim import precession as pr
+    assert pr.plus_proche(2100.0)[0] == 'α UMi' and pr.plus_proche(-2800.0)[0] == 'α Dra'
+    assert pr.plus_proche(13800.0)[0] == 'α Lyr'
+    assert pr.constellation(pr.point_vernal(2026.0)) == 'psc' and pr.constellation(pr.point_vernal(3000.0)) == 'aqr'
+    assert pr.constellation(pr.point_vernal(-2800.0)) == 'tau'
+    assert pr.distance_au_pole('α UMi', 2000.0 + pr.PERIODE_ANS) == pytest.approx(pr.distance_au_pole('α UMi', 2000.0))
+
+
+def test_precession_interface(app_qt):
+    from coupole.modules.anim.animations.precession import Precession
+    a = Precession()
+    a.resize(1000, 700)
+    v = dict(a.valeurs())
+    assert v['Étoile brillante la plus proche du pôle'] == 'Polaris (α UMi), à 0,63°'
+    assert v['Constellation suivante'] == 'Verseau, à partir de 2598'
+    a.annee.setValue(-2800.0)
+    assert dict(a.valeurs())['Année'] == '−2800 (2801 av. J.-C.)'
+    a.annee.setValue(14900.0)
+    a.pas(0.5)
+    assert a.annee.value() < 0.0                           # le temps reboucle après 15 000
+    assert not a.image(900, 560).isNull()
+
+
+# ---------------------------------------------------------------- résonances et chaos (0.12.0)
+def test_resonances_contre_sage():
+    from coupole.modules.anim import resonances as rs
+    s = sage('resonances')
+    for pq, a in s['resonances'].items():
+        p, q = map(int, pq.split(':'))
+        assert rs.A_JUPITER_UA * (q / p) ** (2.0 / 3.0) == pytest.approx(a, rel=1e-9)
+    cas = {'hilda': (3.97, 0.15, 0.0), 'kirkwood': (2.5, 0.1, 0.0), 'comete': (3.6, 0.55, 150.0)}
+    for k, (a, e, phi) in cas.items():
+        ref = s['cas'][k]
+        s1 = rs.etat_initial(a, e, phi, rs.MU_JUPITER)
+        assert s1 == pytest.approx(ref['initial'], abs=1e-9), k
+        assert rs.elements(s1, rs.MU_JUPITER) == pytest.approx((ref['a0'], ref['e0']), abs=1e-9), k
+        s2, t = rs.jumeau(s1), 0.0
+        for T in ('6', '30'):
+            if k == 'comete' and T == '30':
+                continue                                   # chaotique : les deux intégrateurs divergent ensuite
+            s1, s2, _ = rs.avancer(rs.MU_JUPITER, s1, s2, float(T) - t)
+            t = float(T)
+            assert s1 == pytest.approx(ref[T]['etat'], abs=5e-9), (k, T)
+            assert rs.elements(s1, rs.MU_JUPITER) == pytest.approx((ref[T]['a'], ref[T]['e']), abs=1e-8), (k, T)
+            assert rs.ecart(s1, s2) == pytest.approx(ref[T]['ecart'], rel=1e-5), (k, T)
+
+
+def test_resonances_regulier_contre_chaotique():
+    from coupole.modules.anim import resonances as rs
+    mu = rs.MU_JUPITER
+    ecarts = {}
+    for k, a, e, phi in rs.CAS:
+        if k not in ('hilda', 'comete'):
+            continue
+        s1 = rs.etat_initial(a, e, phi, mu)
+        s2 = rs.jumeau(s1)
+        s1, s2, _ = rs.avancer(mu, s1, s2, 2.0 * math.pi * 40)
+        ecarts[k] = rs.ecart(s1, s2)
+    assert ecarts['hilda'] < 1e-3 < ecarts['comete']
+    assert rs.resonance_proche(3.97)[0] == (3, 2) and rs.rapport_periodes(2.5011) == pytest.approx(3.0, rel=1e-3)
+
+
+def test_resonances_interface(app_qt):
+    from coupole.modules.anim.animations.resonances import Resonances
+    a = Resonances()
+    a.resize(1000, 700)
+    v = dict(a.valeurs())
+    assert v['Résonance la plus proche'].startswith('3:2 à 3,97 ua')
+    for _ in range(10):
+        a.pas(0.2)
+    assert a.t == pytest.approx(2.0 * 2.0 * math.pi, rel=1e-9)
+    a.repere.setCurrentIndex(a.repere.findData('fixe'))
+    assert not a.image(900, 560).isNull()
+    a.cas.setCurrentIndex(a.cas.findData('troyen'))
+    assert a.a.value() == pytest.approx(5.2026) and a.t == 0.0
+    assert not a.image(900, 560).isNull()
+
+
+# ---------------------------------------------------------------- limite de Roche (0.12.0)
+def test_roche_contre_sage():
+    from coupole.modules.anim import roche as ro
+    s = sage('roche')
+    assert ro.K_RIGIDE == pytest.approx(s['K_rigide'], rel=1e-9)
+    for k, rm, rs_, _, d0 in ro.SYSTEMES:
+        ref = s['systemes'][k]
+        assert ro.limite(rm / rs_, 'fluide') == pytest.approx(ref['fluide'], rel=1e-9), k
+        assert ro.limite(rm / rs_, 'rigide') == pytest.approx(ref['rigide'], rel=1e-9), k
+        assert ro.etirement(rm / rs_, d0) == pytest.approx(ref['etirement'], rel=1e-9), k
+        assert ro.allongement(rm / rs_, d0) == pytest.approx(ref['allongement'], rel=1e-9), k
+    for g in s['grains']:
+        d, th, gx, gy = g['depart']
+        x, y = d * math.cos(th) + gx * math.cos(th) - gy * math.sin(th), d * math.sin(th) + gx * math.sin(th) + gy * math.cos(th)
+        om = d ** -1.5
+        el = ro.elements(x, y, -om * y, om * x)
+        for T, ref in g['positions'].items():
+            assert ro.position_kepler(el, float(T)) == pytest.approx(ref, abs=1e-8), (g['depart'], T)
+
+
+def test_roche_dislocation(app_qt):
+    from coupole.modules.anim.animations.roche import Roche
+    a = Roche()
+    a.resize(1000, 700)
+    v = dict(a.valeurs())
+    assert v['Limite de Roche, satellite fluide 2,44 R ∛(ρₚ/ρₛ)'].startswith('2,21 R')    # anneaux à 2,27 R
+    assert v['État'] == 'entier'
+    for _ in range(20):
+        a.pas(0.25)
+    assert a.debris is not None and a.d < a.limite() + 0.1
+    assert dict(a.valeurs())['État'].startswith('disloqué')
+    a.systeme.setCurrentIndex(a.systeme.findData('mars_phobos'))
+    a.modele.setCurrentIndex(a.modele.findData('rigide'))
+    a.c_descente.setChecked(False)
+    for _ in range(5):
+        a.pas(0.25)
+    assert a.debris is None                             # Phobos, rigide, tient à 2,76 R
+    assert not a.image(900, 560).isNull()
