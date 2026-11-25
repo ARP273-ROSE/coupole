@@ -460,7 +460,7 @@ def test_kozai_interface_periode(app_qt):
     # instant du maximum interpolé linéairement entre deux images (pas de 0,2 t_K ici) : à 3 × 10⁻³ près
     assert a.maxima[0] == pytest.approx(m[0], abs=3e-3) and a.maxima[1] == pytest.approx(m[1], abs=3e-3)
     v = dict(a.valeurs())
-    assert v['Période des oscillations'].startswith('5,03 t_K')
+    assert v['Période des oscillations'].startswith('5,03 tₖ')
     assert v['e maximale atteinte'].startswith('0,83')
     assert v['Inclinaison critique arccos √(3/5)'] == '39,23°'
     a.i0.setValue(30.0)                                   # sous l'inclinaison critique : e reste petite
