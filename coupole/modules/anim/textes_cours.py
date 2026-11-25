@@ -285,4 +285,95 @@ ANIM_COURS = {
     'anim_meteorradiant_ciel_nuit': ('nuit noire', 'full darkness'),
     'anim_meteorradiant_ciel_crepuscule': ('crépuscule', 'twilight'),
     'anim_meteorradiant_ciel_jour': ('jour', 'daylight'),
+    # ================================================================ Interférences et interférométrie
+    'anim_interferometry_instrument': ('Instrument', 'Instrument'),
+    'anim_interferometry_instrument_aide': ('Choisir un instrument règle sa base et le diamètre de ses ouvertures ; '
+                                            'on peut ensuite les changer à la main.',
+                                            'Choosing an instrument sets its baseline and the diameter of its '
+                                            'apertures; you can then change them by hand.'),
+    'anim_interferometry_i_libre': ('(réglage libre)', '(free setting)'),
+    'anim_interferometry_i_young': ('Fentes d’Young (écart 0,5 mm)', 'Young’s slits (0.5 mm apart)'),
+    'anim_interferometry_i_michelson': ('Michelson et Pease, 1920 (base de 6,1 m)',
+                                        'Michelson and Pease, 1920 (6.1 m baseline)'),
+    'anim_interferometry_i_vlti_ut': ('VLTI, deux télescopes de 8,2 m (130 m)', 'VLTI, two 8.2 m telescopes (130 m)'),
+    'anim_interferometry_i_vlti_at': ('VLTI, télescopes auxiliaires de 1,8 m (200 m)',
+                                      'VLTI, 1.8 m auxiliary telescopes (200 m)'),
+    'anim_interferometry_i_chara': ('CHARA, télescopes de 1 m (331 m)', 'CHARA, 1 m telescopes (331 m)'),
+    'anim_interferometry_base': ('Base B', 'Baseline B'),
+    'anim_interferometry_base_aide': ('Distance entre les deux télescopes (ou les deux fentes), échelle '
+                                      'logarithmique. L’interfrange sur le ciel vaut λ / B.',
+                                      'Distance between the two telescopes (or the two slits), logarithmic scale. '
+                                      'The fringe spacing on the sky is λ / B.'),
+    'anim_interferometry_diametre': ('Diamètre d d’un télescope', 'Diameter d of one telescope'),
+    'anim_interferometry_diametre_aide': ('Diamètre de chaque ouverture. Seule, elle ne résout que 1,22 λ / d : les '
+                                          'franges sont prises dans sa tache d’Airy.',
+                                          'Diameter of each aperture. On its own it only resolves 1.22 λ / d: the '
+                                          'fringes sit inside its Airy spot.'),
+    'anim_interferometry_lambda': ('Longueur d’onde λ', 'Wavelength λ'),
+    'anim_interferometry_lambda_aide': ('Longueur d’onde observée : 550 nm au milieu du visible, 2 200 nm dans '
+                                        'l’infrarouge (bande K, celle du VLTI et de CHARA).',
+                                        'Observed wavelength: 550 nm in the middle of the visible range, 2,200 nm '
+                                        'in the infrared (K band, used by the VLTI and CHARA).'),
+    'anim_interferometry_objet': ('Source', 'Source'),
+    'anim_interferometry_objet_aide': ('Ce que regarde l’interféromètre : une étoile non résolue, le disque d’une '
+                                       'étoile ou un couple serré. Les étoiles réelles règlent la taille.',
+                                       'What the interferometer looks at: an unresolved star, the disc of a star or '
+                                       'a close pair. The real stars set the size.'),
+    'anim_interferometry_o_point': ('Étoile non résolue (un point)', 'Unresolved star (a point)'),
+    'anim_interferometry_o_disque': ('Disque d’une étoile', 'Disc of a star'),
+    'anim_interferometry_o_couple': ('Couple de deux étoiles', 'Pair of two stars'),
+    'anim_interferometry_o_betelgeuse': ('Bételgeuse (disque de 47 mas)', 'Betelgeuse (47 mas disc)'),
+    'anim_interferometry_o_sirius': ('Sirius A (disque de 6 mas)', 'Sirius A (6 mas disc)'),
+    'anim_interferometry_o_capella': ('Capella (couple à 56 mas)', 'Capella (pair 56 mas apart)'),
+    'anim_interferometry_taille': ('Taille angulaire θ ou ρ', 'Angular size θ or ρ'),
+    'anim_interferometry_taille_aide': ('Diamètre θ du disque, ou séparation ρ du couple (mesurée le long de la '
+                                        'base), en millisecondes d’arc (mas), échelle logarithmique.',
+                                        'Diameter θ of the disc, or separation ρ of the pair (measured along the '
+                                        'baseline), in milliarcseconds (mas), logarithmic scale.'),
+    'anim_interferometry_dmag': ('Écart d’éclat Δm du couple', 'Brightness difference Δm of the pair'),
+    'anim_interferometry_dmag_aide': ('La seconde étoile du couple est plus faible de Δm magnitudes : la '
+                                      'visibilité ne descend plus jusqu’à zéro.',
+                                      'The second star of the pair is Δm magnitudes fainter: the visibility no '
+                                      'longer drops to zero.'),
+    'anim_interferometry_balayer': ('Allonger la base en lecture', 'Lengthen the baseline while playing'),
+    'anim_interferometry_balayer_aide': ('Pendant la lecture, la base grandit (échelle logarithmique) et repart du '
+                                         'début de l’axe : on voit les franges s’effacer puis revenir.',
+                                         'While playing, the baseline grows (logarithmic scale) and starts again '
+                                         'from the beginning of the axis: the fringes fade, then come back.'),
+    'anim_interferometry_enveloppe': ('Enveloppes', 'Envelopes'),
+    'anim_interferometry_enveloppe_aide': ('Pointillés : la tache d’Airy d’un télescope seul (gris) et les bornes '
+                                           '(1 ± V) / 2 entre lesquelles oscillent les franges (rouge).',
+                                           'Dotted: the Airy spot of a single telescope (grey) and the bounds '
+                                           '(1 ± V) / 2 between which the fringes oscillate (red).'),
+    'anim_interferometry_t_schema': ('Deux télescopes, une étoile (schéma, angles exagérés)',
+                                     'Two telescopes, one star (diagram, angles exaggerated)'),
+    'anim_interferometry_t_franges': ('Franges d’interférence', 'Interference fringes'),
+    'anim_interferometry_t_visibilite': ('Visibilité des franges selon la base', 'Fringe visibility versus baseline'),
+    'anim_interferometry_recombinaison': ('recombinaison', 'beam combiner'),
+    'anim_interferometry_vers_etoile': ('lumière de l’étoile ↓', 'starlight ↓'),
+    'anim_interferometry_axe_mas': ('angle sur le ciel (mas)', 'angle on the sky (mas)'),
+    'anim_interferometry_axe_sec': ('angle sur le ciel (″)', 'angle on the sky (″)'),
+    'anim_interferometry_axe_i': ('intensité', 'intensity'),
+    'anim_interferometry_axe_b': ('base B (m)', 'baseline B (m)'),
+    'anim_interferometry_axe_v': ('visibilité V', 'visibility V'),
+    'anim_interferometry_v_frange': ('Interfrange λ / B', 'Fringe spacing λ / B'),
+    'anim_interferometry_v_un_telescope': ('Un télescope seul : 1,22 λ / d', 'One telescope alone: 1.22 λ / d'),
+    'anim_interferometry_v_gain': ('Gain en finesse B / d', 'Gain in sharpness B / d'),
+    'anim_interferometry_v_visibilite': ('Visibilité V', 'Visibility V'),
+    'anim_interferometry_v_phase': ('Franges', 'Fringes'),
+    'anim_interferometry_centrees': ('centrées (phase 0)', 'centred (phase 0)'),
+    'anim_interferometry_retournees': ('retournées : décalées d’une demi-frange (phase 180°)',
+                                       'reversed: shifted by half a fringe (phase 180°)'),
+    'anim_interferometry_decalees': ('décalées de {x}°', 'shifted by {x}°'),
+    'anim_interferometry_v_zero': ('Base du premier zéro 1,22 λ / θ', 'Baseline of the first zero 1.22 λ / θ'),
+    'anim_interferometry_v_minimum': ('Base du premier minimum λ / 2ρ', 'Baseline of the first minimum λ / 2ρ'),
+    'anim_interferometry_v_verdict': ('La source', 'The source'),
+    'anim_interferometry_v_ponctuelle': ('un point : V = 1 quelle que soit la base',
+                                         'a point: V = 1 whatever the baseline'),
+    'anim_interferometry_v_seul': ('résolue déjà par un télescope seul', 'already resolved by one telescope alone'),
+    'anim_interferometry_v_interferometre': ('résolue par l’interféromètre seulement (V < 0,9)',
+                                             'resolved by the interferometer only (V < 0.9)'),
+    'anim_interferometry_v_non_resolue': ('non résolue : base trop courte (V ≥ 0,9)',
+                                          'unresolved: baseline too short (V ≥ 0.9)'),
+    'anim_interferometry_v_ecran': ('Interfrange sur un écran à 1 m', 'Fringe spacing on a screen 1 m away'),
 }

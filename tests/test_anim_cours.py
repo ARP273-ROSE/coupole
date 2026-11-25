@@ -245,3 +245,85 @@ def test_radiant_interface(app_qt):
     a.lat.setValue(-55.0)                              # Perséides invisibles de l'hémisphère sud profond
     assert dict(a.valeurs())['Hauteur du radiant'].startswith('sous')
     assert not a.image(640, 420).isNull()
+
+
+# ---------------------------------------------------------------- interférences et interférométrie
+def test_interferometrie_instruments():
+    from coupole.modules.anim import interferometrie as itf
+    s = sage('interferometrie')
+    for k, b, d in itf.INSTRUMENTS:
+        for lam, v in s['instruments'][k].items():
+            assert itf.interfrange_mas(b, float(lam)) == pytest.approx(v['frange'], rel=1e-12), k
+            assert itf.resolution_mas(d, float(lam)) == pytest.approx(v['seul'], rel=1e-12), k
+
+
+def test_interferometrie_visibilites():
+    from coupole.modules.anim import interferometrie as itf
+    s = sage('interferometrie')
+    for c in s['disque']:
+        v = itf.visibilite_complexe('disque', c['theta'], c['b'], c['lam'])
+        assert v.real == pytest.approx(c['v'], abs=2e-8), c
+        assert v.imag == 0.0
+    assert itf.base_premier_zero('disque', 47.0, 575.0) == pytest.approx(s['zero_betelgeuse_575'], rel=1e-12)
+    assert itf.base_premier_zero('disque', 6.0, 2200.0) == pytest.approx(s['zero_sirius_2200'], rel=1e-12)
+    assert abs(itf.visibilite_complexe('disque', 47.0, s['zero_betelgeuse_575'], 575.0)) < 1e-7
+    for c in s['couple']:
+        r = 10 ** (-0.4 * c['dm'])
+        v = itf.visibilite_complexe('couple', c['rho'], c['b'], c['lam'], r)
+        assert v.real == pytest.approx(c['re'], abs=1e-12) and v.imag == pytest.approx(c['im'], abs=1e-12), c
+        assert itf.base_premier_zero('couple', c['rho'], c['lam'], r) == pytest.approx(c['b_min'], rel=1e-12)
+        assert itf.visibilite('couple', c['rho'], c['b_min'], c['lam'], r) == pytest.approx(c['v_min'], abs=1e-12)
+    assert itf.visibilite('point', 0.0, 300.0, 550.0) == 1.0
+    assert itf.base_premier_zero('point', 0.0, 550.0) is None
+
+
+def test_interferometrie_intensite():
+    from coupole.modules.anim import interferometrie as itf
+    s = sage('interferometrie')
+    for c in s['intensite']:
+        v = itf.visibilite_complexe(c['genre'], c['taille'], c['b'], c['lam'])
+        assert itf.intensite(c['alpha'], c['b'], c['d'], c['lam'], v) == pytest.approx(c['i'], abs=3e-8), c
+    # franges d'un point : au centre 1, au premier minimum (α = λ / 2B) presque 0
+    b, lam = 130.0, 2200.0
+    assert itf.intensite(0.0, b, 8.2, lam, 1 + 0j) == pytest.approx(1.0)
+    assert itf.intensite(itf.interfrange_mas(b, lam) / 2, b, 8.2, lam, 1 + 0j) < 1e-2
+    # au-delà du premier zéro, les franges d'un disque sont retournées : minimum au centre
+    v = itf.visibilite_complexe('disque', 5.0, 150.0, 2200.0)
+    assert v.real < 0
+    assert itf.intensite(0.0, 150.0, 8.2, 2200.0, v) < itf.intensite(itf.interfrange_mas(150.0, 2200.0) / 2, 150.0,
+                                                                     8.2, 2200.0, v)
+    xs, ys, demi = itf.coupe(130.0, 8.2, 2200.0, 1 + 0j)
+    assert demi == pytest.approx(6 * itf.interfrange_mas(130.0, 2200.0)) and len(xs) == len(ys) == 401
+
+
+def test_interferometrie_verdict():
+    from coupole.modules.anim import interferometrie as itf
+    assert itf.verdict('point', 0.0, 8.2, 2200.0, 1.0) == 'v_ponctuelle'
+    assert itf.verdict('disque', 100.0, 8.2, 2200.0, 0.0) == 'v_seul'           # 100 mas > 67 mas
+    assert itf.verdict('disque', 5.0, 8.2, 2200.0, 0.1) == 'v_interferometre'
+    assert itf.verdict('disque', 0.2, 8.2, 2200.0, 0.99) == 'v_non_resolue'
+
+
+def test_interferometrie_interface(app_qt):
+    from coupole.modules.anim.animations.interferometrie import Interferometrie
+    a = Interferometrie()
+    a.resize(1000, 700)
+    a.instrument.setCurrentIndex(a.instrument.findData('michelson'))
+    assert a.base.value() == pytest.approx(6.1) and a.diametre.value() == pytest.approx(0.15)
+    a.objet.setCurrentIndex(a.objet.findData('betelgeuse'))
+    a.lam.setValue(575.0)
+    v = dict(a.valeurs())
+    assert v['Base du premier zéro 1,22 λ / θ'] == '3,08 m'
+    assert v['Interfrange λ / B'] == '19 mas'
+    a.base.setValue(3.08)
+    assert dict(a.valeurs())['Visibilité V'].startswith('0,00')
+    a.c_balayer.setChecked(True)
+    b0, b1 = a.axe_bases()
+    for _ in range(300):
+        a.pas(0.1)
+        assert b0 * 0.999 <= a.base.value() <= b1 * 1.2
+    a.instrument.setCurrentIndex(a.instrument.findData('young'))
+    assert 'Interfrange sur un écran à 1 m' in dict(a.valeurs())
+    for o in ('point', 'couple', 'capella', 'sirius'):
+        a.objet.setCurrentIndex(a.objet.findData(o))
+        assert not a.image(640, 420).isNull()

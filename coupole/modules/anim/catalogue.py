@@ -47,6 +47,7 @@ ANIMATIONS = (
     ('orbitalelements', 'renaissance', 'The Elements of an Orbit', 'Coupole', 'elements_orbite:ElementsOrbite'),
     ('hohmann', 'renaissance', 'The Hohmann Transfer', 'Coupole', 'hohmann:Hohmann'),
     ('meteorradiant', 'solarsystemdebris', 'Meteors and their Radiant', 'Coupole', 'radiant:Radiant'),
+    ('interferometry', 'telescopes', 'Interference and Interferometry', 'Coupole', 'interferometrie:Interferometrie'),
     ('smallangledemo', 'ancientastro', 'Small-Angle Approximation Demonstrator', 'ancientastro/smallangledemo.swf',
      'petits_angles:PetitsAngles'),
     ('dipperclock', 'ancientastro', 'Big Dipper Clock', 'ancientastro/dipperclock.swf',
@@ -221,13 +222,14 @@ HORS_CLASSACTION = {'antikythera': ('Anticythere3D', 'https://github.com/ARP273-
                     'orbitalelements': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
                     'hohmann': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
                     'meteorradiant': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
+                    'interferometry': ('Coupole', 'https://github.com/ARP273-ROSE/coupole/blob/main/NOTICE'),
                     'gravityorbits': ('PhET Gravity and Orbits',
                                       'https://phet.colorado.edu/sims/html/gravity-and-orbits/latest/'
                                       'gravity-and-orbits_fr.html')}
 # 0.10.0 : animations tirées des cours d'astronomie générale (propres à Coupole) : diffraction et pouvoir de
 # résolution (Télescopes), éléments d'une orbite et transfert de Hohmann
 # (Renaissance : lois de Kepler et de Newton), étoiles filantes et radiant (petits corps du Système solaire)
-LOT9 = ('resolution', 'orbitalelements', 'hohmann', 'meteorradiant')
+LOT9 = ('resolution', 'orbitalelements', 'hohmann', 'meteorradiant', 'interferometry')
 ORDRE = LOT1 + LOT1_BIS + LOT2 + LOT2_BIS + LOT3 + LOT4 + LOT5 + LOT6 + LOT7 + LOT8 + LOT9
 
 
