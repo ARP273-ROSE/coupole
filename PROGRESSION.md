@@ -1557,3 +1557,36 @@ du *Traité du système du monde*, domaine public ; rien n'est repris d'aucun si
 - main = 47dba46 (0.9.1), publié. Rien en cours.
 - Restes facultatifs, non validés : manuels LaTeX FR/EN du canon (section + captures, aide F1) ; animation
   « parallaxe d'un astéroïde → valeur de l'ua » (idée née d'une question de cours, à proposer).
+
+## 25/11/2026 — 0.10.0 : quatre animations de cours (101 animations ; branche `animations-cours`, fusionnée)
+Demande : porter dans Coupole et Coupole Web les animations montrées ou citées dans un premier cours d'astronomie qui
+n'étaient pas déjà là (ClassAction, PhET, canon). Inventaire tenu hors dépôt. Quatre animations propres à Coupole,
+choisies par intérêt pour l'examen, chacune avec un noyau sans Qt jumeau du web, une vérification SageMath et des tests :
+- [x] **Diffraction et pouvoir de résolution** (`resolution`, Télescopes) : `anim/diffraction.py` (Airy avec obstruction,
+  J₁/I₀ de Numerical Recipes, premier zéro, pose longue = convolution radiale exacte par la gaussienne du seeing, ou
+  gaussienne quadratique si seeing > 3 × premier anneau), `animations/resolution.py` (image 72 × 72 étirée en log, coupe).
+  Sage : `outils/verif_anim/resolution_verif.sage` (v₁, 1,219 67, FWHM 1,029, creux 73,5 %, anneau 1,75 %, zéros
+  ε = 0,14/0,33/0,34, J₁ et I₀e, pose longue par mpmath à 3 × 10⁻³ près).
+- [x] **Les éléments d'une orbite** (`orbitalelements`, Renaissance) : `anim/elements_orbitaux.py` (Kepler, Rz(Ω) Rx(i)
+  Rz(ω), vis-viva, trace au sol, orbites types), `animations/elements_orbite.py` (3D : équateur, γ, nœuds, apsides,
+  angles ; orbite cachée par la Terre et pointillée au sud ; trace au sol avec côtes ; orbite dans son plan). Sage :
+  périodes, a de la GEO et de la Molniya par le jour sidéral, positions et vitesses de 4 jeux d'éléments.
+- [x] **Le transfert de Hohmann** (`hohmann`, Renaissance) : `anim/hohmann_meca.py`, `animations/hohmann.py` (six
+  scénarios, départ à la fenêtre ou tout de suite, cible fantôme à l'arrivée, barres des vitesses). Sage : Δv, durées,
+  angles de phase, périodes synodiques, positions sur l'ellipse (Mars : 2,945 + 2,649 km·s⁻¹, 258,9 j, 44,3°, 779,9 j).
+- [x] **Étoiles filantes et radiant** (`meteorradiant`, Petits corps) : `anim/meteores.py` (7 essaims IMO, radiant,
+  ZHR × sin h ÷ r^(6,5 − m_lim), culmination, Park-Miller identique au web, traînées sur grands cercles),
+  `animations/radiant.py` (ciel vu de dessous, prolongement jusqu'au radiant, courbes de la nuit). Sage : 96 cas.
+- [x] Modules (`outils/importer_contenu.py` : ANIMATIONS_AJOUTEES), recherche (`outils/cas_recherche.py`), comptes 101,
+  manifeste, NOTICE, CHANGELOG FR/EN, README ; manuels FR/EN (canon de Newton enfin décrit + les quatre, captures
+  `docs/manuel/img/anim_*`), compilés par `docs/manuel/compiler.sh` (pdflatex dans le PATH).
+- Tests locaux (venv du kit, offscreen) : `tests/test_anim_cours.py` (15), test_anim_gui, test_classe,
+  test_favoris_bibliotheque, test_recherche, test_confidentialite, test_anim_etoiles_reelles, test_passe_finale,
+  test_anim_rendu : 551 réussis.
+- Captures de contrôle : script hors dépôt (`rendre.py ID cle=valeur @methode:arg --pas N --en --sortie F`).
+
+### NOTE DE REPRISE (25/11/2026)
+- main = 0.10.0 (poussé). Publication : tag `v0.10.0` (release.yml : paquets signés), puis ne garder que la dernière
+  Release (`gh release delete v0.9.3 --cleanup-tag`).
+- Reste (plan ordonné dans l'inventaire privé) : interférences et interférométrie ; occultation stellaire par un
+  astéroïde ; Kozai-Lidov ; points de Lagrange ; diagramme a–e ; libration ; précession des équinoxes ; résonances.
