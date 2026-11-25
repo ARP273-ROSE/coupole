@@ -327,3 +327,80 @@ def test_interferometrie_interface(app_qt):
     for o in ('point', 'couple', 'capella', 'sirius'):
         a.objet.setCurrentIndex(a.objet.findData(o))
         assert not a.image(640, 420).isNull()
+
+
+# ---------------------------------------------------------------- occultation d'une étoile par un astéroïde
+def test_occultation_vitesses_echelles():
+    from coupole.modules.anim import occultation as oc
+    s = sage('occultation')
+    assert oc.V_TERRE == pytest.approx(s['v_terre'], rel=1e-14)
+    for r, v in s['vitesse'].items():
+        assert oc.vitesse_ombre(float(r)) == pytest.approx(v, rel=1e-13), r
+    for k, v in s['fresnel'].items():
+        lam, d = k.split('_')
+        assert oc.fresnel_km(float(lam), float(d)) == pytest.approx(v, rel=1e-13), k
+    for k, v in s['etoile'].items():
+        th, d = k.split('_')
+        assert oc.etoile_km(float(th), float(d)) == pytest.approx(v, rel=1e-13), k
+
+
+def test_occultation_cordes_et_ajustement():
+    from coupole.modules.anim import occultation as oc
+    s = sage('occultation')
+    for c, aj in zip(s['cordes'], s['ajustements']):
+        el = oc.Ellipse(*c['el'])
+        cs = oc.cordes(el, c['ys'])
+        for (y, x1, x2), attendu in zip(cs, c['cordes']):
+            if attendu is None:
+                assert x1 is None, y
+            else:
+                assert (x1, x2) == pytest.approx(tuple(attendu), abs=1e-9), y
+        sig = {0: 1.1, 1: 20.0, 2: 0.5, 3: 0.0}[s['cordes'].index(c)]
+        br = oc.bruiter(cs, sig)
+        for (y, x1, x2), attendu in zip(br, aj['bruitees']):
+            if attendu is not None:
+                assert (x1, x2) == pytest.approx(tuple(attendu), abs=1e-9), y
+        f = oc.ajuster_ellipse([(x, y) for y, x1, x2 in br if x1 is not None for x in (x1, x2)])
+        if aj.get('aucun'):
+            assert f is None
+            continue
+        assert f[:4] == pytest.approx((aj['x0'], aj['y0'], aj['a'], aj['b']), rel=1e-7, abs=1e-7)
+        assert math.remainder(f[4] - aj['psi'], 180.0) == pytest.approx(0.0, abs=1e-5)
+
+
+def test_occultation_corde_duree_et_fraction():
+    from coupole.modules.anim import occultation as oc
+    el = oc.Ellipse(50.0, 50.0, 0.0)
+    x1, x2 = el.corde(0.0)
+    assert (x1, x2) == pytest.approx((-50.0, 50.0))
+    assert el.corde(50.0001) is None
+    # étoile ponctuelle : tout ou rien ; étoile projetée plus grande que l'astéroïde : jamais entièrement cachée
+    assert oc.fraction_cachee(el, 0.0, 0.0, 0.0) == 1.0 and oc.fraction_cachee(el, 60.0, 0.0, 0.0) == 0.0
+    f = oc.fraction_cachee(el, 0.0, 0.0, 100.0)
+    assert 0.2 < f < 0.3                                            # (50/100)² = 25 % du disque
+    assert len(oc.GRILLE) > 150
+    assert oc.stations(3, 10.0) == [-10.0, 0.0, 10.0]
+    # trop peu de cordes : pas d'ellipse
+    assert oc.ajuster_ellipse([(1.0, 0.0), (-1.0, 0.0), (0.5, 1.0), (-0.5, 1.0)]) is None
+
+
+def test_occultation_interface(app_qt):
+    from coupole.modules.anim.animations.occultation import Occultation
+    a = Occultation()
+    a.resize(1000, 700)
+    v = dict(a.valeurs())
+    assert v['Vitesse de l’ombre (à l’opposition)'] == '10,95 km·s⁻¹'
+    assert v['Observateurs qui voient l’étoile disparaître'] == '6 sur 7'
+    a.objet.setCurrentIndex(a.objet.findData('eris'))
+    assert a.diametre.value() == pytest.approx(2326.0)
+    assert dict(a.valeurs())['Vitesse de l’ombre (à l’opposition)'] == '26,74 km·s⁻¹'
+    a.n_stations.setValue(2)
+    assert dict(a.valeurs())['Ellipse ajustée 2a × 2b'] == 'il faut au moins trois cordes'
+    a.etoile.setValue(50.0)
+    a.objet.setCurrentIndex(a.objet.findData('troyen'))
+    assert 'progressive' in dict(a.valeurs())['Étoile projetée à la distance de l’astéroïde']
+    tm = a.t_max()
+    for _ in range(120):
+        a.pas(0.1)
+        assert -tm - 1e-9 <= a.instant() <= tm + 1e-9
+    assert not a.image(640, 420).isNull()

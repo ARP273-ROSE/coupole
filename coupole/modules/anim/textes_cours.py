@@ -376,4 +376,91 @@ ANIM_COURS = {
     'anim_interferometry_v_non_resolue': ('non résolue : base trop courte (V ≥ 0,9)',
                                           'unresolved: baseline too short (V ≥ 0.9)'),
     'anim_interferometry_v_ecran': ('Interfrange sur un écran à 1 m', 'Fringe spacing on a screen 1 m away'),
+    # ================================================================ Occultation d'une étoile par un astéroïde
+    'anim_occultation_objet': ('Astéroïde', 'Asteroid'),
+    'anim_occultation_objet_aide': ('Un exemple règle la taille, la forme et la distance ; on peut ensuite tout '
+                                    'changer à la main.',
+                                    'An example sets the size, shape and distance; you can then change everything '
+                                    'by hand.'),
+    'anim_occultation_o_ceinture': ('Astéroïde de la ceinture principale (100 km)', 'Main-belt asteroid (100 km)'),
+    'anim_occultation_o_troyen': ('Petit troyen de Jupiter (21 km, comme Polymele)',
+                                  'Small Jupiter Trojan (21 km, like Polymele)'),
+    'anim_occultation_o_eris': ('Éris, planète naine (2 326 km)', 'Eris, dwarf planet (2,326 km)'),
+    'anim_occultation_o_libre': ('(réglage libre)', '(free setting)'),
+    'anim_occultation_diametre': ('Diamètre (grand axe)', 'Diameter (major axis)'),
+    'anim_occultation_diametre_aide': ('Plus grande dimension de l’astéroïde, donc de son ombre (échelle '
+                                       'logarithmique).',
+                                       'Largest dimension of the asteroid, hence of its shadow (logarithmic scale).'),
+    'anim_occultation_forme': ('Aplatissement b / a', 'Elongation b / a'),
+    'anim_occultation_forme_aide': ('Petit axe rapporté au grand axe : 1 pour un disque, moins pour un astéroïde '
+                                    'allongé.',
+                                    'Minor axis divided by the major axis: 1 for a disc, less for an elongated '
+                                    'asteroid.'),
+    'anim_occultation_orientation': ('Orientation ψ', 'Orientation ψ'),
+    'anim_occultation_orientation_aide': ('Angle du grand axe avec la direction du mouvement de l’ombre.',
+                                          'Angle of the major axis with the direction of motion of the shadow.'),
+    'anim_occultation_distance': ('Distance au Soleil r', 'Distance from the Sun r'),
+    'anim_occultation_distance_aide': ('À l’opposition, l’ombre court à √(GM☉/1 ua) (1 − 1/√r) : la Terre va plus '
+                                       'vite que l’astéroïde. Un objet lointain donne une ombre rapide.',
+                                       'At opposition the shadow moves at √(GM☉/1 au) (1 − 1/√r): the Earth is '
+                                       'faster than the asteroid. A distant object casts a fast shadow.'),
+    'anim_occultation_stations': ('Nombre d’observateurs', 'Number of observers'),
+    'anim_occultation_stations_aide': ('Observateurs alignés en travers de la trajectoire prévue, à intervalles '
+                                       'réguliers.',
+                                       'Observers lined up across the predicted path, at regular intervals.'),
+    'anim_occultation_espacement': ('Espacement des observateurs', 'Spacing of the observers'),
+    'anim_occultation_espacement_aide': ('Distance entre deux observateurs voisins, perpendiculairement à la '
+                                         'trajectoire (échelle logarithmique).',
+                                         'Distance between two neighbouring observers, across the path '
+                                         '(logarithmic scale).'),
+    'anim_occultation_decalage': ('Erreur de prévision', 'Prediction error'),
+    'anim_occultation_decalage_aide': ('Écart entre la trajectoire réelle de l’ombre et la trajectoire prévue, en '
+                                       'diamètres : les observateurs des bords voient alors un « négatif ».',
+                                       'Offset between the actual path of the shadow and the predicted one, in '
+                                       'diameters: observers at the edges then record a “negative”.'),
+    'anim_occultation_etoile': ('Diamètre apparent de l’étoile', 'Apparent diameter of the star'),
+    'anim_occultation_etoile_aide': ('En millisecondes d’arc : 0,1 mas pour une étoile ordinaire, une quarantaine '
+                                     'pour une supergéante comme Bételgeuse, que l’astéroïde ne cache alors qu’en '
+                                     'partie.',
+                                     'In milliarcseconds: 0.1 mas for an ordinary star, about forty for a '
+                                     'supergiant such as Betelgeuse, which the asteroid then only partly hides.'),
+    'anim_occultation_sigma': ('Erreur de chronométrage σ', 'Timing error σ'),
+    'anim_occultation_sigma_aide': ('Écart type de l’erreur sur chaque instant de disparition et de réapparition '
+                                    '(réaction d’un observateur à l’œil, horloge mal réglée).',
+                                    'Standard deviation of the error on each disappearance and reappearance time '
+                                    '(reaction of a visual observer, badly set clock).'),
+    'anim_occultation_vraie': ('Vraie forme', 'True shape'),
+    'anim_occultation_vraie_aide': ('Contour réel de l’astéroïde, en pointillés, pour juger la reconstitution.',
+                                    'Actual outline of the asteroid, dotted, to judge the reconstruction.'),
+    'anim_occultation_ajuster': ('Ellipse ajustée', 'Fitted ellipse'),
+    'anim_occultation_ajuster_aide': ('Ellipse ajustée par moindres carrés sur les extrémités des cordes (il faut '
+                                      'au moins trois cordes).',
+                                      'Ellipse fitted by least squares to the ends of the chords (at least three '
+                                      'chords are needed).'),
+    'anim_occultation_t_plan': ('L’ombre balaie les observateurs', 'The shadow sweeps over the observers'),
+    'anim_occultation_t_courbes': ('Éclat de l’étoile vu par chaque observateur', 'Star brightness seen by each observer'),
+    'anim_occultation_t_forme': ('Les cordes mesurées et la forme reconstituée',
+                                 'The measured chords and the reconstructed shape'),
+    'anim_occultation_observateurs': ('points : les observateurs (gris : étoile cachée)',
+                                      'dots: the observers (grey: star hidden)'),
+    'anim_occultation_axe_t': ('temps (s)', 'time (s)'),
+    'anim_occultation_axe_flux': ('éclat', 'brightness'),
+    'anim_occultation_legende_forme': ('jaune : cordes ; rouge : ± σ ; bleu : ellipse ajustée',
+                                       'yellow: chords; red: ± σ; blue: fitted ellipse'),
+    'anim_occultation_v_vitesse': ('Vitesse de l’ombre (à l’opposition)', 'Shadow speed (at opposition)'),
+    'anim_occultation_v_distance': ('Distance de la Terre Δ', 'Distance from the Earth Δ'),
+    'anim_occultation_v_cordes': ('Observateurs qui voient l’étoile disparaître',
+                                  'Observers who see the star disappear'),
+    'anim_occultation_sur': ('{n} sur {N}', '{n} of {N}'),
+    'anim_occultation_v_plus_longue': ('Plus longue disparition', 'Longest disappearance'),
+    'anim_occultation_duree_corde': ('{d} s (corde de {c})', '{d} s (chord of {c})'),
+    'anim_occultation_v_ajustee': ('Ellipse ajustée 2a × 2b', 'Fitted ellipse 2a × 2b'),
+    'anim_occultation_pas_assez': ('il faut au moins trois cordes', 'at least three chords are needed'),
+    'anim_occultation_v_equivalent': ('Diamètre équivalent √(2a · 2b)', 'Equivalent diameter √(2a · 2b)'),
+    'anim_occultation_vrai_ajuste': ('vrai {v}, ajusté {a}', 'true {v}, fitted {a}'),
+    'anim_occultation_v_erreur': ('Erreur de position σ v', 'Position error σ v'),
+    'anim_occultation_v_fresnel': ('Échelle de Fresnel √(λ Δ / 2)', 'Fresnel scale √(λ Δ / 2)'),
+    'anim_occultation_v_etoile': ('Étoile projetée à la distance de l’astéroïde', 'Star projected at the asteroid’s distance'),
+    'anim_occultation_franche': ('disparition franche', 'sharp disappearance'),
+    'anim_occultation_progressive': ('disparition progressive, voire partielle', 'gradual, even partial, disappearance'),
 }
