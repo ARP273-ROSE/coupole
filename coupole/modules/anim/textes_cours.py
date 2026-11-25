@@ -27,7 +27,7 @@ ANIM_COURS = {
                                          'Secondary mirror diameter divided by D (0: refractor). The obstruction '
                                          'slightly narrows the central spot but sends more light into the rings.'),
     'anim_resolution_lambda': ('Longueur d’onde λ', 'Wavelength λ'),
-    'anim_resolution_lambda_aide': ('Longueur d’onde observée : 550 nm au milieu du visible, 2 200 nm dans '
+    'anim_resolution_lambda_aide': ('Longueur d’onde observée : 550 nm au milieu du visible, 2 200 nm dans '
                                     'l’infrarouge (bande K). La tache grandit avec λ.',
                                     'Observed wavelength: 550 nm in the middle of the visible range, 2,200 nm in '
                                     'the infrared (K band). The spot grows with λ.'),
@@ -77,4 +77,88 @@ ANIM_COURS = {
     'anim_resolution_confondues': ('confondues', 'unresolved'),
     'anim_resolution_v_dturb': ('Diamètre où la tache d’Airy égale le seeing',
                                 'Diameter at which the Airy spot equals the seeing'),
+    # ================================================================ Les éléments d'une orbite
+    'anim_orbitalelements_orbite': ('Orbite type', 'Typical orbit'),
+    'anim_orbitalelements_orbite_aide': ('Choisir une orbite type règle les cinq éléments ; on peut ensuite les '
+                                         'changer à la main.',
+                                         'Choosing a typical orbit sets the five elements; you can then change them '
+                                         'by hand.'),
+    'anim_orbitalelements_o_libre': ('(réglage libre)', '(free setting)'),
+    'anim_orbitalelements_o_iss': ('Station spatiale (≈ 420 km, i = 51,6°)', 'Space station (≈ 420 km, i = 51.6°)'),
+    'anim_orbitalelements_o_polaire': ('Héliosynchrone (≈ 800 km, i = 98,6°)', 'Sun-synchronous (≈ 800 km, i = 98.6°)'),
+    'anim_orbitalelements_o_gps': ('GPS (demi-jour sidéral, i = 55°)', 'GPS (half a sidereal day, i = 55°)'),
+    'anim_orbitalelements_o_molniya': ('Molniya (e = 0,74, i = 63,4°)', 'Molniya (e = 0.74, i = 63.4°)'),
+    'anim_orbitalelements_o_geo': ('Géostationnaire (42 164 km)', 'Geostationary (42,164 km)'),
+    'anim_orbitalelements_a': ('Demi-grand axe a', 'Semi-major axis a'),
+    'anim_orbitalelements_a_aide': ('Taille de l’orbite, depuis le centre de la Terre (rayon : 6 378 km) ; elle '
+                                    'fixe la période : T = 2π √(a³ / GM).',
+                                    'Size of the orbit, from the centre of the Earth (radius: 6,378 km); it sets '
+                                    'the period: T = 2π √(a³ / GM).'),
+    'anim_orbitalelements_e': ('Excentricité e', 'Eccentricity e'),
+    'anim_orbitalelements_e_aide': ('Forme de l’orbite : 0 pour un cercle, proche de 1 pour une ellipse très '
+                                    'allongée. Périgée a (1 − e), apogée a (1 + e).',
+                                    'Shape of the orbit: 0 for a circle, close to 1 for a very elongated ellipse. '
+                                    'Perigee a (1 − e), apogee a (1 + e).'),
+    'anim_orbitalelements_i': ('Inclinaison i', 'Inclination i'),
+    'anim_orbitalelements_i_aide': ('Angle entre le plan de l’orbite et celui de l’équateur : 0° équatoriale, 90° '
+                                    'polaire, au-delà de 90° rétrograde (le satellite tourne en sens inverse de la '
+                                    'Terre).',
+                                    'Angle between the orbital plane and the equatorial plane: 0° equatorial, 90° '
+                                    'polar, beyond 90° retrograde (the satellite goes round against the Earth’s '
+                                    'rotation).'),
+    'anim_orbitalelements_noeud': ('Longitude du nœud ascendant Ω', 'Longitude of the ascending node Ω'),
+    'anim_orbitalelements_noeud_aide': ('Angle, dans le plan de l’équateur, du point vernal γ au nœud ascendant '
+                                        '(là où le satellite traverse l’équateur vers le nord). Il oriente le plan '
+                                        'de l’orbite.',
+                                        'Angle, in the equatorial plane, from the vernal point γ to the ascending '
+                                        'node (where the satellite crosses the equator heading north). It orients '
+                                        'the orbital plane.'),
+    'anim_orbitalelements_perigee': ('Argument du périgée ω', 'Argument of perigee ω'),
+    'anim_orbitalelements_perigee_aide': ('Angle, dans le plan de l’orbite, du nœud ascendant au périgée. Il oriente '
+                                          'l’ellipse dans son plan (sans effet sur un cercle).',
+                                          'Angle, in the orbital plane, from the ascending node to the perigee. It '
+                                          'orients the ellipse within its plane (no effect on a circle).'),
+    'anim_orbitalelements_angles': ('Angles Ω, ω, i', 'Angles Ω, ω, i'),
+    'anim_orbitalelements_angles_aide': ('Dessine les trois angles qui orientent l’orbite.',
+                                         'Draws the three angles that orient the orbit.'),
+    'anim_orbitalelements_plan': ('Plan de l’équateur', 'Equatorial plane'),
+    'anim_orbitalelements_plan_aide': ('Plan de référence ; la partie de l’orbite au sud de l’équateur est en '
+                                       'pointillé.',
+                                       'Reference plane; the part of the orbit south of the equator is dotted.'),
+    'anim_orbitalelements_trace': ('Trace au sol', 'Ground track'),
+    'anim_orbitalelements_trace_aide': ('Points de la Terre survolés : la Terre tourne sous l’orbite (un tour en '
+                                        '23 h 56 min), d’où le décalage d’une révolution à l’autre.',
+                                        'Points on the Earth flown over: the Earth turns under the orbit (one turn in '
+                                        '23 h 56 min), hence the shift from one revolution to the next.'),
+    'anim_orbitalelements_t_espace': ('L’orbite dans l’espace (repère équatorial)', 'The orbit in space (equatorial frame)'),
+    'anim_orbitalelements_t_trace': ('Trace au sol (trois dernières révolutions)', 'Ground track (last three revolutions)'),
+    'anim_orbitalelements_vernal': ('γ point vernal', 'γ vernal point'),
+    'anim_orbitalelements_t_plan': ('L’orbite dans son plan (ν : anomalie vraie)', 'The orbit in its own plane (ν: true anomaly)'),
+    'anim_orbitalelements_noeud_asc': ('nœud ascendant', 'ascending node'),
+    'anim_orbitalelements_perigee_m': ('périgée', 'perigee'),
+    'anim_orbitalelements_apogee_m': ('apogée', 'apogee'),
+    'anim_orbitalelements_satellite': ('satellite', 'satellite'),
+    'anim_orbitalelements_km': ('km', 'km'),
+    'anim_orbitalelements_altitude': ('altitude', 'altitude'),
+    'anim_orbitalelements_d_ms': ('{m} min {s} s', '{m} min {s} s'),
+    'anim_orbitalelements_d_hm': ('{h} h {m} min', '{h} h {m} min'),
+    'anim_orbitalelements_d_j': ('{j} jours', '{j} days'),
+    'anim_orbitalelements_v_periode': ('Période T', 'Period T'),
+    'anim_orbitalelements_v_perigee': ('Périgée a (1 − e)', 'Perigee a (1 − e)'),
+    'anim_orbitalelements_v_apogee': ('Apogée a (1 + e)', 'Apogee a (1 + e)'),
+    'anim_orbitalelements_v_vitesses': ('Vitesse au périgée / à l’apogée', 'Speed at perigee / at apogee'),
+    'anim_orbitalelements_v_position': ('Position', 'Position'),
+    'anim_orbitalelements_v_temps': ('Temps depuis le passage au périgée', 'Time since perigee passage'),
+    'anim_orbitalelements_v_genre': ('Orbite', 'Orbit'),
+    'anim_orbitalelements_g_heurte': ('le périgée est sous la surface : le satellite s’écrase',
+                                      'the perigee is below the surface: the satellite crashes'),
+    'anim_orbitalelements_g_geostationnaire': ('géostationnaire : le satellite reste au-dessus du même point',
+                                               'geostationary: the satellite stays above the same point'),
+    'anim_orbitalelements_g_geosynchrone': ('géosynchrone : la trace au sol se referme chaque jour',
+                                            'geosynchronous: the ground track closes every day'),
+    'anim_orbitalelements_g_polaire': ('quasi polaire : elle survole presque toute la Terre',
+                                       'near-polar: it flies over almost the whole Earth'),
+    'anim_orbitalelements_g_retrograde': ('rétrograde (i > 90°)', 'retrograde (i > 90°)'),
+    'anim_orbitalelements_g_prograde': ('directe (i < 90°)', 'prograde (i < 90°)'),
+    'anim_orbitalelements_souris': ('Glisser dans la vue 3D : la faire tourner.', 'Drag in the 3D view: rotate it.'),
 }

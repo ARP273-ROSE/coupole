@@ -94,3 +94,54 @@ def test_resolution_interface(app_qt):
     for s in (0.0, 0.5, 3.0):
         a.seeing.setValue(s)
         assert not a.image(640, 420).isNull()
+
+
+# ---------------------------------------------------------------- les éléments d'une orbite
+def test_orbite_periodes_et_vitesses():
+    from coupole.modules.anim import elements_orbitaux as eo
+    s = sage('elements_orbite')
+    for k, (a, e, i, om, w) in eo.ORBITES.items():
+        assert eo.periode_s(a) == pytest.approx(s['periodes'][k], rel=1e-12), k
+        vp, va = s['vitesses'][k]
+        assert eo.vitesse(a * (1 - e), a) == pytest.approx(vp, rel=1e-12)
+        assert eo.vitesse(a * (1 + e), a) == pytest.approx(va, rel=1e-12)
+    assert eo.demi_grand_axe_de_periode(eo.JOUR_SIDERAL_S) == pytest.approx(s['a_geo'], rel=1e-12)
+    assert eo.demi_grand_axe_de_periode(eo.JOUR_SIDERAL_S / 2) == pytest.approx(s['a_molniya'], rel=1e-12)
+    # les orbites types sont bien ce qu'elles disent
+    assert eo.genre_orbite(*eo.ORBITES['geo'][:3]) == 'geostationnaire'
+    assert abs(eo.ORBITES['geo'][0] - s['a_geo']) < 1.0 and abs(eo.ORBITES['molniya'][0] - s['a_molniya']) < 1.0
+    assert eo.genre_orbite(*eo.ORBITES['polaire'][:3]) == 'polaire'
+    assert eo.genre_orbite(6000.0, 0.0, 10.0) == 'heurte'
+
+
+def test_orbite_position_vitesse_trace():
+    from coupole.modules.anim import elements_orbitaux as eo
+    for c in sage('elements_orbite')['cas']:
+        a, e, i, om, w, m = c['el']
+        st = eo.etat(a, e, i, om, w, m)
+        assert st['E'] == pytest.approx(c['E'], abs=1e-9)
+        assert st['nu'] == pytest.approx(c['nu'], abs=1e-9)
+        assert st['r'] == pytest.approx(c['r'], rel=1e-12)
+        assert st['v'] == pytest.approx(c['v'], rel=1e-12)
+        assert st['pos'] == pytest.approx(c['pos'], abs=1e-7)
+        assert st['vit'] == pytest.approx(c['vit'], abs=1e-10)
+        assert math.sqrt(sum(x * x for x in st['vit'])) == pytest.approx(c['norme_vit'], rel=1e-12)
+        lat, lon = eo.sous_satellite(st['pos'], c['t'])
+        assert lat == pytest.approx(c['lat'], abs=1e-9) and lon == pytest.approx(c['lon'], abs=1e-9)
+
+
+def test_orbite_interface(app_qt):
+    from coupole.modules.anim.animations.elements_orbite import ElementsOrbite
+    a = ElementsOrbite()
+    a.resize(900, 640)
+    a.orbite.setCurrentIndex(a.orbite.findData('molniya'))
+    assert a.e.value() == pytest.approx(0.74) and a.i.value() == pytest.approx(63.4) and a.w.value() == pytest.approx(270.0)
+    v = dict(a.valeurs())
+    assert v['Période T'] == '11 h 58 min'
+    a.orbite.setCurrentIndex(a.orbite.findData('geo'))
+    assert 'géostationnaire' in dict(a.valeurs())['Orbite']
+    for _ in range(30):
+        a.pas(0.2)
+    for trace in (True, False):
+        a.c_trace.setChecked(trace)
+        assert not a.image(640, 420).isNull()
