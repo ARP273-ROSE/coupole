@@ -2,7 +2,7 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
-## 0.12.1 — en préparation
+## 0.12.1 — 26 novembre 2026
 
 - **Cartes** (Sites et heures, Choisir un lieu) : la molette zoome autour du point visé par la souris, et non plus du
   centre ; sur un pavé tactile, les petits défilements se cumulent (un niveau par cran) au lieu de sauter dix niveaux

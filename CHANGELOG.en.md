@@ -2,7 +2,7 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
-## 0.12.1 — in preparation
+## 0.12.1 — 26 November 2026
 
 - **Maps** (Sites and time, Choose a place): the mouse wheel zooms around the point under the cursor instead of the
   centre; on a touchpad, small scrolls add up (one level per notch) instead of jumping ten levels in one gesture; a
