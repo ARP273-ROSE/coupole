@@ -534,7 +534,37 @@ class CarteMonde(QWidget):
                 self.vue_changee.emit()
         self._glisse = None
 
-    def wheelEvent(self, ev):
-        self.z = max(1, min(17, self.z + (1 if ev.angleDelta().y() > 0 else -1)))
+    def _zoomer(self, dz: int, pos=None):
+        """Change le zoom de dz niveaux ; le point sous `pos` (position dans le widget) reste en place."""
+        z = max(1, min(17, self.z + dz))
+        if z == self.z:
+            return
+        if pos is not None:
+            ox, oy = self._origine()
+            lon, lat = monde_vers_lonlat(ox + pos.x(), oy + pos.y(), self.z)
+            qx, qy = lonlat_vers_monde(lon, lat, z)
+            self.centre = monde_vers_lonlat(qx - pos.x() + self.width() / 2, qy - pos.y() + self.height() / 2, z)
+        self.z = z
         self.update()
         self.vue_changee.emit()
+
+    def wheelEvent(self, ev):
+        # molette : un cran (120) = un niveau ; pavé tactile : petits pas cumulés, pour ne pas sauter dix niveaux d'un geste
+        self._cumul_molette = getattr(self, '_cumul_molette', 0) + ev.angleDelta().y()
+        dz = int(self._cumul_molette / 120)
+        if dz:
+            self._cumul_molette -= dz * 120
+            self._zoomer(dz, ev.position())
+        ev.accept()
+
+    def event(self, ev):
+        # pincement sur un pavé tactile (macOS, Wayland) : facteur cumulé, un niveau par doublement
+        from PyQt6.QtCore import QEvent
+        if ev.type() == QEvent.Type.NativeGesture and ev.gestureType() == Qt.NativeGestureType.ZoomNativeGesture:
+            self._cumul_pince = getattr(self, '_cumul_pince', 0.0) + ev.value()
+            dz = int(self._cumul_pince / 0.7)               # ln 2 ≈ 0,69 : un doublement
+            if dz:
+                self._cumul_pince -= dz * 0.7
+                self._zoomer(dz, ev.position())
+            return True
+        return super().event(ev)

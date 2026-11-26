@@ -33,7 +33,7 @@ def _carte_avec_cache_simule(dpr):
         return im
     carte.cache.tuile = tuile
     carte.devicePixelRatioF = lambda: dpr
-    carte.centrer(2.76, 49.31, 5)
+    carte.centrer(2.336, 48.8366, 5)
     return carte, cles
 
 
@@ -49,6 +49,35 @@ def test_tuiles_du_niveau_superieur_sur_ecran_dense(app_qt, dpr, zoom_attendu, p
     assert len(cles) == par_tuile * len(cles1)              # même emprise, quatre fois plus de tuiles à 2×
     carte.cache.fermer()
     carte1.cache.fermer()
+
+
+def test_molette_zoome_autour_du_curseur(app_qt):
+    """Un cran de molette = un niveau, autour du point visé ; un pavé tactile (petits pas) cumule avant de zoomer."""
+    from PyQt6.QtCore import QPoint, QPointF
+    from PyQt6.QtGui import QWheelEvent
+    from coupole.gui.cartes import monde_vers_lonlat
+    carte, _ = _carte_avec_cache_simule(1.0)
+
+    def molette(dy, pos=QPointF(450, 120)):
+        ev = QWheelEvent(pos, pos, QPoint(0, 0), QPoint(0, dy), Qt.MouseButton.NoButton,
+                         Qt.KeyboardModifier.NoModifier, Qt.ScrollPhase.NoScrollPhase, False)
+        carte.wheelEvent(ev)
+
+    def sous(pos=(450, 120)):
+        ox, oy = carte._origine()
+        return monde_vers_lonlat(ox + pos[0], oy + pos[1], carte.z)
+    avant = sous()
+    molette(120)
+    assert carte.z == 6
+    assert sous() == pytest.approx(avant, abs=1e-6)          # le point sous le curseur n'a pas bougé
+    for _ in range(5):
+        molette(20)                                           # 100 : pas encore un cran
+    assert carte.z == 6
+    molette(20)
+    assert carte.z == 7
+    molette(-240)
+    assert carte.z == 5
+    carte.cache.fermer()
 
 
 def test_zoom_maximal_reste_servi(app_qt):

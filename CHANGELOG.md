@@ -2,6 +2,12 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.12.1 — en préparation
+
+- **Cartes** (Sites et heures, Choisir un lieu) : la molette zoome autour du point visé par la souris, et non plus du
+  centre ; sur un pavé tactile, les petits défilements se cumulent (un niveau par cran) au lieu de sauter dix niveaux
+  d'un geste ; le pincement du pavé tactile zoome aussi (macOS, Wayland).
+
 ## 0.12.0 — 25 novembre 2026 — Planificateur de parallaxe
 
 - **Planificateur de parallaxe** (Calculateurs de TD) : pour deux lieux, les passages de l'ISS (14 jours au plus) et
