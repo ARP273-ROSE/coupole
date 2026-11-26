@@ -1696,3 +1696,6 @@ manuels FR/EN § « Animations de cours de la 0.12.0 ») :
 
 ## 25/11/2026 (soir) — publication
 - Version publiée sur demande (« publie ») : Coupole 0.12.0, Release v0.12.0 (commit 9c67d97). Reste : simulateurs NAAP des cours à venir, inventaire #86.
+
+## 26/11/2026 — 0.12.1
+- Cartes : molette autour du curseur, pas cumulés au pavé tactile, pincement ; Release v0.12.1 (seule en ligne).
