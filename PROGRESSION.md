@@ -1699,3 +1699,22 @@ manuels FR/EN § « Animations de cours de la 0.12.0 ») :
 
 ## 26/11/2026 — 0.12.1
 - Cartes : molette autour du curseur, pas cumulés au pavé tactile, pincement ; Release v0.12.1 (seule en ligne).
+
+## 27/11/2026 — Pluies de météores (0.13.0, non publiée)
+Demande : « un module avec les pluies de météores, ZHR, fonction de la position… ce qu'il y a dans le cours »
+(cours 3.2 de J. Vaubaillon, TP Météores, fiche IMO « Observation visuelle des météores »).
+- [x] Données : `td/donnees/meteores_imo.json` = calendrier IMO **2027** (Rendtel, IMO INFO(3-26)) tableaux 5 (39 pluies)
+  et 6 (dérive du radiant), transcrits à la main depuis le PDF (`cal2027.pdf`, pdftotext) ; pentes B de Jenniskens 1994
+  (DMS Datalist, 18 pluies, deux composantes pour QUA, PER, GEM, URS). Sans pente publiée : B = 2/|Δλ| (1 % aux limites).
+- [x] Noyau `td/meteores.py` : longitude solaire J2000 (Meeus − précession, jumelle du web), calendrier d'une année
+  (dates du tableau 5 retrouvées exactement pour 2027 ; limites arrondies au jour), radiant interpolé, ZHR(λ), nuit
+  (Soleil < −12°, radiant ≥ 20°, Lune couchée ou fraction ≤ 0,25 ; champ 60° de haut à 30° du radiant), campagne,
+  ICS/CSV, réduction ZHR ± ZHR/√N, indice r par Φ(m+1)/Φ(m) cumulés jusqu'à LM − 1.
+- [x] SageMath `outils/verif_meteores/meteores_verif_sage.py` → `tests/meteores_sage.json` : exemple du cours (10,67 et
+  23,48), tableau 1 de la fiche IMO, réduction, profils, λ⊙ contre 8 instants publiés par l'IMO (≤ 0,017°), hauteur
+  (précession 1976) contre ERFA (< 0,02°), champ, r.
+- [x] Trouvé : l'IMO 2027 écrit « η-Aquariids May 6, 09h UT » = l'heure de 2026 ; λ 45,5° → 15 h 12 en 2027.
+- [x] Interface `td/gui_meteores.py` (4 onglets, graphique de nuit), 3ᵉ calculateur de TD ; tests
+  `tests/test_td_meteores.py` (31) + `test_dialogues_fichiers` (27 ouvertures, ICS/CSV).
+- [x] Jumeau web (Coupole Web 0.11.0) : références `outils/verif_meteores/reference_web.py`.
+- [ ] Reste : manuels FR/EN (section + captures), publication sur « publie ».

@@ -2,6 +2,22 @@
 
 French version (reference): [CHANGELOG.md](CHANGELOG.md).
 
+## 0.13.0 — in preparation — Meteor showers
+
+- **Meteor showers** (Course calculators), for the “Meteor observation” practical of course 3.2 of
+  astrodynamics. **Calendar**: the 39 showers of the IMO working list (2027 calendar, J. Rendtel ed.), dates recomputed
+  for the chosen year from the solar longitude of the maximum, radiant following the drift of table 6, culmination
+  altitude at the chosen place, Moon at the maximum. **One night**: altitude of the Sun, the Moon and each radiant hour
+  by hour, expected rate n = ZHR · F · sin h / r^(6.5 − LM) with Jenniskens' (1994) activity profile, useful time per
+  the IMO sheet (Sun below −12°, radiant at least 20° high, Moon set or within 5 days of New Moon), field to aim at
+  (60° high, 30° from the radiant, away from the Moon). **Campaign**: the best nights until 31 August (report
+  deadline), .ics calendar and CSV. **Reduction**: ZHR = N · r^(6.5 − LM) / (F · t_eff · sin h) with the computed
+  radiant altitude, uncertainty ZHR/√N, population index r from the recorded magnitudes.
+- Checked with SageMath (`outils/verif_meteores/meteores_verif_sage.py`): the course example (N ≈ 10 and 23), table 1 of the IMO sheet, solar longitude
+  against the times of maximum published by the IMO (within 0.02°), radiant altitude, profiles. The IMO 2027 calendar
+  gives “May 6, 09h UT” for the η-Aquariids, the 2026 time: λ = 45.5° falls around 15h in 2027.
+- Also in Coupole Web 0.11.0 (`#/td/meteores`), same results.
+
 ## 0.12.1 — 26 November 2026
 
 - **Maps** (Sites and time, Choose a place): the mouse wheel zooms around the point under the cursor instead of the

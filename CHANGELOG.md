@@ -2,6 +2,23 @@
 
 Version anglaise : [CHANGELOG.en.md](CHANGELOG.en.md).
 
+## 0.13.0 — en préparation — Pluies de météores
+
+- **Pluies de météores** (Calculateurs de TD), pour le TP « Observation des météores » du cours 3.2
+  d'astrodynamique. **Calendrier** : les 39 pluies de la liste de travail de l'IMO (calendrier 2027, J. Rendtel éd.),
+  dates recalculées pour l'année choisie depuis la longitude solaire du maximum, radiant qui suit la dérive du
+  tableau 6, hauteur de culmination au lieu choisi, Lune au maximum. **Une nuit** : hauteur du Soleil, de la Lune et
+  de chaque radiant heure par heure, taux attendu n = ZHR · F · sin h / r^(6,5 − LM) avec le profil d'activité de
+  Jenniskens (1994), temps utile selon la fiche IMO (Soleil sous −12°, radiant à 20° au moins, Lune couchée ou à moins
+  de 5 jours de la nouvelle lune), champ à viser (60° de haut, 30° du radiant, à l'opposé de la Lune). **Campagne** :
+  les meilleures nuits jusqu'au 31 août (date du rapport), agenda .ics et CSV. **Réduction** : ZHR = N · r^(6,5 − LM) /
+  (F · t_eff · sin h) avec la hauteur du radiant calculée, incertitude ZHR/√N, indice de population r tiré des
+  magnitudes notées.
+- Vérifié par SageMath (`outils/verif_meteores/meteores_verif_sage.py`) : exemple du cours (N ≈ 10 et 23), tableau 1 de la fiche IMO, longitude solaire
+  contre les instants de maximum publiés par l'IMO (à 0,02° près), hauteur du radiant, profils. Le calendrier IMO 2027
+  donne pour les η-Aquarides « 6 mai, 09 h UT », l'heure de 2026 : λ = 45,5° tombe vers 15 h en 2027.
+- Aussi dans Coupole Web 0.11.0 (`#/td/meteores`), mêmes résultats.
+
 ## 0.12.1 — 26 novembre 2026
 
 - **Cartes** (Sites et heures, Choisir un lieu) : la molette zoome autour du point visé par la souris, et non plus du

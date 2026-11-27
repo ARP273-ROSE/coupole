@@ -112,7 +112,7 @@ def test_toutes_les_ouvertures_sont_couvertes():
         if f.name == 'fichiers.py':
             continue
         n += len(re.findall(r'fichiers\.choisir_(?:dossier|fichier|enregistrement)\(', f.read_text(encoding='utf-8')))
-    assert n == 25                     # + export/import de la sauvegarde (test_classe.py) ; + 5 Partages ; + 1 TD ; + 2 planificateur
+    assert n == 27                     # + export/import de la sauvegarde (test_classe.py) ; + 5 Partages ; + 1 TD ; + 2 planificateur ; + 2 météores
 
 
 def _montrer(w, app):
@@ -332,6 +332,30 @@ def test_planificateur_de_parallaxe(app_qt, faux):
         _bouton(pl, 'pl_ics').click()
         d = verifier_ouverture(faux, 2)
         assert '*.ics' in fichiers.filtres_portail(d.filtre)[0][1]
+    finally:
+        p.close()
+
+
+def test_pluies_de_meteores(app_qt, faux):
+    """Pluies de météores (0.13.0) : agenda .ics et tableau CSV de la campagne par les vrais boutons."""
+    import datetime as D
+    from coupole.modules.td import meteores as MT
+    from coupole.modules.td import planif as PL
+    from coupole.modules.td.gui import Panneau
+    p = _montrer(Panneau(), app_qt)
+    try:
+        p.liste.setCurrentRow(2)
+        m = p.meteores
+        s = PL.Site(48.8366, 2.336, 67.0, 'Paris')
+        m._campagne(MT.campagne(s, D.date(2026, 12, 13), D.date(2026, 12, 14)), D.date(2026, 12, 13),
+                    D.date(2026, 12, 14), s)
+        m.onglets.setCurrentIndex(2)
+        _bouton(m, 'mt_ics').click()
+        d = verifier_ouverture(faux, 1)
+        assert '*.ics' in fichiers.filtres_portail(d.filtre)[0][1]
+        _bouton(m, 'mt_csv').click()
+        d = verifier_ouverture(faux, 2)
+        assert '*.csv' in fichiers.filtres_portail(d.filtre)[0][1]
     finally:
         p.close()
 

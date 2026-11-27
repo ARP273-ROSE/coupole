@@ -326,3 +326,6 @@ TEXTES = {
 from .textes_planif import TEXTES_PLANIF  # noqa: E402
 
 TEXTES.update(TEXTES_PLANIF)
+from .textes_meteores import TEXTES_METEORES  # noqa: E402
+
+TEXTES.update(TEXTES_METEORES)

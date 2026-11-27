@@ -23,7 +23,8 @@ from . import parallaxe_tp as T
 from .presentation import _n, html_detail, texte_export
 
 UTC = D.timezone.utc
-CALCULATEURS = (('parallaxe_tp', 'td_calc_parallaxe'), ('planif', 'td_calc_planif'))
+CALCULATEURS = (('parallaxe_tp', 'td_calc_parallaxe'), ('planif', 'td_calc_planif'),
+                ('meteores', 'td_calc_meteores'))
 
 
 # ============================================================================================== dessin
@@ -511,6 +512,9 @@ class Panneau(QWidget):
         from .gui_planif import PanneauPlanif
         self.planif = PanneauPlanif()
         self.pile.addWidget(self.planif)
+        from .gui_meteores import PanneauMeteores
+        self.meteores = PanneauMeteores()
+        self.pile.addWidget(self.meteores)
         sp.addWidget(self.pile)
         sp.setStretchFactor(0, 1)
         sp.setStretchFactor(1, 5)
